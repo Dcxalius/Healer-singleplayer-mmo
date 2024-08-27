@@ -1,0 +1,112 @@
+Name
+	TBD
+
+Genre
+	Single player MMO healer simulator
+
+Controls
+	Control the player character by keyboard movements (WASD/Keys)
+	Control the players allies with orders by mouse
+	Cast healing/buff spells either on targeted allies, self cast, at mouseover or in an area
+
+World
+	Procedually generated
+	Devided into chunks, further divided into tiles
+	
+Gameloop
+	Multiple
+	Progression based
+		1. Alone
+			The player has to run from mobs due to no offensive tools
+			Find an injured adventurer (a tank)
+			Get the choice to heal the adventurer
+			If the player does the adventurer will swear loyalty to the player and join the player after a short dialogue
+
+		2. Can now with the help of injured adventurer kill mobs as long as you keep the adventurer alive
+			The player can now do more than the simple gathering stuff of floor quests
+			Eventually the player will find a second adventurer that needs help (a dps)
+			The dps will suggest doing a dungeon with just the three of them
+			Wipe is all but garanteed
+			The player will then be able to start recruiting more adventurers at an inn.
+			Once a dungeon is cleared the clearing party members will want to stick with the healer and asks the player to lead a guild
+
+		3. This is the start of the final? gameloop, the player can now select to send guild members out to do simple quests. Or the player can bring up to 2 of them with them to do more rewarding quests. The player can also form dungeon clearing teams, mix and matching the different guild members to beat differrent encounters
+
+		4. Eventually the player will unlock raids which are technically just 25? person dungeons.
+
+Guild members
+	Name
+	Class
+		Simple, dumbdowned versions. These arent meant to be very that interesting, more flavor than substance
+		The base line before other effects dps should be within 3-5% of worst and best class
+		Armor type
+
+		Tank
+			Mitigation based tank
+				Really efficient to heal but dies to quick burst
+			Health pool tank
+				Can almost never be oneshot but healing won't be as good on them as other tanks
+			Evasion based tanks
+				Very luck based, but can against slow attacking bosses go several seconds without needing a single heal
+		Mdps
+			Fast attacker
+			Slow hard hitting attacker
+			Dot based
+		Rpds
+			Kiting based
+			Aoe based
+			Dot based
+		No healer as the player is the only healer.
+	"Personality"
+	Traits
+		Can both be negative and positive
+		Some of these are tiered
+		"Cowardly"
+			Always tries to flee bellow 25% hp
+		"Selfish Interupter"
+			If targeted by an enemy spell will interupt it with an internal cd
+		"Masterful Interupter"
+			Will always interupt the enemy if able to but deals 5% less damage
+	Proffesion
+		Allows the player to access the upgrades and gathering of resources outside the players chosen profession.
+		Reduced expected gains based on personality and guild upgrades.
+		The player can also assign certain jobs to instead of adding their "tax" in the form of resource donation they instead sell that portion and offers gold as tax
+	Gear
+		The player can assign gear upgrades
+		Armor upgrades are very simple, offering mostly either armor and health for tanks and simple number buffs for dps
+		Weapon upgrads should be more dynamic and feel like they have more of an impact
+		Loot drama?
+
+
+Proffesion
+	Crafting proffesions
+		Turns reagents into base line upgrades for all guildmembers of the professions armor type target
+	Gathering profession
+		Mini games that allows the player to do simple skill checks for a reward scaling with performance
+
+
+
+Guild control
+	Allows the player to recruit and kick members
+	Upgrades
+		Bunker
+			Allows for more members
+
+		Research lab
+			Allows the player to upgrade certail abilities/gear/buildings
+
+		Strategy hall
+			Allows the player to constuct "plays"; set a key to cause the party members to do an action for example gather at a marked target
+
+Town buildings
+	Religious building
+		Allows the player to replenish long cooldowns as well as mana/health
+	Town hall
+		A lot of quests are offered to the player/guild here
+		A good place for part 2 and 3 to find more members
+	Mine 
+		Always "infested" by enemies, the player can clear them for a short while in return for gathering resources
+	Lumberyard
+		Player can buy resources for upgrading their guild hall
+	Guild hall
+		You have to tie your guild hall to a city, this choice isn't permanent but if you do change your old town won't like you as much.
