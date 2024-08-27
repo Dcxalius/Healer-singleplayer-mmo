@@ -1,0 +1,62 @@
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Project_1.Content.Input;
+using Project_1.GameObjects;
+using Project_1.Managers;
+using Project_1.Textures;
+using Project_1.Tiles;
+using Project_1.UI;
+using System.Runtime.InteropServices;
+
+namespace Project_1
+{
+    public class Game1 : Game
+    {
+        public Game1()
+        {
+            GraphicsManager.SetManager(this);
+            Content.RootDirectory = "Content";
+            IsMouseVisible = true;
+        }
+
+        protected override void Initialize()
+        {
+            DebugManager.Init();
+            GraphicsManager.LoadContent(Content);
+            Camera.Init();
+            RandomManager.Init();
+            ObjectManager.Init();
+            TileManager.Init();
+            UIManager.Init();
+
+            base.Initialize();
+        }
+
+        protected override void LoadContent()
+        {
+            //GraphicsManager.LoadContent(Content);
+        }
+
+        protected override void Update(GameTime gameTime)
+        {
+
+            InputManager.Update();
+            TimeManager.Update(gameTime);
+            StateManager.Update();
+
+
+            base.Update(gameTime);
+        }
+
+        protected override void Draw(GameTime gameTime)
+        {
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+
+            StateManager.Draw();
+            
+
+            base.Draw(gameTime);
+        }
+    }
+}
