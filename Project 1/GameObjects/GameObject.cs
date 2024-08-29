@@ -16,7 +16,7 @@ namespace Project_1
 
         
         
-        Textures.Texture gfx;
+        protected Textures.Texture gfx;
 
 
         protected Vector2 pos;

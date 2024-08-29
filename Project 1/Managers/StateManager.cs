@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Project_1.Content.Input;
 using Project_1.GameObjects;
+using Project_1.Textures;
 using Project_1.UI;
 
 namespace Project_1.Managers
@@ -66,6 +67,12 @@ namespace Project_1.Managers
 
         }
 
+        public static void SetState(State aState)
+        {
+            currentState = aState;
+
+        }
+
         static void GameUpdate()
         {
 
@@ -77,11 +84,12 @@ namespace Project_1.Managers
 
             Camera.Update();
             ObjectManager.Update();
-            UIManager.GameUpdate();
+            UIManager.Update();
         }
 
         static void GameDraw()
         {
+            GraphicsManager.ClearScreen(Color.Black);
             Camera.RunningDraw();
         }
 
@@ -92,12 +100,12 @@ namespace Project_1.Managers
                 currentState = State.Game;
             }
 
-            UIManager.PauseUpdate();
+            UIManager.Update();
         }
 
         static void PauseDraw()
         {
-            
+            GraphicsManager.ClearScreen(Color.Black);
             Camera.PauseDraw();
         }
 
@@ -108,17 +116,19 @@ namespace Project_1.Managers
 
         static void StartMenuDraw()
         {
+            GraphicsManager.ClearScreen(Color.White);
 
         }
 
         static void OptionsMenuUpdate()
         {
-
+            UIManager.Update();
         }
 
         static void OptionsMenuDraw()
         {
-
+            GraphicsManager.ClearScreen(Color.LightGray);
+            Camera.OptionDraw();
         }
     }
 }

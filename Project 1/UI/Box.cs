@@ -29,7 +29,7 @@ namespace Project_1.UI
 
         public override void HoldReleaseOnMe()
         {
-
+            base.HoldReleaseOnMe();
         }
 
         public override void ClickedOnMe(ClickEvent click)

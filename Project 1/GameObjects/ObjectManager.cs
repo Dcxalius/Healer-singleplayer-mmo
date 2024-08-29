@@ -11,25 +11,29 @@ namespace Project_1.GameObjects
     {
         public static List<GameObject> gameObjects = new List<GameObject>();
 
+        static Player player = null;
+
         public static void Init()
         {
-            gameObjects.Add(new Player());
-            Camera.BindCamera((MovingObject)gameObjects[0]);
+            player = new Player();
+            Camera.BindCamera(player);
         }
 
         public static void Update()
         {
-            foreach (GameObject obj in gameObjects)
+            player.Update();
+            for (int i = 0; i < gameObjects.Count; i++)
             {
-                obj.Update();
+                gameObjects[i].Update();
             }
         }
 
         public static void Draw(SpriteBatch spriteBatch)
         {
-            foreach (GameObject obj in gameObjects)
+            player.Draw(spriteBatch);
+            for (int i = 0; i < gameObjects.Count; i++)
             {
-                obj.Draw(spriteBatch);
+                gameObjects[i].Draw(spriteBatch);
             }
         }
     }

@@ -17,20 +17,19 @@ namespace Project_1.Textures
 
     internal static class GraphicsManager
     {
-        static Texture2D[][] textures;
         static Dictionary<string, Texture2D>[] texturesDict;
-        public static Texture2D SmileGfx;
         static GraphicsDeviceManager gdm;
         static ContentManager cm;
+        public static SpriteFont buttonFont ;
 
         public static SpriteBatch CreateSpriteBatch()
         {
             return new SpriteBatch(gdm.GraphicsDevice);
         }
 
-        public static void SetManager(Game game)
+        public static void SetManager(Game aGame)
         {
-            gdm = new GraphicsDeviceManager(game);
+            gdm = new GraphicsDeviceManager(aGame);
         }
 
         public static void LoadContent(ContentManager aCm)
@@ -38,8 +37,9 @@ namespace Project_1.Textures
             cm = aCm;
 
             InitArrays();
+            
 
-            SmileGfx = cm.Load<Texture2D>("Object/Smile");
+            buttonFont = cm.Load<SpriteFont>("Font/Gloryse");
         }
 
         static void InitArrays()
@@ -87,16 +87,21 @@ namespace Project_1.Textures
             DebugManager.Print(typeof(GraphicsManager), debug);
         }
 
+        public static void ClearScreen(Color aColor)
+        {
+            gdm.GraphicsDevice.Clear(aColor);
+        }
+
         public static ref Texture2D GetTexture(GfxPath aGfxPath)
         {
             return ref CollectionsMarshal.GetValueRefOrNullRef(texturesDict[(int)aGfxPath.Type], aGfxPath.Name);
         }
 
-        public static void SetWindowSize(Point size)
+        public static void SetWindowSize(Point aSize)
         {
 
-            gdm.PreferredBackBufferWidth = size.X;
-            gdm.PreferredBackBufferHeight = size.Y;
+            gdm.PreferredBackBufferWidth = aSize.X;
+            gdm.PreferredBackBufferHeight = aSize.Y;
             gdm.ApplyChanges();
         }
     }

@@ -34,8 +34,8 @@ namespace Project_1.Textures
             durationBetweenFrames = (double)aTimePerFrame.TotalMilliseconds;
             animationType = aType;
 
-
             CreateAnimationFrames(aDeadFrameCount);
+            visible = possibleFrames[0];
         }
 
         public override void Update()
@@ -118,14 +118,9 @@ namespace Project_1.Textures
                     default:
                         break;
                 }
-                
-            }
-        }
 
-        public override void Draw(SpriteBatch aBatch, Vector2 pos)
-        {
-            Vector2 offset = new Vector2(size.X / 2, size.Y);
-            aBatch.Draw(gfx, pos, possibleFrames[currentFrame], Color.White, 0f, offset, 1f, SpriteEffects.None, 1f);
+                visible = possibleFrames[currentFrame];
+            }
         }
     }
 }

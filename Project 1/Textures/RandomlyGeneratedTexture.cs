@@ -12,8 +12,6 @@ namespace Project_1.Textures
 {
     internal class RandomlyGeneratedTexture : Texture
     {
-        Rectangle visible;
-        
         public RandomlyGeneratedTexture(bool aFreelyRandomized, Point aVisibleSize, GfxPath aPath) : base(aPath, aVisibleSize)
         {
             if (aFreelyRandomized) 
@@ -35,11 +33,6 @@ namespace Project_1.Textures
                 visible = new Rectangle(new Point(xRoll, yRoll), aVisibleSize);
             }
 
-        }
-
-        public override void Draw(SpriteBatch aBatch, Vector2 pos)
-        {
-            aBatch.Draw(gfx, pos, visible, Color.White);
         }
     }
 }

@@ -46,7 +46,7 @@ namespace Project_1
         static Rectangle bindingRectangle = new Rectangle(new Point(0), new Point(screenBorder.X/ 4 * 3, screenBorder.Y/4 * 3));
         static CameraSettings cameraSettings = CameraSettings.RectangleSoftBound;
         static float maxCircleCameraMove = screenBorder.Y / 3;
-        static Rectangle maxRectangleCameraMove;
+        //static Rectangle maxRectangleCameraMove;
 
         public static void Init()
         {
@@ -386,7 +386,7 @@ namespace Project_1
         {
             TileManager.Draw(aBatch);
             ObjectManager.Draw(aBatch);
-            UIManager.GameDraw(aBatch);
+            UIManager.DrawGameUI(aBatch);
 
         }
 
@@ -410,10 +410,19 @@ namespace Project_1
             Draw(spriteBatch);
             
             pauseGfx.Draw(spriteBatch, Vector2.Zero);
-            UIManager.PauseDraw(spriteBatch);
+            UIManager.Draw(spriteBatch);
             spriteBatch.End();
 
 
+        }
+
+        public static void OptionDraw()
+        {
+            spriteBatch.Begin();
+
+            UIManager.Draw(spriteBatch);
+
+            spriteBatch.End();
         }
     }
 }

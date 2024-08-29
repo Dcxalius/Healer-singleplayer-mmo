@@ -13,11 +13,13 @@ namespace Project_1
 {
     public class Game1 : Game
     {
+        public static Game Instance { get; private set; }
         public Game1()
         {
             GraphicsManager.SetManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            Instance = this;
         }
 
         protected override void Initialize()
@@ -51,7 +53,7 @@ namespace Project_1
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.HotPink);
 
             StateManager.Draw();
             

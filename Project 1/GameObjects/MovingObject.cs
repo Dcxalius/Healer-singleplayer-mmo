@@ -10,9 +10,13 @@ namespace Project_1
 {
     internal abstract class MovingObject : GameObject
     {
-        public Vector2 Velocity { get; }
+        public Vector2 Velocity { get => velocity; protected set => velocity = value; }
+        public Vector2 Momentum { get => momentum; protected set => velocity = momentum; }
 
-        Vector2 momentum = Vector2.Zero;
+
+        bool facingRight = true;
+
+        protected Vector2 momentum = Vector2.Zero;
         protected Vector2 velocity = Vector2.Zero;
         float maxSpeed;
         Vector2 drag = new Vector2(0.9f);
@@ -33,7 +37,19 @@ namespace Project_1
             velocity = Vector2.Zero;
             pos += momentum;
             momentum = new Vector2(momentum.X * drag.X, momentum.Y * drag.Y);
-        
+
+            if (momentum.X > 0 && facingRight == false)
+            {
+                facingRight = true;
+                gfx.Flip();
+            }
+
+            if (momentum.X < 0 && facingRight == true)
+            {
+                facingRight = false;
+                gfx.Flip();
+            }
+
             base.Update();
         }
     }

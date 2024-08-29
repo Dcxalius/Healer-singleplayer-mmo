@@ -24,7 +24,7 @@ namespace Project_1.Content.Input
 
         public bool IsStillHeld()
         {
-            if (!InputManager.LeftHold) //Should be change to be mouse indipendant
+            if (!InputManager.LeftHold && !InputManager.LeftPress) //Should be change to be mouse indipendant
             {
                 durationHeld = TimeManager.gt.TotalGameTime - heldSince;
 

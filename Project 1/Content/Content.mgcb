@@ -25,6 +25,13 @@
 /processorParam:TextureFormat=Color
 /build:Debug/Debug.png
 
+#begin Font/Gloryser.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Font/Gloryser.spritefont;Font/Gloryse.spritefont
+
 #begin Object/Arrow.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -108,4 +115,16 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:UI/WhiteBackground.png
+
+#begin UI/XButton.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:UI/XButton.png
 
