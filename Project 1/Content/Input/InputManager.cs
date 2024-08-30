@@ -49,12 +49,22 @@ namespace Project_1.Content.Input
             }
         }
 
+        public static int ScrolledSinceLastFrame
+        {
+            get
+            {
+                return scrolledSinceLastFrame;
+            }
+
+            private set => scrolledSinceLastFrame = value;
+        }
+
         static KeyboardState oldKeyboardState = Keyboard.GetState();
         static KeyboardState newKeyboardState = Keyboard.GetState();
         static MouseState newMouseState;
         static MouseState oldMouseState;
 
-        
+        static int scrolledSinceLastFrame;
 
         public static void Update()
         {
@@ -63,6 +73,8 @@ namespace Project_1.Content.Input
 
             oldMouseState = newMouseState;
             newMouseState = Mouse.GetState();
+
+            ScrolledSinceLastFrame = oldMouseState.ScrollWheelValue - newMouseState.ScrollWheelValue;
 
             if (GetMousePress(oldMouseState.LeftButton, newMouseState.LeftButton))
             {

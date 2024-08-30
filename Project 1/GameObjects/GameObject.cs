@@ -14,7 +14,8 @@ namespace Project_1
     {
         public Vector2 Position { get => pos; }
 
-        
+        //public static int GameObjectsToDraw = 0;
+
         
         protected Textures.Texture gfx;
 
@@ -31,6 +32,8 @@ namespace Project_1
         public virtual void Update()
         {
             gfx.Update();
+            //DebugManager.Print(GetType(), "Objects draw: " + GameObjectsToDraw );
+            //GameObjectsToDraw = 0;
         }
 
 
@@ -38,8 +41,11 @@ namespace Project_1
         {
             Debug.Assert(gfx != null);
 
-            if (Camera.MomAmIInFrame(new Rectangle(pos.ToPoint(), gfx.size)))
+            //Should be moved to texture?
+            if (Camera.MomAmIInFrame(new Rectangle(Camera.WorldPosToCameraSpace(pos).ToPoint(), (gfx.size.ToVector2() *Camera.Scale).ToPoint())))
+            //if (Camera.MomAmIInFrame(new Rectangle(pos.ToPoint(), gfx.size)))
             {
+                //GameObjectsToDraw++;
                 //sb.Draw(gfx, Camera.WorldPosToCameraSpace(pos), Color.White);
                 gfx.Draw(aBatch, Camera.WorldPosToCameraSpace(pos));
             }

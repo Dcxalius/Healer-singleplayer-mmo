@@ -96,33 +96,25 @@ namespace Project_1.Textures
 
         public virtual void Draw(SpriteBatch aBatch, Vector2 aPos)
         {
-            Debug.Assert(gfx != null);
-
-            aBatch.Draw(gfx, aPos, visible ,color, 0f, offset, scale, flip, 1f);
+            Draw(aBatch, aPos, color);
         }
 
         public virtual void Draw(SpriteBatch aBatch, Rectangle aPosRectangle)
         {
-            Debug.Assert(gfx != null);
-            
-            aBatch.Draw(gfx, aPosRectangle, visible, color, 0f, offset, flip, 1f);
-
+            Draw(aBatch, aPosRectangle, color);
         }
 
         public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, Color aColor)
         {
-
-
             Debug.Assert(gfx != null);
 
-            aBatch.Draw(gfx, aPos, visible, aColor, 0f, offset, scale, flip, 1f);
+            aBatch.Draw(gfx, aPos, visible, aColor, 0f, offset, Camera.Scale, flip, 1f);
         }
         public virtual void Draw(SpriteBatch aBatch, Rectangle aPosRectangle, Color aColor)
         {
             Debug.Assert(gfx != null);
 
             aBatch.Draw(gfx, aPosRectangle, visible, aColor, 0f, offset, flip, 1f);
-
         }
     }
 }

@@ -30,6 +30,7 @@ namespace Project_1.Managers
             AllocConsole();
         }
 
+
         public static void Print(Type test, string aMsg)
         {
             Print(test, aMsg, DebugMode.On);
