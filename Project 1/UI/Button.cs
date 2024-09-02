@@ -35,10 +35,10 @@ namespace Project_1.UI
         string buttonText;
         Vector2 textSize;
 
-        public Button(Vector2 aPos, Vector2 aSize, Color aColor) : base(new UITexture(new GfxPath(GfxType.UI, "WhiteBackground"), aColor), aPos, aSize)
+        public Button(Vector2 aPos, Vector2 aSize, Color aColor) : base(new UITexture("WhiteBackground", aColor), aPos, aSize)
         {
             
-            pressedGfx = new UITexture(new GfxPath(GfxType.UI, "GrayBackground"), aColor);
+            pressedGfx = new UITexture("GrayBackground", aColor);
         }
 
         public override void Update()

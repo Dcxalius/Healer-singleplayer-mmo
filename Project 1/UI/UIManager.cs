@@ -29,14 +29,15 @@ namespace Project_1.UI
         public static void InitOptionsMenuUI()
         {
             optionElements.Add(new ExitOptionsButton());
+            optionElements.Add(new ScreenSizeSelect(new Vector2(0.1f), new Vector2(0.3f, 0.1f)));
         }
 
         static void InitGameUI()
         {
             (Vector2 pos1, Vector2 size1) = Camera.TransformDevSizeToRelativeVectors(new Rectangle(100, 100, 128, 128));
-            gameElements.Add(new Box(new UITexture(new GfxPath(GfxType.UI, "WhiteBackground"), Color.AliceBlue), pos1, size1));
+            gameElements.Add(new Box(new UITexture("WhiteBackground", Color.AliceBlue), pos1, size1));
             (Vector2 pos2, Vector2 size2) = Camera.TransformDevSizeToRelativeVectors(new Rectangle(500, 100, 256, 128));
-            gameElements.Add(new Box(new UITexture(new GfxPath(GfxType.UI, "WhiteBackground"), Color.IndianRed), pos2, size2));
+            gameElements.Add(new Box(new UITexture("WhiteBackground", Color.IndianRed), pos2, size2));
 
         }
 

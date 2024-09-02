@@ -13,8 +13,7 @@ namespace Project_1.UI.PauseMenu
 
         static Vector2 pauseSize = new Vector2(0.2f, 0.5f);
         static Vector2 pausePos = new Vector2(0.5f - (pauseSize.X / 2), 0.5f - pauseSize.Y / 2);
-        static GfxPath gfxPath = new GfxPath(GfxType.UI, "WhiteBackground");
-        static UITexture gfx = new UITexture(gfxPath, Color.DarkGray);
+        static UITexture gfx = new UITexture("WhiteBackground", Color.DarkGray);
 
         static Vector2 buttonSize = new Vector2(pauseSize.X / 5 * 4, pauseSize.Y / 12);
         static Vector2 buttonStartingPos = new Vector2(0.5f - (buttonSize.X / 2), pausePos.Y + 0.05f);

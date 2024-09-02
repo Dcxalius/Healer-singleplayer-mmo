@@ -20,7 +20,7 @@ namespace Project_1.Textures
         static Dictionary<string, Texture2D>[] texturesDict;
         static GraphicsDeviceManager gdm;
         static ContentManager cm;
-        public static SpriteFont buttonFont ;
+        public static SpriteFont buttonFont;
 
         public static SpriteBatch CreateSpriteBatch()
         {
@@ -32,14 +32,13 @@ namespace Project_1.Textures
             gdm = new GraphicsDeviceManager(aGame);
         }
 
-        public static void LoadContent(ContentManager aCm)
+        public static void Init(ContentManager aCm)
         {
             cm = aCm;
 
             InitArrays();
-            
-
-            buttonFont = cm.Load<SpriteFont>("Font/Gloryse");
+            SetWindowSize(Camera.devScreenBorder);
+            buttonFont = cm.Load<SpriteFont>("Font/Gloryse"); //TODO: Font is not open source so need to be change at some point
         }
 
         static void InitArrays()
@@ -103,6 +102,10 @@ namespace Project_1.Textures
             gdm.PreferredBackBufferWidth = aSize.X;
             gdm.PreferredBackBufferHeight = aSize.Y;
             gdm.ApplyChanges();
+
+
+            Camera.SetWindowSize(aSize);
+
         }
     }
 }

@@ -35,61 +35,80 @@ namespace Project_1
             get { return 1f / scale; }
         }
 
+        public static Rectangle ScreenRectangle
+        {
+            get => screenRectangle;
+        }
+
+            
+
         static SpriteBatch spriteBatch;
 
         static Vector2 centrePoint = new Vector2(100,100);
-        static Texture2D debugTexture = GraphicsManager.GetTexture(new GfxPath(GfxType.Debug, "Debug"));
 
-        static Textures.Texture pauseGfx = new Textures.Texture(new GfxPath(GfxType.UI, "PauseBackground"));
-
-        public static Point screenBorder = new Point(1500, 900);
-        public static Rectangle screenRectangle;
-
-        static float scale = 1f;
-
+        //---
         static float cameraMoveBorderSize = 0.1f;
         static Vector2 velocity = Vector2.Zero;
         static Vector2 momentum = Vector2.Zero;
         static int baseSpeed = 100;
         static Vector2 drag = new Vector2(0.9f, 0.9f);
 
+        //--- debugText is fine but should pauseGfx be somewhere else?
+        static Texture2D debugTexture = GraphicsManager.GetTexture(new GfxPath(GfxType.Debug, "Debug"));
+        static Textures.Texture pauseGfx = new Textures.Texture(new GfxPath(GfxType.UI, "PauseBackground"));
+
+        //--
+
+        public readonly static Point devScreenBorder = new Point(1500, 900);
+        static Rectangle screenRectangle;
+
+
+
+        static float scale = 1f;
+        static float minScale = 0.7f;
+        static float maxScale = 1.4f;
+
+        //--
         static MovingObject boundObject;
-        static Rectangle bindingRectangle = new Rectangle(new Point(0), new Point(screenBorder.X/ 4 * 3, screenBorder.Y/4 * 3));
-        static Point centrePointInScreen = new Point(screenBorder.X/2, screenBorder.Y/2);
+        static Rectangle bindingRectangle = new Rectangle(new Point(0), new Point(devScreenBorder.X/ 4 * 3, devScreenBorder.Y/4 * 3));
+        static Point centrePointInScreen = new Point(devScreenBorder.X/2, devScreenBorder.Y/2);
         static CameraSettings cameraSettings = CameraSettings.RectangleSoftBound;
-        static float maxCircleCameraMove = screenBorder.Y / 3;
+        static float maxCircleCameraMove = devScreenBorder.Y / 3;
         //static Rectangle maxRectangleCameraMove;
 
         public static void Init()
         {
-            SetWindowSize(screenBorder);
+            SetWindowSize(devScreenBorder);
             spriteBatch = GraphicsManager.CreateSpriteBatch();
         }
 
         public static void Update()
         {
-            if(InputManager.ScrolledSinceLastFrame != 0)
-            {
-                //DebugManager.Print(typeof(Camera), "Scrolled: " + InputManager.ScrolledSinceLastFrame);
-                scale -= (float)InputManager.ScrolledSinceLastFrame / 2400f; //A single mousewheel step is 120 so 2400 gives a movement of 5% points per mousewheel step
-                //screenRectangle.Size = (screenBorder.ToVector2() * Zoom).ToPoint();
-                //screenRectangle.Location = (centrePoint - screenRectangle.Size.ToVector2() / 2).ToPoint();
-                //centrePoint = screenRectangle.Location.ToVector2() + screenRectangle.Size.ToVector2() / 2;
-                DebugManager.Print(typeof(Camera), "Centre point: " + centrePoint);
-            }
+            ScrollZoom();
 
             Move();
+        }
 
-            if (InputManager.ScrolledSinceLastFrame != 0)
+        static void ScrollZoom()
+        {
+            int scrolled = InputManager.ScrolledSinceLastFrame;
+            if (scrolled != 0)
             {
-                //DebugManager.Print(typeof(Camera), "ScreenRectangle: " + screenRectangle);
+                if ((scrolled > 0 && scale <= minScale) || (scrolled < 0 && scale >= maxScale))
+                {
+                    return;
+                }
+                scale -= scrolled / 2400f; //A single mousewheel step is 120 so 2400 gives a movement of 5% points per mousewheel step
+                DebugManager.Print(typeof(Camera), "Centre point: " + centrePoint);
+                bindingRectangle.Size = new Point((int)(screenRectangle.Size.X / 4 * 3 * Zoom), (int)(screenRectangle.Size.Y / 4 * 3 * Zoom));
+
             }
         }
 
         public static (Vector2 , Vector2) TransformDevSizeToRelativeVectors(Rectangle aRect)
         {
-            Vector2 pos = aRect.Location.ToVector2() / screenBorder.ToVector2();
-            Vector2 size = aRect.Size.ToVector2() / screenBorder.ToVector2();
+            Vector2 pos = aRect.Location.ToVector2() / devScreenBorder.ToVector2();
+            Vector2 size = aRect.Size.ToVector2() / devScreenBorder.ToVector2();
 
             return (pos, size);
         }
@@ -104,13 +123,14 @@ namespace Project_1
             cameraSettings = aCameraSettings;
         }
 
-        static void SetWindowSize(Point aSize)
+        public static void SetWindowSize(Point aSize)
         {
-            screenBorder = aSize;
-            screenRectangle = new Rectangle(Point.Zero, aSize);
-            //screenRectangle = new Rectangle(centrePoint.ToPoint() - new Point(screenBorder.X / 2, screenBorder.Y / 2), aSize);
+            screenRectangle.Size = aSize;
             //zoom = something xd
-            GraphicsManager.SetWindowSize(screenBorder); //Flip this? So GraphicsManager handles screensize and passes it to camera
+            //scale = scale 
+            bindingRectangle = new Rectangle(new Point(0), new Point(screenRectangle.Size.X / 4 * 3, screenRectangle.Size.Y / 4 * 3));
+            centrePointInScreen = new Point(screenRectangle.Size.X / 2, screenRectangle.Size.Y / 2);
+            maxCircleCameraMove = screenRectangle.Size.Y / 3;
         }
 
         static void ApplyMouseVelocity()
@@ -224,10 +244,6 @@ namespace Project_1
             }
 
             CheckForSpacePress();
-
-            //screenRectangle.Location = (centrePoint * scale).ToPoint() - new Point((int)(screenBorder.X / 2f), (int)(screenBorder.Y / 2f));
-
-            
         }
 
         static void CheckForSpacePress()
@@ -253,20 +269,26 @@ namespace Project_1
 
             ApplyMouseVelocity();
 
+            CheckIfCameraTriesToLeavePlayer();
 
-            bindingRectangle.Location = (boundObject.Position - bindingRectangle.Size.ToVector2() / 2).ToPoint();
 
-            if (!bindingRectangle.Contains(centrePoint))
-            { 
-                Vector2 cameraRectIntersection = CalculateIntersection();
-
-                TeleportCamera(boundObject.Position - cameraRectIntersection);
-            }
 
             ApplyMovementToCamera();
         }
 
-        static Vector2 CalculateIntersection()
+        static void CheckIfCameraTriesToLeavePlayer()
+        {
+            bindingRectangle.Location = (boundObject.Position - bindingRectangle.Size.ToVector2() / 2).ToPoint();
+
+            if (!bindingRectangle.Contains(centrePoint))
+            {
+                Vector2 cameraRectIntersection = CalculateIntersection();
+
+                TeleportCamera(boundObject.Position - cameraRectIntersection);
+            }
+        }
+
+        static Vector2 CalculateIntersection() //TODO: split this function more
         {
 
             Vector2 playerStart = boundObject.Position;
@@ -276,15 +298,9 @@ namespace Project_1
             (Vector2 rectangleSideRay, Vector2 rectangleFurtherSideRay) = GetRectangleRays(rectangleCornerStart);
 
             
-            float u = (playerStart.Y * rectangleSideRay.X + rectangleSideRay.Y * rectangleCornerStart.X - rectangleCornerStart.Y * rectangleSideRay.X - rectangleSideRay.Y * playerStart.X) / (playerToCameraRay.X * rectangleSideRay.Y - playerToCameraRay.Y * rectangleSideRay.X);
-            float furtherU = (playerStart.Y * rectangleFurtherSideRay.X + rectangleFurtherSideRay.Y * rectangleCornerStart.X - rectangleCornerStart.Y * rectangleFurtherSideRay.X - rectangleFurtherSideRay.Y * playerStart.X) / (playerToCameraRay.X * rectangleFurtherSideRay.Y - playerToCameraRay.Y * rectangleFurtherSideRay.X);
+            float u = LengthToCollisionFromFirstVector(playerStart, playerToCameraRay, rectangleCornerStart, rectangleSideRay);
 
             Vector2 intersection = playerStart + playerToCameraRay * u;
-            Vector2 furtherIntersection = playerStart + playerToCameraRay * furtherU;
-
-            Vector2 playerToCorner = rectangleCornerStart - playerStart;
-            Vector2 cameraToCorner = rectangleCornerStart - centrePoint;
-
 
             Vector2 distanceToBinder = boundObject.Position - intersection;
             float length = distanceToBinder.Length();
@@ -292,11 +308,11 @@ namespace Project_1
             Vector2 normalized = Vector2.Normalize(distanceToBinder);
             Vector2 tele = normalized * length * 0.9999f;
 
-            playerToCorner.Normalize();
-            cameraToCorner.Normalize();
-
             if (!bindingRectangle.Contains(boundObject.Position - tele))
             {
+
+                float furtherU = LengthToCollisionFromFirstVector(playerStart, playerToCameraRay, rectangleCornerStart, rectangleFurtherSideRay);
+                Vector2 furtherIntersection = playerStart + playerToCameraRay * furtherU;
                 distanceToBinder = boundObject.Position - furtherIntersection;
                 length = distanceToBinder.Length();
 
@@ -305,7 +321,11 @@ namespace Project_1
                 return tele;
             }
 
+            Vector2 playerToCorner = rectangleCornerStart - playerStart;
+            Vector2 cameraToCorner = rectangleCornerStart - centrePoint;
 
+            playerToCorner.Normalize();
+            cameraToCorner.Normalize();
 
             if (Math.Abs(cameraToCorner.X) > Math.Abs(playerToCorner.X))
             {
@@ -322,6 +342,13 @@ namespace Project_1
 
             Debug.Assert(false);
             return Vector2.Zero;
+        }
+
+        static float LengthToCollisionFromFirstVector(Vector2 aAStart, Vector2 aADir, Vector2 aBStart, Vector2 aBDir)
+        {
+            float length = (aAStart.Y * aBDir.X + aBDir.Y * aBStart.X - aBStart.Y * aBDir.X - aBDir.Y * aAStart.X) / (aADir.X * aBDir.Y - aADir.Y * aBDir.X);
+
+            return length;
         }
 
         static Vector2 GetClosestRectangleCorner(Vector2 aRay)
@@ -447,7 +474,7 @@ namespace Project_1
 
         public static Vector2 WorldPosToCameraSpace(Vector2 aWorldPos)
         {
-            Vector2 topLeft = centrePoint * scale - new Vector2(screenBorder.X / 2, screenBorder.Y / 2);
+            Vector2 topLeft = centrePoint * scale - new Vector2(screenRectangle.Size.X / 2, screenRectangle.Size.Y / 2);
 
             return aWorldPos*scale - topLeft ; 
         }
@@ -458,12 +485,6 @@ namespace Project_1
             {
                 return true;
             }
-
-            //if (screenRectangle.Contains(aRect))
-            //{
-            //    return true;
-            //}
-
             return false;
         }
 
@@ -471,7 +492,7 @@ namespace Project_1
         {
             TileManager.Draw(aBatch);
             ObjectManager.Draw(aBatch);
-            UIManager.DrawGameUI(aBatch);
+            UIManager.DrawGameUI(aBatch); // a bit ugly but needs to do this since we want to draw the game in pause aswell.
 
         }
 
@@ -482,7 +503,7 @@ namespace Project_1
             Draw(spriteBatch);
             if (DebugManager.mode == DebugMode.On)
             {
-                Vector2 DebugPos = new Vector2(screenBorder.X / 2, screenBorder.Y / 2);
+                Vector2 DebugPos = new Vector2(screenRectangle.Size.X / 2, screenRectangle.Size.Y / 2);
                 spriteBatch.Draw(debugTexture, DebugPos, new Rectangle(0, 0, 10, 10), Color.White, 0f, new Vector2(5), 1f, SpriteEffects.None, 1f);
 
                 //Rectangle r = new Rectangle((centrePoint - screenRectangle.Location.ToVector2() - screenBorder.ToVector2() / 2).ToPoint() , screenRectangle.Size);

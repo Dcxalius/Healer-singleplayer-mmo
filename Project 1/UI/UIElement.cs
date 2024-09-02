@@ -14,10 +14,23 @@ namespace Project_1.UI
 {
     internal abstract class UIElement
     {
+        public Vector2 RelativePos
+        {
+            get => relativePos;
+        }
+        public Vector2 RelativeSize
+        {
+            get => relativeSize;
+        }
+
+
         UITexture gfx;
         protected Rectangle pos;
-        public HoldEvent heldEvents; //TODO: This should prob be cleanse on state change
+        Vector2 relativePos;
+        Vector2 relativeSize;
 
+        public HoldEvent heldEvents; //TODO: This should prob be cleanse on state change
+        
 
         protected List<UIElement> children = new List<UIElement>();
 
@@ -26,7 +39,20 @@ namespace Project_1.UI
             //Debug.Assert(aPos > 0 && aPos < 0);
             gfx = aGfx;
 
-            pos = new Rectangle((Camera.screenBorder.ToVector2() * aPos).ToPoint(), (Camera.screenBorder.ToVector2() * aSize).ToPoint());
+            relativePos = aPos;
+            relativeSize = aSize;
+
+            pos = TransformFromRelativeToValues(aPos, aSize);
+        }
+
+        static protected Rectangle TransformFromRelativeToValues(Vector2 aPos, Vector2 aSize)
+        {
+            return new Rectangle((Camera.ScreenRectangle.Size.ToVector2() * aPos).ToPoint(), (Camera.ScreenRectangle.Size.ToVector2() * aSize).ToPoint());
+        }
+
+        static protected Point TransformFromRelativeToPoint(Vector2 aValue)
+        {
+            return (Camera.ScreenRectangle.Size.ToVector2() * aValue).ToPoint();
         }
 
         public virtual void HoldUpdate()

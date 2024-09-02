@@ -12,6 +12,7 @@ namespace Project_1.UI
 {
     internal class Box : UIElement
     {
+
         public Box(UITexture aGfx, Vector2 aPos, Vector2 aSize) : base(aGfx, aPos, aSize) 
         {
 

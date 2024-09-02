@@ -91,7 +91,7 @@ namespace Project_1.Content.Input
         public static Vector2 GetMousePosRelative()
         {
             Point mousePoint = GetMousePosAbsolute();
-            Point screenSize = Camera.screenBorder;
+            Point screenSize = Camera.devScreenBorder;
 
             Vector2 mouseVector = new Vector2(mousePoint.X / (float)screenSize.X, mousePoint.Y / (float)screenSize.Y);
 

@@ -9,7 +9,7 @@ namespace Project_1.Textures
 {
     internal class UITexture : Texture
     {
-        public UITexture(GfxPath path, Color aColor) : base(path, aColor)
+        public UITexture(string aPath, Color aColor) : base( new GfxPath(GfxType.UI, aPath), aColor)
         {
 
         }

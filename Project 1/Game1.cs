@@ -25,7 +25,7 @@ namespace Project_1
         protected override void Initialize()
         {
             DebugManager.Init();
-            GraphicsManager.LoadContent(Content);
+            GraphicsManager.Init(Content);
             Camera.Init();
             RandomManager.Init();
             ObjectManager.Init();
