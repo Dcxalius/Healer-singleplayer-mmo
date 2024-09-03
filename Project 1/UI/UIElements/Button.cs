@@ -9,13 +9,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI
+namespace Project_1.UI.UIElements
 {
     internal class Button : UIElement
     {
 
-        protected string ButtonText 
-        { 
+        protected string ButtonText //TODO: Bring this out to a class called TextButton
+        {
             get => buttonText;
             set
             {
@@ -25,8 +25,8 @@ namespace Project_1.UI
         }
 
         protected bool Pressed
-        { 
-            get => pressed; 
+        {
+            get => pressed;
         }
 
         UITexture pressedGfx;
@@ -37,13 +37,13 @@ namespace Project_1.UI
 
         public Button(Vector2 aPos, Vector2 aSize, Color aColor) : base(new UITexture("WhiteBackground", aColor), aPos, aSize)
         {
-            
+
             pressedGfx = new UITexture("GrayBackground", aColor);
         }
 
         public override void Update()
         {
-            if (pressed) { DebugManager.Print(this.GetType(), "meow"); }
+            if (pressed) { DebugManager.Print(GetType(), "meow"); }
             base.Update();
         }
 
@@ -52,7 +52,7 @@ namespace Project_1.UI
             pressed = true;
             base.ClickedOnMe(aClick);
         }
-        
+
         public override void HoldReleaseOnMe()
         {
             pressed = false;
@@ -62,7 +62,7 @@ namespace Project_1.UI
 
         public override void Draw(SpriteBatch aBatch)
         {
-            
+
 
             if (!pressed)
             {
@@ -77,7 +77,8 @@ namespace Project_1.UI
             if (buttonText != null)
             {
 
-                aBatch.DrawString(GraphicsManager.buttonFont, buttonText, new Vector2(pos.X + pos.Size.X / 2 - textSize.X / 2, pos.Y + pos.Size.Y / 2 - textSize.Y / 2), Color.White);
+                //aBatch.DrawString(GraphicsManager.buttonFont, buttonText, new Vector2(pos.X + pos.Size.X / 2 , pos.Y + pos.Size.Y / 2 ), Color.Black, 0f, textSize / 2, 1.2f, SpriteEffects.None, 1f);
+                aBatch.DrawString(GraphicsManager.buttonFont, buttonText, new Vector2(pos.X + pos.Size.X / 2 , pos.Y + pos.Size.Y / 2 ), Color.White, 0f, textSize / 2, 1f, SpriteEffects.None, 1f);
             }
         }
     }

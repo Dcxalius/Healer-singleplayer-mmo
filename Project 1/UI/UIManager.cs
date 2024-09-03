@@ -5,11 +5,13 @@ using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.UI.OptionMenu;
 using Project_1.UI.PauseMenu;
+using Project_1.UI.UIElements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Project_1.UI
 {
@@ -144,5 +146,21 @@ namespace Project_1.UI
             }
         }
 
+        public static void Rescale()
+        {
+            RescaleList(gameElements);
+            RescaleList(optionElements);
+            RescaleList(pauseElements);
+
+        }
+
+        public static void RescaleList(List<UIElement> aList)
+        {
+
+            foreach (UIElement element in aList)
+            {
+                element.Rescale();
+            }
+        }
     }
 }

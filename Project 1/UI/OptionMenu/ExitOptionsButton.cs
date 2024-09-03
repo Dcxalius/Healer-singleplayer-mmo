@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Managers;
 using Project_1.Textures;
+using Project_1.UI.UIElements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,9 +19,10 @@ namespace Project_1.UI.OptionMenu
 
         public override void HoldReleaseOnMe()
         {
+            base.HoldReleaseOnMe();
+            
             StateManager.SetState(State.Pause);
 
-            base.HoldReleaseOnMe();
         }
     }
 }

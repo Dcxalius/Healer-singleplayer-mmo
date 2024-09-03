@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI
+namespace Project_1.UI.UIElements
 {
     internal abstract class UIElement
     {
@@ -30,7 +30,7 @@ namespace Project_1.UI
         Vector2 relativeSize;
 
         public HoldEvent heldEvents; //TODO: This should prob be cleanse on state change
-        
+
 
         protected List<UIElement> children = new List<UIElement>();
 
@@ -49,6 +49,8 @@ namespace Project_1.UI
         {
             return new Rectangle((Camera.ScreenRectangle.Size.ToVector2() * aPos).ToPoint(), (Camera.ScreenRectangle.Size.ToVector2() * aSize).ToPoint());
         }
+
+
 
         static protected Point TransformFromRelativeToPoint(Vector2 aValue)
         {
@@ -77,11 +79,19 @@ namespace Project_1.UI
                 child.Update();
             }
 
+            if (pos.Contains(InputManager.GetMousePosAbsolute()))
+            {
+                OnHover();
+            }
         }
 
         public virtual void Draw(SpriteBatch aBatch)
         {
-            gfx.Draw(aBatch, pos);
+            if (gfx != null)
+            {
+
+                gfx.Draw(aBatch, pos);
+            }
 
             foreach (UIElement child in children)
             {
@@ -108,9 +118,14 @@ namespace Project_1.UI
             heldEvents = null;
         }
 
+        public virtual void OnHover()
+        {
+            //DebugManager.Print(GetType(), "Hovered on");
+        }
+
         public bool ClickedOnChildren(ClickEvent aClick)
         {
-            
+
             for (int i = 0; i < children.Count; i++)
             {
                 bool clickedOn = children[i].ClickedOn(aClick);
@@ -126,9 +141,19 @@ namespace Project_1.UI
 
         public virtual void ClickedOnMe(ClickEvent aClick)
         {
-            heldEvents = new HoldEvent(TimeManager.gt.TotalGameTime ,aClick, this);
+            heldEvents = new HoldEvent(TimeManager.gt.TotalGameTime, aClick, this);
 
             DebugManager.Print(GetType(), "Clicked on " + pos);
+        }
+
+        public virtual void Rescale()
+        {
+            pos = TransformFromRelativeToValues(relativePos, relativeSize);
+
+            for (int i = 0; i < children.Count; i++)
+            {
+                children[i].Rescale();
+            }
         }
     }
 }

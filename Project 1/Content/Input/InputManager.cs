@@ -1,9 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Project_1.Managers;
 using Project_1.UI;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -73,6 +75,7 @@ namespace Project_1.Content.Input
 
             oldMouseState = newMouseState;
             newMouseState = Mouse.GetState();
+            //Mouse.PlatformSetCursor();
 
             ScrolledSinceLastFrame = oldMouseState.ScrollWheelValue - newMouseState.ScrollWheelValue;
 
@@ -85,17 +88,18 @@ namespace Project_1.Content.Input
 
         public static Point GetMousePosAbsolute()
         {
-            return newMouseState.Position;
+            //DebugManager.Print(typeof(InputManager), "mouse pos gotten at " + newMouseState.Position);
+            return newMouseState.Position; //TODO: Make this handle the mouse being outside screen
         }
 
         public static Vector2 GetMousePosRelative()
         {
             Point mousePoint = GetMousePosAbsolute();
-            Point screenSize = Camera.devScreenBorder;
+            Point screenSize = Camera.ScreenRectangle.Size;
 
             Vector2 mouseVector = new Vector2(mousePoint.X / (float)screenSize.X, mousePoint.Y / (float)screenSize.Y);
 
-            return mouseVector;
+            return mouseVector;//TODO: Make this handle the mouse being outside screen
         }
 
         public static bool GetMousePress(ButtonState aOldMouseButton, ButtonState aNewMouseButton)

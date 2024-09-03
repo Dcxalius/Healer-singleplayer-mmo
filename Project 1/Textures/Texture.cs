@@ -20,6 +20,7 @@ namespace Project_1.Textures
         protected Vector2 offset;
         SpriteEffects flip;
 
+
         public Texture(GfxPath aPath)
         {
             __Constructor__(aPath);
@@ -106,13 +107,19 @@ namespace Project_1.Textures
 
         public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, Color aColor)
         {
-            Debug.Assert(gfx != null);
+            if (gfx == null)
+            {
+                return;
+            }
 
             aBatch.Draw(gfx, aPos, visible, aColor, 0f, offset, Camera.Scale, flip, 1f);
         }
         public virtual void Draw(SpriteBatch aBatch, Rectangle aPosRectangle, Color aColor)
         {
-            Debug.Assert(gfx != null);
+            if (gfx == null)
+            {
+                return;
+            }
 
             aBatch.Draw(gfx, aPosRectangle, visible, aColor, 0f, offset, flip, 1f);
         }

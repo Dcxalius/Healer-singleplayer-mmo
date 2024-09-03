@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Content.Input;
 using Project_1.Managers;
 using Project_1.Textures;
+using Project_1.UI.UIElements;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
@@ -10,25 +11,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI.SelectBoxes
+namespace Project_1.UI.UIElements.SelectBoxes
 {
     internal abstract class SelectBox : Box
     {
         bool isOpen;
         float openMaxSize;
-        SelectBoxValue[] values;
+        protected SelectBoxValue[] values;
         int selectedValue;
         SelectBoxValueDisplay displayValue;
 
         Vector2 defaultPos;
         Vector2 defaultSize;
 
-        public SelectBox(UITexture aGfx, SelectBoxValue[] aSetOfValues, int aStartDisplayValue, Vector2 aPos, Vector2 aSize) : base(aGfx, aPos, aSize)
+        public SelectBox(UITexture aGfx, SelectBoxValue[] aSetOfValues, int aStartDisplayValue, Vector2 aPos, Vector2 aCollapsedSize) : base(aGfx, aPos, aCollapsedSize)
         {
             defaultPos = aPos;
-            defaultSize = aSize;
+            defaultSize = aCollapsedSize;
             values = aSetOfValues;
-            displayValue = new SelectBoxValueDisplay(aSetOfValues[aStartDisplayValue], aGfx);
+            displayValue = new SelectBoxValueDisplay(aSetOfValues[aStartDisplayValue], aGfx, aPos, aCollapsedSize);
         }
 
         public override void ClickedOnMe(ClickEvent aClick)
@@ -39,8 +40,8 @@ namespace Project_1.UI.SelectBoxes
             {
                 Close(aClick);
             }
-            else 
-            { 
+            else
+            {
                 Open();
             }
         }
@@ -48,18 +49,22 @@ namespace Project_1.UI.SelectBoxes
         void SetNewValue(Point aP)
         {
             int tempSelectedValue = aP.Y / TransformFromRelativeToPoint(defaultSize).Y;
-            DebugManager.Print(GetType(),"New selectedValue is: " + tempSelectedValue);
+            DebugManager.Print(GetType(), "New selectedValue is: " + tempSelectedValue);
 
-            if (tempSelectedValue == 0 || tempSelectedValue == selectedValue)
+            if (tempSelectedValue == 0 || tempSelectedValue == selectedValue + 1)
             {
                 return;
             }
-            
-            ActionWhenSelected(tempSelectedValue);
-            selectedValue = tempSelectedValue;
+
+            ActionWhenSelected(tempSelectedValue - 1);
         }
 
-        protected abstract void ActionWhenSelected(int aSelectedValue);
+        protected virtual void ActionWhenSelected(int aSelectedValue)
+        {
+
+            selectedValue = aSelectedValue;
+            displayValue.SetToNewValue(values[aSelectedValue]);
+        }
 
         void Close(ClickEvent aClick)
         {
@@ -76,7 +81,7 @@ namespace Project_1.UI.SelectBoxes
         {
             isOpen = true;
 
-            pos.Size = new Point(pos.Size.X, TransformFromRelativeToPoint(defaultSize * values.Length).Y);
+            pos.Size = new Point(pos.Size.X, TransformFromRelativeToPoint(defaultSize * (values.Length + 1)).Y);
 
         }
 
@@ -84,7 +89,28 @@ namespace Project_1.UI.SelectBoxes
         {
             base.Draw(aBatch);
 
+            displayValue.Draw(aBatch);
 
+            if (isOpen == false)
+            {
+                return;
+            }
+            for (int i = 0; i < values.Length; i++)
+            {
+                values[i].Draw(aBatch);
+            }
+        }
+
+        public override void Rescale()
+        {
+            base.Rescale();
+
+            displayValue.Rescale();
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                values[i].Rescale();
+            }
         }
     }
 }

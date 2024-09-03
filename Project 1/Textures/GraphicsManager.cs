@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Managers;
+using Project_1.UI;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,10 +18,20 @@ namespace Project_1.Textures
 
     internal static class GraphicsManager
     {
+        public enum FullscreenMode
+        {
+            Windowed,
+            Fullscreen,
+            BorderlessFullscreen
+        }
+
         static Dictionary<string, Texture2D>[] texturesDict;
         static GraphicsDeviceManager gdm;
+        static GraphicsAdapter graphicsAdapter;
         static ContentManager cm;
+        static GameWindow gameWindow;
         public static SpriteFont buttonFont;
+        readonly static Point windowsTitleBarStuff = new Point(128, 32); //128 is a guesstimation of the minimum width, 32 is the required height based on https://learn.microsoft.com/en-us/windows/apps/design/basics/titlebar-design
 
         public static SpriteBatch CreateSpriteBatch()
         {
@@ -30,6 +41,8 @@ namespace Project_1.Textures
         public static void SetManager(Game aGame)
         {
             gdm = new GraphicsDeviceManager(aGame);
+            graphicsAdapter = GraphicsAdapter.DefaultAdapter;
+            gameWindow = aGame.Window;
         }
 
         public static void Init(ContentManager aCm)
@@ -37,8 +50,21 @@ namespace Project_1.Textures
             cm = aCm;
 
             InitArrays();
-            SetWindowSize(Camera.devScreenBorder);
+            SetWindowSize(Camera.devScreenBorder, false, false);
             buttonFont = cm.Load<SpriteFont>("Font/Gloryse"); //TODO: Font is not open source so need to be change at some point
+        }
+
+        [DllImport("user32.dll")]
+        static extern void ClipCursor(ref Rectangle rect);
+
+        public static void Update()
+        {
+            //Rectangle rect = Camera.ScreenRectangle;
+            Rectangle rect = gameWindow.ClientBounds;
+            rect.Location = gameWindow.Position;
+            //rect.Location += 
+
+            ClipCursor(ref rect);
         }
 
         static void InitArrays()
@@ -96,16 +122,49 @@ namespace Project_1.Textures
             return ref CollectionsMarshal.GetValueRefOrNullRef(texturesDict[(int)aGfxPath.Type], aGfxPath.Name);
         }
 
-        public static void SetWindowSize(Point aSize)
+        public static void SetWindowSize(Point aSize, bool aFullscreen, bool aBorderless)
         {
+            if (!AllowedSize(aSize))
+            {
+                return;
+            }
 
             gdm.PreferredBackBufferWidth = aSize.X;
             gdm.PreferredBackBufferHeight = aSize.Y;
+            gdm.IsFullScreen = aFullscreen;
+            gdm.HardwareModeSwitch = (aBorderless || aFullscreen);
             gdm.ApplyChanges();
 
 
             Camera.SetWindowSize(aSize);
 
+            UIManager.Rescale();
+
+
+        }
+
+        static bool AllowedSize(Point aSize)
+        {
+            //https://stackoverflow.com/questions/1264406/how-do-i-get-the-taskbars-position-and-size   
+            if (aSize.Y > graphicsAdapter.CurrentDisplayMode.Height - windowsTitleBarStuff.Y)
+            {
+                DebugManager.Print(typeof(GraphicsManager), "My Y is too big");
+                return false;
+            }
+            if (aSize.X > graphicsAdapter.CurrentDisplayMode.Width)
+            {
+                DebugManager.Print(typeof(GraphicsManager), "My X is too big");
+                return false;
+
+            }
+
+            if (aSize.X < windowsTitleBarStuff.X)
+            {
+                DebugManager.Print(typeof(GraphicsManager), "Tried to set it smaller than the required lenght");
+                return false;
+            }
+
+            return true;
         }
     }
 }
