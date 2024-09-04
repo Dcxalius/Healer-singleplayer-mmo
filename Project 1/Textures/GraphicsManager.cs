@@ -135,7 +135,7 @@ namespace Project_1.Textures
             gdm.HardwareModeSwitch = (aBorderless || aFullscreen);
             gdm.ApplyChanges();
 
-
+            //Add check here to see if display area is correct and if it isn't change aSize
             Camera.SetWindowSize(aSize);
 
             UIManager.Rescale();
