@@ -76,9 +76,19 @@ namespace Project_1
         static float maxCircleCameraMove = devScreenBorder.Y / 3;
         //static Rectangle maxRectangleCameraMove;
 
+        //--
+
+        static RenderTarget2D cameraTarget;
+        static Rectangle renderTargetPosition;
+        
+        public static Rectangle RenderTargetPosition
+        {
+            set => renderTargetPosition = value;
+        }
+
         public static void Init()
         {
-            SetWindowSize(devScreenBorder);
+            //SetWindowSize(devScreenBorder);
             spriteBatch = GraphicsManager.CreateSpriteBatch();
         }
 
@@ -125,6 +135,7 @@ namespace Project_1
 
         public static void SetWindowSize(Point aSize)
         {
+            cameraTarget = GraphicsManager.CreateRenderTarget(aSize);
             screenRectangle.Size = aSize;
             //zoom = something xd
             //scale = scale 
@@ -472,6 +483,13 @@ namespace Project_1
             momentum = new Vector2(momentum.X * drag.X, momentum.Y * drag.Y);
         }
 
+        public static Rectangle WorldPosToCameraSpace(Rectangle aWorldPos)
+        {
+            Point topLeft = (centrePoint * scale - screenRectangle.Size.ToVector2() / 2).ToPoint();
+            Rectangle cameraPos = new Rectangle((aWorldPos.Location.ToVector2() * scale).ToPoint() - topLeft, aWorldPos.Size);
+            return cameraPos;
+        }
+
         public static Vector2 WorldPosToCameraSpace(Vector2 aWorldPos)
         {
             Vector2 topLeft = centrePoint * scale - new Vector2(screenRectangle.Size.X / 2, screenRectangle.Size.Y / 2);
@@ -488,6 +506,13 @@ namespace Project_1
             return false;
         }
 
+        public static void DrawRenderTarget()
+        {
+            spriteBatch.Begin();
+            spriteBatch.Draw(cameraTarget, renderTargetPosition, Color.White);
+            spriteBatch.End();
+        }
+
         static void Draw(SpriteBatch aBatch)
         {
             TileManager.Draw(aBatch);
@@ -498,7 +523,9 @@ namespace Project_1
 
         public static void RunningDraw()
         {
+            GraphicsManager.SetRenderTarget(cameraTarget);
             spriteBatch.Begin();
+            GraphicsManager.ClearScreen(Color.White);
 
             Draw(spriteBatch);
             if (DebugManager.mode == DebugMode.On)
@@ -511,27 +538,34 @@ namespace Project_1
             }
 
             spriteBatch.End();
+            GraphicsManager.SetRenderTarget(null);
+
         }
 
         public static void PauseDraw()
         {
+            GraphicsManager.SetRenderTarget(cameraTarget);
             spriteBatch.Begin();
             Draw(spriteBatch);
-            
+            GraphicsManager.ClearScreen(Color.Purple);
+
             pauseGfx.Draw(spriteBatch, Vector2.Zero);
             UIManager.Draw(spriteBatch);
             spriteBatch.End();
 
+            GraphicsManager.SetRenderTarget(null);
 
         }
 
         public static void OptionDraw()
         {
+            GraphicsManager.SetRenderTarget(cameraTarget);
             spriteBatch.Begin();
 
             UIManager.Draw(spriteBatch);
 
             spriteBatch.End();
+            GraphicsManager.SetRenderTarget(null);
         }
     }
 }

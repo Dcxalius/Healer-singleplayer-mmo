@@ -10,10 +10,11 @@ using System.Threading.Tasks;
 using Project_1.Managers;
 using Project_1.Content.Input;
 using Project_1.Textures;
+using Project_1.GameObjects;
 
 namespace Project_1
 {
-    internal class Player : MovingObject
+    internal class Player : Entity
     {
         public Player() : base(new Textures.AnimatedTexture(new GfxPath(GfxType.Object, "Walker"), new Point(32), Textures.AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(500)), new Vector2(100,100), 100)
         { 

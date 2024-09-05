@@ -12,6 +12,7 @@ namespace Project_1.Textures
         Object,
         Tile,
         UI,
+        Effect,
         Count
     }
 

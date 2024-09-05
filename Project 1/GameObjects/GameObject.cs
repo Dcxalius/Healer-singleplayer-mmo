@@ -21,12 +21,14 @@ namespace Project_1
 
 
         protected Vector2 pos;
+        protected Point size;
 
         public GameObject(Textures.Texture aGfx, Vector2 aStartingPos)
         {
             
             gfx = aGfx;
             pos = aStartingPos;
+            size = aGfx.Visible.Value.Size;
         }
 
         public virtual void Update()
@@ -37,7 +39,7 @@ namespace Project_1
         }
 
 
-        public void Draw(SpriteBatch aBatch)
+        public virtual void Draw(SpriteBatch aBatch)
         {
             Debug.Assert(gfx != null);
 

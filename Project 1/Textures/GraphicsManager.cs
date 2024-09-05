@@ -1,10 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Content.Input;
 using Project_1.Managers;
 using Project_1.UI;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -14,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.Textures
 {
-    //TODO: Slit this into GraphicsMang and TextureMang
+    //TODO: Split this into GraphicsMang and TextureMang
 
     internal static class GraphicsManager
     {
@@ -26,32 +28,53 @@ namespace Project_1.Textures
         }
 
         static Dictionary<string, Texture2D>[] texturesDict;
-        static GraphicsDeviceManager gdm;
+        static GraphicsDeviceManager graphicsDeviceManager;
         static GraphicsAdapter graphicsAdapter;
-        static ContentManager cm;
+        static ContentManager contentManager;
         static GameWindow gameWindow;
         public static SpriteFont buttonFont;
+
+        //--- Window stuff
         readonly static Point windowsTitleBarStuff = new Point(128, 32); //128 is a guesstimation of the minimum width, 32 is the required height based on https://learn.microsoft.com/en-us/windows/apps/design/basics/titlebar-design
+        static Rectangle windowBounds;
+        static readonly Point offset = new Point(8, 31); //I dont know why this is neccessary, well y is just the titlebar height but why does x have to 8????
+        static readonly Point fullscreenOffset = new Point(8, 0); //I dont know why this is neccessary, well y is just the titlebar height but why does x have to 8????
+
+        static bool fullsceen = false;
+        static bool borderlessFullscreen = false;
+
+
 
         public static SpriteBatch CreateSpriteBatch()
         {
-            return new SpriteBatch(gdm.GraphicsDevice);
+            return new SpriteBatch(graphicsDeviceManager.GraphicsDevice);
+        }
+
+        public static RenderTarget2D CreateRenderTarget(Point aSize)
+        {
+            return new RenderTarget2D(graphicsDeviceManager.GraphicsDevice, aSize.X, aSize.Y);
+        }
+
+        public static void SetRenderTarget(RenderTarget2D aRenderTarget)
+        {
+            graphicsDeviceManager.GraphicsDevice.SetRenderTarget(aRenderTarget);
         }
 
         public static void SetManager(Game aGame)
         {
-            gdm = new GraphicsDeviceManager(aGame);
+            graphicsDeviceManager = new GraphicsDeviceManager(aGame);
             graphicsAdapter = GraphicsAdapter.DefaultAdapter;
             gameWindow = aGame.Window;
         }
 
-        public static void Init(ContentManager aCm)
+        public static void Init(ContentManager aContentManager)
         {
-            cm = aCm;
+            contentManager = aContentManager;
 
             InitArrays();
-            SetWindowSize(Camera.devScreenBorder, false, false);
-            buttonFont = cm.Load<SpriteFont>("Font/Gloryse"); //TODO: Font is not open source so need to be change at some point
+            SetWindowSize(Camera.devScreenBorder, fullsceen, borderlessFullscreen);
+            buttonFont = contentManager.Load<SpriteFont>("Font/Gloryse"); //TODO: Font is not open source so need to be change at some point
+            
         }
 
         [DllImport("user32.dll")]
@@ -60,11 +83,26 @@ namespace Project_1.Textures
         public static void Update()
         {
             //Rectangle rect = Camera.ScreenRectangle;
-            Rectangle rect = gameWindow.ClientBounds;
-            rect.Location = gameWindow.Position;
-            //rect.Location += 
 
-            ClipCursor(ref rect);
+            if (fullsceen)
+            {
+                windowBounds.Location = gameWindow.Position + fullscreenOffset;
+
+            }
+            else
+            {
+                windowBounds.Location = gameWindow.Position + offset;
+
+            }
+
+            windowBounds.Size = gameWindow.ClientBounds.Size + windowBounds.Location;
+            //DebugManager.Print(typeof(GraphicsManager), InputManager.GetMousePosAbsolute().ToString());
+            //rect.Location += 
+            if (ApplicationIsActivated() )
+            {
+                ClipCursor(ref windowBounds);
+
+            }
         }
 
         static void InitArrays()
@@ -93,17 +131,17 @@ namespace Project_1.Textures
 
             for (int i = 0; i < texturesDict.Length; i++)
             {
-                string[] dir = Directory.GetFiles(cm.RootDirectory + "\\" + (GfxType)i);
+                string[] dir = Directory.GetFiles(contentManager.RootDirectory + "\\" + (GfxType)i);
 
                 texturesDict[i] = new Dictionary<string, Texture2D>();
 
                 for (int j = 0; j < dir.Length; j++)
                 {
-                    string filePath = dir[j].Substring(cm.RootDirectory.Length + 1);
+                    string filePath = dir[j].Substring(contentManager.RootDirectory.Length + 1);
                     filePath = filePath.Substring(0, filePath.Length - 4);
                     string textureName = filePath.Split('\\')[1];
 
-                    texturesDict[i].Add(textureName, cm.Load<Texture2D>(filePath));
+                    texturesDict[i].Add(textureName, contentManager.Load<Texture2D>(filePath));
                     debug += textureName + ", ";
 
                 }
@@ -114,13 +152,16 @@ namespace Project_1.Textures
 
         public static void ClearScreen(Color aColor)
         {
-            gdm.GraphicsDevice.Clear(aColor);
+            graphicsDeviceManager.GraphicsDevice.Clear(aColor);
         }
 
         public static ref Texture2D GetTexture(GfxPath aGfxPath)
         {
             return ref CollectionsMarshal.GetValueRefOrNullRef(texturesDict[(int)aGfxPath.Type], aGfxPath.Name);
         }
+
+
+        //Partially stolen form https://community.monogame.net/t/how-do-i-make-full-screen-stretch-to-the-entire-screen-and-have-black-bars-on-the-sides-if-the-screen-aspect-ratio-isnt-16-9/17364
 
         public static void SetWindowSize(Point aSize, bool aFullscreen, bool aBorderless)
         {
@@ -129,18 +170,62 @@ namespace Project_1.Textures
                 return;
             }
 
-            gdm.PreferredBackBufferWidth = aSize.X;
-            gdm.PreferredBackBufferHeight = aSize.Y;
-            gdm.IsFullScreen = aFullscreen;
-            gdm.HardwareModeSwitch = (aBorderless || aFullscreen);
-            gdm.ApplyChanges();
+            if (aFullscreen)
+            {
+                graphicsDeviceManager.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+                graphicsDeviceManager.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            }
+            else
+            {
+                graphicsDeviceManager.PreferredBackBufferWidth = aSize.X;
+                graphicsDeviceManager.PreferredBackBufferHeight = aSize.Y;
+            }
+
+            graphicsDeviceManager.IsFullScreen = aFullscreen;
+            graphicsDeviceManager.HardwareModeSwitch = (aBorderless && aFullscreen);
+            graphicsDeviceManager.ApplyChanges();
 
             //Add check here to see if display area is correct and if it isn't change aSize
+
+            Camera.RenderTargetPosition = GetRenderTargetDestination(Camera.devScreenBorder, graphicsDeviceManager.PreferredBackBufferWidth, graphicsDeviceManager.PreferredBackBufferHeight);
+
             Camera.SetWindowSize(aSize);
 
             UIManager.Rescale();
 
 
+        }
+
+        //Fully stolen from https://community.monogame.net/t/how-do-i-make-full-screen-stretch-to-the-entire-screen-and-have-black-bars-on-the-sides-if-the-screen-aspect-ratio-isnt-16-9/17364
+        static Rectangle GetRenderTargetDestination(Point resolution, int preferredBackBufferWidth, int preferredBackBufferHeight)
+        {
+            float resolutionRatio = (float)resolution.X / resolution.Y;
+            float screenRatio;
+            Point bounds = new Point(preferredBackBufferWidth, preferredBackBufferHeight);
+            screenRatio = (float)bounds.X / bounds.Y;
+            float scale;
+            Rectangle rectangle = new Rectangle();
+
+            if (resolutionRatio < screenRatio)
+                scale = (float)bounds.Y / resolution.Y;
+            else if (resolutionRatio > screenRatio)
+                scale = (float)bounds.X / resolution.X;
+            else
+            {
+                // Resolution and window/screen share aspect ratio
+                rectangle.Size = bounds;
+                return rectangle;
+            }
+            rectangle.Width = (int)(resolution.X * scale);
+            rectangle.Height = (int)(resolution.Y * scale);
+            return CenterRectangle(new Rectangle(Point.Zero, bounds), rectangle);
+        }
+
+        static Rectangle CenterRectangle(Rectangle outerRectangle, Rectangle innerRectangle)
+        {
+            Point delta = outerRectangle.Center - innerRectangle.Center;
+            innerRectangle.Offset(delta);
+            return innerRectangle;
         }
 
         static bool AllowedSize(Point aSize)
@@ -165,6 +250,37 @@ namespace Project_1.Textures
             }
 
             return true;
+        }
+
+        /// <summary>Returns true if the current application has focus, false otherwise</summary> 
+        /// from https://stackoverflow.com/questions/7162834/determine-if-current-application-is-activated-has-focus
+        public static bool ApplicationIsActivated()
+        {
+            var activatedHandle = GetForegroundWindow();
+            if (activatedHandle == IntPtr.Zero)
+            {
+                return false;       // No window is currently activated
+            }
+
+            var procId = Process.GetCurrentProcess().Id;
+            int activeProcId;
+            GetWindowThreadProcessId(activatedHandle, out activeProcId);
+
+            return activeProcId == procId;
+        }
+
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        private static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern int GetWindowThreadProcessId(IntPtr handle, out int processId);
+
+
+        static void ToggleFullScreen()
+        {
+            
+            fullsceen = !fullsceen;
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -65,6 +64,7 @@ namespace Project_1.Managers
                     break;
             }
 
+            Camera.DrawRenderTarget();
         }
 
         public static void SetState(State aState)
@@ -89,7 +89,6 @@ namespace Project_1.Managers
 
         static void GameDraw()
         {
-            GraphicsManager.ClearScreen(Color.Black);
             Camera.RunningDraw();
         }
 
@@ -105,7 +104,7 @@ namespace Project_1.Managers
 
         static void PauseDraw()
         {
-            GraphicsManager.ClearScreen(Color.Black);
+            GraphicsManager.ClearScreen(Color.Purple);
             Camera.PauseDraw();
         }
 
