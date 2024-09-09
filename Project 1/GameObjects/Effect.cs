@@ -27,6 +27,16 @@ namespace Project_1.GameObjects
 
             Vector2 xdd = new Vector2(1, 2);
             float isthisit = (normal / xdd).Length();
+
+                        double ellipsedegrees2 = Math.Atan2(norm.Y, norm.X);
+
+            double a = ellipseCentre.X - ellipsePos.Location.X;
+            double b = ellipseCentre.Y - ellipsePos.Location.Y;
+
+            
+
+            double x2 = (a * b * Math.Cos(ellipsedegrees2) / Math.Sqrt(Math.Pow(b * Math.Cos(ellipsedegrees2), 2) + Math.Pow(a * Math.Sin(ellipsedegrees2), 2)));
+            double y2 = (a * b * Math.Sin(ellipsedegrees2) / Math.Sqrt(Math.Pow(b * Math.Cos(ellipsedegrees2), 2) + Math.Pow(a * Math.Sin(ellipsedegrees2), 2)));
         }
     }
 }
