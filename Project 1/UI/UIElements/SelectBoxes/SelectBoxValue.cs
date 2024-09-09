@@ -16,6 +16,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
         {
             Int,
             String,
+            CameraSetting,
             ScreenRez
         }
 
@@ -28,8 +29,8 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
         protected string textToDisplay;
 
-        static SpriteFont font;
-        Vector2 textSize;
+        protected static SpriteFont font;
+        protected Vector2 textSize;
         SelectBoxValueTypes type;
 
         protected SelectBoxValue(SelectBoxValueTypes aType, UITexture aGfx, string aStartText, Vector2 aPos, Vector2 aSize) : base(aGfx, aPos, aSize)

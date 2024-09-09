@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
-using Project_1.Content.Input;
 using Project_1.GameObjects;
+using Project_1.Input;
 using Project_1.Textures;
 using Project_1.UI;
 

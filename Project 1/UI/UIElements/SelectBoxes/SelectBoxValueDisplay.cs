@@ -20,6 +20,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
         public void SetToNewValue(SelectBoxValue aValueToCopy)
         {
             textToDisplay = aValueToCopy.DisplayText;
+            textSize = font.MeasureString(textToDisplay);
         }
     }
 }

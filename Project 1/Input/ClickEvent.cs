@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace Project_1.Content.Input
+namespace Project_1.Input
 {
     internal class ClickEvent
     {
@@ -20,7 +20,7 @@ namespace Project_1.Content.Input
         ClickType buttonPressed;
 
 
-        public ClickEvent(Point aPos, ClickType aButton) 
+        public ClickEvent(Point aPos, ClickType aButton)
         {
             clickPos = aPos;
             buttonPressed = aButton;

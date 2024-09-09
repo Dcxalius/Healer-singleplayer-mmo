@@ -15,7 +15,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
         Point screenSize;
 
-        SelectBoxValueScreenRez(string aRez, Vector2 aPos, Vector2 aSize) : base(SelectBoxValueTypes.Int, null, aRez, aPos, aSize)
+        SelectBoxValueScreenRez(string aRez, Vector2 aPos, Vector2 aSize) : base(SelectBoxValueTypes.ScreenRez, null, aRez, aPos, aSize)
         {
             string[] split = aRez.Split(',');
 

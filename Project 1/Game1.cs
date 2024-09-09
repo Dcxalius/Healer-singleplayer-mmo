@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Project_1.Content.Input;
 using Project_1.GameObjects;
+using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.Tiles;

@@ -8,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Project_1.Managers;
-using Project_1.Content.Input;
 using Project_1.Textures;
 using Project_1.GameObjects;
+using Project_1.Input;
 
 namespace Project_1
 {

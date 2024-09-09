@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.Content.Input
+namespace Project_1.Input
 {
     internal class HoldEvent
     {

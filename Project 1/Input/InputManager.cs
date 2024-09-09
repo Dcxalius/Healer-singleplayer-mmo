@@ -10,12 +10,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.Content.Input
+namespace Project_1.Input
 {
     internal static class InputManager
     {
-        public static bool LeftPress 
-        { 
+        public static bool LeftPress
+        {
             get
             {
                 if (newMouseState.LeftButton == ButtonState.Pressed && oldMouseState.LeftButton == ButtonState.Released)
@@ -23,9 +23,9 @@ namespace Project_1.Content.Input
                     return true;
                 }
                 return false;
-            } 
+            }
         }
-        
+
         public static bool LeftHold
         {
             get
@@ -104,7 +104,7 @@ namespace Project_1.Content.Input
 
         public static bool GetMousePress(ButtonState aOldMouseButton, ButtonState aNewMouseButton)
         {
-            
+
             if (aOldMouseButton != ButtonState.Pressed && aNewMouseButton == ButtonState.Pressed)
             {
                 return true;

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Project_1.Content.Input;
+using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
@@ -30,6 +30,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
             defaultSize = aCollapsedSize;
             values = aSetOfValues;
             displayValue = new SelectBoxValueDisplay(aSetOfValues[aStartDisplayValue], aGfx, aPos, aCollapsedSize);
+            selectedValue = aStartDisplayValue;
         }
 
         public override void ClickedOnMe(ClickEvent aClick)

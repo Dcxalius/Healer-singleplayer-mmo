@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Project_1.Content.Input;
 using Project_1.GameObjects;
+using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.Tiles;
@@ -22,7 +22,8 @@ namespace Project_1
             Free,
             CircleSoftBound,
             RectangleSoftBound,
-            Hardbound
+            Hardbound,
+            Count
         }
 
         public static float Scale
@@ -40,7 +41,10 @@ namespace Project_1
             get => screenRectangle;
         }
 
-            
+        public static CameraSettings CurrentCameraSetting
+        {
+            get => cameraSettings;
+        }
 
         static SpriteBatch spriteBatch;
 

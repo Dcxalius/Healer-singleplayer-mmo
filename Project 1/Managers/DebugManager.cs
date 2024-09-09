@@ -11,6 +11,7 @@ namespace Project_1.Managers
     enum DebugMode
     {
         Off,
+        Hitboxes,
         On
     }
 

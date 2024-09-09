@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Project_1.Content.Input;
+using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.UI.OptionMenu;
@@ -30,8 +30,9 @@ namespace Project_1.UI
 
         public static void InitOptionsMenuUI()
         {
+            optionElements.Add(new CameraStyleSelect(new Vector2(0.1f, 0.22f), new Vector2(0.3f, 0.1f)));
+            optionElements.Add(new ScreenSizeSelect(new Vector2(0.1f, 0.1f), new Vector2(0.3f, 0.1f)));
             optionElements.Add(new ExitOptionsButton());
-            optionElements.Add(new ScreenSizeSelect(new Vector2(0.1f), new Vector2(0.3f, 0.1f)));
         }
 
         static void InitGameUI()
