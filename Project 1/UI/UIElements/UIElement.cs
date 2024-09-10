@@ -50,11 +50,14 @@ namespace Project_1.UI.UIElements
             return new Rectangle((Camera.ScreenRectangle.Size.ToVector2() * aPos).ToPoint(), (Camera.ScreenRectangle.Size.ToVector2() * aSize).ToPoint());
         }
 
-
-
         static protected Point TransformFromRelativeToPoint(Vector2 aValue)
         {
             return (Camera.ScreenRectangle.Size.ToVector2() * aValue).ToPoint();
+        }
+
+        public virtual void Close()
+        {
+
         }
 
         public virtual void HoldUpdate()

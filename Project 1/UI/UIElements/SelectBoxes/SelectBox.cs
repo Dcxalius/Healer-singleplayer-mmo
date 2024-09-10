@@ -67,11 +67,16 @@ namespace Project_1.UI.UIElements.SelectBoxes
             displayValue.SetToNewValue(values[aSelectedValue]);
         }
 
-        void Close(ClickEvent aClick)
+        public override void Close()
         {
             isOpen = false;
 
             pos.Size = TransformFromRelativeToPoint(defaultSize);
+        }
+
+        void Close(ClickEvent aClick)
+        {
+            Close();
 
             Point target = aClick.ClickPos - pos.Location;
 
@@ -80,6 +85,8 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
         void Open()
         {
+            UIManager.CloseAllOptionMenuStuff();
+
             isOpen = true;
 
             pos.Size = new Point(pos.Size.X, TransformFromRelativeToPoint(defaultSize * (values.Length + 1)).Y);

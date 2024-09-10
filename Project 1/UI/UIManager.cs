@@ -100,6 +100,14 @@ namespace Project_1.UI
             }
         }
 
+        public static void CloseAllOptionMenuStuff()
+        {
+            for (int i = 0; i < optionElements.Count; i++)
+            {
+                optionElements[i].Close();
+            }
+        }
+
         public static void DrawGameUI(SpriteBatch aBatch)
         {
             StateDraw(gameElements, aBatch);
