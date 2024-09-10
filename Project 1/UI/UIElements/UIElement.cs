@@ -23,6 +23,16 @@ namespace Project_1.UI.UIElements
             get => relativeSize;
         }
 
+        public Rectangle Pos 
+        { 
+            get
+            {
+                Rectangle parentBasedPos = pos;
+                parentBasedPos.Location += parentPos;
+                return parentBasedPos;
+            }
+        }
+        public ref Rectangle RefPos { get => ref pos; }
 
         UITexture gfx;
         protected Rectangle pos;
@@ -31,12 +41,19 @@ namespace Project_1.UI.UIElements
 
         public HoldEvent heldEvents; //TODO: This should prob be cleanse on state change
 
-
+        protected UIElement? parent;
+        protected Point parentPos = Point.Zero;
         protected List<UIElement> children = new List<UIElement>();
 
-        protected UIElement(UITexture aGfx, Vector2 aPos, Vector2 aSize) //aPos and aSize should be between 0 and 1
+        protected UIElement(in Rectangle? aParentPos, UITexture aGfx, Vector2 aPos, Vector2 aSize) //aPos and aSize should be between 0 and 1
         {
             //Debug.Assert(aPos > 0 && aPos < 0);
+            
+            if (aParentPos != null)
+            {
+                parentPos = aParentPos.GetValueOrDefault().Location;
+            }
+
             gfx = aGfx;
 
             relativePos = aPos;
@@ -82,29 +99,16 @@ namespace Project_1.UI.UIElements
                 child.Update();
             }
 
-            if (pos.Contains(InputManager.GetMousePosAbsolute()))
+            if (Pos.Contains(Camera.TransformRelativeToAbsoluteScreenSpace(InputManager.GetMousePosRelative())))
             {
                 OnHover();
             }
         }
 
-        public virtual void Draw(SpriteBatch aBatch)
-        {
-            if (gfx != null)
-            {
-
-                gfx.Draw(aBatch, pos);
-            }
-
-            foreach (UIElement child in children)
-            {
-                child.Draw(aBatch);
-            }
-        }
 
         public bool ClickedOn(ClickEvent aClick)
         {
-            if (pos.Contains(aClick.ClickPos))
+            if (Pos.Contains(Camera.TransformRelativeToAbsoluteScreenSpace(aClick.ClickPos)))
             {
                 bool clickedOnChild = ClickedOnChildren(aClick);
                 if (clickedOnChild == false)
@@ -156,6 +160,20 @@ namespace Project_1.UI.UIElements
             for (int i = 0; i < children.Count; i++)
             {
                 children[i].Rescale();
+            }
+        }
+
+        public virtual void Draw(SpriteBatch aBatch)
+        {
+            if (gfx != null)
+            {
+
+                gfx.Draw(aBatch, Pos);
+            }
+
+            foreach (UIElement child in children)
+            {
+                child.Draw(aBatch);
             }
         }
     }

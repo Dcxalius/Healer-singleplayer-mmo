@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Input;
 using Project_1.Managers;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,8 @@ namespace Project_1
             pos = aStartingPos;
             size = aGfx.Visible.Value.Size;
         }
+
+        public virtual bool Click(ClickEvent aClickEvent) { return false; }
 
         public virtual void Update()
         {

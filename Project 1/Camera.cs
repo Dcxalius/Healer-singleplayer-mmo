@@ -133,7 +133,15 @@ namespace Project_1
             return (pos, size);
         }
 
-        
+        public static Point TransformRelativeToAbsoluteScreenSpace(Vector2 aPos) 
+        {
+            return (screenRectangle.Size.ToVector2() * aPos).ToPoint();
+        }
+        public static Vector2 TransformAbsoluteToRelativeScreenSpace(Point aPos)
+        {
+            return (aPos.ToVector2() / screenRectangle.Size.ToVector2());
+        }
+
 
         public static void SetCamera(CameraSettings aCameraSettings)
         {

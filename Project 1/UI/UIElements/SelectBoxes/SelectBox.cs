@@ -19,17 +19,15 @@ namespace Project_1.UI.UIElements.SelectBoxes
         float openMaxSize;
         protected SelectBoxValue[] values;
         int selectedValue;
-        SelectBoxValueDisplay displayValue;
+        protected SelectBoxValueDisplay displayValue;
 
         Vector2 defaultPos;
         Vector2 defaultSize;
 
-        public SelectBox(UITexture aGfx, SelectBoxValue[] aSetOfValues, int aStartDisplayValue, Vector2 aPos, Vector2 aCollapsedSize) : base(aGfx, aPos, aCollapsedSize)
+        public SelectBox(in Rectangle? aParentPos ,UITexture aGfx, int aStartDisplayValue, Vector2 aPos, Vector2 aCollapsedSize) : base(in aParentPos, aGfx, aPos, aCollapsedSize)
         {
             defaultPos = aPos;
             defaultSize = aCollapsedSize;
-            values = aSetOfValues;
-            displayValue = new SelectBoxValueDisplay(aSetOfValues[aStartDisplayValue], aGfx, aPos, aCollapsedSize);
             selectedValue = aStartDisplayValue;
         }
 
@@ -78,7 +76,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
         {
             Close();
 
-            Point target = aClick.ClickPos - pos.Location;
+            Point target = Camera.TransformRelativeToAbsoluteScreenSpace(aClick.ClickPos) - pos.Location;
 
             SetNewValue(target);
         }
@@ -95,9 +93,9 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
         public override void Draw(SpriteBatch aBatch)
         {
-            base.Draw(aBatch);
 
-            displayValue.Draw(aBatch);
+            base.Draw(aBatch);
+            displayValue.Draw(aBatch); 
 
             if (isOpen == false)
             {
