@@ -35,7 +35,7 @@ namespace Project_1.UI.UIElements
         string buttonText;
         Vector2 textSize;
 
-        public Button(in Rectangle? aParentPos, Vector2 aPos, Vector2 aSize, Color aColor) : base(in aParentPos, new UITexture("WhiteBackground", aColor), aPos, aSize)
+        public Button(ref Rectangle aParentPos, Vector2 aPos, Vector2 aSize, Color aColor) : base(ref aParentPos, new UITexture("WhiteBackground", aColor), aPos, aSize)
         {
 
             pressedGfx = new UITexture("GrayBackground", aColor);
@@ -43,7 +43,7 @@ namespace Project_1.UI.UIElements
 
         public override void Update()
         {
-            if (pressed) { DebugManager.Print(GetType(), "meow"); }
+            //if (pressed) { DebugManager.Print(GetType(), "meow"); }
             base.Update();
         }
 

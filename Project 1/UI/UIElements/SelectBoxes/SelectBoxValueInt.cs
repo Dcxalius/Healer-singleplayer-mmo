@@ -11,7 +11,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
     {
         int value;
 
-        public SelectBoxValueInt(in Rectangle? aParentPos, string aStartValue, Vector2 aPos, Vector2 aSize) : base(in aParentPos, SelectBoxValueTypes.Int, null, aStartValue, aPos, aSize)
+        public SelectBoxValueInt(ref Rectangle aParentPos, string aStartValue, Vector2 aPos, Vector2 aSize) : base(ref aParentPos, SelectBoxValueTypes.Int, null, aStartValue, aPos, aSize)
         {
         }
     }

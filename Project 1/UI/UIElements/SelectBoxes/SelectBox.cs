@@ -24,7 +24,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
         Vector2 defaultPos;
         Vector2 defaultSize;
 
-        public SelectBox(in Rectangle? aParentPos ,UITexture aGfx, int aStartDisplayValue, Vector2 aPos, Vector2 aCollapsedSize) : base(in aParentPos, aGfx, aPos, aCollapsedSize)
+        public SelectBox(ref Rectangle aParentPos ,UITexture aGfx, int aStartDisplayValue, Vector2 aPos, Vector2 aCollapsedSize) : base(ref aParentPos, aGfx, aPos, aCollapsedSize)
         {
             defaultPos = aPos;
             defaultSize = aCollapsedSize;
@@ -34,6 +34,8 @@ namespace Project_1.UI.UIElements.SelectBoxes
         public override void ClickedOnMe(ClickEvent aClick)
         {
             base.ClickedOnMe(aClick);
+
+            DebugManager.Print(this.GetType(), pos.ToString());
 
             if (isOpen == true)
             {
@@ -48,7 +50,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
         void SetNewValue(Point aP)
         {
             int tempSelectedValue = aP.Y / TransformFromRelativeToPoint(defaultSize).Y;
-            DebugManager.Print(GetType(), "New selectedValue is: " + tempSelectedValue);
+            //DebugManager.Print(GetType(), "New selectedValue is: " + tempSelectedValue);
 
             if (tempSelectedValue == 0 || tempSelectedValue == selectedValue + 1)
             {
@@ -93,8 +95,8 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
         public override void Draw(SpriteBatch aBatch)
         {
-
             base.Draw(aBatch);
+         
             displayValue.Draw(aBatch); 
 
             if (isOpen == false)

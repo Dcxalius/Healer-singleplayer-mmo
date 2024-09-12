@@ -37,9 +37,11 @@ namespace Project_1
             get { return 1f / scale; }
         }
 
-        public static Rectangle ScreenRectangle
+        public static Rectangle ScreenRectangle { get => new Rectangle(Point.Zero, ScreenSize); }
+
+        public static Point ScreenSize
         {
-            get => screenRectangle;
+            get => screenRectangleSize;
         }
 
         public static CameraSettings CurrentCameraSetting
@@ -53,7 +55,7 @@ namespace Project_1
             set => centreInWorldSpace = value;
         }
 
-        public static Point CentrePointInScreenSpace { get => new Point(devScreenBorder.X / 2, devScreenBorder.Y / 2); }
+        public static Point CentrePointInScreenSpace { get => new Point(screenRectangleSize.X / 2, screenRectangleSize.Y / 2); }
 
         static SpriteBatch spriteBatch;
 
@@ -68,7 +70,7 @@ namespace Project_1
         //--
 
         public readonly static Point devScreenBorder = new Point(1500, 900);
-        static Rectangle screenRectangle;
+        static Point screenRectangleSize;
 
 
 
@@ -120,26 +122,22 @@ namespace Project_1
                 }
                 scale -= scrolled / 2400f; //A single mousewheel step is 120 so 2400 gives a movement of 5% points per mousewheel step
                 DebugManager.Print(typeof(Camera), "Centre point: " + centreInWorldSpace);
-                cameraMover.bindingRectangle.Size = new Point((int)(screenRectangle.Size.X / 4 * 3 * Zoom), (int)(screenRectangle.Size.Y / 4 * 3 * Zoom));
+                cameraMover.bindingRectangle.Size = new Point((int)(screenRectangleSize.X / 4 * 3 * Zoom), (int)(screenRectangleSize.Y / 4 * 3 * Zoom));
 
             }
         }
 
-        public static (Vector2 , Vector2) TransformDevSizeToRelativeVectors(Rectangle aRect)
-        {
-            Vector2 pos = aRect.Location.ToVector2() / devScreenBorder.ToVector2();
-            Vector2 size = aRect.Size.ToVector2() / devScreenBorder.ToVector2();
-
-            return (pos, size);
-        }
 
         public static Point TransformRelativeToAbsoluteScreenSpace(Vector2 aPos) 
         {
-            return (screenRectangle.Size.ToVector2() * aPos).ToPoint();
+            Point pos = new Point((int)(screenRectangleSize.X * aPos.X), (int)(screenRectangleSize.Y * aPos.Y));
+            //DebugManager.Print(typeof(Camera), "Abs pos = " + pos + ", and relative pos = " + aPos);
+            return pos;
         }
         public static Vector2 TransformAbsoluteToRelativeScreenSpace(Point aPos)
         {
-            return (aPos.ToVector2() / screenRectangle.Size.ToVector2());
+            Vector2 pos = new Vector2((float)aPos.X / (float)screenRectangleSize.X, (float)aPos.Y / (float)screenRectangleSize.Y);
+            return pos;
         }
 
 
@@ -152,31 +150,31 @@ namespace Project_1
         public static void SetWindowSize(Point aSize)
         {
             cameraTarget = GraphicsManager.CreateRenderTarget(aSize);
-            screenRectangle.Size = aSize;
+            screenRectangleSize = aSize;
             //zoom = something xd
             //scale = scale 
-            cameraMover.bindingRectangle = new Rectangle(new Point(0), new Point(screenRectangle.Size.X / 4 * 3, screenRectangle.Size.Y / 4 * 3));
-            cameraMover.maxCircleCameraMove = screenRectangle.Size.Y / 3;
+            cameraMover.bindingRectangle = new Rectangle(new Point(0), new Point(screenRectangleSize.X / 4 * 3, screenRectangleSize .Y / 4 * 3));
+            cameraMover.maxCircleCameraMove = screenRectangleSize.Y / 3;
         }
 
        
         public static Rectangle WorldPosToCameraSpace(Rectangle aWorldPos)
         {
-            Point topLeft = (centreInWorldSpace * scale - screenRectangle.Size.ToVector2() / 2).ToPoint();
+            Point topLeft = (centreInWorldSpace * scale - screenRectangleSize.ToVector2() / 2).ToPoint();
             Rectangle cameraPos = new Rectangle((aWorldPos.Location.ToVector2() * scale).ToPoint() - topLeft, aWorldPos.Size);
             return cameraPos;
         }
 
         public static Vector2 WorldPosToCameraSpace(Vector2 aWorldPos)
         {
-            Vector2 topLeft = centreInWorldSpace * scale - new Vector2(screenRectangle.Size.X / 2, screenRectangle.Size.Y / 2);
+            Vector2 topLeft = centreInWorldSpace * scale - new Vector2(screenRectangleSize.X / 2,       screenRectangleSize.Y / 2);
 
             return aWorldPos*scale - topLeft ; 
         }
 
         public static bool MomAmIInFrame(Rectangle aRect)
         {
-            if (screenRectangle.Intersects(aRect))
+            if (ScreenRectangle.Intersects(aRect))
             {
                 return true;
             }
@@ -207,7 +205,7 @@ namespace Project_1
             Draw(spriteBatch);
             if (DebugManager.mode == DebugMode.On)
             {
-                Vector2 DebugPos = new Vector2(screenRectangle.Size.X / 2, screenRectangle.Size.Y / 2);
+                Vector2 DebugPos = new Vector2(screenRectangleSize.X / 2, screenRectangleSize.Y / 2);
                 spriteBatch.Draw(debugTexture, DebugPos, new Rectangle(0, 0, 10, 10), Color.White, 0f, new Vector2(5), 1f, SpriteEffects.None, 1f);
 
                 //Rectangle r = new Rectangle((centrePoint - screenRectangle.Location.ToVector2() - screenBorder.ToVector2() / 2).ToPoint() , screenRectangle.Size);

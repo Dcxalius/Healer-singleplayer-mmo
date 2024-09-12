@@ -160,9 +160,6 @@ namespace Project_1.Textures
             return ref CollectionsMarshal.GetValueRefOrNullRef(texturesDict[(int)aGfxPath.Type], aGfxPath.Name);
         }
 
-
-        //Partially stolen form https://community.monogame.net/t/how-do-i-make-full-screen-stretch-to-the-entire-screen-and-have-black-bars-on-the-sides-if-the-screen-aspect-ratio-isnt-16-9/17364
-
         public static void SetWindowSize(Point aSize, bool aFullscreen, bool aBorderless)
         {
             if (!AllowedSize(aSize))
@@ -174,11 +171,13 @@ namespace Project_1.Textures
             {
                 graphicsDeviceManager.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
                 graphicsDeviceManager.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+                Camera.RenderTargetPosition = GetRenderTargetDestination(Camera.devScreenBorder, graphicsDeviceManager.PreferredBackBufferWidth, graphicsDeviceManager.PreferredBackBufferHeight);
             }
             else
             {
                 graphicsDeviceManager.PreferredBackBufferWidth = aSize.X;
                 graphicsDeviceManager.PreferredBackBufferHeight = aSize.Y;
+                Camera.RenderTargetPosition = new Rectangle(0, 0, aSize.X, aSize.Y);
             }
 
             graphicsDeviceManager.IsFullScreen = aFullscreen;
@@ -187,7 +186,6 @@ namespace Project_1.Textures
 
             //Add check here to see if display area is correct and if it isn't change aSize
 
-            Camera.RenderTargetPosition = GetRenderTargetDestination(Camera.devScreenBorder, graphicsDeviceManager.PreferredBackBufferWidth, graphicsDeviceManager.PreferredBackBufferHeight);
 
             Camera.SetWindowSize(aSize);
 
@@ -196,7 +194,7 @@ namespace Project_1.Textures
 
         }
 
-        //Fully stolen from https://community.monogame.net/t/how-do-i-make-full-screen-stretch-to-the-entire-screen-and-have-black-bars-on-the-sides-if-the-screen-aspect-ratio-isnt-16-9/17364
+        //stolen from https://community.monogame.net/t/how-do-i-make-full-screen-stretch-to-the-entire-screen-and-have-black-bars-on-the-sides-if-the-screen-aspect-ratio-isnt-16-9/17364
         static Rectangle GetRenderTargetDestination(Point resolution, int preferredBackBufferWidth, int preferredBackBufferHeight)
         {
             float resolutionRatio = (float)resolution.X / resolution.Y;

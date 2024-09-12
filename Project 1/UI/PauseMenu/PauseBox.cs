@@ -30,13 +30,13 @@ namespace Project_1.UI.PauseMenu
             }
         }
 
-        public PauseBox() : base (null, gfx, pausePos, pauseSize) 
+        public PauseBox() : base (ref UIManager.grandParentPosition, gfx, pausePos, pauseSize) 
         {
-            children.Add(new MainMenuButton(Pos, GetStartPosition, buttonSize));
-            children.Add(new OptionMenuButton(Pos, GetStartPosition, buttonSize));
-            children.Add(new Button(Pos, GetStartPosition, buttonSize, Color.BurlyWood));
-            children.Add(new Button(Pos, GetStartPosition, buttonSize, Color.Green));
-            children.Add(new ExitGameButton(Pos, GetStartPosition, buttonSize));
+            children.Add(new MainMenuButton(ref RefPos, GetStartPosition, buttonSize));
+            children.Add(new OptionMenuButton(ref Pos, GetStartPosition, buttonSize));
+            children.Add(new Button(ref Pos, GetStartPosition, buttonSize, Color.BurlyWood));
+            children.Add(new Button(ref Pos, GetStartPosition, buttonSize, Color.Green));
+            children.Add(new ExitGameButton(ref Pos, GetStartPosition, buttonSize));
         }
 
     }

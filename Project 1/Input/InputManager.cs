@@ -96,7 +96,8 @@ namespace Project_1.Input
         {
             if (GetMousePress(oldMouseState.LeftButton, newMouseState.LeftButton))
             {
-                ClickEvent clickEvent = new ClickEvent(GetMousePosAbsolute(), ClickEvent.ClickType.Left);
+                ClickEvent clickEvent = new ClickEvent(GetMousePosRelative(), ClickEvent.ClickType.Left);
+                //DebugManager.Print(typeof(InputManager), "Mouse pos = " + GetMousePosRelative());
                 bool hitAnUIElement = UIManager.Click(clickEvent);
                 if (hitAnUIElement)
                 {
@@ -116,7 +117,7 @@ namespace Project_1.Input
         public static Vector2 GetMousePosRelative()
         {
             Point mousePoint = GetMousePosAbsolute();
-            Point screenSize = Camera.ScreenRectangle.Size;
+            Point screenSize = Camera.ScreenSize;
 
             Vector2 mouseVector = new Vector2(mousePoint.X / (float)screenSize.X, mousePoint.Y / (float)screenSize.Y);
 

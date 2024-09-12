@@ -21,6 +21,8 @@ namespace Project_1.UI
         static List<UIElement> pauseElements = new List<UIElement>();
         static List<UIElement> optionElements = new List<UIElement>();
 
+        public static Rectangle grandParentPosition = Rectangle.Empty;
+
         public static void Init()
         {
             InitGameUI();
@@ -30,17 +32,13 @@ namespace Project_1.UI
 
         public static void InitOptionsMenuUI()
         {
-            optionElements.Add(new CameraStyleSelect(null, new Vector2(0.1f, 0.22f), new Vector2(0.3f, 0.1f)));
-            optionElements.Add(new ScreenSizeSelect(null, new Vector2(0.1f, 0.1f), new Vector2(0.3f, 0.1f)));
+            optionElements.Add(new CameraStyleSelect(ref grandParentPosition, new Vector2(0.1f, 0.22f), new Vector2(0.3f, 0.1f)));
+            optionElements.Add(new ScreenSizeSelect(ref grandParentPosition, new Vector2(0.1f, 0.1f), new Vector2(0.3f, 0.1f)));
             optionElements.Add(new ExitOptionsButton());
         }
 
         static void InitGameUI()
         {
-            (Vector2 pos1, Vector2 size1) = Camera.TransformDevSizeToRelativeVectors(new Rectangle(100, 100, 128, 128));
-            gameElements.Add(new Box(null, new UITexture("WhiteBackground", Color.AliceBlue), pos1, size1));
-            (Vector2 pos2, Vector2 size2) = Camera.TransformDevSizeToRelativeVectors(new Rectangle(500, 100, 256, 128));
-            gameElements.Add(new Box(null, new UITexture("WhiteBackground", Color.IndianRed), pos2, size2));
 
         }
 

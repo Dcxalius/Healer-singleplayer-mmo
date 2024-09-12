@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Project_1.UI.UIElements
@@ -23,36 +24,35 @@ namespace Project_1.UI.UIElements
             get => relativeSize;
         }
 
-        public Rectangle Pos 
+        public ref Rectangle Pos 
         { 
             get
             {
-                Rectangle parentBasedPos = pos;
-                parentBasedPos.Location += parentPos;
-                return parentBasedPos;
+                absolutePos = pos;
+                absolutePos.Location += parentPos;
+                return ref absolutePos;
             }
         }
         public ref Rectangle RefPos { get => ref pos; }
 
         UITexture gfx;
+        Rectangle absolutePos;
         protected Rectangle pos;
         Vector2 relativePos;
         Vector2 relativeSize;
 
         public HoldEvent heldEvents; //TODO: This should prob be cleanse on state change
 
-        protected UIElement? parent;
+        //protected UIElement? parent;
         protected Point parentPos = Point.Zero;
         protected List<UIElement> children = new List<UIElement>();
 
-        protected UIElement(in Rectangle? aParentPos, UITexture aGfx, Vector2 aPos, Vector2 aSize) //aPos and aSize should be between 0 and 1
+        protected UIElement(ref Rectangle aParentPos, UITexture aGfx, Vector2 aPos, Vector2 aSize) //aPos and aSize should be between 0 and 1
         {
             //Debug.Assert(aPos > 0 && aPos < 0);
             
-            if (aParentPos != null)
-            {
-                parentPos = aParentPos.GetValueOrDefault().Location;
-            }
+            parentPos = aParentPos.Location;
+            
 
             gfx = aGfx;
 
@@ -64,12 +64,15 @@ namespace Project_1.UI.UIElements
 
         static protected Rectangle TransformFromRelativeToValues(Vector2 aPos, Vector2 aSize)
         {
-            return new Rectangle((Camera.ScreenRectangle.Size.ToVector2() * aPos).ToPoint(), (Camera.ScreenRectangle.Size.ToVector2() * aSize).ToPoint());
+            Point pos = new Point((int)(Camera.ScreenSize.X * aPos.X), (int)(Camera.ScreenSize.Y * aPos.Y));
+            Point size = new Point((int)(Camera.ScreenSize.X * aSize.X), (int)(Camera.ScreenSize.Y * aSize.Y));
+            return new Rectangle(pos, size);
         }
 
         static protected Point TransformFromRelativeToPoint(Vector2 aValue)
         {
-            return (Camera.ScreenRectangle.Size.ToVector2() * aValue).ToPoint();
+            Point size = new Point((int)(Camera.ScreenSize.X * aValue.X), (int)(Camera.ScreenSize.Y * aValue.Y));
+            return size;
         }
 
         public virtual void Close()
@@ -99,7 +102,7 @@ namespace Project_1.UI.UIElements
                 child.Update();
             }
 
-            if (Pos.Contains(Camera.TransformRelativeToAbsoluteScreenSpace(InputManager.GetMousePosRelative())))
+            if (Pos.Contains(InputManager.GetMousePosAbsolute()))
             {
                 OnHover();
             }
@@ -150,7 +153,7 @@ namespace Project_1.UI.UIElements
         {
             heldEvents = new HoldEvent(TimeManager.gt.TotalGameTime, aClick, this);
 
-            DebugManager.Print(GetType(), "Clicked on " + pos);
+            //DebugManager.Print(GetType(), "Clicked on " + pos);
         }
 
         public virtual void Rescale()

@@ -12,7 +12,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
 {
     internal class SelectBoxValueDisplay : SelectBoxValue
     {
-        public SelectBoxValueDisplay(in Rectangle? aParentPos, SelectBoxValue aTypeToCopy, UITexture aGfx, Vector2 aSize) : base(in aParentPos, aTypeToCopy.Type, aGfx, aTypeToCopy.DisplayText, Vector2.Zero, aSize)
+        public SelectBoxValueDisplay(ref Rectangle aParentPos, SelectBoxValue aTypeToCopy, UITexture aGfx, Vector2 aSize) : base(ref aParentPos, aTypeToCopy.Type, aGfx, aTypeToCopy.DisplayText, Vector2.Zero, aSize)
         {
 
         }
@@ -21,6 +21,17 @@ namespace Project_1.UI.UIElements.SelectBoxes
         {
             textToDisplay = aValueToCopy.DisplayText;
             textSize = font.MeasureString(textToDisplay);
+        }
+
+        public override void Rescale()
+        {
+            base.Rescale();
+            
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            base.Draw(spriteBatch);
         }
     }
 }

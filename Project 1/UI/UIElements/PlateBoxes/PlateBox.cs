@@ -16,7 +16,7 @@ namespace Project_1.UI.UIElements.PlateBoxes
         PlateBoxSegment[] horizontalSegments; 
         PlateBoxSegment[] verticalSegments;
 
-        public PlateBox(in Rectangle? aParentPos, PlateBoxSegment[] aSetOfHorizonalSegments, PlateBoxSegment[] aSetOfVerticalSegments, Vector2 aPos, Vector2 aSize) : base(in aParentPos, new UITexture("GreyBackground", Color.White), aPos, aSize)
+        public PlateBox(ref Rectangle aParentPos, PlateBoxSegment[] aSetOfHorizonalSegments, PlateBoxSegment[] aSetOfVerticalSegments, Vector2 aPos, Vector2 aSize) : base(ref aParentPos, new UITexture("GreyBackground", Color.White), aPos, aSize)
         {
             //TODO: Make sure the segmentsizes doesnt add up to > aSize
 

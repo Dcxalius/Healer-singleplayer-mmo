@@ -15,7 +15,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
         Point screenSize;
 
-        SelectBoxValueScreenRez(in Rectangle? aParentPos, string aRez, Vector2 aPos, Vector2 aSize) : base(in aParentPos, SelectBoxValueTypes.ScreenRez, null, aRez, aPos, aSize)
+        SelectBoxValueScreenRez(ref Rectangle aParentPos, string aRez, Vector2 aPos, Vector2 aSize) : base(ref aParentPos, SelectBoxValueTypes.ScreenRez, null, aRez, aPos, aSize)
         {
             string[] split = aRez.Split(',');
 
@@ -28,13 +28,13 @@ namespace Project_1.UI.UIElements.SelectBoxes
             Debug.Assert(successL && successW);
         }
 
-        public static SelectBoxValueScreenRez[] CreateArray(in Rectangle? aParentPos, string[] aListToCreate, Vector2 aStartPos, Vector2 aSize)
+        public static SelectBoxValueScreenRez[] CreateArray(ref Rectangle aParentPos, string[] aListToCreate, Vector2 aStartPos, Vector2 aSize)
         {
             SelectBoxValueScreenRez[] returnable = new SelectBoxValueScreenRez[aListToCreate.Length];
             Vector2 pos = aStartPos;
             for (int i = 0; i < aListToCreate.Length; i++)
             {
-                returnable[i] = new SelectBoxValueScreenRez(in aParentPos, aListToCreate[i], pos, aSize);
+                returnable[i] = new SelectBoxValueScreenRez(ref aParentPos, aListToCreate[i], pos, aSize);
                 pos.Y += aSize.Y;
             }
             return returnable;

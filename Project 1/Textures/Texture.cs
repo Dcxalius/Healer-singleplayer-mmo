@@ -49,6 +49,7 @@ namespace Project_1.Textures
             color = Color.White;   
             scale = 1;
             size = aSize;
+            offset = Vector2.Zero;
         }
 
         public Texture(GfxPath aPath, Vector2 aOffset, Point aSize)
@@ -66,6 +67,7 @@ namespace Project_1.Textures
             __Constructor__(aPath);
             scale = 1;
             color = aColor;
+            offset = Vector2.Zero;
         }
 
         public Texture(GfxPath aPath, Vector2 aOffset, Color aColor)
@@ -82,6 +84,7 @@ namespace Project_1.Textures
             gfx = GraphicsManager.GetTexture(aPath);
             flip = SpriteEffects.None;
             visible = null;
+            offset = Vector2.Zero;
         }
 
         public void Flip()
