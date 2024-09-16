@@ -21,7 +21,7 @@ namespace Project_1.UI
         static List<UIElement> pauseElements = new List<UIElement>();
         static List<UIElement> optionElements = new List<UIElement>();
 
-        public static Rectangle grandParentPosition = Rectangle.Empty;
+        public static Point grandParentPosition = Point.Zero;
 
         public static void Init()
         {
@@ -32,8 +32,8 @@ namespace Project_1.UI
 
         public static void InitOptionsMenuUI()
         {
-            optionElements.Add(new CameraStyleSelect(ref grandParentPosition, new Vector2(0.1f, 0.22f), new Vector2(0.3f, 0.1f)));
-            optionElements.Add(new ScreenSizeSelect(ref grandParentPosition, new Vector2(0.1f, 0.1f), new Vector2(0.3f, 0.1f)));
+            optionElements.Add(new CameraStyleSelect(new Vector2(0.1f, 0.22f), new Vector2(0.3f, 0.1f)));
+            optionElements.Add(new ScreenSizeSelect(new Vector2(0.1f, 0.1f), new Vector2(0.3f, 0.1f)));
             optionElements.Add(new ExitOptionsButton());
         }
 
@@ -73,7 +73,7 @@ namespace Project_1.UI
         {
             for (int i = 0; i < aListOfUIElements.Count; i++)
             {
-                aListOfUIElements[i].Update();
+                aListOfUIElements[i].Update(null);
             }
 
         }

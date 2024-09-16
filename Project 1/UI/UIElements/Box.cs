@@ -13,16 +13,15 @@ namespace Project_1.UI.UIElements
     internal class Box : UIElement
     {
 
-        public Box(ref Rectangle aParentPos, UITexture aGfx, Vector2 aPos, Vector2 aSize) : base(ref aParentPos, aGfx, aPos, aSize)
+        public Box(UITexture aGfx, Vector2 aPos, Vector2 aSize) : base(aGfx, aPos, aSize)
         {
 
         }
 
 
-        public override void Update()
+        public override void Update(in UIElement aParent)
         {
-            base.Update();
-            pos.X++;
+            base.Update(aParent);
         }
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)
         {

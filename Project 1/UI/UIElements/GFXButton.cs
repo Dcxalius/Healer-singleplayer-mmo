@@ -15,7 +15,7 @@ namespace Project_1.UI.UIElements
         Texture gfx;
         Rectangle gfxRectangle;
 
-        public GFXButton(ref Rectangle aParentPos, GfxPath aGfxPath, Vector2 aPos, Vector2 aSize, Color aColorOfBorder) : base(ref aParentPos, aPos, aSize, aColorOfBorder)
+        public GFXButton(GfxPath aGfxPath, Vector2 aPos, Vector2 aSize, Color aColorOfBorder) : base(aPos, aSize, aColorOfBorder)
         {
             gfx = new Texture(aGfxPath);
             gfxRectangle = TransformFromRelativeToValues(new Vector2(RelativePos.X + RelativeSize.X / 10, RelativePos.Y + RelativeSize.Y / 10), new Vector2(RelativeSize.X * 0.8f, RelativeSize.Y * 0.8f));
@@ -36,9 +36,9 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        public override void Update()
+        public override void Update(in UIElement aParent)
         {
-            base.Update();
+            base.Update(aParent);
 
             //DebugManager.Print(GetType(), "Pos: " + pos);
             //DebugManager.Print(GetType(), "MousePos: " + InputManager.GetMousePosAbsolute());

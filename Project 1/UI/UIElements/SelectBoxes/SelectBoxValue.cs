@@ -33,7 +33,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
         protected Vector2 textSize;
         SelectBoxValueTypes type;
 
-        protected SelectBoxValue(ref Rectangle aParentPos, SelectBoxValueTypes aType, UITexture aGfx, string aStartText, Vector2 aPos, Vector2 aSize) : base(ref aParentPos, aGfx, aPos, aSize)
+        protected SelectBoxValue(SelectBoxValueTypes aType, UITexture aGfx, string aStartText, Vector2 aPos, Vector2 aSize) : base(aGfx, aPos, aSize)
         {
             type = aType;
             if (font == null)
@@ -56,7 +56,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
         {
             base.Draw(spriteBatch);
 
-            spriteBatch.DrawString(font, textToDisplay, new Vector2(Pos.X + Pos.Size.X / 2, Pos.Y + Pos.Size.Y / 2), Color.Teal, 0f, textSize / 2, 1f, SpriteEffects.None, 1f);
+            spriteBatch.DrawString(font, textToDisplay, new Vector2(AbsolutePos.X + AbsolutePos.Size.X / 2, AbsolutePos.Y + AbsolutePos.Size.Y / 2), Color.Teal, 0f, textSize / 2, 1f, SpriteEffects.None, 1f);
         }
     }
 }

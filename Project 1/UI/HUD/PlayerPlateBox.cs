@@ -17,7 +17,7 @@ namespace Project_1.UI.HUD
 
         //static PlateBoxSegment[] a = new PlateBoxSegment[] { new PlateBoxNameSegment(p.Name, aPos, new Vector2(aSize.X, aSize.Y)) };
         
-        public PlayerPlateBox(ref Rectangle aParentPos, Vector2 aPos, Vector2 aSize) : base(ref aParentPos, null, null, aPos, aSize)
+        public PlayerPlateBox(Vector2 aPos, Vector2 aSize) : base(null, null, aPos, aSize)
         {
             
 

@@ -18,6 +18,7 @@ namespace Project_1.UI.PauseMenu
 
         static Vector2 buttonSize = new Vector2(pauseSize.X / 5 * 4, pauseSize.Y / 12);
         static Vector2 buttonStartingPos = new Vector2(pauseSize.X / 2 - buttonSize.X / 2, 0.05f);
+        static Vector2 buttonStartingFromBottomPos = new Vector2(pauseSize.X / 2 - buttonSize.X / 2, pauseSize.Y - 0.05f);
         static Vector2 buttonOffset = new Vector2(0, buttonSize.Y * 1.5f);
 
         static int buttonIndex = 0;
@@ -30,13 +31,14 @@ namespace Project_1.UI.PauseMenu
             }
         }
 
-        public PauseBox() : base (ref UIManager.grandParentPosition, gfx, pausePos, pauseSize) 
+        public PauseBox() : base (gfx, pausePos, pauseSize) 
         {
-            children.Add(new MainMenuButton(ref RefPos, GetStartPosition, buttonSize));
-            children.Add(new OptionMenuButton(ref Pos, GetStartPosition, buttonSize));
-            children.Add(new Button(ref Pos, GetStartPosition, buttonSize, Color.BurlyWood));
-            children.Add(new Button(ref Pos, GetStartPosition, buttonSize, Color.Green));
-            children.Add(new ExitGameButton(ref Pos, GetStartPosition, buttonSize));
+            children.Add(new ResumeButton(GetStartPosition, buttonSize));
+            children.Add(new OptionMenuButton(GetStartPosition, buttonSize));
+            children.Add(new Button(GetStartPosition, buttonSize, Color.BurlyWood));
+            children.Add(new Button(GetStartPosition, buttonSize, Color.Green));
+            children.Add(new MainMenuButton(GetStartPosition, buttonSize));
+            children.Add(new ExitGameButton(buttonStartingFromBottomPos, buttonSize));
         }
 
     }

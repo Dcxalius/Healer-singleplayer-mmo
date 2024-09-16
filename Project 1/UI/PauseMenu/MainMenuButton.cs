@@ -13,7 +13,7 @@ namespace Project_1.UI.PauseMenu
     internal class MainMenuButton : Button
     {
 
-        public MainMenuButton(ref Rectangle aParentPos, Vector2 aPos, Vector2 aSize) : base(ref aParentPos, aPos, aSize, Color.Gray)
+        public MainMenuButton(Vector2 aPos, Vector2 aSize) : base(aPos, aSize, Color.Gray)
         {
             ButtonText = "Main Menu";
 

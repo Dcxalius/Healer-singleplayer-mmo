@@ -10,7 +10,7 @@ namespace Project_1.UI.UIElements.PlateBoxes
 {
     internal class PlateBoxSegment : UIElement
     {
-        public PlateBoxSegment(ref Rectangle aParentPos, UITexture aGfx, Vector2 aPos, Vector2 aSize) : base(ref aParentPos, aGfx, aPos, aSize)
+        public PlateBoxSegment(UITexture aGfx, Vector2 aPos, Vector2 aSize) : base(aGfx, aPos, aSize)
         {
         }
     }

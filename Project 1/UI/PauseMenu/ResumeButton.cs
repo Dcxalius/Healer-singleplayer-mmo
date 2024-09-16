@@ -9,18 +9,18 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.PauseMenu
 {
-    internal class OptionMenuButton : Button
+    internal class ResumeButton : Button
     {
-        public OptionMenuButton(Vector2 aPos, Vector2 aSize) : base(aPos, aSize, Color.Blue)
+        public ResumeButton(Vector2 aPos, Vector2 aSize) : base(aPos, aSize, Color.PaleVioletRed)
         {
-            ButtonText = "Options Menu";
+            ButtonText = "Resume Game";
         }
 
         public override void HoldReleaseOnMe()
         {
-            StateManager.SetState(State.Options);
-
             base.HoldReleaseOnMe();
+
+            StateManager.currentState = State.Game;
         }
     }
 }

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,35 +25,31 @@ namespace Project_1.UI.UIElements
             get => relativeSize;
         }
 
-        public ref Rectangle Pos 
-        { 
+        public Rectangle AbsolutePos
+        {
             get
             {
-                absolutePos = pos;
-                absolutePos.Location += parentPos;
-                return ref absolutePos;
+                Rectangle a = pos;
+                a.Location = absolutePos;
+                return a;
             }
         }
-        public ref Rectangle RefPos { get => ref pos; }
 
         UITexture gfx;
-        Rectangle absolutePos;
+        Point absolutePos;
         protected Rectangle pos;
         Vector2 relativePos;
         Vector2 relativeSize;
 
-        public HoldEvent heldEvents; //TODO: This should prob be cleanse on state change
+        public HoldEvent heldEvents; //TODO: This should prob be cleansed on state change
 
         //protected UIElement? parent;
         protected Point parentPos = Point.Zero;
         protected List<UIElement> children = new List<UIElement>();
 
-        protected UIElement(ref Rectangle aParentPos, UITexture aGfx, Vector2 aPos, Vector2 aSize) //aPos and aSize should be between 0 and 1
+        protected UIElement(UITexture aGfx, Vector2 aPos, Vector2 aSize) //aPos and aSize should be between 0 and 1
         {
             //Debug.Assert(aPos > 0 && aPos < 0);
-            
-            parentPos = aParentPos.Location;
-            
 
             gfx = aGfx;
 
@@ -60,6 +57,7 @@ namespace Project_1.UI.UIElements
             relativeSize = aSize;
 
             pos = TransformFromRelativeToValues(aPos, aSize);
+            absolutePos = pos.Location;
         }
 
         static protected Rectangle TransformFromRelativeToValues(Vector2 aPos, Vector2 aSize)
@@ -93,16 +91,25 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        public virtual void Update()
+        public virtual void Update(in UIElement aParent)
         {
             HoldUpdate();
 
+            if (aParent != null)
+            {
+                absolutePos = aParent.absolutePos + pos.Location;
+            }
+            else
+            {
+                absolutePos = pos.Location;
+            }
             foreach (UIElement child in children)
             {
-                child.Update();
+                child.Update(this);
             }
 
-            if (Pos.Contains(InputManager.GetMousePosAbsolute()))
+
+            if (AbsolutePos.Contains(InputManager.GetMousePosAbsolute()))
             {
                 OnHover();
             }
@@ -111,7 +118,7 @@ namespace Project_1.UI.UIElements
 
         public bool ClickedOn(ClickEvent aClick)
         {
-            if (Pos.Contains(Camera.TransformRelativeToAbsoluteScreenSpace(aClick.ClickPos)))
+            if (AbsolutePos.Contains(Camera.TransformRelativeToAbsoluteScreenSpace(aClick.ClickPos)))
             {
                 bool clickedOnChild = ClickedOnChildren(aClick);
                 if (clickedOnChild == false)
@@ -171,7 +178,7 @@ namespace Project_1.UI.UIElements
             if (gfx != null)
             {
 
-                gfx.Draw(aBatch, Pos);
+                gfx.Draw(aBatch, AbsolutePos);
             }
 
             foreach (UIElement child in children)

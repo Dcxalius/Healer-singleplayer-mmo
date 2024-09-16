@@ -15,12 +15,12 @@ namespace Project_1.UI.OptionMenu
     {
         public static CameraStyleSelect instance;
 
-        public CameraStyleSelect(ref Rectangle aParentPos, Vector2 aPos, Vector2 aSize) : base(ref aParentPos, new UITexture("WhiteBackground", Color.White), (int)Camera.CurrentCameraSetting, aPos, aSize)
+        public CameraStyleSelect(Vector2 aPos, Vector2 aSize) : base(new UITexture("WhiteBackground", Color.White), (int)Camera.CurrentCameraSetting, aPos, aSize)
         {
             instance = this;
 
-            SelectBoxValueCameraSettings[] setOfValues = SelectBoxValueCameraSettings.CreateArray(ref Pos, new Vector2(0, aSize.Y), aSize);
-            displayValue = new SelectBoxValueDisplay(ref Pos, setOfValues[(int)Camera.CurrentCameraSetting], new UITexture("WhiteBackground", Color.White), aSize);
+            SelectBoxValueCameraSettings[] setOfValues = SelectBoxValueCameraSettings.CreateArray(new Vector2(0, aSize.Y), aSize);
+            displayValue = new SelectBoxValueDisplay(setOfValues[(int)Camera.CurrentCameraSetting], new UITexture("WhiteBackground", Color.White), aSize);
 
             values = setOfValues;
 

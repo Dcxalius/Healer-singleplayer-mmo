@@ -24,11 +24,23 @@ namespace Project_1.UI.UIElements.SelectBoxes
         Vector2 defaultPos;
         Vector2 defaultSize;
 
-        public SelectBox(ref Rectangle aParentPos ,UITexture aGfx, int aStartDisplayValue, Vector2 aPos, Vector2 aCollapsedSize) : base(ref aParentPos, aGfx, aPos, aCollapsedSize)
+        public SelectBox(UITexture aGfx, int aStartDisplayValue, Vector2 aPos, Vector2 aCollapsedSize) : base(aGfx, aPos, aCollapsedSize)
         {
             defaultPos = aPos;
             defaultSize = aCollapsedSize;
             selectedValue = aStartDisplayValue;
+        }
+
+        public override void Update(in UIElement aParent)
+        {
+            base.Update(aParent);
+
+            displayValue.Update(this);
+
+            foreach (var value in values)
+            {
+                value.Update(this);
+            }
         }
 
         public override void ClickedOnMe(ClickEvent aClick)
