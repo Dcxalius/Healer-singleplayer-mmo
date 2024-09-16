@@ -41,10 +41,10 @@ namespace Project_1.UI.UIElements
             pressedGfx = new UITexture("GrayBackground", aColor);
         }
 
-        public override void Update()
+        public override void Update(in UIElement aParent)
         {
-            if (pressed) { DebugManager.Print(GetType(), "meow"); }
-            base.Update();
+            //if (pressed) { DebugManager.Print(GetType(), "meow"); }
+            base.Update(aParent);
         }
 
         public override void ClickedOnMe(ClickEvent aClick)
@@ -62,15 +62,14 @@ namespace Project_1.UI.UIElements
 
         public override void Draw(SpriteBatch aBatch)
         {
-
-
             if (!pressed)
             {
                 base.Draw(aBatch);
             }
             else
             {
-                pressedGfx.Draw(aBatch, pos);
+                //Rectangle? xdd = new Rectangle(parent.Pos.Location ?? Point.Zero + pos.Location, pos.Size);
+                pressedGfx.Draw(aBatch, AbsolutePos);
 
             }
 
@@ -78,7 +77,7 @@ namespace Project_1.UI.UIElements
             {
 
                 //aBatch.DrawString(GraphicsManager.buttonFont, buttonText, new Vector2(pos.X + pos.Size.X / 2 , pos.Y + pos.Size.Y / 2 ), Color.Black, 0f, textSize / 2, 1.2f, SpriteEffects.None, 1f);
-                aBatch.DrawString(GraphicsManager.buttonFont, buttonText, new Vector2(pos.X + pos.Size.X / 2 , pos.Y + pos.Size.Y / 2 ), Color.White, 0f, textSize / 2, 1f, SpriteEffects.None, 1f);
+                aBatch.DrawString(GraphicsManager.buttonFont, buttonText, new Vector2(AbsolutePos.X + AbsolutePos.Size.X / 2 , AbsolutePos.Y + AbsolutePos.Size.Y / 2 ), Color.White, 0f, textSize / 2, 1f, SpriteEffects.None, 1f);
             }
         }
     }

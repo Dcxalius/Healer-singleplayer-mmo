@@ -19,23 +19,35 @@ namespace Project_1.UI.UIElements.SelectBoxes
         float openMaxSize;
         protected SelectBoxValue[] values;
         int selectedValue;
-        SelectBoxValueDisplay displayValue;
+        protected SelectBoxValueDisplay displayValue;
 
         Vector2 defaultPos;
         Vector2 defaultSize;
 
-        public SelectBox(UITexture aGfx, SelectBoxValue[] aSetOfValues, int aStartDisplayValue, Vector2 aPos, Vector2 aCollapsedSize) : base(aGfx, aPos, aCollapsedSize)
+        public SelectBox(UITexture aGfx, int aStartDisplayValue, Vector2 aPos, Vector2 aCollapsedSize) : base(aGfx, aPos, aCollapsedSize)
         {
             defaultPos = aPos;
             defaultSize = aCollapsedSize;
-            values = aSetOfValues;
-            displayValue = new SelectBoxValueDisplay(aSetOfValues[aStartDisplayValue], aGfx, aPos, aCollapsedSize);
             selectedValue = aStartDisplayValue;
+        }
+
+        public override void Update(in UIElement aParent)
+        {
+            base.Update(aParent);
+
+            displayValue.Update(this);
+
+            foreach (var value in values)
+            {
+                value.Update(this);
+            }
         }
 
         public override void ClickedOnMe(ClickEvent aClick)
         {
             base.ClickedOnMe(aClick);
+
+            DebugManager.Print(this.GetType(), pos.ToString());
 
             if (isOpen == true)
             {
@@ -50,7 +62,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
         void SetNewValue(Point aP)
         {
             int tempSelectedValue = aP.Y / TransformFromRelativeToPoint(defaultSize).Y;
-            DebugManager.Print(GetType(), "New selectedValue is: " + tempSelectedValue);
+            //DebugManager.Print(GetType(), "New selectedValue is: " + tempSelectedValue);
 
             if (tempSelectedValue == 0 || tempSelectedValue == selectedValue + 1)
             {
@@ -67,19 +79,26 @@ namespace Project_1.UI.UIElements.SelectBoxes
             displayValue.SetToNewValue(values[aSelectedValue]);
         }
 
-        void Close(ClickEvent aClick)
+        public override void Close()
         {
             isOpen = false;
 
             pos.Size = TransformFromRelativeToPoint(defaultSize);
+        }
 
-            Point target = aClick.ClickPos - pos.Location;
+        void Close(ClickEvent aClick)
+        {
+            Close();
+
+            Point target = Camera.TransformRelativeToAbsoluteScreenSpace(aClick.ClickPos) - pos.Location;
 
             SetNewValue(target);
         }
 
         void Open()
         {
+            UIManager.CloseAllOptionMenuStuff();
+
             isOpen = true;
 
             pos.Size = new Point(pos.Size.X, TransformFromRelativeToPoint(defaultSize * (values.Length + 1)).Y);
@@ -89,8 +108,8 @@ namespace Project_1.UI.UIElements.SelectBoxes
         public override void Draw(SpriteBatch aBatch)
         {
             base.Draw(aBatch);
-
-            displayValue.Draw(aBatch);
+         
+            displayValue.Draw(aBatch); 
 
             if (isOpen == false)
             {

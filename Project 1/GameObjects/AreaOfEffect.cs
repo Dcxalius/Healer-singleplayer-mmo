@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Input;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,5 @@ namespace Project_1.GameObjects
             hitBox = new Rectangle(aStartingPos.ToPoint(), aSize.ToPoint());
         }
 
-        
     }
 }

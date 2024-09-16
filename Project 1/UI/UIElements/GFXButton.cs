@@ -36,9 +36,9 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        public override void Update()
+        public override void Update(in UIElement aParent)
         {
-            base.Update();
+            base.Update(aParent);
 
             //DebugManager.Print(GetType(), "Pos: " + pos);
             //DebugManager.Print(GetType(), "MousePos: " + InputManager.GetMousePosAbsolute());

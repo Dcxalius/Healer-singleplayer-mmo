@@ -21,6 +21,8 @@ namespace Project_1.UI
         static List<UIElement> pauseElements = new List<UIElement>();
         static List<UIElement> optionElements = new List<UIElement>();
 
+        public static Point grandParentPosition = Point.Zero;
+
         public static void Init()
         {
             InitGameUI();
@@ -37,10 +39,6 @@ namespace Project_1.UI
 
         static void InitGameUI()
         {
-            (Vector2 pos1, Vector2 size1) = Camera.TransformDevSizeToRelativeVectors(new Rectangle(100, 100, 128, 128));
-            gameElements.Add(new Box(new UITexture("WhiteBackground", Color.AliceBlue), pos1, size1));
-            (Vector2 pos2, Vector2 size2) = Camera.TransformDevSizeToRelativeVectors(new Rectangle(500, 100, 256, 128));
-            gameElements.Add(new Box(new UITexture("WhiteBackground", Color.IndianRed), pos2, size2));
 
         }
 
@@ -75,7 +73,7 @@ namespace Project_1.UI
         {
             for (int i = 0; i < aListOfUIElements.Count; i++)
             {
-                aListOfUIElements[i].Update();
+                aListOfUIElements[i].Update(null);
             }
 
         }
@@ -100,6 +98,14 @@ namespace Project_1.UI
             }
         }
 
+        public static void CloseAllOptionMenuStuff()
+        {
+            for (int i = 0; i < optionElements.Count; i++)
+            {
+                optionElements[i].Close();
+            }
+        }
+
         public static void DrawGameUI(SpriteBatch aBatch)
         {
             StateDraw(gameElements, aBatch);
@@ -114,27 +120,29 @@ namespace Project_1.UI
 
         }
 
-        public static void Click(ClickEvent aClickEvent)
+        public static bool Click(ClickEvent aClickEvent)
         {
+
             switch (StateManager.currentState)
             {
                 case State.Game:
                     SearchForHit(gameElements, aClickEvent);
-                    break;
+                    return true;
                 case State.Pause:
                     SearchForHit(pauseElements, aClickEvent);
-                    break;
+                    return true;
                 case State.StartMenu:
-                    break;
+                    return true;
                 case State.Options:
                     SearchForHit(optionElements, aClickEvent);
-                    break;
+                    return true;
                 default:
                     break;
             }
+            return false;
         }
 
-        public static void SearchForHit(List<UIElement> aListToSearch, ClickEvent aClickEvent)
+        public static bool SearchForHit(List<UIElement> aListToSearch, ClickEvent aClickEvent)
         {
             for (int i = aListToSearch.Count - 1; i >= 0; i--)
             {
@@ -142,9 +150,10 @@ namespace Project_1.UI
                 clickedOn = aListToSearch[i].ClickedOn(aClickEvent);
                 if (clickedOn == true)
                 {
-                    return;
+                    return true;
                 }
             }
+            return false;
         }
 
         public static void Rescale()

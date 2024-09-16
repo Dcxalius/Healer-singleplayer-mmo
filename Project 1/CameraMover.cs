@@ -24,8 +24,8 @@ namespace Project_1
 
 
         MovingObject boundObject;
-        public Rectangle bindingRectangle = new Rectangle(new Point(0), new Point(devScreenBorder.X / 4 * 3, devScreenBorder.Y / 4 * 3));
-        public float maxCircleCameraMove = devScreenBorder.Y / 3;
+        public Rectangle bindingRectangle = new Rectangle(new Point(0), new Point(ScreenSize.X / 4 * 3, ScreenSize.Y / 4 * 3));
+        public float maxCircleCameraMove = ScreenSize.Y / 3;
 
 
         void ApplyMouseVelocity()

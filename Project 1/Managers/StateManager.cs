@@ -121,7 +121,13 @@ namespace Project_1.Managers
 
         static void OptionsMenuUpdate()
         {
+            if (InputManager.GetPress(Microsoft.Xna.Framework.Input.Keys.Escape))
+            {
+                currentState = State.Pause;
+            }
+
             UIManager.Update();
+
         }
 
         static void OptionsMenuDraw()

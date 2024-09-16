@@ -45,11 +45,18 @@ namespace Project_1.UI.UIElements.SelectBoxes
             textSize = font.MeasureString(textToDisplay);
         }
 
+        public override void Rescale()
+        {
+            base.Rescale();
+            
+            textSize = font.MeasureString(textToDisplay);
+        }
+
         public override void Draw(SpriteBatch spriteBatch)
         {
             base.Draw(spriteBatch);
 
-            spriteBatch.DrawString(font, textToDisplay, pos.Location.ToVector2(), Color.Black, 0f, -pos.Size.ToVector2() / 2 + textSize / 2, 1f, SpriteEffects.None, 1f);
+            spriteBatch.DrawString(font, textToDisplay, new Vector2(AbsolutePos.X + AbsolutePos.Size.X / 2, AbsolutePos.Y + AbsolutePos.Size.Y / 2), Color.Teal, 0f, textSize / 2, 1f, SpriteEffects.None, 1f);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Project_1.GameObjects;
 using Project_1.Managers;
 using Project_1.UI;
 using System;
@@ -70,36 +71,69 @@ namespace Project_1.Input
 
         public static void Update()
         {
+            UpdateStates();
+            UpdateScrollWheel();
+            CreateMouseClickEvent();
+        }
+
+        static void UpdateStates()
+        {
             oldKeyboardState = newKeyboardState;
             newKeyboardState = Keyboard.GetState();
 
             oldMouseState = newMouseState;
             newMouseState = Mouse.GetState();
-            //Mouse.PlatformSetCursor();
 
+        }
+
+        static void UpdateScrollWheel()
+        {
             ScrolledSinceLastFrame = oldMouseState.ScrollWheelValue - newMouseState.ScrollWheelValue;
 
+        }
+
+        static void CreateMouseClickEvent()
+        {
             if (GetMousePress(oldMouseState.LeftButton, newMouseState.LeftButton))
             {
-                ClickEvent clickEvent = new ClickEvent(GetMousePosAbsolute(), ClickEvent.ClickType.Left);
-                UIManager.Click(clickEvent);
+                ClickEvent clickEvent = new ClickEvent(GetMousePosRelative(), ClickEvent.ClickType.Left);
+                //DebugManager.Print(typeof(InputManager), "Mouse pos = " + GetMousePosRelative());
+                bool hitAnUIElement = UIManager.Click(clickEvent);
+                if (hitAnUIElement)
+                {
+                    return;
+                }
+                ObjectManager.Click(clickEvent);
             }
+
         }
 
         public static Point GetMousePosAbsolute()
         {
-            //DebugManager.Print(typeof(InputManager), "mouse pos gotten at " + newMouseState.Position);
-            return newMouseState.Position; //TODO: Make this handle the mouse being outside screen
+            Point mousePos = BoundsCheckOnMouse(newMouseState.Position);
+            return mousePos; //TODO: Make this handle the mouse being outside screen
         }
 
         public static Vector2 GetMousePosRelative()
         {
             Point mousePoint = GetMousePosAbsolute();
-            Point screenSize = Camera.ScreenRectangle.Size;
+            Point screenSize = Camera.ScreenSize;
 
             Vector2 mouseVector = new Vector2(mousePoint.X / (float)screenSize.X, mousePoint.Y / (float)screenSize.Y);
 
-            return mouseVector;//TODO: Make this handle the mouse being outside screen
+            
+
+            return mouseVector;
+        }
+
+        static Point BoundsCheckOnMouse(Point aMousePos)
+        {
+            Rectangle bounds = Camera.ScreenRectangle;
+            if (!bounds.Contains(aMousePos))
+            {
+                return new Point(-1);
+            }
+            return aMousePos;
         }
 
         public static bool GetMousePress(ButtonState aOldMouseButton, ButtonState aNewMouseButton)

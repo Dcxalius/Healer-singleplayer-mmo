@@ -20,6 +20,8 @@ namespace Project_1.UI.OptionMenu
         public override void HoldReleaseOnMe()
         {
             base.HoldReleaseOnMe();
+         
+            UIManager.CloseAllOptionMenuStuff();
             
             StateManager.SetState(State.Pause);
 

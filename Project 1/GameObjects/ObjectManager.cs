@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using Project_1.Input;
+using Project_1.UI.UIElements.PlateBoxes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +11,8 @@ namespace Project_1.GameObjects
 {
     internal static class ObjectManager
     {
+        public static Player Player { get => player; }
+
         public static List<GameObject> gameObjects = new List<GameObject>();
 
         static Player player = null;
@@ -34,6 +38,16 @@ namespace Project_1.GameObjects
             for (int i = 0; i < gameObjects.Count; i++)
             {
                 gameObjects[i].Draw(spriteBatch);
+            }
+        }
+
+        public static void Click(ClickEvent aClickEvent)
+        {
+            bool foundHit = false;
+            foundHit = player.Click(aClickEvent);
+            for (int i = 0; i < gameObjects.Count && !foundHit; i++)
+            {
+                foundHit = gameObjects[i].Click(aClickEvent);
             }
         }
     }

@@ -19,9 +19,9 @@ namespace Project_1.UI.UIElements
         }
 
 
-        public override void Update()
+        public override void Update(in UIElement aParent)
         {
-            base.Update();
+            base.Update(aParent);
         }
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)
         {
