@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1
+namespace Project_1.GameObjects
 {
     internal abstract class GameObject
     {
@@ -56,5 +56,11 @@ namespace Project_1
             }
         }
 
+
+        public void TEST()
+        {
+            DebugManager.Print(this.GetType(), "xdd");
+            pos += new Vector2(1) ;
+        }
     }
 }

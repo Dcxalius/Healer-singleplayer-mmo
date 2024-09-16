@@ -11,6 +11,10 @@ namespace Project_1.Managers
     {
         public static GameTime gt;
 
+        public static double SecondsSinceLastFrame
+        {
+            get => gt.ElapsedGameTime.TotalSeconds;
+        }
         public static void Update(GameTime aGt)
         {
             gt = aGt;

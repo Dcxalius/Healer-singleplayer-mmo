@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Input;
+using Project_1.Managers;
 using Project_1.Textures;
 using SharpDX.Direct2D1.Effects;
 using System;
@@ -14,21 +15,30 @@ namespace Project_1.GameObjects
     internal class Entity : MovingObject
     {
         public string Name { get => name; }
+        public bool HasDestination { get => destinations.Count > 0; }
+
+        Vector2 FeetPos { get => pos + new Vector2(size.X / 2, size.Y / 2); }
 
         static Texture ShadowTexture = new Texture(new GfxPath(GfxType.Object, "Shadow"));
         Rectangle shadowPos;
 
+
+        List<Vector2> destinations = new List<Vector2>();
+
+        int speed = 50;
+
         string name;
+
+
 
         public Entity(Texture aTexture, Vector2 aStartingPos, float aMaxSpeed) : base(aTexture, aStartingPos, aMaxSpeed)
         {
-            shadowPos = new Rectangle((pos + new Vector2(size.X/2, size.Y)).ToPoint()  , size);
+            shadowPos = new Rectangle((pos + new Vector2(size.X/2, size.Y)).ToPoint(), size);
 
             name = "xdd";
         }
 
-
-        public virtual bool Click(ClickEvent aClickEvent)
+        public override bool Click(ClickEvent aClickEvent)
         {
             Rectangle rect = new Rectangle(pos.ToPoint(), size);
             if (rect.Contains(aClickEvent.ClickPos))
@@ -41,9 +51,29 @@ namespace Project_1.GameObjects
 
         protected virtual void ClickedOn(ClickEvent aClickEvent) { }
 
+        Vector2 GetDirVectorToNextDestination(Vector2 aDestination)
+        {
+            Vector2 dirV = FeetPos - aDestination;
+            dirV.Normalize();
+            return dirV;
+        }
+
+        void Walk()
+        { 
+            if (destinations.Count == 0)
+            {
+                return;
+            }
+
+            Vector2 directionToWalk = GetDirVectorToNextDestination(destinations[0]);
+
+            velocity += directionToWalk * speed * (float)TimeManager.SecondsSinceLastFrame;
+        }
 
         public override void Update()
         {
+            Walk();
+            
             base.Update();
 
             Vector2 offset = new Vector2(0, size.Y / 2.5f);

@@ -18,7 +18,7 @@ namespace Project_1.Textures
 {
     //TODO: Split this into GraphicsMang and TextureMang
 
-    internal static class GraphicsManager
+    internal static class GraphicsManager //TODO: Split this into TextureManager and GraphicsManager
     {
         public enum FullscreenMode
         {

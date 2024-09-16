@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Project_1.Camera;
+using Project_1.GameObjects;
 
 namespace Project_1
 {
