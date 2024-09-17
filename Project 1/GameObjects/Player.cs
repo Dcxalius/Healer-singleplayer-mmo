@@ -17,8 +17,7 @@ namespace Project_1
 {
     internal class Player : Entity
     {
-        public List<StrongBox<Walker>> g = new List<StrongBox<Walker>>();
-
+        public List<Walker> commands = new List<Walker>();
         int speed = 50;
 
         public Player() : base(new Textures.AnimatedTexture(new GfxPath(GfxType.Object, "Player"), new Point(32), Textures.AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(500)), new Vector2(100,100), 100)
@@ -51,14 +50,45 @@ namespace Project_1
         public override void Update()
         {
             MouseWalk();
-            g[0].Value.TEST();
 
             base.Update();
         }
 
-       public void AddToCommand(Walker a)
+        public void ClearCommand()
         {
-            g.Add(new StrongBox<Walker>(a));
+            commands.Clear();
+        }
+
+        public void AddToCommand(Walker a)
+        {
+            if (commands.Contains(a)) { return; }
+
+            commands.Add(a);
+        }
+
+        public void RemoveFromCommand(Walker a)
+        {
+            if (!commands.Contains(a)) { return; }
+
+            commands.Remove(a);
+        }
+
+
+        public void IssueMoveOrder(ClickEvent aClick)
+        {
+            Vector2 worldPosDestination = Camera.CameraSpaceToWorldPos(aClick.ClickPos);
+            foreach (var walker in commands)
+            {
+                if (aClick.Modifier(InputManager.HoldModifier.Shift))
+                {
+                    walker.AddWalkingOrder(worldPosDestination);
+                }
+                else
+                {
+                    walker.RecieveDirectWalkingOrder(worldPosDestination);
+
+                }
+            }
         }
     }
 }

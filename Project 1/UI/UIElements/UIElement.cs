@@ -118,7 +118,7 @@ namespace Project_1.UI.UIElements
 
         public bool ClickedOn(ClickEvent aClick)
         {
-            if (AbsolutePos.Contains(Camera.TransformRelativeToAbsoluteScreenSpace(aClick.ClickPos)))
+            if (AbsolutePos.Contains(aClick.ClickPoint))
             {
                 bool clickedOnChild = ClickedOnChildren(aClick);
                 if (clickedOnChild == false)

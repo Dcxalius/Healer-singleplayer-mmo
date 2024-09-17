@@ -15,6 +15,13 @@ namespace Project_1.Input
 {
     internal static class InputManager
     {
+        public enum HoldModifier
+        {
+            Ctrl,
+            Alt,
+            Shift,
+            Count
+        }
         public static bool LeftPress
         {
             get
@@ -73,7 +80,7 @@ namespace Project_1.Input
         {
             UpdateStates();
             UpdateScrollWheel();
-            CreateMouseClickEvent();
+            CheckButtonPress();
         }
 
         static void UpdateStates()
@@ -92,20 +99,40 @@ namespace Project_1.Input
 
         }
 
-        static void CreateMouseClickEvent()
+        static void CheckButtonPress()
         {
             if (GetMousePress(oldMouseState.LeftButton, newMouseState.LeftButton))
             {
-                ClickEvent clickEvent = new ClickEvent(GetMousePosRelative(), ClickEvent.ClickType.Left);
-                //DebugManager.Print(typeof(InputManager), "Mouse pos = " + GetMousePosRelative());
-                bool hitAnUIElement = UIManager.Click(clickEvent);
-                if (hitAnUIElement)
-                {
-                    return;
-                }
-                ObjectManager.Click(clickEvent);
+                CreateClickEvent(ClickEvent.ClickType.Left);
             }
 
+            if (GetMousePress(oldMouseState.RightButton, newMouseState.RightButton))
+            {
+                CreateClickEvent(ClickEvent.ClickType.Right);
+            }
+        }
+
+        static void CreateClickEvent(ClickEvent.ClickType aTypeOfClick)
+        {
+            bool[] heldModifiers = CheckHoldModifiers();
+
+            ClickEvent clickEvent = new ClickEvent(GetMousePosRelative(), aTypeOfClick, heldModifiers);
+            //DebugManager.Print(typeof(InputManager), "Mouse pos = " + GetMousePosRelative());
+            bool hitAnUIElement = UIManager.Click(clickEvent);
+            if (hitAnUIElement)
+            {
+                return;
+            }
+            ObjectManager.Click(clickEvent);
+        }
+
+        static bool[] CheckHoldModifiers()
+        {
+            bool[] heldModifiers = new bool[(int)HoldModifier.Count];
+            heldModifiers[(int)HoldModifier.Shift] = GetHold(Keys.LeftShift) || GetHold(Keys.RightShift);
+            heldModifiers[(int)HoldModifier.Alt] = GetHold(Keys.LeftAlt) || GetHold(Keys.RightAlt);
+            heldModifiers[(int)HoldModifier.Ctrl] = GetHold(Keys.LeftControl) || GetHold(Keys.RightAlt);
+            return heldModifiers;
         }
 
         public static Point GetMousePosAbsolute()

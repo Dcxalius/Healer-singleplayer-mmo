@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,6 +18,7 @@ namespace Project_1.GameObjects
 
         //public static int GameObjectsToDraw = 0;
 
+        protected Rectangle ScreenRectangle { get => new Rectangle(pos.ToPoint(), size); }
         
         protected Textures.Texture gfx;
 
@@ -56,11 +58,5 @@ namespace Project_1.GameObjects
             }
         }
 
-
-        public void TEST()
-        {
-            DebugManager.Print(this.GetType(), "xdd");
-            pos += new Vector2(1) ;
-        }
     }
 }

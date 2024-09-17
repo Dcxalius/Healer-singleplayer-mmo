@@ -17,7 +17,7 @@ namespace Project_1.GameObjects
         public string Name { get => name; }
         public bool HasDestination { get => destinations.Count > 0; }
 
-        Vector2 FeetPos { get => pos + new Vector2(size.X / 2, size.Y / 2); }
+        Vector2 FeetPos { get => pos + new Vector2(size.X / 2, size.Y); }
 
         static Texture ShadowTexture = new Texture(new GfxPath(GfxType.Object, "Shadow"));
         Rectangle shadowPos;
@@ -40,8 +40,7 @@ namespace Project_1.GameObjects
 
         public override bool Click(ClickEvent aClickEvent)
         {
-            Rectangle rect = new Rectangle(pos.ToPoint(), size);
-            if (rect.Contains(aClickEvent.ClickPos))
+            if (Camera.WorldPosToCameraSpace(ScreenRectangle).Contains(aClickEvent.ClickPoint))
             {
                 ClickedOn(aClickEvent);
                 return true;
@@ -51,9 +50,10 @@ namespace Project_1.GameObjects
 
         protected virtual void ClickedOn(ClickEvent aClickEvent) { }
 
-        Vector2 GetDirVectorToNextDestination(Vector2 aDestination)
+        Vector2 GetDirVectorToNextDestination(Vector2 aDestination, out float aLenghtTillDestination)
         {
-            Vector2 dirV = FeetPos - aDestination;
+            Vector2 dirV = aDestination - FeetPos;
+            aLenghtTillDestination = dirV.Length();
             dirV.Normalize();
             return dirV;
         }
@@ -64,11 +64,27 @@ namespace Project_1.GameObjects
             {
                 return;
             }
+            float length = 0;
+            Vector2 directionToWalk = GetDirVectorToNextDestination(destinations[0], out length);
 
-            Vector2 directionToWalk = GetDirVectorToNextDestination(destinations[0]);
+            if (length < speed * 0.9f) //TODO: Find a good factor
+            {
+                destinations.RemoveAt(0);
+
+                return;
+            }
+
 
             velocity += directionToWalk * speed * (float)TimeManager.SecondsSinceLastFrame;
         }
+
+        protected void OverwriteDestination(Vector2 aDestination)
+        {
+            destinations.Clear();
+            destinations.Add(aDestination);
+        }
+
+        protected void AddDestination(Vector2 aDestination) { destinations.Add(aDestination); }
 
         public override void Update()
         {

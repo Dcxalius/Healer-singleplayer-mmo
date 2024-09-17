@@ -161,7 +161,7 @@ namespace Project_1
         public static Rectangle WorldPosToCameraSpace(Rectangle aWorldPos)
         {
             Point topLeft = (centreInWorldSpace * scale - screenRectangleSize.ToVector2() / 2).ToPoint();
-            Rectangle cameraPos = new Rectangle((aWorldPos.Location.ToVector2() * scale).ToPoint() - topLeft, aWorldPos.Size);
+            Rectangle cameraPos = new Rectangle((aWorldPos.Location.ToVector2() * scale).ToPoint() - topLeft, (aWorldPos.Size.ToVector2() * scale).ToPoint());
             return cameraPos;
         }
 
@@ -170,6 +170,23 @@ namespace Project_1
             Vector2 topLeft = centreInWorldSpace * scale - new Vector2(screenRectangleSize.X / 2,       screenRectangleSize.Y / 2);
 
             return aWorldPos*scale - topLeft ; 
+        }
+
+        public static Vector2 CameraSpaceToWorldPos(Point aScreenPos)
+        {
+            Vector2 vectorInScreen = (CentrePointInScreenSpace - aScreenPos).ToVector2();
+
+            Vector2 vectorInWorld = centreInWorldSpace - vectorInScreen;
+            //Needs scale
+            return vectorInWorld;
+        }
+
+        public static Vector2 CameraSpaceToWorldPos(Vector2 aRelativeVector)
+        {
+            //Vector2 a = (TransformRelativeToAbsoluteScreenSpace(aRelativeVector).ToVector2() - CentrePointInScreenSpace.ToVector2() * Scale)  ;
+            Vector2 a = (CentrePointInScreenSpace.ToVector2() * Scale - TransformRelativeToAbsoluteScreenSpace(aRelativeVector).ToVector2())  ;
+            Vector2 b = centreInWorldSpace - a;
+            return b;
         }
 
         public static bool MomAmIInFrame(Rectangle aRect)

@@ -16,18 +16,21 @@ namespace Project_1.GameObjects
         public static Player Player { get => player; }
 
         public static List<GameObject> gameObjects = new List<GameObject>();
-        //public static List<StrongBox<GameObject>> gameObjects = new List<StrongBox<GameObject>>();
 
         static Player player = null;
 
         public static void Init()
         {
             player = new Player();
-            //gameObjects.Add(new StrongBox<GameObject>(new Walker(new Microsoft.Xna.Framework.Vector2(200, 200))));
             gameObjects.Add(new Walker(new Microsoft.Xna.Framework.Vector2(200, 200)));
-            //player.g.Add(gameObjects[0]);
-            ((Walker)gameObjects[0]).AssumingDirectControl(ref player);
             Camera.BindCamera(player);
+        }
+
+        public static void Remove(GameObject aObject)
+        {
+
+
+            gameObjects.Remove(aObject);
         }
 
         public static void Update()
@@ -39,14 +42,6 @@ namespace Project_1.GameObjects
             }
         }
 
-        public static void Draw(SpriteBatch spriteBatch)
-        {
-            player.Draw(spriteBatch);
-            for (int i = 0; i < gameObjects.Count; i++)
-            {
-                gameObjects[i].Draw(spriteBatch);
-            }
-        }
 
         public static void Click(ClickEvent aClickEvent)
         {
@@ -57,9 +52,22 @@ namespace Project_1.GameObjects
                 foundHit = gameObjects[i].Click(aClickEvent);
             }
 
+            if(!foundHit && aClickEvent.ButtonPressed == ClickEvent.ClickType.Left)
+            {
+                player.ClearCommand();
+            }
+
             if (!foundHit && aClickEvent.ButtonPressed == ClickEvent.ClickType.Right)
             {
-
+                player.IssueMoveOrder(aClickEvent);
+            }
+        }
+        public static void Draw(SpriteBatch aSpriteBatch)
+        {
+            player.Draw(aSpriteBatch);
+            for (int i = 0; i < gameObjects.Count; i++)
+            {
+                gameObjects[i].Draw(aSpriteBatch);
             }
         }
     }

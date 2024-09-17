@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Input;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -15,10 +16,49 @@ namespace Project_1.GameObjects
 
         }
 
-        public void AssumingDirectControl(ref Player aPlayer)
+        public void AddToControl(Player aPlayer)
         {
             aPlayer.AddToCommand(this);
         }
 
+        public void NeedyControl(Player aPlayer)
+        {
+            aPlayer.ClearCommand();
+            aPlayer.AddToCommand(this);
+        }
+
+        public override bool Click(ClickEvent aClickEvent)
+        {
+            return base.Click(aClickEvent);
+        }
+
+        protected override void ClickedOn(ClickEvent aClickEvent)
+        {
+            base.ClickedOn(aClickEvent);
+
+            if (aClickEvent.ModifierOr(InputManager.HoldModifier.Ctrl, InputManager.HoldModifier.Shift))
+            {
+                AddToControl(ObjectManager.Player);
+            }
+            else
+            {
+                NeedyControl(ObjectManager.Player);
+            }
+        }
+
+        public void RecieveDirectWalkingOrder(Vector2 aPos)
+        {
+            OverwriteDestination(aPos);
+        }
+
+        public void RecieveDirectWalkingOrder(GameObject aGameObject)
+        {
+            OverwriteDestination(aGameObject.Position);
+        }
+
+        public void AddWalkingOrder(Vector2 aPos)
+        {
+            AddDestination(aPos);
+        }
     }
 }
