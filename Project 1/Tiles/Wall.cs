@@ -2,22 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Project_1.Tiles
 {
-    internal class Grass : Tile
+    internal class Wall : Tile
     {
-        public Grass(Point aPos) : base(true, "Grass", aPos)
+        public Wall(Point aPos) : base(false, "Wall", aPos)
         {
-
-        }
-
-        public override void Update()
-        {
-
         }
     }
 }

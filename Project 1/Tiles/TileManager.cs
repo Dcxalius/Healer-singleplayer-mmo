@@ -31,6 +31,49 @@ namespace Project_1.Tiles
                 }
             }
         }
+        
+        static bool CollisionsWithUnwalkable(Rectangle aWorldRect)
+        {
+            Tile[,] a = GetSurroundingTiles(aWorldRect.Center / TileSize);
+
+            Rectangle[] colliders = GetColliders(a);
+
+
+
+            return true;
+        }
+
+        static Tile[,] GetSurroundingTiles(Point aIndex)
+        {
+            const int sizeOfCheckSquare = 3;
+            Tile[,] a = new Tile[sizeOfCheckSquare, sizeOfCheckSquare];
+
+            for (int i = 0; i < sizeOfCheckSquare; i++)
+            {
+                for (int j = 0; j < sizeOfCheckSquare; j++)
+                {
+                    a[i, j] = tiles[aIndex.X - (int)Math.Floor(sizeOfCheckSquare/2m) + i, aIndex.Y - (int)Math.Floor(sizeOfCheckSquare / 2m) + j];
+                }
+            }
+            return a;
+        }
+
+        static Rectangle[] GetColliders(Tile[,] a)
+        {
+            List<Rectangle> colliders = new List<Rectangle>();
+            for (int i = 0; i < a.GetLength(0); i++)
+            {
+                for (int j = 0; j < a.GetLength(1); j++)
+                {
+                    if (!a[i,j].Walkable)
+                    {
+                        colliders.Add(a[i, j].WorldRectangle);
+                    }
+                }
+            }
+
+            return colliders.ToArray();
+        }
 
         public static void Draw(SpriteBatch aBatch)
         {
