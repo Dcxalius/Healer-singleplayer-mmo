@@ -18,7 +18,7 @@ namespace Project_1.GameObjects
 
         //public static int GameObjectsToDraw = 0;
 
-        protected Rectangle ScreenRectangle { get => new Rectangle(pos.ToPoint(), size); }
+        public Rectangle WorldRectangle { get => new Rectangle(pos.ToPoint(), size); }
         
         protected Textures.Texture gfx;
 
