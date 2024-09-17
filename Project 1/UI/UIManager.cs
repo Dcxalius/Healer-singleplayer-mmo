@@ -126,16 +126,13 @@ namespace Project_1.UI
             switch (StateManager.currentState)
             {
                 case State.Game:
-                    SearchForHit(gameElements, aClickEvent);
-                    return true;
+                    return SearchForHit(gameElements, aClickEvent); 
                 case State.Pause:
-                    SearchForHit(pauseElements, aClickEvent);
-                    return true;
+                    return SearchForHit(pauseElements, aClickEvent);
                 case State.StartMenu:
                     return true;
                 case State.Options:
-                    SearchForHit(optionElements, aClickEvent);
-                    return true;
+                    return SearchForHit(optionElements, aClickEvent);
                 default:
                     break;
             }

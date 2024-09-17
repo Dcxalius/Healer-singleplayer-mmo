@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Input;
+using Project_1.Managers;
 using Project_1.Textures;
 using SharpDX.Direct2D1.Effects;
 using System;
@@ -14,24 +15,32 @@ namespace Project_1.GameObjects
     internal class Entity : MovingObject
     {
         public string Name { get => name; }
+        public bool HasDestination { get => destinations.Count > 0; }
+
+        Vector2 FeetPos { get => pos + new Vector2(size.X / 2, size.Y); }
 
         static Texture ShadowTexture = new Texture(new GfxPath(GfxType.Object, "Shadow"));
         Rectangle shadowPos;
 
+
+        List<Vector2> destinations = new List<Vector2>();
+
+        int speed = 50;
+
         string name;
+
+
 
         public Entity(Texture aTexture, Vector2 aStartingPos, float aMaxSpeed) : base(aTexture, aStartingPos, aMaxSpeed)
         {
-            shadowPos = new Rectangle((pos + new Vector2(size.X/2, size.Y)).ToPoint()  , size);
+            shadowPos = new Rectangle((pos + new Vector2(size.X/2, size.Y)).ToPoint(), size);
 
             name = "xdd";
         }
 
-
-        public virtual bool Click(ClickEvent aClickEvent)
+        public override bool Click(ClickEvent aClickEvent)
         {
-            Rectangle rect = new Rectangle(pos.ToPoint(), size);
-            if (rect.Contains(aClickEvent.ClickPos))
+            if (Camera.WorldPosToCameraSpace(ScreenRectangle).Contains(aClickEvent.ClickPoint))
             {
                 ClickedOn(aClickEvent);
                 return true;
@@ -41,9 +50,46 @@ namespace Project_1.GameObjects
 
         protected virtual void ClickedOn(ClickEvent aClickEvent) { }
 
+        Vector2 GetDirVectorToNextDestination(Vector2 aDestination, out float aLenghtTillDestination)
+        {
+            Vector2 dirV = aDestination - FeetPos;
+            aLenghtTillDestination = dirV.Length();
+            dirV.Normalize();
+            return dirV;
+        }
+
+        void Walk()
+        { 
+            if (destinations.Count == 0)
+            {
+                return;
+            }
+            float length = 0;
+            Vector2 directionToWalk = GetDirVectorToNextDestination(destinations[0], out length);
+
+            if (length < speed * 0.9f) //TODO: Find a good factor
+            {
+                destinations.RemoveAt(0);
+
+                return;
+            }
+
+
+            velocity += directionToWalk * speed * (float)TimeManager.SecondsSinceLastFrame;
+        }
+
+        protected void OverwriteDestination(Vector2 aDestination)
+        {
+            destinations.Clear();
+            destinations.Add(aDestination);
+        }
+
+        protected void AddDestination(Vector2 aDestination) { destinations.Add(aDestination); }
 
         public override void Update()
         {
+            Walk();
+            
             base.Update();
 
             Vector2 offset = new Vector2(0, size.Y / 2.5f);

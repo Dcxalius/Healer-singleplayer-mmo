@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Textures;
+using Project_1.GameObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;

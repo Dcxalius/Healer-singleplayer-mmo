@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-
+using System.Linq;
+using Project_1.Input;
 namespace Project_1.Input
 {
     internal class ClickEvent
@@ -11,7 +12,10 @@ namespace Project_1.Input
             Right
         }
 
+
         public Vector2 ClickPos { get => clickPos; }
+
+        public Point ClickPoint { get => Camera.TransformRelativeToAbsoluteScreenSpace(clickPos); }
 
         Vector2 clickPos;
 
@@ -19,17 +23,29 @@ namespace Project_1.Input
 
         ClickType buttonPressed;
 
+        public bool Modifier(InputManager.HoldModifier aHoldModifier) { return modifierHeld[(int)aHoldModifier]; }
+        public bool ModifierOr(InputManager.HoldModifier aHoldModifier, InputManager.HoldModifier aSecondHoldModifier) { return modifierHeld[(int)aHoldModifier] || modifierHeld[(int)aSecondHoldModifier]; }
 
-        public ClickEvent(Point aPos, ClickType aButton)
+        bool[] modifierHeld;
+
+
+        public ClickEvent(Point aPos, ClickType aButtonPressed, bool[] aModifiers)
         {
             clickPos = Camera.TransformAbsoluteToRelativeScreenSpace(aPos);
-            buttonPressed = aButton;
+            __ClickEvent__(aButtonPressed, aModifiers);
+
         }
 
-        public ClickEvent(Vector2 aClickPos, ClickType aButtonPressed)
+        public ClickEvent(Vector2 aClickPos, ClickType aButtonPressed, bool[] aModifiers)
         {
             clickPos = aClickPos;
+            __ClickEvent__(aButtonPressed, aModifiers);
+        }
+        
+        void __ClickEvent__(ClickType aButtonPressed, bool[] aModifiers)
+        {
             buttonPressed = aButtonPressed;
+            modifierHeld = aModifiers;
         }
     }
 }

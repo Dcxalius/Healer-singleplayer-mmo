@@ -113,7 +113,7 @@ namespace Project_1.Textures
                         }
                         break;
                     case AnimationType.Random:
-                        currentFrame = RandomManager.RollInt(possibleFrames.Length);
+                        currentFrame = RandomManager.RollIntWithAvoidant(possibleFrames.Length, currentFrame);
                         break;
                     default:
                         break;

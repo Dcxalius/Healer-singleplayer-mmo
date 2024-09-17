@@ -6,10 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1
+namespace Project_1.GameObjects
 {
     internal abstract class GameObject
     {
@@ -17,6 +18,7 @@ namespace Project_1
 
         //public static int GameObjectsToDraw = 0;
 
+        protected Rectangle ScreenRectangle { get => new Rectangle(pos.ToPoint(), size); }
         
         protected Textures.Texture gfx;
 
