@@ -41,7 +41,7 @@ namespace Project_1.GameObjects
 
         public override bool Click(ClickEvent aClickEvent)
         {
-            if (Camera.WorldPosToCameraSpace(ScreenRectangle).Contains(aClickEvent.ClickPoint))
+            if (Camera.WorldPosToCameraSpace(WorldRectangle).Contains(aClickEvent.ClickPoint))
             {
                 ClickedOn(aClickEvent);
                 return true;
