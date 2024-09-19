@@ -2,6 +2,7 @@
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
+using Project_1.Tiles;
 using SharpDX.Direct2D1.Effects;
 using System;
 using System.Collections.Generic;
@@ -64,6 +65,7 @@ namespace Project_1.GameObjects
             {
                 return;
             }
+
             float length = 0;
             Vector2 directionToWalk = GetDirVectorToNextDestination(destinations[0], out length);
 
@@ -89,8 +91,40 @@ namespace Project_1.GameObjects
         public override void Update()
         {
             Walk();
-            
+
+            Vector2 oldPosition = pos;
+
             base.Update();
+
+            List<Rectangle> resultingCollisions = TileManager.CollisionsWithUnwalkable(WorldRectangle);
+
+            if (resultingCollisions.Count != 0) 
+            {
+                for (int i = 0; i < resultingCollisions.Count; i++)
+                {
+
+                    Vector2 collisionDir = Vector2.Normalize((resultingCollisions[i].Center - WorldRectangle.Center).ToVector2());
+
+                    if (Math.Abs(collisionDir.X) > Math.Abs(collisionDir.Y))
+                    {
+                        velocity.X = 0;
+                        momentum.X = 0;//TOOD: Has it so if momentum changes rapidly it deals damage? Maybe i dunnu I dont have my gamedesigner hat with me today
+                        pos.X = oldPosition.X;
+                    }
+                    if (Math.Abs(collisionDir.X) < Math.Abs(collisionDir.Y))
+                    {
+                        velocity.Y = 0;
+                        momentum.Y = 0;
+                        pos.Y = oldPosition.Y;
+                    }
+                }
+                //else
+                //{
+                //    velocity = Vector2.Zero;
+                //    momentum = Vector2.Zero;
+                //    pos = oldPosition;
+                //}
+            }
 
             Vector2 offset = new Vector2(0, size.Y / 2.5f);
             shadowPos.Location = (pos + offset ).ToPoint() ;

@@ -27,35 +27,22 @@ namespace Project_1
             Count
         }
 
-        public static float Scale
-        {
-             get { return scale; }
-        }
+        public static float Scale { get => scale;  }
 
-        public static float Zoom
-        {
-            get { return 1f / scale; }
-        }
+        public static float Zoom { get => 1f / scale; }
+        
 
         public static Rectangle ScreenRectangle { get => new Rectangle(Point.Zero, ScreenSize); }
 
-        public static Point ScreenSize
-        {
-            get => screenRectangleSize;
-        }
+        public static Point ScreenSize { get => screenRectangleSize; }
 
-        public static CameraSettings CurrentCameraSetting
-        {
-            get => cameraSettings;
-        }
+        public static CameraSettings CurrentCameraSetting { get => cameraSettings; }
         
-        public static Vector2 CentreInWorldSpace
-        {
-            get => centreInWorldSpace;
-            set => centreInWorldSpace = value;
-        }
+        public static Vector2 CentreInWorldSpace { get => centreInWorldSpace; set => centreInWorldSpace = value; }
 
         public static Point CentrePointInScreenSpace { get => new Point(screenRectangleSize.X / 2, screenRectangleSize.Y / 2); }
+
+        public static Rectangle RenderTargetPosition { set => renderTargetPosition = value; }
 
         static SpriteBatch spriteBatch;
 
@@ -89,10 +76,6 @@ namespace Project_1
 
         static CameraMover cameraMover = new CameraMover();
 
-        public static Rectangle RenderTargetPosition
-        {
-            set => renderTargetPosition = value;
-        }
 
         public static void Init()
         {

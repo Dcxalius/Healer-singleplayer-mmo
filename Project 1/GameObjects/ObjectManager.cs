@@ -29,7 +29,6 @@ namespace Project_1.GameObjects
         public static void Remove(GameObject aObject)
         {
 
-
             gameObjects.Remove(aObject);
         }
 
