@@ -29,11 +29,14 @@ namespace Project_1.UI.UIElements
         {
             get
             {
-                Rectangle a = pos;
-                a.Location = absolutePos;
-                return a;
+                Rectangle tempRec = Rectangle.Empty;
+                tempRec.Location = absolutePos;
+                tempRec.Size = Size;
+                return tempRec;
             }
         }
+
+        public Point Size { get => pos.Size; }
 
         UITexture gfx;
         Point absolutePos;

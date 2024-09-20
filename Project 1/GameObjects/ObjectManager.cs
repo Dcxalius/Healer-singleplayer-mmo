@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Project_1.Input;
+using Project_1.UI.HUD;
 using Project_1.UI.UIElements.PlateBoxes;
 using System;
 using System.Collections.Generic;
@@ -15,29 +16,29 @@ namespace Project_1.GameObjects
     {
         public static Player Player { get => player; }
 
-        public static List<GameObject> gameObjects = new List<GameObject>();
+        public static List<Entity> entities = new List<Entity>();
 
         static Player player = null;
 
         public static void Init()
         {
             player = new Player();
-            gameObjects.Add(new Walker(new Microsoft.Xna.Framework.Vector2(200, 200)));
+            entities.Add(new Walker(new Microsoft.Xna.Framework.Vector2(200, 200)));
             Camera.BindCamera(player);
         }
 
-        public static void Remove(GameObject aObject)
+        public static void Remove(Entity aObject)
         {
 
-            gameObjects.Remove(aObject);
+            entities.Remove(aObject);
         }
 
         public static void Update()
         {
             player.Update();
-            for (int i = 0; i < gameObjects.Count; i++)
+            for (int i = 0; i < entities.Count; i++)
             {
-                gameObjects[i].Update();
+                entities[i].Update();
             }
         }
 
@@ -46,14 +47,15 @@ namespace Project_1.GameObjects
         {
             bool foundHit = false;
             foundHit = player.Click(aClickEvent);
-            for (int i = 0; i < gameObjects.Count && !foundHit; i++)
+            for (int i = 0; i < entities.Count && !foundHit; i++)
             {
-                foundHit = gameObjects[i].Click(aClickEvent);
+                foundHit = entities[i].Click(aClickEvent);
             }
 
             if(!foundHit && aClickEvent.ButtonPressed == ClickEvent.ClickType.Left)
             {
                 player.ClearCommand();
+                HUDManager.SetNewTarget(null);
             }
 
             if (!foundHit && aClickEvent.ButtonPressed == ClickEvent.ClickType.Right)
@@ -64,9 +66,9 @@ namespace Project_1.GameObjects
         public static void Draw(SpriteBatch aSpriteBatch)
         {
             player.Draw(aSpriteBatch);
-            for (int i = 0; i < gameObjects.Count; i++)
+            for (int i = 0; i < entities.Count; i++)
             {
-                gameObjects[i].Draw(aSpriteBatch);
+                entities[i].Draw(aSpriteBatch);
             }
         }
     }

@@ -77,7 +77,7 @@ namespace Project_1.UI.UIElements
             {
 
                 //aBatch.DrawString(GraphicsManager.buttonFont, buttonText, new Vector2(pos.X + pos.Size.X / 2 , pos.Y + pos.Size.Y / 2 ), Color.Black, 0f, textSize / 2, 1.2f, SpriteEffects.None, 1f);
-                aBatch.DrawString(GraphicsManager.buttonFont, buttonText, new Vector2(AbsolutePos.X + AbsolutePos.Size.X / 2 , AbsolutePos.Y + AbsolutePos.Size.Y / 2 ), Color.White, 0f, textSize / 2, 1f, SpriteEffects.None, 1f);
+                aBatch.DrawString(GraphicsManager.buttonFont, buttonText, new Vector2(AbsolutePos.X + Size.X / 2 , AbsolutePos.Y + Size.Y / 2 ), Color.White, 0f, textSize / 2, 1f, SpriteEffects.None, 1f);
             }
         }
     }

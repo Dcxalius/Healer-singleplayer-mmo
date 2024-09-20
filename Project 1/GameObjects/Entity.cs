@@ -3,6 +3,7 @@ using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.Tiles;
+using Project_1.UI.HUD;
 using SharpDX.Direct2D1.Effects;
 using System;
 using System.Collections.Generic;
@@ -44,6 +45,8 @@ namespace Project_1.GameObjects
             if (Camera.WorldPosToCameraSpace(WorldRectangle).Contains(aClickEvent.ClickPoint))
             {
                 ClickedOn(aClickEvent);
+                HUDManager.SetNewTarget(this);
+
                 return true;
             }
             return false;
