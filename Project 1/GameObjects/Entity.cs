@@ -30,7 +30,8 @@ namespace Project_1.GameObjects
         int speed = 50;
 
         string name;
-
+        int maxHealth;
+        int currentHealth;
 
 
         public Entity(Texture aTexture, Vector2 aStartingPos, float aMaxSpeed) : base(aTexture, aStartingPos, aMaxSpeed)
@@ -38,6 +39,8 @@ namespace Project_1.GameObjects
             shadowPos = new Rectangle((pos + new Vector2(size.X/2, size.Y)).ToPoint(), size);
 
             name = "xdd";
+            maxHealth = 200;
+            currentHealth = 150;
         }
 
         public override bool Click(ClickEvent aClickEvent)
@@ -132,6 +135,11 @@ namespace Project_1.GameObjects
             Vector2 offset = new Vector2(0, size.Y / 2.5f);
             shadowPos.Location = (pos + offset ).ToPoint() ;
             shadowPos.Size = (size.ToVector2()  * Camera.Scale).ToPoint();
+
+            if (currentHealth > 0)
+            {
+                currentHealth--;
+            }
         }
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)
