@@ -82,7 +82,11 @@ namespace Project_1.Textures
 
         void __Constructor__(GfxPath aPath)
         {
-            gfx = GraphicsManager.GetTexture(aPath);
+            if (aPath.Name != null)
+            {
+
+                gfx = GraphicsManager.GetTexture(aPath);
+            }
             flip = SpriteEffects.None;
             visible = null;
             offset = Vector2.Zero;

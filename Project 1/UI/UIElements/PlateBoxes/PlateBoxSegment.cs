@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.UIElements.PlateBoxes
 {
-    internal class PlateBoxSegment : UIElement
+    internal abstract class PlateBoxSegment : UIElement
     {
         protected string Text //TODO: Bring this out to a class called TextButton
         {

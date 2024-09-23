@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects;
 using Project_1.Textures;
 using System;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.UIElements.PlateBoxes
 {
-    internal class PlateBox : Box
+    internal abstract class PlateBox : Box
     {
         Entity targetEntity;
 
@@ -32,5 +33,9 @@ namespace Project_1.UI.UIElements.PlateBoxes
             children.AddRange(horizontalSegments);
         }
 
+        public override void Draw(SpriteBatch aBatch)
+        {
+            base.Draw(aBatch);
+        }
     }
 }

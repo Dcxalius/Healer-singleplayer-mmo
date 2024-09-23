@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.UIElements
 {
-    internal class GFXButton : Button
+    internal abstract class GFXButton : Button
     {
         Texture gfx;
         Rectangle gfxRectangle;

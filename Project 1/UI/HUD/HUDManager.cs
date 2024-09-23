@@ -13,8 +13,8 @@ namespace Project_1.UI.HUD
 {
     internal static class HUDManager
     {
-        static PlayerPlateBox playerPlateBox = new PlayerPlateBox(new Vector2(0.1f, 0.1f), new Vector2(0.3f, 0.1f));
-        static TargetPlateBox targetPlateBox = new TargetPlateBox(new Vector2(0.1f, 0.3f), new Vector2(0.3f, 0.1f));
+        static PlayerPlateBox playerPlateBox;
+        static TargetPlateBox targetPlateBox;
 
         static List<UIElement> hudElements = new List<UIElement>();
 
@@ -27,6 +27,8 @@ namespace Project_1.UI.HUD
 
         public static void Init()
         {
+            playerPlateBox = new PlayerPlateBox(new Vector2(0.1f, 0.1f), new Vector2(0.3f, 0.1f));
+            targetPlateBox = new TargetPlateBox(new Vector2(0.1f, 0.3f), new Vector2(0.3f, 0.1f));
             hudElements.Add(playerPlateBox);
             hudElements.Add(targetPlateBox);
         }

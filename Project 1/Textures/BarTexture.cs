@@ -27,11 +27,11 @@ namespace Project_1.Textures
                 {
                     case FillingDirection.Right:
                     case FillingDirection.Up:
-                        visible = new Rectangle(Point.Zero, new Point(visible.Value.Height, (int)(defaultVisible.Y * value)));
+                        visible = new Rectangle(Point.Zero, new Point((int)(defaultVisible.X * value), defaultVisible.Y));
                         break;
                     case FillingDirection.Down:
                     case FillingDirection.Left:
-                        visible = new Rectangle(new Point((int)(defaultVisible.X - defaultVisible.X * value), 0), visible.Value.Size);
+                        visible = new Rectangle(new Point((int)(defaultVisible.X - defaultVisible.X * value), 0), defaultVisible);
                         break;
                     default:
                         break;
@@ -42,14 +42,15 @@ namespace Project_1.Textures
         Point defaultVisible;
         FillingDirection fillingDirection;
 
-        public BarTexture(FillingDirection aDir, string aPath, Color aColor) : base(aPath, aColor)
+        public BarTexture(FillingDirection aDir, Color aColor, string aPath = "WhiteGrayBasedBar") : base(aPath, aColor)
         {
-            defaultVisible = size;
+            defaultVisible = new Point(64,8);
             fillingDirection = aDir;
             if (fillingDirection == FillingDirection.Up || fillingDirection == FillingDirection.Down)
             {
                 rotation = 0.25f;
             }
+            visible = new Rectangle(Point.Zero, defaultVisible);
         }
 
     }

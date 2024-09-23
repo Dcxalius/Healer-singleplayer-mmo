@@ -14,7 +14,7 @@ using System.Xml;
 
 namespace Project_1.GameObjects
 {
-    internal class Entity : MovingObject
+    internal abstract class Entity : MovingObject
     {
         public string Name { get => name; }
         public bool HasDestination { get => destinations.Count > 0; }
@@ -22,6 +22,10 @@ namespace Project_1.GameObjects
         Vector2 FeetPos { get => pos + new Vector2(size.X / 2, size.Y); }
 
         static Texture ShadowTexture = new Texture(new GfxPath(GfxType.Object, "Shadow"));
+
+        public float MaxHealth { get => maxHealth; }
+        public float CurrentHealth { get => currentHealth; }
+        
         Rectangle shadowPos;
 
 
@@ -30,8 +34,8 @@ namespace Project_1.GameObjects
         int speed = 50;
 
         string name;
-        int maxHealth;
-        int currentHealth;
+        float maxHealth;
+        float currentHealth;
 
 
         public Entity(Texture aTexture, Vector2 aStartingPos, float aMaxSpeed) : base(aTexture, aStartingPos, aMaxSpeed)

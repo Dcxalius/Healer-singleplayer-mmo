@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.UIElements
 {
-    internal class Button : UIElement
+    internal abstract class Button : UIElement
     {
 
         protected string ButtonText //TODO: Bring this out to a class called TextButton
