@@ -22,8 +22,9 @@ namespace Project_1.UI.PauseMenu
         static Vector2 buttonOffset = new Vector2(0, buttonSize.Y * 1.5f);
 
         static int buttonIndex = 0;
+        static int buttonIndexFromBottom = 0;
 
-        static Vector2 GetStartPosition
+        static Vector2 GetStartPositionFromTop //TODO: Get this logic out to a menu class
         {
             get
             {
@@ -31,14 +32,22 @@ namespace Project_1.UI.PauseMenu
             }
         }
 
+        static Vector2 GetStartPositionFromBottom
+        {
+            get
+            {
+                return buttonStartingFromBottomPos - buttonOffset * buttonIndexFromBottom++;
+            }
+        }
+
         public PauseBox() : base (gfx, pausePos, pauseSize) 
         {
-            children.Add(new ResumeButton(GetStartPosition, buttonSize));
-            children.Add(new OptionMenuButton(GetStartPosition, buttonSize));
-            children.Add(new Button(GetStartPosition, buttonSize, Color.BurlyWood));
-            children.Add(new Button(GetStartPosition, buttonSize, Color.Green));
-            children.Add(new MainMenuButton(GetStartPosition, buttonSize));
-            children.Add(new ExitGameButton(buttonStartingFromBottomPos, buttonSize));
+            children.Add(new ResumeButton(GetStartPositionFromTop, buttonSize));
+            children.Add(new OptionMenuButton(GetStartPositionFromTop, buttonSize));
+            //children.Add(new Button(GetStartPosition, buttonSize, Color.BurlyWood));
+            //children.Add(new Button(GetStartPosition, buttonSize, Color.Green));
+            children.Add(new ExitGameButton(GetStartPositionFromBottom, buttonSize));
+            children.Add(new MainMenuButton(GetStartPositionFromBottom, buttonSize));
         }
 
     }

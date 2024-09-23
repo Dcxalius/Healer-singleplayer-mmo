@@ -4,7 +4,6 @@ using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -44,11 +43,8 @@ namespace Project_1.Tiles
         
         public static List<Rectangle> CollisionsWithUnwalkable(Rectangle aWorldRect)
         {
-            Tile[,] tilesSurroundingPlayer = GetSurroundingTiles(aWorldRect.Center / TileSize);
 
-            Rectangle?[,] colliders = GetColliders(tilesSurroundingPlayer);
-            List<Rectangle> finalColliders = RightCheck(colliders);
-            finalColliders.AddRange(DownCheck(colliders));
+            List<Rectangle> finalColliders = ConvertUnwalkableTilesToRectangles(aWorldRect.Center);
 
             List<Rectangle> collisions = new List<Rectangle>();
             foreach (var collider in finalColliders)
@@ -61,7 +57,58 @@ namespace Project_1.Tiles
             return collisions;
         }
 
-        static List<Rectangle> RightCheck(Rectangle?[,] aCollidersToCheck)
+        static List<Rectangle> ConvertUnwalkableTilesToRectangles(Point aPos)
+        {
+            Tile[,] tilesSurroundingPlayer = GetSurroundingTiles(aPos / TileSize);
+
+            Rectangle?[,] colliders = GetColliders(tilesSurroundingPlayer);
+
+            return Merge(colliders);
+        }
+
+        static List<Rectangle> Merge(Rectangle?[,] aCollidersToMerge)
+        {
+            List<Rectangle> finalColliders = RightMerge(aCollidersToMerge);
+            finalColliders.AddRange(DownMerge(aCollidersToMerge));
+
+            return finalColliders;
+        }
+        static List<Rectangle> DownMerge(Rectangle?[,] aCollidersToCheck)
+        {
+            List<Rectangle> finalColliders = new List<Rectangle>();
+            int[,] consumedBy = new int[aCollidersToCheck.GetLength(0), aCollidersToCheck.GetLength(1)];
+            for (int i = 0; i < aCollidersToCheck.GetLength(0); i++)
+            {
+                for (int j = 0; j < aCollidersToCheck.GetLength(1) - 1; j++)
+                {
+                    if (aCollidersToCheck[i, j] == null || aCollidersToCheck[i, j + 1] == null)
+                    {
+                        continue;
+                    }
+                    if (aCollidersToCheck[i, j].Value.Bottom == aCollidersToCheck[i, j + 1].Value.Top && aCollidersToCheck[i, j].Value.X == aCollidersToCheck[i, j + 1].Value.X)
+                    {
+                        consumedBy[i, j + 1] = finalColliders.Count;
+                        if (consumedBy[i, j] != 0)
+                        {
+                            Rectangle r = Rectangle.Union(finalColliders[consumedBy[i, j]], aCollidersToCheck[i, j + 1].Value);
+
+                            finalColliders[consumedBy[i, j]] = r;
+                            consumedBy[i, j + 1] = consumedBy[i, j];
+                        }
+                        else
+                        {
+                            finalColliders.Add(Rectangle.Union(aCollidersToCheck[i, j].Value, aCollidersToCheck[i, j + 1].Value));
+                        }
+
+                    }
+                }
+
+            }
+
+            return finalColliders;
+        }
+
+        static List<Rectangle> RightMerge(Rectangle?[,] aCollidersToCheck)
         {
             List<Rectangle> finalColliders = new List<Rectangle>();
             bool[] consumed = new bool[aCollidersToCheck.Length];
@@ -92,45 +139,10 @@ namespace Project_1.Tiles
                     }
                 }
             }
-            DebugManager.Print(typeof(TileManager), "Count of recs in RightCheck: " +  finalColliders.Count);
             return finalColliders;
         }
 
-        static List<Rectangle> DownCheck(Rectangle?[,] aCollidersToCheck)
-        {
-            List<Rectangle> finalColliders = new List<Rectangle>();
-            int [,] consumedBy = new int[aCollidersToCheck.GetLength(0), aCollidersToCheck.GetLength(1)];
-            for (int i = 0; i < aCollidersToCheck.GetLength(0); i++)
-            {
-                for (int j = 0; j < aCollidersToCheck.GetLength(1) - 1; j++)
-                {
-                    if (aCollidersToCheck[i, j] == null || aCollidersToCheck[i, j + 1] == null)
-                    {
-                        continue;
-                    }
-                    if (aCollidersToCheck[i, j].Value.Bottom == aCollidersToCheck[i, j + 1].Value.Top && aCollidersToCheck[i, j].Value.X == aCollidersToCheck[i, j + 1].Value.X)
-                    {
-                        consumedBy[i, j + 1] = finalColliders.Count;
-                        if (consumedBy[i, j] != 0)
-                        {
-                            Rectangle r = Rectangle.Union(finalColliders[consumedBy[i, j]], aCollidersToCheck[i, j + 1].Value);
 
-                            finalColliders[consumedBy[i, j]] = r;
-                            consumedBy[i, j + 1] = consumedBy[i, j];
-                        }
-                        else
-                        {
-                            consumedBy[i, j + 1] = i;
-                            finalColliders.Add(Rectangle.Union(aCollidersToCheck[i, j].Value, aCollidersToCheck[i, j + 1].Value));
-                        }
-
-                    }
-                }
-                
-            }
-
-            return finalColliders;
-        }
 
         static Tile[,] GetSurroundingTiles(Point aIndex)
         {

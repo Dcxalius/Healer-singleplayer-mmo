@@ -134,14 +134,18 @@ namespace Project_1
         {
             cameraTarget = GraphicsManager.CreateRenderTarget(aSize);
             screenRectangleSize = aSize;
-            //zoom = something xd
-            //scale = scale 
+
+            float x = devScreenBorder.X / aSize.X;
+            float y = devScreenBorder.Y / aSize.Y;
+            scale = Math.Max(x, y);
+            minScale = scale - 0.3f;
+            minScale = scale + 0.4f;
             cameraMover.bindingRectangle = new Rectangle(new Point(0), new Point(screenRectangleSize.X / 4 * 3, screenRectangleSize .Y / 4 * 3));
             cameraMover.maxCircleCameraMove = screenRectangleSize.Y / 3;
         }
 
        
-        public static Rectangle WorldPosToCameraSpace(Rectangle aWorldPos)
+        public static Rectangle WorldPosToCameraSpace(Rectangle aWorldPos) //TODO: This returns wrong size
         {
             Point topLeft = (centreInWorldSpace * scale - screenRectangleSize.ToVector2() / 2).ToPoint();
             Rectangle cameraPos = new Rectangle((aWorldPos.Location.ToVector2() * scale).ToPoint() - topLeft, (aWorldPos.Size.ToVector2() * scale).ToPoint());
@@ -166,7 +170,6 @@ namespace Project_1
 
         public static Vector2 CameraSpaceToWorldPos(Vector2 aRelativeVector)
         {
-            //Vector2 a = (TransformRelativeToAbsoluteScreenSpace(aRelativeVector).ToVector2() - CentrePointInScreenSpace.ToVector2() * Scale)  ;
             Vector2 a = (CentrePointInScreenSpace.ToVector2() * Scale - TransformRelativeToAbsoluteScreenSpace(aRelativeVector).ToVector2())  ;
             Vector2 b = centreInWorldSpace - a;
             return b;

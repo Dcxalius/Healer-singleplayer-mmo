@@ -15,14 +15,24 @@ namespace Project_1.UI.HUD
     {
         static Player p = ObjectManager.Player;
 
-        //static PlateBoxSegment[] a = new PlateBoxSegment[] { new PlateBoxNameSegment(p.Name, aPos, new Vector2(aSize.X, aSize.Y)) };
         
-        public PlayerPlateBox(Vector2 aPos, Vector2 aSize) : base(null, null, aPos, aSize)
-        {
-            
+
+        static PlateBoxNameSegment name;
+        static PlateBoxHealthSegment health;
+
+        public PlayerPlateBox(Vector2 aPos, Vector2 aSize) : base(aPos, aSize)
+        { 
+            name = new PlateBoxNameSegment(p.Name, new Vector2(0, 0), new Vector2(aSize.X, aSize.Y / 2));
+            health = new PlateBoxHealthSegment(p, new Vector2(0, aSize.Y / 2), new Vector2(aSize.X, aSize.Y / 4));
+            //health = new PlateBoxHealthSegment(p, new Vector2(0, 0), new Vector2(aSize.X, aSize.Y / 2));
+
+
+            leftVerticalSegments = new PlateBoxSegment[] { };
+            rightVerticalSegments = new PlateBoxSegment[] { };
+            horizontalSegments = new PlateBoxSegment[] { name, health};
+
+            AddSegmentsToChildren();
 
         }
-
-        
     }
 }

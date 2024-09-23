@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.UIElements
 {
-    internal class Box : UIElement
+    internal abstract class Box : UIElement
     {
 
         public Box(UITexture aGfx, Vector2 aPos, Vector2 aSize) : base(aGfx, aPos, aSize)

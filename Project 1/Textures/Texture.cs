@@ -23,6 +23,7 @@ namespace Project_1.Textures
         public float scale;
         protected Rectangle? visible;
         protected Vector2 offset;
+        protected float rotation = 0f;
         SpriteEffects flip;
 
 
@@ -81,7 +82,11 @@ namespace Project_1.Textures
 
         void __Constructor__(GfxPath aPath)
         {
-            gfx = GraphicsManager.GetTexture(aPath);
+            if (aPath.Name != null)
+            {
+
+                gfx = GraphicsManager.GetTexture(aPath);
+            }
             flip = SpriteEffects.None;
             visible = null;
             offset = Vector2.Zero;
@@ -120,7 +125,7 @@ namespace Project_1.Textures
                 return;
             }
 
-            aBatch.Draw(gfx, aPos, visible, aColor, 0f, offset, Camera.Scale, flip, 1f);
+            aBatch.Draw(gfx, aPos, visible, aColor, rotation, offset, Camera.Scale, flip, 1f);
         }
         public virtual void Draw(SpriteBatch aBatch, Rectangle aPosRectangle, Color aColor)
         {
@@ -129,7 +134,7 @@ namespace Project_1.Textures
                 return;
             }
 
-            aBatch.Draw(gfx, aPosRectangle, visible, aColor, 0f, offset, flip, 1f);
+            aBatch.Draw(gfx, aPosRectangle, visible, aColor, rotation, offset, flip, 1f);
         }
     }
 }

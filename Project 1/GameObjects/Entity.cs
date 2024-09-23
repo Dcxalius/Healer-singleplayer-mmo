@@ -3,6 +3,7 @@ using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.Tiles;
+using Project_1.UI.HUD;
 using SharpDX.Direct2D1.Effects;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ using System.Xml;
 
 namespace Project_1.GameObjects
 {
-    internal class Entity : MovingObject
+    internal abstract class Entity : MovingObject
     {
         public string Name { get => name; }
         public bool HasDestination { get => destinations.Count > 0; }
@@ -21,6 +22,10 @@ namespace Project_1.GameObjects
         Vector2 FeetPos { get => pos + new Vector2(size.X / 2, size.Y); }
 
         static Texture ShadowTexture = new Texture(new GfxPath(GfxType.Object, "Shadow"));
+
+        public float MaxHealth { get => maxHealth; }
+        public float CurrentHealth { get => currentHealth; }
+        
         Rectangle shadowPos;
 
 
@@ -29,7 +34,8 @@ namespace Project_1.GameObjects
         int speed = 50;
 
         string name;
-
+        float maxHealth;
+        float currentHealth;
 
 
         public Entity(Texture aTexture, Vector2 aStartingPos, float aMaxSpeed) : base(aTexture, aStartingPos, aMaxSpeed)
@@ -37,6 +43,8 @@ namespace Project_1.GameObjects
             shadowPos = new Rectangle((pos + new Vector2(size.X/2, size.Y)).ToPoint(), size);
 
             name = "xdd";
+            maxHealth = 200;
+            currentHealth = 150;
         }
 
         public override bool Click(ClickEvent aClickEvent)
@@ -44,6 +52,8 @@ namespace Project_1.GameObjects
             if (Camera.WorldPosToCameraSpace(WorldRectangle).Contains(aClickEvent.ClickPoint))
             {
                 ClickedOn(aClickEvent);
+                HUDManager.SetNewTarget(this);
+
                 return true;
             }
             return false;
@@ -129,6 +139,11 @@ namespace Project_1.GameObjects
             Vector2 offset = new Vector2(0, size.Y / 2.5f);
             shadowPos.Location = (pos + offset ).ToPoint() ;
             shadowPos.Size = (size.ToVector2()  * Camera.Scale).ToPoint();
+
+            if (currentHealth > 0)
+            {
+                currentHealth--;
+            }
         }
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)

@@ -1,28 +1,41 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Project_1.UI.UIElements.PlateBoxes
 {
-    internal class PlateBox : Box
+    internal abstract class PlateBox : Box
     {
         Entity targetEntity;
 
-        PlateBoxSegment[] horizontalSegments; 
-        PlateBoxSegment[] verticalSegments;
+        protected PlateBoxSegment[] leftVerticalSegments;
+        protected PlateBoxSegment[] rightVerticalSegments;
+        protected PlateBoxSegment[] horizontalSegments;
 
-        public PlateBox(PlateBoxSegment[] aSetOfHorizonalSegments, PlateBoxSegment[] aSetOfVerticalSegments, Vector2 aPos, Vector2 aSize) : base(new UITexture("GreyBackground", Color.White), aPos, aSize)
+        public PlateBox(Vector2 aPos, Vector2 aSize) : base(new UITexture("GrayBackground", Color.White), aPos, aSize)
         {
-            //TODO: Make sure the segmentsizes doesnt add up to > aSize
-
+            //TODO: Make sure the segmentsizes add up to aSize
 
         }
 
-        
+        protected void AddSegmentsToChildren()
+        {
+
+            children.AddRange(leftVerticalSegments);
+            children.AddRange(rightVerticalSegments);
+            children.AddRange(horizontalSegments);
+        }
+
+        public override void Draw(SpriteBatch aBatch)
+        {
+            base.Draw(aBatch);
+        }
     }
 }

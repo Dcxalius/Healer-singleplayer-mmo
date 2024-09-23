@@ -29,16 +29,19 @@ namespace Project_1.UI.UIElements
         {
             get
             {
-                Rectangle a = pos;
-                a.Location = absolutePos;
-                return a;
+                Rectangle tempRec = Rectangle.Empty;
+                tempRec.Location = absolutePos;
+                tempRec.Size = Size;
+                return tempRec;
             }
         }
 
-        UITexture gfx;
+        public Point Size { get => pos.Size; }
+
+        protected UITexture gfx;
         Point absolutePos;
         protected Rectangle pos;
-        Vector2 relativePos;
+        Vector2 relativePos; //TODO: Change this so 1, 1 refers to parents bottom right instead of screen bottom right + parent top left
         Vector2 relativeSize;
 
         public HoldEvent heldEvents; //TODO: This should prob be cleansed on state change

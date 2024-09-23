@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
+using Project_1.UI.HUD;
 using Project_1.UI.OptionMenu;
 using Project_1.UI.PauseMenu;
 using Project_1.UI.UIElements;
@@ -21,8 +22,6 @@ namespace Project_1.UI
         static List<UIElement> pauseElements = new List<UIElement>();
         static List<UIElement> optionElements = new List<UIElement>();
 
-        public static Point grandParentPosition = Point.Zero;
-
         public static void Init()
         {
             InitGameUI();
@@ -39,7 +38,7 @@ namespace Project_1.UI
 
         static void InitGameUI()
         {
-
+            HUDManager.Init();
         }
 
         static void InitPauseMenuUI()
@@ -55,6 +54,7 @@ namespace Project_1.UI
             {
                 case State.Game:
                     StateUpdate(gameElements);
+                    HUDManager.Update();
                     break;
                 case State.Pause:
                     StateUpdate(pauseElements);
@@ -83,7 +83,6 @@ namespace Project_1.UI
             switch (StateManager.currentState)
             {
                 case State.Game:
-                    StateDraw(gameElements, aBatch);
                     break;
                 case State.Pause:
                     StateDraw(pauseElements, aBatch);
@@ -108,6 +107,7 @@ namespace Project_1.UI
 
         public static void DrawGameUI(SpriteBatch aBatch)
         {
+            HUDManager.Draw(aBatch);
             StateDraw(gameElements, aBatch);
         }
 
