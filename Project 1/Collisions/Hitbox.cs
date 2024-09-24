@@ -17,8 +17,8 @@ namespace Project_1.Collisions
             ellipse,
             rectangle
         }
-        static Texture2D circleDebug = GraphicsManager.GetTexture(new GfxPath(GfxType.Debug, "DebugCircle"));
-        static Texture2D rectangleDebug = GraphicsManager.GetTexture(new GfxPath(GfxType.Debug, "Debug"));
+        static Texture2D circleDebug = TextureManager.GetTexture(new GfxPath(GfxType.Debug, "DebugCircle"));
+        static Texture2D rectangleDebug = TextureManager.GetTexture(new GfxPath(GfxType.Debug, "Debug"));
 
         public HitboxType type;
 

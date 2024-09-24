@@ -20,7 +20,7 @@ namespace Project_1.UI.UIElements
             set
             {
                 buttonText = value;
-                textSize = GraphicsManager.buttonFont.MeasureString(buttonText);
+                textSize = font.MeasureString(buttonText);
             }
         }
 
@@ -32,6 +32,7 @@ namespace Project_1.UI.UIElements
         UITexture pressedGfx;
         bool pressed = false;
 
+        SpriteFont font = TextureManager.GetFont("Gloryse");
         string buttonText;
         Vector2 textSize;
 
@@ -77,7 +78,7 @@ namespace Project_1.UI.UIElements
             {
 
                 //aBatch.DrawString(GraphicsManager.buttonFont, buttonText, new Vector2(pos.X + pos.Size.X / 2 , pos.Y + pos.Size.Y / 2 ), Color.Black, 0f, textSize / 2, 1.2f, SpriteEffects.None, 1f);
-                aBatch.DrawString(GraphicsManager.buttonFont, buttonText, new Vector2(AbsolutePos.X + Size.X / 2 , AbsolutePos.Y + Size.Y / 2 ), Color.White, 0f, textSize / 2, 1f, SpriteEffects.None, 1f);
+                aBatch.DrawString(font, buttonText, new Vector2(AbsolutePos.X + Size.X / 2 , AbsolutePos.Y + Size.Y / 2 ), Color.White, 0f, textSize / 2, 1f, SpriteEffects.None, 1f);
             }
         }
     }

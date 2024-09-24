@@ -13,14 +13,14 @@ namespace Project_1.UI.UIElements.PlateBoxes
 {
     internal class PlateBoxHealthSegment : PlateBoxSegment
     {
-        Bar healthBar;
+        ResourceBar healthBar;
         Entity ent;
         static Color backgroundColor = new Color(255, 211, 211, 120);
 
         public PlateBoxHealthSegment(Entity aEntity ,Vector2 aPos, Vector2 aSize) : base(null, aPos, aSize)
         {
             ent = aEntity;
-            healthBar = new Bar(ent.MaxHealth, new BarTexture(BarTexture.FillingDirection.Right, Color.Red), new UITexture("WhiteBackground", backgroundColor), Vector2.Zero, aSize);
+            healthBar = new ResourceBar(ent.MaxHealth, new BarTexture(BarTexture.FillingDirection.Right, Color.Red), new UITexture("WhiteBackground", backgroundColor), Vector2.Zero, aSize);
             children.Add(healthBar);
         }
 

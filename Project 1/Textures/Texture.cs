@@ -85,7 +85,7 @@ namespace Project_1.Textures
             if (aPath.Name != null)
             {
 
-                gfx = GraphicsManager.GetTexture(aPath);
+                gfx = TextureManager.GetTexture(aPath);
             }
             flip = SpriteEffects.None;
             visible = null;

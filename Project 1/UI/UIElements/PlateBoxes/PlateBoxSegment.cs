@@ -24,11 +24,13 @@ namespace Project_1.UI.UIElements.PlateBoxes
 
         string textToDraw;
         Vector2 textSize;
-        SpriteFont font = GraphicsManager.buttonFont;
-        
+        SpriteFont font;
+
+
 
         public PlateBoxSegment(UITexture aGfx, Vector2 aPos, Vector2 aSize) : base(aGfx, aPos, aSize)
         {
+            font = TextureManager.GetFont("Gloryse");
         }
 
         public override void Draw(SpriteBatch aBatch)

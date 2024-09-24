@@ -51,7 +51,7 @@ namespace Project_1
         //---
 
         //--- debugText is fine but should pauseGfx be somewhere else?
-        static Texture2D debugTexture = GraphicsManager.GetTexture(new GfxPath(GfxType.Debug, "Debug"));
+        static Texture2D debugTexture = TextureManager.GetTexture(new GfxPath(GfxType.Debug, "Debug"));
         static Textures.Texture pauseGfx = new Textures.Texture(new GfxPath(GfxType.UI, "PauseBackground"));
 
         //--

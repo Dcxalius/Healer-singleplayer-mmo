@@ -38,7 +38,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
             type = aType;
             if (font == null)
             {
-                font = GraphicsManager.buttonFont; //ECH
+                font = TextureManager.GetFont("Gloryse"); //ECH
             }
 
             textToDisplay = aStartText;
