@@ -18,7 +18,7 @@ namespace Project_1.UI.PauseMenu
 
         static Vector2 buttonSize = new Vector2(pauseSize.X / 5 * 4, pauseSize.Y / 12);
         static Vector2 buttonStartingPos = new Vector2(pauseSize.X / 2 - buttonSize.X / 2, 0.05f);
-        static Vector2 buttonStartingFromBottomPos = new Vector2(pauseSize.X / 2 - buttonSize.X / 2, pauseSize.Y - 0.05f);
+        static Vector2 buttonStartingFromBottomPos = new Vector2(pauseSize.X / 2 - buttonSize.X / 2, pauseSize.Y - 0.05f - buttonSize.Y);
         static Vector2 buttonOffset = new Vector2(0, buttonSize.Y * 1.5f);
 
         static int buttonIndex = 0;

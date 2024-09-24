@@ -20,43 +20,35 @@ namespace Project_1.UI.UIElements.SelectBoxes
             ScreenRez
         }
 
-        public string DisplayText { get => textToDisplay; }
+        public string DisplayText { get => text.Value; }
         public SelectBoxValueTypes Type { get => type; }
 
 
 
         //public 
 
-        protected string textToDisplay;
+        protected Text text;
 
-        protected static SpriteFont font;
-        protected Vector2 textSize;
         SelectBoxValueTypes type;
 
         protected SelectBoxValue(SelectBoxValueTypes aType, UITexture aGfx, string aStartText, Vector2 aPos, Vector2 aSize) : base(aGfx, aPos, aSize)
         {
             type = aType;
-            if (font == null)
-            {
-                font = TextureManager.GetFont("Gloryse"); //ECH
-            }
-
-            textToDisplay = aStartText;
-            textSize = font.MeasureString(textToDisplay);
+            text = new Text("Gloryse", aStartText, Color.Teal);
         }
 
         public override void Rescale()
         {
             base.Rescale();
             
-            textSize = font.MeasureString(textToDisplay);
+            text.Rescale();
         }
 
-        public override void Draw(SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch aBatch)
         {
-            base.Draw(spriteBatch);
+            base.Draw(aBatch);
 
-            spriteBatch.DrawString(font, textToDisplay, new Vector2(AbsolutePos.X + AbsolutePos.Size.X / 2, AbsolutePos.Y + AbsolutePos.Size.Y / 2), Color.Teal, 0f, textSize / 2, 1f, SpriteEffects.None, 1f);
+            text.CentredDraw(aBatch, AbsolutePos.Center.ToVector2());
         }
     }
 }

@@ -33,7 +33,7 @@ namespace Project_1.GameObjects
 
         int speed = 50;
 
-        string name;
+        protected string name;
         float maxHealth;
         float currentHealth;
 

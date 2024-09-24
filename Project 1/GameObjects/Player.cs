@@ -22,8 +22,8 @@ namespace Project_1
         int speed = 50;
 
         public Player() : base(new Textures.AnimatedTexture(new GfxPath(GfxType.Object, "Player"), new Point(32), Textures.AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(500)), new Vector2(100,100), 100)
-        { 
-        
+        {
+            name = "u :)";
         }
 
 

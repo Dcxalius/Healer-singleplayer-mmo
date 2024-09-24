@@ -13,7 +13,7 @@ namespace Project_1.GameObjects
     {
         public Walker(Vector2 aStartingPos) : base(new Textures.AnimatedTexture(new GfxPath(GfxType.Object, "Walker"), new Point(32), Textures.AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(500)), aStartingPos, 100)
         {
-
+            name = "xddddddddddd";
         }
 
         public void AddToControl(Player aPlayer)

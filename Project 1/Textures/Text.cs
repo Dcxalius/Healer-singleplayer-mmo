@@ -19,7 +19,8 @@ namespace Project_1.Textures
             set
             {
                 textToDisplay = value;
-                offset = font.MeasureString(value); 
+                if (value == null) return;
+                offset = font.MeasureString(value) * Camera.Zoom; 
             }
         }
 
@@ -28,33 +29,44 @@ namespace Project_1.Textures
         Vector2 offset;
         SpriteFont font;
         Color color;
+        float scale;
         
         public Text(string aFontName)
         {
-            textToDisplay = null;
             font = TextureManager.GetFont(aFontName);
+            scale = Camera.Zoom;
+            textToDisplay = null;
             color = Color.White;
-        }
-        public Text(string aFontName, Color aColor)
-        {
-            textToDisplay = null;
-            font = TextureManager.GetFont(aFontName);
-            color = aColor;
         }
 
         public Text(string aFontName, string aTextToStart)
         {
             font = TextureManager.GetFont(aFontName);
+            scale = Camera.Zoom;
             Value = aTextToStart;
             color = Color.White;
         }
+
+        public Text(string aFontName, Color aColor)
+        {
+            font = TextureManager.GetFont(aFontName);
+            scale = Camera.Zoom;
+            textToDisplay = null;
+            color = aColor;
+        }
+
         public Text(string aFontName, string aTextToStart, Color aColor)
         {
             font = TextureManager.GetFont(aFontName);
+            scale = Camera.Zoom;
             Value = aTextToStart;
             color = aColor;
         }
 
+        public void Rescale()
+        {
+            scale = Camera.Zoom;
+        }
 
         public void CentredDraw(SpriteBatch aBatch, Vector2 aPos) //Offsets by half of textsize
         {
@@ -75,10 +87,9 @@ namespace Project_1.Textures
         {
             if (textToDisplay == null)
             {
-                DebugManager.Print(GetType(), "Tried to print empty text");
                 return;
             }
-            aBatch.DrawString(font, textToDisplay, aPos, color, 0f, aOffset, 1f, SpriteEffects.None, 1f);
+            aBatch.DrawString(font, textToDisplay, aPos, color, 0f, aOffset, scale, SpriteEffects.None, 1f);
         }
     }
 }

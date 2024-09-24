@@ -29,13 +29,20 @@ namespace Project_1.UI.UIElements.Bars
         Text fractionText;
         Text percentageText;
 
-        public ResourceBar(float aMaxValue, BarTexture aBarGfx, UITexture aBackgroundGfx, Vector2 aPos, Vector2 aSize) : base(aMaxValue, aBarGfx, aBackgroundGfx, aPos, aSize)
+        public ResourceBar(BarTexture aBarGfx, UITexture aBackgroundGfx, Vector2 aPos, Vector2 aSize) : base(aBarGfx, aBackgroundGfx, aPos, aSize)
         {
             fractionText = new Text("Gloryse", Color.Black);
             percentageText = new Text("Gloryse", Color.Black);
-            currentValue = aMaxValue;
-            maxValue = aMaxValue;
+            MaxValue = 1f;
             Value = 1f;
+        }
+
+
+        public override void Rescale()
+        {
+            base.Rescale();
+            fractionText.Rescale();
+            percentageText.Rescale();
         }
 
         public override void Draw(SpriteBatch aBatch)
