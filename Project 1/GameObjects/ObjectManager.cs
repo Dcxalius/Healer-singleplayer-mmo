@@ -24,7 +24,14 @@ namespace Project_1.GameObjects
         {
             player = new Player();
             entities.Add(new Walker(new Microsoft.Xna.Framework.Vector2(200, 200)));
+            entities.Add(new Sheep(new Microsoft.Xna.Framework.Vector2(500, 500)));
             Camera.BindCamera(player);
+        }
+
+        static void ImportData(string aPathToData)
+        {
+            string[] data = System.IO.File.ReadAllLines(aPathToData);
+            
         }
 
         public static void Remove(Entity aObject)

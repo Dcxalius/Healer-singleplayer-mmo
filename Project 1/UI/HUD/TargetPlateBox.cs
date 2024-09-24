@@ -40,6 +40,7 @@ namespace Project_1.UI.HUD
             }
             targetEntity = aEntity;
             nameSegment.Name = targetEntity.Name;
+            nameSegment.BackgroundColor = Entity.RelationColor(aEntity.relationToPlayer);
             healthSegment.SetTarget(targetEntity);
         }
 

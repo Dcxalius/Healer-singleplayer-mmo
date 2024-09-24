@@ -17,7 +17,8 @@ namespace Project_1.UI.UIElements.PlateBoxes
 
         public PlateBoxSegment(UITexture aGfx, Vector2 aPos, Vector2 aSize) : base(aGfx, aPos, aSize)
         {
-            text = new Text("Gloryse");
+            text = new Text("Gloryse", Color.Black);
+            
         }
 
         public override void Draw(SpriteBatch aBatch)

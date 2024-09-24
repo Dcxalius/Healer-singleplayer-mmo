@@ -16,29 +16,50 @@ namespace Project_1.GameObjects
 {
     internal abstract class Entity : MovingObject
     {
-        public string Name { get => name; }
+        public enum RelationToPlayer
+        {
+            Self, 
+            Friendly,
+            Neutral,
+            Hostile
+        }
+        static Color[] RelationColors = new Color[] { Color.AliceBlue, Color.LightSeaGreen, Color.Yellow, Color.IndianRed };
+        public static Color RelationColor(RelationToPlayer aRelation) { return RelationColors[(int)aRelation]; }
+
+        public string Name { get => name; protected set => name = value; }
         public bool HasDestination { get => destinations.Count > 0; }
-
         Vector2 FeetPos { get => pos + new Vector2(size.X / 2, size.Y); }
+        public float MaxHealth { get => maxHealth; protected set => maxHealth = value; }
+        public float CurrentHealth 
+        {
+            get => currentHealth;
+            protected set
+            {
+                if (value >=  maxHealth)
+                {
+                    currentHealth = maxHealth;
+                    return;
+                }
+                currentHealth = value;
+            }
+        }
 
-        static Texture ShadowTexture = new Texture(new GfxPath(GfxType.Object, "Shadow"));
-
-        public float MaxHealth { get => maxHealth; }
-        public float CurrentHealth { get => currentHealth; }
         
         Rectangle shadowPos;
 
+        static Texture ShadowTexture = new Texture(new GfxPath(GfxType.Object, "Shadow"));
 
         List<Vector2> destinations = new List<Vector2>();
 
         int speed = 50;
 
-        protected string name;
+        string name;
         float maxHealth;
         float currentHealth;
 
+        public RelationToPlayer relationToPlayer;
 
-        public Entity(Texture aTexture, Vector2 aStartingPos, float aMaxSpeed) : base(aTexture, aStartingPos, aMaxSpeed)
+        public Entity(Texture aTexture, Vector2 aStartingPos, float aMaxSpeed, UnitData aDataSet) : base(aTexture, aStartingPos, aMaxSpeed)
         {
             shadowPos = new Rectangle((pos + new Vector2(size.X/2, size.Y)).ToPoint(), size);
 

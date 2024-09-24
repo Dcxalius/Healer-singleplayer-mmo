@@ -12,11 +12,10 @@ namespace Project_1.Textures
 {
     internal class Texture
     {
-        public Rectangle? Visible
-        {
-            get => visible;
-        }
-        
+        public Rectangle? Visible { get => visible; }
+
+        public void SetColor(Color aColor) { color = aColor; }
+
         protected Texture2D gfx;
         public Point size;
         public Color color;
