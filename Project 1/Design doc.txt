@@ -6,7 +6,7 @@ Genre
 
 Controls
 	Control the player character by keyboard movements (WASD/Keys)
-	Control the players allies with orders by mouse
+	Control the players allies with orders by mouse, and can set the units to aggressive/passive/defensive
 	Cast healing/buff spells either on targeted allies, self cast, at mouseover or in an area
 
 World
