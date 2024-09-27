@@ -13,10 +13,6 @@ namespace Project_1.GameObjects
     {
         public Walker(Vector2 aStartingPos) : base(new Textures.AnimatedTexture(new GfxPath(GfxType.Object, "Walker"), new Point(32), Textures.AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(500)), aStartingPos, 100)
         {
-            Name = "xddddddddddd";
-            MaxHealth = 300;
-            CurrentHealth = 300;
-            relationToPlayer = RelationToPlayer.Friendly;
         }
 
         public void AddToControl(Player aPlayer)

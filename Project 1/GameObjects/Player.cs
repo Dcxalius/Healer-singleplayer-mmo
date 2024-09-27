@@ -13,20 +13,17 @@ using Project_1.GameObjects;
 using Project_1.Input;
 using System.Runtime.CompilerServices;
 using Project_1.Tiles;
+using Project_1.UI.HUD;
 
-namespace Project_1
+namespace Project_1.GameObjects
 {
     internal class Player : Entity
     {
         public List<Walker> commands = new List<Walker>();
-        int speed = 50;
+        public List<Walker> party = new List<Walker>();
 
-        public Player() : base(new Textures.AnimatedTexture(new GfxPath(GfxType.Object, "Player"), new Point(32), Textures.AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(500)), new Vector2(100,100), 100)
+        public Player() : base(new AnimatedTexture(new GfxPath(GfxType.Object, "Player"), new Point(32), AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(500)), new Vector2(100,100), 100)
         {
-            Name = "u :)";
-            MaxHealth = 100;
-            CurrentHealth = 150;
-            relationToPlayer = RelationToPlayer.Self;
         }
 
 
@@ -35,19 +32,19 @@ namespace Project_1
             if (HasDestination) { return; }
             if (InputManager.GetHold(Keys.Left))
             {
-                velocity.X -= (float)(speed * TimeManager.SecondsSinceLastFrame);
+                velocity.X -= (float)(Data.Speed * TimeManager.SecondsSinceLastFrame);
             }
             if (InputManager.GetHold(Keys.Right))
             {
-                velocity.X += (float)(speed * TimeManager.SecondsSinceLastFrame);
+                velocity.X += (float)(Data.Speed * TimeManager.SecondsSinceLastFrame);
             }
             if (InputManager.GetHold(Keys.Up))
             {
-                velocity.Y -= (float)(speed * TimeManager.SecondsSinceLastFrame);
+                velocity.Y -= (float)(Data.Speed * TimeManager.SecondsSinceLastFrame);
             }
             if (InputManager.GetHold(Keys.Down))
             {
-                velocity.Y += (float)(speed * TimeManager.SecondsSinceLastFrame);
+                velocity.Y += (float)(Data.Speed * TimeManager.SecondsSinceLastFrame);
             }
         }
 
@@ -63,20 +60,25 @@ namespace Project_1
             commands.Clear();
         }
 
-        public void AddToCommand(Walker a)
+        public void AddToCommand(Walker aWalker)
         {
-            if (commands.Contains(a)) { return; }
+            if (commands.Contains(aWalker)) { return; }
 
-            commands.Add(a);
+            commands.Add(aWalker);
         }
 
-        public void RemoveFromCommand(Walker a)
+        public void RemoveFromCommand(Walker aWalker)
         {
-            if (!commands.Contains(a)) { return; }
+            if (!commands.Contains(aWalker)) { return; }
 
-            commands.Remove(a);
+            commands.Remove(aWalker);
         }
 
+        public void AddToParty(Walker aWalker)
+        {
+            party.Add(aWalker);
+            HUDManager.AddWalkerToParty(party[party.Count - 1]);
+        }
 
         public void IssueMoveOrder(ClickEvent aClick)
         {

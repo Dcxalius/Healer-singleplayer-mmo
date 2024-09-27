@@ -19,7 +19,7 @@ namespace Project_1.UI.HUD
         static PlateBoxHealthSegment healthSegment;
         public TargetPlateBox(Vector2 aPos, Vector2 aSize) : base(aPos, aSize)
         {
-            nameSegment = new PlateBoxNameSegment(null, Vector2.Zero, new Vector2(aSize.X, aSize.Y / 2));
+            nameSegment = new PlateBoxNameSegment(null, Color.White, Vector2.Zero, new Vector2(aSize.X, aSize.Y / 2));
             healthSegment = new PlateBoxHealthSegment(null, new Vector2(0, aSize.Y / 2), new Vector2(aSize.X, aSize.Y / 4));
 
 
@@ -39,8 +39,8 @@ namespace Project_1.UI.HUD
                 return;
             }
             targetEntity = aEntity;
-            nameSegment.Name = targetEntity.Name;
-            nameSegment.BackgroundColor = Entity.RelationColor(aEntity.relationToPlayer);
+            nameSegment.Name = targetEntity.Data.Name;
+            nameSegment.BackgroundColor = aEntity.RelationColor;
             healthSegment.SetTarget(targetEntity);
         }
 

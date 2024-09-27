@@ -17,7 +17,7 @@ namespace Project_1.UI.UIElements.PlateBoxes
 
         
 
-        public PlateBoxNameSegment(string name, Vector2 aPos, Vector2 aSize) : base(new UITexture("WhiteBackground", Entity.RelationColor(Entity.RelationToPlayer.Self)), aPos, aSize)
+        public PlateBoxNameSegment(string name, Color aNamePlateColor, Vector2 aPos, Vector2 aSize) : base(new UITexture("WhiteBackground", aNamePlateColor), aPos, aSize)
         {
             Text = name;
             

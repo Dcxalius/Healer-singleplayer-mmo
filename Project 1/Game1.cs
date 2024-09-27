@@ -29,7 +29,7 @@ namespace Project_1
             GraphicsManager.Init();
             Camera.Init();
             RandomManager.Init();
-            ObjectManager.Init();
+            ObjectManager.Init(Content);
             TileManager.Init();
             UIManager.Init();
 

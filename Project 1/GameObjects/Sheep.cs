@@ -14,8 +14,6 @@ namespace Project_1.GameObjects
         readonly static Point visualSize = new Point(32);
         public Sheep(Vector2 aStartingPos) : base(new AnimatedTexture(path, visualSize, AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(250)), aStartingPos, 50)
         {
-            Name = "shep";
-            MaxHealth = 50;
         }
     }
 }

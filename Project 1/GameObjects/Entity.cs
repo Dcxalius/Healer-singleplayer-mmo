@@ -16,56 +16,31 @@ namespace Project_1.GameObjects
 {
     internal abstract class Entity : MovingObject
     {
-        public enum RelationToPlayer
-        {
-            Self, 
-            Friendly,
-            Neutral,
-            Hostile
-        }
-        static Color[] RelationColors = new Color[] { Color.AliceBlue, Color.LightSeaGreen, Color.Yellow, Color.IndianRed };
-        public static Color RelationColor(RelationToPlayer aRelation) { return RelationColors[(int)aRelation]; }
-
-        public string Name { get => name; protected set => name = value; }
+        public UnitData Data { get => unitData; }
         public bool HasDestination { get => destinations.Count > 0; }
         Vector2 FeetPos { get => pos + new Vector2(size.X / 2, size.Y); }
-        public float MaxHealth { get => maxHealth; protected set => maxHealth = value; }
-        public float CurrentHealth 
-        {
-            get => currentHealth;
-            protected set
-            {
-                if (value >=  maxHealth)
-                {
-                    currentHealth = maxHealth;
-                    return;
-                }
-                currentHealth = value;
-            }
-        }
 
-        
+        public Color RelationColor { get => unitData.RelationColor(); }
+
         Rectangle shadowPos;
 
         static Texture ShadowTexture = new Texture(new GfxPath(GfxType.Object, "Shadow"));
 
         List<Vector2> destinations = new List<Vector2>();
 
-        int speed = 50;
+        
 
-        string name;
-        float maxHealth;
-        float currentHealth;
 
-        public RelationToPlayer relationToPlayer;
+        UnitData unitData;
 
-        public Entity(Texture aTexture, Vector2 aStartingPos, float aMaxSpeed, UnitData aDataSet) : base(aTexture, aStartingPos, aMaxSpeed)
+
+        public Entity(Texture aTexture, Vector2 aStartingPos, float aMaxSpeed) : base(aTexture, aStartingPos, aMaxSpeed)
         {
             shadowPos = new Rectangle((pos + new Vector2(size.X/2, size.Y)).ToPoint(), size);
 
-            name = "xdd";
-            maxHealth = 200;
-            currentHealth = 150;
+            unitData = ObjectManager.GetData(GetType().Name);
+
+            DebugManager.Print(GetType(), GetType().Name);
         }
 
         public override bool Click(ClickEvent aClickEvent)
@@ -100,7 +75,7 @@ namespace Project_1.GameObjects
             float length = 0;
             Vector2 directionToWalk = GetDirVectorToNextDestination(destinations[0], out length);
 
-            if (length < speed * 0.9f) //TODO: Find a good factor
+            if (length < unitData.Speed * 0.9f) //TODO: Find a good factor
             {
                 destinations.RemoveAt(0);
 
@@ -108,7 +83,7 @@ namespace Project_1.GameObjects
             }
 
 
-            velocity += directionToWalk * speed * (float)TimeManager.SecondsSinceLastFrame;
+            velocity += directionToWalk * unitData.Speed * (float)TimeManager.SecondsSinceLastFrame;
         }
 
         protected void OverwriteDestination(Vector2 aDestination)
@@ -161,10 +136,6 @@ namespace Project_1.GameObjects
             shadowPos.Location = (pos + offset ).ToPoint() ;
             shadowPos.Size = (size.ToVector2()  * Camera.Scale).ToPoint();
 
-            if (currentHealth > 0)
-            {
-                currentHealth--;
-            }
         }
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)

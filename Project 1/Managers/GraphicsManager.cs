@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Input;
-using Project_1.Managers;
 using Project_1.UI;
 using System;
 using System.Collections.Generic;
@@ -14,7 +13,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.Textures
+namespace Project_1.Managers
 {
     //TODO: Split this into GraphicsMang and TextureMang
 
@@ -66,10 +65,10 @@ namespace Project_1.Textures
 
         public static void Init()
         {
-            
+
 
             SetWindowSize(Camera.devScreenBorder, fullsceen, borderlessFullscreen);
-            
+
         }
 
         [DllImport("user32.dll")]
@@ -93,7 +92,7 @@ namespace Project_1.Textures
             windowBounds.Size = gameWindow.ClientBounds.Size + windowBounds.Location;
             //DebugManager.Print(typeof(GraphicsManager), InputManager.GetMousePosAbsolute().ToString());
             //rect.Location += 
-            if (ApplicationIsActivated() )
+            if (ApplicationIsActivated())
             {
                 ClipCursor(ref windowBounds);
 
@@ -127,7 +126,7 @@ namespace Project_1.Textures
             }
 
             graphicsDeviceManager.IsFullScreen = aFullscreen;
-            graphicsDeviceManager.HardwareModeSwitch = (aBorderless && aFullscreen);
+            graphicsDeviceManager.HardwareModeSwitch = aBorderless && aFullscreen;
             graphicsDeviceManager.ApplyChanges();
 
             //Add check here to see if display area is correct and if it isn't change aSize
@@ -223,7 +222,7 @@ namespace Project_1.Textures
 
         static void ToggleFullScreen()
         {
-            
+
             fullsceen = !fullsceen;
         }
     }

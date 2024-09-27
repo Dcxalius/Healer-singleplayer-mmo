@@ -23,7 +23,7 @@ namespace Project_1.UI.UIElements.PlateBoxes
             healthBar = new ResourceBar(new BarTexture(BarTexture.FillingDirection.Right, Color.Red), new UITexture("WhiteBackground", backgroundColor), Vector2.Zero, aSize);
             if (entity != null)
             {
-                healthBar.MaxValue = entity.MaxHealth;
+                healthBar.MaxValue = aEntity.Data.MaxHealth;
             }
             children.Add(healthBar);
         }
@@ -32,14 +32,14 @@ namespace Project_1.UI.UIElements.PlateBoxes
         {
             base.Update(aParent);
             if(entity == null) { return; }
-            healthBar.Value = entity.CurrentHealth;
+            healthBar.Value = entity.Data.MaxHealth;
         }
 
         public void SetTarget(Entity aEntity)
         {
             entity = aEntity;
-            healthBar.MaxValue = aEntity.MaxHealth;
-            healthBar.Value = aEntity.CurrentHealth;
+            healthBar.MaxValue = aEntity.Data.MaxHealth;
+            healthBar.Value = entity.Data.MaxHealth;
         }
 
 

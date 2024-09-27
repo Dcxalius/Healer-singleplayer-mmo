@@ -13,6 +13,9 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin Data/UnitData.json
+/copy:Data/UnitData.json
+
 #begin Debug/Debug.png
 /importer:TextureImporter
 /processor:TextureProcessor
