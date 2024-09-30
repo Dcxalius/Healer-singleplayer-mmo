@@ -15,6 +15,13 @@ namespace Project_1.GameObjects
         {
         }
 
+        public override void Update()
+        {
+            base.Update();
+
+
+        }
+
         public void AddToControl(Player aPlayer)
         {
             aPlayer.AddToCommand(this);
@@ -47,13 +54,10 @@ namespace Project_1.GameObjects
 
         public void RecieveDirectWalkingOrder(Vector2 aPos)
         {
+            target = null;
             OverwriteDestination(aPos);
         }
 
-        public void RecieveDirectWalkingOrder(GameObject aGameObject)
-        {
-            OverwriteDestination(aGameObject.Position);
-        }
 
         public void AddWalkingOrder(Vector2 aPos)
         {

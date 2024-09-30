@@ -19,13 +19,18 @@ namespace Project_1.GameObjects
 {
     internal class Player : Entity
     {
-        public List<Walker> commands = new List<Walker>();
-        public List<Walker> party = new List<Walker>();
+
+        List<Walker> commands = new List<Walker>();
+        List<Walker> party = new List<Walker>();
+
+        const float lengthOfLeash = 500;
 
         public Player() : base(new AnimatedTexture(new GfxPath(GfxType.Object, "Player"), new Point(32), AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(500)), new Vector2(100,100), 100)
         {
         }
 
+        public bool IsInCommand(Walker aWalker) { return commands.IndexOf(aWalker) >= 0; }
+        public bool IsInParty(Walker aWalker) { return party.IndexOf(aWalker) >= 0; }
 
         void MouseWalk()
         {
@@ -53,10 +58,20 @@ namespace Project_1.GameObjects
             MouseWalk();
 
             base.Update();
+            for (int i = 0; i < party.Count; i++)
+            {
+                if (party[i].HasDestination == false && (FeetPos - party[i].FeetPos).Length() > lengthOfLeash)
+                {
+                    party[i].Target = ObjectManager.Player;
+                }
+
+            }
+
         }
 
         public void ClearCommand()
         {
+            HUDManager.RemoveWalkersFromControl(commands.ToArray());
             commands.Clear();
         }
 
@@ -64,6 +79,7 @@ namespace Project_1.GameObjects
         {
             if (commands.Contains(aWalker)) { return; }
 
+            HUDManager.AddWalkerToControl(aWalker);
             commands.Add(aWalker);
         }
 
@@ -71,6 +87,7 @@ namespace Project_1.GameObjects
         {
             if (!commands.Contains(aWalker)) { return; }
 
+            HUDManager.RemoveWalkersFromControl(new Walker[] { aWalker });
             commands.Remove(aWalker);
         }
 
@@ -94,6 +111,14 @@ namespace Project_1.GameObjects
                     walker.RecieveDirectWalkingOrder(worldPosDestination);
 
                 }
+            }
+        }
+
+        public void IssueTargetOrder(Entity aEntity)
+        {
+            for (int i = 0; i < commands.Count; i++)
+            {
+                commands[i].Target = aEntity;
             }
         }
     }

@@ -31,7 +31,14 @@ namespace Project_1.GameObjects
             
             gfx = aGfx;
             pos = aStartingPos;
-            size = aGfx.Visible.Value.Size;
+            if (aGfx.Visible != null)
+            {
+                size = aGfx.Visible.Value.Size;
+            }
+            else
+            {
+                size = gfx.size;
+            }
         }
 
         public virtual bool Click(ClickEvent aClickEvent) { return false; }

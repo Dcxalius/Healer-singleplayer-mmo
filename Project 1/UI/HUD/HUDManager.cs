@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects;
 using Project_1.Managers;
 using Project_1.UI.UIElements;
+using SharpDX.MediaFoundation.DirectX;
 using SharpDX.XAudio2;
 using System;
 using System.Collections.Generic;
@@ -55,6 +56,35 @@ namespace Project_1.UI.HUD
 
             partyPlateBoxes[openIndex] = new PartyPlateBox(aWalker, new Vector2(0.1f, 0.24f), new Vector2(0.2f, 0.1f));
             hudElements.Add(partyPlateBoxes[openIndex]);
+        }
+
+        public static void AddWalkerToControl(Walker aWalker)
+        {
+            for (int i = 0; i < partyPlateBoxes.Length; i++)
+            {
+                if (partyPlateBoxes[i].BelongsTo(aWalker))
+                {
+                    partyPlateBoxes[i].VisibleBorder = true;
+                    break;
+                }
+            
+            }
+        }
+
+        public static void RemoveWalkersFromControl(Walker[] aWalkers)
+        {
+            for (int i = 0; i < aWalkers.Length; i++)
+            {
+                for (int j = 0; j < partyPlateBoxes.Length; j++)
+                {
+
+                    if (partyPlateBoxes[j].BelongsTo(aWalkers[i]))
+                    {
+                        partyPlateBoxes[j].VisibleBorder = false;
+                        break;
+                    }
+                }
+            }
         }
 
         public static void Update()

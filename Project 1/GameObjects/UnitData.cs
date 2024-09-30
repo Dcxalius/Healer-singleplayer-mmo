@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -45,31 +46,40 @@ namespace Project_1.GameObjects
 
         public float Speed { get  => speed; set => speed = value; }
 
+        public float SecondsPerAttack { get => secondsPerAttack; }
+        public float AttackDamage { get => attackDamage; }
+        public float AttackRange { get => attackRange; }
+
         string name;
         float maxHealth;
         float currentHealth;
         RelationToPlayer relationToPlayer;
         float speed;
-
+        float secondsPerAttack;
+        float attackDamage;
+        float attackRange;
 
         [JsonConstructor]
-        public UnitData(string name, float maxHealth, RelationToPlayer? relation, float speed) 
+        public UnitData(string name, float maxHealth, RelationToPlayer? relation, float speed, float secondsPerAttack, float attackDamage, float attackRange) 
         {
             
             this.name = name;
             this.maxHealth = maxHealth;
-            Debug.Assert(relation.HasValue);
-            
-            this.relationToPlayer = relation.Value;
             currentHealth = maxHealth;
+            Debug.Assert(relation.HasValue);
+            this.relationToPlayer = relation.Value;
+            
             this.speed = speed;
+            this.secondsPerAttack = secondsPerAttack;
+            this.attackDamage = attackDamage;
+            this.attackRange = attackRange;
             Assert();
         }
 
         void Assert()
         {
 
-            if (name == null || maxHealth <= 0 || speed <= 0)
+            if (name == null || maxHealth <= 0 || speed <= 0 || secondsPerAttack <= 0 || attackDamage <= 0 || attackRange <= 0)
             {
                 throw new Exception("UnitData improperly set");
             }

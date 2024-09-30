@@ -11,9 +11,12 @@ namespace Project_1.GameObjects
     internal class Sheep : Entity
     {
         readonly static GfxPath path = new GfxPath(GfxType.Object, "Sheep");
+        readonly static GfxPath corpsePath = new GfxPath(GfxType.Object, "SheepCorpse");
         readonly static Point visualSize = new Point(32);
+        
         public Sheep(Vector2 aStartingPos) : base(new AnimatedTexture(path, visualSize, AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(250)), aStartingPos, 50)
         {
+            corpse = new Corpse(new Texture(corpsePath), aStartingPos);
         }
     }
 }

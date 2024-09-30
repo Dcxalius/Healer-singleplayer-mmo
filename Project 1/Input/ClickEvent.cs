@@ -24,8 +24,41 @@ namespace Project_1.Input
         ClickType buttonPressed;
 
         public bool Modifier(InputManager.HoldModifier aHoldModifier) { return modifierHeld[(int)aHoldModifier]; }
-        public bool ModifierOr(InputManager.HoldModifier aHoldModifier, InputManager.HoldModifier aSecondHoldModifier) { return modifierHeld[(int)aHoldModifier] || modifierHeld[(int)aSecondHoldModifier]; }
-
+        public bool ModifiersOr(InputManager.HoldModifier[] aHoldModifier)
+        {
+            for (int i = 0; i < aHoldModifier.Length; i++)
+            {
+                if (modifierHeld[(int)aHoldModifier[i]] == true)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public bool Modifiers(InputManager.HoldModifier[] aHoldModifier) 
+        {
+            for (int i = 0; i < aHoldModifier.Length; i++)
+            {
+                if (modifierHeld[(int)aHoldModifier[i]] == false)
+                {
+                    return false;
+                }
+            }
+            return true;
+                
+        }
+        public bool NoModifiers() 
+        {
+            for (int i = 0; i < modifierHeld.Length; i++)
+            {
+                if (modifierHeld[i] == true)
+                {
+                    return false;
+                }
+                
+            }
+            return true;
+        }
         bool[] modifierHeld;
 
 
