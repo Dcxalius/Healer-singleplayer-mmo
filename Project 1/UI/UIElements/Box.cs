@@ -27,15 +27,5 @@ namespace Project_1.UI.UIElements
         {
             base.Draw(aBatch);
         }
-
-        public override void HoldReleaseOnMe()
-        {
-            base.HoldReleaseOnMe();
-        }
-
-        public override void ClickedOnMe(ClickEvent click)
-        {
-            base.ClickedOnMe(click);
-        }
     }
 }

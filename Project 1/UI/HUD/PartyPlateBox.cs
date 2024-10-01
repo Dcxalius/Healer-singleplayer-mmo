@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.GameObjects;
+using Project_1.Input;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.PlateBoxes;
 using System;
@@ -46,6 +47,34 @@ namespace Project_1.UI.HUD
         {
             return aWalker == walker;
             
+        }
+
+
+        public override void HoldReleaseOnMe()
+        {
+            base.HoldReleaseOnMe();
+
+            HUDManager.SetNewTarget(walker);
+        }
+
+        public override bool ClickedOnChildren(ClickEvent aClick)
+        {
+            return false;
+        }
+
+        public override void ClickedOnMe(ClickEvent aClick)
+        {
+            if (aClick.Modifier(InputManager.HoldModifier.Shift))
+            {
+                ObjectManager.Player.AddToCommand(walker);
+                return;
+            }
+            if (aClick.Modifier(InputManager.HoldModifier.Ctrl ))
+            {
+                ObjectManager.Player.NeedyAddToCommand(walker);
+                return;
+            }
+            base.ClickedOnMe(aClick);
         }
     }
 }

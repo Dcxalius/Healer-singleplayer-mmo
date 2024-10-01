@@ -36,9 +36,13 @@ namespace Project_1.GameObjects
             ImportData(aC.RootDirectory, aC);
             player = new Player();
             Camera.BindCamera(player);
-            entities.Add(new Walker(new Microsoft.Xna.Framework.Vector2(200, 200)));
-            player.AddToParty(entities[entities.Count - 1] as Walker);
-            entities.Add(new Sheep(new Microsoft.Xna.Framework.Vector2(500, 500)));
+
+
+
+
+            entities.Add(new Walker(new Microsoft.Xna.Framework.Vector2(200, 200)));//Debug
+            player.AddToParty(entities[entities.Count - 1] as Walker); //Debug
+            entities.Add(new Sheep(new Microsoft.Xna.Framework.Vector2(500, 500)));//Debug
 
         }
 
@@ -58,9 +62,6 @@ namespace Project_1.GameObjects
         static void ImportData(string aPathToData, ContentManager aContentManager)
         {
             string[] dataAsString = System.IO.File.ReadAllLines(aPathToData + "\\Data\\UnitData.json");
-
-            //string[] dataAsString = aContentManager.Load<string[]>("Data\\UnitData.json");
-
 
             for (int i = 0; i < dataAsString.Length; i++)
             {
@@ -112,10 +113,7 @@ namespace Project_1.GameObjects
                 foundHit = entities[i].Click(aClickEvent);
             }
 
-            if (foundHit)
-            {
-                return;
-            }
+            if (foundHit) { return; }
 
             LeftClickedGround(aClickEvent);
             RightClickGround(aClickEvent);
@@ -126,7 +124,7 @@ namespace Project_1.GameObjects
 
             if (aClickEvent.ButtonPressed == ClickEvent.ClickType.Left)
             {
-                if (aClickEvent.Modifiers(new InputManager.HoldModifier[]{ InputManager.HoldModifier.Shift, InputManager.HoldModifier.Ctrl}))
+                if (aClickEvent.ModifiersOr(new InputManager.HoldModifier[]{ InputManager.HoldModifier.Shift, InputManager.HoldModifier.Ctrl}))
                 {
                     player.ClearCommand();
                 }
@@ -147,14 +145,14 @@ namespace Project_1.GameObjects
 
         public static void Draw(SpriteBatch aSpriteBatch)
         {
+            for (int i = 0; i < corpses.Count; i++)
+            {
+                corpses[i].Draw(aSpriteBatch);
+            }
             player.Draw(aSpriteBatch);
             for (int i = 0; i < entities.Count; i++)
             {
                 entities[i].Draw(aSpriteBatch);
-            }
-            for (int i = 0; i < corpses.Count; i++)
-            {
-                corpses[i].Draw(aSpriteBatch);
             }
         }
     }

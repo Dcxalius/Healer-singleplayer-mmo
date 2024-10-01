@@ -14,7 +14,7 @@ namespace Project_1.UI.PauseMenu
 
         static Vector2 pauseSize = new Vector2(0.2f, 0.5f);
         static Vector2 pausePos = new Vector2(0.5f - (pauseSize.X / 2), 0.5f - pauseSize.Y / 2);
-        static UITexture gfx = new UITexture("WhiteBackground", Color.DarkGray);
+        static UITexture staticGfx = new UITexture("WhiteBackground", Color.DarkGray);
 
         static Vector2 buttonSize = new Vector2(pauseSize.X / 5 * 4, pauseSize.Y / 12);
         static Vector2 buttonStartingPos = new Vector2(pauseSize.X / 2 - buttonSize.X / 2, 0.05f);
@@ -40,7 +40,7 @@ namespace Project_1.UI.PauseMenu
             }
         }
 
-        public PauseBox() : base (gfx, pausePos, pauseSize) 
+        public PauseBox() : base (staticGfx, pausePos, pauseSize) 
         {
             children.Add(new ResumeButton(GetStartPositionFromTop, buttonSize));
             children.Add(new OptionMenuButton(GetStartPositionFromTop, buttonSize));

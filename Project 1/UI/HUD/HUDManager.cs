@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects;
+using Project_1.Input;
 using Project_1.Managers;
 using Project_1.UI.UIElements;
 using SharpDX.MediaFoundation.DirectX;
@@ -85,6 +86,20 @@ namespace Project_1.UI.HUD
                     }
                 }
             }
+        }
+
+        public static bool Click(ClickEvent aClickEvent)
+        {
+            for (int i = hudElements.Count - 1; i >= 0; i--)
+            {
+                bool clickedOn = false;
+                clickedOn = hudElements[i].ClickedOn(aClickEvent);
+                if (clickedOn == true)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public static void Update()

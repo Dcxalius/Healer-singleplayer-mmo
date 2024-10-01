@@ -18,7 +18,6 @@ namespace Project_1.UI
 {
     internal static class UIManager
     {
-        static List<UIElement> gameElements = new List<UIElement>();
         static List<UIElement> pauseElements = new List<UIElement>();
         static List<UIElement> optionElements = new List<UIElement>();
 
@@ -53,7 +52,6 @@ namespace Project_1.UI
             switch (StateManager.currentState)
             {
                 case State.Game:
-                    StateUpdate(gameElements);
                     HUDManager.Update();
                     break;
                 case State.Pause:
@@ -105,11 +103,6 @@ namespace Project_1.UI
             }
         }
 
-        public static void DrawGameUI(SpriteBatch aBatch)
-        {
-            HUDManager.Draw(aBatch);
-            StateDraw(gameElements, aBatch);
-        }
 
         static void StateDraw(List<UIElement> aListToDraw, SpriteBatch aBatch)
         {
@@ -126,7 +119,7 @@ namespace Project_1.UI
             switch (StateManager.currentState)
             {
                 case State.Game:
-                    return SearchForHit(gameElements, aClickEvent); 
+                    return HUDManager.Click(aClickEvent); 
                 case State.Pause:
                     return SearchForHit(pauseElements, aClickEvent);
                 case State.StartMenu:
@@ -155,7 +148,7 @@ namespace Project_1.UI
 
         public static void Rescale()
         {
-            RescaleList(gameElements);
+            //RescaleList(HUDManager.Rescale);
             RescaleList(optionElements);
             RescaleList(pauseElements);
 

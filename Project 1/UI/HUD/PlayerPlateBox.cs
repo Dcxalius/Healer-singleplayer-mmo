@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.GameObjects;
+using Project_1.Input;
 using Project_1.Textures;
 using Project_1.UI.UIElements.PlateBoxes;
 using System;
@@ -33,6 +34,19 @@ namespace Project_1.UI.HUD
 
             AddSegmentsToChildren();
 
+        }
+
+
+        public override void HoldReleaseOnMe()
+        {
+            base.HoldReleaseOnMe();
+
+            HUDManager.SetNewTarget(player);
+        }
+
+        public override bool ClickedOnChildren(ClickEvent aClick)
+        {
+            return false;
         }
     }
 }

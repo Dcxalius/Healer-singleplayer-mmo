@@ -14,10 +14,5 @@ namespace Project_1.Tiles
         {
 
         }
-
-        public override void Update()
-        {
-
-        }
     }
 }

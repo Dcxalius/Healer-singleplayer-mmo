@@ -88,7 +88,8 @@ namespace Project_1.Managers
 
         static void GameDraw()
         {
-            Camera.RunningDraw();
+            Camera.GameDraw();
+            Camera.DrawGameToCamera();
         }
 
         static void PauseUpdate()

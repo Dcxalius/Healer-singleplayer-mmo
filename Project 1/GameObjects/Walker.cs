@@ -29,8 +29,7 @@ namespace Project_1.GameObjects
 
         public void NeedyControl(Player aPlayer)
         {
-            aPlayer.ClearCommand();
-            aPlayer.AddToCommand(this);
+            aPlayer.NeedyAddToCommand(this);
         }
 
         public override bool Click(ClickEvent aClickEvent)
@@ -62,6 +61,11 @@ namespace Project_1.GameObjects
         public void AddWalkingOrder(Vector2 aPos)
         {
             AddDestination(aPos);
+        }
+
+        protected override void AddToAggroTable(Entity aAttacker, float aDamageTaken)
+        {
+            
         }
     }
 }

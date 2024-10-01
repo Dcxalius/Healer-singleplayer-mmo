@@ -35,7 +35,7 @@ namespace Project_1.GameObjects
             }
 
             velocity = Vector2.Zero;
-            pos += momentum;
+            Position += momentum;
             momentum = new Vector2(momentum.X * drag.X, momentum.Y * drag.Y);
 
             if (momentum.X > 0 && facingRight == false)

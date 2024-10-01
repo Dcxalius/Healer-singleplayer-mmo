@@ -16,7 +16,7 @@ namespace Project_1.GameObjects
         
         public Sheep(Vector2 aStartingPos) : base(new AnimatedTexture(path, visualSize, AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(250)), aStartingPos, 50)
         {
-            corpse = new Corpse(new Texture(corpsePath), aStartingPos);
+            corpse = new Corpse(new Texture(corpsePath));
         }
     }
 }

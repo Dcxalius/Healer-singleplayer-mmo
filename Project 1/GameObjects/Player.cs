@@ -37,20 +37,27 @@ namespace Project_1.GameObjects
             if (HasDestination) { return; }
             if (InputManager.GetHold(Keys.Left))
             {
-                velocity.X -= (float)(Data.Speed * TimeManager.SecondsSinceLastFrame);
+                velocity.X -= 1;
+                //velocity.X -= (float)(Data.Speed * TimeManager.SecondsSinceLastFrame);
             }
             if (InputManager.GetHold(Keys.Right))
             {
-                velocity.X += (float)(Data.Speed * TimeManager.SecondsSinceLastFrame);
+                velocity.X += 1;
+                //velocity.X += (float)(Data.Speed * TimeManager.SecondsSinceLastFrame);
             }
             if (InputManager.GetHold(Keys.Up))
             {
-                velocity.Y -= (float)(Data.Speed * TimeManager.SecondsSinceLastFrame);
+                velocity.Y -= 1;
+                //velocity.Y -= (float)(Data.Speed * TimeManager.SecondsSinceLastFrame);
             }
             if (InputManager.GetHold(Keys.Down))
             {
-                velocity.Y += (float)(Data.Speed * TimeManager.SecondsSinceLastFrame);
+                velocity.Y += 1;
             }
+
+            if (velocity == Vector2.Zero) return;
+            velocity.Normalize();
+            velocity *= (float)(Data.Speed * TimeManager.SecondsSinceLastFrame);
         }
 
         public override void Update()
@@ -81,6 +88,13 @@ namespace Project_1.GameObjects
 
             HUDManager.AddWalkerToControl(aWalker);
             commands.Add(aWalker);
+        }
+
+        public void NeedyAddToCommand(Walker aWalker)
+        {
+            commands.Clear();
+            AddToCommand(aWalker);
+
         }
 
         public void RemoveFromCommand(Walker aWalker)

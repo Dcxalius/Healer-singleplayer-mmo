@@ -13,8 +13,6 @@ namespace Project_1.UI.UIElements.PlateBoxes
 {
     internal abstract class PlateBox : Box
     {
-        Entity targetEntity;
-
         protected PlateBoxSegment[] leftVerticalSegments;
         protected PlateBoxSegment[] rightVerticalSegments;
         protected PlateBoxSegment[] horizontalSegments;

@@ -19,12 +19,12 @@ namespace Project_1.Textures
             Random
         }
         
-        Rectangle[] possibleFrames;
-        int currentFrame = 0;
+        protected Rectangle[] possibleFrames;
+        protected int currentFrame = 0;
         double durationBetweenFrames;
         double lastFrameFlip;
 
-        AnimationType animationType;
+        protected AnimationType animationType;
         
         bool loopingBackwards;
 

@@ -12,12 +12,12 @@ namespace Project_1.UI.UIElements
 {
     internal abstract class GFXButton : Button
     {
-        Texture gfx;
+        Texture gfxOnButton;
         Rectangle gfxRectangle;
 
         public GFXButton(GfxPath aGfxPath, Vector2 aPos, Vector2 aSize, Color aColorOfBorder) : base(aPos, aSize, aColorOfBorder)
         {
-            gfx = new Texture(aGfxPath);
+            gfxOnButton = new Texture(aGfxPath);
             gfxRectangle = TransformFromRelativeToValues(new Vector2(RelativePos.X + RelativeSize.X / 10, RelativePos.Y + RelativeSize.Y / 10), new Vector2(RelativeSize.X * 0.8f, RelativeSize.Y * 0.8f));
         }
 
@@ -27,11 +27,11 @@ namespace Project_1.UI.UIElements
 
             if (!Pressed)
             {
-                gfx.Draw(aBatch, gfxRectangle);
+                gfxOnButton.Draw(aBatch, gfxRectangle);
             }
             else
             {
-                gfx.Draw(aBatch, gfxRectangle, Color.DarkGray);
+                gfxOnButton.Draw(aBatch, gfxRectangle, Color.DarkGray);
 
             }
         }

@@ -26,7 +26,6 @@ namespace Project_1.GameObjects
 
         protected UnitData Data { get => unitData; }
         public bool HasDestination { get => destinations.Count > 0; }
-        public Vector2 FeetPos { get => pos + new Vector2(size.X / 2, size.Y); }
         public Color RelationColor { get => unitData.RelationColor(); }
         public UnitData.RelationToPlayer Relation { get => unitData.Relation; }
         public Entity Target { get => target; set => target = value; }
@@ -34,6 +33,7 @@ namespace Project_1.GameObjects
         public string Name { get => unitData.Name; }
         public float CurrentHealth {  get => unitData.CurrentHealth;}
         public float MaxHealth {  get => unitData.MaxHealth;}
+        
 
 
         Rectangle shadowPos;
@@ -45,7 +45,7 @@ namespace Project_1.GameObjects
 
         protected Entity target = null;
 
-        float timesSinceLastAttack = 0;
+        float timeSinceLastAttack = 0;
 
         UnitData unitData;
 
@@ -53,7 +53,7 @@ namespace Project_1.GameObjects
 
         public Entity(Texture aTexture, Vector2 aStartingPos, float aMaxSpeed) : base(aTexture, aStartingPos, aMaxSpeed)
         {
-            shadowPos = new Rectangle((pos + new Vector2(size.X/2, size.Y)).ToPoint(), size);
+            shadowPos = new Rectangle((Position + new Vector2(size.X/2, size.Y)).ToPoint(), size);
 
             unitData = ObjectManager.GetData(GetType().Name);
 
@@ -62,13 +62,19 @@ namespace Project_1.GameObjects
 
         public void TakeDamage(Entity aAttacker, float aDamageTaken)
         {
+            AddToAggroTable(aAttacker, aDamageTaken);
+            unitData.CurrentHealth -= aDamageTaken;
+        }
+
+        protected virtual void AddToAggroTable(Entity aAttacker, float aDamageTaken)
+        {
+
             if (!aggroTable.TryAdd(aAttacker, aDamageTaken))
             {
                 aggroTable[aAttacker] += aDamageTaken;
             }
-            unitData.CurrentHealth -= aDamageTaken;
-
         }
+
 
         public override bool Click(ClickEvent aClickEvent)
         {
@@ -145,7 +151,6 @@ namespace Project_1.GameObjects
             }
 
             velocity += directionToWalk * unitData.Speed * (float)TimeManager.SecondsSinceLastFrame;
-
         }
 
         protected void OverwriteDestination(Vector2 aDestination)
@@ -159,28 +164,25 @@ namespace Project_1.GameObjects
         public override void Update()
         {
             Walk();
+            Vector2 oldPosition = Position;
 
 
             base.Update();
             AttackTarget();
             
-            CheckForCollisions();
+            CheckForCollisions(oldPosition);
 
             AggroStuff();
-
-            if (unitData.CurrentHealth <= 0)
-            {
-                ObjectManager.AddCorpse(corpse);
-                ObjectManager.RemoveEntity(this);
-            }
+            Death();
         }
 
         protected virtual void AggroStuff()
         {
             float highestThreat = 0;
 
-            if (target != null) //TODO: Move this out to a nonfriendly class
+            if (target != null && aggroTable.ContainsKey(target)) //TODO: Move this out to a nonfriendly class
             {
+                
                 highestThreat = aggroTable[target];
             }
             foreach (var item in aggroTable)
@@ -193,22 +195,32 @@ namespace Project_1.GameObjects
             }
         }
 
+        protected virtual void Death()
+        {
+            if (unitData.CurrentHealth <= 0)
+            {
+                ObjectManager.RemoveEntity(this);
+                corpse.SpawnCorpe(Position);
+            }
+        }
+
         void AttackTarget()
         {
             if (target == null) return;
 
-            if (unitData.SecondsPerAttack > timesSinceLastAttack)
+            if (unitData.SecondsPerAttack > timeSinceLastAttack)
             {
-                timesSinceLastAttack += (float)TimeManager.SecondsSinceLastFrame;
+                timeSinceLastAttack += (float)TimeManager.SecondsSinceLastFrame;
                 return;     
             }
 
             if (CheckForRelation() && (target.FeetPos - FeetPos).Length() < this.unitData.AttackRange)
             {
-                timesSinceLastAttack = 0;
+                timeSinceLastAttack = 0;
                 target.TakeDamage(this, unitData.AttackDamage);
                 if (target.unitData.CurrentHealth <= 0)
                 {
+                    aggroTable.Remove(target);
                     target = null;
                 }
             }
@@ -228,9 +240,8 @@ namespace Project_1.GameObjects
             return false;
         }
 
-        void CheckForCollisions()
+        void CheckForCollisions(Vector2 aOldPosition)
         {
-            Vector2 oldPosition = pos;
 
             List<Rectangle> resultingCollisions = TileManager.CollisionsWithUnwalkable(WorldRectangle);
 
@@ -245,37 +256,26 @@ namespace Project_1.GameObjects
                     {
                         velocity.X = 0;
                         momentum.X = 0;//TOOD: Has it so if momentum changes rapidly it deals damage? Maybe i dunnu I dont have my gamedesigner hat with me today
-                        pos.X = oldPosition.X;
+                        Position = new Vector2(aOldPosition.X, Position.Y);
                     }
                     if (Math.Abs(collisionDir.X) < Math.Abs(collisionDir.Y))
                     {
                         velocity.Y = 0;
                         momentum.Y = 0;
-                        pos.Y = oldPosition.Y;
+                        Position = new Vector2(Position.X, aOldPosition.Y);
                     }
                 }
-                //else
-                //{
-                //    velocity = Vector2.Zero;
-                //    momentum = Vector2.Zero;
-                //    pos = oldPosition;
-                //}
             }
 
             Vector2 offset = new Vector2(0, size.Y / 2.5f);
-            shadowPos.Location = (pos + offset).ToPoint();
+            shadowPos.Location = (Position + offset).ToPoint();
             shadowPos.Size = (size.ToVector2() * Camera.Scale).ToPoint();
         }
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)
         {
-
-
-            ShadowTexture.Draw(aBatch, Camera.WorldPosToCameraSpace(shadowPos));
-            
+            ShadowTexture.Draw(aBatch, Camera.WorldPosToCameraSpace(shadowPos).Location.ToVector2(), FeetPos - Vector2.One);   
             base.Draw(aBatch);
-
-            
         }
     }
 }

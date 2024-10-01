@@ -5,7 +5,6 @@ using Project_1.GameObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,9 +18,16 @@ namespace Project_1.Tiles
 
         public bool Walkable { get => walkable; }
 
+
         public Tile(bool aWalkable, string aTextureName, Point aPos) : base(new Textures.RandomlyGeneratedTexture(true, tileSize, new GfxPath(GfxType.Tile, aTextureName)), aPos.ToVector2())
         { 
             walkable = aWalkable;
+        }
+
+        public override void Draw(SpriteBatch aBatch)
+        {
+            //base.Draw(aBatch);
+            gfx.Draw(aBatch, Camera.WorldPosToCameraSpace(Position), Vector2.Zero);
         }
     }
 }

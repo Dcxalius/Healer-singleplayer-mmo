@@ -1,5 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json;
+using Project_1.GameObjects;
 using Project_1.Managers;
 using System;
 using System.Collections.Generic;
@@ -14,9 +17,25 @@ namespace Project_1.Tiles
         static Tile[,] tiles;
         readonly static Point TileSize = new Point(32, 32);
         const int sizeOfSquareToCheck = 3; // this should always be odd
+        static Dictionary<string, TileData> tileData = new Dictionary<string, TileData>();
+
         public static void Init()
         {
             GenerateTiles(new Point(0), new Point(100, 100));
+        }
+
+
+        static void ImportData(string aPathToData, ContentManager aContentManager)
+        {
+            string[] dataAsString = System.IO.File.ReadAllLines(aPathToData + "\\Data\\TileData.json");
+
+            for (int i = 0; i < dataAsString.Length; i++)
+            {
+                TileData data = JsonConvert.DeserializeObject<TileData>(dataAsString[i]);
+                tileData.Add(data.Name, data);
+
+            }
+
         }
 
         static void GenerateTiles(Point aLeftUppermostTile, Point aSize)

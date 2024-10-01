@@ -126,7 +126,7 @@ namespace Project_1.UI.UIElements
                 bool clickedOnChild = ClickedOnChildren(aClick);
                 if (clickedOnChild == false)
                 {
-                    ClickedOnMe(aClick);
+                        ClickedOnMe(aClick);
                 }
                 return true;
             }
@@ -143,7 +143,7 @@ namespace Project_1.UI.UIElements
             //DebugManager.Print(GetType(), "Hovered on");
         }
 
-        public bool ClickedOnChildren(ClickEvent aClick)
+        public virtual bool ClickedOnChildren(ClickEvent aClick)
         {
 
             for (int i = 0; i < children.Count; i++)

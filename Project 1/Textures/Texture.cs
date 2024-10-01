@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Managers;
+using Project_1.Tiles;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -109,7 +111,12 @@ namespace Project_1.Textures
 
         public virtual void Draw(SpriteBatch aBatch, Vector2 aPos)
         {
-            Draw(aBatch, aPos, color);
+            Draw(aBatch, aPos, color, Camera.WorldRectangle.Bottom);
+        }
+
+        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, Vector2 aFeetPos)
+        {
+            Draw(aBatch, aPos, color, aFeetPos.Y);
         }
 
         public virtual void Draw(SpriteBatch aBatch, Rectangle aPosRectangle)
@@ -117,14 +124,19 @@ namespace Project_1.Textures
             Draw(aBatch, aPosRectangle, color);
         }
 
-        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, Color aColor)
+        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, Color aColor, float aFeetPosY)
         {
             if (gfx == null)
             {
                 return;
             }
 
-            aBatch.Draw(gfx, aPos, visible, aColor, rotation, offset, Camera.Scale, flip, 1f);
+            //if (typeof(RandomlyGeneratedTexture) != GetType()) DebugManager.Print(GetType(), "floatD should be: " + aFeetPosY / Camera.WorldRectangle.Bottom);
+            if (Camera.MomAmIInFrame(new Rectangle(aPos.ToPoint(), (size.ToVector2() *Camera.Scale).ToPoint())))
+            {
+                aBatch.Draw(gfx, aPos, visible, aColor, rotation, offset, Camera.Scale, flip, aFeetPosY / Camera.WorldRectangle.Bottom);
+
+            }
         }
         public virtual void Draw(SpriteBatch aBatch, Rectangle aPosRectangle, Color aColor)
         {
@@ -132,8 +144,11 @@ namespace Project_1.Textures
             {
                 return;
             }
+            if (Camera.MomAmIInFrame(aPosRectangle))
+            {
+                aBatch.Draw(gfx, aPosRectangle, visible, aColor, rotation, offset, flip, 1f);
 
-            aBatch.Draw(gfx, aPosRectangle, visible, aColor, rotation, offset, flip, 1f);
+            }
         }
     }
 }

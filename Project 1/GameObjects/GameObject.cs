@@ -14,7 +14,8 @@ namespace Project_1.GameObjects
 {
     internal abstract class GameObject
     {
-        public Vector2 Position { get => pos; }
+        public Vector2 Position { get => pos; protected set => pos = value; }
+        public Vector2 FeetPos { get => Position + new Vector2(size.X / 2, size.Y); }
 
         //public static int GameObjectsToDraw = 0;
 
@@ -23,7 +24,7 @@ namespace Project_1.GameObjects
         protected Textures.Texture gfx;
 
 
-        protected Vector2 pos;
+        Vector2 pos;
         protected Point size;
 
         public GameObject(Textures.Texture aGfx, Vector2 aStartingPos)
@@ -56,12 +57,12 @@ namespace Project_1.GameObjects
             Debug.Assert(gfx != null);
 
             //Should be moved to texture?
-            if (Camera.MomAmIInFrame(new Rectangle(Camera.WorldPosToCameraSpace(pos).ToPoint(), (gfx.size.ToVector2() *Camera.Scale).ToPoint())))
             //if (Camera.MomAmIInFrame(new Rectangle(pos.ToPoint(), gfx.size)))
             {
                 //GameObjectsToDraw++;
                 //sb.Draw(gfx, Camera.WorldPosToCameraSpace(pos), Color.White);
-                gfx.Draw(aBatch, Camera.WorldPosToCameraSpace(pos));
+                
+                gfx.Draw(aBatch, Camera.WorldPosToCameraSpace(pos), FeetPos);
             }
         }
 
