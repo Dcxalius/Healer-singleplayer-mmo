@@ -22,6 +22,7 @@ namespace Project_1.Input
             Shift,
             Count
         }
+
         public static bool LeftPress
         {
             get

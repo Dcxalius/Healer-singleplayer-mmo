@@ -32,6 +32,7 @@ namespace Project_1
             ObjectManager.Init(Content);
             TileManager.Init(Content);
             UIManager.Init();
+            KeyBindManager.Init(Content);
 
             base.Initialize();
         }

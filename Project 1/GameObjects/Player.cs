@@ -35,20 +35,20 @@ namespace Project_1.GameObjects
         void KeyboardWalk()
         {
             if (HasDestination) { return; }
-            if (InputManager.GetHold(Keys.Left))
+            if (KeyBindManager.GetHold(KeyBindManager.KeyListner.MoveCharacterLeft))
             {
                 velocity.X -= 1;
             }
-            if (InputManager.GetHold(Keys.Right))
+            if (KeyBindManager.GetHold(KeyBindManager.KeyListner.MoveCharacterRight))
             {
                 velocity.X += 1;
             }
-            if (InputManager.GetHold(Keys.Up))
+            if (KeyBindManager.GetHold(KeyBindManager.KeyListner.MoveCharacterUp))
             {
                 velocity.Y -= 1;
             }
-            if (InputManager.GetHold(Keys.Down))
-            {
+            if (KeyBindManager.GetHold(KeyBindManager.KeyListner.MoveCharacterDown))
+            { 
                 velocity.Y += 1;
             }
 
