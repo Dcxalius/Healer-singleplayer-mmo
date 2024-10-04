@@ -11,15 +11,8 @@ namespace Project_1.GameObjects
 {
     internal class Walker : Entity
     {
-        public Walker(Vector2 aStartingPos) : base(new Textures.AnimatedTexture(new GfxPath(GfxType.Object, "Walker"), new Point(32), Textures.AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(500)), aStartingPos, 100)
+        public Walker(Vector2 aStartingPos) : base(new Textures.AnimatedTexture(new GfxPath(GfxType.Object, "Walker"), new Point(32), Textures.AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(500)), aStartingPos)
         {
-        }
-
-        public override void Update()
-        {
-            base.Update();
-
-
         }
 
         public void AddToControl(Player aPlayer)
@@ -32,10 +25,6 @@ namespace Project_1.GameObjects
             aPlayer.NeedyAddToCommand(this);
         }
 
-        public override bool Click(ClickEvent aClickEvent)
-        {
-            return base.Click(aClickEvent);
-        }
 
         protected override void ClickedOn(ClickEvent aClickEvent)
         {

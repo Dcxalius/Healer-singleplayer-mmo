@@ -13,26 +13,24 @@ namespace Project_1.GameObjects
     {
         public Vector2 Velocity { get => velocity; protected set => velocity = value; }
         public Vector2 Momentum { get => momentum; protected set => velocity = momentum; }
-
+        public abstract float MaxSpeed { get; }
 
         bool facingRight = true;
 
         protected Vector2 momentum = Vector2.Zero;
         protected Vector2 velocity = Vector2.Zero;
-        float maxSpeed;
-        //Vector2 drag = new Vector2(0.9f);
+        //float maxSpeed;
 
-        public MovingObject(Texture aTexture, Vector2 aStartingPos, float aMaxSpeed) : base(aTexture, aStartingPos)
+        public MovingObject(Texture aTexture, Vector2 aStartingPos) : base(aTexture, aStartingPos)
         {
-            maxSpeed = aMaxSpeed;
         }
 
         public override void Update()
         {
             momentum += velocity;
-            if (momentum.Length() > maxSpeed)
+            if (momentum.Length() > MaxSpeed)
             {
-                momentum = Vector2.Normalize(momentum) * maxSpeed;
+                momentum = Vector2.Normalize(momentum) * MaxSpeed;
             }
 
             velocity = Vector2.Zero;

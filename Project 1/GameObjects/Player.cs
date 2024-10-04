@@ -25,30 +25,27 @@ namespace Project_1.GameObjects
 
         const float lengthOfLeash = 500;
 
-        public Player() : base(new AnimatedTexture(new GfxPath(GfxType.Object, "Player"), new Point(32), AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(500)), new Vector2(100,100), 100)
+        public Player(Vector2 aStartPos) : base(new AnimatedTexture(new GfxPath(GfxType.Object, "Player"), new Point(32), AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(500)), aStartPos)
         {
         }
 
         public bool IsInCommand(Walker aWalker) { return commands.IndexOf(aWalker) >= 0; }
         public bool IsInParty(Walker aWalker) { return party.IndexOf(aWalker) >= 0; }
 
-        void MouseWalk()
+        void KeyboardWalk()
         {
             if (HasDestination) { return; }
             if (InputManager.GetHold(Keys.Left))
             {
                 velocity.X -= 1;
-                //velocity.X -= (float)(Data.Speed * TimeManager.SecondsSinceLastFrame);
             }
             if (InputManager.GetHold(Keys.Right))
             {
                 velocity.X += 1;
-                //velocity.X += (float)(Data.Speed * TimeManager.SecondsSinceLastFrame);
             }
             if (InputManager.GetHold(Keys.Up))
             {
                 velocity.Y -= 1;
-                //velocity.Y -= (float)(Data.Speed * TimeManager.SecondsSinceLastFrame);
             }
             if (InputManager.GetHold(Keys.Down))
             {
@@ -62,18 +59,20 @@ namespace Project_1.GameObjects
 
         public override void Update()
         {
-            MouseWalk();
-
+            KeyboardWalk();
             base.Update();
+            SummonPartyIfTooFarAway();
+        }
+
+        void SummonPartyIfTooFarAway()
+        {
             for (int i = 0; i < party.Count; i++)
             {
                 if (party[i].HasDestination == false && (FeetPos - party[i].FeetPos).Length() > lengthOfLeash)
                 {
                     party[i].Target = ObjectManager.Player;
                 }
-
             }
-
         }
 
         public void ClearCommand()
@@ -113,7 +112,7 @@ namespace Project_1.GameObjects
 
         public void IssueMoveOrder(ClickEvent aClick)
         {
-            Vector2 worldPosDestination = Camera.CameraSpaceToWorldPos(aClick.ClickPos);
+            Vector2 worldPosDestination = Camera.CameraSpaceToWorldPos(aClick.RelativePos);
             foreach (var walker in commands)
             {
                 if (aClick.Modifier(InputManager.HoldModifier.Shift))

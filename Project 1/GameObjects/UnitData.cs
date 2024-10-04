@@ -44,7 +44,8 @@ namespace Project_1.GameObjects
 
         public RelationToPlayer Relation { get => relationToPlayer; set => relationToPlayer = value; }  
 
-        public float Speed { get  => speed; set => speed = value; }
+        public float Speed { get  => speed; }
+        public float MaxSpeed { get => maxSpeed; }
 
         public float SecondsPerAttack { get => secondsPerAttack; }
         public float AttackDamage { get => attackDamage; }
@@ -55,12 +56,13 @@ namespace Project_1.GameObjects
         float currentHealth;
         RelationToPlayer relationToPlayer;
         float speed;
+        float maxSpeed;
         float secondsPerAttack;
         float attackDamage;
         float attackRange;
 
         [JsonConstructor]
-        public UnitData(string name, float maxHealth, RelationToPlayer? relation, float speed, float secondsPerAttack, float attackDamage, float attackRange) 
+        public UnitData(string name, float maxHealth, RelationToPlayer? relation, float speed, float maxSpeed, float secondsPerAttack, float attackDamage, float attackRange) 
         {
             
             this.name = name;
@@ -70,6 +72,7 @@ namespace Project_1.GameObjects
             this.relationToPlayer = relation.Value;
             
             this.speed = speed;
+            this.maxSpeed = maxSpeed;
             this.secondsPerAttack = secondsPerAttack;
             this.attackDamage = attackDamage;
             this.attackRange = attackRange;

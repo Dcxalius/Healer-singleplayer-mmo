@@ -158,7 +158,7 @@ namespace Project_1
         }
 
        
-        public static Rectangle WorldPosToCameraSpace(Rectangle aWorldPos) //TODO: This returns wrong size
+        public static Rectangle WorldPosToCameraSpace(Rectangle aWorldPos)
         {
             Point topLeft = (centreInWorldSpace * scale - screenRectangleSize.ToVector2() / 2).ToPoint();
             Rectangle cameraPos = new Rectangle((aWorldPos.Location.ToVector2() * scale).ToPoint() - topLeft, (aWorldPos.Size.ToVector2() * scale).ToPoint());
@@ -209,8 +209,6 @@ namespace Project_1
         {
             TileManager.Draw(aBatch);
             ObjectManager.Draw(aBatch);
-            //HUDManager.Draw(aBatch); // a bit ugly but needs to do this since we want to draw the game in pause aswell.
-
         }
 
         public static void DrawGameToCamera()
@@ -232,16 +230,10 @@ namespace Project_1
 
             
             DrawGameObjects(gameSpriteBatch);
-            if (DebugManager.mode == DebugMode.On)
-            {
-                Vector2 DebugPos = new Vector2(screenRectangleSize.X / 2, screenRectangleSize.Y / 2);
-                gameSpriteBatch.Draw(debugTexture, DebugPos, new Rectangle(0, 0, 10, 10), Color.White, 0f, new Vector2(5), 1f, SpriteEffects.None, 1f);
-
-                //Rectangle r = new Rectangle((centrePoint - screenRectangle.Location.ToVector2() - screenBorder.ToVector2() / 2).ToPoint() , screenRectangle.Size);
-                //gameSpriteBatch.Draw(debugTexture, r, new Rectangle(0, 0, 10, 10), Color.White);
-            }
-
             gameSpriteBatch.Draw(uiTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+
+
+
             gameSpriteBatch.End();
             GraphicsManager.SetRenderTarget(null);
 
@@ -253,13 +245,15 @@ namespace Project_1
             GraphicsManager.SetRenderTarget(cameraTarget);
             spriteBatch.Begin();
             GraphicsManager.ClearScreen(Color.Purple);
-            DrawGameObjects(spriteBatch);
+            
+            
+            DrawGameObjects(spriteBatch); //draw game
+            spriteBatch.Draw(uiTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f); //draw game ui
+            pauseGfx.Draw(spriteBatch, Vector2.Zero); //draw gray screen overlay
+            UIManager.Draw(spriteBatch); //draw pause menu
 
 
-            spriteBatch.Draw(uiTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
-            pauseGfx.Draw(spriteBatch, Vector2.Zero);
 
-            UIManager.Draw(spriteBatch);
             spriteBatch.End();
 
             GraphicsManager.SetRenderTarget(null);

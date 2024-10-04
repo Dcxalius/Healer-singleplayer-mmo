@@ -34,7 +34,7 @@ namespace Project_1.GameObjects
         public float CurrentHealth {  get => unitData.CurrentHealth;}
         public float MaxHealth {  get => unitData.MaxHealth;}
         
-
+        public override float MaxSpeed { get => unitData.MaxSpeed; }
 
         Rectangle shadowPos;
 
@@ -51,13 +51,10 @@ namespace Project_1.GameObjects
 
         protected Corpse corpse;
 
-        public Entity(Texture aTexture, Vector2 aStartingPos, float aMaxSpeed) : base(aTexture, aStartingPos, aMaxSpeed)
+        public Entity(Texture aTexture, Vector2 aStartingPos) : base(aTexture, aStartingPos)
         {
             shadowPos = new Rectangle((Position + new Vector2(size.X/2, size.Y)).ToPoint(), size);
-
             unitData = ObjectManager.GetData(GetType().Name);
-
-            DebugManager.Print(GetType(), GetType().Name);
         }
 
         public void TakeDamage(Entity aAttacker, float aDamageTaken)
@@ -68,7 +65,6 @@ namespace Project_1.GameObjects
 
         protected virtual void AddToAggroTable(Entity aAttacker, float aDamageTaken)
         {
-
             if (!aggroTable.TryAdd(aAttacker, aDamageTaken))
             {
                 aggroTable[aAttacker] += aDamageTaken;
@@ -78,7 +74,7 @@ namespace Project_1.GameObjects
 
         public override bool Click(ClickEvent aClickEvent)
         {
-            if (Camera.WorldPosToCameraSpace(WorldRectangle).Contains(aClickEvent.ClickPoint))
+            if (Camera.WorldPosToCameraSpace(WorldRectangle).Contains(aClickEvent.AbsolutePos))
             {
                 if (aClickEvent.NoModifiers())
                 {
@@ -213,6 +209,11 @@ namespace Project_1.GameObjects
                 timeSinceLastAttack += (float)TimeManager.SecondsSinceLastFrame;
                 return;     
             }
+            AttackIfInRange();
+        }
+
+        void AttackIfInRange()
+        {
 
             if (CheckForRelation() && (target.FeetPos - FeetPos).Length() < this.unitData.AttackRange)
             {
@@ -255,7 +256,7 @@ namespace Project_1.GameObjects
                     if (Math.Abs(collisionDir.X) > Math.Abs(collisionDir.Y))
                     {
                         velocity.X = 0;
-                        momentum.X = 0;//TOOD: Has it so if momentum changes rapidly it deals damage? Maybe i dunnu I dont have my gamedesigner hat with me today
+                        momentum.X = 0;
                         Position = new Vector2(aOldPosition.X, Position.Y);
                     }
                     if (Math.Abs(collisionDir.X) < Math.Abs(collisionDir.Y))

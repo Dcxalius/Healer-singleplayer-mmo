@@ -15,9 +15,9 @@ namespace Project_1.Managers
         {
             get => gt.ElapsedGameTime.TotalSeconds;
         }
-        public static void Update(GameTime aGt)
+        public static void Update(GameTime aGameTime)
         {
-            gt = aGt;
+            gt = aGameTime;
         }
 
     }

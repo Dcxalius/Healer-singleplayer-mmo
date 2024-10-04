@@ -56,6 +56,12 @@ namespace Project_1.UI.UIElements
 
         }
 
+        protected override void HoldReleaseAwayFromMe()
+        {
+            pressed = false;
+            base.HoldReleaseAwayFromMe();
+        }
+
         public override void Draw(SpriteBatch aBatch)
         {
             if (!pressed)

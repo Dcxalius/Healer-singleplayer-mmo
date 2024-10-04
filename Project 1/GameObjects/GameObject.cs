@@ -14,25 +14,21 @@ namespace Project_1.GameObjects
 {
     internal abstract class GameObject
     {
-        public Vector2 Position { get => pos; protected set => pos = value; }
-        public Vector2 Centre { get => pos + size.ToVector2() / 2; }
+        public Vector2 Position { get => position; protected set => position = value; }
+        public Vector2 Centre { get => position + size.ToVector2() / 2; }
         public Vector2 FeetPos { get => Position + new Vector2(size.X / 2, size.Y); }
-
-        //public static int GameObjectsToDraw = 0;
-
-        public Rectangle WorldRectangle { get => new Rectangle(pos.ToPoint(), size); }
+        public Rectangle WorldRectangle { get => new Rectangle(position.ToPoint(), size); }
         
         protected Textures.Texture gfx;
 
 
-        Vector2 pos;
+        Vector2 position;
         protected Point size;
 
         public GameObject(Textures.Texture aGfx, Vector2 aStartingPos)
         {
-            
             gfx = aGfx;
-            pos = aStartingPos;
+            position = aStartingPos;
             if (aGfx.Visible != null)
             {
                 size = aGfx.Visible.Value.Size;
@@ -48,24 +44,13 @@ namespace Project_1.GameObjects
         public virtual void Update()
         {
             gfx.Update();
-            //DebugManager.Print(GetType(), "Objects draw: " + GameObjectsToDraw );
-            //GameObjectsToDraw = 0;
         }
 
 
         public virtual void Draw(SpriteBatch aBatch)
         {
             Debug.Assert(gfx != null);
-
-            //Should be moved to texture?
-            //if (Camera.MomAmIInFrame(new Rectangle(pos.ToPoint(), gfx.size)))
-            {
-                //GameObjectsToDraw++;
-                //sb.Draw(gfx, Camera.WorldPosToCameraSpace(pos), Color.White);
-                
-                gfx.Draw(aBatch, Camera.WorldPosToCameraSpace(pos), FeetPos);
-            }
+            gfx.Draw(aBatch, Camera.WorldPosToCameraSpace(position), FeetPos);
         }
-
     }
 }

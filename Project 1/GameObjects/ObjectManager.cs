@@ -34,7 +34,7 @@ namespace Project_1.GameObjects
             //UnitData data = new UnitData("Sheep", 100, UnitData.RelationToPlayer.Neutral, 50);
             //ExportData("C:\\Users\\Cassandra\\source\\repos\\Project 1\\Project 1\\Content\\UnitData.json", data);
             ImportData(aC.RootDirectory, aC);
-            player = new Player();
+            player = new Player(new Microsoft.Xna.Framework.Vector2(100));
             Camera.BindCamera(player);
 
 
@@ -67,15 +67,12 @@ namespace Project_1.GameObjects
             {
                 UnitData data = JsonConvert.DeserializeObject<UnitData>(dataAsString[i]);
                 unitData.Add(data.Name, data);
-
             }
-
         }
 
         static void ExportData(string aDestination, object aObjectToExport)
         {
             string json = JsonConvert.SerializeObject(aObjectToExport);
-
             System.IO.File.WriteAllText(aDestination, json);
         }
 
@@ -86,9 +83,9 @@ namespace Project_1.GameObjects
 
         public static void RemoveEntity(Entity aObject)
         {
-
             entities.Remove(aObject);
         }
+
 
         public static void Update()
         {

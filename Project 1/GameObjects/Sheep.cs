@@ -14,7 +14,7 @@ namespace Project_1.GameObjects
         readonly static GfxPath corpsePath = new GfxPath(GfxType.Object, "SheepCorpse");
         readonly static Point visualSize = new Point(32);
         
-        public Sheep(Vector2 aStartingPos) : base(new AnimatedTexture(path, visualSize, AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(250)), aStartingPos, 50)
+        public Sheep(Vector2 aStartingPos) : base(new AnimatedTexture(path, visualSize, AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(250)), aStartingPos)
         {
             corpse = new Corpse(new Texture(corpsePath));
         }

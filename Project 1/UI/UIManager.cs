@@ -23,7 +23,7 @@ namespace Project_1.UI
 
         public static void Init()
         {
-            InitGameUI();
+            HUDManager.Init();
             InitPauseMenuUI();
             InitOptionsMenuUI();
         }
@@ -33,11 +33,6 @@ namespace Project_1.UI
             optionElements.Add(new CameraStyleSelect(new Vector2(0.1f, 0.22f), new Vector2(0.3f, 0.1f)));
             optionElements.Add(new ScreenSizeSelect(new Vector2(0.1f, 0.1f), new Vector2(0.3f, 0.1f)));
             optionElements.Add(new ExitOptionsButton());
-        }
-
-        static void InitGameUI()
-        {
-            HUDManager.Init();
         }
 
         static void InitPauseMenuUI()
@@ -148,7 +143,6 @@ namespace Project_1.UI
 
         public static void Rescale()
         {
-            //RescaleList(HUDManager.Rescale);
             RescaleList(optionElements);
             RescaleList(pauseElements);
 

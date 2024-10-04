@@ -15,7 +15,7 @@ namespace Project_1.Input
         ClickEvent clickEventThatTriggered;
         UIElement creatorOfEvent;
 
-        public HoldEvent(TimeSpan aStartTime, ClickEvent aClickEvent /*might be unnec*/, UIElement aOwner /*this one too xdd*/)
+        public HoldEvent(TimeSpan aStartTime, ClickEvent aClickEvent, UIElement aOwner /*might be unnec*/)
         {
             heldSince = aStartTime;
             clickEventThatTriggered = aClickEvent;
@@ -24,7 +24,7 @@ namespace Project_1.Input
 
         public bool IsStillHeld()
         {
-            if (!InputManager.LeftHold && !InputManager.LeftPress) //Should be change to be mouse indipendant
+            if (LeftHeld() || RightHeld()) //Should be change to be mouse indipendant
             {
                 durationHeld = TimeManager.gt.TotalGameTime - heldSince;
 
@@ -32,6 +32,26 @@ namespace Project_1.Input
             }
 
             return true;
+        }
+
+        bool LeftHeld()
+        {
+            if (clickEventThatTriggered.ButtonPressed != ClickEvent.ClickType.Left)
+            {
+                return false;
+            }
+
+            return !InputManager.LeftHold && !InputManager.LeftPress;
+        }
+
+        bool RightHeld() 
+        {
+            if (clickEventThatTriggered.ButtonPressed != ClickEvent.ClickType.Right)
+            {
+                return false;
+            }
+
+            return !InputManager.LeftHold && !InputManager.LeftPress;
         }
     }
 }

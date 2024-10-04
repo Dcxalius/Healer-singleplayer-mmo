@@ -38,6 +38,8 @@ namespace Project_1.UI.UIElements
 
         public Point Size { get => pos.Size; }
 
+        bool Hovered { get => AbsolutePos.Contains(InputManager.GetMousePosAbsolute()); }
+
         protected UITexture gfx;
         Point absolutePos;
         protected Rectangle pos;
@@ -90,7 +92,14 @@ namespace Project_1.UI.UIElements
 
             if (!heldEvents.IsStillHeld())
             {
-                HoldReleaseOnMe();
+                if (Hovered)
+                {
+                    HoldReleaseOnMe();
+                }
+                else
+                {
+                    HoldReleaseAwayFromMe();
+                }
             }
         }
 
@@ -112,7 +121,7 @@ namespace Project_1.UI.UIElements
             }
 
 
-            if (AbsolutePos.Contains(InputManager.GetMousePosAbsolute()))
+            if (Hovered)
             {
                 OnHover();
             }
@@ -121,7 +130,7 @@ namespace Project_1.UI.UIElements
 
         public bool ClickedOn(ClickEvent aClick)
         {
-            if (AbsolutePos.Contains(aClick.ClickPoint))
+            if (AbsolutePos.Contains(aClick.AbsolutePos))
             {
                 bool clickedOnChild = ClickedOnChildren(aClick);
                 if (clickedOnChild == false)
@@ -134,6 +143,11 @@ namespace Project_1.UI.UIElements
         }
 
         public virtual void HoldReleaseOnMe()
+        {
+            heldEvents = null;
+        }
+
+        protected virtual void HoldReleaseAwayFromMe()
         {
             heldEvents = null;
         }

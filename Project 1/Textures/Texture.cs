@@ -85,7 +85,6 @@ namespace Project_1.Textures
         {
             if (aPath.Name != null)
             {
-
                 gfx = TextureManager.GetTexture(aPath);
             }
             flip = SpriteEffects.None;
@@ -130,11 +129,9 @@ namespace Project_1.Textures
             {
                 return;
             }
-
-            //if (typeof(RandomlyGeneratedTexture) != GetType()) DebugManager.Print(GetType(), "floatD should be: " + aFeetPosY / Camera.WorldRectangle.Bottom);
             if (Camera.MomAmIInFrame(new Rectangle(aPos.ToPoint(), (size.ToVector2() *Camera.Scale).ToPoint())))
             {
-                aBatch.Draw(gfx, aPos, visible, aColor, rotation, offset, Camera.Scale, flip, aFeetPosY / Camera.WorldRectangle.Bottom);
+                aBatch.Draw(gfx, aPos, visible, aColor, rotation, offset, Camera.Scale, flip, aFeetPosY / (Camera.WorldRectangle.Bottom + size.Y));
 
             }
         }
