@@ -9,7 +9,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
 {
     internal class SelectBoxValueInt : SelectBoxValue
     {
-        int value;
+        //int value;
 
         public SelectBoxValueInt(string aStartValue, Vector2 aPos, Vector2 aSize) : base(SelectBoxValueTypes.Int, null, aStartValue, aPos, aSize)
         {

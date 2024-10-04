@@ -1,7 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects;
+using Project_1.Input;
+using Project_1.Managers;
 using Project_1.UI.UIElements;
+using SharpDX.MediaFoundation.DirectX;
 using SharpDX.XAudio2;
 using System;
 using System.Collections.Generic;
@@ -15,6 +18,7 @@ namespace Project_1.UI.HUD
     {
         static PlayerPlateBox playerPlateBox;
         static TargetPlateBox targetPlateBox;
+        static PartyPlateBox[] partyPlateBoxes = new PartyPlateBox[4];
 
         static List<UIElement> hudElements = new List<UIElement>();
 
@@ -27,13 +31,76 @@ namespace Project_1.UI.HUD
 
         public static void Init()
         {
-            playerPlateBox = new PlayerPlateBox(new Vector2(0.1f, 0.1f), new Vector2(0.3f, 0.1f));
-            targetPlateBox = new TargetPlateBox(new Vector2(0.1f, 0.3f), new Vector2(0.3f, 0.1f));
+            playerPlateBox = new PlayerPlateBox(new Vector2(0.1f, 0.1f), new Vector2(0.2f, 0.1f));
+            targetPlateBox = new TargetPlateBox(new Vector2(0.33f, 0.1f), new Vector2(0.2f, 0.1f));
             hudElements.Add(playerPlateBox);
             hudElements.Add(targetPlateBox);
         }
 
+        public static void AddWalkerToParty(Walker aWalker)
+        {
+            int openIndex = -1;
+            for (int i = 0; i < partyPlateBoxes.Length; i++)
+            {
+                if (partyPlateBoxes[i] == null)
+                {
+                    openIndex = i;
+                    break;
+                }
+            }
 
+            if (openIndex == -1)
+            {
+                DebugManager.Print(typeof(HUDManager), "Tried to add to full party.");
+                return;
+            }
+
+            partyPlateBoxes[openIndex] = new PartyPlateBox(aWalker, new Vector2(0.1f, 0.24f), new Vector2(0.2f, 0.1f));
+            hudElements.Add(partyPlateBoxes[openIndex]);
+        }
+
+        public static void AddWalkerToControl(Walker aWalker)
+        {
+            for (int i = 0; i < partyPlateBoxes.Length; i++)
+            {
+                if (partyPlateBoxes[i].BelongsTo(aWalker))
+                {
+                    partyPlateBoxes[i].VisibleBorder = true;
+                    break;
+                }
+            
+            }
+        }
+
+        public static void RemoveWalkersFromControl(Walker[] aWalkers)
+        {
+            for (int i = 0; i < aWalkers.Length; i++)
+            {
+                for (int j = 0; j < partyPlateBoxes.Length; j++)
+                {
+
+                    if (partyPlateBoxes[j].BelongsTo(aWalkers[i]))
+                    {
+                        partyPlateBoxes[j].VisibleBorder = false;
+                        break;
+                    }
+                }
+            }
+        }
+
+        public static bool Click(ClickEvent aClickEvent)
+        {
+            for (int i = hudElements.Count - 1; i >= 0; i--)
+            {
+                bool clickedOn = false;
+                clickedOn = hudElements[i].ClickedOn(aClickEvent);
+                if (clickedOn == true)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         public static void Update()
         {

@@ -11,9 +11,9 @@ namespace Project_1.UI.PauseMenu
 {
     internal class OptionMenuButton : Button
     {
-        public OptionMenuButton(Vector2 aPos, Vector2 aSize) : base(aPos, aSize, Color.Blue)
+        public OptionMenuButton(Vector2 aPos, Vector2 aSize) : base(aPos, aSize, Color.Blue, "Options Menu")
         {
-            ButtonText = "Options Menu";
+
         }
 
         public override void HoldReleaseOnMe()

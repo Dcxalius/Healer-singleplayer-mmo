@@ -11,9 +11,9 @@ namespace Project_1.UI.PauseMenu
 {
     internal class ResumeButton : Button
     {
-        public ResumeButton(Vector2 aPos, Vector2 aSize) : base(aPos, aSize, Color.PaleVioletRed)
+        public ResumeButton(Vector2 aPos, Vector2 aSize) : base(aPos, aSize, Color.PaleVioletRed, "Resume Game")
         {
-            ButtonText = "Resume Game";
+            
         }
 
         public override void HoldReleaseOnMe()

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Textures;
+using Project_1.Tiles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace Project_1.GameObjects
         protected Vector2 momentum = Vector2.Zero;
         protected Vector2 velocity = Vector2.Zero;
         float maxSpeed;
-        Vector2 drag = new Vector2(0.9f);
+        //Vector2 drag = new Vector2(0.9f);
 
         public MovingObject(Texture aTexture, Vector2 aStartingPos, float aMaxSpeed) : base(aTexture, aStartingPos)
         {
@@ -35,8 +36,8 @@ namespace Project_1.GameObjects
             }
 
             velocity = Vector2.Zero;
-            pos += momentum;
-            momentum = new Vector2(momentum.X * drag.X, momentum.Y * drag.Y);
+            Position += momentum;
+            momentum = new Vector2(momentum.X * TileManager.GetDragCoeficient(Centre), momentum.Y * TileManager.GetDragCoeficient(Centre));
 
             if (momentum.X > 0 && facingRight == false)
             {

@@ -92,6 +92,30 @@
 /processorParam:TextureFormat=Color
 /build:Object/Shadow.png
 
+#begin Object/Sheep.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Object/Sheep.png
+
+#begin Object/SheepCorpse.Png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Object/SheepCorpse.Png
+
 #begin Object/Smile.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -115,6 +139,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Object/Walker.png
+
+#begin Tile/Dirt.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Tile/Dirt.png
 
 #begin Tile/Grass.png
 /importer:TextureImporter
@@ -151,6 +187,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:UI/GrayBackground.png
+
+#begin UI/GrayWhiteBorder.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:UI/GrayWhiteBorder.png
 
 #begin UI/PauseBackground.png
 /importer:TextureImporter

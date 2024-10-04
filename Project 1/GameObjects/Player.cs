@@ -13,39 +13,51 @@ using Project_1.GameObjects;
 using Project_1.Input;
 using System.Runtime.CompilerServices;
 using Project_1.Tiles;
+using Project_1.UI.HUD;
 
-namespace Project_1
+namespace Project_1.GameObjects
 {
     internal class Player : Entity
     {
-        public List<Walker> commands = new List<Walker>();
-        int speed = 50;
 
-        public Player() : base(new Textures.AnimatedTexture(new GfxPath(GfxType.Object, "Player"), new Point(32), Textures.AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(500)), new Vector2(100,100), 100)
-        { 
-        
+        List<Walker> commands = new List<Walker>();
+        List<Walker> party = new List<Walker>();
+
+        const float lengthOfLeash = 500;
+
+        public Player() : base(new AnimatedTexture(new GfxPath(GfxType.Object, "Player"), new Point(32), AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(500)), new Vector2(100,100), 100)
+        {
         }
 
+        public bool IsInCommand(Walker aWalker) { return commands.IndexOf(aWalker) >= 0; }
+        public bool IsInParty(Walker aWalker) { return party.IndexOf(aWalker) >= 0; }
 
         void MouseWalk()
         {
             if (HasDestination) { return; }
             if (InputManager.GetHold(Keys.Left))
             {
-                velocity.X -= (float)(speed * TimeManager.SecondsSinceLastFrame);
+                velocity.X -= 1;
+                //velocity.X -= (float)(Data.Speed * TimeManager.SecondsSinceLastFrame);
             }
             if (InputManager.GetHold(Keys.Right))
             {
-                velocity.X += (float)(speed * TimeManager.SecondsSinceLastFrame);
+                velocity.X += 1;
+                //velocity.X += (float)(Data.Speed * TimeManager.SecondsSinceLastFrame);
             }
             if (InputManager.GetHold(Keys.Up))
             {
-                velocity.Y -= (float)(speed * TimeManager.SecondsSinceLastFrame);
+                velocity.Y -= 1;
+                //velocity.Y -= (float)(Data.Speed * TimeManager.SecondsSinceLastFrame);
             }
             if (InputManager.GetHold(Keys.Down))
             {
-                velocity.Y += (float)(speed * TimeManager.SecondsSinceLastFrame);
+                velocity.Y += 1;
             }
+
+            if (velocity == Vector2.Zero) return;
+            velocity.Normalize();
+            velocity *= (float)(Data.Speed * TimeManager.SecondsSinceLastFrame);
         }
 
         public override void Update()
@@ -53,27 +65,51 @@ namespace Project_1
             MouseWalk();
 
             base.Update();
+            for (int i = 0; i < party.Count; i++)
+            {
+                if (party[i].HasDestination == false && (FeetPos - party[i].FeetPos).Length() > lengthOfLeash)
+                {
+                    party[i].Target = ObjectManager.Player;
+                }
+
+            }
+
         }
 
         public void ClearCommand()
         {
+            HUDManager.RemoveWalkersFromControl(commands.ToArray());
             commands.Clear();
         }
 
-        public void AddToCommand(Walker a)
+        public void AddToCommand(Walker aWalker)
         {
-            if (commands.Contains(a)) { return; }
+            if (commands.Contains(aWalker)) { return; }
 
-            commands.Add(a);
+            HUDManager.AddWalkerToControl(aWalker);
+            commands.Add(aWalker);
         }
 
-        public void RemoveFromCommand(Walker a)
+        public void NeedyAddToCommand(Walker aWalker)
         {
-            if (!commands.Contains(a)) { return; }
+            commands.Clear();
+            AddToCommand(aWalker);
 
-            commands.Remove(a);
         }
 
+        public void RemoveFromCommand(Walker aWalker)
+        {
+            if (!commands.Contains(aWalker)) { return; }
+
+            HUDManager.RemoveWalkersFromControl(new Walker[] { aWalker });
+            commands.Remove(aWalker);
+        }
+
+        public void AddToParty(Walker aWalker)
+        {
+            party.Add(aWalker);
+            HUDManager.AddWalkerToParty(party[party.Count - 1]);
+        }
 
         public void IssueMoveOrder(ClickEvent aClick)
         {
@@ -89,6 +125,14 @@ namespace Project_1
                     walker.RecieveDirectWalkingOrder(worldPosDestination);
 
                 }
+            }
+        }
+
+        public void IssueTargetOrder(Entity aEntity)
+        {
+            for (int i = 0; i < commands.Count; i++)
+            {
+                commands[i].Target = aEntity;
             }
         }
     }

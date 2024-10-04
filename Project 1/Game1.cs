@@ -25,11 +25,12 @@ namespace Project_1
         protected override void Initialize()
         {
             DebugManager.Init();
-            GraphicsManager.Init(Content);
+            TextureManager.Init(Content);
+            GraphicsManager.Init();
             Camera.Init();
             RandomManager.Init();
-            ObjectManager.Init();
-            TileManager.Init();
+            ObjectManager.Init(Content);
+            TileManager.Init(Content);
             UIManager.Init();
 
             base.Initialize();

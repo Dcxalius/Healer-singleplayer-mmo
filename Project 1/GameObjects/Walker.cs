@@ -13,6 +13,12 @@ namespace Project_1.GameObjects
     {
         public Walker(Vector2 aStartingPos) : base(new Textures.AnimatedTexture(new GfxPath(GfxType.Object, "Walker"), new Point(32), Textures.AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(500)), aStartingPos, 100)
         {
+        }
+
+        public override void Update()
+        {
+            base.Update();
+
 
         }
 
@@ -23,8 +29,7 @@ namespace Project_1.GameObjects
 
         public void NeedyControl(Player aPlayer)
         {
-            aPlayer.ClearCommand();
-            aPlayer.AddToCommand(this);
+            aPlayer.NeedyAddToCommand(this);
         }
 
         public override bool Click(ClickEvent aClickEvent)
@@ -36,11 +41,11 @@ namespace Project_1.GameObjects
         {
             base.ClickedOn(aClickEvent);
 
-            if (aClickEvent.ModifierOr(InputManager.HoldModifier.Ctrl, InputManager.HoldModifier.Shift))
+            if (aClickEvent.Modifier(InputManager.HoldModifier.Shift))
             {
                 AddToControl(ObjectManager.Player);
             }
-            else
+            else if (aClickEvent.Modifier(InputManager.HoldModifier.Ctrl))
             {
                 NeedyControl(ObjectManager.Player);
             }
@@ -48,17 +53,19 @@ namespace Project_1.GameObjects
 
         public void RecieveDirectWalkingOrder(Vector2 aPos)
         {
+            target = null;
             OverwriteDestination(aPos);
         }
 
-        public void RecieveDirectWalkingOrder(GameObject aGameObject)
-        {
-            OverwriteDestination(aGameObject.Position);
-        }
 
         public void AddWalkingOrder(Vector2 aPos)
         {
             AddDestination(aPos);
+        }
+
+        protected override void AddToAggroTable(Entity aAttacker, float aDamageTaken)
+        {
+            
         }
     }
 }

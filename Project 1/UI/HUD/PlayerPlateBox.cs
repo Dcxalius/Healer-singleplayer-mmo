@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.GameObjects;
+using Project_1.Input;
 using Project_1.Textures;
 using Project_1.UI.UIElements.PlateBoxes;
 using System;
@@ -13,7 +14,7 @@ namespace Project_1.UI.HUD
 {
     internal class PlayerPlateBox : PlateBox
     {
-        static Player p = ObjectManager.Player;
+        static Player player = ObjectManager.Player;
 
         
 
@@ -22,8 +23,8 @@ namespace Project_1.UI.HUD
 
         public PlayerPlateBox(Vector2 aPos, Vector2 aSize) : base(aPos, aSize)
         { 
-            name = new PlateBoxNameSegment(p.Name, new Vector2(0, 0), new Vector2(aSize.X, aSize.Y / 2));
-            health = new PlateBoxHealthSegment(p, new Vector2(0, aSize.Y / 2), new Vector2(aSize.X, aSize.Y / 4));
+            name = new PlateBoxNameSegment(player.Name, player.RelationColor, new Vector2(0, 0), new Vector2(aSize.X, aSize.Y / 2));
+            health = new PlateBoxHealthSegment(player, new Vector2(0, aSize.Y / 2), new Vector2(aSize.X, aSize.Y / 4));
             //health = new PlateBoxHealthSegment(p, new Vector2(0, 0), new Vector2(aSize.X, aSize.Y / 2));
 
 
@@ -33,6 +34,19 @@ namespace Project_1.UI.HUD
 
             AddSegmentsToChildren();
 
+        }
+
+
+        public override void HoldReleaseOnMe()
+        {
+            base.HoldReleaseOnMe();
+
+            HUDManager.SetNewTarget(player);
+        }
+
+        public override bool ClickedOnChildren(ClickEvent aClick)
+        {
+            return false;
         }
     }
 }

@@ -13,9 +13,8 @@ namespace Project_1.UI.PauseMenu
     internal class MainMenuButton : Button
     {
 
-        public MainMenuButton(Vector2 aPos, Vector2 aSize) : base(aPos, aSize, Color.Gray)
+        public MainMenuButton(Vector2 aPos, Vector2 aSize) : base(aPos, aSize, Color.Gray, "Main Menu")
         {
-            ButtonText = "Main Menu";
 
         }
 
@@ -24,11 +23,6 @@ namespace Project_1.UI.PauseMenu
             StateManager.SetState(State.StartMenu);
 
             base.HoldReleaseOnMe();
-        }
-
-        public override void Draw(SpriteBatch aBatch)
-        {
-            base.Draw(aBatch);
         }
     }
 }

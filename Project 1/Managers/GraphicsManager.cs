@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Input;
-using Project_1.Managers;
 using Project_1.UI;
 using System;
 using System.Collections.Generic;
@@ -14,7 +13,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.Textures
+namespace Project_1.Managers
 {
     //TODO: Split this into GraphicsMang and TextureMang
 
@@ -27,12 +26,9 @@ namespace Project_1.Textures
             BorderlessFullscreen
         }
 
-        static Dictionary<string, Texture2D>[] texturesDict;
         static GraphicsDeviceManager graphicsDeviceManager;
         static GraphicsAdapter graphicsAdapter;
-        static ContentManager contentManager;
         static GameWindow gameWindow;
-        public static SpriteFont buttonFont;
 
         //--- Window stuff
         readonly static Point windowsTitleBarStuff = new Point(128, 32); //128 is a guesstimation of the minimum width, 32 is the required height based on https://learn.microsoft.com/en-us/windows/apps/design/basics/titlebar-design
@@ -67,14 +63,12 @@ namespace Project_1.Textures
             gameWindow = aGame.Window;
         }
 
-        public static void Init(ContentManager aContentManager)
+        public static void Init()
         {
-            contentManager = aContentManager;
 
-            InitArrays();
+
             SetWindowSize(Camera.devScreenBorder, fullsceen, borderlessFullscreen);
-            buttonFont = contentManager.Load<SpriteFont>("Font/Gloryse"); //TODO: Font is not open source so need to be change at some point
-            
+
         }
 
         [DllImport("user32.dll")]
@@ -98,66 +92,17 @@ namespace Project_1.Textures
             windowBounds.Size = gameWindow.ClientBounds.Size + windowBounds.Location;
             //DebugManager.Print(typeof(GraphicsManager), InputManager.GetMousePosAbsolute().ToString());
             //rect.Location += 
-            if (ApplicationIsActivated() )
+            if (ApplicationIsActivated())
             {
                 ClipCursor(ref windowBounds);
 
             }
         }
 
-        static void InitArrays()
-        {
-            //textures = new Texture2D[(int)GfxType.Count][];
-            texturesDict = new Dictionary<string, Texture2D>[(int)GfxType.Count];
-
-
-
-            //for (int i = 0; i < textures.Length; i++)
-            //{
-            //    string[] dir = Directory.GetFiles(cm.RootDirectory + "\\" + (GfxType)i);
-            //    textures[i] = new Texture2D[dir.Length];
-            //    for (int j = 0; j < dir.Length; j++)
-            //    {
-            //        string trimmedName = dir[j].Substring(cm.RootDirectory.Length + 1);
-            //        trimmedName = trimmedName.Substring(0, trimmedName.Length - 4);
-
-            //        textures[i][j] = cm.Load<Texture2D>(trimmedName);
-            //        //Console.WriteLine(trimmedName);
-
-            //    }
-            //}
-
-            string debug = "Textures loaded: ";
-
-            for (int i = 0; i < texturesDict.Length; i++)
-            {
-                string[] dir = Directory.GetFiles(contentManager.RootDirectory + "\\" + (GfxType)i);
-
-                texturesDict[i] = new Dictionary<string, Texture2D>();
-
-                for (int j = 0; j < dir.Length; j++)
-                {
-                    string filePath = dir[j].Substring(contentManager.RootDirectory.Length + 1);
-                    filePath = filePath.Substring(0, filePath.Length - 4);
-                    string textureName = filePath.Split('\\')[1];
-
-                    texturesDict[i].Add(textureName, contentManager.Load<Texture2D>(filePath));
-                    debug += textureName + ", ";
-
-                }
-            }
-
-            DebugManager.Print(typeof(GraphicsManager), debug);
-        }
 
         public static void ClearScreen(Color aColor)
         {
             graphicsDeviceManager.GraphicsDevice.Clear(aColor);
-        }
-
-        public static ref Texture2D GetTexture(GfxPath aGfxPath)
-        {
-            return ref CollectionsMarshal.GetValueRefOrNullRef(texturesDict[(int)aGfxPath.Type], aGfxPath.Name);
         }
 
         public static void SetWindowSize(Point aSize, bool aFullscreen, bool aBorderless)
@@ -181,7 +126,7 @@ namespace Project_1.Textures
             }
 
             graphicsDeviceManager.IsFullScreen = aFullscreen;
-            graphicsDeviceManager.HardwareModeSwitch = (aBorderless && aFullscreen);
+            graphicsDeviceManager.HardwareModeSwitch = aBorderless && aFullscreen;
             graphicsDeviceManager.ApplyChanges();
 
             //Add check here to see if display area is correct and if it isn't change aSize
@@ -277,7 +222,7 @@ namespace Project_1.Textures
 
         static void ToggleFullScreen()
         {
-            
+
             fullsceen = !fullsceen;
         }
     }

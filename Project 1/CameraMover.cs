@@ -256,16 +256,16 @@ namespace Project_1
         {
             Vector2 closestDirVector = CentreInWorldSpace - aRectangleCorner;
             Vector2 otherDirVector = CentreInWorldSpace - aRectangleCorner;
-            string msg = "";
+            //string msg = "";
             if (Math.Abs(closestDirVector.X) > Math.Abs(closestDirVector.Y))
             {
-                msg = "x > Y";
+                //msg = "x > Y";
                 closestDirVector.Y = 0;
                 otherDirVector.X = 0;
             }
             else
             {
-                msg = "y > x";
+                //msg = "y > x";
                 closestDirVector.X = 0;
                 otherDirVector.Y = 0;
             }

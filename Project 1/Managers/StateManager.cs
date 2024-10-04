@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Project_1.GameObjects;
 using Project_1.Input;
-using Project_1.Textures;
 using Project_1.UI;
 
 namespace Project_1.Managers
@@ -89,7 +88,8 @@ namespace Project_1.Managers
 
         static void GameDraw()
         {
-            Camera.RunningDraw();
+            Camera.GameDraw();
+            Camera.DrawGameToCamera();
         }
 
         static void PauseUpdate()

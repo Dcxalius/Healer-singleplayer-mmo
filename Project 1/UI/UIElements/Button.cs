@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
+using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,12 +17,8 @@ namespace Project_1.UI.UIElements
 
         protected string ButtonText //TODO: Bring this out to a class called TextButton
         {
-            get => buttonText;
-            set
-            {
-                buttonText = value;
-                textSize = GraphicsManager.buttonFont.MeasureString(buttonText);
-            }
+            get => text.Value;
+            set { text.Value = value; }
         }
 
         protected bool Pressed
@@ -32,12 +29,11 @@ namespace Project_1.UI.UIElements
         UITexture pressedGfx;
         bool pressed = false;
 
-        string buttonText;
-        Vector2 textSize;
+        Text text;
 
-        public Button(Vector2 aPos, Vector2 aSize, Color aColor) : base(new UITexture("WhiteBackground", aColor), aPos, aSize)
+        public Button(Vector2 aPos, Vector2 aSize, Color aColor, string aText = null) : base(new UITexture("WhiteBackground", aColor), aPos, aSize)
         {
-
+            text = new Text("Gloryse", aText);
             pressedGfx = new UITexture("GrayBackground", aColor);
         }
 
@@ -73,12 +69,11 @@ namespace Project_1.UI.UIElements
 
             }
 
-            if (buttonText != null)
+            if (text.Value == null)
             {
-
-                //aBatch.DrawString(GraphicsManager.buttonFont, buttonText, new Vector2(pos.X + pos.Size.X / 2 , pos.Y + pos.Size.Y / 2 ), Color.Black, 0f, textSize / 2, 1.2f, SpriteEffects.None, 1f);
-                aBatch.DrawString(GraphicsManager.buttonFont, buttonText, new Vector2(AbsolutePos.X + Size.X / 2 , AbsolutePos.Y + Size.Y / 2 ), Color.White, 0f, textSize / 2, 1f, SpriteEffects.None, 1f);
+                return;
             }
+            text.CentredDraw(aBatch, AbsolutePos.Center.ToVector2());
         }
     }
 }

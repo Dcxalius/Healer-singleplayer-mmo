@@ -6,11 +6,13 @@ using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.Tiles;
 using Project_1.UI;
+using Project_1.UI.HUD;
 using Project_1.UI.OptionMenu;
 using System;
 using System.Data;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Security.Permissions;
 using System.Windows.Forms;
 
 namespace Project_1
@@ -27,31 +29,31 @@ namespace Project_1
             Count
         }
 
-        public static float Scale { get => scale;  }
+        public static float Scale { get => scale; }
 
         public static float Zoom { get => 1f / scale; }
-        
+
 
         public static Rectangle ScreenRectangle { get => new Rectangle(Point.Zero, ScreenSize); }
 
         public static Point ScreenSize { get => screenRectangleSize; }
 
         public static CameraSettings CurrentCameraSetting { get => cameraSettings; }
-        
+
+        public static Rectangle WorldRectangle { get => new Rectangle(centreInWorldSpace.ToPoint() - CentrePointInScreenSpace, ScreenSize); }
         public static Vector2 CentreInWorldSpace { get => centreInWorldSpace; set => centreInWorldSpace = value; }
 
         public static Point CentrePointInScreenSpace { get => new Point(screenRectangleSize.X / 2, screenRectangleSize.Y / 2); }
 
         public static Rectangle RenderTargetPosition { set => renderTargetPosition = value; }
 
-        static SpriteBatch spriteBatch;
 
         static Vector2 centreInWorldSpace = new Vector2(100,100);
 
         //---
 
         //--- debugText is fine but should pauseGfx be somewhere else?
-        static Texture2D debugTexture = GraphicsManager.GetTexture(new GfxPath(GfxType.Debug, "Debug"));
+        static Texture2D debugTexture = TextureManager.GetTexture(new GfxPath(GfxType.Debug, "Debug"));
         static Textures.Texture pauseGfx = new Textures.Texture(new GfxPath(GfxType.UI, "PauseBackground"));
 
         //--
@@ -72,7 +74,14 @@ namespace Project_1
         //--
 
         static RenderTarget2D cameraTarget;
+        static SpriteBatch spriteBatch;
         static Rectangle renderTargetPosition;
+
+        static RenderTarget2D gameTarget;
+        static SpriteBatch gameSpriteBatch;
+
+        static RenderTarget2D uiTarget;
+        static SpriteBatch uiSpriteBatch;
 
         static CameraMover cameraMover = new CameraMover();
 
@@ -81,6 +90,8 @@ namespace Project_1
         {
             //SetWindowSize(devScreenBorder);
             spriteBatch = GraphicsManager.CreateSpriteBatch();
+            gameSpriteBatch = GraphicsManager.CreateSpriteBatch();
+            uiSpriteBatch = GraphicsManager.CreateSpriteBatch();
         }
 
         public static void Update()
@@ -133,6 +144,8 @@ namespace Project_1
         public static void SetWindowSize(Point aSize)
         {
             cameraTarget = GraphicsManager.CreateRenderTarget(aSize);
+            uiTarget = GraphicsManager.CreateRenderTarget(aSize);
+            gameTarget = GraphicsManager.CreateRenderTarget(aSize);
             screenRectangleSize = aSize;
 
             float x = devScreenBorder.X / aSize.X;
@@ -186,53 +199,83 @@ namespace Project_1
 
         public static void DrawRenderTarget()
         {
+            
             spriteBatch.Begin();
             spriteBatch.Draw(cameraTarget, renderTargetPosition, Color.White);
             spriteBatch.End();
         }
 
-        static void Draw(SpriteBatch aBatch)
+        static void DrawGameObjects(SpriteBatch aBatch)
         {
             TileManager.Draw(aBatch);
             ObjectManager.Draw(aBatch);
-            UIManager.DrawGameUI(aBatch); // a bit ugly but needs to do this since we want to draw the game in pause aswell.
+            //HUDManager.Draw(aBatch); // a bit ugly but needs to do this since we want to draw the game in pause aswell.
 
         }
 
-        public static void RunningDraw()
+        public static void DrawGameToCamera()
         {
             GraphicsManager.SetRenderTarget(cameraTarget);
             spriteBatch.Begin();
+            spriteBatch.Draw(gameTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
+            GraphicsManager.SetRenderTarget(null);
+        }
+
+        public static void GameDraw()
+        {
+            UIDraw();
+            GraphicsManager.SetRenderTarget(gameTarget);
+            gameSpriteBatch.Begin(SpriteSortMode.FrontToBack);
+            //spriteBatch.Begin();
             GraphicsManager.ClearScreen(Color.White);
 
-            Draw(spriteBatch);
+            
+            DrawGameObjects(gameSpriteBatch);
             if (DebugManager.mode == DebugMode.On)
             {
                 Vector2 DebugPos = new Vector2(screenRectangleSize.X / 2, screenRectangleSize.Y / 2);
-                spriteBatch.Draw(debugTexture, DebugPos, new Rectangle(0, 0, 10, 10), Color.White, 0f, new Vector2(5), 1f, SpriteEffects.None, 1f);
+                gameSpriteBatch.Draw(debugTexture, DebugPos, new Rectangle(0, 0, 10, 10), Color.White, 0f, new Vector2(5), 1f, SpriteEffects.None, 1f);
 
                 //Rectangle r = new Rectangle((centrePoint - screenRectangle.Location.ToVector2() - screenBorder.ToVector2() / 2).ToPoint() , screenRectangle.Size);
-                //spriteBatch.Draw(debugTexture, r, new Rectangle(0, 0, 10, 10), Color.White);
+                //gameSpriteBatch.Draw(debugTexture, r, new Rectangle(0, 0, 10, 10), Color.White);
             }
 
-            spriteBatch.End();
+            gameSpriteBatch.Draw(uiTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+            gameSpriteBatch.End();
             GraphicsManager.SetRenderTarget(null);
 
         }
 
         public static void PauseDraw()
         {
+            
             GraphicsManager.SetRenderTarget(cameraTarget);
             spriteBatch.Begin();
-            Draw(spriteBatch);
             GraphicsManager.ClearScreen(Color.Purple);
+            DrawGameObjects(spriteBatch);
 
+
+            spriteBatch.Draw(uiTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
             pauseGfx.Draw(spriteBatch, Vector2.Zero);
+
             UIManager.Draw(spriteBatch);
             spriteBatch.End();
 
             GraphicsManager.SetRenderTarget(null);
 
+        }
+
+        static void UIDraw()
+        {
+            GraphicsManager.SetRenderTarget(uiTarget);
+            uiSpriteBatch.Begin();
+            GraphicsManager.ClearScreen(Color.Transparent);
+            HUDManager.Draw(uiSpriteBatch);
+
+            uiSpriteBatch.End();
+
+            GraphicsManager.SetRenderTarget(null);
         }
 
         public static void OptionDraw()

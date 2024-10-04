@@ -1,5 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json;
+using Project_1.GameObjects;
 using Project_1.Managers;
 using System;
 using System.Collections.Generic;
@@ -14,9 +17,24 @@ namespace Project_1.Tiles
         static Tile[,] tiles;
         readonly static Point TileSize = new Point(32, 32);
         const int sizeOfSquareToCheck = 3; // this should always be odd
-        public static void Init()
+        static Dictionary<string, TileData> tileData = new Dictionary<string, TileData>();
+
+        public static void Init(ContentManager aContentManager)
         {
+            ImportData(aContentManager.RootDirectory, aContentManager);
             GenerateTiles(new Point(0), new Point(100, 100));
+        }
+
+
+        static void ImportData(string aPathToData, ContentManager aContentManager)
+        {
+            string[] dataAsString = System.IO.File.ReadAllLines(aPathToData + "\\Data\\TileData.json");
+
+            for (int i = 0; i < dataAsString.Length; i++)
+            {
+                TileData data = JsonConvert.DeserializeObject<TileData>(dataAsString[i]);
+                tileData.Add(data.Name, data);
+            }
         }
 
         static void GenerateTiles(Point aLeftUppermostTile, Point aSize)
@@ -31,14 +49,49 @@ namespace Project_1.Tiles
 
                     if (i == 0 || j == 0 || i == aSize.X-1 || j == aSize.Y-1)
                     {
-                        tiles[i, j] = new Wall(pos);
+                        tiles[i, j] = new Tile(tileData["Wall"], pos);
                     }
                     else
                     {
-                        tiles[i, j] = new Grass(pos);
+                        Tile leftTile = tiles[i - 1, j];
+                        Tile upTile = tiles[i, j - 1];
+
+                        float oddsOfDirt = 0.1f;
+
+                        if (leftTile.Name == "Wall" || upTile.Name == "Wall")
+                        {
+                            oddsOfDirt++;
+                        }
+                        if (leftTile.Name == "Wall" || leftTile.Name == "Dirt")
+                        {
+                            oddsOfDirt += 0.1f;
+
+                        }
+                        if (upTile.Name == "Wall" || upTile.Name == "Dirt")
+                        {
+                            if (oddsOfDirt > 0)
+                            {
+                                oddsOfDirt += 0.3f;
+                            }
+                            oddsOfDirt += 0.2f;
+                        }
+
+                        if (RandomManager.RollDouble() < oddsOfDirt)
+                        {
+                            tiles[i, j] = new Tile(tileData["Dirt"], pos);
+                        }
+                        else
+                        {
+                            tiles[i, j] = new Tile(tileData["Grass"], pos);
+                        }
                     }
                 }
             }
+        }
+
+        public static float GetDragCoeficient(Vector2 aCentreOfObject)
+        {
+            return tiles[(int)(aCentreOfObject.X / TileSize.X), (int)(aCentreOfObject.Y / TileSize.Y)].DragCoeficient;
         }
         
         public static List<Rectangle> CollisionsWithUnwalkable(Rectangle aWorldRect)
