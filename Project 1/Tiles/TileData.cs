@@ -9,6 +9,8 @@ namespace Project_1.Tiles
     internal struct TileData
     {
         public string Name { get => name; }
+        public bool Walkable { get => walkable; }
+        public float DragCoeficient { get => dragCoeficient; }
         string name;
         bool walkable;
         float dragCoeficient;

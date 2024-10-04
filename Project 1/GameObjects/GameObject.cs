@@ -15,6 +15,7 @@ namespace Project_1.GameObjects
     internal abstract class GameObject
     {
         public Vector2 Position { get => pos; protected set => pos = value; }
+        public Vector2 Centre { get => pos + size.ToVector2() / 2; }
         public Vector2 FeetPos { get => Position + new Vector2(size.X / 2, size.Y); }
 
         //public static int GameObjectsToDraw = 0;

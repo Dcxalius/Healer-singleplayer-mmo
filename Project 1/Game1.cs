@@ -30,7 +30,7 @@ namespace Project_1
             Camera.Init();
             RandomManager.Init();
             ObjectManager.Init(Content);
-            TileManager.Init();
+            TileManager.Init(Content);
             UIManager.Init();
 
             base.Initialize();

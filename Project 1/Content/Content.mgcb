@@ -13,9 +13,6 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin Data/UnitData.json
-/copy:Data/UnitData.json
-
 #begin Debug/Debug.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -142,6 +139,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Object/Walker.png
+
+#begin Tile/Dirt.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Tile/Dirt.png
 
 #begin Tile/Grass.png
 /importer:TextureImporter
