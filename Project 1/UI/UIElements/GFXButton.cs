@@ -12,12 +12,12 @@ namespace Project_1.UI.UIElements
 {
     internal abstract class GFXButton : Button
     {
-        Texture gfxOnButton;
+        UITexture gfxOnButton;
         Rectangle gfxRectangle;
 
-        public GFXButton(GfxPath aGfxPath, Vector2 aPos, Vector2 aSize, Color aColorOfBorder) : base(aPos, aSize, aColorOfBorder)
+        public GFXButton(string aGfxPath, Vector2 aPos, Vector2 aSize, Color aColorOfBorder) : base(aPos, aSize, aColorOfBorder)
         {
-            gfxOnButton = new Texture(aGfxPath);
+            gfxOnButton = new UITexture(aGfxPath, Color.White);
             gfxRectangle = TransformFromRelativeToValues(new Vector2(RelativePos.X + RelativeSize.X / 10, RelativePos.Y + RelativeSize.Y / 10), new Vector2(RelativeSize.X * 0.8f, RelativeSize.Y * 0.8f));
         }
 

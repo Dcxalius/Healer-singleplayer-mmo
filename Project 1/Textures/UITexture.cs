@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +16,23 @@ namespace Project_1.Textures
 
         }
 
+
+        public virtual void Draw(SpriteBatch aBatch, Rectangle aPosRectangle)
+        {
+            Draw(aBatch, aPosRectangle, color);
+        }
+
+        public virtual void Draw(SpriteBatch aBatch, Rectangle aPosRectangle, Color aColor)
+        {
+            if (gfx == null)
+            {
+                return;
+            }
+            if (Camera.MomAmIInFrame(aPosRectangle))
+            {
+                aBatch.Draw(gfx, aPosRectangle, visible, aColor, rotation, offset, flip, 1f);
+
+            }
+        }
     }
 }

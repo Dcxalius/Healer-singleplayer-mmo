@@ -175,7 +175,7 @@ namespace Project_1.UI.UIElements
 
         public virtual void ClickedOnMe(ClickEvent aClick)
         {
-            heldEvents = new HoldEvent(TimeManager.gt.TotalGameTime, aClick, this);
+            heldEvents = new HoldEvent(TimeManager.CurrentFrameTime, aClick, this);
 
             //DebugManager.Print(GetType(), "Clicked on " + pos);
         }

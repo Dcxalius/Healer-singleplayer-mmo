@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Input;
 using Project_1.Textures;
+using Project_1.Textures.AnimatedTextures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace Project_1.GameObjects
 {
     internal class Walker : Entity
     {
-        public Walker(Vector2 aStartingPos) : base(new Textures.AnimatedTexture(new GfxPath(GfxType.Object, "Walker"), new Point(32), Textures.AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(500)), aStartingPos)
+        public Walker(Vector2 aStartingPos) : base(new RandomAnimatedTexture(new GfxPath(GfxType.Object, "Walker"), new Point(32), 0, TimeSpan.FromMilliseconds(500)), aStartingPos)
         {
         }
 

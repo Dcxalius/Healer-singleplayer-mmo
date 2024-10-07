@@ -10,12 +10,12 @@ namespace Project_1.Input
 {
     internal class HoldEvent
     {
-        TimeSpan heldSince;
-        public TimeSpan durationHeld;
+        double heldSince;
+        public double durationHeld;
         ClickEvent clickEventThatTriggered;
         UIElement creatorOfEvent;
 
-        public HoldEvent(TimeSpan aStartTime, ClickEvent aClickEvent, UIElement aOwner /*might be unnec*/)
+        public HoldEvent(double aStartTime, ClickEvent aClickEvent, UIElement aOwner /*might be unnec*/)
         {
             heldSince = aStartTime;
             clickEventThatTriggered = aClickEvent;
@@ -26,7 +26,7 @@ namespace Project_1.Input
         {
             if (LeftHeld() || RightHeld()) //Should be change to be mouse indipendant
             {
-                durationHeld = TimeManager.gt.TotalGameTime - heldSince;
+                durationHeld = TimeManager.CurrentFrameTime - heldSince;
 
                 return false;
             }

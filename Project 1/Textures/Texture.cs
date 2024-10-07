@@ -25,7 +25,7 @@ namespace Project_1.Textures
         protected Rectangle? visible;
         protected Vector2 offset;
         protected float rotation = 0f;
-        SpriteEffects flip;
+        protected SpriteEffects flip;
 
 
         public Texture(GfxPath aPath)
@@ -103,10 +103,7 @@ namespace Project_1.Textures
             flip = SpriteEffects.None;
         }
 
-        public virtual void Update()
-        {
-
-        }
+        public virtual void Update() {}
 
         public virtual void Draw(SpriteBatch aBatch, Vector2 aPos)
         {
@@ -118,11 +115,7 @@ namespace Project_1.Textures
             Draw(aBatch, aPos, color, aFeetPos.Y);
         }
 
-        public virtual void Draw(SpriteBatch aBatch, Rectangle aPosRectangle)
-        {
-            Draw(aBatch, aPosRectangle, color);
-        }
-
+       
         public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, Color aColor, float aFeetPosY)
         {
             if (gfx == null)
@@ -135,17 +128,6 @@ namespace Project_1.Textures
 
             }
         }
-        public virtual void Draw(SpriteBatch aBatch, Rectangle aPosRectangle, Color aColor)
-        {
-            if (gfx == null)
-            {
-                return;
-            }
-            if (Camera.MomAmIInFrame(aPosRectangle))
-            {
-                aBatch.Draw(gfx, aPosRectangle, visible, aColor, rotation, offset, flip, 1f);
 
-            }
-        }
     }
 }

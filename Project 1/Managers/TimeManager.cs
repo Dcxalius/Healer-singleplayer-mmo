@@ -9,16 +9,23 @@ namespace Project_1.Managers
 {
     internal static class TimeManager
     {
-        public static GameTime gt;
+        static GameTime gt;
 
         public static double SecondsSinceLastFrame
         {
             get => gt.ElapsedGameTime.TotalSeconds;
         }
+        
+        public static double CurrentFrameTime
+        {
+            get => gt.TotalGameTime.TotalMilliseconds;
+        }
+        
         public static void Update(GameTime aGameTime)
         {
             gt = aGameTime;
         }
+
 
     }
 }

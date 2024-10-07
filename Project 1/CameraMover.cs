@@ -81,7 +81,7 @@ namespace Project_1
 
             Vector2 mouseAbsoluteToCentre = absoluteMosPos - CentrePointInScreenSpace.ToVector2();
             mouseAbsoluteToCentre.Normalize();
-            velocity = mouseAbsoluteToCentre * (float)(baseSpeed * TimeManager.gt.ElapsedGameTime.TotalSeconds) * movementFactor;
+            velocity = mouseAbsoluteToCentre * (float)(baseSpeed * TimeManager.SecondsSinceLastFrame) * movementFactor;
             //DebugManager.Print(typeof(Camera), "Velocity = " + velocity.ToString());
         }
 

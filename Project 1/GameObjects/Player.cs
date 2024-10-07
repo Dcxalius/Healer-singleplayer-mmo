@@ -14,6 +14,7 @@ using Project_1.Input;
 using System.Runtime.CompilerServices;
 using Project_1.Tiles;
 using Project_1.UI.HUD;
+using Project_1.Textures.AnimatedTextures;
 
 namespace Project_1.GameObjects
 {
@@ -25,7 +26,7 @@ namespace Project_1.GameObjects
 
         const float lengthOfLeash = 500;
 
-        public Player(Vector2 aStartPos) : base(new AnimatedTexture(new GfxPath(GfxType.Object, "Player"), new Point(32), AnimatedTexture.AnimationType.Random, 0, TimeSpan.FromMilliseconds(500)), aStartPos)
+        public Player(Vector2 aStartPos) : base(new RandomAnimatedTexture(new GfxPath(GfxType.Object, "Player"), new Point(32), 0, TimeSpan.FromMilliseconds(500)), aStartPos)
         {
         }
 

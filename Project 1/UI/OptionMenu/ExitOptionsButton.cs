@@ -12,9 +12,9 @@ namespace Project_1.UI.OptionMenu
 {
     internal class ExitOptionsButton : GFXButton
     {
-        public ExitOptionsButton() : base(new GfxPath(GfxType.UI, "XButton"), new Vector2(0.9f), new Vector2(0.05f), Color.Beige)
+        public ExitOptionsButton() : base("XButton", new Vector2(0.9f), new Vector2(0.05f), Color.Beige)
         {
-
+             
         }
 
         public override void HoldReleaseOnMe()
