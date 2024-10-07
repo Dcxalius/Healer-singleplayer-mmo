@@ -57,12 +57,12 @@ namespace Project_1.UI.HUD
             HUDManager.SetNewTarget(walker);
         }
 
-        public override bool ClickedOnChildren(ClickEvent aClick)
+        protected override bool ClickedOnChildren(ClickEvent aClick)
         {
             return false;
         }
 
-        public override void ClickedOnMe(ClickEvent aClick)
+        protected override void ClickedOnMe(ClickEvent aClick)
         {
             if (aClick.Modifier(InputManager.HoldModifier.Shift))
             {

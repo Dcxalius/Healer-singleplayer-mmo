@@ -35,6 +35,7 @@ namespace Project_1.UI.HUD
             targetPlateBox = new TargetPlateBox(new Vector2(0.33f, 0.1f), new Vector2(0.2f, 0.1f));
             hudElements.Add(playerPlateBox);
             hudElements.Add(targetPlateBox);
+            
         }
 
         public static void AddWalkerToParty(Walker aWalker)
@@ -117,6 +118,14 @@ namespace Project_1.UI.HUD
                 hudElements[i].Draw(aBatch);
             }
 
+        }
+
+        public static void Rescale()
+        {
+            for (int i = 0; i < hudElements.Count; i++)
+            {
+                hudElements[i].Rescale();
+            }
         }
 
     }

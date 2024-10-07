@@ -152,12 +152,12 @@ namespace Project_1.UI.UIElements
             heldEvents = null;
         }
 
-        public virtual void OnHover()
+        protected virtual void OnHover()
         {
             //DebugManager.Print(GetType(), "Hovered on");
         }
 
-        public virtual bool ClickedOnChildren(ClickEvent aClick)
+        protected virtual bool ClickedOnChildren(ClickEvent aClick)
         {
 
             for (int i = 0; i < children.Count; i++)
@@ -173,7 +173,7 @@ namespace Project_1.UI.UIElements
             return false;
         }
 
-        public virtual void ClickedOnMe(ClickEvent aClick)
+        protected virtual void ClickedOnMe(ClickEvent aClick)
         {
             heldEvents = new HoldEvent(TimeManager.CurrentFrameTime, aClick, this);
 
@@ -198,10 +198,12 @@ namespace Project_1.UI.UIElements
                 gfx.Draw(aBatch, AbsolutePos);
             }
 
+            aBatch.GraphicsDevice.ScissorRectangle = pos;
             foreach (UIElement child in children)
             {
                 child.Draw(aBatch);
             }
+            aBatch.GraphicsDevice.ScissorRectangle = Camera.scissorRect;
         }
     }
 }

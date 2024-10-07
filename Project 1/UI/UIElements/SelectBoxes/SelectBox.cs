@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
+using Project_1.UI.OptionMenu;
 using Project_1.UI.UIElements;
 using System;
 using System.Collections.Generic;
@@ -43,7 +44,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
             }
         }
 
-        public override void ClickedOnMe(ClickEvent aClick)
+        protected override void ClickedOnMe(ClickEvent aClick)
         {
             base.ClickedOnMe(aClick);
 
@@ -97,7 +98,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
         void Open()
         {
-            UIManager.CloseAllOptionMenuStuff();
+            OptionManager.CloseAllOptionMenuStuff();
 
             isOpen = true;
 

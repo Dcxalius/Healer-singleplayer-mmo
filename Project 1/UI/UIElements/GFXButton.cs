@@ -36,14 +36,6 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        public override void Update(in UIElement aParent)
-        {
-            base.Update(aParent);
-
-            //DebugManager.Print(GetType(), "Pos: " + pos);
-            //DebugManager.Print(GetType(), "MousePos: " + InputManager.GetMousePosAbsolute());
-        }
-
         public override void Rescale()
         {
             base.Rescale();
@@ -51,11 +43,6 @@ namespace Project_1.UI.UIElements
             gfxRectangle = TransformFromRelativeToValues(new Vector2(RelativePos.X + RelativeSize.X / 10, RelativePos.Y + RelativeSize.Y / 10), new Vector2(RelativeSize.X * 0.8f, RelativeSize.Y * 0.8f));
             //DebugManager.Print(GetType(), "Pos: " + pos);
             //DebugManager.Print(GetType(), "gfxRec: " + gfxRectangle);
-        }
-
-        public override void ClickedOnMe(ClickEvent aClick)
-        {
-            base.ClickedOnMe(aClick);
         }
     }
 }

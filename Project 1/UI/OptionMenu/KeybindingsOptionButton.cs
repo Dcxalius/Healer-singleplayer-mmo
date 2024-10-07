@@ -1,6 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Project_1.Managers;
-using Project_1.Textures;
 using Project_1.UI.UIElements;
 using System;
 using System.Collections.Generic;
@@ -10,21 +8,19 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.OptionMenu
 {
-    internal class ExitOptionsButton : GFXButton
+    internal class KeybindingsOptionButton : Button
     {
-        public ExitOptionsButton() : base("XButton", new Vector2(0.9f), new Vector2(0.05f), Color.Beige)
+        public KeybindingsOptionButton(Vector2 aPos, Vector2 aSize) : base(aPos, aSize, Color.White, "Keybindings", Color.Black)
         {
-             
+
         }
 
         public override void HoldReleaseOnMe()
         {
             base.HoldReleaseOnMe();
-         
-            OptionManager.CloseAllOptionMenuStuff();
-            
-            StateManager.SetState(State.Pause);
 
+            OptionManager.SetScreen(OptionManager.OptionScreen.Keybindings);
         }
     }
+
 }

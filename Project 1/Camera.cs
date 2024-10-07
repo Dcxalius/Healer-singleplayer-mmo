@@ -86,12 +86,15 @@ namespace Project_1
         static CameraMover cameraMover = new CameraMover();
 
 
+        public static Rectangle scissorRect;
+        static RasterizerState rasterizerState = new RasterizerState() { ScissorTestEnable = true };
+
         public static void Init()
         {
-            //SetWindowSize(devScreenBorder);
             spriteBatch = GraphicsManager.CreateSpriteBatch();
             gameSpriteBatch = GraphicsManager.CreateSpriteBatch();
             uiSpriteBatch = GraphicsManager.CreateSpriteBatch();
+           
         }
 
         public static void Update()
@@ -155,9 +158,13 @@ namespace Project_1
             minScale = scale + 0.4f;
             cameraMover.bindingRectangle = new Rectangle(new Point(0), new Point(screenRectangleSize.X / 4 * 3, screenRectangleSize .Y / 4 * 3));
             cameraMover.maxCircleCameraMove = screenRectangleSize.Y / 3;
+
+            Init();
+            scissorRect = spriteBatch.GraphicsDevice.ScissorRectangle;
+
         }
 
-       
+
         public static Rectangle WorldPosToCameraSpace(Rectangle aWorldPos)
         {
             Point topLeft = (centreInWorldSpace * scale - screenRectangleSize.ToVector2() / 2).ToPoint();
@@ -263,7 +270,7 @@ namespace Project_1
         static void UIDraw()
         {
             GraphicsManager.SetRenderTarget(uiTarget);
-            uiSpriteBatch.Begin();
+            uiSpriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, rasterizerState);
             GraphicsManager.ClearScreen(Color.Transparent);
             HUDManager.Draw(uiSpriteBatch);
 

@@ -31,9 +31,10 @@ namespace Project_1.UI.UIElements
 
         Text text;
 
-        public Button(Vector2 aPos, Vector2 aSize, Color aColor, string aText = null) : base(new UITexture("WhiteBackground", aColor), aPos, aSize)
+        public Button(Vector2 aPos, Vector2 aSize, Color aColor, string aText = null, Color? aTextColor = null) : base(new UITexture("WhiteBackground", aColor), aPos, aSize)
         {
-            text = new Text("Gloryse", aText);
+            Color denullifiedTextColor = aTextColor == null ? Color.White : aTextColor.Value;
+            text = new Text("Gloryse", aText, denullifiedTextColor);
             pressedGfx = new UITexture("GrayBackground", aColor);
         }
 
@@ -43,7 +44,7 @@ namespace Project_1.UI.UIElements
             base.Update(aParent);
         }
 
-        public override void ClickedOnMe(ClickEvent aClick)
+        protected override void ClickedOnMe(ClickEvent aClick)
         {
             pressed = true;
             base.ClickedOnMe(aClick);

@@ -18,27 +18,21 @@ namespace Project_1.UI
 {
     internal static class UIManager
     {
-        static List<UIElement> pauseElements = new List<UIElement>();
-        static List<UIElement> optionElements = new List<UIElement>();
+        static PauseBox pauseBox;
 
         public static void Init()
         {
             HUDManager.Init();
             InitPauseMenuUI();
-            InitOptionsMenuUI();
+            OptionManager.Init();
         }
 
-        public static void InitOptionsMenuUI()
-        {
-            optionElements.Add(new CameraStyleSelect(new Vector2(0.1f, 0.22f), new Vector2(0.3f, 0.1f)));
-            optionElements.Add(new ScreenSizeSelect(new Vector2(0.1f, 0.1f), new Vector2(0.3f, 0.1f)));
-            optionElements.Add(new ExitOptionsButton());
-        }
+        
 
         static void InitPauseMenuUI()
         {
 
-            pauseElements.Add(new PauseBox());
+            pauseBox = new PauseBox();
 
         }
 
@@ -50,12 +44,12 @@ namespace Project_1.UI
                     HUDManager.Update();
                     break;
                 case State.Pause:
-                    StateUpdate(pauseElements);
+                    pauseBox.Update(null);
                     break;
                 case State.StartMenu:
                     break;
                 case State.Options:
-                    StateUpdate(optionElements);
+                    OptionManager.Update();
                     break;
                 default:
                     break;
@@ -78,25 +72,18 @@ namespace Project_1.UI
                 case State.Game:
                     break;
                 case State.Pause:
-                    StateDraw(pauseElements, aBatch);
+                    pauseBox.Draw(aBatch);
                     break;
                 case State.StartMenu:
                     break;
                 case State.Options:
-                    StateDraw(optionElements, aBatch);
+                    OptionManager.Draw(aBatch);
                     break;
                 default:
                     break;
             }
         }
 
-        public static void CloseAllOptionMenuStuff()
-        {
-            for (int i = 0; i < optionElements.Count; i++)
-            {
-                optionElements[i].Close();
-            }
-        }
 
 
         static void StateDraw(List<UIElement> aListToDraw, SpriteBatch aBatch)
@@ -116,45 +103,25 @@ namespace Project_1.UI
                 case State.Game:
                     return HUDManager.Click(aClickEvent); 
                 case State.Pause:
-                    return SearchForHit(pauseElements, aClickEvent);
+                    return pauseBox.ClickedOn(aClickEvent);
                 case State.StartMenu:
                     return true;
                 case State.Options:
-                    return SearchForHit(optionElements, aClickEvent);
+                    return OptionManager.SearchForHit(aClickEvent);
                 default:
                     break;
             }
             return false;
         }
 
-        public static bool SearchForHit(List<UIElement> aListToSearch, ClickEvent aClickEvent)
-        {
-            for (int i = aListToSearch.Count - 1; i >= 0; i--)
-            {
-                bool clickedOn = false;
-                clickedOn = aListToSearch[i].ClickedOn(aClickEvent);
-                if (clickedOn == true)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
         public static void Rescale()
         {
-            RescaleList(optionElements);
-            RescaleList(pauseElements);
-
-        }
-
-        public static void RescaleList(List<UIElement> aList)
-        {
-
-            foreach (UIElement element in aList)
+            if (pauseBox == null)
             {
-                element.Rescale();
+                return;
             }
+            OptionManager.Rescale();
+            pauseBox.Rescale();
         }
     }
 }

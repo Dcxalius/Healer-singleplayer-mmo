@@ -7,6 +7,7 @@ using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.Tiles;
 using Project_1.UI;
+using Project_1.UI.OptionMenu;
 using System.Runtime.InteropServices;
 
 namespace Project_1
@@ -27,7 +28,7 @@ namespace Project_1
             DebugManager.Init();
             TextureManager.Init(Content);
             GraphicsManager.Init();
-            Camera.Init();
+            //Camera.Init();
             RandomManager.Init();
             ObjectManager.Init(Content);
             TileManager.Init(Content);

@@ -24,7 +24,7 @@ namespace Project_1.UI.HUD
         public PlayerPlateBox(Vector2 aPos, Vector2 aSize) : base(aPos, aSize)
         { 
             name = new PlateBoxNameSegment(player.Name, player.RelationColor, new Vector2(0, 0), new Vector2(aSize.X, aSize.Y / 2));
-            health = new PlateBoxHealthSegment(player, new Vector2(0, aSize.Y / 2), new Vector2(aSize.X, aSize.Y / 4));
+            health = new PlateBoxHealthSegment(player, new Vector2(0, aSize.Y / 2), new Vector2(aSize.X * 3, aSize.Y / 4));
             //health = new PlateBoxHealthSegment(p, new Vector2(0, 0), new Vector2(aSize.X, aSize.Y / 2));
 
 
@@ -44,7 +44,7 @@ namespace Project_1.UI.HUD
             HUDManager.SetNewTarget(player);
         }
 
-        public override bool ClickedOnChildren(ClickEvent aClick)
+        protected override bool ClickedOnChildren(ClickEvent aClick)
         {
             return false;
         }

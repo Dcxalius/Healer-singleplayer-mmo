@@ -133,7 +133,6 @@ namespace Project_1.Managers
 
 
             Camera.SetWindowSize(aSize);
-
             UIManager.Rescale();
 
 
