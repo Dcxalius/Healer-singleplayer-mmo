@@ -5,6 +5,7 @@ using Project_1.GameObjects;
 using Project_1.Managers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,8 +31,7 @@ namespace Project_1.Input
 
         public static void Init(ContentManager aContentManager)
         {
-            ;
-            //ExportData(aContentManager.RootDirectory + "\\Data\\Keybinds.json", firstButtons.Union(secondButtons));
+            
             ImportBindings(aContentManager.RootDirectory);
         }
 
@@ -42,6 +42,7 @@ namespace Project_1.Input
                 string dataAsString = System.IO.File.ReadAllText(aPathToData + "\\Data\\Keybinds.json");
 
                 Keys[] importedBinds = JsonConvert.DeserializeObject<Keys[]>(dataAsString);
+                Debug.Assert(importedBinds.Length != (int)KeyListner.Count);
                 for (int i = 0; i < (int)KeyListner.Count; i++)
                 {
                     firstButtons[i] = importedBinds[i];
@@ -51,8 +52,18 @@ namespace Project_1.Input
             }
             catch (Exception)
             {
+                
+                Debug.Assert(defaultFirstKeys.Length - 1 != (int)KeyListner.Count || defaultSecondKeys.Length - 1 != (int)KeyListner.Count, "Default Key has wrong count");
+
+                
                 DefaultKeys();
             }
+
+        }
+
+        public static void SaveBindings(string aPathToData)
+        {
+            ExportData(aPathToData + "\\Data\\Keybinds.json", firstButtons.Union(secondButtons));
 
         }
 
