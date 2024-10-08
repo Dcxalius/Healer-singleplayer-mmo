@@ -27,6 +27,11 @@ namespace Project_1.Textures
         protected float rotation = 0f;
         protected SpriteEffects flip;
 
+        public Texture(Texture2D aGfx, Point aSize)
+        {
+            gfx = aGfx;
+            size = aSize;
+        }
 
         public Texture(GfxPath aPath)
         {

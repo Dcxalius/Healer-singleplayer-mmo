@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace Project_1.Textures.AnimatedTextures
 {
-    internal class TriggerableAnimatedTexture : Texture
+    internal class TriggerableAnimatedTexture
     {
         AnimatedTexture restAnimation;
         AnimatedTexture triggeredAnimation;
         bool triggered = false;
-        public TriggerableAnimatedTexture(AnimatedTexture aRestAnimation, AnimatedTexture aTriggeredAnimation,Point aVisableSize) : base(null, aVisableSize)
+        public TriggerableAnimatedTexture(AnimatedTexture aRestAnimation, AnimatedTexture aTriggeredAnimation,Point aVisableSize)
         {
             restAnimation = aRestAnimation;
             triggeredAnimation = aTriggeredAnimation;
@@ -25,22 +25,22 @@ namespace Project_1.Textures.AnimatedTextures
             triggeredAnimation.ResetCurrentFrame();
         }
 
-        public override void Update()
-        {
-            base.Update();
-            restAnimation.Update();
-            if (triggered == false) return;
+        //public override void Update()
+        //{
+        //    base.Update();
+        //    restAnimation.Update();
+        //    if (triggered == false) return;
 
-            triggeredAnimation.Update();
-        }
+        //    triggeredAnimation.Update();
+        //}
 
-        public override void Draw(SpriteBatch aBatch, Vector2 aPos, Vector2 aFeetPos)
-        {
-            if (triggered == true)
-            {
-                triggeredAnimation.Draw(aBatch, aPos, aFeetPos);
-            }
-            restAnimation.Draw(aBatch, aPos, aFeetPos);
-        }
+        //public override void Draw(SpriteBatch aBatch, Vector2 aPos, Vector2 aFeetPos)
+        //{
+        //    if (triggered == true)
+        //    {
+        //        triggeredAnimation.Draw(aBatch, aPos, aFeetPos);
+        //    }
+        //    restAnimation.Draw(aBatch, aPos, aFeetPos);
+        //}
     }
 }

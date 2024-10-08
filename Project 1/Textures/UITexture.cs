@@ -11,6 +11,11 @@ namespace Project_1.Textures
     internal class UITexture : Texture
     {
 
+        public UITexture(Texture2D aText, Point aSize) : base(aText, aSize)
+        {
+
+        }
+
         public UITexture(string aPath, Color aColor) : base( new GfxPath(GfxType.UI, aPath), aColor)
         {
 

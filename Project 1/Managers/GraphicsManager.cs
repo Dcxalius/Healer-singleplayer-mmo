@@ -49,6 +49,12 @@ namespace Project_1.Managers
             SetWindowSize(Camera.devScreenBorder, fullsceen, borderlessFullscreen);
 
         }
+
+        public static Texture2D CreateNewTexture(Point aSize)
+        {
+            return new Texture2D(graphicsDeviceManager.GraphicsDevice, aSize.X, aSize.Y);
+        }
+
         public static bool CaptureScissor(object aCaptor, Rectangle aRect)
         {
             if (scissorRectCaptor != null)
