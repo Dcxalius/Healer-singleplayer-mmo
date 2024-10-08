@@ -58,10 +58,7 @@ namespace Project_1.UI.HUD
 
         public override void Draw(SpriteBatch aBatch)
         {
-            if (targetEntity == null)
-            {
-                return;
-            }
+            if (targetEntity == null) return;
 
             base.Draw(aBatch);
         }

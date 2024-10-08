@@ -18,7 +18,7 @@ using System.Windows.Forms;
 namespace Project_1
 {
 
-    internal static class Camera
+    internal static class Camera //TODO: Unstatic this and shove an instance into graphics manager
     {
         public enum CameraSettings
         {
@@ -86,8 +86,8 @@ namespace Project_1
         static CameraMover cameraMover = new CameraMover();
 
 
-        public static Rectangle scissorRect;
         static RasterizerState rasterizerState = new RasterizerState() { ScissorTestEnable = true };
+
 
         public static void Init()
         {
@@ -103,6 +103,9 @@ namespace Project_1
 
             cameraMover.Move();
         }
+
+        
+
         public static void BindCamera(MovingObject aBinder)
         {
             cameraMover.BindCamera(aBinder);
@@ -160,7 +163,6 @@ namespace Project_1
             cameraMover.maxCircleCameraMove = screenRectangleSize.Y / 3;
 
             Init();
-            scissorRect = spriteBatch.GraphicsDevice.ScissorRectangle;
 
         }
 
@@ -270,7 +272,7 @@ namespace Project_1
         static void UIDraw()
         {
             GraphicsManager.SetRenderTarget(uiTarget);
-            uiSpriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, rasterizerState);
+            uiSpriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, rasterizerState);
             GraphicsManager.ClearScreen(Color.Transparent);
             HUDManager.Draw(uiSpriteBatch);
 

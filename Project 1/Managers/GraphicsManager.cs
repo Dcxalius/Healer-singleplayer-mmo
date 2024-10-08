@@ -39,8 +39,41 @@ namespace Project_1.Managers
         static bool fullsceen = false;
         static bool borderlessFullscreen = false;
 
+        static Rectangle unCaptueredScissorRect;
+        static object scissorRectCaptor = null;
+
+        public static void Init()
+        {
 
 
+            SetWindowSize(Camera.devScreenBorder, fullsceen, borderlessFullscreen);
+
+        }
+        public static bool CaptureScissor(object aCaptor, Rectangle aRect)
+        {
+            if (scissorRectCaptor != null)
+            {
+                return false;
+            }
+
+            scissorRectCaptor = aCaptor;
+            graphicsDeviceManager.GraphicsDevice.ScissorRectangle = aRect;
+
+            return true;
+        }
+
+        public static bool ReleaseScissor(object aReleaser)
+        {
+            if (scissorRectCaptor != aReleaser ) 
+            {
+                return false;
+            }
+
+            scissorRectCaptor = null;
+            graphicsDeviceManager.GraphicsDevice.ScissorRectangle = unCaptueredScissorRect;
+
+            return true;
+        }
         public static SpriteBatch CreateSpriteBatch()
         {
             return new SpriteBatch(graphicsDeviceManager.GraphicsDevice);
@@ -63,13 +96,6 @@ namespace Project_1.Managers
             gameWindow = aGame.Window;
         }
 
-        public static void Init()
-        {
-
-
-            SetWindowSize(Camera.devScreenBorder, fullsceen, borderlessFullscreen);
-
-        }
 
         [DllImport("user32.dll")]
         static extern void ClipCursor(ref Rectangle rect);
@@ -134,7 +160,7 @@ namespace Project_1.Managers
 
             Camera.SetWindowSize(aSize);
             UIManager.Rescale();
-
+            unCaptueredScissorRect = graphicsDeviceManager.GraphicsDevice.ScissorRectangle;
 
         }
 

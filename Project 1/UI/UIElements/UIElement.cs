@@ -198,12 +198,12 @@ namespace Project_1.UI.UIElements
                 gfx.Draw(aBatch, AbsolutePos);
             }
 
-            aBatch.GraphicsDevice.ScissorRectangle = pos;
+            GraphicsManager.CaptureScissor(this, pos);
             foreach (UIElement child in children)
             {
                 child.Draw(aBatch);
             }
-            aBatch.GraphicsDevice.ScissorRectangle = Camera.scissorRect;
+            GraphicsManager.ReleaseScissor(this);
         }
     }
 }
