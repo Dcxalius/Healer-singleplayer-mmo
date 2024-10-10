@@ -36,6 +36,10 @@ namespace Project_1.UI.HUD
 
         public void SetEntity(Entity aEntity)
         {
+            if (targetEntity != null)
+            {
+                targetEntity.Deselect();
+            }
             if (aEntity == null)
             {
                 targetEntity = null;
@@ -46,6 +50,7 @@ namespace Project_1.UI.HUD
             nameSegment.Name = targetEntity.Name;
             nameSegment.BackgroundColor = aEntity.RelationColor;
             healthSegment.SetTarget(targetEntity);
+            targetEntity.Select();
         }
 
         public override void Update(in UIElement aParent)

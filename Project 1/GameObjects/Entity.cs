@@ -38,12 +38,14 @@ namespace Project_1.GameObjects
 
         Rectangle shadowPos;
 
+        static Texture SelectTexture = new Texture(new GfxPath(GfxType.Object, "SelectRing"));
         static Texture ShadowTexture = new Texture(new GfxPath(GfxType.Object, "Shadow"));
 
         Dictionary<Entity, float> aggroTable = new Dictionary<Entity, float>();
         List<Vector2> destinations = new List<Vector2>();
 
         protected Entity target = null;
+        bool selected = false;
 
         float timeSinceLastAttack = 0;
 
@@ -55,6 +57,16 @@ namespace Project_1.GameObjects
         {
             shadowPos = new Rectangle((Position + new Vector2(size.X/2, size.Y)).ToPoint(), size);
             unitData = ObjectManager.GetData(GetType().Name);
+        }
+
+        public void Select()
+        {
+            selected = true;
+        }
+
+        public void Deselect()
+        {
+            selected = false;
         }
 
         public void TakeDamage(Entity aAttacker, float aDamageTaken)
@@ -275,7 +287,19 @@ namespace Project_1.GameObjects
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)
         {
-            ShadowTexture.Draw(aBatch, Camera.WorldPosToCameraSpace(shadowPos).Location.ToVector2(), FeetPos - Vector2.One);   
+            Color shadowColor = Color.Black;
+            if (GetType() == typeof(Walker))
+            {
+                if (ObjectManager.Player.IsInCommand(this as Walker))
+                {
+                    shadowColor = Color.DarkGreen;
+                }
+            }
+            ShadowTexture.Draw(aBatch, Camera.WorldPosToCameraSpace(shadowPos).Location.ToVector2(), shadowColor, FeetPos.Y - 1);
+            if (selected == true)
+            {
+                SelectTexture.Draw(aBatch, Camera.WorldPosToCameraSpace(shadowPos).Location.ToVector2(), Data.RelationColor(), FeetPos.Y - 1);
+            }
             base.Draw(aBatch);
         }
     }

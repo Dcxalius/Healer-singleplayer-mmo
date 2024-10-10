@@ -31,6 +31,11 @@ namespace Project_1.Textures
         {
             gfx = aGfx;
             size = aSize;
+            scale = 1;
+            color = Color.White;
+            flip = SpriteEffects.None;
+            visible = null;
+            offset = Vector2.Zero;
         }
 
         public Texture(GfxPath aPath)
@@ -115,9 +120,9 @@ namespace Project_1.Textures
             Draw(aBatch, aPos, color, Camera.WorldRectangle.Bottom);
         }
 
-        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, Vector2 aFeetPos)
+        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, float aFeetPosY)
         {
-            Draw(aBatch, aPos, color, aFeetPos.Y);
+            Draw(aBatch, aPos, color, aFeetPosY);
         }
 
        

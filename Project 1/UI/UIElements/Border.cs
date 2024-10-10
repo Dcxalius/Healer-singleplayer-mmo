@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Managers;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -14,37 +15,52 @@ namespace Project_1.UI.UIElements
         public bool Visible { get => visible; set => visible = value; }
 
         bool visible = true;
-        public Border(Color aColor, Vector2 aPos, Vector2 aSize) : base(null, aPos, aSize)
+        public Border(Color aColor, Vector2 aPos, Vector2 aSizeOfBoxToBorder) : base(null, aPos, aSizeOfBoxToBorder)
         //public Border(Color aColor, Vector2 aPos, Vector2 aSize) : base(new UITexture("GrayWhiteBorder", aColor), aPos, aSize)
         {
-            Point size = Camera.TransformRelativeToAbsoluteScreenSpace(aPos);
+            //This probably should be broken out and called on rescale or be completly reworked and handled through shaders
+            Point size = Camera.TransformRelativeToAbsoluteScreenSpace(aSizeOfBoxToBorder);
+            size = (size.ToVector2()* 10).ToPoint();
             Texture2D text = Managers.GraphicsManager.CreateNewTexture(size);
 
-            float borderWidth = 0.05f;
+            float borderWidth = 0.10f;
 
             int xBorder = (int)(size.X * borderWidth);
-            Color c = Color.Green;
+            Color c = Color.DarkGreen;
             Color[] data = new Color[size.X * size.Y];
+            int borderSize = Math.Min(size.X, size.Y);
             for (int i = 0; i < size.X; i++)
             {
                 for (int j = 0; j < size.Y; j++)
                 {
-                    if (i <= size.X * borderWidth || j <= size.Y * borderWidth || i >= size.X - size.X * borderWidth || j >= size.Y - size.Y * borderWidth)
+                    if (i <= borderSize * borderWidth || j <= borderSize * borderWidth || i >= size.X - borderSize * borderWidth || j >= size.Y - borderSize * borderWidth)
                     {
                         int minX = Math.Min(size.X - i, i);
                         int minY = Math.Min(size.Y - j, j);
-                        float colorMultiplier;
-                        if (minX < minY)
+                        //float colorMultiplier;
+                        //if (minX < minY)
+                        //{
+                        //    colorMultiplier = borderWidth - minX / borderWidth;
+                        //}
+                        //else
+                        //{
+
+                        //    colorMultiplier =  borderWidth - minY / borderWidth;
+                        //}
+                        //c.A = (byte) (255 - 255 * Math.Min(minX, minY) / (borderSize * borderWidth));
+                        c.A = (byte) (125 - 125 * Math.Min(minX, minY) / (borderSize * borderWidth));
+                        
+                        if (RandomManager.RollDouble() + 0.2 > Math.Min(minX, minY) / (borderSize * borderWidth)) //TODO: Change this
                         {
-                            colorMultiplier = size.X * borderWidth - minX / size.X * borderWidth;
+                            data[i + j * size.X] = c;
+
                         }
                         else
                         {
+                            data[i + j * size.X] = Color.Transparent;
 
-                            colorMultiplier = size.Y * borderWidth - minY / size.Y * borderWidth;
                         }
-                        c.A = (byte) (255 - 255 * Math.Min(minX, minY) * borderWidth);
-                        data[i + j* size.X] = c;
+
                     }
                     else
                     {
