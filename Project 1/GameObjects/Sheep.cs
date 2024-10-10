@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.GameObjects
 {
-    internal class Sheep : Entity
+    internal class Sheep : NonFriendly
     {
         readonly static GfxPath path = new GfxPath(GfxType.Object, "Sheep");
         readonly static GfxPath corpsePath = new GfxPath(GfxType.Object, "SheepCorpse");

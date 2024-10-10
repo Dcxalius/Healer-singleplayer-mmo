@@ -53,9 +53,5 @@ namespace Project_1.GameObjects
             AddDestination(aPos);
         }
 
-        protected override void AddToAggroTable(Entity aAttacker, float aDamageTaken)
-        {
-            
-        }
     }
 }

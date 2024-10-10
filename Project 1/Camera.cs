@@ -18,7 +18,7 @@ using System.Windows.Forms;
 namespace Project_1
 {
 
-    internal static class Camera //TODO: Unstatic this and shove an instance into graphics manager
+    internal static class Camera
     {
         public enum CameraSettings
         {

@@ -31,6 +31,7 @@ namespace Project_1.GameObjects
         public Entity Target { get => target; set => target = value; }
 
         public string Name { get => unitData.Name; }
+        public bool Alive { get => unitData.CurrentHealth > 0; }
         public float CurrentHealth {  get => unitData.CurrentHealth;}
         public float MaxHealth {  get => unitData.MaxHealth;}
         
@@ -38,10 +39,11 @@ namespace Project_1.GameObjects
 
         Rectangle shadowPos;
 
+        List<NonFriendly> aggroTablesIAmOn = new List<NonFriendly>();
+
         static Texture SelectTexture = new Texture(new GfxPath(GfxType.Object, "SelectRing"));
         static Texture ShadowTexture = new Texture(new GfxPath(GfxType.Object, "Shadow"));
 
-        Dictionary<Entity, float> aggroTable = new Dictionary<Entity, float>();
         List<Vector2> destinations = new List<Vector2>();
 
         protected Entity target = null;
@@ -59,6 +61,26 @@ namespace Project_1.GameObjects
             unitData = ObjectManager.GetData(GetType().Name);
         }
 
+        public void AddedToAggroTable(NonFriendly aNonfriendly)
+        {
+            if (aggroTablesIAmOn.Contains(aNonfriendly))
+            {
+                DebugManager.Print(GetType(), aNonfriendly + " tried to add me from a table I thought I was on.");
+                return;
+            }
+            aggroTablesIAmOn.Add(aNonfriendly);
+        }
+
+        public void RemovedFromAggroTable(NonFriendly aNonfriendly)
+        {
+            if (!aggroTablesIAmOn.Contains(aNonfriendly))
+            {
+                DebugManager.Print(GetType(), aNonfriendly + " tried to remove me from a table I didn't know I was on.");
+                return;
+            }
+            aggroTablesIAmOn.Remove(aNonfriendly);
+        }
+
         public void Select()
         {
             selected = true;
@@ -69,19 +91,11 @@ namespace Project_1.GameObjects
             selected = false;
         }
 
-        public void TakeDamage(Entity aAttacker, float aDamageTaken)
+        public virtual void TakeDamage(Entity aAttacker, float aDamageTaken)
         {
-            AddToAggroTable(aAttacker, aDamageTaken);
             unitData.CurrentHealth -= aDamageTaken;
         }
 
-        protected virtual void AddToAggroTable(Entity aAttacker, float aDamageTaken)
-        {
-            if (!aggroTable.TryAdd(aAttacker, aDamageTaken))
-            {
-                aggroTable[aAttacker] += aDamageTaken;
-            }
-        }
 
 
         public override bool Click(ClickEvent aClickEvent)
@@ -180,28 +194,11 @@ namespace Project_1.GameObjects
             
             CheckForCollisions(oldPosition);
 
-            AggroStuff();
+            
             Death();
         }
 
-        protected virtual void AggroStuff()
-        {
-            float highestThreat = 0;
-
-            if (target != null && aggroTable.ContainsKey(target)) //TODO: Move this out to a nonfriendly class
-            {
-                
-                highestThreat = aggroTable[target];
-            }
-            foreach (var item in aggroTable)
-            {
-                if (item.Value > highestThreat * 1.05)
-                {
-                    target = item.Key;
-
-                }
-            }
-        }
+        
 
         protected virtual void Death()
         {
@@ -233,7 +230,6 @@ namespace Project_1.GameObjects
                 target.TakeDamage(this, unitData.AttackDamage);
                 if (target.unitData.CurrentHealth <= 0)
                 {
-                    aggroTable.Remove(target);
                     target = null;
                 }
             }
