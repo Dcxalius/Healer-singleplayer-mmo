@@ -25,6 +25,8 @@ namespace Project_1.GameObjects
         Vector2 position;
         protected Point size;
 
+
+
         public GameObject(Textures.Texture aGfx, Vector2 aStartingPos)
         {
             gfx = aGfx;

@@ -68,6 +68,11 @@ namespace Project_1.GameObjects
                 float v = 0;
                 for (int j = 0; j < aggroEntities.Count; j++)
                 {
+                    if (aggroValues.Count == 0)
+                    {
+                        target = null;
+                        return;
+                    }
                     if (aggroValues[aggroEntities[i]] > v)
                     {
                         newTarget = aggroEntities[i];

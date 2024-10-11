@@ -94,6 +94,8 @@ namespace Project_1.GameObjects
         public virtual void TakeDamage(Entity aAttacker, float aDamageTaken)
         {
             unitData.CurrentHealth -= aDamageTaken;
+            FloatingText floatingText = new FloatingText(aDamageTaken.ToString(), Color.Red, FeetPos, Vector2.Normalize(FeetPos - aAttacker.FeetPos));
+            ObjectManager.SpawnFloatingText(floatingText);
         }
 
 

@@ -29,6 +29,8 @@ namespace Project_1.GameObjects
         static Dictionary<string, UnitData> unitData = new Dictionary<string, UnitData>();
         static UnitData defaultData = new UnitData();
 
+        static List<FloatingText> floatingTexts = new List<FloatingText>();
+
         public static void Init(ContentManager aC)
         {
             //UnitData data = new UnitData("Sheep", 100, UnitData.RelationToPlayer.Neutral, 50);
@@ -44,6 +46,11 @@ namespace Project_1.GameObjects
             player.AddToParty(entities[entities.Count - 1] as Walker); //Debug
             entities.Add(new Sheep(new Microsoft.Xna.Framework.Vector2(500, 500)));//Debug
 
+        }
+
+        public static void DoWhatLeaguePlayersTellMe(FloatingText aText)
+        {
+            floatingTexts.Remove(aText);
         }
 
         public static UnitData GetData(string aName)
@@ -86,6 +93,10 @@ namespace Project_1.GameObjects
             entities.Remove(aObject);
         }
 
+        public static void SpawnFloatingText(FloatingText aFloatingText)
+        {
+            floatingTexts.Add(aFloatingText);
+        }
 
         public static void Update()
         {
@@ -97,6 +108,10 @@ namespace Project_1.GameObjects
             for (int i = corpses.Count - 1; i >= 0; i--)
             {
                 corpses[i].Update();
+            }
+            for (int i = 0; i < floatingTexts.Count; i++)
+            {
+                floatingTexts[i].Update();
             }
         }
 
@@ -150,6 +165,11 @@ namespace Project_1.GameObjects
             for (int i = 0; i < entities.Count; i++)
             {
                 entities[i].Draw(aSpriteBatch);
+            }
+
+            for (int i = 0; i < floatingTexts.Count; i++)
+            {
+                floatingTexts[i].Draw(aSpriteBatch);
             }
         }
     }

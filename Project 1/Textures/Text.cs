@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Managers;
+using SharpDX.MediaFoundation;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,6 +25,7 @@ namespace Project_1.Textures
             }
         }
 
+        public Vector2 Offset { get => offset; }
 
         string textToDisplay;
         Vector2 offset;

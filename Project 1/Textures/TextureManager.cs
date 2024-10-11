@@ -19,12 +19,14 @@ namespace Project_1.Textures
 
         static ContentManager contentManager;
 
+        public static Effect textOutline;
 
         public static void Init(ContentManager aContentManager)
         {
             contentManager = aContentManager;
             InitArrays();
             InitFonts();
+            textOutline = aContentManager.Load<Effect>("TextOutline");
         }
 
         static void InitFonts()
