@@ -233,7 +233,7 @@ namespace Project_1
         {
             UIDraw();
             GraphicsManager.SetRenderTarget(gameTarget);
-            gameSpriteBatch.Begin(SpriteSortMode.FrontToBack);
+            gameSpriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.NonPremultiplied);
             //spriteBatch.Begin();
             GraphicsManager.ClearScreen(Color.White);
 

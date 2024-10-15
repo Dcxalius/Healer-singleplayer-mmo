@@ -27,6 +27,7 @@ namespace Project_1.Textures
             InitArrays();
             InitFonts();
             textOutline = aContentManager.Load<Effect>("TextOutline");
+            //textOutline.Parameters["texelSize"].SetValue()
         }
 
         static void InitFonts()

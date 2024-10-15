@@ -50,9 +50,9 @@ namespace Project_1.GameObjects
             
             spriteBatch.End();
             GraphicsManager.SetRenderTarget(null);
-            Stream stream = File.OpenWrite("xdd.png");
-            renderTarget.SaveAsPng(stream, textSize.X, textSize.Y);
-            stream.Close();
+            //Stream stream = File.OpenWrite("xdd.png");
+            //renderTarget.SaveAsPng(stream, textSize.X, textSize.Y);
+            //stream.Close();
         }
 
         public void Update()
