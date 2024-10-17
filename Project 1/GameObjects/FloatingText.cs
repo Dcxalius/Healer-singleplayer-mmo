@@ -17,29 +17,38 @@ namespace Project_1.GameObjects
         Text text;
         Color color;
         Vector2 position;
-        float speed = 75;
+        float speed;
         Vector2 momentum;
         Vector2 velocity;
         double spawnTime;
 
-        double duration = 600d;
+        double duration;
 
         RenderTarget2D renderTarget;
         SpriteBatch spriteBatch;
 
-        public FloatingText(string aTextToDisplay, Color aColor, Vector2 aStartPos, Vector2 aHeadingVector)
+        public FloatingText(string aTextToDisplay, Color aColor, Vector2 aStartPos, Vector2 aHeadingVector, Vector2? aVelocity = null, float aSpeed = 75, double aDuration = 600d)
         {
             text = new Text("Gloryse", aTextToDisplay, aColor);
             Point textSize = text.Offset.ToPoint();
+            speed = aSpeed;
             color = aColor;
             position = aStartPos;
             aHeadingVector.Y = -3;
             momentum = aHeadingVector * speed;
             spawnTime = TimeManager.CurrentFrameTime;
-            velocity = new Vector2(0, 9.8f);
+            if (aVelocity.HasValue)
+            {
+                velocity = aVelocity.Value;
+            }
+            else
+            {
+                velocity = new Vector2(0, 9.8f);
+            }
+            duration = aDuration;
 
             //renderTarget = GraphicsManager.CreateRenderTarget(new Point(30, 10));
-            renderTarget = GraphicsManager.CreateRenderTarget(textSize);
+            renderTarget = GraphicsManager.CreateRenderTarget(textSize); //Once effect is properly implement test to see if its quicker to create rendertargets for every one or have a render target for all
             spriteBatch = GraphicsManager.CreateSpriteBatch();
 
             GraphicsManager.SetRenderTarget(renderTarget);

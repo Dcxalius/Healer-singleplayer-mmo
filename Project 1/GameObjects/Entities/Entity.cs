@@ -65,7 +65,7 @@ namespace Project_1.GameObjects.Entities
         {
             if (aggroTablesIAmOn.Contains(aNonfriendly))
             {
-                DebugManager.Print(GetType(), aNonfriendly + " tried to add me from a table I thought I was on.");
+                DebugManager.Print(GetType(), aNonfriendly + " tried to add me to a table I thought I was on.");
                 return;
             }
             aggroTablesIAmOn.Add(aNonfriendly);

@@ -82,6 +82,15 @@ namespace Project_1.Input
             }
         }
 
+        public static Keys? GetKey(bool aFirstButton, KeyListner aListner)
+        {
+            if (aFirstButton)
+            {
+                return firstButtons[(int)aListner];
+            }
+            return secondButtons[(int)aListner];
+        }
+
         public static bool GetPress(KeyListner aListner)
         {
             return InputManager.GetPress(firstButtons[(int)aListner].Value) || InputManager.GetPress(secondButtons[(int)aListner].Value);
@@ -90,6 +99,44 @@ namespace Project_1.Input
         public static bool GetHold(KeyListner aListner)
         {
             return InputManager.GetHold(firstButtons[(int)aListner].Value) || InputManager.GetHold(secondButtons[(int)aListner].Value);
+        }
+
+        public static bool SetKey(bool aFirstButton, KeyListner aListner, Keys? aKey)
+        {
+            for (int i = 0; i < firstButtons.Length; i++)
+            {
+                if (!firstButtons[i].HasValue)
+                {
+                    continue;
+                }
+                if (firstButtons[i].Value == aKey)
+                {
+                    return false;
+                }
+            }
+            for (int j = 0; j < secondButtons.Length; j++)
+            {
+                if (!secondButtons[j].HasValue)
+                {
+                    continue;
+                }
+                if (secondButtons[j].Value == aKey)
+                {
+                    return false;
+                }
+            }
+
+
+            if (aFirstButton)
+            {
+                firstButtons[(int)aListner] = aKey;
+                return true;
+            }
+            else
+            {
+                secondButtons[(int)aListner] = aKey;
+                return true;
+            }
         }
 
         public static void Update()
