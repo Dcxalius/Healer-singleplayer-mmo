@@ -9,14 +9,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Project_1.Managers;
 using Project_1.Textures;
-using Project_1.GameObjects;
 using Project_1.Input;
 using System.Runtime.CompilerServices;
 using Project_1.Tiles;
 using Project_1.UI.HUD;
 using Project_1.Textures.AnimatedTextures;
 
-namespace Project_1.GameObjects
+namespace Project_1.GameObjects.Entities
 {
     internal class Player : Entity
     {
@@ -49,7 +48,7 @@ namespace Project_1.GameObjects
                 velocity.Y -= 1;
             }
             if (KeyBindManager.GetHold(KeyBindManager.KeyListner.MoveCharacterDown))
-            { 
+            {
                 velocity.Y += 1;
             }
 

@@ -44,8 +44,8 @@ namespace Project_1.GameObjects
 
             GraphicsManager.SetRenderTarget(renderTarget);
             GraphicsManager.ClearScreen(Color.Transparent);
-            //spriteBatch.Begin(SpriteSortMode.Deferred);
-            spriteBatch.Begin(samplerState : SamplerState.PointClamp, effect : TextureManager.textOutline);
+            spriteBatch.Begin(SpriteSortMode.Deferred);
+            //spriteBatch.Begin(samplerState : SamplerState.PointClamp, effect : TextureManager.textOutline);
             text.LeftAllignedDraw(spriteBatch, new Vector2(0, textSize.Y / 2));
             
             spriteBatch.End();

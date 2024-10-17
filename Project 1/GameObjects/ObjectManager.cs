@@ -14,6 +14,7 @@ using Microsoft.VisualBasic.ApplicationServices;
 using System.Reflection.Metadata;
 using Microsoft.Xna.Framework.Content;
 using Project_1.Managers;
+using Project_1.GameObjects.Entities;
 
 namespace Project_1.GameObjects
 {

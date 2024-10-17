@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Project_1.GameObjects;
+using Project_1.GameObjects.Spells;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
@@ -34,6 +35,7 @@ namespace Project_1
             TileManager.Init(Content);
             UIManager.Init();
             KeyBindManager.Init(Content);
+            AreaOfEffectFactory.Init(Content);
 
             base.Initialize();
         }

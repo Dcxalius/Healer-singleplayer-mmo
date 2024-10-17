@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.GameObjects.Entities;
 using Project_1.Input;
 using Project_1.Textures;
 using System;
@@ -8,15 +9,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Project_1.GameObjects
+namespace Project_1.GameObjects.Spells
 {
     internal class AreaOfEffect : GameObject
     {
-        Rectangle hitBox;
-
+        AreaOfEffectData effectData;
+        Entity owner;
         public AreaOfEffect(string aGfxName, Vector2 aStartingPos, Vector2 aSize) : base(new Texture(new GfxPath(GfxType.Effect, aGfxName)), aStartingPos)
         {
-            hitBox = new Rectangle(aStartingPos.ToPoint(), aSize.ToPoint());
         }
 
     }

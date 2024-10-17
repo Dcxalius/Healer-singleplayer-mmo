@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace Project_1.GameObjects
+namespace Project_1.GameObjects.Entities
 {
     internal abstract class Entity : MovingObject
     {
@@ -32,9 +32,9 @@ namespace Project_1.GameObjects
 
         public string Name { get => unitData.Name; }
         public bool Alive { get => unitData.CurrentHealth > 0; }
-        public float CurrentHealth {  get => unitData.CurrentHealth;}
-        public float MaxHealth {  get => unitData.MaxHealth;}
-        
+        public float CurrentHealth { get => unitData.CurrentHealth; }
+        public float MaxHealth { get => unitData.MaxHealth; }
+
         public override float MaxSpeed { get => unitData.MaxSpeed; }
 
         Rectangle shadowPos;
@@ -57,7 +57,7 @@ namespace Project_1.GameObjects
 
         public Entity(Texture aTexture, Vector2 aStartingPos) : base(aTexture, aStartingPos)
         {
-            shadowPos = new Rectangle((Position + new Vector2(size.X/2, size.Y)).ToPoint(), size);
+            shadowPos = new Rectangle((Position + new Vector2(size.X / 2, size.Y)).ToPoint(), size);
             unitData = ObjectManager.GetData(GetType().Name);
         }
 
@@ -115,7 +115,7 @@ namespace Project_1.GameObjects
             return false;
         }
 
-        protected virtual void ClickedOn(ClickEvent aClickEvent) 
+        protected virtual void ClickedOn(ClickEvent aClickEvent)
         {
             if (aClickEvent.NoModifiers() && aClickEvent.ButtonPressed == ClickEvent.ClickType.Right)
             {
@@ -132,7 +132,7 @@ namespace Project_1.GameObjects
         }
 
         void Walk()
-        { 
+        {
             if (destinations.Count == 0 && target == null)
             {
                 return;
@@ -193,14 +193,14 @@ namespace Project_1.GameObjects
 
             base.Update();
             AttackTarget();
-            
+
             CheckForCollisions(oldPosition);
 
-            
+
             Death();
         }
 
-        
+
 
         protected virtual void Death()
         {
@@ -218,7 +218,7 @@ namespace Project_1.GameObjects
             if (unitData.SecondsPerAttack > timeSinceLastAttack)
             {
                 timeSinceLastAttack += (float)TimeManager.SecondsSinceLastFrame;
-                return;     
+                return;
             }
             AttackIfInRange();
         }
@@ -226,7 +226,7 @@ namespace Project_1.GameObjects
         void AttackIfInRange()
         {
 
-            if (CheckForRelation() && (target.FeetPos - FeetPos).Length() < this.unitData.AttackRange)
+            if (CheckForRelation() && (target.FeetPos - FeetPos).Length() < unitData.AttackRange)
             {
                 timeSinceLastAttack = 0;
                 target.TakeDamage(this, unitData.AttackDamage);
@@ -239,11 +239,11 @@ namespace Project_1.GameObjects
 
         bool CheckForRelation()
         {
-            if (target.Relation == UnitData.RelationToPlayer.Self && this.Relation == UnitData.RelationToPlayer.Friendly )
+            if (target.Relation == UnitData.RelationToPlayer.Self && Relation == UnitData.RelationToPlayer.Friendly)
             {
                 return false;
             }
-            if (target.Relation != this.Relation)
+            if (target.Relation != Relation)
             {
                 return true;
             }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Project_1.GameObjects;
+using Project_1.GameObjects.Entities;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.UI.UIElements;

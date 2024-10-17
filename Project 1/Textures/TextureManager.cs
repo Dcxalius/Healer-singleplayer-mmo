@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.GameObjects.Spells;
 using Project_1.Managers;
 using System;
 using System.Collections.Generic;

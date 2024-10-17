@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects
+namespace Project_1.GameObjects.Entities
 {
     struct UnitData
     {
@@ -42,9 +42,9 @@ namespace Project_1.GameObjects
             }
         }
 
-        public RelationToPlayer Relation { get => relationToPlayer; set => relationToPlayer = value; }  
+        public RelationToPlayer Relation { get => relationToPlayer; set => relationToPlayer = value; }
 
-        public float Speed { get  => speed; }
+        public float Speed { get => speed; }
         public float MaxSpeed { get => maxSpeed; }
 
         public float SecondsPerAttack { get => secondsPerAttack; }
@@ -62,15 +62,15 @@ namespace Project_1.GameObjects
         float attackRange;
 
         [JsonConstructor]
-        public UnitData(string name, float maxHealth, RelationToPlayer? relation, float speed, float maxSpeed, float secondsPerAttack, float attackDamage, float attackRange) 
+        public UnitData(string name, float maxHealth, RelationToPlayer? relation, float speed, float maxSpeed, float secondsPerAttack, float attackDamage, float attackRange)
         {
-            
+
             this.name = name;
             this.maxHealth = maxHealth;
             currentHealth = maxHealth;
             Debug.Assert(relation.HasValue);
-            this.relationToPlayer = relation.Value;
-            
+            relationToPlayer = relation.Value;
+
             this.speed = speed;
             this.maxSpeed = maxSpeed;
             this.secondsPerAttack = secondsPerAttack;

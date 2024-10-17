@@ -17,7 +17,7 @@ namespace Project_1.Input
         public enum KeyListner
         {
             MoveCharacterUp, MoveCharacterLeft, MoveCharacterDown, MoveCharacterRight,
-
+            DebugFire,
 
 
             Count
@@ -26,8 +26,8 @@ namespace Project_1.Input
         static Keys?[] firstButtons = new Keys?[(int)KeyListner.Count];
         static Keys?[] secondButtons = new Keys?[(int)KeyListner.Count];
 
-        readonly static Keys[] defaultFirstKeys = new Keys[(int)KeyListner.Count] {Keys.W, Keys.A, Keys.S, Keys.D };
-        readonly static Keys[] defaultSecondKeys = new Keys[(int)KeyListner.Count] {Keys.Up, Keys.Left, Keys.Down, Keys.Right };
+        readonly static Keys[] defaultFirstKeys = new Keys[(int)KeyListner.Count] {Keys.W, Keys.A, Keys.S, Keys.D, Keys.Q};
+        readonly static Keys[] defaultSecondKeys = new Keys[(int)KeyListner.Count] {Keys.Up, Keys.Left, Keys.Down, Keys.Right , Keys.None};
 
         public static void Init(ContentManager aContentManager)
         {

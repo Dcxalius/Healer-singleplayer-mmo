@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects
+namespace Project_1.GameObjects.Entities
 {
     internal class NonFriendly : Entity
     {
@@ -88,7 +88,7 @@ namespace Project_1.GameObjects
         {
             AddToAggroTable(aAttacker, aDamageTaken);
             base.TakeDamage(aAttacker, aDamageTaken);
-            
+
         }
 
         protected virtual void AddToAggroTable(Entity aAttacker, float aDamageTaken)

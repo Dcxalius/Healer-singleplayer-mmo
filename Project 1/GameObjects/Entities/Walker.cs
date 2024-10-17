@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects
+namespace Project_1.GameObjects.Entities
 {
     internal class Walker : Entity
     {
