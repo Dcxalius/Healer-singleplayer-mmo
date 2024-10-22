@@ -26,6 +26,7 @@ namespace Project_1.UI.UIElements
             get => pressed;
         }
 
+        UITexture hoverGfx;
         UITexture pressedGfx;
         bool pressed = false;
 
@@ -36,6 +37,7 @@ namespace Project_1.UI.UIElements
             Color denullifiedTextColor = aTextColor == null ? Color.White : aTextColor.Value;
             text = new Text("Gloryse", aText, denullifiedTextColor);
             pressedGfx = new UITexture("GrayBackground", aColor);
+            hoverGfx = new UITexture("ButtonHover", Color.Yellow);
         }
 
         public override void Update(in UIElement aParent)
@@ -63,6 +65,7 @@ namespace Project_1.UI.UIElements
             base.HoldReleaseAwayFromMe();
         }
 
+
         public override void Draw(SpriteBatch aBatch)
         {
             if (!pressed)
@@ -81,6 +84,11 @@ namespace Project_1.UI.UIElements
                 return;
             }
             text.CentredDraw(aBatch, AbsolutePos.Center.ToVector2());
+
+            if (wasHovered)
+            {
+                hoverGfx.Draw(aBatch, AbsolutePos);
+            }
         }
     }
 }

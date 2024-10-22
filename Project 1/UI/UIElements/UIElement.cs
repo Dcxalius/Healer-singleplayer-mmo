@@ -39,6 +39,7 @@ namespace Project_1.UI.UIElements
         public Point Size { get => pos.Size; }
 
         bool Hovered { get => AbsolutePos.Contains(InputManager.GetMousePosAbsolute()); }
+        protected bool wasHovered = false;
 
         protected UITexture gfx;
         Point absolutePos;
@@ -80,7 +81,10 @@ namespace Project_1.UI.UIElements
 
         public virtual void Close()
         {
-
+            for (int i = 0; i < children.Count; i++)
+            {
+                children[i].Close();
+            }
         }
 
         public virtual void HoldUpdate()
@@ -92,7 +96,7 @@ namespace Project_1.UI.UIElements
 
             if (!heldEvents.IsStillHeld())
             {
-                if (Hovered)
+                if (wasHovered)
                 {
                     HoldReleaseOnMe();
                 }
@@ -107,7 +111,7 @@ namespace Project_1.UI.UIElements
         {
             HoldUpdate();
 
-            if (aParent != null)
+            if (aParent != null) //TODO: Make this less ugly
             {
                 absolutePos = aParent.absolutePos + pos.Location;
             }
@@ -121,9 +125,16 @@ namespace Project_1.UI.UIElements
             }
 
 
-            if (Hovered)
+            if (!wasHovered && Hovered)
             {
+                wasHovered = true;
                 OnHover();
+            }
+
+            if (wasHovered && !Hovered)
+            {
+                wasHovered = false;
+                OnDeHover();
             }
         }
 
@@ -155,6 +166,11 @@ namespace Project_1.UI.UIElements
         protected virtual void OnHover()
         {
             //DebugManager.Print(GetType(), "Hovered on");
+        }
+
+        protected virtual void OnDeHover()
+        {
+
         }
 
         protected virtual bool ClickedOnChildren(ClickEvent aClick)

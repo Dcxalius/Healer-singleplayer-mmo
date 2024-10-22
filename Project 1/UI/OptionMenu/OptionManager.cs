@@ -24,6 +24,8 @@ namespace Project_1.UI.OptionMenu
 
         static OptionScreen currentScreen = OptionScreen.Video;
 
+        static ExitOptionsButton exitOptionsButton;
+
         public static void Init()
         {
             InitPermanents();
@@ -34,7 +36,13 @@ namespace Project_1.UI.OptionMenu
         static void InitPermanents()
         {
             optionScreenPermanents.Add(new OptionScreenBox((int)OptionScreen.Count, new Vector2(0), new Vector2(0.3f,0.04f)));
-            optionScreenPermanents.Add(new ExitOptionsButton());
+            exitOptionsButton = new ExitOptionsButton();
+            optionScreenPermanents.Add(exitOptionsButton);
+        }
+        
+        public static void AddActionToDoAtExitOfOptionMenu(Action aAction)
+        {
+            exitOptionsButton.AddFuncToTriggerOnExit(aAction);
         }
 
         static void InitVideo()
@@ -46,9 +54,27 @@ namespace Project_1.UI.OptionMenu
             };
         }
 
+        static Vector2 keybindingStartPos = new Vector2(0.2f, 0.1f);
+        static Vector2 keybindingSize = new Vector2(0.5f, 0.05f);
+        static Vector2 keybindingSpacing = new Vector2(0, 0.01f);
+        static Vector2 GetKeybindingPos
+        {
+            get
+            {
+                Vector2 r = keybindingStartPos;
+                keybindingStartPos.Y += keybindingSize.Y + keybindingSpacing.Y;
+
+                return r;
+            }
+        }
+
         static void InitKeybindings()
         {
             optionElements[(int)OptionScreen.Keybindings] = new List<UIElement>();
+            for (int i = 0; i < (int)KeyBindManager.KeyListner.Count; i++)
+            {
+                optionElements[(int)OptionScreen.Keybindings].Add(new KeybindingObject((KeyBindManager.KeyListner)i, GetKeybindingPos, keybindingSize));
+            }
 
         }
 

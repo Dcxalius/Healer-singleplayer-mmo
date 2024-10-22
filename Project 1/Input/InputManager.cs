@@ -70,6 +70,21 @@ namespace Project_1.Input
             private set => scrolledSinceLastFrame = value;
         }
 
+        public static Keys? GetAnyKey
+        {
+            get
+            {
+                IEnumerable<Keys> a = newKeyboardState.GetPressedKeys().Except(oldKeyboardState.GetPressedKeys());
+
+                if (a.Count() == 0)
+                {
+                    return null;
+                }
+
+                return a.First();
+            }
+        }
+
         static KeyboardState oldKeyboardState = Keyboard.GetState();
         static KeyboardState newKeyboardState = Keyboard.GetState();
         static MouseState newMouseState;

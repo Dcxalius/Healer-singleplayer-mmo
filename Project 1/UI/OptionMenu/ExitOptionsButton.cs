@@ -12,9 +12,22 @@ namespace Project_1.UI.OptionMenu
 {
     internal class ExitOptionsButton : GFXButton
     {
+        List<Action> onExit;
+
         public ExitOptionsButton() : base("XButton", new Vector2(0.9f), new Vector2(0.05f), Color.Beige)
         {
-             
+            onExit = new List<Action>();
+
+        }
+
+        public void AddFuncToTriggerOnExit(Action aAction)
+        {
+            if (onExit.Contains(aAction))
+            {
+                return;
+            }
+            
+            onExit.Add(aAction);
         }
 
         public override void HoldReleaseOnMe()
@@ -22,9 +35,14 @@ namespace Project_1.UI.OptionMenu
             base.HoldReleaseOnMe();
          
             OptionManager.CloseAllOptionMenuStuff();
-            
-            StateManager.SetState(State.Pause);
 
+            for (int i = 0; i < onExit.Count; i++)
+            {
+                onExit[i].Invoke();
+            }
+            onExit.Clear();
+
+            StateManager.SetState(State.Pause);
         }
     }
 }

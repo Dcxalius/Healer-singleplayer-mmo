@@ -6,6 +6,7 @@ using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,23 +24,26 @@ namespace Project_1.Input
             Count
         }
 
-        static Keys?[] firstButtons = new Keys?[(int)KeyListner.Count];
-        static Keys?[] secondButtons = new Keys?[(int)KeyListner.Count];
+        static Keys[] firstButtons = new Keys[(int)KeyListner.Count];
+        static Keys[] secondButtons = new Keys[(int)KeyListner.Count];
 
         readonly static Keys[] defaultFirstKeys = new Keys[(int)KeyListner.Count] {Keys.W, Keys.A, Keys.S, Keys.D, Keys.Q};
         readonly static Keys[] defaultSecondKeys = new Keys[(int)KeyListner.Count] {Keys.Up, Keys.Left, Keys.Down, Keys.Right , Keys.None};
 
+        static string rootDir;
+
         public static void Init(ContentManager aContentManager)
         {
             
-            ImportBindings(aContentManager.RootDirectory);
+            rootDir = aContentManager.RootDirectory;
+            ImportBindings();
         }
 
-        static void ImportBindings(string aPathToData)
+        static void ImportBindings()
         {
             try
             {
-                string dataAsString = System.IO.File.ReadAllText(aPathToData + "\\Data\\Keybinds.json");
+                string dataAsString = System.IO.File.ReadAllText(rootDir + "\\Data\\Keybinds.json");
 
                 Keys[] importedBinds = JsonConvert.DeserializeObject<Keys[]>(dataAsString);
                 Debug.Assert(importedBinds.Length != (int)KeyListner.Count);
@@ -50,10 +54,15 @@ namespace Project_1.Input
                 }
 
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                
-                Debug.Assert(defaultFirstKeys.Length - 1 != (int)KeyListner.Count || defaultSecondKeys.Length - 1 != (int)KeyListner.Count, "Default Key has wrong count");
+                if (!(exception is IndexOutOfRangeException || exception is JsonSerializationException || exception is FileNotFoundException))
+                {
+                    throw;
+                }
+
+                DebugManager.Print(typeof(KeyBindManager), "Error Importing Bindings from file.");
+                Debug.Assert(defaultFirstKeys.Length == (int)KeyListner.Count && defaultSecondKeys.Length == (int)KeyListner.Count, "Default Key has wrong count");
 
                 
                 DefaultKeys();
@@ -61,15 +70,15 @@ namespace Project_1.Input
 
         }
 
-        public static void SaveBindings(string aPathToData)
+        public static void SaveBindings()
         {
-            ExportData(aPathToData + "\\Data\\Keybinds.json", firstButtons.Union(secondButtons));
+            ExportData(rootDir + "\\Data\\Keybinds.json", firstButtons.Concat(secondButtons));
 
         }
 
         static void ExportData(string aDestination, object aObjectToExport)
         {
-            string json = JsonConvert.SerializeObject(aObjectToExport);
+            string json = JsonConvert.SerializeObject(aObjectToExport, Formatting.None, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Include });
             System.IO.File.WriteAllText(aDestination, json);
         }
 
@@ -93,40 +102,16 @@ namespace Project_1.Input
 
         public static bool GetPress(KeyListner aListner)
         {
-            return InputManager.GetPress(firstButtons[(int)aListner].Value) || InputManager.GetPress(secondButtons[(int)aListner].Value);
+            return InputManager.GetPress(firstButtons[(int)aListner]) || InputManager.GetPress(secondButtons[(int)aListner]);
         }
 
         public static bool GetHold(KeyListner aListner)
         {
-            return InputManager.GetHold(firstButtons[(int)aListner].Value) || InputManager.GetHold(secondButtons[(int)aListner].Value);
+            return InputManager.GetHold(firstButtons[(int)aListner]) || InputManager.GetHold(secondButtons[(int)aListner]);
         }
 
-        public static bool SetKey(bool aFirstButton, KeyListner aListner, Keys? aKey)
+        public static bool SetKey(bool aFirstButton, KeyListner aListner, Keys aKey)
         {
-            for (int i = 0; i < firstButtons.Length; i++)
-            {
-                if (!firstButtons[i].HasValue)
-                {
-                    continue;
-                }
-                if (firstButtons[i].Value == aKey)
-                {
-                    return false;
-                }
-            }
-            for (int j = 0; j < secondButtons.Length; j++)
-            {
-                if (!secondButtons[j].HasValue)
-                {
-                    continue;
-                }
-                if (secondButtons[j].Value == aKey)
-                {
-                    return false;
-                }
-            }
-
-
             if (aFirstButton)
             {
                 firstButtons[(int)aListner] = aKey;
@@ -137,6 +122,26 @@ namespace Project_1.Input
                 secondButtons[(int)aListner] = aKey;
                 return true;
             }
+        }
+
+        public static bool CheckForNoDupeKeys(Keys aKey)
+        {
+            for (int i = 0; i < firstButtons.Length; i++)
+            {
+                if (firstButtons[i] == aKey)
+                {
+                    return false;
+                }
+            }
+            for (int j = 0; j < secondButtons.Length; j++)
+            {
+                if (secondButtons[j] == aKey)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public static void Update()

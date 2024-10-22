@@ -13,22 +13,22 @@ namespace Project_1.UI.UIElements
     {
         Text underlyingText;
         static readonly Color defaultC = Color.White;
-        public Label(string aText, Vector2 aPos, Vector2 aSize, Color? aColor = null) : base(null, aPos, aSize)
+        public Label(string aText, Vector2 aPos, Vector2 aSize, Color? aColor = null, string aFontname = "Gloryse") : base(null, aPos, aSize)
         {
             if (aColor.HasValue)
             {
-                underlyingText = new Text("Gloryse", aText, aColor.Value);
+                underlyingText = new Text(aFontname, aText, aColor.Value);
             }
             else
             {
-                underlyingText = new Text("Gloryse", aText);
+                underlyingText = new Text(aFontname, aText);
 
             }
         }
 
         public override void Draw(SpriteBatch aBatch)
         {
-            underlyingText.LeftAllignedDraw(aBatch, pos.Location.ToVector2());
+            underlyingText.LeftAllignedDraw(aBatch, AbsolutePos.Location.ToVector2() + new Vector2(0, AbsolutePos.Size.Y / 2));
 
             base.Draw(aBatch);
 

@@ -28,13 +28,13 @@ namespace Project_1
         {
             DebugManager.Init();
             TextureManager.Init(Content);
+            KeyBindManager.Init(Content);
             GraphicsManager.Init();
             //Camera.Init();
             RandomManager.Init();
             ObjectManager.Init(Content);
             TileManager.Init(Content);
             UIManager.Init();
-            KeyBindManager.Init(Content);
             AreaOfEffectFactory.Init(Content);
 
             base.Initialize();
