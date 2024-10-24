@@ -21,7 +21,7 @@ namespace Project_1.GameObjects.Spells
 
         public OverTime(string aName, double aDuration, double aTickRate) : base(aName)
         {
-            createTime = TimeManager.CurrentFrameTime;
+            createTime = TimeManager.TotalFrameTime;
             duration = aDuration;
             
             tickRate = aTickRate;
@@ -30,12 +30,12 @@ namespace Project_1.GameObjects.Spells
 
         public void Update()
         {
-            if (createTime + duration < TimeManager.CurrentFrameTime)
+            if (createTime + duration < TimeManager.TotalFrameTime)
             {
                 //kill me
             }
 
-            if (createTime + tickRate * tickCounter > TimeManager.CurrentFrameTime)
+            if (createTime + tickRate * tickCounter > TimeManager.TotalFrameTime)
             {
                 tickCounter++;
                 //trigger effect

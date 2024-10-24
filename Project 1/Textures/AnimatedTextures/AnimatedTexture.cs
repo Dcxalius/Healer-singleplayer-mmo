@@ -54,7 +54,7 @@ namespace Project_1.Textures
 
         protected virtual void CheckForFrameUpdate()
         {
-            double currentTime = TimeManager.CurrentFrameTime;
+            double currentTime = TimeManager.TotalFrameTime;
 
             if (lastFrameFlip + durationBetweenFrames < currentTime)
             {
@@ -71,7 +71,7 @@ namespace Project_1.Textures
         public void ResetCurrentFrame()
         {
             currentFrame = 0;
-            lastFrameFlip = TimeManager.CurrentFrameTime;
+            lastFrameFlip = TimeManager.TotalFrameTime;
         }
     }
 }

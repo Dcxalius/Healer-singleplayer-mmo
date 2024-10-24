@@ -20,7 +20,7 @@ namespace Project_1.UI.PauseMenu
         {
             base.HoldReleaseOnMe();
 
-            StateManager.currentState = State.Game;
+            StateManager.UnpauseGame();
         }
     }
 }

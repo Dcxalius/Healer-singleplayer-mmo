@@ -15,9 +15,9 @@ namespace Project_1.UI.UIElements
         UITexture gfxOnButton;
         Rectangle gfxRectangle;
 
-        public GFXButton(string aGfxPath, Vector2 aPos, Vector2 aSize, Color aColorOfBorder) : base(aPos, aSize, aColorOfBorder)
+        public GFXButton(GfxPath aPath, Vector2 aPos, Vector2 aSize, Color aColorOfBorder) : base(aPos, aSize, aColorOfBorder)
         {
-            gfxOnButton = new UITexture(aGfxPath, Color.White);
+            gfxOnButton = new UITexture(aPath, Color.White);
             gfxRectangle = TransformFromRelativeToValues(new Vector2(RelativePos.X + RelativeSize.X / 10, RelativePos.Y + RelativeSize.Y / 10), new Vector2(RelativeSize.X * 0.8f, RelativeSize.Y * 0.8f));
         }
 

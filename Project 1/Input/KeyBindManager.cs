@@ -19,7 +19,7 @@ namespace Project_1.Input
         {
             MoveCharacterUp, MoveCharacterLeft, MoveCharacterDown, MoveCharacterRight,
             DebugFire,
-
+            SpellBar1Spell1, SpellBar1Spell2, SpellBar1Spell3, SpellBar1Spell4, SpellBar1Spell5, SpellBar1Spell6, SpellBar1Spell7, SpellBar1Spell8, SpellBar1Spell9, SpellBar1Spell10,
 
             Count
         }
@@ -27,8 +27,14 @@ namespace Project_1.Input
         static Keys[] firstButtons = new Keys[(int)KeyListner.Count];
         static Keys[] secondButtons = new Keys[(int)KeyListner.Count];
 
-        readonly static Keys[] defaultFirstKeys = new Keys[(int)KeyListner.Count] {Keys.W, Keys.A, Keys.S, Keys.D, Keys.Q};
-        readonly static Keys[] defaultSecondKeys = new Keys[(int)KeyListner.Count] {Keys.Up, Keys.Left, Keys.Down, Keys.Right , Keys.None};
+        readonly static Keys[] defaultFirstKeys = new Keys[(int)KeyListner.Count] 
+        {Keys.W, Keys.A, Keys.S, Keys.D, 
+         Keys.Q,
+         Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None};
+        readonly static Keys[] defaultSecondKeys = new Keys[(int)KeyListner.Count] 
+        {Keys.Up, Keys.Left, Keys.Down, Keys.Right, 
+         Keys.None,
+         Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None};
 
         static string rootDir;
 

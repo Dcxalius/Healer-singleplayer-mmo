@@ -26,7 +26,7 @@ namespace Project_1.Input
         {
             if (LeftHeld() || RightHeld()) //Should be change to be mouse indipendant
             {
-                durationHeld = TimeManager.CurrentFrameTime - heldSince;
+                durationHeld = TimeManager.TotalFrameTime - heldSince;
 
                 return false;
             }

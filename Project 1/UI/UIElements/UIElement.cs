@@ -191,7 +191,7 @@ namespace Project_1.UI.UIElements
 
         protected virtual void ClickedOnMe(ClickEvent aClick)
         {
-            heldEvents = new HoldEvent(TimeManager.CurrentFrameTime, aClick, this);
+            heldEvents = new HoldEvent(TimeManager.TotalFrameTime, aClick, this);
 
             //DebugManager.Print(GetType(), "Clicked on " + pos);
         }

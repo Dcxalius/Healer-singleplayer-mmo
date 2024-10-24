@@ -36,7 +36,7 @@ namespace Project_1.GameObjects
             position = aStartPos;
             aHeadingVector.Y = -3;
             momentum = aHeadingVector * speed;
-            spawnTime = TimeManager.CurrentFrameTime;
+            spawnTime = TimeManager.TotalFrameTime;
             if (aVelocity.HasValue)
             {
                 velocity = aVelocity.Value;
@@ -66,7 +66,7 @@ namespace Project_1.GameObjects
 
         public void Update()
         {
-            if (spawnTime + duration <= TimeManager.CurrentFrameTime)
+            if (spawnTime + duration <= TimeManager.TotalFrameTime)
             {
                 ObjectManager.DoWhatLeaguePlayersTellMe(this);
             }

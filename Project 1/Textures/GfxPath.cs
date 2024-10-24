@@ -13,6 +13,7 @@ namespace Project_1.Textures
         Tile,
         UI,
         Effect,
+        SpellImage,
         Count
     }
 

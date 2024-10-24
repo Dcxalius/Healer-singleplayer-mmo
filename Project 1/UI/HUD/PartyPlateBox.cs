@@ -21,7 +21,7 @@ namespace Project_1.UI.HUD
         static PlateBoxNameSegment name;
         static PlateBoxHealthSegment health;
 
-        Border border;
+        CommandBorder border;
 
         public PartyPlateBox(Walker aWalker, Vector2 aPos, Vector2 aSize) : base(aPos, aSize)
         {
@@ -38,7 +38,7 @@ namespace Project_1.UI.HUD
 
             AddSegmentsToChildren();
 
-            border = new Border(Color.YellowGreen, Vector2.Zero, aSize);
+            border = new CommandBorder(Color.YellowGreen, Vector2.Zero, aSize);
             children.Add(border);
             VisibleBorder = false;
         }

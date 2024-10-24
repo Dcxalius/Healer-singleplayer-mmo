@@ -74,16 +74,19 @@ namespace Project_1.Managers
 
         static void GameUpdate()
         {
-
-            if ( InputManager.GetPress(Microsoft.Xna.Framework.Input.Keys.Escape))
+            if (InputManager.GetPress(Microsoft.Xna.Framework.Input.Keys.Escape))
             {
-                currentState = State.Pause;
+                PauseGame(State.Pause);
             }
-
-
             Camera.Update();
             ObjectManager.Update();
             UIManager.Update();
+        }
+
+        static void PauseGame(State aStateToPauseTo)
+        {
+            currentState = aStateToPauseTo;
+            TimeManager.StartPause();
         }
 
         static void GameDraw()
@@ -96,10 +99,16 @@ namespace Project_1.Managers
         {
             if (InputManager.GetPress(Microsoft.Xna.Framework.Input.Keys.Escape))
             {
-                currentState = State.Game;
+                UnpauseGame();
             }
 
             UIManager.Update();
+        }
+
+        public static void UnpauseGame()
+        {
+            currentState = State.Game;
+            TimeManager.StopPause();
         }
 
         static void PauseDraw()

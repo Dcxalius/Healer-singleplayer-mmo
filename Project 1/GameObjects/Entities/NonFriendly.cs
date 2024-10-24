@@ -32,7 +32,7 @@ namespace Project_1.GameObjects.Entities
 
         void ClearStaleAggro(int i)
         {
-            if (aggroDurations[aggroEntities[i]] + maxAggroDurationStaleness < TimeManager.CurrentFrameTime)
+            if (aggroDurations[aggroEntities[i]] + maxAggroDurationStaleness < TimeManager.TotalFrameTime)
             {
                 aggroValues.Remove(aggroEntities[i]);
                 aggroDurations.Remove(aggroEntities[i]);
@@ -96,14 +96,14 @@ namespace Project_1.GameObjects.Entities
             if (aggroEntities.Contains(aAttacker))
             {
                 aggroValues[aAttacker] += aDamageTaken;
-                aggroDurations[aAttacker] = TimeManager.CurrentFrameTime;
+                aggroDurations[aAttacker] = TimeManager.TotalFrameTime;
                 return;
             }
 
 
             aggroEntities.Add(aAttacker);
             aggroValues.Add(aAttacker, aDamageTaken);
-            aggroDurations[aAttacker] = TimeManager.CurrentFrameTime;
+            aggroDurations[aAttacker] = TimeManager.TotalFrameTime;
 
             aAttacker.AddedToAggroTable(this);
         }
