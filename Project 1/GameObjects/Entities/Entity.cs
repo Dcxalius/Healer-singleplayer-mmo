@@ -293,7 +293,7 @@ namespace Project_1.GameObjects.Entities
                     shadowColor = Color.DarkGreen;
                 }
             }
-            ShadowTexture.Draw(aBatch, Camera.WorldPosToCameraSpace(shadowPos).Location.ToVector2(), shadowColor, FeetPos.Y - 1);
+            ShadowTexture.Draw(aBatch, Camera.WorldPosToCameraSpace(shadowPos).Location.ToVector2(), shadowColor, FeetPos.Y - 2);
             if (selected == true)
             {
                 SelectTexture.Draw(aBatch, Camera.WorldPosToCameraSpace(shadowPos).Location.ToVector2(), Data.RelationColor(), FeetPos.Y - 1);

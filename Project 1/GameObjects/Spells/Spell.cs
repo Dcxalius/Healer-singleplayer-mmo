@@ -1,4 +1,5 @@
 ﻿using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Entities.Players;
 using Project_1.Managers;
 using Project_1.Textures;
 using System;

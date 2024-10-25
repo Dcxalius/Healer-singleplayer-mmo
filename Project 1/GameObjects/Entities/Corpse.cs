@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +14,7 @@ namespace Project_1.GameObjects.Entities
     {
 
 
-        public Corpse(Texture aGfx) : base(aGfx, Vector2.Zero)
+        public Corpse(Textures.Texture aGfx) : base(aGfx, Vector2.Zero)
         {
         }
 
@@ -20,6 +22,11 @@ namespace Project_1.GameObjects.Entities
         {
             Position = aPos;
             ObjectManager.AddCorpse(this);
+        }
+        public override void Draw(SpriteBatch aBatch)
+        {
+            Debug.Assert(gfx != null);
+            gfx.Draw(aBatch, Camera.WorldPosToCameraSpace(Position), Position.Y);
         }
     }
 }

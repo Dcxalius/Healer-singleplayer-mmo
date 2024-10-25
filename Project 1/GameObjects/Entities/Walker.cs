@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.GameObjects.Entities.Players;
 using Project_1.Input;
 using Project_1.Textures;
 using Project_1.Textures.AnimatedTextures;

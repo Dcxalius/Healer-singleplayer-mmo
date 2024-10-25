@@ -15,7 +15,7 @@ using Project_1.Tiles;
 using Project_1.UI.HUD;
 using Project_1.Textures.AnimatedTextures;
 
-namespace Project_1.GameObjects.Entities
+namespace Project_1.GameObjects.Entities.Players
 {
     internal class Player : Entity
     {

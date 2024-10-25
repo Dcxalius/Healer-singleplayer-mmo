@@ -9,11 +9,15 @@ namespace Project_1.GameObjects.Spells
 {
     internal class SpellEffect
     {
+        static int GetId { get => nextId++; }
+        static int nextId;
+        int id;
         string name;
 
         public SpellEffect(string aName)
         {
-
+            id = GetId;
+            name = aName;
         }
     }
 }
