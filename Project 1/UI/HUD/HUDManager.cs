@@ -34,7 +34,7 @@ namespace Project_1.UI.HUD
         {
             playerPlateBox = new PlayerPlateBox(new Vector2(0.1f, 0.1f), new Vector2(0.2f, 0.1f));
             targetPlateBox = new TargetPlateBox(new Vector2(0.33f, 0.1f), new Vector2(0.2f, 0.1f));
-            firstSpellBar = new FirstSpellBar(10, new Vector2(0.2f, 0.89f), 0.6f);
+            firstSpellBar = new FirstSpellBar(10, new Vector2(0.2f, 0.86f), 0.6f);
 
             hudElements.Add(playerPlateBox);
             hudElements.Add(targetPlateBox);

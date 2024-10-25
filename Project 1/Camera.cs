@@ -127,6 +127,12 @@ namespace Project_1
             }
         }
 
+        public static Vector2 GetRelativeSquare(float aSizeInX)
+        {
+            float a = screenRectangleSize.X * aSizeInX;
+            float b = a / (float)screenRectangleSize.Y;
+            return new (aSizeInX, b);
+        }
 
         public static Point TransformRelativeToAbsoluteScreenSpace(Vector2 aPos) 
         {
