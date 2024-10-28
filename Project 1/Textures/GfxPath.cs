@@ -11,6 +11,7 @@ namespace Project_1.Textures
         Debug,
         Object,
         Tile,
+        Item,
         UI,
         Effect,
         SpellImage,

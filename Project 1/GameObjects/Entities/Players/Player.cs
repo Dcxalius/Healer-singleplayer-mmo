@@ -10,23 +10,27 @@ using System.Threading.Tasks;
 using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.Input;
-using System.Runtime.CompilerServices;
 using Project_1.Tiles;
 using Project_1.UI.HUD;
 using Project_1.Textures.AnimatedTextures;
+using Project_1.Items;
 
 namespace Project_1.GameObjects.Entities.Players
 {
     internal class Player : Entity
     {
+        public Inventory Inventory { get => inventory; }
 
         List<Walker> commands = new List<Walker>();
         List<Walker> party = new List<Walker>();
 
         const float lengthOfLeash = 500;
 
+        Inventory inventory;
+
         public Player(Vector2 aStartPos) : base(new RandomAnimatedTexture(new GfxPath(GfxType.Object, "Player"), new Point(32), 0, TimeSpan.FromMilliseconds(500)), aStartPos)
         {
+            inventory = new Inventory();
         }
 
         public bool IsInCommand(Walker aWalker) { return commands.IndexOf(aWalker) >= 0; }

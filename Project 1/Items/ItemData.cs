@@ -1,20 +1,20 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json;
 using Project_1.Textures;
 using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Project_1.Items
 {
-    internal class ItemData
+    internal struct ItemData
     {
-        public int ID { get => id; }
-        static int Id { get => nextId++; }
-        static int nextId = 0;
+        public int ID { get => id; set => id = value; }
         int id;
         string name;
         string description;
@@ -22,20 +22,27 @@ namespace Project_1.Items
         public int MaxStack { get => maxStack; }
         int maxStack;
 
-        UITexture gfx;
+        public GfxPath GfxPath { get => gfx; }
+        GfxPath gfx;
 
-        public ItemData(UITexture aTexture, string aName, string aDescription, int aMaxStack)
+        [JsonConstructor]
+        public ItemData(int id, string gfxName, string name, string description, int maxStack)
         {
-            id = Id;
-            gfx = aTexture;
-            name = aName;
-            description = aDescription;
-            maxStack = aMaxStack;
+            this.id = id;
+            gfx = new GfxPath(GfxType.Item, gfxName);
+            this.name = name;
+            this.description = description;
+            this.maxStack = maxStack;
         }
 
-        public void Draw(SpriteBatch aBatch, Rectangle aPos)
+        void Assert()
         {
-            gfx.Draw(aBatch, aPos);
+            Debug.Assert(name != null && description != null && maxStack > 0, "Itemdata not properly set");
         }
+
+        //public void Draw(SpriteBatch aBatch, Rectangle aPos)
+        //{
+        //    gfx.Draw(aBatch, aPos);
+        //}
     }
 }

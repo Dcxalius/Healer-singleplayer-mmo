@@ -113,6 +113,7 @@ namespace Project_1.UI.UIElements
 
             if (aParent != null) //TODO: Make this less ugly
             {
+                parentPos = aParent.absolutePos;
                 absolutePos = aParent.absolutePos + pos.Location;
             }
             else
@@ -199,6 +200,7 @@ namespace Project_1.UI.UIElements
         public virtual void Rescale()
         {
             pos = TransformFromRelativeToValues(relativePos, relativeSize);
+            absolutePos = parentPos + pos.Location;
 
             for (int i = 0; i < children.Count; i++)
             {

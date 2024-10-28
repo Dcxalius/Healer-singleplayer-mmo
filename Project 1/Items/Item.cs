@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Textures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,8 @@ namespace Project_1.Items
         public int Count { get => count; set => count = value; }
 
         public int MaxStack { get => itemData.MaxStack; }
+
+        public GfxPath Gfx { get => itemData.GfxPath; }
 
         ItemData itemData;
         int count;
@@ -55,9 +58,9 @@ namespace Project_1.Items
             
         }
 
-        public void Draw(SpriteBatch aBatch, Rectangle aPos)
-        {
-            itemData.Draw(aBatch, aPos);
-        }
+        //public void Draw(SpriteBatch aBatch, Rectangle aPos)
+        //{
+        //    itemData.Draw(aBatch, aPos);
+        //}
     }
 }

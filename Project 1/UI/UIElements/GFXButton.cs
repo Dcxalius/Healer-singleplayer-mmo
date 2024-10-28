@@ -14,11 +14,11 @@ namespace Project_1.UI.UIElements
     {
         UITexture gfxOnButton;
         Rectangle gfxRectangle;
+        Rectangle xdd;
 
         public GFXButton(GfxPath aPath, Vector2 aPos, Vector2 aSize, Color aColorOfBorder) : base(aPos, aSize, aColorOfBorder)
         {
             gfxOnButton = new UITexture(aPath, Color.White);
-            gfxRectangle = TransformFromRelativeToValues(new Vector2(RelativePos.X + RelativeSize.X / 10, RelativePos.Y + RelativeSize.Y / 10), new Vector2(RelativeSize.X * 0.8f, RelativeSize.Y * 0.8f));
         }
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)
@@ -27,22 +27,28 @@ namespace Project_1.UI.UIElements
 
             if (!Pressed)
             {
-                gfxOnButton.Draw(aBatch, gfxRectangle);
+                gfxOnButton.Draw(aBatch, constructGfxRect());
             }
             else
             {
-                gfxOnButton.Draw(aBatch, gfxRectangle, Color.DarkGray);
+                gfxOnButton.Draw(aBatch, constructGfxRect(), Color.DarkGray);
 
             }
+        }
+
+        Rectangle constructGfxRect()
+        {
+            Point pos = new Vector2(AbsolutePos.X + AbsolutePos.Size.X / 10, AbsolutePos.Y + AbsolutePos.Size.Y / 10).ToPoint();
+            Point size = new Vector2(AbsolutePos.Size.X * 0.8f, AbsolutePos.Size.Y * 0.8f).ToPoint();
+
+            return new Rectangle(pos, size);
+
         }
 
         public override void Rescale()
         {
             base.Rescale();
 
-            gfxRectangle = TransformFromRelativeToValues(new Vector2(RelativePos.X + RelativeSize.X / 10, RelativePos.Y + RelativeSize.Y / 10), new Vector2(RelativeSize.X * 0.8f, RelativeSize.Y * 0.8f));
-            //DebugManager.Print(GetType(), "Pos: " + pos);
-            //DebugManager.Print(GetType(), "gfxRec: " + gfxRectangle);
         }
     }
 }

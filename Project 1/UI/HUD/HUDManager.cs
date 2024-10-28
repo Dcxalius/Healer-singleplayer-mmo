@@ -19,6 +19,7 @@ namespace Project_1.UI.HUD
         static PlayerPlateBox playerPlateBox;
         static TargetPlateBox targetPlateBox;
         static FirstSpellBar firstSpellBar;
+        static InventoryBox inventoryBox;
         static PartyPlateBox[] partyPlateBoxes = new PartyPlateBox[4];
 
         static List<UIElement> hudElements = new List<UIElement>();
@@ -35,10 +36,12 @@ namespace Project_1.UI.HUD
             playerPlateBox = new PlayerPlateBox(new Vector2(0.1f, 0.1f), new Vector2(0.2f, 0.1f));
             targetPlateBox = new TargetPlateBox(new Vector2(0.33f, 0.1f), new Vector2(0.2f, 0.1f));
             firstSpellBar = new FirstSpellBar(10, new Vector2(0.2f, 0.86f), 0.6f);
+            inventoryBox = new InventoryBox(new Vector2(0.59f, 0.59f), new Vector2(0.4f));
 
             hudElements.Add(playerPlateBox);
             hudElements.Add(targetPlateBox);
             hudElements.Add(firstSpellBar);
+            hudElements.Add(inventoryBox);
         }
 
         public static void AddWalkerToParty(Walker aWalker)

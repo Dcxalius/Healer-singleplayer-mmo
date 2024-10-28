@@ -12,24 +12,31 @@ namespace Project_1.Items
 {
     internal class Inventory
     {
-        int bagSlots = 4;
-        int defaultSlots = 32;
+        public int bagSlots = 4;
+        public int defaultSlots = 32;
 
         Item[][] items;
         Bag[] bags;
-        public void Init()
+        public Inventory()
         {
             bags = new Bag[bagSlots];
             items = new Item[bagSlots + 1][];
             items[0] = new Item[defaultSlots];
-            for (int i = 0; i < items.GetLength(0); i++)
+            for (int i = 0; i < items.GetLength(0) - 1; i++)
             {
                 if (bags[i] != null)
                 {
                     items[i + 1] = new Item[bags[i].SlotCount];
                 }
             }
+
+            if (DebugManager.mode == DebugMode.On)
+            {
+                bags[3] = new Bag(ItemFactory.GetItemData(0));
+            }
         }
+
+        
 
         public bool EquipBag(Bag aBag)
         {
@@ -229,6 +236,11 @@ namespace Project_1.Items
                     items[aInventory][i] = aItem;
                 }
             }
+        }
+
+        public Bag[] GetBags()
+        {
+            return bags;
         }
     }
 }

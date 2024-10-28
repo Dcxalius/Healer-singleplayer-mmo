@@ -80,6 +80,11 @@ namespace Project_1.Textures
             scale = 1;
             color = aColor;
             offset = Vector2.Zero;
+            if (gfx == null)
+            {
+                return;
+            }
+            size = gfx.Bounds.Size;
         }
 
         public Texture(GfxPath aPath, Vector2 aOffset, Color aColor)
@@ -88,6 +93,11 @@ namespace Project_1.Textures
             scale = 1;
             color = aColor;
             offset = aOffset;
+            if (gfx == null)
+            {
+                return;
+            }
+            size = gfx.Bounds.Size;
         }
 
 
