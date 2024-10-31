@@ -13,7 +13,7 @@ namespace Project_1.UI.UIElements.PlateBoxes
     internal class PlateBoxNameSegment : PlateBoxSegment
     {
         public string Name { get => Text; set => Text = value; }
-        public Color BackgroundColor { set => gfx.SetColor(value); }
+        public Color BackgroundColor { set => gfx.Color = value; }
 
         
 

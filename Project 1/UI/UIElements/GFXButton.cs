@@ -12,9 +12,8 @@ namespace Project_1.UI.UIElements
 {
     internal abstract class GFXButton : Button
     {
-        UITexture gfxOnButton;
-        Rectangle gfxRectangle;
-        Rectangle xdd;
+        protected UITexture gfxOnButton;
+        //Rectangle gfxRectangle;
 
         public GFXButton(GfxPath aPath, Vector2 aPos, Vector2 aSize, Color aColorOfBorder) : base(aPos, aSize, aColorOfBorder)
         {
@@ -27,16 +26,16 @@ namespace Project_1.UI.UIElements
 
             if (!Pressed)
             {
-                gfxOnButton.Draw(aBatch, constructGfxRect());
+                gfxOnButton.Draw(aBatch, ConstructGfxRect());
             }
             else
             {
-                gfxOnButton.Draw(aBatch, constructGfxRect(), Color.DarkGray);
+                gfxOnButton.Draw(aBatch, ConstructGfxRect(), Color.DarkGray);
 
             }
         }
 
-        Rectangle constructGfxRect()
+        Rectangle ConstructGfxRect() //TODO: Make this not calculate every update
         {
             Point pos = new Vector2(AbsolutePos.X + AbsolutePos.Size.X / 10, AbsolutePos.Y + AbsolutePos.Size.Y / 10).ToPoint();
             Point size = new Vector2(AbsolutePos.Size.X * 0.8f, AbsolutePos.Size.Y * 0.8f).ToPoint();

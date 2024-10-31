@@ -16,7 +16,7 @@ namespace Project_1.Items
         public int defaultSlots = 32;
 
         Item[][] items;
-        Bag[] bags;
+        public Bag[] bags;
         public Inventory()
         {
             bags = new Bag[bagSlots];

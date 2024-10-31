@@ -4,6 +4,7 @@ using Project_1.GameObjects.Entities;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.UI.UIElements;
+using Project_1.UI.UIElements.Inventory;
 using SharpDX.MediaFoundation.DirectX;
 using SharpDX.XAudio2;
 using System;
@@ -24,6 +25,7 @@ namespace Project_1.UI.HUD
 
         static List<UIElement> hudElements = new List<UIElement>();
 
+        static HeldItem heldItem;
 
         public static void SetNewTarget(Entity aEntity)
         {
@@ -42,6 +44,8 @@ namespace Project_1.UI.HUD
             hudElements.Add(targetPlateBox);
             hudElements.Add(firstSpellBar);
             hudElements.Add(inventoryBox);
+
+            heldItem = new HeldItem();
         }
 
         public static void AddWalkerToParty(Walker aWalker)
@@ -64,6 +68,16 @@ namespace Project_1.UI.HUD
 
             partyPlateBoxes[openIndex] = new PartyPlateBox(aWalker, new Vector2(0.1f, 0.24f), new Vector2(0.2f, 0.1f));
             hudElements.Add(partyPlateBoxes[openIndex]);
+        }
+
+        public static void HoldItem(Item aItem, Vector2 aGrabOffset)
+        {
+            heldItem.HoldItem(aItem, aGrabOffset);
+        }
+
+        public static void ReleaseItem()
+        {
+            heldItem.ReleaseMe();
         }
 
         public static void AddWalkerToControl(Walker aWalker)
@@ -115,6 +129,8 @@ namespace Project_1.UI.HUD
             {
                 hudElements[i].Update(null);
             }
+
+            heldItem.Update();
         }
 
         public static void Draw(SpriteBatch aBatch)
@@ -124,6 +140,7 @@ namespace Project_1.UI.HUD
                 hudElements[i].Draw(aBatch);
             }
 
+            heldItem.Draw(aBatch);
         }
 
         public static void Rescale()

@@ -16,11 +16,11 @@ namespace Project_1.Textures
     {
         public Rectangle? Visible { get => visible; }
 
-        public void SetColor(Color aColor) { color = aColor; }
+        public Color Color { get => color; set => color = value; }
 
         protected Texture2D gfx;
         public Point size;
-        public Color color;
+        protected Color color;
         public float scale;
         protected Rectangle? visible;
         protected Vector2 offset;

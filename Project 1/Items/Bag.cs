@@ -10,7 +10,7 @@ namespace Project_1.Items
     internal class Bag : Item
     {
         public int SlotCount { get => slotCount; }
-        int slotCount;
+        int slotCount = 8;
 
         public Bag(ItemData aData) : base(aData, 1)
         {

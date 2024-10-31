@@ -1,9 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Project_1.Items;
 using Project_1.Textures;
 using Project_1.UI.HUD;
-using Project_1.UI.UIElements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,42 +12,28 @@ namespace Project_1.UI.UIElements.Inventory
 {
     internal class BagBox : Box
     {
-        Item defaultBag;
-        Item[] bags; 
+        Item[] slots;
 
-        
-
-        public BagBox(Vector2 aPos, Vector2 aSize) : base(new UITexture("WhiteBackground", Color.White), aPos, aSize)
+        public BagBox(int aSlotCount, int aColumnCount, Vector2 aPos, Vector2 aSize) : base(new UITexture("WhiteBackground", Color.Beige), aPos, aSize)
         {
-            defaultBag = new Item(new GfxPath(GfxType.Item, "DefaultBag"), InventoryBox.spacing, InventoryBox.itemSize);
-            children.Add(defaultBag);
-        }
-
-        public void SetBags(Bag[] aBags)
-        {
-            bags = new Item[aBags.Length];
-            for (int i = 0; i < aBags.Length; i++)
+            slots = new Item[aSlotCount];
+            for (int i = 0; i < slots.Length; i++)
             {
-                Vector2 pos = (i + 1) * (InventoryBox.itemSize + InventoryBox.spacing);
+                float x = ((i % aColumnCount) * ((InventoryBox.itemSize.X + InventoryBox.spacing.X)) + InventoryBox.spacing.X);
+                float y = InventoryBox.spacing.Y + (InventoryBox.itemSize.Y + InventoryBox.spacing.Y) * (float)Math.Floor((double)i / aColumnCount);
+                Vector2 pos = new Vector2(x, y);
                 Vector2 size = InventoryBox.itemSize;
 
-                if (aBags[i] == null)
+                if (slots[i] == null)
                 {
-                    bags[i] = new Item(new GfxPath(GfxType.Item, null), pos, size);
+                    slots[i] = new Item(new GfxPath(GfxType.Item, null), pos, size);
                 }
                 else
                 {
-                    bags[i] = new Item(aBags[i].Gfx, pos , size);
+                    //slots[i] = new Item(aBags[i].Gfx, pos, size);
                 }
             }
-
-            children.AddRange(bags);
-        }
-
-        public override void Rescale()
-        {
-            base.Rescale();
-
+            children.AddRange(slots);
         }
     }
 }

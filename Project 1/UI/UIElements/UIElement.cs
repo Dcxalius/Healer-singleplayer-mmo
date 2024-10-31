@@ -11,19 +11,14 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace Project_1.UI.UIElements
 {
     internal abstract class UIElement
     {
-        public Vector2 RelativePos
-        {
-            get => relativePos;
-        }
-        public Vector2 RelativeSize
-        {
-            get => relativeSize;
-        }
+        public Vector2 RelativePos { get => relativePos; }
+        public Vector2 RelativeSize { get => relativeSize; }
 
         public Rectangle AbsolutePos
         {
@@ -37,6 +32,9 @@ namespace Project_1.UI.UIElements
         }
 
         public Point Size { get => pos.Size; }
+
+        public UITexture Gfx { get => gfx; }
+        public Color Color { get => gfx.Color; set => gfx.Color = value; }
 
         bool Hovered { get => AbsolutePos.Contains(InputManager.GetMousePosAbsolute()); }
         protected bool wasHovered = false;
@@ -122,7 +120,9 @@ namespace Project_1.UI.UIElements
             }
             foreach (UIElement child in children)
             {
+               
                 child.Update(this);
+
             }
 
 
@@ -179,15 +179,22 @@ namespace Project_1.UI.UIElements
 
             for (int i = 0; i < children.Count; i++)
             {
+                
                 bool clickedOn = children[i].ClickedOn(aClick);
                 if (clickedOn)
                 {
+                    ClickedOnChild(aClick);
                     return true;
 
                 }
             }
 
             return false;
+        }
+
+        protected virtual void ClickedOnChild(ClickEvent aClick)
+        {
+
         }
 
         protected virtual void ClickedOnMe(ClickEvent aClick)
@@ -206,6 +213,18 @@ namespace Project_1.UI.UIElements
             {
                 children[i].Rescale();
             }
+        }
+
+        public void Move(Vector2 aNewPos)
+        {
+            relativePos = aNewPos;
+            pos.Location = TransformFromRelativeToPoint(aNewPos);
+        }
+
+        protected void Resize(Vector2 aSize)
+        {
+            relativeSize = aSize;
+            pos.Size = TransformFromRelativeToPoint(aSize);
         }
 
         public virtual void Draw(SpriteBatch aBatch)

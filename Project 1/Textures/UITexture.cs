@@ -10,6 +10,7 @@ namespace Project_1.Textures
 {
     internal class UITexture : Texture
     {
+        readonly Color defaultColor = Color.White;
 
         public UITexture(Texture2D aText, Point aSize) : base(aText, aSize)
         {
