@@ -54,6 +54,7 @@ namespace Project_1
             InputManager.Update();
             TimeManager.Update(gameTime);
             StateManager.Update();
+            DebugManager.Update();
 
             base.Update(gameTime);
         }

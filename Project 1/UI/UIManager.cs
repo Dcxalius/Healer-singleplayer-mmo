@@ -114,6 +114,25 @@ namespace Project_1.UI
             return false;
         }
 
+        public static bool Release(ReleaseEvent aReleaseEvent)
+        {
+            switch (StateManager.currentState)
+            {
+                case State.Game:
+                    return HUDManager.Release(aReleaseEvent);
+                case State.Pause:
+                    //return pauseBox.ClickedOn(aClickEvent);
+                    return false;
+                case State.StartMenu:
+                    return false;
+                case State.Options:
+                    //return OptionManager.SearchForHit(aClickEvent);
+                    return false;
+                default:
+                    return false;
+            }
+        }
+
         public static void Rescale()
         {
             if (pauseBox == null)

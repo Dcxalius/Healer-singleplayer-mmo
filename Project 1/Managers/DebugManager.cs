@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Project_1.GameObjects;
+using Project_1.Input;
+using Project_1.Items;
+using Project_1.UI.HUD;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -31,6 +35,13 @@ namespace Project_1.Managers
             AllocConsole();
         }
 
+        public static void Update()
+        {
+            if (KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugPoop))
+            {
+                SpawnPoopInInventory();
+            }
+        }
 
         public static void Print(Type test, string aMsg)
         {
@@ -43,6 +54,13 @@ namespace Project_1.Managers
             {
                 Console.WriteLine(test.ToString() + ": " + aMsg);
             }
+        }
+
+        public static void SpawnPoopInInventory()
+        {
+            Item poop = new Item(ItemFactory.GetItemDataByName("Poop"), 1);
+            ObjectManager.Player.Inventory.AddItem(poop);
+            
         }
     }
 }

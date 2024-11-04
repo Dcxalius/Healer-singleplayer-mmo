@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Bson;
 using Project_1.Managers;
+using Project_1.UI.HUD;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,7 +23,7 @@ namespace Project_1.Items
             bags = new Bag[bagSlots];
             items = new Item[bagSlots + 1][];
             items[0] = new Item[defaultSlots];
-            for (int i = 0; i < items.GetLength(0) - 1; i++)
+            for (int i = 0; i < bagSlots; i++)
             {
                 if (bags[i] != null)
                 {
@@ -32,11 +33,20 @@ namespace Project_1.Items
 
             if (DebugManager.mode == DebugMode.On)
             {
-                bags[3] = new Bag(ItemFactory.GetItemData(0));
+                EquipBag( new Bag(ItemFactory.GetItemData(1)));
+
             }
         }
 
-        
+        public Item[] GetItemsInBox(int aIndex)
+        {
+            return items[aIndex];
+        }
+
+        public Item GetItemInSlot(int aBagIndex, int aSlotIndex)
+        {
+            return items[aBagIndex][aSlotIndex];
+        }
 
         public bool EquipBag(Bag aBag)
         {
@@ -70,6 +80,8 @@ namespace Project_1.Items
 
             return null;
         }
+
+        //public void UnequipBag(int aBag, )
 
         public void RearrangeBags(int aBagSlot, int aSlotToSwapWith)
         {
@@ -115,10 +127,12 @@ namespace Project_1.Items
         public bool AddItem(Item aItem)
         {
             int count = aItem.Count;
-            for (int i = 0; i < items.GetLength(0); i++)
+            for (int i = 0; i < items.Length; i++)
             {
-                for (int j = 0; j < items.GetLength(1); j++)
+                if (items[i] == null) continue;
+                for (int j = 0; j < items[i].Length; j++)
                 {
+                    if (items[i][j] == null) continue;
                     if (items[i][j].ID == aItem.ID)
                     {
                         int tempCount = items[i][j].AddToStack(count);
@@ -135,21 +149,24 @@ namespace Project_1.Items
                 
             }
 
-            for (int i = 0; i < items.GetLength(0); i++)
+            for (int i = 0; i < items.Length; i++)
             {
-                for (int j = 0; j < items.GetLength(1); j++)
+                if (items[i] == null) continue;
+                for (int j = 0; j < items[i].Length; j++)
                 {
                     if (items[i][j] == null)
                     {
                         items[i][j] = aItem;
-                        if (aItem.MaxStack > count)
+                        if (aItem.MaxStack < count)
                         {
                             items[i][j].Count = aItem.MaxStack;
                             count -= aItem.MaxStack;
+                            HUDManager.AssignSlot(i, j);
                         }
                         else
                         {
                             items[i][j].Count = count;
+                            HUDManager.AssignSlot(i, j);
                             return true;
                         }
                     }
@@ -164,6 +181,8 @@ namespace Project_1.Items
             Item tempItem = items[aSlot.Item1][aSlot.Item2];
             items[aSlot.Item1][aSlot.Item2] = items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2];
             items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2] = tempItem;
+            HUDManager.AssignSlot(aSlot.Item1, aSlot.Item2);
+            HUDManager.AssignSlot(aSlotToSwapWith.Item1, aSlotToSwapWith.Item2);
         }
 
         public bool RemoveItem(Item aItem, int aCountToRemove)

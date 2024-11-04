@@ -8,6 +8,7 @@ using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Inventory;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,7 +41,7 @@ namespace Project_1.UI.HUD
             Vector2 bagPos = Vector2.Zero;
             bagPos.X = spacing.X;
             bagPos.Y = CalculateBagBoxSize(inventory.defaultSlots, itemSize, spacing, aSize.X).Y;
-            bagBox[0] = new BagBox(inventory.defaultSlots, columnCount, spacing, CalculateBagBoxSize(inventory.defaultSlots, itemSize, spacing, aSize.X));
+            bagBox[0] = new BagBox(0, inventory.defaultSlots, columnCount, spacing, CalculateBagBoxSize(inventory.defaultSlots, itemSize, spacing, aSize.X));
             bagPos.Y += spacing.Y;
             bagPos.Y += spacing.Y;
 
@@ -48,13 +49,13 @@ namespace Project_1.UI.HUD
             {
                 if (inventory.bags[i - 1] == null)
                 {
-                    bagBox[i] = new BagBox(0, 1, Vector2.Zero, Vector2.Zero);
+                    bagBox[i] = new BagBox(i, 0, 1, Vector2.Zero, Vector2.Zero);
                     continue;
                 }
 
                 Vector2 size = CalculateBagBoxSize(inventory.bags[i - 1].SlotCount, itemSize, spacing, aSize.X);
 
-                bagBox[i] = new BagBox(inventory.bags[i - 1].SlotCount, columnCount, bagPos, size);
+                bagBox[i] = new BagBox(i, inventory.bags[i - 1].SlotCount, columnCount, bagPos, size);
                 bagPos.Y += size.Y + spacing.Y;
             }
 
@@ -63,6 +64,26 @@ namespace Project_1.UI.HUD
 
             CalculateSize();
         }
+
+        public void AssignItem(int aBag, int aSlot)
+        {
+            bagBox[aBag].AssignSlot(aSlot);
+        }
+
+        //public void RefreshAllBags()
+        //{
+        //    //for (int i = 0; i < bagBox.Length; i++)
+        //    //{
+        //    //    bagBox[i].GetBagContent();
+        //    //}
+        //}
+
+        //public void RefreshSlot(int aBag, int aSlot)
+        //{
+        //    ////if (bagBox[aBag] == null) return false;
+        //    //Debug.Assert(bagBox[aBag].SlotCount == 0 || bagBox[aBag].SlotCount < aSlot, "Either tried to refresh empty bag or slot nr was to big.");
+        //    //bagBox[aBag].RefreshSlot(aSlot);
+        //}
 
         void CalculateSize() //TODO: Find better name
         {

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using Project_1.GameObjects;
 using Project_1.Managers;
 using Project_1.UI;
+using Project_1.UI.UIElements;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -140,6 +141,14 @@ namespace Project_1.Input
                 return;
             }
             ObjectManager.Click(clickEvent);
+        }
+
+        public static void CreateReleaseEvent(UIElement aCreator, ReleaseEvent.ReleaseType aTypeOfRelease)
+        {
+            bool[] heldModifiers = CheckHoldModifiers();
+
+            ReleaseEvent releaseEvent = new ReleaseEvent(aCreator, GetMousePosRelative(), aTypeOfRelease, heldModifiers);
+            UIManager.Release(releaseEvent);
         }
 
         static bool[] CheckHoldModifiers()

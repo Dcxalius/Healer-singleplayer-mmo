@@ -14,8 +14,11 @@ namespace Project_1.Items
 {
     internal struct ItemData
     {
-        public int ID { get => id; set => id = value; }
+        public int ID { get => id; /*set => id = value;*/ }
         int id;
+        static int Id { get => nextId++; }
+        static int nextId = 0;
+        public string Name { get => name; }
         string name;
         string description;
 
@@ -28,7 +31,7 @@ namespace Project_1.Items
         [JsonConstructor]
         public ItemData(int id, string gfxName, string name, string description, int maxStack)
         {
-            this.id = id;
+            this.id = Id;
             gfx = new GfxPath(GfxType.Item, gfxName);
             this.name = name;
             this.description = description;

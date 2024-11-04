@@ -139,19 +139,45 @@ namespace Project_1.UI.UIElements
             }
         }
 
-
-        public bool ClickedOn(ClickEvent aClick)
+        public bool ReleasedOn(ReleaseEvent aRelease)
         {
-            if (AbsolutePos.Contains(aClick.AbsolutePos))
+            if (AbsolutePos.Contains(aRelease.AbsolutePos))
             {
-                bool clickedOnChild = ClickedOnChildren(aClick);
+                bool clickedOnChild = ReleasedOnChildren(aRelease);
                 if (clickedOnChild == false)
                 {
-                        ClickedOnMe(aClick);
+                    ReleaseOnMe(aRelease);
                 }
                 return true;
             }
             return false;
+        }
+
+        public bool ReleasedOnChildren(ReleaseEvent aRelease)
+        {
+            for (int i = 0; i < children.Count; i++)
+            {
+
+                bool clickedOn = children[i].ReleasedOn(aRelease);
+                if (clickedOn)
+                {
+                    ReleasedOnChild(aRelease);
+                    return true;
+
+                }
+            }
+
+            return false;
+        }
+
+        public virtual void ReleasedOnChild(ReleaseEvent aRelease)
+        {
+
+        }
+
+        public virtual void ReleaseOnMe(ReleaseEvent aRelease)
+        {
+
         }
 
         public virtual void HoldReleaseOnMe()
@@ -172,6 +198,20 @@ namespace Project_1.UI.UIElements
         protected virtual void OnDeHover()
         {
 
+        }
+
+        public bool ClickedOn(ClickEvent aClick)
+        {
+            if (AbsolutePos.Contains(aClick.AbsolutePos))
+            {
+                bool clickedOnChild = ClickedOnChildren(aClick);
+                if (clickedOnChild == false)
+                {
+                    ClickedOnMe(aClick);
+                }
+                return true;
+            }
+            return false;
         }
 
         protected virtual bool ClickedOnChildren(ClickEvent aClick)

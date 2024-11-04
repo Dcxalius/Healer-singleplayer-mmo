@@ -52,7 +52,10 @@ namespace Project_1.UI.UIElements.Inventory
                 return;
             }
 
-            heldItem.Gfx.Draw(aBatch, new Rectangle((InputManager.GetMousePosAbsolute().ToVector2() - grabOffset).ToPoint(), new Point(32)), new Color(80, 80, 80, 80));
+            Rectangle pos = new Rectangle((InputManager.GetMousePosAbsolute().ToVector2() - grabOffset).ToPoint(), new Point(32));
+            Color transparent = new Color(80, 80, 80, 80);
+            heldItem.Gfx.Draw(aBatch, pos, transparent);
+            heldItem.GfxOnButton.Draw(aBatch, pos, transparent);
         }
     }
 }

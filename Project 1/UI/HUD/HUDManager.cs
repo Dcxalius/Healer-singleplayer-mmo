@@ -70,6 +70,22 @@ namespace Project_1.UI.HUD
             hudElements.Add(partyPlateBoxes[openIndex]);
         }
 
+        public static void AssignSlot(int aBag, int aSlot)
+        {
+            inventoryBox.AssignItem(aBag, aSlot);
+        }
+
+
+        //public static void RefreshInventory()
+        //{
+        //    inventoryBox.RefreshAllBags();
+        //}
+
+        //public static void RefeshSlot(int aBag, int aSlot)
+        //{
+        //    inventoryBox.RefreshSlot(aBag, aSlot);
+        //}
+
         public static void HoldItem(Item aItem, Vector2 aGrabOffset)
         {
             heldItem.HoldItem(aItem, aGrabOffset);
@@ -79,6 +95,8 @@ namespace Project_1.UI.HUD
         {
             heldItem.ReleaseMe();
         }
+
+        
 
         public static void AddWalkerToControl(Walker aWalker)
         {
@@ -113,9 +131,19 @@ namespace Project_1.UI.HUD
         {
             for (int i = hudElements.Count - 1; i >= 0; i--)
             {
-                bool clickedOn = false;
-                clickedOn = hudElements[i].ClickedOn(aClickEvent);
-                if (clickedOn == true)
+                if (hudElements[i].ClickedOn(aClickEvent))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static bool Release(ReleaseEvent aReleaseEvent)
+        {
+            for (int i = hudElements.Count - 1; i >= 0; i--)
+            {
+                if (hudElements[i].ReleasedOn(aReleaseEvent))
                 {
                     return true;
                 }

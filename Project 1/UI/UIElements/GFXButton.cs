@@ -12,6 +12,8 @@ namespace Project_1.UI.UIElements
 {
     internal abstract class GFXButton : Button
     {
+        public UITexture GfxOnButton { get => gfxOnButton; }
+
         protected UITexture gfxOnButton;
         //Rectangle gfxRectangle;
 
@@ -23,6 +25,8 @@ namespace Project_1.UI.UIElements
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)
         {
             base.Draw(aBatch);
+
+            if (gfxOnButton == null) return;
 
             if (!Pressed)
             {
