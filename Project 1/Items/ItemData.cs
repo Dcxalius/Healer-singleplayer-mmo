@@ -14,12 +14,20 @@ namespace Project_1.Items
 {
     internal struct ItemData
     {
+        public enum ItemType
+        {
+            NotSet,
+            Container,
+            Trash
+        }
+
         public int ID { get => id; /*set => id = value;*/ }
         int id;
         static int Id { get => nextId++; }
         static int nextId = 0;
         public string Name { get => name; }
         string name;
+        public string Description { get => description; }
         string description;
 
         public int MaxStack { get => maxStack; }
@@ -28,19 +36,24 @@ namespace Project_1.Items
         public GfxPath GfxPath { get => gfx; }
         GfxPath gfx;
 
+
+        public ItemType Type { get => itemType; }
+        ItemType itemType;
+
         [JsonConstructor]
-        public ItemData(int id, string gfxName, string name, string description, int maxStack)
+        public ItemData(int id, string gfxName, string name, string description, int maxStack, ItemType itemType)
         {
             this.id = Id;
             gfx = new GfxPath(GfxType.Item, gfxName);
             this.name = name;
             this.description = description;
             this.maxStack = maxStack;
+            this.itemType = itemType;
         }
 
         void Assert()
         {
-            Debug.Assert(name != null && description != null && maxStack > 0, "Itemdata not properly set");
+            Debug.Assert(name != null && description != null && maxStack > 0 && itemType != ItemType.NotSet, "Itemdata not properly set");
         }
 
         //public void Draw(SpriteBatch aBatch, Rectangle aPos)

@@ -22,7 +22,7 @@ namespace Project_1.UI.UIElements.Inventory
         bool holdable;
         public bool IsEmpty { get => isEmpty; }
 
-        (int, int) Index { get => (bagIndex, slotIndex); } //For bagslots -1 -1 is default, unmovable bag, and then -1 -2 for first movable bag and so on
+        (int, int) Index { get => (bagIndex, slotIndex); } //For bagslots -1 -1 is default, unmovable bag, and then -1 0 for first movable bag and so on
         int bagIndex;
         int slotIndex;
 
@@ -86,17 +86,42 @@ namespace Project_1.UI.UIElements.Inventory
             base.ReleaseOnMe(aRelease);
 
             if (aRelease.Parent.GetType() != GetType()) return;
-            if ((aRelease.Parent as Item).Index.Item1 == -1 && Index.Item1 != -1)
+
+            Item droppedOnMe = aRelease.Parent as Item;
+
+            if (droppedOnMe.bagIndex == -1) // From bagrack in hand
             {
-                Items.Item i = ObjectManager.Player.Inventory.GetItemInSlot(bagIndex, slotIndex);
-                if (i == null)
+                if (bagIndex >= 0) //Onto Inventory
                 {
-                    ObjectManager.Player.Inventory.RemoveBag();
+                    Items.Item i = ObjectManager.Player.Inventory.GetItemInSlot(bagIndex, slotIndex);
+                    if (i == null)
+                    {
+                        ObjectManager.Player.Inventory.UnequipBag(droppedOnMe.slotIndex, Index);
+                    }
+                    return;
                 }
-                
-                
+
+                if (bagIndex == -1) //Onto bagrack
+                {
+                    ObjectManager.Player.Inventory.SwapPlacesOfBags(droppedOnMe.slotIndex, slotIndex);
+                    return;
+                }
+
+                throw new NotImplementedException();
             }
-            ObjectManager.Player.Inventory.SwapItems(Index, (aRelease.Parent as Item).Index);
+
+            if (bagIndex == -1) // Onto bagrack
+            {
+                if (ObjectManager.Player.Inventory.GetItemInSlot(droppedOnMe.Index).ItemType != ItemData.ItemType.Container) //Dropped is bag
+                {
+                    return;
+                }
+
+                ObjectManager.Player.Inventory.SwapBags(droppedOnMe.Index, slotIndex);
+                return;
+            }
+
+            ObjectManager.Player.Inventory.SwapItems(Index, droppedOnMe.Index);
         }
 
         public override void HoldReleaseOnMe()
@@ -119,6 +144,7 @@ namespace Project_1.UI.UIElements.Inventory
                 HUDManager.ReleaseItem();
             }
         }
+
 
         public override void Draw(SpriteBatch aBatch)
         {

@@ -70,9 +70,14 @@ namespace Project_1.UI.HUD
             hudElements.Add(partyPlateBoxes[openIndex]);
         }
 
-        public static void AssignSlot(int aBag, int aSlot)
+        public static void RefreshSlot(int aBag, int aSlot)
         {
-            inventoryBox.AssignItem(aBag, aSlot);
+            inventoryBox.RefreshSlot(aBag, aSlot);
+        }
+
+        public static void RefreshSlot((int, int) aBagAndSlot)
+        {
+            RefreshSlot(aBagAndSlot.Item1, aBagAndSlot.Item2);
         }
 
 

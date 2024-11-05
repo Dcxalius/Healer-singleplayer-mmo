@@ -19,6 +19,8 @@ namespace Project_1.Items
 
         public GfxPath Gfx { get => itemData.GfxPath; }
 
+        public ItemData.ItemType ItemType { get => itemData.Type; }
+        
         ItemData itemData;
         int count;
 

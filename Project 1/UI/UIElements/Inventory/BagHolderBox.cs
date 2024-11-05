@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.GameObjects;
 using Project_1.Items;
 using Project_1.Textures;
 using Project_1.UI.HUD;
@@ -7,7 +8,6 @@ using Project_1.UI.UIElements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Project_1.UI.UIElements.Inventory
@@ -35,15 +35,21 @@ namespace Project_1.UI.UIElements.Inventory
 
                 if (aBags[i] == null)
                 {
-                    bags[i] = new Item(-1, -1 - i, true, new GfxPath(GfxType.Item, null), pos, size);
+                    bags[i] = new Item(-1, i, true, new GfxPath(GfxType.Item, null), pos, size);
                 }
                 else
                 {
-                    bags[i] = new Item(-1, -1 - i, true, aBags[i].Gfx, pos , size);
+                    bags[i] = new Item(-1, i, true, aBags[i].Gfx, pos , size);
                 }
             }
 
             children.AddRange(bags);
+        }
+
+        public void RefreshSlot(int aSlot)
+        {
+
+            bags[aSlot].AssignItem(ObjectManager.Player.Inventory.bags[aSlot]);
         }
 
         public override void Rescale()

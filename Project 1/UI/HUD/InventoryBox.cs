@@ -29,13 +29,15 @@ namespace Project_1.UI.HUD
 
         public static Vector2 itemSize = Camera.GetRelativeSquare(itemSizeX);
         public static Vector2 spacing = Camera.GetRelativeSquare(spacingX);
+
+        int columnCount;
         public InventoryBox(Vector2 aPos, Vector2 aSize) : base(new UITexture("WhiteBackground",new Color(80, 80, 80, 80)), aPos, aSize) //this will scale down size to closest fit
         {
             inventory = ObjectManager.Player.Inventory;
             bagHolderBox = new BagHolderBox(new Vector2(spacing.X, aSize.Y - (itemSize.Y + spacing.Y * 3)), new Vector2(itemSize.X * (inventory.bagSlots + 1) + spacing.X * (inventory.bagSlots + 2), itemSize.Y + spacing.Y * 2));
             bagHolderBox.SetBags(inventory.GetBags());
 
-            int columnCount = CalculateColumns(inventory.defaultSlots, itemSize.X, spacing.X, aSize.X);
+            columnCount = CalculateColumns(inventory.defaultSlots, itemSize.X, spacing.X, aSize.X);
             bagBox = new BagBox[inventory.bagSlots + 1];
 
             Vector2 bagPos = Vector2.Zero;
@@ -65,9 +67,23 @@ namespace Project_1.UI.HUD
             CalculateSize();
         }
 
-        public void AssignItem(int aBag, int aSlot)
+        public void RefreshSlot(int aBag, int aSlot)
         {
-            bagBox[aBag].AssignSlot(aSlot);
+            if (aBag == -1)
+            {
+                bagHolderBox.RefreshSlot(aSlot);
+                if (inventory.bags[aSlot] != null)
+                {
+                    bagBox[aSlot].RefreshBag(inventory.bags[aSlot].SlotCount, columnCount);
+                    return;
+                }
+                bagBox[aSlot].RefreshBag(0, 1);
+
+
+
+                return;
+            }
+            bagBox[aBag].RefreshSlot(aSlot);
         }
 
         //public void RefreshAllBags()
