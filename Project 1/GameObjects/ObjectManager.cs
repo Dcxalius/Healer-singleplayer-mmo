@@ -122,12 +122,16 @@ namespace Project_1.GameObjects
         {
             bool foundHit = false;
             foundHit = player.Click(aClickEvent);
-            for (int i = 0; i < entities.Count && !foundHit; i++)
+            if (foundHit) { return; }
+            for (int i = 0; i < entities.Count; i++)
             {
-                foundHit = entities[i].Click(aClickEvent);
+                if (entities[i].Click(aClickEvent)) { return; }
+            }
+            for (int i = 0; i < corpses.Count; i++)
+            {
+                if (corpses[i].Click(aClickEvent)) { return; }
             }
 
-            if (foundHit) { return; }
 
             LeftClickedGround(aClickEvent);
             RightClickGround(aClickEvent);

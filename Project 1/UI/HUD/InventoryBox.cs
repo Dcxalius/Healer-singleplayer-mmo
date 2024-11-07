@@ -18,7 +18,6 @@ namespace Project_1.UI.HUD
 {
     internal class InventoryBox : Box
     {
-        public bool visible = false;
 
         Inventory inventory;
 
@@ -34,6 +33,9 @@ namespace Project_1.UI.HUD
         int columnCount;
         public InventoryBox(Vector2 aPos, Vector2 aSize) : base(new UITexture("WhiteBackground",new Color(80, 80, 80, 80)), aPos, aSize) //this will scale down size to closest fit
         {
+            visible = false;
+            visibleKey = KeyBindManager.KeyListner.Inventory;
+
             inventory = ObjectManager.Player.Inventory;
             bagHolderBox = new BagHolderBox(new Vector2(spacing.X, aSize.Y - (itemSize.Y + spacing.Y * 3)), new Vector2(itemSize.X * (inventory.bagSlots + 1) + spacing.X * (inventory.bagSlots + 2), itemSize.Y + spacing.Y * 2));
             bagHolderBox.SetBags(inventory.GetBags());
@@ -161,10 +163,7 @@ namespace Project_1.UI.HUD
         {
             base.Update(aParent);
 
-            if (KeyBindManager.GetPress(KeyBindManager.KeyListner.Inventory))
-            {
-                visible = !visible;
-            }
+            
 
         }
 
@@ -178,8 +177,6 @@ namespace Project_1.UI.HUD
 
         public override void Draw(SpriteBatch aBatch)
         {
-            if (!visible) return;
-
             base.Draw(aBatch);
         }
     }

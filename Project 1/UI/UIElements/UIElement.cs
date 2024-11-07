@@ -200,7 +200,7 @@ namespace Project_1.UI.UIElements
 
         }
 
-        public bool ClickedOn(ClickEvent aClick)
+        public virtual bool ClickedOn(ClickEvent aClick)
         {
             if (AbsolutePos.Contains(aClick.AbsolutePos))
             {

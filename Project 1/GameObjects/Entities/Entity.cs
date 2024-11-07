@@ -55,8 +55,9 @@ namespace Project_1.GameObjects.Entities
 
         protected Corpse corpse;
 
-        public Entity(Texture aTexture, Vector2 aStartingPos) : base(aTexture, aStartingPos)
+        public Entity(Texture aTexture, Vector2 aStartingPos, Corpse aCorpse = null) : base(aTexture, aStartingPos)
         {
+            corpse = aCorpse;
             shadowPos = new Rectangle((Position + new Vector2(size.X / 2, size.Y)).ToPoint(), size);
             unitData = ObjectManager.GetData(GetType().Name);
         }
@@ -207,7 +208,7 @@ namespace Project_1.GameObjects.Entities
             if (unitData.CurrentHealth <= 0)
             {
                 ObjectManager.RemoveEntity(this);
-                corpse.SpawnCorpe(Position);
+                if (corpse != null) corpse.SpawnCorpe(Position); //Make this spawn a default corpse if corpse is null
             }
         }
 

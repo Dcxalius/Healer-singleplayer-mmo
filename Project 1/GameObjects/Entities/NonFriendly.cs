@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Items;
 using Project_1.Managers;
 using Project_1.Textures;
 using SharpDX.MediaFoundation;
@@ -12,14 +13,21 @@ namespace Project_1.GameObjects.Entities
 {
     internal class NonFriendly : Entity
     {
-
+        LootTable loot;
         List<Entity> aggroEntities = new List<Entity>();
         Dictionary<Entity, float> aggroValues = new Dictionary<Entity, float>();
         Dictionary<Entity, double> aggroDurations = new Dictionary<Entity, double>();
-        double maxAggroDurationStaleness = TimeSpan.FromSeconds(5).TotalMilliseconds;
-        public NonFriendly(Texture aTexture, Vector2 aStartingPos) : base(aTexture, aStartingPos)
+        double maxAggroDurationStaleness = TimeSpan.FromSeconds(10).TotalMilliseconds;
+        public NonFriendly(Texture aTexture, Vector2 aStartingPos, Corpse aCorpse = null) : base(aTexture, aStartingPos, aCorpse)
         {
-
+            Loot[] loots = new Loot[5];
+            loots[0] = new Loot(new Item(ItemFactory.GetItemDataByName("Small Bag"), 1), 1, (1, 1));
+            for (int i = 1; i < loots.Length; i++)
+            {
+                loots[i] = new Loot(new Item(ItemFactory.GetItemDataByName("Poop"), 1), 10, (1,5));
+            }
+            loot = new LootTable(loots, 1, 5);
+            corpse.AssignLoot(loot);
         }
 
         public override void Update()

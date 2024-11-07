@@ -1,6 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Input;
+using Project_1.Items;
 using Project_1.Textures;
+using Project_1.UI.HUD;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,10 +15,16 @@ namespace Project_1.GameObjects.Entities
 {
     internal class Corpse : GameObject
     {
-
+        LootTable loot;
+        const float lootLength = 10;
 
         public Corpse(Textures.Texture aGfx) : base(aGfx, Vector2.Zero)
         {
+        }
+
+        public void AssignLoot(LootTable aLoot)
+        {
+            loot = aLoot;
         }
 
         public void SpawnCorpe(Vector2 aPos)
@@ -23,6 +32,17 @@ namespace Project_1.GameObjects.Entities
             Position = aPos;
             ObjectManager.AddCorpse(this);
         }
+
+        public override bool Click(ClickEvent aClickEvent)
+        {
+            if (aClickEvent.ButtonPressed != ClickEvent.ClickType.Right) return false;
+            if ((ObjectManager.Player.Position - Position).Length() > lootLength) return false;
+
+            HUDManager.Loot(this);
+
+            return true;
+        }
+
         public override void Draw(SpriteBatch aBatch)
         {
             Debug.Assert(gfx != null);
