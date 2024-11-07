@@ -22,23 +22,26 @@ namespace Project_1.UI.UIElements.Inventory
         bool holdable;
         public bool IsEmpty { get => isEmpty; }
 
-        (int, int) Index { get => (bagIndex, slotIndex); } //For bagslots -1 -1 is default, unmovable bag, and then -1 0 for first movable bag and so on
+        (int, int) Index { get => (bagIndex, slotIndex); } //For bagslots -1 0 is default, unmovable bag, and then -1 1 for first movable bag and so on
         int bagIndex;
         int slotIndex;
+
+        Text itemCount;
 
         public Item(int aBagIndex, int aSlotIndex, bool aHoldable, GfxPath aPath, Vector2 aPos, Vector2 aSize) : base(aPath, aPos, aSize, Color.DarkGray)
         {
             bagIndex = aBagIndex;
             slotIndex = aSlotIndex;
             if (aPath.Name != null) isEmpty = false;
+            itemCount = new Text("Gloryse");
             holdable = aHoldable;
         }
 
         protected override void ClickedOnMe(ClickEvent aClick)
         {
-            base.ClickedOnMe(aClick);
-
             if (aClick.ButtonPressed != ClickEvent.ClickType.Left) return;
+
+            base.ClickedOnMe(aClick);
 
             if (isEmpty == false && holdable)
             {
@@ -55,12 +58,15 @@ namespace Project_1.UI.UIElements.Inventory
             }
             gfxOnButton = new UITexture(aItem.Gfx, Color.White);
             isEmpty = false;
+            if (aItem.MaxStack == 1) return;
+            itemCount.Value = aItem.Count.ToString();
         }
 
         public void RemoveItem()
         {
             gfxOnButton = null;
             isEmpty = true;
+            itemCount.Value = null;
         }
 
         public void HoldMe()
@@ -68,17 +74,17 @@ namespace Project_1.UI.UIElements.Inventory
             if (!holdable) return;
             Debug.Assert(!isHeld, "Tried to hold me twice.");
 
-
             isHeld = true;
-            Color = Color.DarkGray;
+            Color = Color.LightGray;
         }
 
         public void ReleaseMe()
         {
             if (!holdable) return;
             Debug.Assert(isHeld, "Tried to release me without holding me");
+
             isHeld = false;
-            Color = Color.Gray;
+            Color = Color.DarkGray;
         }
 
         public override void ReleaseOnMe(ReleaseEvent aRelease)
@@ -93,6 +99,7 @@ namespace Project_1.UI.UIElements.Inventory
             {
                 if (bagIndex >= 0) //Onto Inventory
                 {
+                    if (droppedOnMe.slotIndex == bagIndex) return; //Bag is tried being placed in itself
                     Items.Item i = ObjectManager.Player.Inventory.GetItemInSlot(bagIndex, slotIndex);
                     if (i == null)
                     {
@@ -112,7 +119,7 @@ namespace Project_1.UI.UIElements.Inventory
 
             if (bagIndex == -1) // Onto bagrack
             {
-                if (ObjectManager.Player.Inventory.GetItemInSlot(droppedOnMe.Index).ItemType != ItemData.ItemType.Container) //Dropped is bag
+                if (ObjectManager.Player.Inventory.GetItemInSlot(droppedOnMe.Index).ItemType != ItemData.ItemType.Container) //Dropped is not bag
                 {
                     return;
                 }
@@ -150,6 +157,8 @@ namespace Project_1.UI.UIElements.Inventory
         {
 
             base.Draw(aBatch);
+            itemCount.RightAllignedDraw(aBatch, (AbsolutePos.Location + AbsolutePos.Size).ToVector2() - new Vector2(0, itemCount.Offset.Y / 2));
+            itemCount.LeftAllignedDraw(aBatch, RelativePos);
         }
     }
 }

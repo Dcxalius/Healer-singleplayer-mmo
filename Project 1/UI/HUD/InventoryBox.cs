@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json.Bson;
 using Project_1.GameObjects;
 using Project_1.Input;
 using Project_1.Items;
@@ -40,6 +41,16 @@ namespace Project_1.UI.HUD
             columnCount = CalculateColumns(inventory.defaultSlots, itemSize.X, spacing.X, aSize.X);
             bagBox = new BagBox[inventory.bagSlots + 1];
 
+            xdd(aSize);
+
+            children.Add(bagHolderBox);
+            children.AddRange(bagBox);
+
+            CalculateSize();
+        }
+
+        void xdd(Vector2 aSize)
+        {
             Vector2 bagPos = Vector2.Zero;
             bagPos.X = spacing.X;
             bagPos.Y = CalculateBagBoxSize(inventory.defaultSlots, itemSize, spacing, aSize.X).Y;
@@ -49,22 +60,17 @@ namespace Project_1.UI.HUD
 
             for (int i = 1; i < bagBox.Length; i++)
             {
-                if (inventory.bags[i - 1] == null)
+                if (inventory.bags[i] == null)
                 {
                     bagBox[i] = new BagBox(i, 0, 1, Vector2.Zero, Vector2.Zero);
                     continue;
                 }
 
-                Vector2 size = CalculateBagBoxSize(inventory.bags[i - 1].SlotCount, itemSize, spacing, aSize.X);
+                Vector2 size = CalculateBagBoxSize(inventory.bags[i].SlotCount, itemSize, spacing, aSize.X);
 
-                bagBox[i] = new BagBox(i, inventory.bags[i - 1].SlotCount, columnCount, bagPos, size);
+                bagBox[i] = new BagBox(i, inventory.bags[i].SlotCount, columnCount, bagPos, size);
                 bagPos.Y += size.Y + spacing.Y;
             }
-
-            children.Add(bagHolderBox);
-            children.AddRange(bagBox);
-
-            CalculateSize();
         }
 
         public void RefreshSlot(int aBag, int aSlot)
@@ -75,11 +81,12 @@ namespace Project_1.UI.HUD
                 if (inventory.bags[aSlot] != null)
                 {
                     bagBox[aSlot].RefreshBag(inventory.bags[aSlot].SlotCount, columnCount);
+                    CalculateSize();
                     return;
                 }
                 bagBox[aSlot].RefreshBag(0, 1);
 
-
+                CalculateSize();
 
                 return;
             }
@@ -107,21 +114,23 @@ namespace Project_1.UI.HUD
 
             resize.X = bagBox[0].RelativeSize.X + spacing.X * 2;
             
-            float bagY = 0;
+            float bagY = spacing.Y;
             for (int i = 0; i < bagBox.Length; i++)
             {
                 if (bagBox[i].RelativeSize.Y == 0)
                 {
                     continue;
                 }
-                bagY = bagBox[i].RelativeSize.Y + spacing.Y;
+                bagBox[i].Move(new Vector2(spacing.X, bagY));
+                bagY += bagBox[i].RelativeSize.Y + spacing.Y;
             }
 
-            resize.Y = spacing.Y + bagHolderBox.RelativeSize.Y + spacing.Y + bagBox[0].RelativeSize.Y + spacing.Y + bagY;
+            resize.Y = bagHolderBox.RelativeSize.Y + spacing.Y + bagY;
 
             Resize(resize);
-
             bagHolderBox.Move(new Vector2(spacing.X, RelativeSize.Y - (itemSize.Y + spacing.Y * 3)));
+            Move(new Vector2(RelativePos.X, 0.9f - resize.Y));
+
         }
 
         Vector2 CalculateBagBoxSize(int aSlotCount, Vector2 aItemSize, Vector2 aSpacing, float aWidthOfInventory)

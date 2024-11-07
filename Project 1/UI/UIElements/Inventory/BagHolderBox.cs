@@ -21,25 +21,25 @@ namespace Project_1.UI.UIElements.Inventory
 
         public BagHolderBox(Vector2 aPos, Vector2 aSize) : base(new UITexture("WhiteBackground", Color.White), aPos, aSize)
         {
-            defaultBag = new Item(-1, -1, false, new GfxPath(GfxType.Item, "DefaultBag"), InventoryBox.spacing, InventoryBox.itemSize);
+            defaultBag = new Item(-1, 0, false, new GfxPath(GfxType.Item, "DefaultBag"), InventoryBox.spacing, InventoryBox.itemSize);
             children.Add(defaultBag);
         }
 
         public void SetBags(Bag[] aBags)
         {
-            bags = new Item[aBags.Length];
-            for (int i = 0; i < aBags.Length; i++)
+            bags = new Item[aBags.Length - 1];
+            for (int i = 1; i < aBags.Length; i++)
             {
-                Vector2 pos = new Vector2((i + 1) * (InventoryBox.itemSize.X + InventoryBox.spacing.X) + InventoryBox.spacing.X, InventoryBox.spacing.Y);
+                Vector2 pos = new Vector2((i) * (InventoryBox.itemSize.X + InventoryBox.spacing.X) + InventoryBox.spacing.X, InventoryBox.spacing.Y);
                 Vector2 size = InventoryBox.itemSize;
 
                 if (aBags[i] == null)
                 {
-                    bags[i] = new Item(-1, i, true, new GfxPath(GfxType.Item, null), pos, size);
+                    bags[i - 1] = new Item(-1, i, true, new GfxPath(GfxType.Item, null), pos, size);
                 }
                 else
                 {
-                    bags[i] = new Item(-1, i, true, aBags[i].Gfx, pos , size);
+                    bags[i - 1] = new Item(-1, i, true, aBags[i].Gfx, pos , size);
                 }
             }
 
@@ -49,7 +49,7 @@ namespace Project_1.UI.UIElements.Inventory
         public void RefreshSlot(int aSlot)
         {
 
-            bags[aSlot].AssignItem(ObjectManager.Player.Inventory.bags[aSlot]);
+            bags[aSlot - 1].AssignItem(ObjectManager.Player.Inventory.bags[aSlot]);
         }
 
         public override void Rescale()

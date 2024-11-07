@@ -25,10 +25,18 @@ namespace Project_1.UI.UIElements.Inventory
 
         void GetBagContent(int aSlotCount, int aColumnCount)
         {
+            if (aSlotCount == 0)
+            {
+                MakeZero();
+                return;
+            }
             slots = new Item[aSlotCount];
 
             columnCount = aColumnCount;
             Items.Item[] items = ObjectManager.Player.Inventory.GetItemsInBox(bagNr);
+
+            float rowCount = (float)Math.Ceiling(aSlotCount / (double)aColumnCount);
+            Resize(new Vector2(aColumnCount * InventoryBox.itemSize.X + aColumnCount * InventoryBox.spacing.X + InventoryBox.spacing.X, rowCount * InventoryBox.itemSize.Y + rowCount * InventoryBox.spacing.Y + InventoryBox.spacing.Y));
 
             for (int i = 0; i < slots.Length; i++)
             {
@@ -50,6 +58,12 @@ namespace Project_1.UI.UIElements.Inventory
             children.AddRange(slots);
         }
 
+        void MakeZero()
+        {
+            children.Clear();
+            Resize(Vector2.Zero);
+        }
+
         public void RefreshSlot(int aSlot)
         {
             slots[aSlot].AssignItem(ObjectManager.Player.Inventory.GetItemInSlot(bagNr, aSlot));
@@ -60,7 +74,5 @@ namespace Project_1.UI.UIElements.Inventory
             children.Clear();
             GetBagContent(aSlotCount, aColumnCount);
         }
-
-
     }
 }

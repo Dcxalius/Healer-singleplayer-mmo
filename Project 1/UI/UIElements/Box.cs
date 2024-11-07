@@ -30,21 +30,3 @@ namespace Project_1.UI.UIElements
         }
     }
 }
-//internal abstract class Box : UIElement
-//{
-
-//    public Box(UITexture aGfx, Vector2 aPos, Vector2 aSize) : base(aGfx, aPos, aSize)
-//    {
-
-//    }
-
-
-//    public override void Update(in UIElement aParent)
-//    {
-//        base.Update(aParent);
-//    }
-//    public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)
-//    {
-//        base.Draw(aBatch);
-//    }
-//}

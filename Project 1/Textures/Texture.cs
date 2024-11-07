@@ -80,10 +80,7 @@ namespace Project_1.Textures
             scale = 1;
             color = aColor;
             offset = Vector2.Zero;
-            if (gfx == null)
-            {
-                return;
-            }
+            if (gfx == null) return;
             size = gfx.Bounds.Size;
         }
 
@@ -93,10 +90,7 @@ namespace Project_1.Textures
             scale = 1;
             color = aColor;
             offset = aOffset;
-            if (gfx == null)
-            {
-                return;
-            }
+            if (gfx == null) return;
             size = gfx.Bounds.Size;
         }
 
@@ -135,19 +129,14 @@ namespace Project_1.Textures
             Draw(aBatch, aPos, color, aFeetPosY);
         }
 
-       
         public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, Color aColor, float aFeetPosY)
         {
-            if (gfx == null)
-            {
-                return;
-            }
+            if (gfx == null) return;
+
             if (Camera.MomAmIInFrame(new Rectangle(aPos.ToPoint(), (size.ToVector2() *Camera.Scale).ToPoint())))
             {
                 aBatch.Draw(gfx, aPos, visible, aColor, rotation, offset, Camera.Scale, flip, aFeetPosY / (Camera.WorldRectangle.Bottom + size.Y));
-
             }
         }
-
     }
 }
