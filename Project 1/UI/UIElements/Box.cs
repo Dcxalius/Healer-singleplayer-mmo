@@ -33,12 +33,19 @@ namespace Project_1.UI.UIElements
         {
             base.Update(aParent);
 
+            ToggleVisibilty();
+        }
+
+        void ToggleVisibilty()
+        {
             if (!visibleKey.HasValue) return;
             if (KeyBindManager.GetPress(visibleKey.Value))
             {
                 visible = !visible;
             }
         }
+
+
         public override void Draw(SpriteBatch aBatch)
         { 
             if (!visible) return;

@@ -9,10 +9,14 @@ namespace Project_1.Items
 {
     internal class Loot
     {
+        public Item Item { get => item; }
         Item item;
         
+
         public int Weight { get => weight; }
 
+        public int MinCount { get => countRange.Item1; }
+        public int MaxCount { get => countRange.Item2; }
         (int, int) countRange;
         int weight;
 

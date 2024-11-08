@@ -15,11 +15,15 @@ namespace Project_1.GameObjects.Entities
 {
     internal class Corpse : GameObject
     {
+        public Item[] Drop { get => drop; }
         LootTable loot;
-        const float lootLength = 10;
+        Item[] drop;
+        public float LootLength { get => lootLength; }
+        float lootLength;
 
         public Corpse(Textures.Texture aGfx) : base(aGfx, Vector2.Zero)
         {
+            lootLength = WorldRectangle.Size.ToVector2().Length();
         }
 
         public void AssignLoot(LootTable aLoot)
@@ -29,6 +33,7 @@ namespace Project_1.GameObjects.Entities
 
         public void SpawnCorpe(Vector2 aPos)
         {
+            drop = loot.GenerateDrop();
             Position = aPos;
             ObjectManager.AddCorpse(this);
         }
@@ -36,7 +41,7 @@ namespace Project_1.GameObjects.Entities
         public override bool Click(ClickEvent aClickEvent)
         {
             if (aClickEvent.ButtonPressed != ClickEvent.ClickType.Right) return false;
-            if ((ObjectManager.Player.Position - Position).Length() > lootLength) return false;
+            if ((ObjectManager.Player.FeetPos - Centre).Length() > lootLength) return false;
 
             HUDManager.Loot(this);
 

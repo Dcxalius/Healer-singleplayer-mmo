@@ -94,6 +94,16 @@ namespace Project_1.UI.HUD
         //    inventoryBox.RefreshSlot(aBag, aSlot);
         //}
 
+        public static Items.Item LootItem(int aSlotInLoot)
+        {
+            return lootBox.LootItem(aSlotInLoot);
+        }
+
+        public static void ReduceLootItem(int aSlotInLoot, int aCount)
+        {
+            lootBox.ReduceItem(aSlotInLoot, aCount);
+        }
+
         public static void HoldItem(Item aItem, Vector2 aGrabOffset)
         {
             heldItem.HoldItem(aItem, aGrabOffset);

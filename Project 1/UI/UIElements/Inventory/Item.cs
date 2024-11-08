@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects;
 using Project_1.Input;
 using Project_1.Items;
+using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.UI.HUD;
 using System;
@@ -22,11 +23,11 @@ namespace Project_1.UI.UIElements.Inventory
         bool holdable;
         public bool IsEmpty { get => isEmpty; }
 
-        (int, int) Index { get => (bagIndex, slotIndex); } //For bagslots -1 0 is default, unmovable bag, and then -1 1 for first movable bag and so on
-        int bagIndex;
-        int slotIndex;
+        public (int, int) Index { get => (bagIndex, slotIndex); } //For bagslots -1 0 is default, unmovable bag, and then -1 1 for first movable bag and so on
+        public int bagIndex;
+        public int slotIndex;
 
-        Text itemCount;
+        protected Text itemCount;
 
         public Item(int aBagIndex, int aSlotIndex, bool aHoldable, GfxPath aPath, Vector2 aPos, Vector2 aSize) : base(aPath, aPos, aSize, Color.DarkGray)
         {
@@ -91,7 +92,7 @@ namespace Project_1.UI.UIElements.Inventory
         {
             base.ReleaseOnMe(aRelease);
 
-            if (aRelease.Parent.GetType() != GetType()) return;
+            if (!(aRelease.Parent.GetType().IsSubclassOf(GetType()) || aRelease.Parent.GetType() == GetType())) return;
 
             Item droppedOnMe = aRelease.Parent as Item;
 
@@ -104,7 +105,9 @@ namespace Project_1.UI.UIElements.Inventory
                     if (i == null)
                     {
                         ObjectManager.Player.Inventory.UnequipBag(droppedOnMe.slotIndex, Index);
+                        return;
                     }
+                    //Swap bags if dropped on bag no?
                     return;
                 }
 
@@ -119,14 +122,21 @@ namespace Project_1.UI.UIElements.Inventory
 
             if (bagIndex == -1) // Onto bagrack
             {
-                if (ObjectManager.Player.Inventory.GetItemInSlot(droppedOnMe.Index).ItemType != ItemData.ItemType.Container) //Dropped is not bag
-                {
-                    return;
-                }
+                if (droppedOnMe.bagIndex == -2) return; //Drop from loot
+
+                if (ObjectManager.Player.Inventory.GetItemInSlot(droppedOnMe.Index).ItemType != ItemData.ItemType.Container) return; //Dropped is not bag
 
                 ObjectManager.Player.Inventory.SwapBags(droppedOnMe.Index, slotIndex);
                 return;
             }
+
+            if (droppedOnMe.bagIndex == -2) //From loot
+            {
+                ObjectManager.Player.Inventory.LootItem(droppedOnMe.slotIndex, Index);
+                return;
+            }
+
+            if (bagIndex == -2) return; //Tried to place items in loot, this isnt tibia buddy
 
             ObjectManager.Player.Inventory.SwapItems(Index, droppedOnMe.Index);
         }

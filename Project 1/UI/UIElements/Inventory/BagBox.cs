@@ -45,13 +45,13 @@ namespace Project_1.UI.UIElements.Inventory
                 Vector2 pos = new Vector2(x, y);
                 Vector2 size = InventoryBox.itemSize;
 
-                if (items[i] == null)
+                if (items[i] != null)
                 {
-                    slots[i] = new Item(bagNr, i, true, new GfxPath(GfxType.Item, null), pos, size);
+                    slots[i] = new Item(bagNr, i, true, items[i].Gfx, pos, size);
                 }
                 else
                 {
-                    slots[i] = new Item(bagNr, i, true, items[i].Gfx, pos, size);
+                    slots[i] = new Item(bagNr, i, true, new GfxPath(GfxType.Item, null), pos, size);
                 }
             }
 

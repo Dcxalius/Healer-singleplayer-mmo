@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Managers;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,12 @@ namespace Project_1.Items
         {
             itemData = aData;
             count = aCount;
+        }
+
+        public Item(Loot aLoot)
+        {
+            itemData = aLoot.Item.itemData;
+            count = RandomManager.RollInt(aLoot.MinCount, aLoot.MaxCount);
         }
 
         public int AddToStack(int aCount)

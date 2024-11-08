@@ -97,13 +97,13 @@ namespace Project_1.Textures
 
         void __Constructor__(GfxPath aPath)
         {
-            if (aPath.Name != null)
-            {
-                gfx = TextureManager.GetTexture(aPath);
-            }
+            
             flip = SpriteEffects.None;
             visible = null;
             offset = Vector2.Zero;
+            if (aPath == null) return;
+            if (aPath.Name == null) return;
+            gfx = TextureManager.GetTexture(aPath);
         }
 
         public void Flip()

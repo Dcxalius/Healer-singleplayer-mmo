@@ -150,7 +150,7 @@ namespace Project_1.Items
 
         public void SwapBags((int, int) aSlot,  int aSlotToSwapWith)
         {
-            Debug.Assert(items[aSlot.Item1][aSlot.Item2].GetType() == typeof(Bag), "Tried to treat non bag as a bag.");
+            Debug.Assert(items[aSlot.Item1][aSlot.Item2].ItemType == ItemData.ItemType.Container, "Tried to treat non bag as a bag.");
            
 
             if (bags[aSlotToSwapWith] == null)
@@ -184,6 +184,34 @@ namespace Project_1.Items
         int CountOfItemsInBag(int aBagSlot)
         {
             return items[aBagSlot].Where(item => item != null).Count();
+        }
+
+        public void LootItem(int aLootIndex, (int, int) aBagAndSlot)
+        {
+            Item item = HUDManager.LootItem(aLootIndex);
+            if (items[aBagAndSlot.Item1][aBagAndSlot.Item2] == null)
+            {
+                items[aBagAndSlot.Item1][aBagAndSlot.Item2] = item;
+                HUDManager.ReduceLootItem(aLootIndex, item.Count);
+                HUDManager.RefreshSlot(aBagAndSlot);
+                return;
+            }
+            if (item.ID != items[aBagAndSlot.Item1][aBagAndSlot.Item2].ID) return;
+            
+
+            if (items[aBagAndSlot.Item1][aBagAndSlot.Item2].Count + item.Count <= item.MaxStack)
+            {
+                items[aBagAndSlot.Item1][aBagAndSlot.Item2].Count += item.Count;
+                HUDManager.ReduceLootItem(aLootIndex, item.Count);
+                HUDManager.RefreshSlot(aBagAndSlot);
+                return;
+            }
+
+            int c = item.MaxStack - items[aBagAndSlot.Item1][aBagAndSlot.Item2].Count;
+            items[aBagAndSlot.Item1][aBagAndSlot.Item2].Count = item.MaxStack;
+            HUDManager.ReduceLootItem(aLootIndex, c);
+            HUDManager.RefreshSlot(aBagAndSlot);
+
         }
 
         public bool AddItem(Item aItem)
@@ -241,9 +269,17 @@ namespace Project_1.Items
 
         public void SwapItems((int, int) aSlot, (int, int) aSlotToSwapWith)
         {
-            Item tempItem = items[aSlot.Item1][aSlot.Item2];
-            items[aSlot.Item1][aSlot.Item2] = items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2];
-            items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2] = tempItem;
+            if (items[aSlot.Item1][aSlot.Item2] == items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2])
+            {
+                //TODO: Merge
+            }
+            else
+            {
+                Item tempItem = items[aSlot.Item1][aSlot.Item2];
+                items[aSlot.Item1][aSlot.Item2] = items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2];
+                items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2] = tempItem;
+            }
+
             HUDManager.RefreshSlot(aSlot.Item1, aSlot.Item2);
             HUDManager.RefreshSlot(aSlotToSwapWith.Item1, aSlotToSwapWith.Item2);
         }

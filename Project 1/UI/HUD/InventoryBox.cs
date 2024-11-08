@@ -43,7 +43,7 @@ namespace Project_1.UI.HUD
             columnCount = CalculateColumns(inventory.defaultSlots, itemSize.X, spacing.X, aSize.X);
             bagBox = new BagBox[inventory.bagSlots + 1];
 
-            xdd(aSize);
+            CreateBagBoxes(aSize);
 
             children.Add(bagHolderBox);
             children.AddRange(bagBox);
@@ -51,7 +51,7 @@ namespace Project_1.UI.HUD
             CalculateSize();
         }
 
-        void xdd(Vector2 aSize)
+        void CreateBagBoxes(Vector2 aSize)
         {
             Vector2 bagPos = Vector2.Zero;
             bagPos.X = spacing.X;
