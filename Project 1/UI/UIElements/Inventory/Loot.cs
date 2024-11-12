@@ -13,20 +13,30 @@ namespace Project_1.UI.UIElements.Inventory
 {
     internal class Loot : Item
     {
+        Items.Item item;
+
         public Loot(int aSlotIndex, Items.Item aItem, GfxPath aPath, Vector2 aPos, Vector2 aSize) : base(-2, aSlotIndex, true, aPath, aPos, aSize)
         {
             if (aItem == null) return;
+            item = aItem;
             if (aItem.MaxStack == 1) return;
             itemCount.Value = aItem.Count.ToString();
         }
 
-
+        protected override void RightClickedItem()
+        {
+            if (ObjectManager.Player.Inventory.AddItem(item))
+            {
+                Hide();
+            }
+        }
 
         public void Hide()
         {
             //gfx = null;
             itemCount.Value = null;
             Resize(Vector2.Zero);
+            item = null;
         }
 
         public override void ReleaseOnMe(ReleaseEvent aRelease)

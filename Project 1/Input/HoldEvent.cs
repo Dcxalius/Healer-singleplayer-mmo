@@ -12,8 +12,10 @@ namespace Project_1.Input
     {
         double heldSince;
         public double durationHeld;
+        public ClickEvent.ClickType ClickThatCreated { get => clickEventThatTriggered.ButtonPressed; }
         ClickEvent clickEventThatTriggered;
         UIElement creatorOfEvent;
+
 
         public HoldEvent(double aStartTime, ClickEvent aClickEvent, UIElement aOwner /*might be unnec*/)
         {
@@ -21,6 +23,7 @@ namespace Project_1.Input
             clickEventThatTriggered = aClickEvent;
             creatorOfEvent = aOwner;
         }
+
 
         public bool IsStillHeld()
         {

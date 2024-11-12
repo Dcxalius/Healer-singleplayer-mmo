@@ -9,8 +9,8 @@ namespace Project_1.Items
 {
     internal class Loot
     {
-        public Item Item { get => item; }
-        Item item;
+        public ItemData ItemData { get => itemData; }
+        ItemData itemData;
         
 
         public int Weight { get => weight; }
@@ -20,9 +20,9 @@ namespace Project_1.Items
         (int, int) countRange;
         int weight;
 
-        public Loot(Item aItem, int aWeight, (int, int) aCountRange)
+        public Loot(ItemData aItemData, int aWeight, (int, int) aCountRange)
         {
-            item = aItem;
+            itemData = aItemData;
             weight = aWeight;
             countRange = aCountRange;
         }

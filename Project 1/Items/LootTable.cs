@@ -50,14 +50,14 @@ namespace Project_1.Items
             {
                 if (roll <= loots[j].Weight)
                 {
-                    return new Item(loots[j]);
+                    return ItemFactory.CreateItem(loots[j]);
 
                 }
                 roll -= loots[j].Weight;
             }
 
             Debug.Assert(false, "I dunnu how u got here tbh.");
-            return null;
+            throw new NotImplementedException();
         }
     }
 }

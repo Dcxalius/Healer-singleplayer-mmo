@@ -4,6 +4,7 @@ using Project_1.Managers;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,18 +23,19 @@ namespace Project_1.Items
 
         public ItemData.ItemType ItemType { get => itemData.Type; }
         
-        ItemData itemData;
+        protected ItemData itemData;
         int count;
 
         public Item(ItemData aData, int aCount)
         {
+            Debug.Assert(aCount > 0, "Tried to add 0 counts of an item");
             itemData = aData;
             count = aCount;
         }
 
         public Item(Loot aLoot)
         {
-            itemData = aLoot.Item.itemData;
+            itemData = aLoot.ItemData;
             count = RandomManager.RollInt(aLoot.MinCount, aLoot.MaxCount);
         }
 

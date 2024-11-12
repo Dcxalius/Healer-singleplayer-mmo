@@ -58,7 +58,7 @@ namespace Project_1.Managers
 
         public static void SpawnPoopInInventory()
         {
-            Item poop = new Item(ItemFactory.GetItemDataByName("Poop"), 1);
+            Item poop = ItemFactory.CreateItem(ItemFactory.GetItemData("Poop"), 1);
             ObjectManager.Player.Inventory.AddItem(poop);
             
         }

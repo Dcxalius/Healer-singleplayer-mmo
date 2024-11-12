@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.Items
 {
-    internal struct ItemData
+    internal class ItemData
     {
         public enum ItemType
         {
@@ -20,6 +20,7 @@ namespace Project_1.Items
             Container,
             Trash
         }
+
 
         public int ID { get => id; /*set => id = value;*/ }
         int id;
@@ -49,12 +50,16 @@ namespace Project_1.Items
             this.description = description;
             this.maxStack = maxStack;
             this.itemType = itemType;
+
+            Assert();
         }
 
         void Assert()
         {
             Debug.Assert(name != null && description != null && maxStack > 0 && itemType != ItemType.NotSet, "Itemdata not properly set");
         }
+
+        
 
         //public void Draw(SpriteBatch aBatch, Rectangle aPos)
         //{

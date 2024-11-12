@@ -17,10 +17,10 @@ namespace Project_1.Items
         public int defaultSlots = 32;
 
         Item[][] items;
-        public Bag[] bags;
+        public Container[] bags;
         public Inventory()
         {
-            bags = new Bag[bagSlots + 1]; //Bag 0 is fornow always null
+            bags = new Container[bagSlots + 1]; //Bag 0 is fornow always null
             items = new Item[bagSlots + 1][];
             items[0] = new Item[defaultSlots];
             for (int i = 1; i < bagSlots; i++)
@@ -33,8 +33,8 @@ namespace Project_1.Items
 
             if (DebugManager.mode == DebugMode.On)
             {
-                EquipBag( new Bag(ItemFactory.GetItemData(0)));
-                items[0][22] = new Bag(ItemFactory.GetItemData(2));
+                EquipBag( ItemFactory.CreateItem(ItemFactory.GetItemData("Small Bag") ) as Container);
+                items[0][22] = ItemFactory.CreateItem(ItemFactory.GetItemData("Medium Bag"));
             }
         }
 
@@ -53,7 +53,7 @@ namespace Project_1.Items
             return items[aBagIndex][aSlotIndex];
         }
 
-        public bool EquipBag(Bag aBag)
+        public bool EquipBag(Container aBag)
         {
             DebugManager.Print(GetType(), "Depricated Method used");
             for (int i = 1; i < bags.Length; i++)
@@ -69,7 +69,29 @@ namespace Project_1.Items
             return false;
         }
 
-        public void AddBag(Bag aBag, int aEmptySlotToAddTo)
+        public bool EquipBag((int, int) aBagAndSlot)
+        {
+            Debug.Assert(items[aBagAndSlot.Item1][aBagAndSlot.Item2].ItemType == ItemData.ItemType.Container);
+            for (int i = 1; i < bags.Length; i++)
+            {
+                if (bags[i] == null)
+                {
+                    bags[i] = items[aBagAndSlot.Item1][aBagAndSlot.Item2] as Container;
+                    items[i] = new Item[bags[i].SlotCount];
+
+                    items[aBagAndSlot.Item1][aBagAndSlot.Item2] = null;
+                    HUDManager.RefreshSlot(aBagAndSlot);
+                    HUDManager.RefreshSlot(-1, i);
+
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void AddBag(Container aBag, int aEmptySlotToAddTo)
         {
             Debug.Assert(aEmptySlotToAddTo != 0, "Tried to Add a bag to default bagslot.");
             Debug.Assert(bags[aEmptySlotToAddTo] == null, "Tried to add to occupied slot.");
@@ -78,20 +100,23 @@ namespace Project_1.Items
             HUDManager.RefreshSlot(-1, aEmptySlotToAddTo);
         }
 
-        public Bag RemoveBag(int aBagSlot)
+        public bool RemoveBag(int aBagSlot)
         {
             Debug.Assert(bags[aBagSlot] != null, "Tried to remove nonexistant bag.");
 
             if (items[aBagSlot].All(item => item == null))
             {
-                Bag returnBag = bags[aBagSlot];
-                bags[aBagSlot] = null;
-                HUDManager.RefreshSlot(-1, aBagSlot);
-                return returnBag;
+                if (AddItem(bags[aBagSlot]))
+                {
+                    bags[aBagSlot] = null;
+                    items[aBagSlot] = null;
+                    HUDManager.RefreshSlot(-1, aBagSlot);
+                }
+                return true;
             }
 
 
-            return null;
+            return false;
         }
 
         public void UnequipBag(int aBag, (int, int) aInventorySlot)
@@ -108,7 +133,7 @@ namespace Project_1.Items
         public void RearrangeBags(int aBagSlot, int aSlotToSwapWith)
         {
             Item[] tempItems = items[aBagSlot];
-            Bag tempBag = bags[aBagSlot];
+            Container tempBag = bags[aBagSlot];
             items[aBagSlot] = items[aSlotToSwapWith];
             bags[aBagSlot] = bags[aSlotToSwapWith];
             items[aSlotToSwapWith] = tempItems;
@@ -135,7 +160,7 @@ namespace Project_1.Items
                 return;
             }
 
-            Bag tempBag = bags[aBagSlot];
+            Container tempBag = bags[aBagSlot];
             Item[] tempItems = items[aBagSlot];
 
             bags[aBagSlot] = bags[aSlotToSwapWith];
@@ -148,36 +173,40 @@ namespace Project_1.Items
             HUDManager.RefreshSlot(-1, aSlotToSwapWith);
         }
 
-        public void SwapBags((int, int) aSlot,  int aSlotToSwapWith)
+        public void SwapBags((int, int) aSlot, int aSlotToSwapWith)
         {
             Debug.Assert(items[aSlot.Item1][aSlot.Item2].ItemType == ItemData.ItemType.Container, "Tried to treat non bag as a bag.");
-           
+
 
             if (bags[aSlotToSwapWith] == null)
             {
                 //Bag to empty
-                AddBag(items[aSlot.Item1][aSlot.Item2] as Bag, aSlotToSwapWith);
+                AddBag(items[aSlot.Item1][aSlot.Item2] as Container, aSlotToSwapWith);
                 items[aSlot.Item1][aSlot.Item2] = null;
                 HUDManager.RefreshSlot(aSlot);
                 HUDManager.RefreshSlot(-1, aSlotToSwapWith);
                 return;
             }
 
-            if ((items[aSlot.Item1][aSlot.Item2] as Bag).SlotCount < CountOfItemsInBag(aSlotToSwapWith))
+            if ((items[aSlot.Item1][aSlot.Item2] as Container).SlotCount < CountOfItemsInBag(aSlotToSwapWith))
             {
                 DebugManager.Print(GetType(), "Tried to swap with a bag too small.");
                 return;
             }
 
             //Bag in bag to bag in rack
-            Bag tempBag = bags[aSlotToSwapWith];
-            Item[] tempItems = (Item[])items[aSlotToSwapWith].Skip(tempBag.SlotCount);
-            bags[aSlotToSwapWith] = bags[aSlot.Item2];
+            Container tempBag = bags[aSlotToSwapWith];
+            Item[] tempItems = items[aSlotToSwapWith].Skip(tempBag.SlotCount).ToArray();
+            bags[aSlotToSwapWith] = items[aSlot.Item1][aSlot.Item2] as Container;
+            items[aSlotToSwapWith] = new Item[bags[aSlotToSwapWith].SlotCount];
             for (int i = 0; i < tempItems.Length; i++)
             {
                 AddItemToInventoryFromInventory(tempItems[i], aSlotToSwapWith);
 
             }
+            items[aSlot.Item1][aSlot.Item2] = tempBag;
+            HUDManager.RefreshSlot(aSlot);
+            HUDManager.RefreshSlot(-1, aSlotToSwapWith);
         }
 
 
@@ -347,7 +376,7 @@ namespace Project_1.Items
             return false;
         }
 
-        void AddItemToInventoryFromInventory(Item aItem, int aInventory) //If adding to bag make sure to add + 1 to offset default bag
+        void AddItemToInventoryFromInventory(Item aItem, int aInventory)
         {
             for (int i = 0; i < items[aInventory].Length; i++)
             {
@@ -355,11 +384,12 @@ namespace Project_1.Items
                 {
                     items[aInventory][i] = aItem;
                     HUDManager.RefreshSlot(aInventory, i);
+                    return;
                 }
             }
         }
 
-        public Bag[] GetBags()
+        public Container[] GetBags()
         {
             return bags;
         }

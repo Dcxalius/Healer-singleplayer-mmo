@@ -25,7 +25,7 @@ namespace Project_1.UI.UIElements.Inventory
             children.Add(defaultBag);
         }
 
-        public void SetBags(Bag[] aBags)
+        public void SetBags(Container[] aBags)
         {
             bags = new Item[aBags.Length - 1];
             for (int i = 1; i < aBags.Length; i++)

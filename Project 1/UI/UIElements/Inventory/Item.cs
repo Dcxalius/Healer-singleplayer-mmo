@@ -40,9 +40,9 @@ namespace Project_1.UI.UIElements.Inventory
 
         protected override void ClickedOnMe(ClickEvent aClick)
         {
-            if (aClick.ButtonPressed != ClickEvent.ClickType.Left) return;
-
             base.ClickedOnMe(aClick);
+
+            if (aClick.ButtonPressed != ClickEvent.ClickType.Left) return;
 
             if (isEmpty == false && holdable)
             {
@@ -143,12 +143,17 @@ namespace Project_1.UI.UIElements.Inventory
 
         public override void HoldReleaseOnMe()
         {
-            base.HoldReleaseOnMe();
+            if (isEmpty == false && holdable && heldEvents.ClickThatCreated == ClickEvent.ClickType.Right)
+            {
+                RightClickedItem();
+            }
 
-            if (isEmpty == false && holdable)
+            if (isEmpty == false && holdable && heldEvents.ClickThatCreated == ClickEvent.ClickType.Left)
             {
                 HUDManager.ReleaseItem();
             }
+
+            base.HoldReleaseOnMe();
         }
 
         protected override void HoldReleaseAwayFromMe()
@@ -162,6 +167,29 @@ namespace Project_1.UI.UIElements.Inventory
             }
         }
 
+        protected virtual void RightClickedItem()
+        {
+            if (bagIndex >= 0)
+            {
+                switch (ObjectManager.Player.Inventory.GetItemInSlot(Index).ItemType)
+                {
+                    case ItemData.ItemType.NotSet:
+                        throw new NotImplementedException();
+                    case ItemData.ItemType.Container:
+                        ObjectManager.Player.Inventory.EquipBag(Index);
+                        break;
+                    case ItemData.ItemType.Trash:
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+
+            if (bagIndex == -1)
+            {
+                ObjectManager.Player.Inventory.RemoveBag(slotIndex);
+            }
+        }
 
         public override void Draw(SpriteBatch aBatch)
         {
