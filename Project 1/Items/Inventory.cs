@@ -100,7 +100,7 @@ namespace Project_1.Items
             HUDManager.RefreshSlot(-1, aEmptySlotToAddTo);
         }
 
-        public bool RemoveBag(int aBagSlot)
+        public bool UnequipBag(int aBagSlot)
         {
             Debug.Assert(bags[aBagSlot] != null, "Tried to remove nonexistant bag.");
 
@@ -215,6 +215,39 @@ namespace Project_1.Items
             return items[aBagSlot].Where(item => item != null).Count();
         }
 
+        public void LootItem(int aLootIndex)
+        {
+            Item item = HUDManager.LootItem(aLootIndex);
+            for (int i = 0; i < items.Length; i++)
+            {
+                for (int j = 0; j < items[i].Length; j++)
+                {
+                    if (items[i][j] == null)
+                    {
+                        items[i][j] = item;
+                        HUDManager.ReduceLootItem(aLootIndex, item.Count);
+                        HUDManager.RefreshSlot(i, j);
+                        return;
+                    }
+
+                    if (items[i][j].ID != item.ID) return;
+
+                    if (items[i][j].Count + item.Count <= item.MaxStack)
+                    {
+                        items[i][j].Count += item.Count;
+                        HUDManager.ReduceLootItem(aLootIndex, item.Count);
+                        HUDManager.RefreshSlot(i, j);
+                        return;
+                    }
+
+                    int c = item.MaxStack - items[i][j].Count;
+                    items[i][j].Count = item.MaxStack;
+                    HUDManager.ReduceLootItem(aLootIndex, c);
+                    HUDManager.RefreshSlot(i, j);
+                }
+            }
+        }
+
         public void LootItem(int aLootIndex, (int, int) aBagAndSlot)
         {
             Item item = HUDManager.LootItem(aLootIndex);
@@ -242,6 +275,7 @@ namespace Project_1.Items
             HUDManager.RefreshSlot(aBagAndSlot);
 
         }
+
 
         public bool AddItem(Item aItem)
         {
@@ -298,9 +332,19 @@ namespace Project_1.Items
 
         public void SwapItems((int, int) aSlot, (int, int) aSlotToSwapWith)
         {
-            if (items[aSlot.Item1][aSlot.Item2] == items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2])
+            if (items[aSlot.Item1][aSlot.Item2].ID == items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2].ID)
             {
-                //TODO: Merge
+                int total = items[aSlot.Item1][aSlot.Item2].Count + items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2].Count;
+                if (total > items[aSlot.Item1][aSlot.Item2].MaxStack)
+                {
+                    items[aSlot.Item1][aSlot.Item2].Count = items[aSlot.Item1][aSlot.Item2].MaxStack;
+                    items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2].Count = total - items[aSlot.Item1][aSlot.Item2].MaxStack;
+                }
+                else
+                {
+                    items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2] = null;
+                    items[aSlot.Item1][aSlot.Item2].Count = total; //Swap these
+                }
             }
             else
             {

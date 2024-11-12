@@ -20,14 +20,7 @@ namespace Project_1.GameObjects.Entities
         double maxAggroDurationStaleness = TimeSpan.FromSeconds(10).TotalMilliseconds;
         public NonFriendly(Texture aTexture, Vector2 aStartingPos, Corpse aCorpse = null) : base(aTexture, aStartingPos, aCorpse)
         {
-            Loot[] loots = new Loot[5];
-            loots[0] = new Loot(ItemFactory.GetItemData("Small Bag"), 1, (1, 1));
-            for (int i = 1; i < loots.Length; i++)
-            {
-                loots[i] = new Loot(ItemFactory.GetItemData("Poop"), 10, (1,5));
-            }
-            loot = new LootTable(loots, 1, 5);
-            corpse.AssignLoot(loot);
+            corpse.AssignLoot(UnitData.LootTable);
         }
 
         public override void Update()

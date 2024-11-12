@@ -143,7 +143,7 @@ namespace Project_1.UI.UIElements.Inventory
 
         public override void HoldReleaseOnMe()
         {
-            if (isEmpty == false && holdable && heldEvents.ClickThatCreated == ClickEvent.ClickType.Right)
+            if (isEmpty == false && !isHeld && holdable && heldEvents.ClickThatCreated == ClickEvent.ClickType.Right)
             {
                 RightClickedItem();
             }
@@ -187,7 +187,7 @@ namespace Project_1.UI.UIElements.Inventory
 
             if (bagIndex == -1)
             {
-                ObjectManager.Player.Inventory.RemoveBag(slotIndex);
+                ObjectManager.Player.Inventory.UnequipBag(slotIndex);
             }
         }
 

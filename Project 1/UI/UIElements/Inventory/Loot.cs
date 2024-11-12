@@ -3,6 +3,7 @@ using Project_1.GameObjects;
 using Project_1.Input;
 using Project_1.Items;
 using Project_1.Textures;
+using Project_1.UI.HUD;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,10 +26,7 @@ namespace Project_1.UI.UIElements.Inventory
 
         protected override void RightClickedItem()
         {
-            if (ObjectManager.Player.Inventory.AddItem(item))
-            {
-                Hide();
-            }
+            ObjectManager.Player.Inventory.LootItem(slotIndex);
         }
 
         public void Hide()

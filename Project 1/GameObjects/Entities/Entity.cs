@@ -24,7 +24,7 @@ namespace Project_1.GameObjects.Entities
             RetaliateButFleeWhenLow
         }
 
-        protected UnitData Data { get => unitData; }
+        protected UnitData UnitData { get => unitData; }
         public bool HasDestination { get => destinations.Count > 0; }
         public Color RelationColor { get => unitData.RelationColor(); }
         public UnitData.RelationToPlayer Relation { get => unitData.Relation; }
@@ -297,7 +297,7 @@ namespace Project_1.GameObjects.Entities
             ShadowTexture.Draw(aBatch, Camera.WorldPosToCameraSpace(shadowPos).Location.ToVector2(), shadowColor, FeetPos.Y - 2);
             if (selected == true)
             {
-                SelectTexture.Draw(aBatch, Camera.WorldPosToCameraSpace(shadowPos).Location.ToVector2(), Data.RelationColor(), FeetPos.Y - 1);
+                SelectTexture.Draw(aBatch, Camera.WorldPosToCameraSpace(shadowPos).Location.ToVector2(), UnitData.RelationColor(), FeetPos.Y - 1);
             }
             base.Draw(aBatch);
         }
