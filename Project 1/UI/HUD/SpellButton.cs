@@ -83,7 +83,7 @@ namespace Project_1.UI.HUD
 
             if (!spellData.OffCooldown)
             {
-                onCooldownGfx.Draw(aBatch, pos, Color.White);
+                //onCooldownGfx.Draw(aBatch, pos, Color.White);
             }
         }
     }

@@ -191,6 +191,11 @@ namespace Project_1.UI.UIElements.Inventory
             }
         }
 
+        protected override void OnHover()
+        {
+            base.OnHover();
+        }
+
         public override void Draw(SpriteBatch aBatch)
         {
 

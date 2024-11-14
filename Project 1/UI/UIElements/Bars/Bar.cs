@@ -15,7 +15,7 @@ namespace Project_1.UI.UIElements.Bars
     {
         public virtual float Value
         {
-            set { barComponent.UpdateBar(value); }
+            set { barComponent.UpdateBar(value, RelativeSize.X); }
         }
 
         BarComponent barComponent;

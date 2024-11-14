@@ -17,12 +17,12 @@ namespace Project_1.UI.UIElements.Bars
 
         }
 
-        public void UpdateBar(float aNewValue)
+        public void UpdateBar(float aNewValue, float aMaxX)
         {
             ((BarTexture)gfx).Filled = aNewValue;
             Vector2 v = RelativeSize;
-            v.X = RelativeSize.X * aNewValue;
-            pos.Size = TransformFromRelativeToPoint(v);
+            v.X = aMaxX * aNewValue;
+            Resize(v);
         }
     }
 }

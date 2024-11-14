@@ -41,7 +41,7 @@ namespace Project_1.UI.UIElements
 
         protected UITexture gfx;
         Point absolutePos;
-        protected Rectangle pos;
+        Rectangle pos;
         Vector2 relativePos; //TODO: Change this so 1, 1 refers to parents bottom right instead of screen bottom right + parent top left
         Vector2 relativeSize;
 

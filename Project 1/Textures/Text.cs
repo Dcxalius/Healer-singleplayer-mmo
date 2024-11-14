@@ -13,7 +13,7 @@ namespace Project_1.Textures
 {
     internal class Text
     {
-        public string Value
+        public virtual string Value
         {
             get => textToDisplay;
 
@@ -29,7 +29,7 @@ namespace Project_1.Textures
 
         string textToDisplay;
         Vector2 offset;
-        SpriteFont font;
+        protected SpriteFont font;
         Color color;
         float scale;
         

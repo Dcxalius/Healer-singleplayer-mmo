@@ -48,7 +48,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
         {
             base.ClickedOnMe(aClick);
 
-            DebugManager.Print(this.GetType(), pos.ToString());
+            //DebugManager.Print(this.GetType(), pos.ToString());
 
             if (isOpen == true)
             {
@@ -84,14 +84,14 @@ namespace Project_1.UI.UIElements.SelectBoxes
         {
             isOpen = false;
 
-            pos.Size = TransformFromRelativeToPoint(defaultSize);
+            Resize(defaultSize);
         }
 
         void Close(ClickEvent aClick)
         {
             Close();
 
-            Point target = Camera.TransformRelativeToAbsoluteScreenSpace(aClick.RelativePos) - pos.Location;
+            Point target = Camera.TransformRelativeToAbsoluteScreenSpace(aClick.RelativePos) - AbsolutePos.Location;
 
             SetNewValue(target);
         }
@@ -102,7 +102,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
             isOpen = true;
 
-            pos.Size = new Point(pos.Size.X, TransformFromRelativeToPoint(defaultSize * (values.Length + 1)).Y);
+            Resize(new Vector2(Size.X, defaultSize.Y * (values.Length + 1)));
 
         }
 
