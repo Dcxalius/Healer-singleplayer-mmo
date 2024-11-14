@@ -62,8 +62,8 @@ namespace Project_1.GameObjects.Entities
         float attackDamage;
         float attackRange;
 
-        public LootTable LootTable { get => lootTable; }
-        LootTable lootTable;
+        [JsonIgnore]
+        public LootTable LootTable { get => LootFactory.GetData(name); }
 
         [JsonConstructor]
         public UnitData(string name, float maxHealth, RelationToPlayer? relation, float speed, float maxSpeed, float secondsPerAttack, float attackDamage, float attackRange)
@@ -81,13 +81,6 @@ namespace Project_1.GameObjects.Entities
             this.attackDamage = attackDamage;
             this.attackRange = attackRange;
 
-            Loot[] loots = new Loot[5];
-            loots[0] = new Loot(ItemFactory.GetItemData("Small Bag"), 1, (1, 1));
-            for (int i = 1; i < loots.Length; i++)
-            {
-                loots[i] = new Loot(ItemFactory.GetItemData("Poop"), 10, (1, 5));
-            }
-            lootTable = new LootTable(loots, 1, 5);
             Assert();
         }
 

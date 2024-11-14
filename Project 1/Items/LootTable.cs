@@ -11,13 +11,13 @@ namespace Project_1.Items
     internal class LootTable
     {
         public int Count { get => loots.Length; }
-        public Loot[] Loots { get => loots; }
-        Loot[] loots;
+        public LootData[] Loots { get => loots; }
+        LootData[] loots;
         int totalWeights;
         int minDrops;
         int maxDrops;
 
-        public LootTable(Loot[] aLoot, int aMinDrops, int aMaxDrops)
+        public LootTable(LootData[] aLoot, int aMinDrops, int aMaxDrops)
         {
             totalWeights = 0;
             loots = aLoot;
@@ -35,25 +35,46 @@ namespace Project_1.Items
             List<Item> returnable = new List<Item>();
 
             int count = RandomManager.RollInt(minDrops, maxDrops);
+            int[] dropCount = new int[loots.Length];
             for (int i = 0; i < count; i++)
             {
-                returnable.Add(FindItemToCreate());
+                Item drop = FindItemToCreate(ref dropCount);
+                returnable.Add(drop);
             }
 
             return returnable.ToArray();
         }
 
-        Item FindItemToCreate()
+        Item FindItemToCreate(ref int[] aDropCount)
         {
-            int roll = RandomManager.RollInt(1, totalWeights);
-            for (int j = 0; j < loots.Length; j++)
+            int weights = totalWeights;
+            for (int i = 0; i < aDropCount.Length; i++)
             {
-                if (roll <= loots[j].Weight)
+                if (loots[i].MaxDrops <= aDropCount[i])
                 {
-                    return ItemFactory.CreateItem(loots[j]);
+                    weights -= loots[i].Weight;
+                }
+            }
+
+            if (weights == 0)
+            {
+                return null;
+            }
+            int roll = RandomManager.RollInt(1, weights);
+            for (int i = 0; i < loots.Length; i++)
+            {
+                if (loots[i].MaxDrops <= aDropCount[i])
+                {
+                    continue;
+                }
+
+                if (roll <= loots[i].Weight)
+                {
+                    aDropCount[i]++;
+                    return ItemFactory.CreateItem(loots[i]);
 
                 }
-                roll -= loots[j].Weight;
+                roll -= loots[i].Weight;
             }
 
             Debug.Assert(false, "I dunnu how u got here tbh.");

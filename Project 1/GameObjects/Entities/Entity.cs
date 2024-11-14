@@ -59,7 +59,7 @@ namespace Project_1.GameObjects.Entities
         {
             corpse = aCorpse;
             shadowPos = new Rectangle((Position + new Vector2(size.X / 2, size.Y)).ToPoint(), size);
-            unitData = ObjectManager.GetData(GetType().Name);
+            unitData = ObjectFactory.GetData(GetType().Name);
         }
 
         public void AddedToAggroTable(NonFriendly aNonfriendly)

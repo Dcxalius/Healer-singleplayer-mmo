@@ -33,7 +33,7 @@ namespace Project_1.Items
             count = aCount;
         }
 
-        public Item(Loot aLoot)
+        public Item(LootData aLoot)
         {
             itemData = aLoot.ItemData;
             count = RandomManager.RollInt(aLoot.MinCount, aLoot.MaxCount);

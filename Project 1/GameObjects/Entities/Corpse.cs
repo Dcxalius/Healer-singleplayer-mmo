@@ -21,19 +21,18 @@ namespace Project_1.GameObjects.Entities
         public float LootLength { get => lootLength; }
         float lootLength;
 
-        public Corpse(Textures.Texture aGfx) : base(aGfx, Vector2.Zero)
-        {
-            lootLength = WorldRectangle.Size.ToVector2().Length();
-        }
-
-        public void AssignLoot(LootTable aLoot)
+        public Corpse(Textures.Texture aGfx, LootTable aLoot) : base(aGfx, Vector2.Zero)
         {
             loot = aLoot;
+            lootLength = WorldRectangle.Size.ToVector2().Length();
         }
 
         public void SpawnCorpe(Vector2 aPos)
         {
-            drop = loot.GenerateDrop();
+            if (loot!= null)
+            {
+                drop = loot.GenerateDrop();
+            }
             Position = aPos;
             ObjectManager.AddCorpse(this);
         }

@@ -138,7 +138,7 @@ namespace Project_1.UI.UIElements.Inventory
 
             if (bagIndex == -2) return; //Tried to place items in loot, this isnt tibia buddy
 
-            ObjectManager.Player.Inventory.SwapItems(Index, droppedOnMe.Index);
+            ObjectManager.Player.Inventory.SwapItems(droppedOnMe.Index, Index);
         }
 
         public override void HoldReleaseOnMe()

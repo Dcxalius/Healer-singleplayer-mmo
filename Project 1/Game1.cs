@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Project_1.GameObjects;
+using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spells;
 using Project_1.Input;
 using Project_1.Items;
@@ -29,12 +30,14 @@ namespace Project_1
         {
             DebugManager.Init();
             ItemFactory.Init(Content);
+            LootFactory.Init(Content);
             TextureManager.Init(Content);
             KeyBindManager.Init(Content);
             GraphicsManager.Init();
             //Camera.Init();
             RandomManager.Init();
-            ObjectManager.Init(Content);
+            ObjectFactory.Init(Content);
+            ObjectManager.Init();
             TileManager.Init(Content);
             UIManager.Init();
             AreaOfEffectFactory.Init(Content);

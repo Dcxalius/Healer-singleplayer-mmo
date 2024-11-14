@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Items;
 using Project_1.Textures;
 using Project_1.Textures.AnimatedTextures;
 using System;
@@ -15,7 +16,7 @@ namespace Project_1.GameObjects.Entities
         readonly static GfxPath corpsePath = new GfxPath(GfxType.Object, "SheepCorpse");
         readonly static Point visualSize = new Point(32);
 
-        public Sheep(Vector2 aStartingPos) : base(new RandomAnimatedTexture(path, visualSize, 0, TimeSpan.FromMilliseconds(250)), aStartingPos, new Corpse(new Texture(corpsePath)))
+        public Sheep(Vector2 aStartingPos) : base(new RandomAnimatedTexture(path, visualSize, 0, TimeSpan.FromMilliseconds(250)), aStartingPos, new Corpse(new Texture(corpsePath), LootFactory.GetData("Sheep")))
         {
 
         }

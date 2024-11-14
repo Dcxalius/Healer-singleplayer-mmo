@@ -34,7 +34,7 @@ namespace Project_1.UI.HUD
         public void ReduceItem(int aIndex, int aCount)
         {
             int newCount = lootedCorpse.Drop[aIndex].Count - aCount;
-            Debug.Assert(newCount >= 0, "xdd");
+            Debug.Assert(newCount >= 0, "Tried to reduce items by more then it had.");
             if (newCount == 0)
             {
                 lootedCorpse.Drop[aIndex] = null;

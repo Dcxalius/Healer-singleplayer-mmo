@@ -28,16 +28,10 @@ namespace Project_1.GameObjects
 
         static Player player = null;
 
-        static Dictionary<string, UnitData> unitData = new Dictionary<string, UnitData>();
-        static UnitData defaultData = new UnitData();
-
         static List<FloatingText> floatingTexts = new List<FloatingText>();
 
-        public static void Init(ContentManager aC)
+        public static void Init()
         {
-            //UnitData data = new UnitData("Sheep", 100, UnitData.RelationToPlayer.Neutral, 50);
-            //ExportData("C:\\Users\\Cassandra\\source\\repos\\Project 1\\Project 1\\Content\\UnitData.json", data);
-            ImportData(aC.RootDirectory, aC);
             player = new Player(new Microsoft.Xna.Framework.Vector2(100));
             Camera.BindCamera(player);
 
@@ -55,35 +49,7 @@ namespace Project_1.GameObjects
             floatingTexts.Remove(aText);
         }
 
-        public static UnitData GetData(string aName)
-        {
-            if (unitData.ContainsKey(aName))
-            {
-                return unitData[aName];
-            }
-            else
-            {
-                DebugManager.Print(typeof(ObjectManager), "Error getting data for unit " +  aName);
-                return defaultData;
-            }
-        }
-
-        static void ImportData(string aPathToData, ContentManager aContentManager)
-        {
-            string[] dataAsString = System.IO.File.ReadAllLines(aPathToData + "\\Data\\UnitData.json");
-
-            for (int i = 0; i < dataAsString.Length; i++)
-            {
-                UnitData data = JsonConvert.DeserializeObject<UnitData>(dataAsString[i]);
-                unitData.Add(data.Name, data);
-            }
-        }
-
-        static void ExportData(string aDestination, object aObjectToExport)
-        {
-            string json = JsonConvert.SerializeObject(aObjectToExport);
-            System.IO.File.WriteAllText(aDestination, json);
-        }
+     
 
         public static void AddCorpse(Corpse aCorpse)
         {

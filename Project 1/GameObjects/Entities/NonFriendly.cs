@@ -20,7 +20,7 @@ namespace Project_1.GameObjects.Entities
         double maxAggroDurationStaleness = TimeSpan.FromSeconds(10).TotalMilliseconds;
         public NonFriendly(Texture aTexture, Vector2 aStartingPos, Corpse aCorpse = null) : base(aTexture, aStartingPos, aCorpse)
         {
-            corpse.AssignLoot(UnitData.LootTable);
+            
         }
 
         public override void Update()

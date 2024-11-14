@@ -15,7 +15,7 @@ namespace Project_1.Items
         {
         }
 
-        public Container(Loot aLoot) : base(aLoot)
+        public Container(LootData aLoot) : base(aLoot)
         {
         
         }

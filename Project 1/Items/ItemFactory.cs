@@ -23,7 +23,7 @@ namespace Project_1.Items
         public static void Init(ContentManager aContentManager)
         {
             //itemData = new Dictionary<int, ItemData>();
-            List<ItemData> xdd = new List<ItemData>();
+            List<ItemData> itemList = new List<ItemData>();
 
             string path = aContentManager.RootDirectory + "\\Data\\Items\\";
             string[] folders = Directory.GetDirectories(path);
@@ -36,12 +36,12 @@ namespace Project_1.Items
                     string rawData = File.ReadAllText(files[j]);
                     ItemData data = CreateData(rawData, folders[i].Substring(path.Length));
                     //data.ID = Id;
-                    xdd.Add(data);
+                    itemList.Add(data);
                 }
             }
 
            
-            itemData = xdd.ToArray();
+            itemData = itemList.ToArray();
         }
 
         static ItemData CreateData(string aRawData, string aFolder)
@@ -57,6 +57,11 @@ namespace Project_1.Items
             }
         }
 
+        public static bool DoesDataExist(string aName)
+        {
+            return itemData.Where(data => data.Name == aName).Count() > 0;
+        }
+
         public static ItemData GetItemData(int aId)
         {
             return itemData[aId];
@@ -64,7 +69,7 @@ namespace Project_1.Items
 
         public static ItemData GetItemData(string a)
         {
-            return itemData.Single(data => data.Name == a);
+            return itemData.Single(data => data.Name == a); //TODO: Add handling for if multiple items have the same name.
         }
 
         public static Item CreateItem(ItemData aData, int aCount = 0)
@@ -83,7 +88,7 @@ namespace Project_1.Items
             throw new NotImplementedException();
         }
 
-        public static Item CreateItem(Loot aLoot)
+        public static Item CreateItem(LootData aLoot)
         {
             switch (aLoot.ItemData.Type)
             {

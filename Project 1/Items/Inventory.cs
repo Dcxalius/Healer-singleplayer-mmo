@@ -230,7 +230,7 @@ namespace Project_1.Items
                         return;
                     }
 
-                    if (items[i][j].ID != item.ID) return;
+                    if (items[i][j].ID != item.ID) continue;
 
                     if (items[i][j].Count + item.Count <= item.MaxStack)
                     {
@@ -332,6 +332,14 @@ namespace Project_1.Items
 
         public void SwapItems((int, int) aSlot, (int, int) aSlotToSwapWith)
         {
+            if (items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2] == null)
+            {
+                items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2] = items[aSlot.Item1][aSlot.Item2];
+                items[aSlot.Item1][aSlot.Item2] = null;
+                HUDManager.RefreshSlot(aSlot.Item1, aSlot.Item2);
+                HUDManager.RefreshSlot(aSlotToSwapWith.Item1, aSlotToSwapWith.Item2);
+                return;
+            }
             if (items[aSlot.Item1][aSlot.Item2].ID == items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2].ID)
             {
                 int total = items[aSlot.Item1][aSlot.Item2].Count + items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2].Count;
