@@ -6,19 +6,22 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Project_1.GameObjects;
 using Project_1.Input;
+using Project_1.Particles;
 using Project_1.UI;
 
 namespace Project_1.Managers
 {
-    enum State
-    {
-        Game,
-        Pause,
-        StartMenu,
-        Options
-    }
+    
     internal static class StateManager
     {
+        public enum State
+        {
+            Game,
+            Pause,
+            StartMenu,
+            Options
+        }
+
         public static State currentState = State.Game;
 
         public static void Update()
@@ -81,6 +84,7 @@ namespace Project_1.Managers
             Camera.Update();
             ObjectManager.Update();
             UIManager.Update();
+            ParticleManager.Update();
         }
 
         static void PauseGame(State aStateToPauseTo)

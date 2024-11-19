@@ -19,7 +19,15 @@ namespace Project_1.Managers
         
         public static double TotalFrameTime
         {
-            get => gt.TotalGameTime.TotalMilliseconds;
+            get
+            {
+                if (!timePaused.HasValue)
+                {
+                    return gt.TotalGameTime.TotalMilliseconds;
+                }
+                return timePaused.Value.TotalMilliseconds;
+            }
+
         }
         
         public static void Update(GameTime aGameTime)

@@ -20,7 +20,7 @@ namespace Project_1.UI.PauseMenu
 
         public override void HoldReleaseOnMe()
         {
-            StateManager.SetState(State.StartMenu);
+            StateManager.SetState(StateManager.State.StartMenu);
 
             base.HoldReleaseOnMe();
         }

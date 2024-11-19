@@ -40,15 +40,15 @@ namespace Project_1.UI
         {
             switch (StateManager.currentState)
             {
-                case State.Game:
+                case StateManager.State.Game:
                     HUDManager.Update();
                     break;
-                case State.Pause:
+                case StateManager.State.Pause:
                     pauseBox.Update(null);
                     break;
-                case State.StartMenu:
+                case StateManager.State.StartMenu:
                     break;
-                case State.Options:
+                case StateManager.State.Options:
                     OptionManager.Update();
                     break;
                 default:
@@ -69,14 +69,14 @@ namespace Project_1.UI
         {
             switch (StateManager.currentState)
             {
-                case State.Game:
+                case StateManager.State.Game:
                     break;
-                case State.Pause:
+                case StateManager.State.Pause:
                     pauseBox.Draw(aBatch);
                     break;
-                case State.StartMenu:
+                case StateManager.State.StartMenu:
                     break;
-                case State.Options:
+                case StateManager.State.Options:
                     OptionManager.Draw(aBatch);
                     break;
                 default:
@@ -100,13 +100,13 @@ namespace Project_1.UI
 
             switch (StateManager.currentState)
             {
-                case State.Game:
+                case StateManager.State.Game:
                     return HUDManager.Click(aClickEvent); 
-                case State.Pause:
+                case StateManager.State.Pause:
                     return pauseBox.ClickedOn(aClickEvent);
-                case State.StartMenu:
+                case StateManager.State.StartMenu:
                     return true;
-                case State.Options:
+                case StateManager.State.Options:
                     return OptionManager.SearchForHit(aClickEvent);
                 default:
                     break;
@@ -118,14 +118,14 @@ namespace Project_1.UI
         {
             switch (StateManager.currentState)
             {
-                case State.Game:
+                case StateManager.State.Game:
                     return HUDManager.Release(aReleaseEvent);
-                case State.Pause:
+                case StateManager.State.Pause:
                     //return pauseBox.ClickedOn(aClickEvent);
                     return false;
-                case State.StartMenu:
+                case StateManager.State.StartMenu:
                     return false;
-                case State.Options:
+                case StateManager.State.Options:
                     //return OptionManager.SearchForHit(aClickEvent);
                     return false;
                 default:

@@ -7,6 +7,7 @@ using Project_1.GameObjects.Spells;
 using Project_1.Input;
 using Project_1.Items;
 using Project_1.Managers;
+using Project_1.Particles;
 using Project_1.Textures;
 using Project_1.Tiles;
 using Project_1.UI;
@@ -41,6 +42,7 @@ namespace Project_1
             TileManager.Init(Content);
             UIManager.Init();
             AreaOfEffectFactory.Init(Content);
+            ParticleManager.Init();
 
             base.Initialize();
         }

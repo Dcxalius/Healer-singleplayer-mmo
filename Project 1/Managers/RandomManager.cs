@@ -30,6 +30,12 @@ namespace Project_1.Managers
             return random.Next(aMinSize, aMaxSize);
         }
 
+        
+        public static int RollInt((int, int) aMinMax)
+        {
+            return RollInt(aMinMax.Item1, aMinMax.Item2);
+        }
+
         public static int RollIntWithAvoidant(int aMaxSize, int aAvoidant)
         {
             int i = RollInt(aMaxSize - 1);
@@ -42,6 +48,21 @@ namespace Project_1.Managers
         public static double RollDouble()
         {
             return random.NextDouble();
+        }
+
+        public static double RollDouble(double aMax)
+        {
+            return random.NextDouble() * aMax;
+        }
+
+        public static double RollDouble(double aMin, double aMax)
+        {
+            return aMin + random.NextDouble() * (aMax - aMin);
+        }
+
+        public static double RollDouble((double, double) aMinMax)
+        {
+            return RollDouble(aMinMax.Item1, aMinMax.Item2);
         }
     }
 }

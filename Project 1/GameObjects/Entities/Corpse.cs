@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Input;
 using Project_1.Items;
+using Project_1.Particles;
 using Project_1.Textures;
 using Project_1.UI.HUD;
 using System;
@@ -15,16 +16,21 @@ namespace Project_1.GameObjects.Entities
 {
     internal class Corpse : GameObject
     {
+        ParticleBase particle;
+
         public Item[] Drop { get => drop; }
         LootTable loot;
         Item[] drop;
         public float LootLength { get => lootLength; }
         float lootLength;
 
+        public bool IsEmpty { get => drop.All(drop => drop == null); }
+
         public Corpse(Textures.Texture aGfx, LootTable aLoot) : base(aGfx, Vector2.Zero)
         {
             loot = aLoot;
             lootLength = WorldRectangle.Size.ToVector2().Length();
+            particle = new ParticleBase(1000d, ParticleBase.OpacityType.Fading, new Vector2(0, -1), new Vector2(0), 0.95f, new Color[]{ Color.Yellow }, new Point(1));
         }
 
         public void SpawnCorpe(Vector2 aPos)
@@ -41,10 +47,21 @@ namespace Project_1.GameObjects.Entities
         {
             if (aClickEvent.ButtonPressed != ClickEvent.ClickType.Right) return false;
             if ((ObjectManager.Player.FeetPos - Centre).Length() > lootLength) return false;
+            if (drop.All(drop => drop == null)) return false;
 
             HUDManager.Loot(this);
 
             return true;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+
+            if (!IsEmpty)
+            {
+                ParticleManager.SpawnParticle(particle, WorldRectangle, 1, this);
+            }
         }
 
         public override void Draw(SpriteBatch aBatch)

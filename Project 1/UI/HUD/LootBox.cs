@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
+using Project_1.Input;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Inventory;
@@ -20,6 +21,11 @@ namespace Project_1.UI.HUD
 
         Vector2 lootSize = Camera.GetRelativeSquare(0.05f);
         Vector2 spacing = Camera.GetRelativeSquare(0.025f);
+
+        bool spoonToBig = false; //TODO: Break this out to a interface
+        float scrollValue = 0;
+        float totalLoot;
+        float[] originalPos;
 
         public LootBox(Vector2 aPos, Vector2 aSize) : base(new UITexture("GrayBackground", Color.NavajoWhite), aPos, aSize)
         {
@@ -41,11 +47,16 @@ namespace Project_1.UI.HUD
                 loot[aIndex].Hide();
                 return;
             }
-            lootedCorpse.Drop[aIndex].Count -= aCount;
+            lootedCorpse.Drop[aIndex].Count -= aCount; //TODO: Make this not remove directly from property
         }
 
         public void Loot(Corpse aCorpse)
         {
+            if (aCorpse.IsEmpty)
+            {
+                return;
+            }
+
             visible = true;
             lootedCorpse = aCorpse;
             CreateLoot();
@@ -55,6 +66,7 @@ namespace Project_1.UI.HUD
         {
             Items.Item[] loots = lootedCorpse.Drop;
             loot = new Loot[loots.Length];
+            originalPos = new float[loot.Length];
 
             Vector2 pos = Vector2.Zero;
             pos.X = spacing.X;
@@ -70,9 +82,24 @@ namespace Project_1.UI.HUD
                 {
                     loot[i] = new Loot(i, null, new GfxPath(GfxType.Debug, null), pos, Vector2.Zero);
                 }
+                originalPos[i] = pos.Y;
                 pos.Y += lootSize.Y;
                 pos.Y += spacing.Y;
             }
+
+            if (pos.Y > RelativeSize.Y - lootSize.Y - spacing.Y)
+            {
+                spoonToBig = true;
+                scrollValue = 0;
+                totalLoot = loots.Length;
+            }
+            else
+            {
+                spoonToBig = false;
+                scrollValue = 0;
+                totalLoot = 0;
+            }
+
             children.AddRange(loot);
         }
 
@@ -80,7 +107,47 @@ namespace Project_1.UI.HUD
         {
             base.Update(aParent);
 
+            if (spoonToBig == true)
+            {
+                float lastScrollValue = scrollValue;
+                scrollValue += (InputManager.ScrolledSinceLastFrame / 120 / totalLoot * 0.3f); //TODO: Make this stop camera from zooming
+
+                if (scrollValue < 0)
+                {
+                    scrollValue = 0;
+                }
+
+                if (scrollValue > originalPos.Last() + lootSize.Y + spacing.Y - RelativeSize.Y)
+                {
+                    scrollValue = originalPos.Last() + lootSize.Y + spacing.Y - RelativeSize.Y;
+                }
+
+                if (lastScrollValue != scrollValue)
+                {
+                    for (int i = 0; i < children.Count; i++)
+                    {
+                        if (loot.Contains(children[i]))
+                        {
+                            children[i].Move(new Vector2(children[i].RelativePos.X, originalPos[i] - scrollValue));
+                        }
+                    }
+                }
+            }
+
+            CheckIfLootedAll();
             ToFarFromCorpse();
+        }
+
+        void CheckIfLootedAll()
+        {
+            if (lootedCorpse == null)
+            {
+                return;
+            }
+            if (lootedCorpse.IsEmpty)
+            {
+                StopLoot();
+            }
         }
 
         void ToFarFromCorpse()
@@ -98,9 +165,9 @@ namespace Project_1.UI.HUD
         public void StopLoot()
         {
             visible = false;
+            children.RemoveAll(child => loot.Contains(child));
             loot = null;
             lootedCorpse = null;
-            children.Clear();
         }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects;
 using Project_1.Input;
 using Project_1.Managers;
+using Project_1.Particles;
 using Project_1.Textures;
 using Project_1.Tiles;
 using Project_1.UI;
@@ -205,11 +206,12 @@ namespace Project_1
 
         public static bool MomAmIInFrame(Rectangle aRect)
         {
-            if (ScreenRectangle.Intersects(aRect))
-            {
-                return true;
-            }
-            return false;
+            return ScreenRectangle.Intersects(aRect);
+        }
+
+        public static bool MomAmIInFrame(Vector2 aWorldPos)
+        {
+            return ScreenRectangle.Contains(aWorldPos);
         }
 
         public static void DrawRenderTarget()
@@ -224,6 +226,7 @@ namespace Project_1
         {
             TileManager.Draw(aBatch);
             ObjectManager.Draw(aBatch);
+            ParticleManager.Draw(aBatch);
         }
 
         public static void DrawGameToCamera()

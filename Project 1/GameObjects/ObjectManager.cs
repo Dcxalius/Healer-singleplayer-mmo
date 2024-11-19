@@ -40,7 +40,11 @@ namespace Project_1.GameObjects
 
             entities.Add(new Walker(new Microsoft.Xna.Framework.Vector2(200, 200)));//Debug
             player.AddToParty(entities[entities.Count - 1] as Walker); //Debug
-            entities.Add(new Sheep(new Microsoft.Xna.Framework.Vector2(500, 500)));//Debug
+            for (int i = 0; i < 100; i++)
+            {
+                entities.Add(new Sheep(new Microsoft.Xna.Framework.Vector2((float)500 + 30 * (i % 10), (float)(500 + 30 * Math.Floor(i / 10d)))));//Debug
+
+            }
 
         }
 
