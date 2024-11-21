@@ -33,7 +33,6 @@ namespace Project_1.UI.HUD
         int columnCount;
         public InventoryBox(Vector2 aPos, Vector2 aSize) : base(new UITexture("WhiteBackground",new Color(80, 80, 80, 80)), aPos, aSize) //this will scale down size to closest fit
         {
-            visible = false;
             visibleKey = KeyBindManager.KeyListner.Inventory;
 
             inventory = ObjectManager.Player.Inventory;
@@ -49,6 +48,7 @@ namespace Project_1.UI.HUD
             children.AddRange(bagBox);
 
             CalculateSize();
+            ToggleVisibilty();
         }
 
         void CreateBagBoxes(Vector2 aSize)

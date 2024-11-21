@@ -23,6 +23,9 @@ namespace Project_1.Items
 
         public ItemData.ItemType ItemType { get => itemData.Type; }
         
+        public string Name { get => itemData.Name; }
+        public string Description { get => itemData.Description; }
+
         protected ItemData itemData;
         int count;
 

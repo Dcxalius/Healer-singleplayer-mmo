@@ -14,8 +14,6 @@ namespace Project_1.UI.UIElements
 {
     internal abstract class Box : UIElement
     {
-        protected bool visible = true;
-        protected KeyBindManager.KeyListner? visibleKey = null;
 
         public Box(UITexture aGfx, Vector2 aPos, Vector2 aSize) : base(aGfx, aPos, aSize)
         {
@@ -24,7 +22,6 @@ namespace Project_1.UI.UIElements
 
         public override bool ClickedOn(ClickEvent aClick)
         {
-            if (!visible) return false;
             return base.ClickedOn(aClick);
 
         }
@@ -32,24 +29,12 @@ namespace Project_1.UI.UIElements
         public override void Update(in UIElement aParent)
         {
             base.Update(aParent);
-
-            ToggleVisibilty();
         }
 
-        void ToggleVisibilty()
-        {
-            if (!visibleKey.HasValue) return;
-            if (KeyBindManager.GetPress(visibleKey.Value))
-            {
-                visible = !visible;
-            }
-        }
 
 
         public override void Draw(SpriteBatch aBatch)
         { 
-            if (!visible) return;
-
             base.Draw(aBatch);
         }
     }

@@ -23,6 +23,7 @@ namespace Project_1.UI.HUD
         static InventoryBox inventoryBox;
         static PartyPlateBox[] partyPlateBoxes = new PartyPlateBox[4];
         static LootBox lootBox;
+        static DescriptorBox descriptorBox;
 
         static List<UIElement> hudElements = new List<UIElement>();
 
@@ -41,12 +42,14 @@ namespace Project_1.UI.HUD
             firstSpellBar = new FirstSpellBar(10, new Vector2(0.2f, 0.86f), 0.6f);
             inventoryBox = new InventoryBox(new Vector2(0.59f, 0.59f), new Vector2(0.4f));
             lootBox = new LootBox(new Vector2(0.1f, 0.5f), new Vector2(0.4f, 0.4f));
+            descriptorBox = new DescriptorBox();
 
             hudElements.Add(playerPlateBox);
             hudElements.Add(targetPlateBox);
             hudElements.Add(firstSpellBar);
             hudElements.Add(inventoryBox);
             hudElements.Add(lootBox);
+            hudElements.Add(descriptorBox);
 
             heldItem = new HeldItem();
         }
@@ -81,6 +84,11 @@ namespace Project_1.UI.HUD
         public static void RefreshSlot((int, int) aBagAndSlot)
         {
             RefreshSlot(aBagAndSlot.Item1, aBagAndSlot.Item2);
+        }
+
+        public static void SetDescriptorBox(Item aItem)
+        {
+            descriptorBox.SetToItem(aItem);
         }
 
 

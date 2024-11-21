@@ -29,7 +29,7 @@ namespace Project_1.UI.HUD
 
         public LootBox(Vector2 aPos, Vector2 aSize) : base(new UITexture("GrayBackground", Color.NavajoWhite), aPos, aSize)
         {
-            visible = false;
+            ToggleVisibilty();
         }
 
         public Items.Item LootItem(int aIndex)
@@ -57,7 +57,7 @@ namespace Project_1.UI.HUD
                 return;
             }
 
-            visible = true;
+            ToggleVisibilty();
             lootedCorpse = aCorpse;
             CreateLoot();
         }
@@ -185,7 +185,7 @@ namespace Project_1.UI.HUD
 
         public void StopLoot()
         {
-            visible = false;
+            ToggleVisibilty();
             children.RemoveAll(child => loot.Contains(child));
             loot = null;
             lootedCorpse = null;

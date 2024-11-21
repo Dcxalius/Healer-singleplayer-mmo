@@ -41,6 +41,10 @@ namespace Project_1.Managers
             {
                 SpawnPoopInInventory();
             }
+            if (KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugBanana))
+            {
+                SpawnBananaInInventory();
+            }
         }
 
         public static void Print(Type test, string aMsg)
@@ -61,6 +65,14 @@ namespace Project_1.Managers
             Item poop = ItemFactory.CreateItem(ItemFactory.GetItemData("Poop"), 1);
             ObjectManager.Player.Inventory.AddItem(poop);
             
+        }
+
+        static void SpawnBananaInInventory()
+        {
+            if (mode == DebugMode.Off) return;
+
+            Item banana = ItemFactory.CreateItem(ItemFactory.GetItemData("If this is only a banana why is the name so long"), 1);
+            ObjectManager.Player.Inventory.AddItem(banana);
         }
     }
 }

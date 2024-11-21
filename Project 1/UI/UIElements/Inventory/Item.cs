@@ -29,6 +29,31 @@ namespace Project_1.UI.UIElements.Inventory
 
         protected Text itemCount;
 
+        public Items.Item GetActualItem 
+        {
+            get
+            {
+                if (bagIndex >= 0)
+                {
+                    return ObjectManager.Player.Inventory.GetItemInSlot(Index);
+                }
+
+                if (bagIndex == -1)
+                {
+                    Container[] a = ObjectManager.Player.Inventory.GetBags();
+
+                    return a[slotIndex];
+                }
+
+                if (bagIndex == -2)
+                {
+                    throw new NotImplementedException();
+                }
+
+                return null;
+            }
+        }
+
         public Item(int aBagIndex, int aSlotIndex, bool aHoldable, GfxPath aPath, Vector2 aPos, Vector2 aSize) : base(aPath, aPos, aSize, Color.DarkGray)
         {
             bagIndex = aBagIndex;
@@ -87,6 +112,8 @@ namespace Project_1.UI.UIElements.Inventory
             isHeld = false;
             Color = Color.DarkGray;
         }
+
+        
 
         public override void ReleaseOnMe(ReleaseEvent aRelease)
         {
@@ -194,6 +221,22 @@ namespace Project_1.UI.UIElements.Inventory
         protected override void OnHover()
         {
             base.OnHover();
+
+            if (!Visible) return;
+            if (holdable)
+            {
+                HUDManager.SetDescriptorBox(this);
+            }
+        }
+
+        protected override void OnDeHover()
+        {
+            base.OnDeHover();
+
+            if (holdable)
+            {
+                HUDManager.SetDescriptorBox(null);
+            }
         }
 
         public override void Draw(SpriteBatch aBatch)

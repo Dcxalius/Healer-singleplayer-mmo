@@ -17,6 +17,9 @@ namespace Project_1.UI.UIElements
 {
     internal abstract class UIElement
     {
+        protected bool Visible { get => visible; }
+        bool visible;
+        protected KeyBindManager.KeyListner? visibleKey = null;
         public Vector2 RelativePos { get => relativePos; }
         public Vector2 RelativeSize { get => relativeSize; }
 
@@ -30,6 +33,7 @@ namespace Project_1.UI.UIElements
                 return tempRec;
             }
         }
+
 
         public Point Size { get => pos.Size; }
 
@@ -47,6 +51,8 @@ namespace Project_1.UI.UIElements
 
         public HoldEvent heldEvents; //TODO: This should prob be cleansed on state change
 
+
+
         //protected UIElement? parent;
         protected Point parentPos = Point.Zero;
         protected List<UIElement> children = new List<UIElement>();
@@ -54,7 +60,7 @@ namespace Project_1.UI.UIElements
         protected UIElement(UITexture aGfx, Vector2 aPos, Vector2 aSize) //aPos and aSize should be between 0 and 1
         {
             //Debug.Assert(aPos > 0 && aPos < 0);
-
+            visible = true;
             gfx = aGfx;
 
             relativePos = aPos;
@@ -62,6 +68,66 @@ namespace Project_1.UI.UIElements
 
             pos = TransformFromRelativeToValues(aPos, aSize);
             absolutePos = pos.Location;
+        }
+
+        public virtual void Update(in UIElement aParent)
+        {
+            HoldUpdate();
+
+            if (aParent != null) //TODO: Make this less ugly
+            {
+                parentPos = aParent.absolutePos;
+                absolutePos = aParent.absolutePos + pos.Location;
+            }
+            else
+            {
+                absolutePos = pos.Location;
+            }
+            foreach (UIElement child in children)
+            {
+               
+                child.Update(this);
+            }
+
+
+
+            HoverUpdate();
+            GetVisibiltyPress();
+        }
+
+        void HoverUpdate()
+        {
+            if (!visible) return;
+
+            if (!wasHovered && Hovered)
+            {
+                wasHovered = true;
+                OnHover();
+            }
+
+            if (wasHovered && !Hovered)
+            {
+                wasHovered = false;
+                OnDeHover();
+            }
+        }
+
+        void GetVisibiltyPress()
+        {
+            if (!visibleKey.HasValue) return;
+            if (KeyBindManager.GetPress(visibleKey.Value))
+            {
+                ToggleVisibilty();
+            }
+        }
+
+        protected void ToggleVisibilty()
+        {
+            visible = !visible;
+            foreach (UIElement child in children)
+            {
+                child.ToggleVisibilty();
+            }
         }
 
         static protected Rectangle TransformFromRelativeToValues(Vector2 aPos, Vector2 aSize)
@@ -105,42 +171,9 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        public virtual void Update(in UIElement aParent)
-        {
-            HoldUpdate();
-
-            if (aParent != null) //TODO: Make this less ugly
-            {
-                parentPos = aParent.absolutePos;
-                absolutePos = aParent.absolutePos + pos.Location;
-            }
-            else
-            {
-                absolutePos = pos.Location;
-            }
-            foreach (UIElement child in children)
-            {
-               
-                child.Update(this);
-
-            }
-
-
-            if (!wasHovered && Hovered)
-            {
-                wasHovered = true;
-                OnHover();
-            }
-
-            if (wasHovered && !Hovered)
-            {
-                wasHovered = false;
-                OnDeHover();
-            }
-        }
-
         public bool ReleasedOn(ReleaseEvent aRelease)
         {
+            if (!visible) return false;
             if (AbsolutePos.Contains(aRelease.AbsolutePos))
             {
                 bool clickedOnChild = ReleasedOnChildren(aRelease);
@@ -155,6 +188,7 @@ namespace Project_1.UI.UIElements
 
         public bool ReleasedOnChildren(ReleaseEvent aRelease)
         {
+            if (!visible) return false;
             for (int i = 0; i < children.Count; i++)
             {
 
@@ -173,10 +207,12 @@ namespace Project_1.UI.UIElements
         public virtual void ReleasedOnChild(ReleaseEvent aRelease)
         {
 
+            if (!visible) return;
         }
 
         public virtual void ReleaseOnMe(ReleaseEvent aRelease)
         {
+            if (!visible) return;
 
         }
 
@@ -192,16 +228,19 @@ namespace Project_1.UI.UIElements
 
         protected virtual void OnHover()
         {
+            if (!visible) return;
             //DebugManager.Print(GetType(), "Hovered on");
         }
 
         protected virtual void OnDeHover()
         {
-
+            if (!visible) return;
         }
 
         public virtual bool ClickedOn(ClickEvent aClick)
         {
+            if (!visible) return false;
+
             if (AbsolutePos.Contains(aClick.AbsolutePos))
             {
                 bool clickedOnChild = ClickedOnChildren(aClick);
@@ -216,6 +255,7 @@ namespace Project_1.UI.UIElements
 
         protected virtual bool ClickedOnChildren(ClickEvent aClick)
         {
+            if (!visible) return false;
 
             for (int i = 0; i < children.Count; i++)
             {
@@ -234,11 +274,13 @@ namespace Project_1.UI.UIElements
 
         protected virtual void ClickedOnChild(ClickEvent aClick)
         {
+            if (!visible) return;
 
         }
 
         protected virtual void ClickedOnMe(ClickEvent aClick)
         {
+            if (!visible) return;
             heldEvents = new HoldEvent(TimeManager.TotalFrameTime, aClick, this);
 
             //DebugManager.Print(GetType(), "Clicked on " + pos);
@@ -269,6 +311,8 @@ namespace Project_1.UI.UIElements
 
         public virtual void Draw(SpriteBatch aBatch)
         {
+            if (!visible) return;
+
             if (gfx != null)
             {
 
