@@ -12,12 +12,20 @@ namespace Project_1.GameObjects.Spells
         static int GetId { get => nextId++; }
         static int nextId;
         int id;
+        public string Name { get => name; }
         string name;
 
         public SpellEffect(string aName)
         {
             id = GetId;
             name = aName;
+        }
+
+        public virtual bool Trigger(Entity aCaster, Entity aTarget)
+        {
+            
+
+            return false;
         }
     }
 }

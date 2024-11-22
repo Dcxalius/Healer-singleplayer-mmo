@@ -27,12 +27,13 @@ namespace Project_1
             Instance = this;
         }
 
-        protected override void Initialize()
+        protected override void Initialize() //TODO: Split all Inits so that all calls that are independant are called first and only after that the dependant ones are called
         {
             DebugManager.Init();
             ItemFactory.Init(Content);
             LootFactory.Init(Content);
             TextureManager.Init(Content);
+            SpellFactory.Init(Content);
             KeyBindManager.Init(Content);
             GraphicsManager.Init();
             //Camera.Init();
@@ -43,7 +44,6 @@ namespace Project_1
             UIManager.Init();
             AreaOfEffectFactory.Init(Content);
             ParticleManager.Init();
-
             base.Initialize();
         }
 

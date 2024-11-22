@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Spells;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.UI.UIElements;
@@ -24,6 +25,7 @@ namespace Project_1.UI.HUD
         static PartyPlateBox[] partyPlateBoxes = new PartyPlateBox[4];
         static LootBox lootBox;
         static DescriptorBox descriptorBox;
+        static SpellBookBox spellBookBox;
 
         static List<UIElement> hudElements = new List<UIElement>();
 
@@ -42,6 +44,7 @@ namespace Project_1.UI.HUD
             firstSpellBar = new FirstSpellBar(10, new Vector2(0.2f, 0.86f), 0.6f);
             inventoryBox = new InventoryBox(new Vector2(0.59f, 0.59f), new Vector2(0.4f));
             lootBox = new LootBox(new Vector2(0.1f, 0.5f), new Vector2(0.4f, 0.4f));
+            spellBookBox = new SpellBookBox(new Vector2(0.2f, 0.4f), new Vector2(0.4f, 0.4f));
             descriptorBox = new DescriptorBox();
 
             hudElements.Add(playerPlateBox);
@@ -50,6 +53,7 @@ namespace Project_1.UI.HUD
             hudElements.Add(inventoryBox);
             hudElements.Add(lootBox);
             hudElements.Add(descriptorBox);
+            hudElements.Add(spellBookBox);
 
             heldItem = new HeldItem();
         }
@@ -76,14 +80,19 @@ namespace Project_1.UI.HUD
             hudElements.Add(partyPlateBoxes[openIndex]);
         }
 
-        public static void RefreshSlot(int aBag, int aSlot)
+        public static void AddSpellToSpellBook(Spell aSpell)
+        {
+            spellBookBox.AssignSpell(aSpell);
+        }
+
+        public static void RefreshInventorySlot(int aBag, int aSlot)
         {
             inventoryBox.RefreshSlot(aBag, aSlot);
         }
 
-        public static void RefreshSlot((int, int) aBagAndSlot)
+        public static void RefreshInventorySlot((int, int) aBagAndSlot)
         {
-            RefreshSlot(aBagAndSlot.Item1, aBagAndSlot.Item2);
+            RefreshInventorySlot(aBagAndSlot.Item1, aBagAndSlot.Item2);
         }
 
         public static void SetDescriptorBox(Item aItem)

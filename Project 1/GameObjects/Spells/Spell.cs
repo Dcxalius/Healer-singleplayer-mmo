@@ -14,13 +14,14 @@ namespace Project_1.GameObjects.Spells
     {
         Player player;
         SpellData spellData;
+        public GfxPath GfxPath { get => spellData.GfxPath; }
         public bool OffCooldown { get => lastTimeCasted + spellData.Cooldown < TimeManager.TotalFrameTime; }
         public double RatioOfCooldownDone { get => Math.Max(TimeManager.TotalFrameTime - lastTimeCasted / lastTimeCasted + spellData.Cooldown, 1); }
         double lastTimeCasted;
 
         public Spell(string aName, Player aOwner) 
         {
-            //data = DataGetter(aName);
+            spellData = SpellFactory.GetSpell(aName);
             player = aOwner;
         }
 

@@ -80,8 +80,8 @@ namespace Project_1.Items
                     items[i] = new Item[bags[i].SlotCount];
 
                     items[aBagAndSlot.Item1][aBagAndSlot.Item2] = null;
-                    HUDManager.RefreshSlot(aBagAndSlot);
-                    HUDManager.RefreshSlot(-1, i);
+                    HUDManager.RefreshInventorySlot(aBagAndSlot);
+                    HUDManager.RefreshInventorySlot(-1, i);
 
 
                     return true;
@@ -97,7 +97,7 @@ namespace Project_1.Items
             Debug.Assert(bags[aEmptySlotToAddTo] == null, "Tried to add to occupied slot.");
             bags[aEmptySlotToAddTo] = aBag;
             items[aEmptySlotToAddTo] = new Item[aBag.SlotCount];
-            HUDManager.RefreshSlot(-1, aEmptySlotToAddTo);
+            HUDManager.RefreshInventorySlot(-1, aEmptySlotToAddTo);
         }
 
         public bool UnequipBag(int aBagSlot)
@@ -110,7 +110,7 @@ namespace Project_1.Items
                 {
                     bags[aBagSlot] = null;
                     items[aBagSlot] = null;
-                    HUDManager.RefreshSlot(-1, aBagSlot);
+                    HUDManager.RefreshInventorySlot(-1, aBagSlot);
                 }
                 return true;
             }
@@ -125,8 +125,8 @@ namespace Project_1.Items
             items[aInventorySlot.Item1][aInventorySlot.Item2] = bags[aBag];
             bags[aBag] = null;
             items[aBag] = null;
-            HUDManager.RefreshSlot(aInventorySlot);
-            HUDManager.RefreshSlot(-1, aBag);
+            HUDManager.RefreshInventorySlot(aInventorySlot);
+            HUDManager.RefreshInventorySlot(-1, aBag);
 
         }
 
@@ -138,8 +138,8 @@ namespace Project_1.Items
             bags[aBagSlot] = bags[aSlotToSwapWith];
             items[aSlotToSwapWith] = tempItems;
             bags[aSlotToSwapWith] = tempBag;
-            HUDManager.RefreshSlot(-1, aBagSlot);
-            HUDManager.RefreshSlot(-1, aSlotToSwapWith);
+            HUDManager.RefreshInventorySlot(-1, aBagSlot);
+            HUDManager.RefreshInventorySlot(-1, aSlotToSwapWith);
         }
 
         public void SwapPlacesOfBags(int aBagSlot, int aSlotToSwapWith)
@@ -155,8 +155,8 @@ namespace Project_1.Items
                 bags[aBagSlot] = null;
                 items[aBagSlot] = null;
 
-                HUDManager.RefreshSlot(-1, aBagSlot);
-                HUDManager.RefreshSlot(-1, aSlotToSwapWith);
+                HUDManager.RefreshInventorySlot(-1, aBagSlot);
+                HUDManager.RefreshInventorySlot(-1, aSlotToSwapWith);
                 return;
             }
 
@@ -169,8 +169,8 @@ namespace Project_1.Items
             bags[aSlotToSwapWith] = tempBag;
             items[aSlotToSwapWith] = tempItems;
 
-            HUDManager.RefreshSlot(-1, aBagSlot);
-            HUDManager.RefreshSlot(-1, aSlotToSwapWith);
+            HUDManager.RefreshInventorySlot(-1, aBagSlot);
+            HUDManager.RefreshInventorySlot(-1, aSlotToSwapWith);
         }
 
         public void SwapBags((int, int) aSlot, int aSlotToSwapWith)
@@ -183,8 +183,8 @@ namespace Project_1.Items
                 //Bag to empty
                 AddBag(items[aSlot.Item1][aSlot.Item2] as Container, aSlotToSwapWith);
                 items[aSlot.Item1][aSlot.Item2] = null;
-                HUDManager.RefreshSlot(aSlot);
-                HUDManager.RefreshSlot(-1, aSlotToSwapWith);
+                HUDManager.RefreshInventorySlot(aSlot);
+                HUDManager.RefreshInventorySlot(-1, aSlotToSwapWith);
                 return;
             }
 
@@ -205,8 +205,8 @@ namespace Project_1.Items
 
             }
             items[aSlot.Item1][aSlot.Item2] = tempBag;
-            HUDManager.RefreshSlot(aSlot);
-            HUDManager.RefreshSlot(-1, aSlotToSwapWith);
+            HUDManager.RefreshInventorySlot(aSlot);
+            HUDManager.RefreshInventorySlot(-1, aSlotToSwapWith);
         }
 
 
@@ -226,7 +226,7 @@ namespace Project_1.Items
                     {
                         items[i][j] = item;
                         HUDManager.ReduceLootItem(aLootIndex, item.Count);
-                        HUDManager.RefreshSlot(i, j);
+                        HUDManager.RefreshInventorySlot(i, j);
                         return;
                     }
 
@@ -236,14 +236,14 @@ namespace Project_1.Items
                     {
                         items[i][j].Count += item.Count;
                         HUDManager.ReduceLootItem(aLootIndex, item.Count);
-                        HUDManager.RefreshSlot(i, j);
+                        HUDManager.RefreshInventorySlot(i, j);
                         return;
                     }
 
                     int c = item.MaxStack - items[i][j].Count;
                     items[i][j].Count = item.MaxStack;
                     HUDManager.ReduceLootItem(aLootIndex, c);
-                    HUDManager.RefreshSlot(i, j);
+                    HUDManager.RefreshInventorySlot(i, j);
                 }
             }
         }
@@ -255,7 +255,7 @@ namespace Project_1.Items
             {
                 items[aBagAndSlot.Item1][aBagAndSlot.Item2] = item;
                 HUDManager.ReduceLootItem(aLootIndex, item.Count);
-                HUDManager.RefreshSlot(aBagAndSlot);
+                HUDManager.RefreshInventorySlot(aBagAndSlot);
                 return;
             }
             if (item.ID != items[aBagAndSlot.Item1][aBagAndSlot.Item2].ID) return;
@@ -265,14 +265,14 @@ namespace Project_1.Items
             {
                 items[aBagAndSlot.Item1][aBagAndSlot.Item2].Count += item.Count;
                 HUDManager.ReduceLootItem(aLootIndex, item.Count);
-                HUDManager.RefreshSlot(aBagAndSlot);
+                HUDManager.RefreshInventorySlot(aBagAndSlot);
                 return;
             }
 
             int c = item.MaxStack - items[aBagAndSlot.Item1][aBagAndSlot.Item2].Count;
             items[aBagAndSlot.Item1][aBagAndSlot.Item2].Count = item.MaxStack;
             HUDManager.ReduceLootItem(aLootIndex, c);
-            HUDManager.RefreshSlot(aBagAndSlot);
+            HUDManager.RefreshInventorySlot(aBagAndSlot);
 
         }
 
@@ -289,7 +289,7 @@ namespace Project_1.Items
                     if (items[i][j].ID == aItem.ID)
                     {
                         int tempCount = items[i][j].AddToStack(count);
-                        HUDManager.RefreshSlot(i, j);
+                        HUDManager.RefreshInventorySlot(i, j);
                         if (tempCount == 0)
                         {
                             return true;
@@ -315,12 +315,12 @@ namespace Project_1.Items
                         {
                             items[i][j].Count = aItem.MaxStack;
                             count -= aItem.MaxStack;
-                            HUDManager.RefreshSlot(i, j);
+                            HUDManager.RefreshInventorySlot(i, j);
                         }
                         else
                         {
                             items[i][j].Count = count;
-                            HUDManager.RefreshSlot(i, j);
+                            HUDManager.RefreshInventorySlot(i, j);
                             return true;
                         }
                     }
@@ -336,8 +336,8 @@ namespace Project_1.Items
             {
                 items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2] = items[aSlot.Item1][aSlot.Item2];
                 items[aSlot.Item1][aSlot.Item2] = null;
-                HUDManager.RefreshSlot(aSlot.Item1, aSlot.Item2);
-                HUDManager.RefreshSlot(aSlotToSwapWith.Item1, aSlotToSwapWith.Item2);
+                HUDManager.RefreshInventorySlot(aSlot.Item1, aSlot.Item2);
+                HUDManager.RefreshInventorySlot(aSlotToSwapWith.Item1, aSlotToSwapWith.Item2);
                 return;
             }
             if (items[aSlot.Item1][aSlot.Item2].ID == items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2].ID)
@@ -361,8 +361,8 @@ namespace Project_1.Items
                 items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2] = tempItem;
             }
 
-            HUDManager.RefreshSlot(aSlot.Item1, aSlot.Item2);
-            HUDManager.RefreshSlot(aSlotToSwapWith.Item1, aSlotToSwapWith.Item2);
+            HUDManager.RefreshInventorySlot(aSlot.Item1, aSlot.Item2);
+            HUDManager.RefreshInventorySlot(aSlotToSwapWith.Item1, aSlotToSwapWith.Item2);
         }
 
         public bool RemoveItem(Item aItem, int aCountToRemove)
@@ -405,7 +405,7 @@ namespace Project_1.Items
             if (items[aSlot.Item1][aSlot.Item2].Count == 0)
             {
                 items[aSlot.Item1][aSlot.Item2] = null;
-                HUDManager.RefreshSlot(aSlot);
+                HUDManager.RefreshInventorySlot(aSlot);
             }
         }
 
@@ -418,7 +418,7 @@ namespace Project_1.Items
                     if (items[i][j] == aItem)
                     {
                         items[i][j] = null;
-                        HUDManager.RefreshSlot(i, j);
+                        HUDManager.RefreshInventorySlot(i, j);
                         return true;
                     }
                 }
@@ -435,7 +435,7 @@ namespace Project_1.Items
                 if (items[aInventory][i] == null)
                 {
                     items[aInventory][i] = aItem;
-                    HUDManager.RefreshSlot(aInventory, i);
+                    HUDManager.RefreshInventorySlot(aInventory, i);
                     return;
                 }
             }

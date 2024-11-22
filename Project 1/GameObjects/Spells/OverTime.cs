@@ -1,4 +1,5 @@
-﻿using Project_1.Managers;
+﻿using Project_1.GameObjects.Entities;
+using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -17,29 +18,50 @@ namespace Project_1.GameObjects.Spells
         double tickRate;
         int tickCounter = 0;
 
-        Instant effect;
+        Instant[] effect;
 
-        public OverTime(string aName, double aDuration, double aTickRate) : base(aName)
+        bool isOver;
+
+        public OverTime(string aName, string[] effectNames, double aDuration, double aTickRate) : base(aName)
         {
-            createTime = TimeManager.TotalFrameTime;
+            isOver = false;
             duration = aDuration;
-            
+
+            for (int i = 0; i < effectNames.Length; i++)
+            {
+                effect[i] = SpellFactory.GetSpellEffect(effectNames[i]) as Instant;
+            }
+
             tickRate = aTickRate;
             Debug.Assert(duration > tickRate);
         }
 
-        public void Update()
+        public void Update(Entity aEntity)
         {
             if (createTime + duration < TimeManager.TotalFrameTime)
             {
-                //kill me
+                isOver = true;
+                return;
             }
 
             if (createTime + tickRate * tickCounter > TimeManager.TotalFrameTime)
             {
                 tickCounter++;
-                //trigger effect
+                if (effect.Length == 1)
+                {
+                    effect[0].Trigger(aEntity);
+                }
+                else
+                {
+                    effect[Math.Min(effect.Length, tickCounter)].Trigger(aEntity);
+                }
             }
+        }
+
+        public override bool Trigger(Entity aCaster, Entity aTarget)
+        {
+            createTime = TimeManager.TotalFrameTime;
+            caster = aCaster;
         }
     }
 }

@@ -88,6 +88,11 @@ namespace Project_1.UI.HUD
         public override void Draw(SpriteBatch aBatch)
         {
             base.Draw(aBatch);
+            DrawText(aBatch);
+        }
+
+        void DrawText(SpriteBatch aBatch)
+        {
 
             Vector2 spacing = Camera.TransformRelativeToAbsoluteScreenSpace(Camera.GetRelativeSquare(0.005f)).ToVector2();
             Vector2 offsetName = new Vector2(0, descriptedName.Offset.Y / 2);

@@ -121,7 +121,7 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        protected void ToggleVisibilty()
+        public void ToggleVisibilty()
         {
             visible = !visible;
             foreach (UIElement child in children)

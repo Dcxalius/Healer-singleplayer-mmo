@@ -13,7 +13,6 @@ namespace Project_1.GameObjects.Entities
 {
     internal class NonFriendly : Entity
     {
-        LootTable loot;
         List<Entity> aggroEntities = new List<Entity>();
         Dictionary<Entity, float> aggroValues = new Dictionary<Entity, float>();
         Dictionary<Entity, double> aggroDurations = new Dictionary<Entity, double>();

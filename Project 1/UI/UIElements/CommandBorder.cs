@@ -12,7 +12,7 @@ namespace Project_1.UI.UIElements
 {
     internal class CommandBorder : UIElement
     {
-        public bool Visible { get => visible; set => visible = value; }
+        public new bool Visible { get => visible; set => visible = value; }
 
         bool visible = true;
         public CommandBorder(Color aColor, Vector2 aPos, Vector2 aSizeOfBoxToBorder) : base(null, aPos, aSizeOfBoxToBorder)
@@ -20,7 +20,7 @@ namespace Project_1.UI.UIElements
         {
             //This probably should be broken out and called on rescale or be completly reworked and handled through shaders
             Point size = Camera.TransformRelativeToAbsoluteScreenSpace(aSizeOfBoxToBorder);
-            size = (size.ToVector2()* 10).ToPoint();
+            size = (size.ToVector2()).ToPoint();
             Texture2D text = Managers.GraphicsManager.CreateNewTexture(size);
 
             float borderWidth = 0.10f;
@@ -48,16 +48,17 @@ namespace Project_1.UI.UIElements
                         //    colorMultiplier =  borderWidth - minY / borderWidth;
                         //}
                         //c.A = (byte) (255 - 255 * Math.Min(minX, minY) / (borderSize * borderWidth));
-                        c.A = (byte) (125 - 125 * Math.Min(minX, minY) / (borderSize * borderWidth));
-                        
-                        if (RandomManager.RollDouble() + 0.2 > Math.Min(minX, minY) / (borderSize * borderWidth)) //TODO: Change this
+                        //c.A = (byte) (125 - 125 * Math.Min(minX, minY) / (borderSize * borderWidth));
+                        int min = (Math.Min(minX, minY) + 1);
+                        c.A = (byte)(255 / min);
+                        //if (RandomManager.RollDouble() + 0.2 > Math.Min(minX, minY) / (borderSize * borderWidth)) //TODO: Change this
+                        //{
+                        //    data[i + j * size.X] = c;
+
+                        //}
+                        //else
                         {
                             data[i + j * size.X] = c;
-
-                        }
-                        else
-                        {
-                            data[i + j * size.X] = Color.Transparent;
 
                         }
 
