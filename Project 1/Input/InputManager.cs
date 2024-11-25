@@ -24,6 +24,13 @@ namespace Project_1.Input
             Count
         }
 
+        public enum ClickType
+        {
+            Left,
+            Middle,
+            Right
+        }
+
         public static bool LeftPress
         {
             get
@@ -120,16 +127,16 @@ namespace Project_1.Input
         {
             if (GetMousePress(oldMouseState.LeftButton, newMouseState.LeftButton))
             {
-                CreateClickEvent(ClickEvent.ClickType.Left);
+                CreateClickEvent(InputManager.ClickType.Left);
             }
 
             if (GetMousePress(oldMouseState.RightButton, newMouseState.RightButton))
             {
-                CreateClickEvent(ClickEvent.ClickType.Right);
+                CreateClickEvent(InputManager.ClickType.Right);
             }
         }
 
-        static void CreateClickEvent(ClickEvent.ClickType aTypeOfClick)
+        static void CreateClickEvent(InputManager.ClickType aTypeOfClick)
         {
             bool[] heldModifiers = CheckHoldModifiers();
 
@@ -143,7 +150,7 @@ namespace Project_1.Input
             ObjectManager.Click(clickEvent);
         }
 
-        public static void CreateReleaseEvent(UIElement aCreator, ReleaseEvent.ReleaseType aTypeOfRelease)
+        public static void CreateReleaseEvent(UIElement aCreator, InputManager.ClickType aTypeOfRelease)
         {
             bool[] heldModifiers = CheckHoldModifiers();
 

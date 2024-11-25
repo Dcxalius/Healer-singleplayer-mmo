@@ -12,30 +12,31 @@ namespace Project_1.GameObjects.Spells
 {
     internal class Spell
     {
-        Player player;
+        Entity owner;
         SpellData spellData;
         public GfxPath GfxPath { get => spellData.GfxPath; }
         public bool OffCooldown { get => lastTimeCasted + spellData.Cooldown < TimeManager.TotalFrameTime; }
-        public double RatioOfCooldownDone { get => Math.Max(TimeManager.TotalFrameTime - lastTimeCasted / lastTimeCasted + spellData.Cooldown, 1); }
+        public double RatioOfCooldownDone { get => Math.Min((TimeManager.TotalFrameTime - lastTimeCasted) / spellData.Cooldown, 1); }
         double lastTimeCasted;
-
-        public Spell(string aName, Player aOwner) 
-        {
-            spellData = SpellFactory.GetSpell(aName);
-            player = aOwner;
-        }
-
-        public Spell(SpellData aData, Player aOwner)
-        {
-            spellData = aData;
-            player = aOwner;
-        }
 
         public static GfxPath GetGfxPath(Spell aSpell)
         {
             if (aSpell == null) return new GfxPath(GfxType.SpellImage, null);
             return new GfxPath(GfxType.SpellImage, aSpell.spellData.Name);
         }
+
+        public Spell(string aName, Entity aOwner) 
+        {
+            spellData = SpellFactory.GetSpell(aName);
+            owner = aOwner;
+        }
+
+        public Spell(SpellData aData, Entity aOwner)
+        {
+            spellData = aData;
+            owner = aOwner;
+        }
+
 
         public bool Trigger()
         {
@@ -44,17 +45,12 @@ namespace Project_1.GameObjects.Spells
                 return false;
             }
 
-            if (player.Target == null)
+            if (owner.Target == null)
             {
-                return Trigger(player);
+                return Trigger(owner);
             }
 
-            if (Trigger(player.Target))
-            {
-                return Trigger(player);
-            }
-
-            return false;
+            return Trigger(owner.Target);
         }
 
         bool Trigger(Entity aTarget)
@@ -65,7 +61,12 @@ namespace Project_1.GameObjects.Spells
             }
 
             lastTimeCasted = TimeManager.TotalFrameTime;
-            //TODO: Do stuff to target
+
+            SpellEffect[] effects = spellData.Effects;
+            for (int i = 0; i < effects.Length; i++)
+            {
+                effects[i].Trigger(owner, aTarget);
+            }
             return true;
         }
     }

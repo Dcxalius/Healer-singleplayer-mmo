@@ -91,21 +91,21 @@ namespace Project_1.GameObjects.Entities
 
         }
 
-        protected virtual void AddToAggroTable(Entity aAttacker, float aDamageTaken)
+        public virtual void AddToAggroTable(Entity aEntityToAdd, float aThreatValue)
         {
-            if (aggroEntities.Contains(aAttacker))
+            if (aggroEntities.Contains(aEntityToAdd))
             {
-                aggroValues[aAttacker] += aDamageTaken;
-                aggroDurations[aAttacker] = TimeManager.TotalFrameTime;
+                aggroValues[aEntityToAdd] += aThreatValue;
+                aggroDurations[aEntityToAdd] = TimeManager.TotalFrameTime;
                 return;
             }
 
 
-            aggroEntities.Add(aAttacker);
-            aggroValues.Add(aAttacker, aDamageTaken);
-            aggroDurations[aAttacker] = TimeManager.TotalFrameTime;
+            aggroEntities.Add(aEntityToAdd);
+            aggroValues.Add(aEntityToAdd, aThreatValue);
+            aggroDurations[aEntityToAdd] = TimeManager.TotalFrameTime;
 
-            aAttacker.AddedToAggroTable(this);
+            aEntityToAdd.AddedToAggroTable(this);
         }
 
         protected virtual void Aggro()

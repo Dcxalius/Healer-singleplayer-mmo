@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Textures;
-using Project_1.UI.UIElements;
+using Project_1.UI.UIElements.SpellBook;
 using System;
 using System.Collections.Generic;
 using System.Linq;

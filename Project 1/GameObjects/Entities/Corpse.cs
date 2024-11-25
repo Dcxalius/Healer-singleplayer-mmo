@@ -45,7 +45,7 @@ namespace Project_1.GameObjects.Entities
 
         public override bool Click(ClickEvent aClickEvent)
         {
-            if (aClickEvent.ButtonPressed != ClickEvent.ClickType.Right) return false;
+            if (aClickEvent.ButtonPressed != InputManager.ClickType.Right) return false;
             if ((ObjectManager.Player.FeetPos - Centre).Length() > lootLength) return false;
             if (drop.All(drop => drop == null)) return false;
 

@@ -171,7 +171,7 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        public bool ReleasedOn(ReleaseEvent aRelease)
+        public virtual bool ReleasedOn(ReleaseEvent aRelease)
         {
             if (!visible) return false;
             if (AbsolutePos.Contains(aRelease.AbsolutePos))
@@ -192,8 +192,8 @@ namespace Project_1.UI.UIElements
             for (int i = 0; i < children.Count; i++)
             {
 
-                bool clickedOn = children[i].ReleasedOn(aRelease);
-                if (clickedOn)
+                bool releasedOn = children[i].ReleasedOn(aRelease);
+                if (releasedOn)
                 {
                     ReleasedOnChild(aRelease);
                     return true;

@@ -12,7 +12,7 @@ namespace Project_1.Input
     {
         double heldSince;
         public double durationHeld;
-        public ClickEvent.ClickType ClickThatCreated { get => clickEventThatTriggered.ButtonPressed; }
+        public InputManager.ClickType ClickThatCreated { get => clickEventThatTriggered.ButtonPressed; }
         ClickEvent clickEventThatTriggered;
         UIElement creatorOfEvent;
 
@@ -39,7 +39,7 @@ namespace Project_1.Input
 
         bool LeftHeld()
         {
-            if (clickEventThatTriggered.ButtonPressed != ClickEvent.ClickType.Left)
+            if (clickEventThatTriggered.ButtonPressed != InputManager.ClickType.Left)
             {
                 return false;
             }
@@ -49,7 +49,7 @@ namespace Project_1.Input
 
         bool RightHeld() 
         {
-            if (clickEventThatTriggered.ButtonPressed != ClickEvent.ClickType.Right)
+            if (clickEventThatTriggered.ButtonPressed != InputManager.ClickType.Right)
             {
                 return false;
             }

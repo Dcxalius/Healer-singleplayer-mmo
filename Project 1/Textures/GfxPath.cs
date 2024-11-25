@@ -20,6 +20,8 @@ namespace Project_1.Textures
 
     internal class GfxPath
     {
+        public static GfxPath NullPath { get => new GfxPath(GfxType.Debug, null); }
+
         public GfxType Type
         {
             get { return type; }

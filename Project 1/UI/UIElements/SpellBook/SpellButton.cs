@@ -11,12 +11,12 @@ using Project_1.Managers;
 using Project_1.GameObjects.Spells;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Project_1.UI.HUD
+namespace Project_1.UI.UIElements.SpellBook
 {
     internal class SpellButton : GFXButton
     {
         CooldownTexture onCooldownGfx;
-        Border emptyBorder;
+        //Border emptyBorder;
 
         KeyBindManager.KeyListner keyListner;
 
@@ -26,7 +26,7 @@ namespace Project_1.UI.HUD
         {
             keyListner = aKeyListner;
             onCooldownGfx = new CooldownTexture();
-            emptyBorder = new Border(Vector2.Zero, aSize);
+            //emptyBorder = new Border(Vector2.Zero, aSize);
             //gfx = new UITexture(Spell img);
         }
 
@@ -44,7 +44,7 @@ namespace Project_1.UI.HUD
 
             if (spellData == null) return;
 
-            onCooldownGfx.UpdateDuration(spellData.RatioOfCooldownDone);
+            onCooldownGfx.Ratio = spellData.RatioOfCooldownDone;
 
             if (KeyBindManager.GetPress(keyListner))
             {
@@ -58,17 +58,27 @@ namespace Project_1.UI.HUD
             Triggered();
         }
 
+        public override void ReleaseOnMe(ReleaseEvent aRelease)
+        {
+            base.ReleaseOnMe(aRelease);
+
+            if (aRelease.Parent.GetType() != typeof(SpellBookSpell)) return;
+
+            AssignSpell((aRelease.Parent as SpellBookSpell).SpellData);
+        }
+
         void Triggered()
         {
             if (spellData == null) return;
 
             spellData.Trigger();
+
         }
 
         public override void Rescale()
         {
             base.Rescale();
-            emptyBorder.Rescale();
+            //emptyBorder.Rescale();
         }
 
         public override void Draw(SpriteBatch aBatch)
@@ -77,13 +87,13 @@ namespace Project_1.UI.HUD
 
             if (spellData == null)
             {
-                emptyBorder.Draw(aBatch);
+                //emptyBorder.Draw(aBatch);
                 return;
             }
 
             if (!spellData.OffCooldown)
             {
-                //onCooldownGfx.Draw(aBatch, pos, Color.White);
+                onCooldownGfx.Draw(aBatch, AbsolutePos, Color.White);
             }
         }
     }

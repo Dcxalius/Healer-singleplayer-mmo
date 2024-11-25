@@ -6,40 +6,34 @@ namespace Project_1.Input
 {
     internal class ReleaseEvent
     {
-        public enum ReleaseType
-        {
-            Left,
-            Middle,
-            Right
-        }
 
         public Vector2 RelativePos { get => releasePos; }
         public Point AbsolutePos { get => Camera.TransformRelativeToAbsoluteScreenSpace(releasePos); }
-        public ReleaseType ButtonPressed { get => buttonPressed; }
+        public InputManager.ClickType ButtonPressed { get => buttonPressed; }
         public UIElement Parent { get => creator; }
 
         Vector2 releasePos;
 
-        ReleaseType buttonPressed;
+        InputManager.ClickType buttonPressed;
 
         bool[] modifierHeld;
 
         UIElement creator;
 
-        public ReleaseEvent(UIElement aCreator, Point aPos, ReleaseType aButtonReleased, bool[] aModifiers)
+        public ReleaseEvent(UIElement aCreator, Point aPos, InputManager.ClickType aButtonReleased, bool[] aModifiers)
         {
             releasePos = Camera.TransformAbsoluteToRelativeScreenSpace(aPos);
             __ClickEvent__(aCreator, aButtonReleased, aModifiers);
 
         }
 
-        public ReleaseEvent(UIElement aCreator, Vector2 aClickPos, ReleaseType aButtonReleased, bool[] aModifiers)
+        public ReleaseEvent(UIElement aCreator, Vector2 aClickPos, InputManager.ClickType aButtonReleased, bool[] aModifiers)
         {
             releasePos = aClickPos;
             __ClickEvent__(aCreator, aButtonReleased, aModifiers);
         }
 
-        void __ClickEvent__(UIElement aCreator, ReleaseType aButtonReleased, bool[] aModifiers)
+        void __ClickEvent__(UIElement aCreator, InputManager.ClickType aButtonReleased, bool[] aModifiers)
         {
             buttonPressed = aButtonReleased;
             modifierHeld = aModifiers;

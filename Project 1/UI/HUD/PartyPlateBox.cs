@@ -55,7 +55,8 @@ namespace Project_1.UI.HUD
         {
             base.HoldReleaseOnMe();
 
-            HUDManager.SetNewTarget(walker);
+            ObjectManager.Player.Target = walker;
+            HUDManager.SetNewTarget();
         }
 
         protected override bool ClickedOnChildren(ClickEvent aClick)

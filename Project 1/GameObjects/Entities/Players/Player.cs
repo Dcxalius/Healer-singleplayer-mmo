@@ -30,6 +30,23 @@ namespace Project_1.GameObjects.Entities.Players
 
         const float lengthOfLeash = 500;
 
+        public override Entity Target
+        {
+            get => playerClickTarget;
+            set
+            {
+                if (playerClickTarget != null)
+                {
+                    playerClickTarget.Deselect();
+                }
+                playerClickTarget = value;
+                if (playerClickTarget != null)
+                {
+                    playerClickTarget.Select();
+                }
+            }
+        }
+        Entity playerClickTarget;
 
         public Player(Vector2 aStartPos) : base(new RandomAnimatedTexture(new GfxPath(GfxType.Object, "Player"), new Point(32), 0, TimeSpan.FromMilliseconds(500)), aStartPos)
         {

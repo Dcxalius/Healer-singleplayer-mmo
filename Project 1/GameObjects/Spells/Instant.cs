@@ -18,21 +18,27 @@ namespace Project_1.GameObjects.Spells
         }
 
         int value;
-        Type type;
+        Type type 
+        {
+            get
+            {
+                if (value > 0)
+                {
+                    return Type.Heal;
+                }
+                else
+                {
+                    return Type.Attack;
+                }
+            }
+        }
 
         [JsonConstructor]
         public Instant(string name, int value) : base(name)
         {
             Debug.Assert(value != 0, "Tried to make effect with no effect.");
             this.value = value;
-            if (value > 0)
-            {
-                type = Type.Heal;
-            }
-            else
-            {
-                type = Type.Attack;
-            }
+            
         }
 
         public override bool Trigger(Entity aCaster, Entity aTarget)
@@ -40,9 +46,15 @@ namespace Project_1.GameObjects.Spells
             if (type == Type.Attack)
             {
                 aTarget.TakeDamage(aCaster, value);
-
+                return true;
             }
 
+            if (type == Type.Heal)
+            {
+                aTarget.TakeHealing(aCaster, value);
+                return true;
+
+            }
             return false;
         }
     }

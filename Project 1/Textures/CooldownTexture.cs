@@ -13,9 +13,12 @@ namespace Project_1.Textures
     {
         public enum CooldownGfxType
         {
-            SweepingRight
+            SweepRight,
+            SweepUp
         }
 
+        public double Ratio { set => ratio = value; }
+        double ratio;
         CooldownGfxType cdType;
 
         public CooldownTexture() : base("Cooldown", Color.White)
@@ -23,15 +26,31 @@ namespace Project_1.Textures
             visible = new Rectangle(Point.Zero, size);
         }
 
-        public void UpdateDuration(double aRatio)
+        public Point GetReducedSize(Point aSize)
         {
-            visible = new Rectangle(Point.Zero, new Point(size.X, (int)(size.Y * (1 - aRatio))));
+            Point reduceSizeBy;
+
+            switch (cdType)
+            {
+                case CooldownGfxType.SweepRight:
+                    reduceSizeBy = new Point((int)(aSize.X * (1 - ratio)), 0); 
+                    break;
+                case CooldownGfxType.SweepUp:
+                    reduceSizeBy = new Point(0, (int)(aSize.Y * (1 - ratio)));
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+
+            return aSize - reduceSizeBy;
         }
 
-        public override void Draw(SpriteBatch aBatch, Rectangle aPosRectangle, Color aColor)
+
+
+        public override void Draw(SpriteBatch aBatch, Rectangle aPosition, Color aColor)
         {
-            //base.Draw(aBatch, aPosRectangle, aColor);
-            aBatch.Draw(gfx, aPosRectangle, visible, aColor);
+            base.Draw(aBatch, new Rectangle(aPosition.Location, GetReducedSize(aPosition.Size)), aColor);
+            //aBatch.Draw(gfx, aPosRectangle, visRect, aColor);
         }
     }
 }

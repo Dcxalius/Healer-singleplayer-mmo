@@ -110,7 +110,7 @@ namespace Project_1.GameObjects
         static void LeftClickedGround(ClickEvent aClickEvent)
         {
 
-            if (aClickEvent.ButtonPressed == ClickEvent.ClickType.Left)
+            if (aClickEvent.ButtonPressed == InputManager.ClickType.Left)
             {
                 if (aClickEvent.ModifiersOr(new InputManager.HoldModifier[]{ InputManager.HoldModifier.Shift, InputManager.HoldModifier.Ctrl}))
                 {
@@ -118,14 +118,16 @@ namespace Project_1.GameObjects
                 }
                 else
                 {
-                    HUDManager.SetNewTarget(null);
+                    player.Target = null;
+                    HUDManager.SetNewTarget();
+
                 }
             }
         }
 
         static void RightClickGround(ClickEvent aClickEvent)
         {
-            if (aClickEvent.ButtonPressed == ClickEvent.ClickType.Right)
+            if (aClickEvent.ButtonPressed == InputManager.ClickType.Right)
             {
                 player.IssueMoveOrder(aClickEvent);
             }

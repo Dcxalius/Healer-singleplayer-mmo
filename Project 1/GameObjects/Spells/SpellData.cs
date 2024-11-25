@@ -26,6 +26,8 @@ namespace Project_1.GameObjects.Spells
         string gfxName;
         double cooldown;
         double castTime;
+
+        public SpellEffect[] Effects { get => effects; }
         SpellEffect[] effects;
         UnitData.RelationToPlayer[] acceptableTargets;
 
@@ -34,7 +36,7 @@ namespace Project_1.GameObjects.Spells
         {
             this.name = name;
             this.gfxName = gfxName;
-            this.cooldown = cooldown;
+            this.cooldown = cooldown * 1000;
             this.castTime = castTime;
 
             List<SpellEffect> tempEffects = new List<SpellEffect>();
@@ -58,7 +60,7 @@ namespace Project_1.GameObjects.Spells
 
         void Trigger(Entity aCaster, Entity aTarget)
         {
-            effects[0].Trigger();
+            effects[0].Trigger(aCaster, aTarget);
         }
     }
 }

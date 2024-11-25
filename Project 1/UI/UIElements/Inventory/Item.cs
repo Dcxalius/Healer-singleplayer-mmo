@@ -67,7 +67,7 @@ namespace Project_1.UI.UIElements.Inventory
         {
             base.ClickedOnMe(aClick);
 
-            if (aClick.ButtonPressed != ClickEvent.ClickType.Left) return;
+            if (aClick.ButtonPressed != InputManager.ClickType.Left) return;
 
             if (isEmpty == false && holdable)
             {
@@ -170,12 +170,12 @@ namespace Project_1.UI.UIElements.Inventory
 
         public override void HoldReleaseOnMe()
         {
-            if (isEmpty == false && !isHeld && holdable && heldEvents.ClickThatCreated == ClickEvent.ClickType.Right)
+            if (isEmpty == false && !isHeld && holdable && heldEvents.ClickThatCreated == InputManager.ClickType.Right)
             {
                 RightClickedItem();
             }
 
-            if (isEmpty == false && holdable && heldEvents.ClickThatCreated == ClickEvent.ClickType.Left)
+            if (isEmpty == false && holdable && heldEvents.ClickThatCreated == InputManager.ClickType.Left)
             {
                 HUDManager.ReleaseItem();
             }
@@ -185,13 +185,15 @@ namespace Project_1.UI.UIElements.Inventory
 
         protected override void HoldReleaseAwayFromMe()
         {
-            base.HoldReleaseAwayFromMe();
 
-            if (isEmpty == false && holdable)
+
+            if (isEmpty == false && holdable && heldEvents.ClickThatCreated == InputManager.ClickType.Left)
             {
-                InputManager.CreateReleaseEvent(this, ReleaseEvent.ReleaseType.Left);
+                InputManager.CreateReleaseEvent(this, heldEvents.ClickThatCreated);
                 HUDManager.ReleaseItem();
             }
+            base.HoldReleaseAwayFromMe();
+
         }
 
         protected virtual void RightClickedItem()

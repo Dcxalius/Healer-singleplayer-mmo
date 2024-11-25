@@ -12,56 +12,29 @@ namespace Project_1.GameObjects.Spells
 {
     internal class OverTime : SpellEffect
     {
-        double createTime;
+        public double Duration { get => duration; }
         double duration;
 
+        public double TickRate { get => tickRate; }
         double tickRate;
-        int tickCounter = 0;
 
-        Instant[] effect;
+        public Instant[] Effects;
+        Instant[] effects;
 
-        bool isOver;
 
         public OverTime(string aName, string[] effectNames, double aDuration, double aTickRate) : base(aName)
         {
-            isOver = false;
             duration = aDuration;
 
             for (int i = 0; i < effectNames.Length; i++)
             {
-                effect[i] = SpellFactory.GetSpellEffect(effectNames[i]) as Instant;
+                effects[i] = SpellFactory.GetSpellEffect(effectNames[i]) as Instant;
             }
 
             tickRate = aTickRate;
             Debug.Assert(duration > tickRate);
         }
 
-        public void Update(Entity aEntity)
-        {
-            if (createTime + duration < TimeManager.TotalFrameTime)
-            {
-                isOver = true;
-                return;
-            }
-
-            if (createTime + tickRate * tickCounter > TimeManager.TotalFrameTime)
-            {
-                tickCounter++;
-                if (effect.Length == 1)
-                {
-                    effect[0].Trigger(aEntity);
-                }
-                else
-                {
-                    effect[Math.Min(effect.Length, tickCounter)].Trigger(aEntity);
-                }
-            }
-        }
-
-        public override bool Trigger(Entity aCaster, Entity aTarget)
-        {
-            createTime = TimeManager.TotalFrameTime;
-            caster = aCaster;
-        }
+        
     }
 }

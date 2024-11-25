@@ -10,6 +10,7 @@ namespace Project_1.GameObjects.Entities.Players
 {
     internal class SpellBook
     {
+        public Spell[] Spells { get => knownSpells.ToArray(); }
         List<Spell> knownSpells;
         Player player;
 
@@ -18,13 +19,13 @@ namespace Project_1.GameObjects.Entities.Players
         {
             knownSpells = new List<Spell>();
             player = aPlayer;
-            //AddSpell(new Spell("Heal", player));
+            AddSpell(new Spell("Heal", player));
         }
 
         public void AddSpell(Spell aSpell)
         {
             knownSpells.Add(aSpell);
-            HUDManager.AddSpellToSpellBook(aSpell);
+            //HUDManager.AddSpellToSpellBook(aSpell);
         }
     }
 }

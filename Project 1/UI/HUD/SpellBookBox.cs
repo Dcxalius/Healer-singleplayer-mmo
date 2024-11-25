@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.GameObjects;
 using Project_1.GameObjects.Spells;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
+using Project_1.UI.UIElements.SpellBook;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +23,18 @@ namespace Project_1.UI.HUD
             spellBookSpells = new SpellBookSpell[cols * rows];
             Vector2 startPos = Camera.GetRelativeSquare(0.01f);
             Vector2 spacing = Camera.GetRelativeSquare(0.005f);
-            Vector2 size = Camera.GetRelativeSquare(0.015f); 
+            Vector2 size = Camera.GetRelativeSquare(0.015f);
+
+            Spell[] xdd = ObjectManager.Player.SpellBook.Spells;
+
             for (int i = 0; i < spellBookSpells.Length; i++)
             {
-                Vector2 pos = new Vector2(startPos.X + (float)Math.Floor((double)i / rows)* (size.X + spacing.X), startPos.Y + i % rows * (size.Y + spacing.Y));
+                Vector2 pos = new Vector2(startPos.X + (float)Math.Floor((double)i / rows) * (size.X + spacing.X), startPos.Y + i % rows * (size.Y + spacing.Y));
+                if (i < xdd.Length)
+                {
+                    spellBookSpells[i] = new SpellBookSpell(pos, size, xdd[i]);
+                    continue;
+                }
                 spellBookSpells[i] = new SpellBookSpell(pos, size);
             }
 

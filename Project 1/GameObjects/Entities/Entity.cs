@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.GameObjects.Spells;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
@@ -7,6 +8,7 @@ using Project_1.UI.HUD;
 using SharpDX.Direct2D1.Effects;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Security.Policy;
 using System.Text;
@@ -28,7 +30,7 @@ namespace Project_1.GameObjects.Entities
         public bool HasDestination { get => destinations.Count > 0; }
         public Color RelationColor { get => unitData.RelationColor(); }
         public UnitData.RelationToPlayer Relation { get => unitData.Relation; }
-        public Entity Target { get => target; set => target = value; }
+        public virtual Entity Target { get => target; set => target = value; }
 
         public string Name { get => unitData.Name; }
         public bool Alive { get => unitData.CurrentHealth > 0; }
@@ -55,11 +57,40 @@ namespace Project_1.GameObjects.Entities
 
         protected Corpse corpse;
 
+        List<Buff> buffs;
+
         public Entity(Texture aTexture, Vector2 aStartingPos, Corpse aCorpse = null) : base(aTexture, aStartingPos)
         {
+            buffs = new List<Buff>();
             corpse = aCorpse;
             shadowPos = new Rectangle((Position + new Vector2(size.X / 2, size.Y)).ToPoint(), size);
             unitData = ObjectFactory.GetData(GetType().Name);
+        }
+
+
+        public override void Update()
+        {
+            Walk();
+            Vector2 oldPosition = Position;
+            base.Update();
+            CheckForCollisions(oldPosition);
+
+
+            AttackTarget();
+            UpdateBuffs();
+            Death();
+        }
+
+        void UpdateBuffs()
+        {
+            for (int i = buffs.Count - 1; i >= 0; i--)
+            {
+                buffs[i].Update(this);
+                if (buffs[i].IsOver)
+                {
+                    buffs.RemoveAt(i);
+                }
+            }
         }
 
         public void AddedToAggroTable(NonFriendly aNonfriendly)
@@ -99,7 +130,16 @@ namespace Project_1.GameObjects.Entities
             ObjectManager.SpawnFloatingText(floatingText);
         }
 
-
+        public virtual void TakeHealing(Entity aHealer, float aHealingTaken)
+        {
+            unitData.CurrentHealth += aHealingTaken;
+            FloatingText floatingText = new FloatingText(aHealingTaken.ToString(), Color.White, FeetPos, Vector2.Normalize(FeetPos - aHealer.FeetPos)); //TODO: Change color to green once text border has been implemented
+            ObjectManager.SpawnFloatingText(floatingText);
+            for (int i = 0; i < aggroTablesIAmOn.Count; i++)
+            {
+                aggroTablesIAmOn[i].AddToAggroTable(aHealer, aHealingTaken);
+            }
+        }
 
         public override bool Click(ClickEvent aClickEvent)
         {
@@ -107,7 +147,8 @@ namespace Project_1.GameObjects.Entities
             {
                 if (aClickEvent.NoModifiers())
                 {
-                    HUDManager.SetNewTarget(this);
+                    ObjectManager.Player.Target = this;
+                    HUDManager.SetNewTarget();
                 }
                 ClickedOn(aClickEvent);
 
@@ -118,7 +159,7 @@ namespace Project_1.GameObjects.Entities
 
         protected virtual void ClickedOn(ClickEvent aClickEvent)
         {
-            if (aClickEvent.NoModifiers() && aClickEvent.ButtonPressed == ClickEvent.ClickType.Right)
+            if (aClickEvent.NoModifiers() && aClickEvent.ButtonPressed == InputManager.ClickType.Right)
             {
                 ObjectManager.Player.IssueTargetOrder(this);
             }
@@ -185,21 +226,6 @@ namespace Project_1.GameObjects.Entities
         }
 
         protected void AddDestination(Vector2 aDestination) { destinations.Add(aDestination); }
-
-        public override void Update()
-        {
-            Walk();
-            Vector2 oldPosition = Position;
-
-
-            base.Update();
-            AttackTarget();
-
-            CheckForCollisions(oldPosition);
-
-
-            Death();
-        }
 
 
 

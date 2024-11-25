@@ -32,7 +32,7 @@ namespace Project_1.Input
         {Keys.W, Keys.A, Keys.S, Keys.D, 
          Keys.Q, Keys.NumPad0, Keys.NumPad1,
          Keys.I, Keys.T,
-         Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None};
+         Keys.D1, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None};
         readonly static Keys[] defaultSecondKeys = new Keys[(int)KeyListner.Count] 
         {Keys.Up, Keys.Left, Keys.Down, Keys.Right, 
          Keys.None, Keys.None, Keys.None,

@@ -6,6 +6,7 @@ using Project_1.Input;
 using Project_1.Managers;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Inventory;
+using Project_1.UI.UIElements.SpellBook;
 using SharpDX.MediaFoundation.DirectX;
 using SharpDX.XAudio2;
 using System;
@@ -30,10 +31,11 @@ namespace Project_1.UI.HUD
         static List<UIElement> hudElements = new List<UIElement>();
 
         static HeldItem heldItem;
+        static HeldSpell heldSpell;
 
-        public static void SetNewTarget(Entity aEntity)
+        public static void SetNewTarget()
         {
-            targetPlateBox.SetEntity(aEntity);
+            targetPlateBox.SetEntity();
         }
 
 
@@ -56,6 +58,7 @@ namespace Project_1.UI.HUD
             hudElements.Add(spellBookBox);
 
             heldItem = new HeldItem();
+            heldSpell = new HeldSpell();
         }
 
         public static void AddWalkerToParty(Walker aWalker)
@@ -131,6 +134,16 @@ namespace Project_1.UI.HUD
             heldItem.ReleaseMe();
         }
 
+        public static void HoldSpell(Spell aSpell, Vector2 aGrabOffset)
+        {
+            heldSpell.HoldMe(aSpell, aGrabOffset);
+        }
+
+        public static void ReleaseSpell()
+        {
+            heldSpell.ReleaseMe();
+        }
+
         public static void Loot(Corpse aCorpse)
         {
             lootBox.Loot(aCorpse);
@@ -196,8 +209,6 @@ namespace Project_1.UI.HUD
             {
                 hudElements[i].Update(null);
             }
-
-            heldItem.Update();
         }
 
         public static void Draw(SpriteBatch aBatch)
@@ -208,6 +219,7 @@ namespace Project_1.UI.HUD
             }
 
             heldItem.Draw(aBatch);
+            heldSpell.Draw(aBatch);
         }
 
         public static void Rescale()

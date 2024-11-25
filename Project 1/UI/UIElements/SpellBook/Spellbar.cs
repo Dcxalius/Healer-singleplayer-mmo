@@ -1,13 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Textures;
-using Project_1.UI.HUD;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI.UIElements
+namespace Project_1.UI.UIElements.SpellBook
 {
     internal class Spellbar : Box
     {
@@ -37,7 +36,7 @@ namespace Project_1.UI.UIElements
 
         static float calcButtonSize(float aSizeX, int aButtonCount)
         {
-            return (aSizeX - (calcOffset(aSizeX, aButtonCount) * (aButtonCount + 1))) / aButtonCount;
+            return (aSizeX - calcOffset(aSizeX, aButtonCount) * (aButtonCount + 1)) / aButtonCount;
         }
 
         static float calcY(float aSizeX, int aButtonCount)

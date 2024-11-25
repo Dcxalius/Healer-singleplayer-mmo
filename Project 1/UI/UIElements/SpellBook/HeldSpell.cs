@@ -1,50 +1,53 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.GameObjects.Spells;
 using Project_1.Input;
 using Project_1.Textures;
+using Project_1.UI.UIElements.Inventory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI.UIElements.Inventory
+namespace Project_1.UI.UIElements.SpellBook
 {
-    internal class HeldItem
+    internal class HeldSpell
     {
-        Item heldItem;
+        Spell heldSpell;
         Vector2 grabOffset;
-        public HeldItem()
+        UITexture xdd;
+
+        public HeldSpell()
         {
+            
         }
 
-        public bool HoldItem(Item aItem, Vector2 aGrabOffset)
+        public void HoldMe(Spell aSpell, Vector2 aGrabOffset)
         {
-            heldItem = aItem;
-            heldItem.HoldMe();
+            heldSpell = aSpell;
             grabOffset = aGrabOffset;
-            return true;
+
+            xdd = new UITexture(heldSpell.GfxPath, Color.Gray);
         }
 
-        public bool ReleaseMe()
+
+        public void ReleaseMe()
         {
-            heldItem.ReleaseMe();
             grabOffset = Vector2.Zero;
-            heldItem = null;
-            return true;
+            heldSpell = null;
+
+            xdd = new UITexture(GfxPath.NullPath, Color.White);
         }
 
         public void Draw(SpriteBatch aBatch)
         {
-            if (heldItem == null)
-            {
-                return;
-            }
-
+            if (heldSpell == null) return;
             Rectangle pos = new Rectangle((InputManager.GetMousePosAbsolute().ToVector2() - grabOffset).ToPoint(), new Point(32));
+
             Color transparent = new Color(80, 80, 80, 80);
-            heldItem.Gfx.Draw(aBatch, pos, transparent);
-            heldItem.GfxOnButton.Draw(aBatch, pos, transparent);
+            xdd.Draw(aBatch, pos, transparent);
         }
+            
     }
 }

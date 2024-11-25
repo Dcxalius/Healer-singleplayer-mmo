@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.Input;
 using Project_1.UI.UIElements;
@@ -16,7 +17,7 @@ namespace Project_1.UI.HUD
     internal class TargetPlateBox : PlateBox
     {
 
-        Entity targetEntity;
+        //Entity targetEntity;
         
         PlateBoxNameSegment nameSegment;
         PlateBoxHealthSegment healthSegment;
@@ -34,36 +35,29 @@ namespace Project_1.UI.HUD
             AddSegmentsToChildren();
         }
 
-        public void SetEntity(Entity aEntity)
+        public void SetEntity()
         {
-            if (targetEntity != null)
+            if (ObjectManager.Player.Target == null)
             {
-                targetEntity.Deselect();
-            }
-            if (aEntity == null)
-            {
-                targetEntity = null;
                 nameSegment.Name = null;
                 return;
             }
-            targetEntity = aEntity;
-            nameSegment.Name = targetEntity.Name;
-            nameSegment.BackgroundColor = aEntity.RelationColor;
-            healthSegment.SetTarget(targetEntity);
-            targetEntity.Select();
+            nameSegment.Name = ObjectManager.Player.Target.Name;
+            nameSegment.BackgroundColor = ObjectManager.Player.Target.RelationColor;
+            healthSegment.SetTarget(ObjectManager.Player.Target);
         }
 
         public override void Update(in UIElement aParent)
         {
             base.Update(aParent);
 
-            if (targetEntity == null) { return; }
-            if (targetEntity.CurrentHealth <= 0) { SetEntity(null); }
+            if (ObjectManager.Player.Target == null) { return; }
+            if (ObjectManager.Player.Target.CurrentHealth <= 0) { SetEntity(); }
         }
 
         public override void Draw(SpriteBatch aBatch)
         {
-            if (targetEntity == null) return;
+            if (ObjectManager.Player.Target == null) return;
 
             base.Draw(aBatch);
         }

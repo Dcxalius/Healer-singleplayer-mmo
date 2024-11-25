@@ -5,38 +5,32 @@ namespace Project_1.Input
 {
     internal class ClickEvent
     {
-        public enum ClickType
-        {
-            Left,
-            Middle,
-            Right
-        }
 
         public Vector2 RelativePos { get => clickPos; }
         public Point AbsolutePos { get => Camera.TransformRelativeToAbsoluteScreenSpace(clickPos); }
-        public ClickType ButtonPressed { get => buttonPressed; }
+        public InputManager.ClickType ButtonPressed { get => buttonPressed; }
 
         Vector2 clickPos;
 
-        ClickType buttonPressed;
+        InputManager.ClickType buttonPressed;
 
         bool[] modifierHeld;
 
 
-        public ClickEvent(Point aPos, ClickType aButtonPressed, bool[] aModifiers)
+        public ClickEvent(Point aPos, InputManager.ClickType aButtonPressed, bool[] aModifiers)
         {
             clickPos = Camera.TransformAbsoluteToRelativeScreenSpace(aPos);
             __ClickEvent__(aButtonPressed, aModifiers);
 
         }
 
-        public ClickEvent(Vector2 aClickPos, ClickType aButtonPressed, bool[] aModifiers)
+        public ClickEvent(Vector2 aClickPos, InputManager.ClickType aButtonPressed, bool[] aModifiers)
         {
             clickPos = aClickPos;
             __ClickEvent__(aButtonPressed, aModifiers);
         }
 
-        void __ClickEvent__(ClickType aButtonPressed, bool[] aModifiers)
+        void __ClickEvent__(InputManager.ClickType aButtonPressed, bool[] aModifiers)
         {
             buttonPressed = aButtonPressed;
             modifierHeld = aModifiers;
