@@ -20,6 +20,7 @@ namespace Project_1.GameObjects.Entities.Players
             knownSpells = new List<Spell>();
             player = aPlayer;
             AddSpell(new Spell("Heal", player));
+            AddSpell(new Spell("Renew", player));
         }
 
         public void AddSpell(Spell aSpell)

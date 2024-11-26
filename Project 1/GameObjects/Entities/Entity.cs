@@ -85,12 +85,18 @@ namespace Project_1.GameObjects.Entities
         {
             for (int i = buffs.Count - 1; i >= 0; i--)
             {
-                buffs[i].Update(this);
                 if (buffs[i].IsOver)
                 {
                     buffs.RemoveAt(i);
+                    continue;
                 }
+                buffs[i].Update(this);
             }
+        }
+
+        public void AddBuff(Buff aBuff)
+        {
+            buffs.Add(aBuff);
         }
 
         public void AddedToAggroTable(NonFriendly aNonfriendly)

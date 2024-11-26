@@ -15,10 +15,10 @@ namespace Project_1.GameObjects.Spells
 
         protected override double Duration => overTime.Duration;
 
-        public Periodic(Entity aCaster) : base(aCaster)
+        public Periodic(Entity aCaster, OverTime aOverTime) : base(aCaster)
         {
             tickCounter = 0;
-
+            overTime = aOverTime;
         }
 
 
@@ -26,7 +26,7 @@ namespace Project_1.GameObjects.Spells
         public override void Update(Entity aEntity)
         {
             base.Update(aEntity);
-            if (createTime + overTime.TickRate * tickCounter > TimeManager.TotalFrameTime)
+            if (createTime + overTime.TickRate * tickCounter < TimeManager.TotalFrameTime)
             {
                 tickCounter++;
                 overTime.Effects[Math.Min(overTime.Effects.Length - 1, tickCounter)].Trigger(caster, aEntity);

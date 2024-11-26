@@ -21,6 +21,7 @@ namespace Project_1.GameObjects.Spells
         public Buff(Entity aCaster)
         {
             caster = aCaster;
+            createTime = TimeManager.TotalFrameTime;
         }
 
         public virtual void Update(Entity aEntity)

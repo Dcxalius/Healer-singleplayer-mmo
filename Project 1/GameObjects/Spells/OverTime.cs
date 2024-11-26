@@ -1,4 +1,5 @@
-﻿using Project_1.GameObjects.Entities;
+﻿using Newtonsoft.Json;
+using Project_1.GameObjects.Entities;
 using Project_1.Managers;
 using System;
 using System.Collections.Generic;
@@ -18,23 +19,28 @@ namespace Project_1.GameObjects.Spells
         public double TickRate { get => tickRate; }
         double tickRate;
 
-        public Instant[] Effects;
+        public Instant[] Effects { get => effects; }
         Instant[] effects;
 
-
-        public OverTime(string aName, string[] effectNames, double aDuration, double aTickRate) : base(aName)
+        [JsonConstructor]
+        public OverTime(string name, string[] effectNames, double duration, double tickRate) : base(name)
         {
-            duration = aDuration;
-
+            this.duration = duration * 1000;
+            this.tickRate = tickRate * 1000;
+            effects = new Instant[effectNames.Length]; 
             for (int i = 0; i < effectNames.Length; i++)
             {
                 effects[i] = SpellFactory.GetSpellEffect(effectNames[i]) as Instant;
             }
 
-            tickRate = aTickRate;
-            Debug.Assert(duration > tickRate);
+            Debug.Assert(this.duration > this.tickRate);
         }
 
-        
+        public override bool Trigger(Entity aCaster, Entity aTarget)
+        {
+            Periodic xdd = new Periodic(aCaster, this);
+            aTarget.AddBuff(xdd);
+            return true;
+        }
     }
 }

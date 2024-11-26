@@ -36,10 +36,8 @@ namespace Project_1.GameObjects.Entities
             {
                 aggroValues.Remove(aggroEntities[i]);
                 aggroDurations.Remove(aggroEntities[i]);
-                if (aggroEntities[i] == target)
-                {
-                    AquireNewTarget(i);
-                }
+                
+                AquireNewTarget(i);
                 aggroEntities[i].RemovedFromAggroTable(this);
                 aggroEntities.Remove(aggroEntities[i]);
             }
@@ -68,15 +66,17 @@ namespace Project_1.GameObjects.Entities
                 float v = 0;
                 for (int j = 0; j < aggroEntities.Count; j++)
                 {
+                    if (i == j) continue;
+                    
                     if (aggroValues.Count == 0)
                     {
                         target = null;
                         return;
                     }
-                    if (aggroValues[aggroEntities[i]] > v)
+                    if (aggroValues[aggroEntities[j]] > v)
                     {
-                        newTarget = aggroEntities[i];
-                        v = aggroValues[aggroEntities[i]];
+                        newTarget = aggroEntities[j];
+                        v = aggroValues[aggroEntities[j]];
                     }
                 }
                 target = newTarget;

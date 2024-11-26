@@ -5,6 +5,7 @@ using SharpDX.MediaFoundation.DirectX;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,7 +17,8 @@ namespace Project_1.GameObjects.Spells
     {
         static Dictionary<string, SpellData> spellData;
         //static Dictionary<int, SpellEffect> spellEffect;
-        static SpellEffect[] effectData;
+        static Instant[] instantData;
+        static OverTime[] overTimeData;
 
         public static void Init(ContentManager aContentManager)
         {
@@ -41,47 +43,77 @@ namespace Project_1.GameObjects.Spells
 
         static void InitEffectData(ContentManager aContentManager)
         {
-            string path = aContentManager.RootDirectory + "\\Data\\Effects\\";
-            string[] folders = Directory.GetDirectories(path);
+            
+            //string[] folders = Directory.GetDirectories(path);
+            
+            InitInstant(aContentManager);
+            InitOverTime(aContentManager);
 
-            List<SpellEffect> effects = new List<SpellEffect>();
-            for (int i = 0; i < folders.Length; i++)
+        }
+
+        static void InitInstant(ContentManager aContentManager) //TODO: Ugly AF so find a better way
+        {
+            List<Instant> effects = new List<Instant>();
+
+            string pathInstant = aContentManager.RootDirectory + "\\Data\\Effects\\Instant";
+            string[] files = Directory.GetFiles(pathInstant);
+            for (int j = 0; j < files.Length; j++)
             {
 
-                string[] files = Directory.GetFiles(folders[i]);
-                for (int j = 0; j < files.Length; j++)
-                {
+                string rawData = File.ReadAllText(files[j]);
+                Instant data = JsonConvert.DeserializeObject<Instant>(rawData);
 
-                    string rawData = File.ReadAllText(files[i]);
-                    SpellEffect data;
-                    switch (folders[i])
-                    {
-                        case "Content\\Data\\Effects\\Instant":
-                            data = JsonConvert.DeserializeObject<Instant>(rawData);
-                            break;
-                        case "Content\\Data\\Effects\\OverTime":
-                            data = JsonConvert.DeserializeObject<OverTime>(rawData);
-                            break;
-                        default:
-                            throw new NotImplementedException();
-                    }
-                    effects.Add(data);
 
-                }
+                effects.Add(data);
+
+
             }
+            instantData = effects.ToArray();
 
-            effectData = effects.ToArray();
+        }
+
+
+        static void InitOverTime(ContentManager aContentManager)
+        {
+            List<OverTime> effects = new List<OverTime>();
+            string pathOverTime = aContentManager.RootDirectory + "\\Data\\Effects\\OverTime";
+            string[] files = Directory.GetFiles(pathOverTime);
+            
+            for (int j = 0; j < files.Length; j++)
+            {
+
+                string rawData = File.ReadAllText(files[j]);
+                OverTime data = JsonConvert.DeserializeObject<OverTime>(rawData);
+                Debug.Assert(!instantData.Any(xdd => xdd.Name == data.Name), "Tried to add an overtime effect with the same name of an instant, this will be unable to be accessed by name.");
+
+                effects.Add(data);
+
+
+            }
+            overTimeData = effects.ToArray();
         }
 
         public static SpellEffect GetSpellEffect(int aId)
         {
-            return effectData[aId];
+            if (aId < instantData.Length)
+            {
+                return instantData[aId];
+            }
+
+            return instantData[aId - instantData.Length];
         }
 
         public static SpellEffect GetSpellEffect(string aName)
         {
-            return effectData.Single(effect => effect.Name == aName);
 
+            SpellEffect effect = instantData.SingleOrDefault(effect => effect.Name == aName);
+
+            if (effect != null) return effect;
+
+            effect = overTimeData.SingleOrDefault(effect => effect.Name == aName);
+
+            Debug.Assert(effect != null, "Didn't find SpellEffect by the name " + aName);
+            return effect;
         }
 
         public static SpellData GetSpell(String aName)

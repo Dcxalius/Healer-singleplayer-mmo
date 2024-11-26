@@ -62,10 +62,10 @@ namespace Project_1.GameObjects.Spells
 
             lastTimeCasted = TimeManager.TotalFrameTime;
 
-            SpellEffect[] effects = spellData.Effects;
-            for (int i = 0; i < effects.Length; i++)
+            
+            for (int i = 0; i < spellData.Effects.Length; i++)
             {
-                effects[i].Trigger(owner, aTarget);
+                spellData.Effects[i].Trigger(owner, aTarget);
             }
             return true;
         }
