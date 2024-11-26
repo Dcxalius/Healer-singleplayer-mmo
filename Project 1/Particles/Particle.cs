@@ -30,7 +30,9 @@ namespace Project_1.Particles
 
         Color color;
 
-        public Particle(Vector2 aWorldPos, ParticleBase aParticleBase, GameObject aParent)
+        ParticleMovement particleMovement;
+
+        public Particle(Vector2 aWorldPos, ParticleBase aParticleBase, GameObject aParent, ParticleMovement aMovement)
         {
             isDead = false;
 
@@ -38,13 +40,15 @@ namespace Project_1.Particles
             worldPos = aWorldPos;
 
             timeSpawned = TimeManager.TotalFrameTime;
-            momentum = particleBase.Momentum;
+            momentum = aMovement.Momentum;
             lifeSpan = particleBase.LifeSpan;
 
             color = aParticleBase.Colors[0];
             opacity = 1d;
 
             parent = aParent;
+
+            particleMovement = aMovement;
         }
 
 
@@ -61,8 +65,8 @@ namespace Project_1.Particles
                 opacity = 1 - ((TimeManager.TotalFrameTime - timeSpawned) / lifeSpan);
             }
 
-            momentum *= particleBase.Drag;
-            momentum += particleBase.Velocity;
+            momentum *= particleMovement.Drag;
+            momentum += particleMovement.Velocity;
             worldPos += momentum;
         }
 

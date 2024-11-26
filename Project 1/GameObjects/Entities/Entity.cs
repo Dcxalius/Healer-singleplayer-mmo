@@ -2,6 +2,7 @@
 using Project_1.GameObjects.Spells;
 using Project_1.Input;
 using Project_1.Managers;
+using Project_1.Particles;
 using Project_1.Textures;
 using Project_1.Tiles;
 using Project_1.UI.HUD;
@@ -59,12 +60,15 @@ namespace Project_1.GameObjects.Entities
 
         List<Buff> buffs;
 
+        ParticleBase bloodsplatter;
+
         public Entity(Texture aTexture, Vector2 aStartingPos, Corpse aCorpse = null) : base(aTexture, aStartingPos)
         {
             buffs = new List<Buff>();
             corpse = aCorpse;
             shadowPos = new Rectangle((Position + new Vector2(size.X / 2, size.Y)).ToPoint(), size);
             unitData = ObjectFactory.GetData(GetType().Name);
+            bloodsplatter = new ParticleBase((1000d, 2000d), ParticleBase.OpacityType.Fading, new Color[] { Color.Red }, new Point(1));
         }
 
 
@@ -132,14 +136,19 @@ namespace Project_1.GameObjects.Entities
         public virtual void TakeDamage(Entity aAttacker, float aDamageTaken)
         {
             unitData.CurrentHealth -= aDamageTaken;
-            FloatingText floatingText = new FloatingText(aDamageTaken.ToString(), Color.Red, FeetPos, Vector2.Normalize(FeetPos - aAttacker.FeetPos));
+            Vector2 dirOfFlyingStuff = Vector2.Normalize(FeetPos - aAttacker.FeetPos);
+            FloatingText floatingText = new FloatingText(aDamageTaken.ToString(), Color.Red, FeetPos, dirOfFlyingStuff); //TODO: Change to handle attacker and this being in the same place
             ObjectManager.SpawnFloatingText(floatingText);
+
+
+            ParticleMovement bloodMovement = new ParticleMovement(dirOfFlyingStuff, Vector2.Zero, 0.9f);
+            ParticleManager.SpawnParticle(bloodsplatter, WorldRectangle, this, bloodMovement, 10);
         }
 
         public virtual void TakeHealing(Entity aHealer, float aHealingTaken)
         {
             unitData.CurrentHealth += aHealingTaken;
-            FloatingText floatingText = new FloatingText(aHealingTaken.ToString(), Color.White, FeetPos, Vector2.Normalize(FeetPos - aHealer.FeetPos)); //TODO: Change color to green once text border has been implemented
+            FloatingText floatingText = new FloatingText(aHealingTaken.ToString(), Color.White, FeetPos, Vector2.Normalize(FeetPos - aHealer.FeetPos)); //TODO: Change color to green once text border has been implemented ALSO Change to handle attacker and this being in the same place
             ObjectManager.SpawnFloatingText(floatingText);
             for (int i = 0; i < aggroTablesIAmOn.Count; i++)
             {

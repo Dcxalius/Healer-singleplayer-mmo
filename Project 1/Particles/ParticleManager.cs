@@ -19,24 +19,25 @@ namespace Project_1.Particles
             particles = new List<Particle>();
         }
 
-        public static void SpawnParticle(ParticleBase aParticle, Vector2 aWorldPos, GameObject aParent)
+        public static void SpawnParticle(ParticleBase aParticle, Vector2 aWorldPos, GameObject aParent, ParticleMovement aParticleMovement)
         {
-            particles.Add(new Particle(aWorldPos, aParticle, aParent));
+            particles.Add(new Particle(aWorldPos, aParticle, aParent, aParticleMovement));
         }
 
-        public static void SpawnParticle(ParticleBase aParticle, Rectangle aWorldPos, GameObject aParent)
+        public static void SpawnParticle(ParticleBase aParticle, Rectangle aWorldPos, GameObject aParent, ParticleMovement aParticleMovement)
         {
             Vector2 pos = new Vector2((float)RandomManager.RollDouble(aWorldPos.Left, aWorldPos.Right), (float)RandomManager.RollDouble(aWorldPos.Top, aWorldPos.Bottom));
-            SpawnParticle(aParticle, pos, aParent);
+            SpawnParticle(aParticle, pos, aParent, aParticleMovement);
         }
 
-        public static void SpawnParticle(ParticleBase aParticle, Rectangle aWorldPos, double aParticlesPerSecond, GameObject aParent)
+        public static void SpawnParticle(ParticleBase aParticle, Rectangle aWorldPos, GameObject aParent, ParticleMovement aParticleMovement, double aParticlesPerSecond)
         {
+            aParticlesPerSecond *= TimeManager.SecondsSinceLastFrame;
             if (aParticlesPerSecond >= 1)
             {
                 for (int i = 0; i < (int)Math.Floor(aParticlesPerSecond); i++)
                 {
-                    SpawnParticle(aParticle, aWorldPos, aParent);
+                    SpawnParticle(aParticle, aWorldPos, aParent, aParticleMovement);
                 }
             }
 
@@ -44,7 +45,15 @@ namespace Project_1.Particles
 
             if (RandomManager.RollDouble() <= pps)
             {
-                SpawnParticle(aParticle, aWorldPos, aParent);
+                SpawnParticle(aParticle, aWorldPos, aParent, aParticleMovement);
+            }
+        }
+
+        public static void SpawnParticle(ParticleBase aParticle, Rectangle aWorldPos, GameObject aParent, ParticleMovement aParticleMovement, int aParticleCount)
+        {
+            for (int i = 0; i < aParticleCount; i++)
+            {
+                SpawnParticle(aParticle, aWorldPos, aParent, aParticleMovement);
             }
         }
 

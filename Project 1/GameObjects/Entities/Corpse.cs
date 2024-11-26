@@ -16,8 +16,8 @@ namespace Project_1.GameObjects.Entities
 {
     internal class Corpse : GameObject
     {
-        ParticleBase particle;
-
+        ParticleBase lootGlow;
+        ParticleMovement lootGlowMovement;
         public Item[] Drop { get => drop; }
         LootTable loot;
         Item[] drop;
@@ -30,7 +30,8 @@ namespace Project_1.GameObjects.Entities
         {
             loot = aLoot;
             lootLength = WorldRectangle.Size.ToVector2().Length();
-            particle = new ParticleBase(1000d, ParticleBase.OpacityType.Fading, new Vector2(0, -1), new Vector2(0), 0.95f, new Color[]{ Color.Yellow }, new Point(1));
+            lootGlow = new ParticleBase((1000d, 1000d), ParticleBase.OpacityType.Fading, new Color[]{ Color.Yellow }, new Point(1));
+            lootGlowMovement = new ParticleMovement(new Vector2(0, -1), new Vector2(0), 0.95f);
         }
 
         public void SpawnCorpe(Vector2 aPos)
@@ -60,7 +61,7 @@ namespace Project_1.GameObjects.Entities
 
             if (!IsEmpty)
             {
-                ParticleManager.SpawnParticle(particle, WorldRectangle, 1, this);
+                ParticleManager.SpawnParticle(lootGlow, WorldRectangle, this, lootGlowMovement, 60d);
             }
         }
 

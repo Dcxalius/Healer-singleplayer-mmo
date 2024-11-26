@@ -18,10 +18,11 @@ namespace Project_1.Particles
             Fading
 
         }
-        public double LifeSpan 
-        { 
+        public double LifeSpan
+        {
             get
             {
+
                 if (lifeSpan.Item1 == lifeSpan.Item2)
                 {
                     return lifeSpan.Item1;
@@ -30,6 +31,7 @@ namespace Project_1.Particles
                 return RandomManager.RollDouble(lifeSpan);
             }
         }
+
         (double, double) lifeSpan;
 
         public Color[] Colors { get => color; }
@@ -38,36 +40,17 @@ namespace Project_1.Particles
         public Texture2D Texture { get => texture; }
         Texture2D texture;
 
-        public Vector2 Momentum { get => momentum; }
-        Vector2 momentum;
-        public Vector2 Velocity { get => velocity; }
-        Vector2 velocity;
-
-        public float Drag { get => drag; }
-        float drag;
 
         public OpacityType Opacity { get => opacityType; }
         OpacityType opacityType;
 
-        public ParticleBase((double, double) aLifeSpan, OpacityType aOpacity, Vector2 aMomentum, Vector2 aVelocity, float aDrag, Color[] aColor, Point aSize)
+        public ParticleBase((double, double) aLifeSpan, OpacityType aOpacity, Color[] aColor, Point aSize)
         {
-            lifeSpan = aLifeSpan; 
-            
-            __consturctor__(aOpacity, aMomentum, aVelocity, aDrag, aColor, aSize);
-        }
+            lifeSpan = aLifeSpan;
 
-        public ParticleBase(double aLifeSpan, OpacityType aOpacity, Vector2 aMomentum, Vector2 aVelocity, float aDrag, Color[] aColor, Point aSize)
-        {
-            lifeSpan = (aLifeSpan, aLifeSpan);
-
-            __consturctor__(aOpacity, aMomentum, aVelocity, aDrag, aColor, aSize);
-        }
-
-        void __consturctor__(OpacityType aOpacity, Vector2 aMomentum, Vector2 aVelocity, float aDrag, Color[] aColor, Point aSize)
-        {
-            drag = aDrag;
-            momentum = aMomentum;
-            velocity = aVelocity;
+            //drag = aDrag;
+            //momentum = aMomentum;
+            //velocity = aVelocity;
             color = aColor;
             opacityType = aOpacity;
 
