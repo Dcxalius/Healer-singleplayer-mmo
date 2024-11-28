@@ -68,7 +68,7 @@ namespace Project_1.GameObjects.Entities
             corpse = aCorpse;
             shadowPos = new Rectangle((Position + new Vector2(size.X / 2, size.Y)).ToPoint(), size);
             unitData = ObjectFactory.GetData(GetType().Name);
-            bloodsplatter = new ParticleBase((1000d, 2000d), ParticleBase.OpacityType.Fading, new Color[] { Color.Red }, new Point(1));
+            bloodsplatter = new ParticleBase((1000d, 2000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[] { Color.Red }, new Point(1));
         }
 
 

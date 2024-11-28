@@ -43,7 +43,7 @@ namespace Project_1.Particles
             momentum = aMovement.Momentum;
             lifeSpan = particleBase.LifeSpan;
 
-            color = aParticleBase.Colors[0];
+            color = aParticleBase.Color;
             opacity = 1d;
 
             parent = aParent;

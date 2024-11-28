@@ -30,7 +30,7 @@ namespace Project_1.GameObjects.Entities
         {
             loot = aLoot;
             lootLength = WorldRectangle.Size.ToVector2().Length();
-            lootGlow = new ParticleBase((1000d, 1000d), ParticleBase.OpacityType.Fading, new Color[]{ Color.Yellow }, new Point(1));
+            lootGlow = new ParticleBase((1000d, 1000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[]{ Color.Yellow }, new Point(1));
             lootGlowMovement = new ParticleMovement(new Vector2(0, -1), new Vector2(0), 0.95f);
         }
 
