@@ -33,7 +33,7 @@ namespace Project_1.GameObjects
         public static void Init()
         {
             player = new Player(new Microsoft.Xna.Framework.Vector2(100));
-            Camera.BindCamera(player);
+            Camera.Camera.BindCamera(player);
 
 
 

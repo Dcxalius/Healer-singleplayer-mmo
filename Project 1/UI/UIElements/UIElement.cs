@@ -132,14 +132,14 @@ namespace Project_1.UI.UIElements
 
         static protected Rectangle TransformFromRelativeToValues(Vector2 aPos, Vector2 aSize)
         {
-            Point pos = new Point((int)(Camera.ScreenSize.X * aPos.X), (int)(Camera.ScreenSize.Y * aPos.Y));
-            Point size = new Point((int)(Camera.ScreenSize.X * aSize.X), (int)(Camera.ScreenSize.Y * aSize.Y));
+            Point pos = new Point((int)(Camera.Camera.ScreenSize.X * aPos.X), (int)(Camera.Camera.ScreenSize.Y * aPos.Y));
+            Point size = new Point((int)(Camera.Camera.ScreenSize.X * aSize.X), (int)(Camera.Camera.ScreenSize.Y * aSize.Y));
             return new Rectangle(pos, size);
         }
 
         static protected Point TransformFromRelativeToPoint(Vector2 aValue)
         {
-            Point size = new Point((int)(Camera.ScreenSize.X * aValue.X), (int)(Camera.ScreenSize.Y * aValue.Y));
+            Point size = new Point((int)(Camera.Camera.ScreenSize.X * aValue.X), (int)(Camera.Camera.ScreenSize.Y * aValue.Y));
             return size;
         }
 

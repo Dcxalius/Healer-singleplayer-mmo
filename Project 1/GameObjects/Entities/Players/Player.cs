@@ -137,7 +137,7 @@ namespace Project_1.GameObjects.Entities.Players
 
         public void IssueMoveOrder(ClickEvent aClick)
         {
-            Vector2 worldPosDestination = Camera.CameraSpaceToWorldPos(aClick.RelativePos);
+            Vector2 worldPosDestination = Camera.Camera.ScreenSpaceToWorldSpace(aClick.RelativePos);
             foreach (var walker in commands)
             {
                 if (aClick.Modifier(InputManager.HoldModifier.Shift))

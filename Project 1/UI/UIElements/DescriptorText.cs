@@ -29,7 +29,7 @@ namespace Project_1.UI.UIElements
                     base.Value = value;
                     return;
                 }
-                if ((font.MeasureString(value) * Camera.Zoom).X > maxX)
+                if ((font.MeasureString(value) * Camera.Camera.Zoom).X > maxX)
                 {
                     string trim = value.Trim();
                     string[] split = trim.Split(' ');

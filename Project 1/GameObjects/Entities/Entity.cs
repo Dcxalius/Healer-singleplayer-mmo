@@ -158,7 +158,7 @@ namespace Project_1.GameObjects.Entities
 
         public override bool Click(ClickEvent aClickEvent)
         {
-            if (Camera.WorldPosToCameraSpace(WorldRectangle).Contains(aClickEvent.AbsolutePos))
+            if (Camera.Camera.WorldPosToCameraSpace(WorldRectangle).Contains(aClickEvent.AbsolutePos))
             {
                 if (aClickEvent.NoModifiers())
                 {
@@ -322,7 +322,7 @@ namespace Project_1.GameObjects.Entities
 
             Vector2 offset = new Vector2(0, size.Y / 2.5f);
             shadowPos.Location = (Position + offset).ToPoint();
-            shadowPos.Size = (size.ToVector2() * Camera.Scale).ToPoint();
+            shadowPos.Size = (size.ToVector2() * Camera.Camera.Scale).ToPoint();
         }
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)
@@ -335,10 +335,10 @@ namespace Project_1.GameObjects.Entities
                     shadowColor = Color.DarkGreen;
                 }
             }
-            ShadowTexture.Draw(aBatch, Camera.WorldPosToCameraSpace(shadowPos).Location.ToVector2(), shadowColor, FeetPos.Y - 2);
+            ShadowTexture.Draw(aBatch, Camera.Camera.WorldPosToCameraSpace(shadowPos).Location.ToVector2(), shadowColor, FeetPos.Y - 2);
             if (selected == true)
             {
-                SelectTexture.Draw(aBatch, Camera.WorldPosToCameraSpace(shadowPos).Location.ToVector2(), UnitData.RelationColor(), FeetPos.Y - 1);
+                SelectTexture.Draw(aBatch, Camera.Camera.WorldPosToCameraSpace(shadowPos).Location.ToVector2(), UnitData.RelationColor(), FeetPos.Y - 1);
             }
             base.Draw(aBatch);
         }

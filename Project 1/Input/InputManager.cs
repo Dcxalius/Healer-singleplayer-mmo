@@ -72,6 +72,7 @@ namespace Project_1.Input
         {
             get
             {
+                //Debug.Assert(scrolledSinceLastFrame == 0);
                 return scrolledSinceLastFrame;
             }
 
@@ -176,7 +177,7 @@ namespace Project_1.Input
         public static Vector2 GetMousePosRelative()
         {
             Point mousePoint = GetMousePosAbsolute();
-            Point screenSize = Camera.ScreenSize;
+            Point screenSize = Camera.Camera.ScreenSize.ToPoint();
 
             Vector2 mouseVector = new Vector2(mousePoint.X / (float)screenSize.X, mousePoint.Y / (float)screenSize.Y);
 
@@ -187,7 +188,7 @@ namespace Project_1.Input
 
         static Point BoundsCheckOnMouse(Point aMousePos)
         {
-            Rectangle bounds = Camera.ScreenRectangle;
+            Rectangle bounds = Camera.Camera.ScreenRectangle;
             if (!bounds.Contains(aMousePos))
             {
                 return new Point(-1);

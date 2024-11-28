@@ -217,7 +217,7 @@ namespace Project_1.Items
 
         public void LootItem(int aLootIndex)
         {
-            Item item = HUDManager.LootItem(aLootIndex);
+            Item item = HUDManager.GetLootItem(aLootIndex);
             for (int i = 0; i < items.Length; i++)
             {
                 for (int j = 0; j < items[i].Length; j++)
@@ -250,7 +250,7 @@ namespace Project_1.Items
 
         public void LootItem(int aLootIndex, (int, int) aBagAndSlot)
         {
-            Item item = HUDManager.LootItem(aLootIndex);
+            Item item = HUDManager.GetLootItem(aLootIndex);
             if (items[aBagAndSlot.Item1][aBagAndSlot.Item2] == null)
             {
                 items[aBagAndSlot.Item1][aBagAndSlot.Item2] = item;
@@ -439,6 +439,12 @@ namespace Project_1.Items
                     return;
                 }
             }
+        }
+
+        public Container GetBag(int aSlotIndex)
+        {
+            Debug.Assert(aSlotIndex > 0, "Incorrect slot given");
+            return bags[aSlotIndex];
         }
 
         public Container[] GetBags()

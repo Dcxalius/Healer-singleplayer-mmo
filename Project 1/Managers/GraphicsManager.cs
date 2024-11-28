@@ -46,7 +46,7 @@ namespace Project_1.Managers
         {
 
 
-            SetWindowSize(Camera.devScreenBorder, fullsceen, borderlessFullscreen);
+            SetWindowSize(Camera.Camera.devScreenBorder, fullsceen, borderlessFullscreen);
 
         }
 
@@ -148,13 +148,13 @@ namespace Project_1.Managers
             {
                 graphicsDeviceManager.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
                 graphicsDeviceManager.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-                Camera.RenderTargetPosition = GetRenderTargetDestination(Camera.devScreenBorder, graphicsDeviceManager.PreferredBackBufferWidth, graphicsDeviceManager.PreferredBackBufferHeight);
+                Camera.Camera.RenderTargetPosition = GetRenderTargetDestination(Camera.Camera.devScreenBorder, graphicsDeviceManager.PreferredBackBufferWidth, graphicsDeviceManager.PreferredBackBufferHeight);
             }
             else
             {
                 graphicsDeviceManager.PreferredBackBufferWidth = aSize.X;
                 graphicsDeviceManager.PreferredBackBufferHeight = aSize.Y;
-                Camera.RenderTargetPosition = new Rectangle(0, 0, aSize.X, aSize.Y);
+                Camera.Camera.RenderTargetPosition = new Rectangle(0, 0, aSize.X, aSize.Y);
             }
 
             graphicsDeviceManager.IsFullScreen = aFullscreen;
@@ -164,7 +164,7 @@ namespace Project_1.Managers
             //Add check here to see if display area is correct and if it isn't change aSize
 
 
-            Camera.SetWindowSize(aSize);
+            Camera.Camera.SetWindowSize(new Camera.AbsoluteScreenPosition(aSize));
             UIManager.Rescale();
             unCaptueredScissorRect = graphicsDeviceManager.GraphicsDevice.ScissorRectangle;
 

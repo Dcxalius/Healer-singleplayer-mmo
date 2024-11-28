@@ -36,7 +36,7 @@ namespace Project_1.Textures
             {
                 return;
             }
-            if (Camera.MomAmIInFrame(aPosRectangle))
+            if (Camera.Camera.MomAmIInFrame(aPosRectangle))
             {
                 aBatch.Draw(gfx, aPosRectangle, visible, aColor, rotation, offset, flip, 1f);
 

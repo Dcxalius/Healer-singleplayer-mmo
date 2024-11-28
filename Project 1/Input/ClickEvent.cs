@@ -7,7 +7,7 @@ namespace Project_1.Input
     {
 
         public Vector2 RelativePos { get => clickPos; }
-        public Point AbsolutePos { get => Camera.TransformRelativeToAbsoluteScreenSpace(clickPos); }
+        public Point AbsolutePos { get => Camera.Camera.TransformRelativeToAbsoluteScreenSpace(clickPos); }
         public InputManager.ClickType ButtonPressed { get => buttonPressed; }
 
         Vector2 clickPos;
@@ -19,7 +19,7 @@ namespace Project_1.Input
 
         public ClickEvent(Point aPos, InputManager.ClickType aButtonPressed, bool[] aModifiers)
         {
-            clickPos = Camera.TransformAbsoluteToRelativeScreenSpace(aPos);
+            clickPos = Camera.Camera.TransformAbsoluteToRelativeScreenSpace(aPos);
             __ClickEvent__(aButtonPressed, aModifiers);
 
         }

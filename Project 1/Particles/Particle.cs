@@ -94,9 +94,9 @@ namespace Project_1.Particles
 
         public void Draw(SpriteBatch aBatch)
         {
-            if (!Camera.MomAmIInFrame(worldPos)) return;
+            if (!Camera.Camera.MomAmIInFrame(worldPos)) return;
             
-            aBatch.Draw(particleBase.Texture, Camera.WorldPosToCameraSpace(worldPos), null, GetOpacityColor(color, opacity), 0f, Vector2.Zero, 1f, SpriteEffects.None, (parent.FeetPos.Y + 1) / (Camera.WorldRectangle.Bottom)); //TODO: Make this use the layerDepth
+            aBatch.Draw(particleBase.Texture, Camera.Camera.WorldPosToCameraSpace(worldPos), null, GetOpacityColor(color, opacity), 0f, Vector2.Zero, 1f, SpriteEffects.None, (parent.FeetPos.Y + 1) / (Camera.Camera.WorldRectangle.Bottom)); //TODO: Make this use the layerDepth
         }
 
     }

@@ -79,7 +79,7 @@ namespace Project_1.GameObjects
 
         public void Draw(SpriteBatch aBatch)
         {
-            aBatch.Draw(renderTarget, Camera.WorldPosToCameraSpace(position), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+            aBatch.Draw(renderTarget, Camera.Camera.WorldPosToCameraSpace(position), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
         }
     }
 }

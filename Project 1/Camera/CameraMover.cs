@@ -7,10 +7,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Project_1.Camera;
+using static Project_1.Camera.Camera;
 using Project_1.GameObjects;
 
-namespace Project_1
+namespace Project_1.Camera
 {
     internal class CameraMover
     {
@@ -119,7 +119,7 @@ namespace Project_1
             {
                 if (boundObject == null)
                 {
-                    SetCamera(Camera.CameraSettings.Free);
+                    SetCamera(CameraSettings.Free);
                     return;
                 }
                 CentreInWorldSpace = boundObject.Position;
@@ -130,7 +130,7 @@ namespace Project_1
         {
             if (boundObject == null)
             {
-                SetCamera(Camera.CameraSettings.Free);
+                SetCamera(CameraSettings.Free);
 
                 return;
             }

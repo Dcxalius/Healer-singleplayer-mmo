@@ -8,7 +8,7 @@ namespace Project_1.Input
     {
 
         public Vector2 RelativePos { get => releasePos; }
-        public Point AbsolutePos { get => Camera.TransformRelativeToAbsoluteScreenSpace(releasePos); }
+        public Point AbsolutePos { get => Camera.Camera.TransformRelativeToAbsoluteScreenSpace(releasePos); }
         public InputManager.ClickType ButtonPressed { get => buttonPressed; }
         public UIElement Parent { get => creator; }
 
@@ -22,7 +22,7 @@ namespace Project_1.Input
 
         public ReleaseEvent(UIElement aCreator, Point aPos, InputManager.ClickType aButtonReleased, bool[] aModifiers)
         {
-            releasePos = Camera.TransformAbsoluteToRelativeScreenSpace(aPos);
+            releasePos = Camera.Camera.TransformAbsoluteToRelativeScreenSpace(aPos);
             __ClickEvent__(aCreator, aButtonReleased, aModifiers);
 
         }

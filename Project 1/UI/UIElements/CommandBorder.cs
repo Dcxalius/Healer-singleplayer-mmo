@@ -19,7 +19,7 @@ namespace Project_1.UI.UIElements
         //public Border(Color aColor, Vector2 aPos, Vector2 aSize) : base(new UITexture("GrayWhiteBorder", aColor), aPos, aSize)
         {
             //This probably should be broken out and called on rescale or be completly reworked and handled through shaders
-            Point size = Camera.TransformRelativeToAbsoluteScreenSpace(aSizeOfBoxToBorder);
+            Point size = Camera.Camera.TransformRelativeToAbsoluteScreenSpace(aSizeOfBoxToBorder);
             size = (size.ToVector2()).ToPoint();
             Texture2D text = Managers.GraphicsManager.CreateNewTexture(size);
 

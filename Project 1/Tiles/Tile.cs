@@ -28,7 +28,7 @@ namespace Project_1.Tiles
         public override void Draw(SpriteBatch aBatch)
         {
             //base.Draw(aBatch); Dont draw as a gameobject to make all tiles appear in the background
-            gfx.Draw(aBatch, Camera.WorldPosToCameraSpace(Position), 0); 
+            gfx.Draw(aBatch, Camera.Camera.WorldPosToCameraSpace(Position), 0); 
         }
     }
 }

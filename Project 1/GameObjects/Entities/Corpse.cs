@@ -46,6 +46,7 @@ namespace Project_1.GameObjects.Entities
 
         public override bool Click(ClickEvent aClickEvent)
         {
+            if (!Camera.Camera.WorldPosToCameraSpace(WorldRectangle).Contains(aClickEvent.AbsolutePos)) return false;
             if (aClickEvent.ButtonPressed != InputManager.ClickType.Right) return false;
             if ((ObjectManager.Player.FeetPos - Centre).Length() > lootLength) return false;
             if (drop.All(drop => drop == null)) return false;
@@ -68,7 +69,7 @@ namespace Project_1.GameObjects.Entities
         public override void Draw(SpriteBatch aBatch)
         {
             Debug.Assert(gfx != null);
-            gfx.Draw(aBatch, Camera.WorldPosToCameraSpace(Position), Position.Y);
+            gfx.Draw(aBatch, Camera.Camera.WorldPosToCameraSpace(Position), Position.Y);
         }
     }
 }

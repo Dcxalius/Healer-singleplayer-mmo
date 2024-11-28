@@ -19,8 +19,8 @@ namespace Project_1.UI.HUD
         Corpse lootedCorpse;
         Loot[] loot;
 
-        Vector2 lootSize = Camera.GetRelativeSquare(0.05f);
-        Vector2 spacing = Camera.GetRelativeSquare(0.025f);
+        Vector2 lootSize = Camera.Camera.GetRelativeSquare(0.05f);
+        Vector2 spacing = Camera.Camera.GetRelativeSquare(0.025f);
 
         bool tooMuchLootForWindow = false; //TODO: Break this out to a interface
         float scrollValue = 0;
@@ -32,7 +32,7 @@ namespace Project_1.UI.HUD
             ToggleVisibilty();
         }
 
-        public Items.Item LootItem(int aIndex)
+        public Items.Item GetItem(int aIndex)
         {
             return lootedCorpse.Drop[aIndex];
         }
@@ -57,6 +57,7 @@ namespace Project_1.UI.HUD
                 return;
             }
 
+            ClearLoot();
             ToggleVisibilty();
             lootedCorpse = aCorpse;
             CreateLoot();
@@ -87,7 +88,7 @@ namespace Project_1.UI.HUD
                 pos.Y += spacing.Y;
             }
 
-            if (pos.Y > RelativeSize.Y - lootSize.Y - spacing.Y)
+            if (RelativeSize.Y < pos.Y - lootSize.Y - spacing.Y)
             {
                 tooMuchLootForWindow = true;
                 scrollValue = 0;
@@ -107,7 +108,7 @@ namespace Project_1.UI.HUD
         {
             base.Update(aParent);
 
-
+            CheckIfShouldClose();
             UpdateScroll();
         }
 
@@ -140,16 +141,17 @@ namespace Project_1.UI.HUD
         {
             float lastScrollValue = scrollValue;
 
-            scrollValue += (InputManager.ScrolledSinceLastFrame / 120 / totalLoot * 0.3f); //TODO: Make this stop camera from zooming
-
+            scrollValue += ((float)InputManager.ScrolledSinceLastFrame / 120 / totalLoot * 0.3f); //TODO: Make this stop camera from zooming
+            //Debug.Assert(scrollValue == 0);
             return lastScrollValue;
         }
 
         void CapScroll()
         {
-            if (scrollValue < 0)
+            if (scrollValue <= 0)
             {
                 scrollValue = 0;
+                return;
             }
 
             if (scrollValue > originalYPos.Last() + lootSize.Y + spacing.Y - RelativeSize.Y)
@@ -160,12 +162,14 @@ namespace Project_1.UI.HUD
 
         void CheckIfShouldClose()
         {
-            if (lootedCorpse == null)
+            if (lootedCorpse == null) return;
+
+            if ((lootedCorpse.Centre - ObjectManager.Player.FeetPos).Length() > lootedCorpse.LootLength)
             {
+                StopLoot();
                 return;
             }
             CheckIfLootedAll();
-            ToFarFromCorpse();
         }
         void CheckIfLootedAll()
         {
@@ -175,17 +179,14 @@ namespace Project_1.UI.HUD
             }
         }
 
-        void ToFarFromCorpse()
-        {
-            if ((lootedCorpse.Centre - ObjectManager.Player.FeetPos).Length() > lootedCorpse.LootLength)
-            {
-                StopLoot();
-            }
-        }
-
         public void StopLoot()
         {
             ToggleVisibilty();
+            ClearLoot();
+        }
+
+        void ClearLoot()
+        {
             children.RemoveAll(child => loot.Contains(child));
             loot = null;
             lootedCorpse = null;

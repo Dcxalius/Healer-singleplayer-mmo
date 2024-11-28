@@ -91,7 +91,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
         {
             Close();
 
-            Point target = Camera.TransformRelativeToAbsoluteScreenSpace(aClick.RelativePos) - AbsolutePos.Location;
+            Point target = Camera.Camera.TransformRelativeToAbsoluteScreenSpace(aClick.RelativePos) - AbsolutePos.Location;
 
             SetNewValue(target);
         }

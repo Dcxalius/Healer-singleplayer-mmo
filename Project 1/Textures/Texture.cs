@@ -121,7 +121,7 @@ namespace Project_1.Textures
 
         public virtual void Draw(SpriteBatch aBatch, Vector2 aPos)
         {
-            Draw(aBatch, aPos, color, Camera.WorldRectangle.Bottom);
+            Draw(aBatch, aPos, color, Camera.Camera.WorldRectangle.Bottom);
         }
 
         public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, float aFeetPosY)
@@ -133,9 +133,9 @@ namespace Project_1.Textures
         {
             if (gfx == null) return;
 
-            if (Camera.MomAmIInFrame(new Rectangle(aPos.ToPoint(), (size.ToVector2() *Camera.Scale).ToPoint())))
+            if (Camera.Camera.MomAmIInFrame(new Rectangle(aPos.ToPoint(), (size.ToVector2() * Camera.Camera.Scale).ToPoint())))
             {
-                aBatch.Draw(gfx, aPos, visible, aColor, rotation, offset, Camera.Scale, flip, aFeetPosY / (Camera.WorldRectangle.Bottom + size.Y));
+                aBatch.Draw(gfx, aPos, visible, aColor, rotation, offset, Camera.Camera.Scale, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
             }
         }
     }

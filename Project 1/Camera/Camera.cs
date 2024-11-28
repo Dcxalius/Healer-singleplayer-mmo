@@ -16,7 +16,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Permissions;
 using System.Windows.Forms;
 
-namespace Project_1
+namespace Project_1.Camera
 {
 
     internal static class Camera
@@ -35,21 +35,21 @@ namespace Project_1
         public static float Zoom { get => 1f / scale; }
 
 
-        public static Rectangle ScreenRectangle { get => new Rectangle(Point.Zero, ScreenSize); }
+        public static Rectangle ScreenRectangle { get => new Rectangle(Point.Zero, ScreenSize.ToPoint()); }
 
-        public static Point ScreenSize { get => screenRectangleSize; }
+        public static AbsoluteScreenPosition ScreenSize { get => screenRectangleSize; }
 
         public static CameraSettings CurrentCameraSetting { get => cameraSettings; }
 
-        public static Rectangle WorldRectangle { get => new Rectangle(centreInWorldSpace.ToPoint() - CentrePointInScreenSpace, ScreenSize); }
+        public static Rectangle WorldRectangle { get => new Rectangle(centreInWorldSpace.ToPoint() - (CentrePointInScreenSpace / Scale).ToPoint(), (ScreenSize / Scale).ToPoint()); }
         public static Vector2 CentreInWorldSpace { get => centreInWorldSpace; set => centreInWorldSpace = value; }
 
-        public static Point CentrePointInScreenSpace { get => new Point(screenRectangleSize.X / 2, screenRectangleSize.Y / 2); }
+        public static AbsoluteScreenPosition CentrePointInScreenSpace { get => screenRectangleSize / 2; }
 
         public static Rectangle RenderTargetPosition { set => renderTargetPosition = value; }
 
 
-        static Vector2 centreInWorldSpace = new Vector2(100,100);
+        static Vector2 centreInWorldSpace = new Vector2(100, 100);
 
         //---
 
@@ -60,7 +60,7 @@ namespace Project_1
         //--
 
         public readonly static Point devScreenBorder = new Point(1500, 900);
-        static Point screenRectangleSize;
+        static AbsoluteScreenPosition screenRectangleSize;
 
 
 
@@ -95,7 +95,7 @@ namespace Project_1
             spriteBatch = GraphicsManager.CreateSpriteBatch();
             gameSpriteBatch = GraphicsManager.CreateSpriteBatch();
             uiSpriteBatch = GraphicsManager.CreateSpriteBatch();
-           
+
         }
 
         public static void Update()
@@ -105,7 +105,7 @@ namespace Project_1
             cameraMover.Move();
         }
 
-        
+
 
         public static void BindCamera(MovingObject aBinder)
         {
@@ -117,12 +117,13 @@ namespace Project_1
             int scrolled = InputManager.ScrolledSinceLastFrame;
             if (scrolled != 0)
             {
-                if ((scrolled > 0 && scale <= minScale) || (scrolled < 0 && scale >= maxScale))
+                if (scrolled > 0 && scale <= minScale || scrolled < 0 && scale >= maxScale)
                 {
                     return;
                 }
                 scale -= scrolled / 2400f; //A single mousewheel step is 120 so 2400 gives a movement of 5% points per mousewheel step
-                DebugManager.Print(typeof(Camera), "Centre point: " + centreInWorldSpace);
+                //DebugManager.Print(typeof(Camera), "Centre point: " + centreInWorldSpace + ", " + CentrePointInScreenSpace);
+                //DebugManager.Print(typeof(Camera), "WorldRect size: " + WorldRectangle.Size);
                 cameraMover.bindingRectangle.Size = new Point((int)(screenRectangleSize.X / 4 * 3 * Zoom), (int)(screenRectangleSize.Y / 4 * 3 * Zoom));
 
             }
@@ -131,19 +132,19 @@ namespace Project_1
         public static Vector2 GetRelativeSquare(float aSizeInX)
         {
             float a = screenRectangleSize.X * aSizeInX;
-            float b = a / (float)screenRectangleSize.Y;
-            return new (aSizeInX, b);
+            float b = a / screenRectangleSize.Y;
+            return new(aSizeInX, b);
         }
 
-        public static Point TransformRelativeToAbsoluteScreenSpace(Vector2 aPos) 
+        public static Point TransformRelativeToAbsoluteScreenSpace(Vector2 aPos) //TODO: Change this to Relative and absolute and move it out of here
         {
             Point pos = new Point((int)(screenRectangleSize.X * aPos.X), (int)(screenRectangleSize.Y * aPos.Y));
             //DebugManager.Print(typeof(Camera), "Abs pos = " + pos + ", and relative pos = " + aPos);
             return pos;
         }
-        public static Vector2 TransformAbsoluteToRelativeScreenSpace(Point aPos)
+        public static Vector2 TransformAbsoluteToRelativeScreenSpace(Point aPos) //TODO: Change this to Relative and absolute and move it out of here
         {
-            Vector2 pos = new Vector2((float)aPos.X / (float)screenRectangleSize.X, (float)aPos.Y / (float)screenRectangleSize.Y);
+            Vector2 pos = new Vector2(aPos.X / (float)screenRectangleSize.X, aPos.Y / (float)screenRectangleSize.Y);
             return pos;
         }
 
@@ -154,19 +155,19 @@ namespace Project_1
             cameraSettings = aCameraSettings;
         }
 
-        public static void SetWindowSize(Point aSize)
+        public static void SetWindowSize(AbsoluteScreenPosition aSize)
         {
-            cameraTarget = GraphicsManager.CreateRenderTarget(aSize);
-            uiTarget = GraphicsManager.CreateRenderTarget(aSize);
-            gameTarget = GraphicsManager.CreateRenderTarget(aSize);
+            cameraTarget = GraphicsManager.CreateRenderTarget(aSize.ToPoint());
+            uiTarget = GraphicsManager.CreateRenderTarget(aSize.ToPoint());
+            gameTarget = GraphicsManager.CreateRenderTarget(aSize.ToPoint());
             screenRectangleSize = aSize;
 
             float x = devScreenBorder.X / aSize.X;
             float y = devScreenBorder.Y / aSize.Y;
             scale = Math.Max(x, y);
             minScale = scale - 0.3f;
-            minScale = scale + 0.4f;
-            cameraMover.bindingRectangle = new Rectangle(new Point(0), new Point(screenRectangleSize.X / 4 * 3, screenRectangleSize .Y / 4 * 3));
+            maxScale = scale + 0.4f;
+            cameraMover.bindingRectangle = new Rectangle(new Point(0), new Point(screenRectangleSize.X / 4 * 3, screenRectangleSize.Y / 4 * 3));
             cameraMover.maxCircleCameraMove = screenRectangleSize.Y / 3;
 
             Init();
@@ -183,25 +184,25 @@ namespace Project_1
 
         public static Vector2 WorldPosToCameraSpace(Vector2 aWorldPos)
         {
-            Vector2 topLeft = centreInWorldSpace * scale - new Vector2(screenRectangleSize.X / 2,       screenRectangleSize.Y / 2);
+            Vector2 topLeft = centreInWorldSpace * scale - new Vector2(screenRectangleSize.X / 2, screenRectangleSize.Y / 2);
 
-            return aWorldPos*scale - topLeft ; 
+            return aWorldPos * scale - topLeft;
         }
 
-        public static Vector2 CameraSpaceToWorldPos(Point aScreenPos)
+        public static Vector2 ScreenSpaceToWorldSpace(AbsoluteScreenPosition aScreenPos)
         {
             Vector2 vectorInScreen = (CentrePointInScreenSpace - aScreenPos).ToVector2();
 
-            Vector2 vectorInWorld = centreInWorldSpace - vectorInScreen;
-            //Needs scale
+            Vector2 vectorInWorld = centreInWorldSpace - vectorInScreen * Zoom;
+
             return vectorInWorld;
         }
 
-        public static Vector2 CameraSpaceToWorldPos(Vector2 aRelativeVector)
+        public static Vector2 ScreenSpaceToWorldSpace(Vector2 aRelativeVector)
         {
-            Vector2 a = (CentrePointInScreenSpace.ToVector2() * Scale - TransformRelativeToAbsoluteScreenSpace(aRelativeVector).ToVector2())  ;
-            Vector2 b = centreInWorldSpace - a;
-            return b;
+            Vector2 vectorInScreen = CentrePointInScreenSpace.ToVector2() - TransformRelativeToAbsoluteScreenSpace(aRelativeVector).ToVector2();
+            Vector2 vectorInWorld = WorldRectangle.Center.ToVector2() - vectorInScreen * Zoom;
+            return vectorInWorld;
         }
 
         public static bool MomAmIInFrame(Rectangle aRect)
@@ -211,12 +212,12 @@ namespace Project_1
 
         public static bool MomAmIInFrame(Vector2 aWorldPos)
         {
-            return ScreenRectangle.Contains(aWorldPos);
+            return WorldRectangle.Contains(aWorldPos);
         }
 
         public static void DrawRenderTarget()
         {
-            
+
             spriteBatch.Begin();
             spriteBatch.Draw(cameraTarget, renderTargetPosition, Color.White);
             spriteBatch.End();
@@ -246,7 +247,7 @@ namespace Project_1
             //spriteBatch.Begin();
             GraphicsManager.ClearScreen(Color.White);
 
-            
+
             DrawGameObjects(gameSpriteBatch);
             gameSpriteBatch.Draw(uiTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
 
@@ -259,12 +260,12 @@ namespace Project_1
 
         public static void PauseDraw()
         {
-            
+
             GraphicsManager.SetRenderTarget(cameraTarget);
             spriteBatch.Begin();
             GraphicsManager.ClearScreen(Color.Purple);
-            
-            
+
+
             DrawGameObjects(spriteBatch); //draw game
             spriteBatch.Draw(uiTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f); //draw game ui
             pauseGfx.Draw(spriteBatch, Vector2.Zero); //draw gray screen overlay

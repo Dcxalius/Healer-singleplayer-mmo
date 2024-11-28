@@ -40,14 +40,12 @@ namespace Project_1.UI.UIElements.Inventory
 
                 if (bagIndex == -1)
                 {
-                    Container[] a = ObjectManager.Player.Inventory.GetBags();
-
-                    return a[slotIndex];
+                    return ObjectManager.Player.Inventory.GetBag(slotIndex);
                 }
 
                 if (bagIndex == -2)
                 {
-                    throw new NotImplementedException();
+                    return HUDManager.GetLootItem(slotIndex);
                 }
 
                 return null;

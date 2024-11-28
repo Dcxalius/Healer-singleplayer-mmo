@@ -11,7 +11,7 @@ using Project_1.UI;
 
 namespace Project_1.Managers
 {
-    
+
     internal static class StateManager
     {
         public enum State
@@ -66,7 +66,7 @@ namespace Project_1.Managers
                     break;
             }
 
-            Camera.DrawRenderTarget();
+            Camera.Camera.DrawRenderTarget();
         }
 
         public static void SetState(State aState)
@@ -81,7 +81,7 @@ namespace Project_1.Managers
             {
                 PauseGame(State.Pause);
             }
-            Camera.Update();
+            Camera.Camera.Update();
             ObjectManager.Update();
             UIManager.Update();
             ParticleManager.Update();
@@ -95,8 +95,8 @@ namespace Project_1.Managers
 
         static void GameDraw()
         {
-            Camera.GameDraw();
-            Camera.DrawGameToCamera();
+            Camera.Camera.GameDraw();
+            Camera.Camera.DrawGameToCamera();
         }
 
         static void PauseUpdate()
@@ -118,7 +118,7 @@ namespace Project_1.Managers
         static void PauseDraw()
         {
             GraphicsManager.ClearScreen(Color.Purple);
-            Camera.PauseDraw();
+            Camera.Camera.PauseDraw();
         }
 
         static void StartMenuUpdate()
@@ -142,7 +142,7 @@ namespace Project_1.Managers
         static void OptionsMenuDraw()
         {
             GraphicsManager.ClearScreen(Color.LightGray);
-            Camera.OptionDraw();
+            Camera.Camera.OptionDraw();
         }
     }
 }

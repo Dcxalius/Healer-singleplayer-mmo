@@ -21,7 +21,7 @@ namespace Project_1.Textures
             {
                 textToDisplay = value;
                 if (value == null) return;
-                offset = font.MeasureString(value) * Camera.Zoom; 
+                offset = font.MeasureString(value) * Camera.Camera.Zoom; 
             }
         }
 
@@ -36,7 +36,7 @@ namespace Project_1.Textures
         public Text(string aFontName)
         {
             font = TextureManager.GetFont(aFontName);
-            scale = Camera.Zoom;
+            scale = Camera.Camera.Zoom;
             textToDisplay = null;
             color = Color.White;
         }
@@ -44,7 +44,7 @@ namespace Project_1.Textures
         public Text(string aFontName, string aTextToStart)
         {
             font = TextureManager.GetFont(aFontName);
-            scale = Camera.Zoom;
+            scale = Camera.Camera.Zoom;
             Value = aTextToStart;
             color = Color.White;
         }
@@ -52,7 +52,7 @@ namespace Project_1.Textures
         public Text(string aFontName, Color aColor)
         {
             font = TextureManager.GetFont(aFontName);
-            scale = Camera.Zoom;
+            scale = Camera.Camera.Zoom;
             textToDisplay = null;
             color = aColor;
         }
@@ -60,14 +60,14 @@ namespace Project_1.Textures
         public Text(string aFontName, string aTextToStart, Color aColor)
         {
             font = TextureManager.GetFont(aFontName);
-            scale = Camera.Zoom;
+            scale = Camera.Camera.Zoom;
             Value = aTextToStart;
             color = aColor;
         }
 
         public void Rescale()
         {
-            scale = Camera.Zoom;
+            scale = Camera.Camera.Zoom;
         }
 
         public void CentredDraw(SpriteBatch aBatch, Vector2 aPos) //Offsets by half of textsize

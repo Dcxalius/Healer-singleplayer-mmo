@@ -114,9 +114,9 @@ namespace Project_1.UI.HUD
         //    inventoryBox.RefreshSlot(aBag, aSlot);
         //}
 
-        public static Items.Item LootItem(int aSlotInLoot)
+        public static Items.Item GetLootItem(int aSlotInLoot)
         {
-            return lootBox.LootItem(aSlotInLoot);
+            return lootBox.GetItem(aSlotInLoot);
         }
 
         public static void ReduceLootItem(int aSlotInLoot, int aCount)
