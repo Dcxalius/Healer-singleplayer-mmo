@@ -13,13 +13,14 @@ namespace Project_1.UI.UIElements.Bars
 {
     internal class Bar : Box
     {
+        public new Color Color { get => barComponent.Color; set => barComponent.Color = value; }
         public virtual float Value
         {
             set { barComponent.UpdateBar(value, RelativeSize.X); }
         }
 
         BarComponent barComponent;
-        
+
 
         public Bar(BarTexture aBarGfx, UITexture aBackgroundGfx, Vector2 aPos, Vector2 aSize) : base(aBackgroundGfx, aPos, aSize)
         {

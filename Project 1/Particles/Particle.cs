@@ -31,6 +31,7 @@ namespace Project_1.Particles
         Color color;
 
         ParticleMovement particleMovement;
+        float rotation;
 
         public Particle(Vector2 aWorldPos, ParticleBase aParticleBase, GameObject aParent, ParticleMovement aMovement)
         {
@@ -49,6 +50,7 @@ namespace Project_1.Particles
             parent = aParent;
 
             particleMovement = aMovement;
+            rotation = (float)Math.Atan2(aMovement.Momentum.Y, aMovement.Momentum.X);
         }
 
 
@@ -96,7 +98,7 @@ namespace Project_1.Particles
         {
             if (!Camera.Camera.MomAmIInFrame(worldPos)) return;
             
-            aBatch.Draw(particleBase.Texture, Camera.Camera.WorldPosToCameraSpace(worldPos), null, GetOpacityColor(color, opacity), 0f, Vector2.Zero, 1f, SpriteEffects.None, (parent.FeetPos.Y + 1) / (Camera.Camera.WorldRectangle.Bottom)); //TODO: Make this use the layerDepth
+            aBatch.Draw(particleBase.Texture, Camera.Camera.WorldPosToCameraSpace(worldPos), null, GetOpacityColor(color, opacity), rotation, Vector2.Zero, 1f, SpriteEffects.None, (parent.FeetPos.Y + 1) / (Camera.Camera.WorldRectangle.Bottom)); //TODO: Make this use the layerDepth
         }
 
     }

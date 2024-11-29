@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Spells;
 using Project_1.Input;
 using Project_1.Managers;
@@ -38,6 +39,11 @@ namespace Project_1.GameObjects.Entities
         public float CurrentHealth { get => unitData.CurrentHealth; }
         public float MaxHealth { get => unitData.MaxHealth; }
 
+        public float CurrentResource { get => unitData.CurrentResource; }
+        public float MaxResource { get => unitData.MaxResource; }
+
+        public Color ResourceColor { get => unitData.ResourceColor; }
+
         public override float MaxSpeed { get => unitData.MaxSpeed; }
 
         Rectangle shadowPos;
@@ -62,8 +68,16 @@ namespace Project_1.GameObjects.Entities
 
         ParticleBase bloodsplatter;
 
+        bool inCombat;
+
+        public bool OffGlobalCooldown { get => lastCastSpell + globalCooldown < TimeManager.TotalFrameTime; }
+        public double RatioOfGlobalCooldownDone { get => Math.Min((TimeManager.TotalFrameTime - lastCastSpell) / globalCooldown, 1); }
+        const double globalCooldown = 1500;
+        double lastCastSpell;
+
         public Entity(Texture aTexture, Vector2 aStartingPos, Corpse aCorpse = null) : base(aTexture, aStartingPos)
         {
+            inCombat = false;
             buffs = new List<Buff>();
             corpse = aCorpse;
             shadowPos = new Rectangle((Position + new Vector2(size.X / 2, size.Y)).ToPoint(), size);
@@ -79,10 +93,34 @@ namespace Project_1.GameObjects.Entities
             base.Update();
             CheckForCollisions(oldPosition);
 
-
+            unitData.Update();
             AttackTarget();
             UpdateBuffs();
             Death();
+        }
+
+
+        public bool CastSpell(Spell aSpell)
+        {
+            if (aSpell == null) return false;
+            //if (!spellBook.HasSpell(aSpell)) return false;
+            if (!UnitData.Resource.isCastable(aSpell.ResourceCost)) return false;
+            if (!OffGlobalCooldown) return false;
+
+            if (!aSpell.Trigger()) return false;
+            lastCastSpell = TimeManager.TotalFrameTime;
+            UnitData.Resource.CastSpell(aSpell.ResourceCost);
+
+
+            return true;
+        }
+
+        public void ServerTick() //"Server tick"
+        {
+            if (!inCombat)
+            {
+                unitData.HealthRegen();
+            }
         }
 
         void UpdateBuffs()
@@ -110,6 +148,7 @@ namespace Project_1.GameObjects.Entities
                 DebugManager.Print(GetType(), aNonfriendly + " tried to add me to a table I thought I was on.");
                 return;
             }
+            inCombat = true;
             aggroTablesIAmOn.Add(aNonfriendly);
         }
 
@@ -121,6 +160,17 @@ namespace Project_1.GameObjects.Entities
                 return;
             }
             aggroTablesIAmOn.Remove(aNonfriendly);
+            Combat();
+        }
+        void Combat()
+        {
+            if (inCombat)
+            {
+                if (aggroTablesIAmOn.Count == 0)
+                {
+                    inCombat = false;
+                }
+            }
         }
 
         public void Select()

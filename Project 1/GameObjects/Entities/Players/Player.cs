@@ -14,6 +14,7 @@ using Project_1.Tiles;
 using Project_1.UI.HUD;
 using Project_1.Textures.AnimatedTextures;
 using Project_1.Items;
+using Project_1.GameObjects.Spells;
 
 namespace Project_1.GameObjects.Entities.Players
 {
@@ -53,6 +54,7 @@ namespace Project_1.GameObjects.Entities.Players
             inventory = new Inventory();
             spellBook = new SpellBook(this);
         }
+
 
         public bool IsInCommand(Walker aWalker) { return commands.IndexOf(aWalker) >= 0; }
         public bool IsInParty(Walker aWalker) { return party.IndexOf(aWalker) >= 0; }

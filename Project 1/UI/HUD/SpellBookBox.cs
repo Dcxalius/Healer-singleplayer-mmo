@@ -25,14 +25,14 @@ namespace Project_1.UI.HUD
             Vector2 spacing = Camera.Camera.GetRelativeSquare(0.005f);
             Vector2 size = Camera.Camera.GetRelativeSquare(0.015f);
 
-            Spell[] xdd = ObjectManager.Player.SpellBook.Spells;
+            Spell[] spells = ObjectManager.Player.SpellBook.Spells;
 
             for (int i = 0; i < spellBookSpells.Length; i++)
             {
                 Vector2 pos = new Vector2(startPos.X + (float)Math.Floor((double)i / rows) * (size.X + spacing.X), startPos.Y + i % rows * (size.Y + spacing.Y));
-                if (i < xdd.Length)
+                if (i < spells.Length)
                 {
-                    spellBookSpells[i] = new SpellBookSpell(pos, size, xdd[i]);
+                    spellBookSpells[i] = new SpellBookSpell(pos, size, spells[i]);
                     continue;
                 }
                 spellBookSpells[i] = new SpellBookSpell(pos, size);

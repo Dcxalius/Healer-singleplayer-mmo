@@ -10,12 +10,14 @@ namespace Project_1.UI.UIElements.Bars
 {
     internal class BarComponent : UIElement
     {
-
+        public new Color Color { get => gfx.Color; set => gfx.Color = value; }
 
         public BarComponent(BarTexture aGfx, Vector2 aPos, Vector2 aSize) : base(aGfx, aPos, aSize)
         {
 
         }
+
+        
 
         public void UpdateBar(float aNewValue, float aMaxX)
         {

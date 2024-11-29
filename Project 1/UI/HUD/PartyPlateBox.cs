@@ -20,6 +20,7 @@ namespace Project_1.UI.HUD
 
         static PlateBoxNameSegment name;
         static PlateBoxHealthSegment health;
+        static PlateBoxResourceSegment resource;
 
         CommandBorder border;
 
@@ -29,12 +30,14 @@ namespace Project_1.UI.HUD
 
             name = new PlateBoxNameSegment(walker.Name, walker.RelationColor, new Vector2(0, 0), new Vector2(aSize.X, aSize.Y / 2));
             health = new PlateBoxHealthSegment(walker, new Vector2(0, aSize.Y / 2), new Vector2(aSize.X, aSize.Y / 4));
+            resource = new PlateBoxResourceSegment(walker, new Vector2(0, aSize.Y / 4 * 3 ), new Vector2(aSize.X, aSize.Y / 4));
+
             //health = new PlateBoxHealthSegment(walker, new Vector2(0, 0), new Vector2(aSize.X, aSize.Y / 2));
 
 
             leftVerticalSegments = new PlateBoxSegment[] { };
             rightVerticalSegments = new PlateBoxSegment[] { };
-            horizontalSegments = new PlateBoxSegment[] { name, health };
+            horizontalSegments = new PlateBoxSegment[] { name, health, resource};
 
             AddSegmentsToChildren();
 

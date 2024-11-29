@@ -3,6 +3,7 @@ using Project_1.GameObjects.Entities.Players;
 using Project_1.Managers;
 using Project_1.Textures;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,30 +13,35 @@ namespace Project_1.GameObjects.Spells
 {
     internal class Spell
     {
+        public static GfxPath GetGfxPath(Spell aSpell)
+        {
+            if (aSpell == null) return new GfxPath(GfxType.SpellImage, null);
+
+            return new GfxPath(GfxType.SpellImage, aSpell.spellData.Name);
+        }
+
         Entity owner;
         SpellData spellData;
+        public float ResourceCost { get => spellData.ResourceCost; }
         public GfxPath GfxPath { get => spellData.GfxPath; }
         public bool OffCooldown { get => lastTimeCasted + spellData.Cooldown < TimeManager.TotalFrameTime; }
         public double RatioOfCooldownDone { get => Math.Min((TimeManager.TotalFrameTime - lastTimeCasted) / spellData.Cooldown, 1); }
         double lastTimeCasted;
 
-        public static GfxPath GetGfxPath(Spell aSpell)
-        {
-            if (aSpell == null) return new GfxPath(GfxType.SpellImage, null);
-            return new GfxPath(GfxType.SpellImage, aSpell.spellData.Name);
-        }
-
         public Spell(string aName, Entity aOwner) 
         {
             spellData = SpellFactory.GetSpell(aName);
             owner = aOwner;
+            lastTimeCasted = double.NegativeInfinity;
         }
 
         public Spell(SpellData aData, Entity aOwner)
         {
             spellData = aData;
             owner = aOwner;
+            lastTimeCasted = double.NegativeInfinity;
         }
+
 
 
         public bool Trigger()

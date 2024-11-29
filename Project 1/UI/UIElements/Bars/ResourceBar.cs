@@ -17,12 +17,20 @@ namespace Project_1.UI.UIElements.Bars
         {
             set
             {
+                if (value == 0 && maxValue == 0)
+                {
+                    base.Value = 1f;
+                    fractionText.Value = null;
+                    percentageText.Value = null;
+                    return;
+                }
                 currentValue = value;
                 base.Value = value / maxValue;
                 fractionText.Value = currentValue + "/" + maxValue;
                 percentageText.Value = (int)(currentValue / maxValue * 100) + "%";
             }
         }
+
 
         float currentValue;
         float maxValue;

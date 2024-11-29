@@ -28,5 +28,10 @@ namespace Project_1.GameObjects.Entities.Players
             knownSpells.Add(aSpell);
             //HUDManager.AddSpellToSpellBook(aSpell);
         }
+
+        public bool HasSpell(Spell aSpell)
+        {
+            return knownSpells.Contains(aSpell);
+        }
     }
 }

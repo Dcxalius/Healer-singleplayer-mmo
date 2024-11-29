@@ -85,6 +85,13 @@ namespace Project_1.GameObjects
             {
                 floatingTexts[i].Update();
             }
+            if (TimeManager.TotalFrameTime % 2000 < 1)
+            {
+                for (int i = 0; i < entities.Count; i++)
+                {
+                    entities[i].ServerTick();
+                }
+            }
         }
 
 

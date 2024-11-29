@@ -10,6 +10,7 @@ using Project_1.Input;
 using Project_1.Managers;
 using Project_1.GameObjects.Spells;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.GameObjects;
 
 namespace Project_1.UI.UIElements.SpellBook
 {
@@ -44,7 +45,7 @@ namespace Project_1.UI.UIElements.SpellBook
 
             if (spellData == null) return;
 
-            onCooldownGfx.Ratio = spellData.RatioOfCooldownDone;
+            onCooldownGfx.Ratio = Math.Min(spellData.RatioOfCooldownDone, ObjectManager.Player.RatioOfGlobalCooldownDone); //TODO: Consider splitting the cd effect to two seperate ones
 
             if (KeyBindManager.GetPress(keyListner))
             {
@@ -71,8 +72,7 @@ namespace Project_1.UI.UIElements.SpellBook
         {
             if (spellData == null) return;
 
-            spellData.Trigger();
-
+            ObjectManager.Player.CastSpell(spellData);
         }
 
         public override void Rescale()
@@ -91,7 +91,7 @@ namespace Project_1.UI.UIElements.SpellBook
                 return;
             }
 
-            if (!spellData.OffCooldown)
+            if (!spellData.OffCooldown || !ObjectManager.Player.OffGlobalCooldown)
             {
                 onCooldownGfx.Draw(aBatch, AbsolutePos, Color.White);
             }

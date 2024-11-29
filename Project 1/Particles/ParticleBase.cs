@@ -33,7 +33,7 @@ namespace Project_1.Particles
         {
             Static, //Always grabs the first color
             Random, //Grabs a random color from the given array
-            Step
+            Step //Steps through all the colors before repeating
         }
         public Color Color
         {
@@ -65,7 +65,7 @@ namespace Project_1.Particles
         public enum TextureType
         {
             Static,
-
+            Fading
 
         }
 
@@ -97,16 +97,31 @@ namespace Project_1.Particles
 
             textureType = aTextureType; 
             texture = GraphicsManager.CreateNewTexture(aSize);
-            Color[] C;
+            Color[] textureData;
             switch (textureType)
             {
                 case TextureType.Static:
-                    C = Enumerable.Repeat(Color.White, aSize.X * aSize.Y).ToArray();
+                    textureData = Enumerable.Repeat(Color.White, aSize.X * aSize.Y).ToArray();
+                    break;
+                case TextureType.Fading:
+                    Color color = Color.White;
+                    textureData = new Color[aSize.X * aSize.Y];
+                    for (int i = 0; i < aColor.Length; i++)
+                    {
+                        textureData[i] = color;
+                        if (i % aSize.X == 0)
+                        {
+                            color.R = (byte)(color.R / 2);
+                            color.G = (byte)(color.G / 2);
+                            color.B = (byte)(color.B / 2);
+                            color.A = (byte)(color.A / 2);
+                        }
+                    }
                     break;
                 default:
                     throw new NotImplementedException();
             }
-            texture.SetData(C);
+            texture.SetData(textureData);
         }
     }
 }
