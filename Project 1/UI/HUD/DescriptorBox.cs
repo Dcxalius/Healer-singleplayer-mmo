@@ -53,7 +53,7 @@ namespace Project_1.UI.HUD
             ToggleVisibilty();
             descriptedName.Value = item.Name;
             description.Value = item.Description;
-            Vector2 spacing = Camera.Camera.GetRelativeSquare(0.005f);
+            Vector2 spacing = Camera.Camera.GetRelativeXSquare(0.005f);
             int y = (int)(descriptedName.Offset.Y + description.Offset.Y);
             int x = (int)Math.Max(descriptedName.Offset.X, description.Offset.X);
             Resize(Camera.Camera.TransformAbsoluteToRelativeScreenSpace(new Point(x, y)) + spacing * 2 + new Vector2(0, spacing.Y));
@@ -94,7 +94,7 @@ namespace Project_1.UI.HUD
         void DrawText(SpriteBatch aBatch)
         {
 
-            Vector2 spacing = Camera.Camera.TransformRelativeToAbsoluteScreenSpace(Camera.Camera.GetRelativeSquare(0.005f)).ToVector2();
+            Vector2 spacing = Camera.Camera.TransformRelativeToAbsoluteScreenSpace(Camera.Camera.GetRelativeXSquare(0.005f)).ToVector2();
             Vector2 offsetName = new Vector2(0, descriptedName.Offset.Y / 2);
             Vector2 pos = (AbsolutePos.Location.ToVector2() + spacing + offsetName);
             Vector2 offsetDesc = new Vector2(0, description.Offset.Y / 2);

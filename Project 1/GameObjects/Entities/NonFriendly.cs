@@ -13,6 +13,8 @@ namespace Project_1.GameObjects.Entities
 {
     internal class NonFriendly : Entity
     {
+        public override bool InCombat => aggroEntities.Count > 0;
+
         List<Entity> aggroEntities = new List<Entity>();
         Dictionary<Entity, float> aggroValues = new Dictionary<Entity, float>();
         Dictionary<Entity, double> aggroDurations = new Dictionary<Entity, double>();

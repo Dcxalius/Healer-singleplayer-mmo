@@ -99,7 +99,6 @@ namespace Project_1.GameObjects.Entities
                     break;
                 case Resource.ResourceType.Rage:
                     throw new NotImplementedException();
-                    break;
                 case Resource.ResourceType.None:
                     resource = new None();
                     break;

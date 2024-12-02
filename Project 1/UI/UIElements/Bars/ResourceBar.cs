@@ -57,7 +57,7 @@ namespace Project_1.UI.UIElements.Bars
         {
             base.Draw(aBatch);
 
-            fractionText.CentredDraw(aBatch, AbsolutePos.Center.ToVector2());
+            //fractionText.CentredDraw(aBatch, AbsolutePos.Center.ToVector2());
             fractionText.LeftAllignedDraw(aBatch, new Vector2(AbsolutePos.Left + 5, AbsolutePos.Center.Y));
             percentageText.RightAllignedDraw(aBatch, new Vector2(AbsolutePos.Right - 5, AbsolutePos.Center.Y));
         }

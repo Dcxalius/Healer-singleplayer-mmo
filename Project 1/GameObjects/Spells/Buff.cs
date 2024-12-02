@@ -1,5 +1,6 @@
 ﻿using Project_1.GameObjects.Entities;
 using Project_1.Managers;
+using Project_1.Textures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +12,12 @@ namespace Project_1.GameObjects.Spells
     class Buff
     {
         protected Entity caster;
+        
+        public virtual GfxPath GfxPath { get; }
 
         protected double createTime;
 
-        protected virtual double Duration { get; }
+        public virtual double Duration { get; }
 
         public bool IsOver { get => createTime + Duration < TimeManager.TotalFrameTime; }
 

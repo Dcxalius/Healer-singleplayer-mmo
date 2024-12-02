@@ -129,7 +129,7 @@ namespace Project_1.Camera
             }
         }
 
-        public static Vector2 GetRelativeSquare(float aSizeInX)
+        public static Vector2 GetRelativeXSquare(float aSizeInX)
         {
             float a = screenRectangleSize.X * aSizeInX;
             float b = a / screenRectangleSize.Y;

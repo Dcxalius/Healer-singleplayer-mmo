@@ -1,5 +1,6 @@
 ﻿using Project_1.GameObjects.Entities;
 using Project_1.Managers;
+using Project_1.Textures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,14 +12,18 @@ namespace Project_1.GameObjects.Spells
     internal class Periodic : Buff
     {
         int tickCounter;
+
+        public override GfxPath GfxPath => overTime.GfxPath;
         protected OverTime overTime;
 
-        protected override double Duration => overTime.Duration;
+
+        public override double Duration => overTime.Duration;
 
         public Periodic(Entity aCaster, OverTime aOverTime) : base(aCaster)
         {
             tickCounter = 0;
             overTime = aOverTime;
+            
         }
 
 

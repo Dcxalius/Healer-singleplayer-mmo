@@ -21,9 +21,9 @@ namespace Project_1.UI.HUD
         {
             visibleKey = Input.KeyBindManager.KeyListner.SpellBook;
             spellBookSpells = new SpellBookSpell[cols * rows];
-            Vector2 startPos = Camera.Camera.GetRelativeSquare(0.01f);
-            Vector2 spacing = Camera.Camera.GetRelativeSquare(0.005f);
-            Vector2 size = Camera.Camera.GetRelativeSquare(0.015f);
+            Vector2 startPos = Camera.Camera.GetRelativeXSquare(0.01f);
+            Vector2 spacing = Camera.Camera.GetRelativeXSquare(0.005f);
+            Vector2 size = Camera.Camera.GetRelativeXSquare(0.015f);
 
             Spell[] spells = ObjectManager.Player.SpellBook.Spells;
 

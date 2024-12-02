@@ -20,6 +20,9 @@ namespace Project_1.GameObjects.Spells
             return new GfxPath(GfxType.SpellImage, aSpell.spellData.Name);
         }
 
+        public float CastDistance { get => spellData.CastDistance; }
+        public double CastTime { get => spellData.CastTime; }
+
         Entity owner;
         SpellData spellData;
         public float ResourceCost { get => spellData.ResourceCost; }
@@ -44,23 +47,20 @@ namespace Project_1.GameObjects.Spells
 
 
 
-        public bool Trigger()
+
+        public bool Trigger(Entity aTarget)
         {
+
             if (!OffCooldown)
             {
                 return false;
             }
 
-            if (owner.Target == null)
+            if (aTarget == null)
             {
                 return Trigger(owner);
             }
 
-            return Trigger(owner.Target);
-        }
-
-        bool Trigger(Entity aTarget)
-        {
             if (!spellData.Targetable(aTarget.Relation))
             {
                 return false;

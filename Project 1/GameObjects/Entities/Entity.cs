@@ -8,6 +8,7 @@ using Project_1.Textures;
 using Project_1.Tiles;
 using Project_1.UI.HUD;
 using SharpDX.Direct2D1.Effects;
+using SharpDX.Direct3D11;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
@@ -68,12 +69,16 @@ namespace Project_1.GameObjects.Entities
 
         ParticleBase bloodsplatter;
 
+        public virtual bool InCombat { get => inCombat; }
         bool inCombat;
 
         public bool OffGlobalCooldown { get => lastCastSpell + globalCooldown < TimeManager.TotalFrameTime; }
         public double RatioOfGlobalCooldownDone { get => Math.Min((TimeManager.TotalFrameTime - lastCastSpell) / globalCooldown, 1); }
         const double globalCooldown = 1500;
         double lastCastSpell;
+        Spell channeledSpell;
+        Vector2 channeledSpellStartPosition;
+        double startCastTime;
 
         public Entity(Texture aTexture, Vector2 aStartingPos, Corpse aCorpse = null) : base(aTexture, aStartingPos)
         {
@@ -92,32 +97,118 @@ namespace Project_1.GameObjects.Entities
             Vector2 oldPosition = Position;
             base.Update();
             CheckForCollisions(oldPosition);
-
+            UpdateSpellChannel();
             unitData.Update();
             AttackTarget();
             UpdateBuffs();
             Death();
         }
 
+        bool CastSpeedCheck()
+        {
+            const float xdd = 0.1f;
+            if (momentum.Length() < xdd)
+            {
+                return false;
+            }
+            return true;
+        }
 
-        public bool CastSpell(Spell aSpell)
+        void UpdateSpellChannel()
+        {
+            if (channeledSpell == null) return;
+            if (CastSpeedCheck())
+            {
+                CancelChannel();
+                
+                return;
+            }
+
+            if (FinishChannel()) return;
+
+            HUDManager.UpdateChannelSpell((float)((TimeManager.TotalFrameTime - startCastTime) / channeledSpell.CastTime));
+        }
+
+        void CancelChannel()
+        {
+            HUDManager.CancelChannel();
+            channeledSpell = null;
+            channeledSpellStartPosition = Vector2.Zero;
+        }
+
+        bool FinishChannel()
+        {
+            if (channeledSpell.CastTime < TimeManager.TotalFrameTime - startCastTime)
+            {
+                const float graceWidth = 5;
+                if (channeledSpell.CastDistance + graceWidth < (Target.FeetPos - FeetPos).Length())
+                {
+                    CancelChannel();
+                    return true;
+
+                }
+                CastSpell(channeledSpell);
+                //channeledSpell.Trigger(Target);
+                channeledSpell = null;
+                channeledSpellStartPosition = Vector2.Zero;
+                HUDManager.FinishChannel();
+                return true;
+            }
+            return false;
+        }
+
+        bool StartChannel(Spell aSpell)
+        {
+            if (channeledSpell != null) return false;
+            if (aSpell == null) return false;
+            if (aSpell.CastTime == 0) return false;
+            if (!aSpell.OffCooldown) return false;
+            if (CastSpeedCheck()) return false;
+            lastCastSpell = TimeManager.TotalFrameTime;
+            channeledSpellStartPosition = FeetPos;
+            channeledSpell = aSpell;
+            startCastTime = TimeManager.TotalFrameTime;
+            HUDManager.ChannelSpell(channeledSpell);
+            HUDManager.UpdateChannelSpell(0);
+            return true;
+        }
+
+        public bool StartCast(Spell aSpell)
         {
             if (aSpell == null) return false;
             //if (!spellBook.HasSpell(aSpell)) return false;
             if (!UnitData.Resource.isCastable(aSpell.ResourceCost)) return false;
             if (!OffGlobalCooldown) return false;
+            if (!aSpell.OffCooldown) return false;
 
-            if (!aSpell.Trigger()) return false;
+            if (Target != null)
+            {
+                float d = (Target.FeetPos - FeetPos).Length();
+                if (d > aSpell.CastDistance) return false;
+            }
+
+
+            if (aSpell.CastTime > 0)
+            {
+                ObjectManager.Player.StartChannel(aSpell);
+                return true;
+            }
             lastCastSpell = TimeManager.TotalFrameTime;
-            UnitData.Resource.CastSpell(aSpell.ResourceCost);
+            return CastSpell(aSpell);
+        }
 
+        bool CastSpell(Spell aSpell)
+        {
+
+            if (!aSpell.Trigger(Target)) return false;
+            UnitData.Resource.CastSpell(aSpell.ResourceCost);
 
             return true;
         }
 
         public void ServerTick() //"Server tick"
         {
-            if (!inCombat)
+            if (!InCombat)
             {
                 unitData.HealthRegen();
             }
@@ -240,6 +331,11 @@ namespace Project_1.GameObjects.Entities
 
         void Walk()
         {
+            if (momentum.Length() < 0.1f)
+            {
+                momentum = Vector2.Zero;
+            }
+
             if (destinations.Count == 0 && target == null)
             {
                 return;

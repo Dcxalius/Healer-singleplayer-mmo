@@ -12,6 +12,8 @@ namespace Project_1.Textures
     {
         readonly Color defaultColor = Color.White;
 
+        public static UITexture Null => new UITexture(GfxPath.NullPath, Color.White);
+
         public UITexture(Texture2D aText, Point aSize) : base(aText, aSize)
         {
 

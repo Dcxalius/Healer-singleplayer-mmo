@@ -5,6 +5,7 @@ using Project_1.GameObjects.Spells;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.UI.UIElements;
+using Project_1.UI.UIElements.Bars;
 using Project_1.UI.UIElements.Inventory;
 using Project_1.UI.UIElements.SpellBook;
 using SharpDX.MediaFoundation.DirectX;
@@ -27,6 +28,7 @@ namespace Project_1.UI.HUD
         static LootBox lootBox;
         static DescriptorBox descriptorBox;
         static SpellBookBox spellBookBox;
+        static CastBar playerCastBar;
 
         static List<UIElement> hudElements = new List<UIElement>();
 
@@ -48,6 +50,7 @@ namespace Project_1.UI.HUD
             lootBox = new LootBox(new Vector2(0.1f, 0.5f), new Vector2(0.4f, 0.4f));
             spellBookBox = new SpellBookBox(new Vector2(0.2f, 0.4f), new Vector2(0.4f, 0.4f));
             descriptorBox = new DescriptorBox();
+            playerCastBar = new CastBar(new Vector2(0.1f, 0.203f), new Vector2(0.2f, 0.015f));
 
             hudElements.Add(playerPlateBox);
             hudElements.Add(targetPlateBox);
@@ -56,6 +59,7 @@ namespace Project_1.UI.HUD
             hudElements.Add(lootBox);
             hudElements.Add(descriptorBox);
             hudElements.Add(spellBookBox);
+            hudElements.Add(playerCastBar);
 
             heldItem = new HeldItem();
             heldSpell = new HeldSpell();
@@ -113,6 +117,26 @@ namespace Project_1.UI.HUD
         //{
         //    inventoryBox.RefreshSlot(aBag, aSlot);
         //}
+
+        public static void FinishChannel()
+        {
+            playerCastBar.FinishCast();
+        }
+
+        public static void CancelChannel()
+        {
+            playerCastBar.CancelCast();
+        }
+
+        public static void UpdateChannelSpell(float aNewVal)
+        {
+            playerCastBar.Value = aNewVal;
+        }
+
+        public static void ChannelSpell(Spell aSpell)
+        {
+            playerCastBar.CastSpell(aSpell);
+        }
 
         public static Items.Item GetLootItem(int aSlotInLoot)
         {

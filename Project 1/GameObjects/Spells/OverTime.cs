@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Project_1.GameObjects.Entities;
 using Project_1.Managers;
+using Project_1.Textures;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -22,8 +23,12 @@ namespace Project_1.GameObjects.Spells
         public Instant[] Effects { get => effects; }
         Instant[] effects;
 
+        public GfxPath GfxPath { get => gfxPath; }
+        GfxPath gfxPath;
+
+
         [JsonConstructor]
-        public OverTime(string name, string[] effectNames, double duration, double tickRate) : base(name)
+        public OverTime(string name, string gfxName, string[] effectNames, double duration, double tickRate) : base(name)
         {
             this.duration = duration * 1000;
             this.tickRate = tickRate * 1000;
@@ -33,6 +38,7 @@ namespace Project_1.GameObjects.Spells
                 effects[i] = SpellFactory.GetSpellEffect(effectNames[i]) as Instant;
             }
 
+            gfxPath = new GfxPath(GfxType.SpellImage, gfxName);
             Debug.Assert(this.duration > this.tickRate);
         }
 
