@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spells;
 using Project_1.Input;
@@ -22,44 +23,55 @@ namespace Project_1.UI.HUD
     {
         static PlayerPlateBox playerPlateBox;
         static TargetPlateBox targetPlateBox;
-        static FirstSpellBar firstSpellBar;
-        static InventoryBox inventoryBox;
         static PartyPlateBox[] partyPlateBoxes = new PartyPlateBox[4];
+        static BuffBox playerBuffBox;
+        static BuffBox targetBuffBox;
+        static BuffBox[] partyBuffBoxes = new BuffBox[4];
+
+        static InventoryBox inventoryBox;
         static LootBox lootBox;
         static DescriptorBox descriptorBox;
+
         static SpellBookBox spellBookBox;
         static CastBar playerCastBar;
+        static FirstSpellBar firstSpellBar;
 
         static List<UIElement> hudElements = new List<UIElement>();
 
         static HeldItem heldItem;
         static HeldSpell heldSpell;
 
-        public static void SetNewTarget()
-        {
-            targetPlateBox.SetEntity();
-        }
 
 
         public static void Init()
         {
+
             playerPlateBox = new PlayerPlateBox(new Vector2(0.1f, 0.1f), new Vector2(0.2f, 0.1f));
             targetPlateBox = new TargetPlateBox(new Vector2(0.33f, 0.1f), new Vector2(0.2f, 0.1f));
-            firstSpellBar = new FirstSpellBar(10, new Vector2(0.2f, 0.86f), 0.6f);
-            inventoryBox = new InventoryBox(new Vector2(0.59f, 0.59f), new Vector2(0.4f));
+            playerBuffBox = new BuffBox(ObjectManager.Player, BuffBox.FillDirection.TopRightToDown, new Vector2(0.01f, 0.1f), new Vector2(0.08f, 0.1f));
+            targetBuffBox = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, new Vector2(0.33f, 0.21f), new Vector2(0.2f, 0.1f));
+
             lootBox = new LootBox(new Vector2(0.1f, 0.5f), new Vector2(0.4f, 0.4f));
-            spellBookBox = new SpellBookBox(new Vector2(0.2f, 0.4f), new Vector2(0.4f, 0.4f));
+            inventoryBox = new InventoryBox(new Vector2(0.59f, 0.59f), new Vector2(0.4f));
             descriptorBox = new DescriptorBox();
+
+            spellBookBox = new SpellBookBox(new Vector2(0.2f, 0.4f), new Vector2(0.4f, 0.4f));
+            firstSpellBar = new FirstSpellBar(10, new Vector2(0.2f, 0.86f), 0.6f);
             playerCastBar = new CastBar(new Vector2(0.1f, 0.203f), new Vector2(0.2f, 0.015f));
 
             hudElements.Add(playerPlateBox);
             hudElements.Add(targetPlateBox);
-            hudElements.Add(firstSpellBar);
-            hudElements.Add(inventoryBox);
+            hudElements.Add(playerBuffBox);
+            hudElements.Add(targetBuffBox);
+
             hudElements.Add(lootBox);
+            hudElements.Add(inventoryBox);
             hudElements.Add(descriptorBox);
+
+            hudElements.Add(firstSpellBar);
             hudElements.Add(spellBookBox);
             hudElements.Add(playerCastBar);
+
 
             heldItem = new HeldItem();
             heldSpell = new HeldSpell();
@@ -83,8 +95,41 @@ namespace Project_1.UI.HUD
                 return;
             }
 
-            partyPlateBoxes[openIndex] = new PartyPlateBox(aWalker, new Vector2(0.1f, 0.24f), new Vector2(0.2f, 0.1f));
+            partyPlateBoxes[openIndex] = new PartyPlateBox(aWalker, new Vector2(0.1f, 0.24f), new Vector2(0.2f, 0.1f)); //TODO: Fix temp values
+            partyBuffBoxes[openIndex] = new BuffBox(aWalker, BuffBox.FillDirection.TopRightToDown, new Vector2(0.01f, 0.24f), new Vector2(0.08f, 0.1f));
+            partyBuffBoxes[openIndex].AssignBox(aWalker);
             hudElements.Add(partyPlateBoxes[openIndex]);
+            hudElements.Add(partyBuffBoxes[openIndex]);
+        }
+
+
+        public static void SetNewTarget() //TODO: Make this use new target as arg
+        {
+            targetPlateBox.SetEntity();
+            targetBuffBox.AssignBox(ObjectManager.Player.Target);
+        }
+
+        public static void AddBuff(GameObjects.Spells.Buff aBuff, Entity aEntity)
+        {
+            if (targetBuffBox.IsThisMine(aEntity))
+            {
+                targetBuffBox.AddBuff(aBuff);
+            }
+            if (playerBuffBox.IsThisMine(aEntity))
+            {
+                playerBuffBox.AddBuff(aBuff);
+                return;
+            }
+            for (int i = 0; i < partyBuffBoxes.Length; i++)
+            {
+                if (partyBuffBoxes[i] == null) continue;
+
+                if (partyBuffBoxes[i].IsThisMine(aEntity))
+                {
+                    partyBuffBoxes[i].AddBuff(aBuff);
+                    return;
+                }
+            }
         }
 
         public static void AddSpellToSpellBook(Spell aSpell)

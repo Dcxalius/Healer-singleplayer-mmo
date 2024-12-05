@@ -78,6 +78,7 @@ namespace Project_1.GameObjects.Entities
         double lastCastSpell;
         Spell channeledSpell;
         Vector2 channeledSpellStartPosition;
+        Entity channelTarget;
         double startCastTime;
 
         public Entity(Texture aTexture, Vector2 aStartingPos, Corpse aCorpse = null) : base(aTexture, aStartingPos)
@@ -132,6 +133,7 @@ namespace Project_1.GameObjects.Entities
         void CancelChannel()
         {
             HUDManager.CancelChannel();
+            channelTarget = null;
             channeledSpell = null;
             channeledSpellStartPosition = Vector2.Zero;
         }
@@ -141,17 +143,19 @@ namespace Project_1.GameObjects.Entities
             if (channeledSpell.CastTime < TimeManager.TotalFrameTime - startCastTime)
             {
                 const float graceWidth = 5;
-                if (channeledSpell.CastDistance + graceWidth < (Target.FeetPos - FeetPos).Length())
+                if (channeledSpell.CastDistance + graceWidth < (channelTarget.FeetPos - FeetPos).Length())
                 {
                     CancelChannel();
                     return true;
 
                 }
+
                 CastSpell(channeledSpell);
-                //channeledSpell.Trigger(Target);
-                channeledSpell = null;
-                channeledSpellStartPosition = Vector2.Zero;
+
                 HUDManager.FinishChannel();
+                channeledSpell = null;
+                channelTarget = null;
+                channeledSpellStartPosition = Vector2.Zero;
                 return true;
             }
             return false;
@@ -168,6 +172,8 @@ namespace Project_1.GameObjects.Entities
             channeledSpellStartPosition = FeetPos;
             channeledSpell = aSpell;
             startCastTime = TimeManager.TotalFrameTime;
+            channelTarget = Target;
+            if (channelTarget == null) { channelTarget = this; }
             HUDManager.ChannelSpell(channeledSpell);
             HUDManager.UpdateChannelSpell(0);
             return true;
@@ -229,7 +235,22 @@ namespace Project_1.GameObjects.Entities
 
         public void AddBuff(Buff aBuff)
         {
+            for (int i = 0; i < buffs.Count; i++)
+            {
+                if (buffs[i] == aBuff)
+                {
+                    buffs[i].Recast();
+                    return;
+                }
+            }
+
             buffs.Add(aBuff);
+            HUDManager.AddBuff(buffs.Last(), this);
+        }
+
+        public List<Buff> GetAllBuffs()
+        {
+            return buffs;
         }
 
         public void AddedToAggroTable(NonFriendly aNonfriendly)

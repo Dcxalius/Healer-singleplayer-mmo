@@ -299,8 +299,10 @@ namespace Project_1.UI.UIElements
 
         public void Move(Vector2 aNewPos)
         {
+            if (aNewPos.X == float.NaN || aNewPos.Y == float.NaN) throw new ArgumentException("Invalid move.");
             relativePos = aNewPos;
             pos.Location = TransformFromRelativeToPoint(aNewPos);
+            absolutePos = pos.Location + parentPos;
         }
 
         protected void Resize(Vector2 aSize)

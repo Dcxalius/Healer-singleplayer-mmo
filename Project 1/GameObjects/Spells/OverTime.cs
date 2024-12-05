@@ -44,8 +44,8 @@ namespace Project_1.GameObjects.Spells
 
         public override bool Trigger(Entity aCaster, Entity aTarget)
         {
-            Periodic xdd = new Periodic(aCaster, this);
-            aTarget.AddBuff(xdd);
+            Periodic periodic = new Periodic(aCaster, this);
+            aTarget.AddBuff(periodic);
             return true;
         }
     }

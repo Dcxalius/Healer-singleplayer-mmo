@@ -13,28 +13,31 @@ namespace Project_1.GameObjects.Spells
     {
         int tickCounter;
 
-        public override GfxPath GfxPath => overTime.GfxPath;
-        protected OverTime overTime;
+        public override GfxPath GfxPath => OverTime.GfxPath;
+        OverTime OverTime { get => effect as OverTime; }
 
+        public override double Duration => OverTime.Duration;
 
-        public override double Duration => overTime.Duration;
-
-        public Periodic(Entity aCaster, OverTime aOverTime) : base(aCaster)
+        public Periodic(Entity aCaster, OverTime aOverTime) : base(aCaster, aOverTime)
         {
             tickCounter = 0;
-            overTime = aOverTime;
             
         }
 
+        public override void Recast()
+        {
+            base.Recast();
 
+            tickCounter = 0;
+        }
 
         public override void Update(Entity aEntity)
         {
             base.Update(aEntity);
-            if (createTime + overTime.TickRate * tickCounter < TimeManager.TotalFrameTime)
+            if (createTime + OverTime.TickRate * tickCounter < TimeManager.TotalFrameTime)
             {
                 tickCounter++;
-                overTime.Effects[Math.Min(overTime.Effects.Length - 1, tickCounter)].Trigger(caster, aEntity);
+                OverTime.Effects[Math.Min(OverTime.Effects.Length - 1, tickCounter)].Trigger(caster, aEntity); //TODO: Change this so it doesn't instaproc  
 
             }
         }
