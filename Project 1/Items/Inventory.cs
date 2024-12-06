@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json.Bson;
+using Project_1.GameObjects;
+using Project_1.GameObjects.Entities;
 using Project_1.Managers;
 using Project_1.UI.HUD;
 using System;
@@ -13,13 +15,18 @@ namespace Project_1.Items
 {
     internal class Inventory
     {
+        Entity owner;
+
         public int bagSlots = 4;
         public int defaultSlots = 32;
 
         Item[][] items;
         public Container[] bags;
-        public Inventory()
+        public Inventory(Entity aOwner)
         {
+            owner = aOwner;
+
+
             bags = new Container[bagSlots + 1]; //Bag 0 is fornow always null
             items = new Item[bagSlots + 1][];
             items[0] = new Item[defaultSlots];
@@ -36,6 +43,22 @@ namespace Project_1.Items
                 EquipBag( ItemFactory.CreateItem(ItemFactory.GetItemData("Small Bag") ) as Container);
                 items[0][22] = ItemFactory.CreateItem(ItemFactory.GetItemData("Medium Bag"));
             }
+        }
+
+        public bool ConsumeItem((int, int) aBagAndSlotIndex)
+        {
+            return ConsumeItem(aBagAndSlotIndex.Item1, aBagAndSlotIndex.Item2);
+        }
+
+        public bool ConsumeItem(int aBagIndex, int aSlotIndex)
+        {
+            Debug.Assert(items[aBagIndex][aSlotIndex].ItemType == ItemData.ItemType.Consumable, "Tried to consume nonconcumable.");
+
+            if (!(items[aBagIndex][aSlotIndex] as Consumable).Use(owner)) return false;
+
+            TrimStack(aBagIndex, aSlotIndex, 1);
+            HUDManager.RefreshInventorySlot(aBagIndex, aSlotIndex);
+            return true;
         }
 
         public Item[] GetItemsInBox(int aIndex)
@@ -398,15 +421,21 @@ namespace Project_1.Items
             return false;
         }
 
-        public void TrimStack((int, int) aSlot, int aCount)
+        public void TrimStack(int aBagIndex, int aSlotIndex, int aCount)
         {
-            Debug.Assert(aCount <= items[aSlot.Item1][aSlot.Item2].Count, "Tried to remove to much from item");
-            items[aSlot.Item1][aSlot.Item2].Count -= aCount;
-            if (items[aSlot.Item1][aSlot.Item2].Count == 0)
+
+            Debug.Assert(aCount <= items[aBagIndex][aSlotIndex].Count, "Tried to remove to much from item");
+            items[aBagIndex][aSlotIndex].Count -= aCount;
+            if (items[aBagIndex][aSlotIndex].Count == 0)
             {
-                items[aSlot.Item1][aSlot.Item2] = null;
-                HUDManager.RefreshInventorySlot(aSlot);
+                items[aBagIndex][aSlotIndex] = null;
             }
+            HUDManager.RefreshInventorySlot(aBagIndex, aSlotIndex);
+        }
+
+        public void TrimStack((int, int) aBagAndSlotIndex, int aCount)
+        {
+            TrimStack(aBagAndSlotIndex.Item1, aBagAndSlotIndex.Item2, aCount);
         }
 
         public bool DestroyItem(Item aItem)

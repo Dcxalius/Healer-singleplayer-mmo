@@ -16,6 +16,6 @@ namespace Project_1.GameObjects.Entities.Resources
 
         public override float MaxValue => 0;
 
-        public override float Value { get => 0; protected set => base.Value = value; }
+        public override float Value { get => 0; }
     }
 }

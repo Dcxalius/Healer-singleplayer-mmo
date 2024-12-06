@@ -51,7 +51,7 @@ namespace Project_1.GameObjects.Entities.Players
 
         public Player(Vector2 aStartPos) : base(new RandomAnimatedTexture(new GfxPath(GfxType.Object, "Player"), new Point(32), 0, TimeSpan.FromMilliseconds(500)), aStartPos)
         {
-            inventory = new Inventory();
+            inventory = new Inventory(this);
             spellBook = new SpellBook(this);
         }
 

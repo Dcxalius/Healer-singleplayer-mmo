@@ -17,6 +17,7 @@ namespace Project_1.Items
         //static Dictionary<int, ItemData> itemData;
         static ItemData[] itemData;
 
+
         //static int Id { get => nextId++; }
         //static int nextId = 0;
 
@@ -52,6 +53,8 @@ namespace Project_1.Items
                     return JsonConvert.DeserializeObject<ItemData>(aRawData);
                 case "Container":
                     return JsonConvert.DeserializeObject<ContainerData>(aRawData);
+                case "Consumable":
+                    return JsonConvert.DeserializeObject<ConsumableData>(aRawData);
                 default:
                     throw new NotImplementedException();
             }
@@ -82,10 +85,11 @@ namespace Project_1.Items
                     return new Container(aData as ContainerData);
                 case ItemData.ItemType.Trash:
                     return new Item(aData, aCount);
+                case ItemData.ItemType.Consumable:
+                    return new Consumable(aData as ConsumableData, aCount);
                 default:
                     throw new NotImplementedException();
             }
-            throw new NotImplementedException();
         }
 
         public static Item CreateItem(LootData aLoot)
@@ -98,10 +102,12 @@ namespace Project_1.Items
                     return new Container(aLoot);
                 case ItemData.ItemType.Trash:
                     return new Item(aLoot);
+                case ItemData.ItemType.Consumable:
+                    return new Consumable(aLoot);
+
                 default:
                     throw new NotImplementedException();
             }
-            throw new NotImplementedException();
         }
     }
 }

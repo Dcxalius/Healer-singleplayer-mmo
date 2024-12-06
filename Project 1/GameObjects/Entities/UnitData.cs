@@ -54,7 +54,19 @@ namespace Project_1.GameObjects.Entities
         public float AttackRange { get => attackRange; }
 
         public float MaxResource { get => resource.MaxValue; }
-        public float CurrentResource { get => resource.Value; }
+        public float CurrentResource
+        {
+            get
+            {
+                return resource.Value;
+            }
+
+            set
+            {
+                resource.Value = value;
+            }
+        }
+
         public Resource Resource { get => resource; }
         public Color ResourceColor { get => resource.ResourceColor; }
 

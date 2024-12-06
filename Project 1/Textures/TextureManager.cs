@@ -92,7 +92,15 @@ namespace Project_1.Textures
 
         public static ref Texture2D GetTexture(GfxPath aGfxPath)
         {
-            return ref CollectionsMarshal.GetValueRefOrNullRef(texturesDict[(int)aGfxPath.Type], aGfxPath.Name);
+            ref Texture2D? a = ref CollectionsMarshal.GetValueRefOrNullRef(texturesDict[(int)aGfxPath.Type], aGfxPath.Name);
+
+            if (System.Runtime.CompilerServices.Unsafe.IsNullRef(ref a)) 
+            {
+                DebugManager.Print(typeof(TextureManager), "Texture " + aGfxPath.Name + " from type " + aGfxPath.Type + " was not found.");
+                a = ref CollectionsMarshal.GetValueRefOrNullRef(texturesDict[(int)GfxType.Debug], "MissingTexture");
+            }
+
+            return ref a ;
         }
 
     }

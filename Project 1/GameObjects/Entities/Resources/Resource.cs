@@ -21,7 +21,7 @@ namespace Project_1.GameObjects.Entities.Resources
         public string Name { get => resourceType.ToString(); }
 
         public virtual float MaxValue { get; }
-        public virtual float Value { get; protected set; }
+        public virtual float Value { get; set; }
 
         public virtual float RegenValue { get; protected set; }
 

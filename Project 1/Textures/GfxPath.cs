@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace Project_1.Textures
 {
+
+
     enum GfxType
     {
         Debug,
@@ -17,7 +19,6 @@ namespace Project_1.Textures
         SpellImage,
         Count
     }
-
     internal class GfxPath
     {
         public static GfxPath NullPath { get => new GfxPath(GfxType.Debug, null); }

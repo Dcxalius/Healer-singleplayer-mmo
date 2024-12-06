@@ -14,7 +14,7 @@ namespace Project_1.GameObjects.Entities.Resources
         public override float Value
         {
             get => manaValue;
-            protected set
+            set
             {
                 manaValue = value;
                 if (manaValue > maxValue)

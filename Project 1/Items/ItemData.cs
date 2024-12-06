@@ -18,7 +18,8 @@ namespace Project_1.Items
         {
             NotSet,
             Container,
-            Trash
+            Trash,
+            Consumable
         }
 
 
@@ -56,7 +57,7 @@ namespace Project_1.Items
 
         void Assert()
         {
-            Debug.Assert(name != null && description != null && maxStack > 0 && itemType != ItemType.NotSet, "Itemdata not properly set");
+            Debug.Assert(name != null && description != null && maxStack > 0 && itemType != ItemType.NotSet, "Itemdata not properly set.");
         }
 
         

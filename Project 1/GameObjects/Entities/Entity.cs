@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.GameObjects.Entities.Players;
+using Project_1.GameObjects.Entities.Resources;
 using Project_1.GameObjects.Spells;
 using Project_1.Input;
 using Project_1.Managers;
@@ -7,12 +8,11 @@ using Project_1.Particles;
 using Project_1.Textures;
 using Project_1.Tiles;
 using Project_1.UI.HUD;
-using SharpDX.Direct2D1.Effects;
-using SharpDX.Direct3D11;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,11 +37,13 @@ namespace Project_1.GameObjects.Entities
 
         public string Name { get => unitData.Name; }
         public bool Alive { get => unitData.CurrentHealth > 0; }
-        public float CurrentHealth { get => unitData.CurrentHealth; }
+        public bool FullHealth { get => unitData.MaxHealth == unitData.CurrentHealth; }
         public float MaxHealth { get => unitData.MaxHealth; }
+        public float CurrentHealth { get => unitData.CurrentHealth; }
 
-        public float CurrentResource { get => unitData.CurrentResource; }
+        public Resource.ResourceType ResourceType { get => unitData.Resource.Type; }
         public float MaxResource { get => unitData.MaxResource; }
+        public float CurrentResource { get => unitData.CurrentResource; }
 
         public Color ResourceColor { get => unitData.ResourceColor; }
 
@@ -105,10 +107,33 @@ namespace Project_1.GameObjects.Entities
             Death();
         }
 
+        public bool ResourceGain(Entity aEntity, float aValue, Resource.ResourceType aResourceType)
+        {
+            if (aResourceType != ResourceType) return false;
+
+            if (MaxResource == CurrentResource) return false;
+
+            float value = aValue;
+
+            if (MaxResource < CurrentHealth + value)
+            {
+                value = MaxResource - CurrentHealth;
+            }
+
+            for (int i = 0; i < aggroTablesIAmOn.Count; i++)
+            {
+                aggroTablesIAmOn[i].AddToAggroTable(aEntity, value);
+            }
+
+            unitData.CurrentResource += value;
+
+            return true;
+        }
+
         bool CastSpeedCheck()
         {
-            const float xdd = 0.1f;
-            if (momentum.Length() < xdd)
+            const float graceSpeedWindow = 0.1f;
+            if (momentum.Length() < graceSpeedWindow)
             {
                 return false;
             }
@@ -307,15 +332,22 @@ namespace Project_1.GameObjects.Entities
             ParticleManager.SpawnParticle(bloodsplatter, WorldRectangle, this, bloodMovement, 10);
         }
 
-        public virtual void TakeHealing(Entity aHealer, float aHealingTaken)
+        public virtual bool TakeHealing(Entity aHealer, float aHealingTaken)
         {
-            unitData.CurrentHealth += aHealingTaken;
-            FloatingText floatingText = new FloatingText(aHealingTaken.ToString(), Color.White, FeetPos, Vector2.Normalize(FeetPos - aHealer.FeetPos)); //TODO: Change color to green once text border has been implemented ALSO Change to handle attacker and this being in the same place
+            float value = aHealingTaken;
+
+            if (FullHealth) return false;
+            if (CurrentHealth + value > MaxHealth) value = MaxHealth - CurrentHealth;
+
+            unitData.CurrentHealth += value;
+            FloatingText floatingText = new FloatingText(value.ToString(), Color.White, FeetPos, Vector2.Normalize(FeetPos - aHealer.FeetPos)); //TODO: Change color to green once text border has been implemented ALSO Change to handle attacker and this being in the same place
             ObjectManager.SpawnFloatingText(floatingText);
             for (int i = 0; i < aggroTablesIAmOn.Count; i++)
             {
-                aggroTablesIAmOn[i].AddToAggroTable(aHealer, aHealingTaken);
+                aggroTablesIAmOn[i].AddToAggroTable(aHealer, value);
             }
+
+            return true;
         }
 
         public override bool Click(ClickEvent aClickEvent)

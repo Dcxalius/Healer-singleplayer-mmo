@@ -207,6 +207,9 @@ namespace Project_1.UI.UIElements.Inventory
                         break;
                     case ItemData.ItemType.Trash:
                         break;
+                    case ItemData.ItemType.Consumable:
+                        ObjectManager.Player.Inventory.ConsumeItem(Index);
+                        break;
                     default:
                         throw new NotImplementedException();
                 }

@@ -14,7 +14,7 @@ namespace Project_1.GameObjects.Entities.Resources
         public override float Value
         {
             get => energyValue;
-            protected set
+            set
             {
                 energyValue = value;
                 if (energyValue > maxValue)

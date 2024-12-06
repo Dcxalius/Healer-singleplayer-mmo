@@ -39,11 +39,11 @@ namespace Project_1.Managers
         {
             if (KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugPoop))
             {
-                SpawnPoopInInventory();
+                SpawnHealthPotion();
             }
             if (KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugBanana))
             {
-                SpawnBananaInInventory();
+                SpawnManaPotion();
             }
         }
 
@@ -60,18 +60,19 @@ namespace Project_1.Managers
             }
         }
 
-        public static void SpawnPoopInInventory()
+        public static void SpawnHealthPotion()
         {
-            Item poop = ItemFactory.CreateItem(ItemFactory.GetItemData("Poop"), 1);
+            if (mode == DebugMode.Off) return;
+            Item poop = ItemFactory.CreateItem(ItemFactory.GetItemData("Health Potion"), 1);
             ObjectManager.Player.Inventory.AddItem(poop);
             
         }
 
-        static void SpawnBananaInInventory()
+        static void SpawnManaPotion()
         {
             if (mode == DebugMode.Off) return;
 
-            Item banana = ItemFactory.CreateItem(ItemFactory.GetItemData("If this is only a banana why is the name so long"), 1);
+            Item banana = ItemFactory.CreateItem(ItemFactory.GetItemData("Mana Potion"), 1);
             ObjectManager.Player.Inventory.AddItem(banana);
         }
     }
