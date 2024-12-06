@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.UI.OptionMenu;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
         Point screenSize;
 
-        SelectBoxValueScreenRez(string aRez, Vector2 aPos, Vector2 aSize) : base(SelectBoxValueTypes.ScreenRez, null, aRez, aPos, aSize)
+        SelectBoxValueScreenRez(string aRez, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(SelectBoxValueTypes.ScreenRez, null, aRez, aPos, aSize)
         {
             string[] split = aRez.Split(',');
 
@@ -28,10 +29,10 @@ namespace Project_1.UI.UIElements.SelectBoxes
             Debug.Assert(successL && successW);
         }
 
-        public static SelectBoxValueScreenRez[] CreateArray(string[] aListToCreate, Vector2 aStartPos, Vector2 aSize)
+        public static SelectBoxValueScreenRez[] CreateArray(string[] aListToCreate, RelativeScreenPosition aStartPos, RelativeScreenPosition aSize)
         {
             SelectBoxValueScreenRez[] returnable = new SelectBoxValueScreenRez[aListToCreate.Length];
-            Vector2 pos = aStartPos;
+            RelativeScreenPosition pos = aStartPos;
             for (int i = 0; i < aListToCreate.Length; i++)
             {
                 returnable[i] = new SelectBoxValueScreenRez(aListToCreate[i], pos, aSize);

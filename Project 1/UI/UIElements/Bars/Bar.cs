@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.Textures;
 using System;
@@ -22,9 +23,9 @@ namespace Project_1.UI.UIElements.Bars
         BarComponent barComponent;
 
 
-        public Bar(BarTexture aBarGfx, UITexture aBackgroundGfx, Vector2 aPos, Vector2 aSize) : base(aBackgroundGfx, aPos, aSize)
+        public Bar(BarTexture aBarGfx, UITexture aBackgroundGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aBackgroundGfx, aPos, aSize)
         {
-            barComponent = new BarComponent(aBarGfx, Vector2.Zero, aSize);
+            barComponent = new BarComponent(aBarGfx, RelativeScreenPosition.Zero, aSize);
             children.Add(barComponent);
         }
         public override void Draw(SpriteBatch aBatch)

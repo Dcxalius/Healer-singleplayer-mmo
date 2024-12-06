@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
 using System;
@@ -12,19 +13,19 @@ namespace Project_1.UI.PauseMenu
     internal class PauseBox : Box
     {
 
-        static Vector2 pauseSize = new Vector2(0.2f, 0.5f);
-        static Vector2 pausePos = new Vector2(0.5f - (pauseSize.X / 2), 0.5f - pauseSize.Y / 2);
+        static RelativeScreenPosition pauseSize = new RelativeScreenPosition(0.2f, 0.5f);
+        static RelativeScreenPosition pausePos = new RelativeScreenPosition(0.5f - (pauseSize.X / 2), 0.5f - pauseSize.Y / 2);
         static UITexture staticGfx = new UITexture("WhiteBackground", Color.DarkGray);
 
-        static Vector2 buttonSize = new Vector2(pauseSize.X / 5 * 4, pauseSize.Y / 12);
-        static Vector2 buttonStartingPos = new Vector2(pauseSize.X / 2 - buttonSize.X / 2, 0.05f);
-        static Vector2 buttonStartingFromBottomPos = new Vector2(pauseSize.X / 2 - buttonSize.X / 2, pauseSize.Y - 0.05f - buttonSize.Y);
-        static Vector2 buttonOffset = new Vector2(0, buttonSize.Y * 1.5f);
+        static RelativeScreenPosition buttonSize = new RelativeScreenPosition(pauseSize.X / 5 * 4, pauseSize.Y / 12);
+        static RelativeScreenPosition buttonStartingPos = new RelativeScreenPosition(pauseSize.X / 2 - buttonSize.X / 2, 0.05f);
+        static RelativeScreenPosition buttonStartingFromBottomPos = new RelativeScreenPosition(pauseSize.X / 2 - buttonSize.X / 2, pauseSize.Y - 0.05f - buttonSize.Y);
+        static RelativeScreenPosition buttonOffset = new RelativeScreenPosition(0, buttonSize.Y * 1.5f);
 
         static int buttonIndex = 0;
         static int buttonIndexFromBottom = 0;
 
-        static Vector2 GetStartPositionFromTop //TODO: Get this logic out to a menu class
+        static RelativeScreenPosition GetStartPositionFromTop //TODO: Get this logic out to a menu class
         {
             get
             {
@@ -32,7 +33,7 @@ namespace Project_1.UI.PauseMenu
             }
         }
 
-        static Vector2 GetStartPositionFromBottom
+        static RelativeScreenPosition GetStartPositionFromBottom
         {
             get
             {

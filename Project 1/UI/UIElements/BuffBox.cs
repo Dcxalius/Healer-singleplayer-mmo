@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spells;
 using Project_1.Textures;
@@ -25,25 +26,25 @@ namespace Project_1.UI.UIElements
         Entity owner;
 
 
-        Vector2 StartPosition
+        RelativeScreenPosition StartPosition
         {
             get
             {
                 switch (fillDirection)
                 {
                     case FillDirection.TopRightToDown:
-                        return new Vector2(RelativeSize.X - buffSize.X - spacing.X, spacing.Y);
+                        return new RelativeScreenPosition(RelativeSize.X - buffSize.X - spacing.X, spacing.Y);
                     default:
                         throw new NotImplementedException();
                 }
             }
         }
 
-        Vector2 buffSize = Camera.Camera.GetRelativeXSquare(0.015f);
-        Vector2 spacing = Camera.Camera.GetRelativeXSquare(0.005f);
-        Vector2 textSpacing = new Vector2(0, 0.007f);
+        RelativeScreenPosition buffSize = Camera.Camera.GetRelativeXSquare(0.015f);
+        RelativeScreenPosition spacing = Camera.Camera.GetRelativeXSquare(0.005f);
+        RelativeScreenPosition textSpacing = new RelativeScreenPosition(0, 0.007f);
 
-        public BuffBox(Entity aOwner, FillDirection aDir, Vector2 aPos, Vector2 aSize) : base(UITexture.Null, aPos, aSize)
+        public BuffBox(Entity aOwner, FillDirection aDir, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(UITexture.Null, aPos, aSize)
         {
             owner = aOwner;
             buffs = new List<Buff>();
@@ -74,7 +75,7 @@ namespace Project_1.UI.UIElements
             ClearBuffs();
             for (int i = 0; i < aBuff.Count; i++)
             {
-                buffs.Add(new Buff(aBuff[i], Vector2.Zero, buffSize));
+                buffs.Add(new Buff(aBuff[i], RelativeScreenPosition.Zero, buffSize));
             }
             children.AddRange(buffs);
             SortBuffs();
@@ -82,7 +83,7 @@ namespace Project_1.UI.UIElements
 
         public void AddBuff(GameObjects.Spells.Buff aBuff)
         {
-            buffs.Add(new Buff(aBuff, Vector2.Zero, buffSize));
+            buffs.Add(new Buff(aBuff, RelativeScreenPosition.Zero, buffSize));
             children.Add(buffs.Last());
             SortBuffs();
         }
@@ -109,7 +110,7 @@ namespace Project_1.UI.UIElements
         void SortBuffs()
         {
             buffs.Sort();
-            Vector2 pos = StartPosition;
+            RelativeScreenPosition pos = StartPosition;
             int maxInX = (int)Math.Floor(RelativeSize.X / (buffSize.X + spacing.X + textSpacing.X) + spacing.X);
             int maxInY = (int)Math.Floor(RelativeSize.Y / (buffSize.Y + spacing.Y + textSpacing.Y) + spacing.Y);
 
@@ -121,15 +122,15 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        Vector2 StepPosition(int i, int aMaxX, int aMaxY)
+        RelativeScreenPosition StepPosition(int i, int aMaxX, int aMaxY)
         {
             switch (fillDirection)
             {
                 case FillDirection.TopRightToDown:
-                    Vector2 xdd = Vector2.Zero;
-                    xdd.X = (float)((buffSize.X + spacing.X + textSpacing.X) * -Math.Floor((double)i / aMaxY));
-                    xdd.Y = ((buffSize.Y + spacing.Y + textSpacing.Y) * (i % aMaxY)); 
-                    return xdd;
+                    RelativeScreenPosition step = RelativeScreenPosition.Zero;
+                    step.X = (float)((buffSize.X + spacing.X + textSpacing.X) * -Math.Floor((double)i / aMaxY));
+                    step.Y = ((buffSize.Y + spacing.Y + textSpacing.Y) * (i % aMaxY)); 
+                    return step;
                 default:
                     throw new NotImplementedException();
             }

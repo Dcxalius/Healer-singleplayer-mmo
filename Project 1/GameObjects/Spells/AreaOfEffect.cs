@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.GameObjects.Entities;
 using Project_1.Input;
 using Project_1.Textures;
@@ -15,7 +16,7 @@ namespace Project_1.GameObjects.Spells
     {
         AreaOfEffectData effectData;
         Entity owner;
-        public AreaOfEffect(string aGfxName, Vector2 aStartingPos, Vector2 aSize) : base(new Texture(new GfxPath(GfxType.Effect, aGfxName)), aStartingPos)
+        public AreaOfEffect(string aGfxName, WorldSpace aStartingPos, WorldSpace aSize) : base(new Texture(new GfxPath(GfxType.Effect, aGfxName)), aStartingPos)
         {
         }
 

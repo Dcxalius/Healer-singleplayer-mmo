@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.Items;
 using Project_1.Managers;
 using Project_1.Textures;
@@ -19,7 +20,7 @@ namespace Project_1.GameObjects.Entities
         Dictionary<Entity, float> aggroValues = new Dictionary<Entity, float>();
         Dictionary<Entity, double> aggroDurations = new Dictionary<Entity, double>();
         double maxAggroDurationStaleness = TimeSpan.FromSeconds(10).TotalMilliseconds;
-        public NonFriendly(Texture aTexture, Vector2 aStartingPos, Corpse aCorpse = null) : base(aTexture, aStartingPos, aCorpse)
+        public NonFriendly(Texture aTexture, WorldSpace aStartingPos, Corpse aCorpse = null) : base(aTexture, aStartingPos, aCorpse)
         {
             
         }

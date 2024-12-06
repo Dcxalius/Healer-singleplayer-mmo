@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic.Devices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.Input;
 using Project_1.Items;
@@ -52,7 +53,7 @@ namespace Project_1.UI.UIElements.Inventory
             }
         }
 
-        public Item(int aBagIndex, int aSlotIndex, bool aHoldable, GfxPath aPath, Vector2 aPos, Vector2 aSize) : base(aPath, aPos, aSize, Color.DarkGray)
+        public Item(int aBagIndex, int aSlotIndex, bool aHoldable, GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPath, aPos, aSize, Color.DarkGray)
         {
             bagIndex = aBagIndex;
             slotIndex = aSlotIndex;

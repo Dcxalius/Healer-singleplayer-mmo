@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
@@ -17,7 +18,7 @@ namespace Project_1.UI.UIElements
         protected UITexture gfxOnButton;
         //Rectangle gfxRectangle;
 
-        public GFXButton(GfxPath aPath, Vector2 aPos, Vector2 aSize, Color aColorOfBorder) : base(aPos, aSize, aColorOfBorder)
+        public GFXButton(GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColorOfBorder) : base(aPos, aSize, aColorOfBorder)
         {
             gfxOnButton = new UITexture(aPath, Color.White);
         }

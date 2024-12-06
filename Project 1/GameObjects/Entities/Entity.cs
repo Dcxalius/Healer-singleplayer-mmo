@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Entities.Resources;
 using Project_1.GameObjects.Spells;
@@ -56,7 +57,7 @@ namespace Project_1.GameObjects.Entities
         static Texture SelectTexture = new Texture(new GfxPath(GfxType.Object, "SelectRing"));
         static Texture ShadowTexture = new Texture(new GfxPath(GfxType.Object, "Shadow"));
 
-        List<Vector2> destinations = new List<Vector2>();
+        List<WorldSpace> destinations = new List<WorldSpace>();
 
         protected Entity target = null;
         bool selected = false;
@@ -79,11 +80,11 @@ namespace Project_1.GameObjects.Entities
         const double globalCooldown = 1500;
         double lastCastSpell;
         Spell channeledSpell;
-        Vector2 channeledSpellStartPosition;
+        WorldSpace channeledSpellStartPosition;
         Entity channelTarget;
         double startCastTime;
 
-        public Entity(Texture aTexture, Vector2 aStartingPos, Corpse aCorpse = null) : base(aTexture, aStartingPos)
+        public Entity(Texture aTexture, WorldSpace aStartingPos, Corpse aCorpse = null) : base(aTexture, aStartingPos)
         {
             inCombat = false;
             buffs = new List<Buff>();
@@ -133,7 +134,7 @@ namespace Project_1.GameObjects.Entities
         bool CastSpeedCheck()
         {
             const float graceSpeedWindow = 0.1f;
-            if (momentum.Length() < graceSpeedWindow)
+            if (momentum.ToVector2().Length() < graceSpeedWindow)
             {
                 return false;
             }
@@ -160,7 +161,7 @@ namespace Project_1.GameObjects.Entities
             HUDManager.CancelChannel();
             channelTarget = null;
             channeledSpell = null;
-            channeledSpellStartPosition = Vector2.Zero;
+            channeledSpellStartPosition = WorldSpace.Zero;
         }
 
         bool FinishChannel()
@@ -168,7 +169,7 @@ namespace Project_1.GameObjects.Entities
             if (channeledSpell.CastTime < TimeManager.TotalFrameTime - startCastTime)
             {
                 const float graceWidth = 5;
-                if (channeledSpell.CastDistance + graceWidth < (channelTarget.FeetPos - FeetPos).Length())
+                if (channeledSpell.CastDistance + graceWidth < (channelTarget.FeetPos - FeetPos).ToVector2().Length())
                 {
                     CancelChannel();
                     return true;
@@ -180,7 +181,7 @@ namespace Project_1.GameObjects.Entities
                 HUDManager.FinishChannel();
                 channeledSpell = null;
                 channelTarget = null;
-                channeledSpellStartPosition = Vector2.Zero;
+                channeledSpellStartPosition = WorldSpace.Zero;
                 return true;
             }
             return false;
@@ -214,7 +215,7 @@ namespace Project_1.GameObjects.Entities
 
             if (Target != null)
             {
-                float d = (Target.FeetPos - FeetPos).Length();
+                float d = (Target.FeetPos - FeetPos).ToVector2().Length();
                 if (d > aSpell.CastDistance) return false;
             }
 
@@ -352,7 +353,7 @@ namespace Project_1.GameObjects.Entities
 
         public override bool Click(ClickEvent aClickEvent)
         {
-            if (Camera.Camera.WorldPosToCameraSpace(WorldRectangle).Contains(aClickEvent.AbsolutePos))
+            if (Camera.Camera.WorldPosToCameraSpace(WorldRectangle).Contains(aClickEvent.AbsolutePos.ToPoint()))
             {
                 if (aClickEvent.NoModifiers())
                 {
@@ -374,19 +375,19 @@ namespace Project_1.GameObjects.Entities
             }
         }
 
-        Vector2 GetDirVectorToNextDestination(Vector2 aDestination, out float aLenghtTillDestination)
+        WorldSpace GetDirVectorToNextDestination(WorldSpace aDestination, out float aLenghtTillDestination)
         {
-            Vector2 dirV = aDestination - FeetPos;
-            aLenghtTillDestination = dirV.Length();
+            WorldSpace dirV = aDestination - FeetPos;
+            aLenghtTillDestination = dirV.ToVector2().Length();
             dirV.Normalize();
             return dirV;
         }
 
         void Walk()
         {
-            if (momentum.Length() < 0.1f)
+            if (momentum.ToVector2().Length() < 0.1f)
             {
-                momentum = Vector2.Zero;
+                momentum = WorldSpace.Zero;
             }
 
             if (destinations.Count == 0 && target == null)
@@ -407,11 +408,11 @@ namespace Project_1.GameObjects.Entities
         {
 
             float length = 0;
-            Vector2 directionToWalk = GetDirVectorToNextDestination(destinations[0], out length);
+            WorldSpace directionToWalk = GetDirVectorToNextDestination(destinations[0], out length);
 
             if (target == null)
             {
-                if (length < momentum.Length() * 10f) //TODO: Find a good factor
+                if (length < momentum.ToVector2().Length() * 10f) //TODO: Find a good factor
                 {
                     destinations.RemoveAt(0);
 
@@ -433,13 +434,13 @@ namespace Project_1.GameObjects.Entities
             velocity += directionToWalk * unitData.Speed * (float)TimeManager.SecondsSinceLastFrame;
         }
 
-        protected void OverwriteDestination(Vector2 aDestination)
+        protected void OverwriteDestination(WorldSpace aDestination)
         {
             destinations.Clear();
             destinations.Add(aDestination);
         }
 
-        protected void AddDestination(Vector2 aDestination) { destinations.Add(aDestination); }
+        protected void AddDestination(WorldSpace aDestination) { destinations.Add(aDestination); }
 
 
 
@@ -467,7 +468,7 @@ namespace Project_1.GameObjects.Entities
         void AttackIfInRange()
         {
 
-            if (CheckForRelation() && (target.FeetPos - FeetPos).Length() < unitData.AttackRange)
+            if (CheckForRelation() && (target.FeetPos - FeetPos).ToVector2().Length() < unitData.AttackRange)
             {
                 timeSinceLastAttack = 0;
                 target.TakeDamage(this, unitData.AttackDamage);
@@ -508,13 +509,13 @@ namespace Project_1.GameObjects.Entities
                     {
                         velocity.X = 0;
                         momentum.X = 0;
-                        Position = new Vector2(aOldPosition.X, Position.Y);
+                        Position = new WorldSpace(aOldPosition.X, Position.Y);
                     }
                     if (Math.Abs(collisionDir.X) < Math.Abs(collisionDir.Y))
                     {
                         velocity.Y = 0;
                         momentum.Y = 0;
-                        Position = new Vector2(Position.X, aOldPosition.Y);
+                        Position = new WorldSpace(Position.X, aOldPosition.Y);
                     }
                 }
             }

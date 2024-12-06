@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.Input;
 using Project_1.Items;
 using Project_1.Particles;
@@ -26,7 +27,7 @@ namespace Project_1.GameObjects.Entities
 
         public bool IsEmpty { get => drop.All(drop => drop == null); }
 
-        public Corpse(Textures.Texture aGfx, LootTable aLoot) : base(aGfx, Vector2.Zero)
+        public Corpse(Textures.Texture aGfx, LootTable aLoot) : base(aGfx, WorldSpace.Zero)
         {
             loot = aLoot;
             lootLength = WorldRectangle.Size.ToVector2().Length();
@@ -34,7 +35,7 @@ namespace Project_1.GameObjects.Entities
             lootGlowMovement = new ParticleMovement(new Vector2(0, -1), new Vector2(0), 0.95f);
         }
 
-        public void SpawnCorpe(Vector2 aPos)
+        public void SpawnCorpe(WorldSpace aPos)
         {
             if (loot!= null)
             {
@@ -46,9 +47,9 @@ namespace Project_1.GameObjects.Entities
 
         public override bool Click(ClickEvent aClickEvent)
         {
-            if (!Camera.Camera.WorldPosToCameraSpace(WorldRectangle).Contains(aClickEvent.AbsolutePos)) return false;
+            if (!Camera.Camera.WorldPosToCameraSpace(WorldRectangle).Contains(aClickEvent.AbsolutePos.ToPoint())) return false;
             if (aClickEvent.ButtonPressed != InputManager.ClickType.Right) return false;
-            if ((ObjectManager.Player.FeetPos - Centre).Length() > lootLength) return false;
+            if (ObjectManager.Player.FeetPos.DistanceTo(Centre) > lootLength) return false;
             if (drop.All(drop => drop == null)) return false;
 
             HUDManager.Loot(this);

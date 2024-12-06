@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.Managers;
 using Project_1.UI.UIElements;
 using System;
@@ -11,7 +12,7 @@ namespace Project_1.UI.PauseMenu
 {
     internal class ResumeButton : Button
     {
-        public ResumeButton(Vector2 aPos, Vector2 aSize) : base(aPos, aSize, Color.PaleVioletRed, "Resume Game")
+        public ResumeButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, Color.PaleVioletRed, "Resume Game")
         {
             
         }

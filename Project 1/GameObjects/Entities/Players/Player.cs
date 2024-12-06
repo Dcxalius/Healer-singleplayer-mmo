@@ -15,6 +15,7 @@ using Project_1.UI.HUD;
 using Project_1.Textures.AnimatedTextures;
 using Project_1.Items;
 using Project_1.GameObjects.Spells;
+using Project_1.Camera;
 
 namespace Project_1.GameObjects.Entities.Players
 {
@@ -49,7 +50,7 @@ namespace Project_1.GameObjects.Entities.Players
         }
         Entity playerClickTarget;
 
-        public Player(Vector2 aStartPos) : base(new RandomAnimatedTexture(new GfxPath(GfxType.Object, "Player"), new Point(32), 0, TimeSpan.FromMilliseconds(500)), aStartPos)
+        public Player(WorldSpace aStartPos) : base(new RandomAnimatedTexture(new GfxPath(GfxType.Object, "Player"), new Point(32), 0, TimeSpan.FromMilliseconds(500)), aStartPos)
         {
             inventory = new Inventory(this);
             spellBook = new SpellBook(this);
@@ -79,7 +80,7 @@ namespace Project_1.GameObjects.Entities.Players
                 velocity.Y += 1;
             }
 
-            if (velocity == Vector2.Zero) return;
+            if (velocity == WorldSpace.Zero) return;
             velocity.Normalize();
             velocity *= (float)(UnitData.Speed * TimeManager.SecondsSinceLastFrame);
         }
@@ -95,7 +96,7 @@ namespace Project_1.GameObjects.Entities.Players
         {
             for (int i = 0; i < party.Count; i++)
             {
-                if (party[i].HasDestination == false && (FeetPos - party[i].FeetPos).Length() > lengthOfLeash)
+                if (party[i].HasDestination == false && (FeetPos - party[i].FeetPos).ToVector2().Length() > lengthOfLeash)
                 {
                     party[i].Target = ObjectManager.Player;
                 }
@@ -139,7 +140,7 @@ namespace Project_1.GameObjects.Entities.Players
 
         public void IssueMoveOrder(ClickEvent aClick)
         {
-            Vector2 worldPosDestination = Camera.Camera.ScreenSpaceToWorldSpace(aClick.RelativePos);
+            WorldSpace worldPosDestination = WorldSpace.FromRelaticeScreenSpace(aClick.RelativePos);
             foreach (var walker in commands)
             {
                 if (aClick.Modifier(InputManager.HoldModifier.Shift))

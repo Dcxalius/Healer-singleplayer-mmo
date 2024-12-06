@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
@@ -22,10 +23,10 @@ namespace Project_1.UI.UIElements.SelectBoxes
         int selectedValue;
         protected SelectBoxValueDisplay displayValue;
 
-        Vector2 defaultPos;
-        Vector2 defaultSize;
+        RelativeScreenPosition defaultPos;
+        RelativeScreenPosition defaultSize;
 
-        public SelectBox(UITexture aGfx, int aStartDisplayValue, Vector2 aPos, Vector2 aCollapsedSize) : base(aGfx, aPos, aCollapsedSize)
+        public SelectBox(UITexture aGfx, int aStartDisplayValue, RelativeScreenPosition aPos, RelativeScreenPosition aCollapsedSize) : base(aGfx, aPos, aCollapsedSize)
         {
             defaultPos = aPos;
             defaultSize = aCollapsedSize;
@@ -102,7 +103,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
             isOpen = true;
 
-            Resize(new Vector2(Size.X, defaultSize.Y * (values.Length + 1)));
+            Resize(new RelativeScreenPosition(Size.X, defaultSize.Y * (values.Length + 1)));
 
         }
 

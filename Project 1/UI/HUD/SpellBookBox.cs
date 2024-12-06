@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Spells;
 using Project_1.Textures;
@@ -17,19 +18,19 @@ namespace Project_1.UI.HUD
         SpellBookSpell[] spellBookSpells;
         const int rows = 3;
         const int cols = 2;
-        public SpellBookBox(Vector2 aPos, Vector2 aSize) : base(new UITexture("WhiteBackground", Color.SaddleBrown), aPos, aSize)
+        public SpellBookBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.SaddleBrown), aPos, aSize)
         {
             visibleKey = Input.KeyBindManager.KeyListner.SpellBook;
             spellBookSpells = new SpellBookSpell[cols * rows];
-            Vector2 startPos = Camera.Camera.GetRelativeXSquare(0.01f);
-            Vector2 spacing = Camera.Camera.GetRelativeXSquare(0.005f);
-            Vector2 size = Camera.Camera.GetRelativeXSquare(0.015f);
+            RelativeScreenPosition startPos = Camera.Camera.GetRelativeXSquare(0.01f);
+            RelativeScreenPosition spacing = Camera.Camera.GetRelativeXSquare(0.005f);
+            RelativeScreenPosition size = Camera.Camera.GetRelativeXSquare(0.015f);
 
             Spell[] spells = ObjectManager.Player.SpellBook.Spells;
 
             for (int i = 0; i < spellBookSpells.Length; i++)
             {
-                Vector2 pos = new Vector2(startPos.X + (float)Math.Floor((double)i / rows) * (size.X + spacing.X), startPos.Y + i % rows * (size.Y + spacing.Y));
+                RelativeScreenPosition pos = new RelativeScreenPosition(startPos.X + (float)Math.Floor((double)i / rows) * (size.X + spacing.X), startPos.Y + i % rows * (size.Y + spacing.Y));
                 if (i < spells.Length)
                 {
                     spellBookSpells[i] = new SpellBookSpell(pos, size, spells[i]);

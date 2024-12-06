@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic.Devices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.Input;
 using Project_1.Managers;
@@ -24,9 +25,9 @@ namespace Project_1.UI.HUD
 
         float maxX;
 
-        public DescriptorBox() : base(new UITexture("GrayBackground", Color.White), Vector2.Zero, Vector2.Zero)
+        public DescriptorBox() : base(new UITexture("GrayBackground", Color.White), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
         {
-            maxX = Camera.Camera.TransformRelativeToAbsoluteScreenSpace(new Vector2(0.15f)).X;
+            maxX = Camera.Camera.TransformRelativeToAbsoluteScreenSpace(new RelativeScreenPosition(0.15f)).X;
             descriptedName = new DescriptorText(maxX, "Gloryse", Color.White);
             description = new DescriptorText(maxX, "Gloryse", Color.White);
 
@@ -53,11 +54,11 @@ namespace Project_1.UI.HUD
             ToggleVisibilty();
             descriptedName.Value = item.Name;
             description.Value = item.Description;
-            Vector2 spacing = Camera.Camera.GetRelativeXSquare(0.005f);
+            RelativeScreenPosition spacing = Camera.Camera.GetRelativeXSquare(0.005f);
             int y = (int)(descriptedName.Offset.Y + description.Offset.Y);
             int x = (int)Math.Max(descriptedName.Offset.X, description.Offset.X);
-            Resize(Camera.Camera.TransformAbsoluteToRelativeScreenSpace(new Point(x, y)) + spacing * 2 + new Vector2(0, spacing.Y));
-            Move(InputManager.GetMousePosRelative() - Camera.Camera.TransformAbsoluteToRelativeScreenSpace(Size));
+            Resize(new AbsoluteScreenPosition(x, y).ToRelativeScreenPosition() + spacing * 2 + new RelativeScreenPosition(0, spacing.Y));
+            Move(InputManager.GetMousePosRelative() - RelativeSize);
         }
 
         void ResetDescriptor()
@@ -65,7 +66,7 @@ namespace Project_1.UI.HUD
             ToggleVisibilty();
             descriptedName.Value = null;
             description.Value = null;
-            Resize(Vector2.Zero);
+            Resize(RelativeScreenPosition.Zero);
             return;
         }
 
@@ -75,7 +76,7 @@ namespace Project_1.UI.HUD
 
             if (Visible)
             {
-                Move(InputManager.GetMousePosRelative() - Camera.Camera.TransformAbsoluteToRelativeScreenSpace(Size));
+                Move(InputManager.GetMousePosRelative() - RelativeSize);
             }
         }
 

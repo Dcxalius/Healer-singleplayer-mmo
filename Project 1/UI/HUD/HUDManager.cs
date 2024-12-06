@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spells;
@@ -46,18 +47,18 @@ namespace Project_1.UI.HUD
         public static void Init()
         {
 
-            playerPlateBox = new PlayerPlateBox(new Vector2(0.1f, 0.1f), new Vector2(0.2f, 0.1f));
-            targetPlateBox = new TargetPlateBox(new Vector2(0.33f, 0.1f), new Vector2(0.2f, 0.1f));
-            playerBuffBox = new BuffBox(ObjectManager.Player, BuffBox.FillDirection.TopRightToDown, new Vector2(0.01f, 0.1f), new Vector2(0.08f, 0.1f));
-            targetBuffBox = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, new Vector2(0.33f, 0.21f), new Vector2(0.2f, 0.1f));
+            playerPlateBox = new PlayerPlateBox(new RelativeScreenPosition(0.1f, 0.1f), new RelativeScreenPosition(0.2f, 0.1f));
+            targetPlateBox = new TargetPlateBox(new RelativeScreenPosition(0.33f, 0.1f), new RelativeScreenPosition(0.2f, 0.1f));
+            playerBuffBox = new BuffBox(ObjectManager.Player, BuffBox.FillDirection.TopRightToDown, new RelativeScreenPosition(0.01f, 0.1f), new RelativeScreenPosition(0.08f, 0.1f));
+            targetBuffBox = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, new RelativeScreenPosition(0.33f, 0.21f), new RelativeScreenPosition(0.2f, 0.1f));
 
-            lootBox = new LootBox(new Vector2(0.1f, 0.5f), new Vector2(0.4f, 0.4f));
-            inventoryBox = new InventoryBox(new Vector2(0.59f, 0.59f), new Vector2(0.4f));
+            lootBox = new LootBox(new RelativeScreenPosition(0.1f, 0.5f), new RelativeScreenPosition(0.4f, 0.4f));
+            inventoryBox = new InventoryBox(new RelativeScreenPosition(0.59f, 0.59f), new RelativeScreenPosition(0.4f));
             descriptorBox = new DescriptorBox();
 
-            spellBookBox = new SpellBookBox(new Vector2(0.2f, 0.4f), new Vector2(0.4f, 0.4f));
-            firstSpellBar = new FirstSpellBar(10, new Vector2(0.2f, 0.86f), 0.6f);
-            playerCastBar = new CastBar(new Vector2(0.1f, 0.203f), new Vector2(0.2f, 0.015f));
+            spellBookBox = new SpellBookBox(new RelativeScreenPosition(0.2f, 0.4f), new RelativeScreenPosition(0.4f, 0.4f));
+            firstSpellBar = new FirstSpellBar(10, new RelativeScreenPosition(0.2f, 0.86f), 0.6f);
+            playerCastBar = new CastBar(new RelativeScreenPosition(0.1f, 0.203f), new RelativeScreenPosition(0.2f, 0.015f));
 
             hudElements.Add(playerPlateBox);
             hudElements.Add(targetPlateBox);
@@ -95,8 +96,8 @@ namespace Project_1.UI.HUD
                 return;
             }
 
-            partyPlateBoxes[openIndex] = new PartyPlateBox(aWalker, new Vector2(0.1f, 0.24f), new Vector2(0.2f, 0.1f)); //TODO: Fix temp values
-            partyBuffBoxes[openIndex] = new BuffBox(aWalker, BuffBox.FillDirection.TopRightToDown, new Vector2(0.01f, 0.24f), new Vector2(0.08f, 0.1f));
+            partyPlateBoxes[openIndex] = new PartyPlateBox(aWalker, new RelativeScreenPosition(0.1f, 0.24f), new RelativeScreenPosition(0.2f, 0.1f)); //TODO: Fix temp values
+            partyBuffBoxes[openIndex] = new BuffBox(aWalker, BuffBox.FillDirection.TopRightToDown, new RelativeScreenPosition(0.01f, 0.24f), new RelativeScreenPosition(0.08f, 0.1f));
             partyBuffBoxes[openIndex].AssignBox(aWalker);
             hudElements.Add(partyPlateBoxes[openIndex]);
             hudElements.Add(partyBuffBoxes[openIndex]);

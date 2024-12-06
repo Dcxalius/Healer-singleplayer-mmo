@@ -16,6 +16,7 @@ using Microsoft.Xna.Framework.Content;
 using Project_1.Managers;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Players;
+using Project_1.Camera;
 
 namespace Project_1.GameObjects
 {
@@ -32,17 +33,17 @@ namespace Project_1.GameObjects
 
         public static void Init()
         {
-            player = new Player(new Microsoft.Xna.Framework.Vector2(100));
+            player = new Player(new WorldSpace(100));
             Camera.Camera.BindCamera(player);
 
 
 
 
-            entities.Add(new Walker(new Microsoft.Xna.Framework.Vector2(200, 200)));//Debug
+            entities.Add(new Walker(new WorldSpace(200, 200)));//Debug
             player.AddToParty(entities[entities.Count - 1] as Walker); //Debug
             for (int i = 0; i < 100; i++)
             {
-                entities.Add(new Sheep(new Microsoft.Xna.Framework.Vector2((float)500 + 30 * (i % 10), (float)(500 + 30 * Math.Floor(i / 10d)))));//Debug
+                entities.Add(new Sheep(new WorldSpace((float)500 + 30 * (i % 10), (float)(500 + 30 * Math.Floor(i / 10d)))));//Debug
 
             }
 

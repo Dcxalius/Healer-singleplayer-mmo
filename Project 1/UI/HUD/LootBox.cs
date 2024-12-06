@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.Input;
@@ -19,15 +20,15 @@ namespace Project_1.UI.HUD
         Corpse lootedCorpse;
         Loot[] loot;
 
-        Vector2 lootSize = Camera.Camera.GetRelativeXSquare(0.05f);
-        Vector2 spacing = Camera.Camera.GetRelativeXSquare(0.025f);
+        RelativeScreenPosition lootSize = Camera.Camera.GetRelativeXSquare(0.05f);
+        RelativeScreenPosition spacing = Camera.Camera.GetRelativeXSquare(0.025f);
 
         bool tooMuchLootForWindow = false; //TODO: Break this out to a interface
         float scrollValue = 0;
         int totalLoot;
         float[] originalYPos;
 
-        public LootBox(Vector2 aPos, Vector2 aSize) : base(new UITexture("GrayBackground", Color.NavajoWhite), aPos, aSize)
+        public LootBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", Color.NavajoWhite), aPos, aSize)
         {
             ToggleVisibilty();
         }
@@ -69,7 +70,7 @@ namespace Project_1.UI.HUD
             loot = new Loot[loots.Length];
             originalYPos = new float[loot.Length];
 
-            Vector2 pos = Vector2.Zero;
+            RelativeScreenPosition pos = RelativeScreenPosition.Zero;
             pos.X = spacing.X;
             pos.Y = spacing.Y;
             for (int i = 0; i < loot.Length; i++)
@@ -81,7 +82,7 @@ namespace Project_1.UI.HUD
                 }
                 else
                 {
-                    loot[i] = new Loot(i, null, new GfxPath(GfxType.Debug, null), pos, Vector2.Zero);
+                    loot[i] = new Loot(i, null, new GfxPath(GfxType.Debug, null), pos, RelativeScreenPosition.Zero);
                 }
                 originalYPos[i] = pos.Y;
                 pos.Y += lootSize.Y;
@@ -130,7 +131,7 @@ namespace Project_1.UI.HUD
                 {
                     if (loot.Contains(children[i]))
                     {
-                        children[i].Move(new Vector2(children[i].RelativePos.X, originalYPos[i] - scrollValue));
+                        children[i].Move(new RelativeScreenPosition(children[i].RelativePos.X, originalYPos[i] - scrollValue));
                     }
                 }
             }
@@ -164,7 +165,7 @@ namespace Project_1.UI.HUD
         {
             if (lootedCorpse == null) return;
 
-            if ((lootedCorpse.Centre - ObjectManager.Player.FeetPos).Length() > lootedCorpse.LootLength)
+            if (lootedCorpse.Centre.DistanceTo(ObjectManager.Player.FeetPos) > lootedCorpse.LootLength)
             {
                 StopLoot();
                 return;

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.Input;
 using Project_1.Textures;
@@ -13,7 +14,7 @@ namespace Project_1.GameObjects.Entities
 {
     internal class Walker : Entity
     {
-        public Walker(Vector2 aStartingPos) : base(new RandomAnimatedTexture(new GfxPath(GfxType.Object, "Walker"), new Point(32), 0, TimeSpan.FromMilliseconds(500)), aStartingPos)
+        public Walker(WorldSpace aStartingPos) : base(new RandomAnimatedTexture(new GfxPath(GfxType.Object, "Walker"), new Point(32), 0, TimeSpan.FromMilliseconds(500)), aStartingPos)
         {
         }
 
@@ -42,14 +43,14 @@ namespace Project_1.GameObjects.Entities
             }
         }
 
-        public void RecieveDirectWalkingOrder(Vector2 aPos)
+        public void RecieveDirectWalkingOrder(WorldSpace aPos)
         {
             target = null;
             OverwriteDestination(aPos);
         }
 
 
-        public void AddWalkingOrder(Vector2 aPos)
+        public void AddWalkingOrder(WorldSpace aPos)
         {
             AddDestination(aPos);
         }

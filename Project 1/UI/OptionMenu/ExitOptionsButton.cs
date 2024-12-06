@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
@@ -14,7 +15,7 @@ namespace Project_1.UI.OptionMenu
     {
         List<Action> onExit;
 
-        public ExitOptionsButton() : base(new GfxPath(GfxType.UI, "XButton"), new Vector2(0.9f), new Vector2(0.05f), Color.Beige)
+        public ExitOptionsButton() : base(new GfxPath(GfxType.UI, "XButton"), new RelativeScreenPosition(0.9f), new RelativeScreenPosition(0.05f), Color.Beige)
         {
             onExit = new List<Action>();
 

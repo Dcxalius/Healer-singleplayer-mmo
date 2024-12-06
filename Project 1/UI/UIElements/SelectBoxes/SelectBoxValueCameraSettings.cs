@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -13,15 +14,15 @@ namespace Project_1.UI.UIElements.SelectBoxes
         public Camera.Camera.CameraSettings CameraSetting { get => cameraSetting; }
 
         Camera.Camera.CameraSettings cameraSetting;
-        public SelectBoxValueCameraSettings(Camera.Camera.CameraSettings aCameraSetting, Vector2 aPos, Vector2 aSize) : base(SelectBoxValueTypes.CameraSetting, null, aCameraSetting.ToString(), aPos, aSize)
+        public SelectBoxValueCameraSettings(Camera.Camera.CameraSettings aCameraSetting, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(SelectBoxValueTypes.CameraSetting, null, aCameraSetting.ToString(), aPos, aSize)
         {
             cameraSetting = aCameraSetting;
         }
 
-        public static SelectBoxValueCameraSettings[] CreateArray(Vector2 aStartPos, Vector2 aSize)
+        public static SelectBoxValueCameraSettings[] CreateArray(RelativeScreenPosition aStartPos, RelativeScreenPosition aSize)
         {
             SelectBoxValueCameraSettings[] returnable = new SelectBoxValueCameraSettings[(int)Camera.Camera.CameraSettings.Count];
-            Vector2 pos = aStartPos;
+            RelativeScreenPosition pos = aStartPos;
             for (int i = 0; i < (int)Camera.Camera.CameraSettings.Count; i++)
             {
                 returnable[i] = new SelectBoxValueCameraSettings(((Camera.Camera.CameraSettings)i), pos, aSize);

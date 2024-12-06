@@ -42,14 +42,14 @@ namespace Project_1.Camera
         public static CameraSettings CurrentCameraSetting { get => cameraSettings; }
 
         public static Rectangle WorldRectangle { get => new Rectangle(centreInWorldSpace.ToPoint() - (CentrePointInScreenSpace / Scale).ToPoint(), (ScreenSize / Scale).ToPoint()); }
-        public static Vector2 CentreInWorldSpace { get => centreInWorldSpace; set => centreInWorldSpace = value; }
+        public static WorldSpace CentreInWorldSpace { get => centreInWorldSpace; set => centreInWorldSpace = value; }
 
         public static AbsoluteScreenPosition CentrePointInScreenSpace { get => screenRectangleSize / 2; }
 
         public static Rectangle RenderTargetPosition { set => renderTargetPosition = value; }
 
 
-        static Vector2 centreInWorldSpace = new Vector2(100, 100);
+        static WorldSpace centreInWorldSpace = new WorldSpace(100, 100);
 
         //---
 
@@ -129,16 +129,16 @@ namespace Project_1.Camera
             }
         }
 
-        public static Vector2 GetRelativeXSquare(float aSizeInX)
+        public static RelativeScreenPosition GetRelativeXSquare(float aSizeInX)
         {
             float a = screenRectangleSize.X * aSizeInX;
             float b = a / screenRectangleSize.Y;
             return new(aSizeInX, b);
         }
 
-        public static Point TransformRelativeToAbsoluteScreenSpace(Vector2 aPos) //TODO: Change this to Relative and absolute and move it out of here
+        public static AbsoluteScreenPosition TransformRelativeToAbsoluteScreenSpace(Vector2 aPos) //TODO: Change this to Relative and absolute and move it out of here
         {
-            Point pos = new Point((int)(screenRectangleSize.X * aPos.X), (int)(screenRectangleSize.Y * aPos.Y));
+            AbsoluteScreenPosition pos = new AbsoluteScreenPosition((int)(screenRectangleSize.X * aPos.X), (int)(screenRectangleSize.Y * aPos.Y));
             //DebugManager.Print(typeof(Camera), "Abs pos = " + pos + ", and relative pos = " + aPos);
             return pos;
         }

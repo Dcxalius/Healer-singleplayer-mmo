@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.Textures;
 using Project_1.UI.UIElements.SelectBoxes;
 using SharpDX.Direct2D1;
@@ -15,11 +16,11 @@ namespace Project_1.UI.OptionMenu
     {
         public static CameraStyleSelect instance;
 
-        public CameraStyleSelect(Vector2 aPos, Vector2 aSize) : base(new UITexture("WhiteBackground", Color.White), (int)Camera.Camera.CurrentCameraSetting, aPos, aSize)
+        public CameraStyleSelect(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.White), (int)Camera.Camera.CurrentCameraSetting, aPos, aSize)
         {
             instance = this;
 
-            SelectBoxValueCameraSettings[] setOfValues = SelectBoxValueCameraSettings.CreateArray(new Vector2(0, aSize.Y), aSize);
+            SelectBoxValueCameraSettings[] setOfValues = SelectBoxValueCameraSettings.CreateArray(new RelativeScreenPosition(0, aSize.Y), aSize);
             displayValue = new SelectBoxValueDisplay(setOfValues[(int)Camera.Camera.CurrentCameraSetting], new UITexture("WhiteBackground", Color.White), aSize);
 
             values = setOfValues;

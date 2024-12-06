@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.Input;
 using Project_1.Items;
@@ -16,7 +17,7 @@ namespace Project_1.UI.UIElements.Inventory
     {
         Items.Item item;
 
-        public Loot(int aSlotIndex, Items.Item aItem, GfxPath aPath, Vector2 aPos, Vector2 aSize) : base(-2, aSlotIndex, true, aPath, aPos, aSize)
+        public Loot(int aSlotIndex, Items.Item aItem, GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(-2, aSlotIndex, true, aPath, aPos, aSize)
         {
             if (aItem == null) return;
             item = aItem;
@@ -33,7 +34,7 @@ namespace Project_1.UI.UIElements.Inventory
         {
             //gfx = null;
             itemCount.Value = null;
-            Resize(Vector2.Zero);
+            Resize(RelativeScreenPosition.Zero);
             item = null;
         }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
     {
         //int value;
 
-        public SelectBoxValueInt(string aStartValue, Vector2 aPos, Vector2 aSize) : base(SelectBoxValueTypes.Int, null, aStartValue, aPos, aSize)
+        public SelectBoxValueInt(string aStartValue, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(SelectBoxValueTypes.Int, null, aStartValue, aPos, aSize)
         {
         }
     }

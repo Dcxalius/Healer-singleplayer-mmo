@@ -12,6 +12,7 @@ using Project_1.GameObjects.Spells;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities.Players;
+using Project_1.Camera;
 
 namespace Project_1.UI.UIElements.SpellBook
 {
@@ -24,7 +25,7 @@ namespace Project_1.UI.UIElements.SpellBook
 
         Spell spellData;
 
-        public SpellButton(KeyBindManager.KeyListner aKeyListner, Vector2 aPos, Vector2 aSize, Spell aSpell = null) : base(Spell.GetGfxPath(aSpell), aPos, aSize, Color.Gray)
+        public SpellButton(KeyBindManager.KeyListner aKeyListner, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Spell aSpell = null) : base(Spell.GetGfxPath(aSpell), aPos, aSize, Color.Gray)
         {
             keyListner = aKeyListner;
             onCooldownGfx = new CooldownTexture();
@@ -61,7 +62,7 @@ namespace Project_1.UI.UIElements.SpellBook
                 gfx.Color = Color.White;
                 return;
             }
-            if ((P.Target.FeetPos - P.FeetPos).Length() > spellData.CastDistance) gfx.Color = Color.Red;
+            if (P.Target.FeetPos.DistanceTo(P.FeetPos) > spellData.CastDistance) gfx.Color = Color.Red;
             else gfx.Color = Color.White;
         }
 

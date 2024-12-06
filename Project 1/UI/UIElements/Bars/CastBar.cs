@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.GameObjects.Spells;
 using Project_1.Managers;
 using Project_1.Textures;
@@ -25,7 +26,7 @@ namespace Project_1.UI.UIElements.Bars
                 base.Value = value;
             }
         }
-        public CastBar(Vector2 aPos, Vector2 aSize) : base(new BarTexture(BarTexture.FillingDirection.Right, Color.White), new UITexture(new GfxPath(GfxType.UI, "WhiteBackground"), Color.Black), aPos, aSize)
+        public CastBar(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new BarTexture(BarTexture.FillingDirection.Right, Color.White), new UITexture(new GfxPath(GfxType.UI, "WhiteBackground"), Color.Black), aPos, aSize)
         {
             remainingCast = new Text("Gloryse", Color.Wheat);
         }

@@ -11,10 +11,10 @@ namespace Project_1.Camera
     {
         Vector2 position;
 
-        static RelativeScreenPosition Zero { get { return new RelativeScreenPosition(); } }
+        public static RelativeScreenPosition Zero { get { return new RelativeScreenPosition(); } }
 
-        public float X { get { return position.X; } }
-        public float Y { get { return position.Y; } }
+        public float X { get { return position.X; } set => position.X = value; }
+        public float Y { get { return position.Y; } set => position.Y = value; }
 
         public RelativeScreenPosition()
         {
@@ -35,8 +35,31 @@ namespace Project_1.Camera
         {
             position = new Vector2(aX, aY);
         }
+        static public Rectangle TransformToAbsoluteRect(RelativeScreenPosition aPos, RelativeScreenPosition aSize)
+        {
+            Point pos = new Point((int)(Camera.ScreenSize.X * aPos.X), (int)(Camera.ScreenSize.Y * aPos.Y));
+            Point size = new Point((int)(Camera.ScreenSize.X * aSize.X), (int)(Camera.ScreenSize.Y * aSize.Y));
+            return new Rectangle(pos, size);
+        }
 
+        static public RelativeScreenPosition FromAbsoluteScreenPosition(AbsoluteScreenPosition aAbsoluteScreenPosition)
+        {
+            RelativeScreenPosition pos = new RelativeScreenPosition(aAbsoluteScreenPosition.X / (float)Camera.ScreenRectangle.Width, aAbsoluteScreenPosition.Y / (float)Camera.ScreenRectangle.Height);
+            return pos;
+        }
 
+        static public AbsoluteScreenPosition ToAbsoluteScreenPosition(RelativeScreenPosition aAbsoluteScreenPosition)
+        {
+            return AbsoluteScreenPosition.FromRelativeScreenPosition(aAbsoluteScreenPosition);
+        }
+
+        public AbsoluteScreenPosition ToAbsoluteScreenPos()
+        {
+            return ToAbsoluteScreenPosition(this);
+        }
+
+        public static implicit operator Vector2(RelativeScreenPosition rs) => rs.position;
+        public static explicit operator RelativeScreenPosition(Vector2 v) => new RelativeScreenPosition(v);
 
         public static RelativeScreenPosition operator +(RelativeScreenPosition aScreenPosition) => aScreenPosition;
 

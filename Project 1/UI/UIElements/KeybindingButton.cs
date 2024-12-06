@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Project_1.Camera;
 using Project_1.Input;
 using Project_1.UI.OptionMenu;
 using Project_1.UI.UIElements;
@@ -18,7 +19,7 @@ namespace Project_1.UI.UIElements
         
         
         bool waitingForPress = false;
-        public KeybindingButton(bool aFirstButtons, KeyBindManager.KeyListner aKeyListner, Vector2 aPos, Vector2 aSize) : base(aPos, aSize, Color.White, KeyBindManager.GetKey(aFirstButtons, aKeyListner).ToString(), Color.Black)
+        public KeybindingButton(bool aFirstButtons, KeyBindManager.KeyListner aKeyListner, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, Color.White, KeyBindManager.GetKey(aFirstButtons, aKeyListner).ToString(), Color.Black)
         {
             firstButtons = aFirstButtons; 
             keyListner = aKeyListner;

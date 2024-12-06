@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.Managers;
 using Project_1.UI;
@@ -168,30 +169,30 @@ namespace Project_1.Input
             return heldModifiers;
         }
 
-        public static Point GetMousePosAbsolute()
+        public static AbsoluteScreenPosition GetMousePosAbsolute()
         {
-            Point mousePos = BoundsCheckOnMouse(newMouseState.Position);
+            AbsoluteScreenPosition mousePos = BoundsCheckOnMouse(new AbsoluteScreenPosition(newMouseState.Position));
             return mousePos; //TODO: Make this handle the mouse being outside screen
         }
 
-        public static Vector2 GetMousePosRelative()
+        public static RelativeScreenPosition GetMousePosRelative()
         {
             Point mousePoint = GetMousePosAbsolute();
             Point screenSize = Camera.Camera.ScreenSize.ToPoint();
 
-            Vector2 mouseVector = new Vector2(mousePoint.X / (float)screenSize.X, mousePoint.Y / (float)screenSize.Y);
+            RelativeScreenPosition mouseVector = new RelativeScreenPosition(mousePoint.X / (float)screenSize.X, mousePoint.Y / (float)screenSize.Y);
 
             
 
             return mouseVector;
         }
 
-        static Point BoundsCheckOnMouse(Point aMousePos)
+        static AbsoluteScreenPosition BoundsCheckOnMouse(AbsoluteScreenPosition aMousePos)
         {
             Rectangle bounds = Camera.Camera.ScreenRectangle;
-            if (!bounds.Contains(aMousePos))
+            if (!bounds.Contains(aMousePos.ToPoint()))
             {
-                return new Point(-1);
+                return new AbsoluteScreenPosition(-1);
             }
             return aMousePos;
         }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.Input;
 using Project_1.Managers;
 using System;
@@ -14,20 +15,20 @@ namespace Project_1.GameObjects
 {
     internal abstract class GameObject
     {
-        public Vector2 Position { get => position; protected set => position = value; }
-        public Vector2 Centre { get => position + size.ToVector2() / 2; }
-        public Vector2 FeetPos { get => Position + new Vector2(size.X / 2, size.Y); }
+        public WorldSpace Position { get => position; protected set => position = value; }
+        public WorldSpace Centre { get => position + new WorldSpace(size.ToVector2()) / 2; }
+        public WorldSpace FeetPos { get => Position + (WorldSpace)new Vector2(size.X / 2, size.Y); }
         public Rectangle WorldRectangle { get => new Rectangle(position.ToPoint(), size); }
         
         protected Textures.Texture gfx;
 
 
-        Vector2 position;
+        WorldSpace position;
         protected Point size;
 
 
 
-        public GameObject(Textures.Texture aGfx, Vector2 aStartingPos)
+        public GameObject(Textures.Texture aGfx, WorldSpace aStartingPos)
         {
             gfx = aGfx;
             position = aStartingPos;

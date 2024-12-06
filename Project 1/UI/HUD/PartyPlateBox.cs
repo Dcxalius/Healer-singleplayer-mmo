@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.Input;
@@ -24,13 +25,13 @@ namespace Project_1.UI.HUD
 
         CommandBorder border;
 
-        public PartyPlateBox(Walker aWalker, Vector2 aPos, Vector2 aSize) : base(aPos, aSize)
+        public PartyPlateBox(Walker aWalker, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize)
         {
             walker = aWalker;
 
-            name = new PlateBoxNameSegment(walker.Name, walker.RelationColor, new Vector2(0, 0), new Vector2(aSize.X, aSize.Y / 2));
-            health = new PlateBoxHealthSegment(walker, new Vector2(0, aSize.Y / 2), new Vector2(aSize.X, aSize.Y / 4));
-            resource = new PlateBoxResourceSegment(walker, new Vector2(0, aSize.Y / 4 * 3 ), new Vector2(aSize.X, aSize.Y / 4));
+            name = new PlateBoxNameSegment(walker.Name, walker.RelationColor, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(aSize.X, aSize.Y / 2));
+            health = new PlateBoxHealthSegment(walker, new RelativeScreenPosition(0, aSize.Y / 2), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
+            resource = new PlateBoxResourceSegment(walker, new RelativeScreenPosition(0, aSize.Y / 4 * 3 ), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
 
             //health = new PlateBoxHealthSegment(walker, new Vector2(0, 0), new Vector2(aSize.X, aSize.Y / 2));
 
@@ -41,7 +42,7 @@ namespace Project_1.UI.HUD
 
             AddSegmentsToChildren();
 
-            border = new CommandBorder(Color.YellowGreen, Vector2.Zero, aSize);
+            border = new CommandBorder(Color.YellowGreen, RelativeScreenPosition.Zero, aSize);
             children.Add(border);
             VisibleBorder = false;
         }

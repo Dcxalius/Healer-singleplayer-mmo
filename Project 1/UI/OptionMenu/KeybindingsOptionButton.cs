@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.UI.UIElements;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace Project_1.UI.OptionMenu
 {
     internal class KeybindingsOptionButton : Button
     {
-        public KeybindingsOptionButton(Vector2 aPos, Vector2 aSize) : base(aPos, aSize, Color.White, "Keybindings", Color.Black)
+        public KeybindingsOptionButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, Color.White, "Keybindings", Color.Black)
         {
 
         }

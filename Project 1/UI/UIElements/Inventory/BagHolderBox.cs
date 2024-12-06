@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.Items;
 using Project_1.Textures;
@@ -19,7 +20,7 @@ namespace Project_1.UI.UIElements.Inventory
 
         
 
-        public BagHolderBox(Vector2 aPos, Vector2 aSize) : base(new UITexture("WhiteBackground", Color.White), aPos, aSize)
+        public BagHolderBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.White), aPos, aSize)
         {
             defaultBag = new Item(-1, 0, false, new GfxPath(GfxType.Item, "DefaultBag"), InventoryBox.spacing, InventoryBox.itemSize);
             children.Add(defaultBag);
@@ -30,8 +31,8 @@ namespace Project_1.UI.UIElements.Inventory
             bags = new Item[aBags.Length - 1];
             for (int i = 1; i < aBags.Length; i++)
             {
-                Vector2 pos = new Vector2((i) * (InventoryBox.itemSize.X + InventoryBox.spacing.X) + InventoryBox.spacing.X, InventoryBox.spacing.Y);
-                Vector2 size = InventoryBox.itemSize;
+                RelativeScreenPosition pos = new RelativeScreenPosition((i) * (InventoryBox.itemSize.X + InventoryBox.spacing.X) + InventoryBox.spacing.X, InventoryBox.spacing.Y);
+                RelativeScreenPosition size = InventoryBox.itemSize;
 
                 if (aBags[i] == null)
                 {

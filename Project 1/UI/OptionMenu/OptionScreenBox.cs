@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
 using System;
@@ -15,11 +16,11 @@ namespace Project_1.UI.OptionMenu
         VideoOptionsButton videoOptionsButton;
         KeybindingsOptionButton keybindingsOptionButton;
 
-        public OptionScreenBox(int aCountOfButtons, Vector2 aPos, Vector2 aSize) : base(null, aPos, aSize)
+        public OptionScreenBox(int aCountOfButtons, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, aPos, aSize)
         {
-            Vector2 buttonSize = new Vector2(aSize.X / aCountOfButtons, aSize.Y);
-            videoOptionsButton = new VideoOptionsButton(new Vector2(0), buttonSize);
-            keybindingsOptionButton = new KeybindingsOptionButton(new Vector2(buttonSize.X, 0), buttonSize);
+            RelativeScreenPosition buttonSize = new RelativeScreenPosition(aSize.X / aCountOfButtons, aSize.Y);
+            videoOptionsButton = new VideoOptionsButton(new RelativeScreenPosition(0), buttonSize);
+            keybindingsOptionButton = new KeybindingsOptionButton(new RelativeScreenPosition(buttonSize.X, 0), buttonSize);
 
             children.Add(videoOptionsButton);  
             children.Add(keybindingsOptionButton);

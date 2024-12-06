@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Project_1.Camera;
 
 namespace Project_1.Tiles
 {
@@ -20,7 +21,7 @@ namespace Project_1.Tiles
 
         TileData tileData;
 
-        public Tile(TileData aTileData, Point aPos) : base(new Textures.RandomlyGeneratedTexture(true, tileSize, new GfxPath(GfxType.Tile, aTileData.Name)), aPos.ToVector2())
+        public Tile(TileData aTileData, Point aPos) : base(new Textures.RandomlyGeneratedTexture(true, tileSize, new GfxPath(GfxType.Tile, aTileData.Name)), (WorldSpace)aPos.ToVector2())
         { 
             tileData = aTileData;
         }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace Project_1.UI.UIElements.PlateBoxes
 
         Text text;
 
-        public PlateBoxSegment(UITexture aGfx, Vector2 aPos, Vector2 aSize) : base(aGfx, aPos, aSize)
+        public PlateBoxSegment(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aGfx, aPos, aSize)
         {
             text = new Text("Gloryse", Color.Black);
             

@@ -11,10 +11,10 @@ namespace Project_1.Camera
     {
         Vector2 position;
 
-        static WorldSpace Zero { get { return new WorldSpace(); } }
+        public static WorldSpace Zero { get { return new WorldSpace(); } }
 
-        public float X { get { return position.X; } }
-        public float Y { get { return position.Y; } }
+        public float X { get { return position.X; }  set { position.X = value; } }
+        public float Y { get { return position.Y; } set { position.Y = value; } }
 
         public WorldSpace()
         {
@@ -36,7 +36,28 @@ namespace Project_1.Camera
             position = new Vector2(aX, aY);
         }
 
+        public float DistanceTo(WorldSpace aOtherSpace)
+        {
+            return (this - aOtherSpace).ToVector2().Length();
+        }
 
+        public static WorldSpace FromRelaticeScreenSpace(RelativeScreenPosition aScreenSpace)
+        {
+            return FromAbsoluteScreenSpace(Camera.TransformRelativeToAbsoluteScreenSpace(aScreenSpace.ToVector2()));
+        }
+
+        public static WorldSpace FromAbsoluteScreenSpace(AbsoluteScreenPosition aScreenSpace)
+        {
+
+            WorldSpace vectorInScreen = (WorldSpace)(Camera.CentrePointInScreenSpace - aScreenSpace).ToVector2();
+
+            WorldSpace vectorInWorld = (WorldSpace)(Camera.CentreInWorldSpace - vectorInScreen * Camera.Zoom);
+
+            return vectorInWorld;
+        }
+
+        public static implicit operator Vector2(WorldSpace ws) => ws.position; 
+        public static explicit operator WorldSpace(Vector2 v) => new WorldSpace(v);
 
         public static WorldSpace operator +(WorldSpace aScreenPosition) => aScreenPosition;
 
@@ -95,6 +116,11 @@ namespace Project_1.Camera
         public bool Equals(WorldSpace obj)
         {
             return (position == obj.position);
+        }
+
+        public void Normalize()
+        {
+            position.Normalize();
         }
 
         public Point ToPoint()

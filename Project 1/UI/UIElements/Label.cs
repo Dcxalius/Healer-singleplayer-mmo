@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace Project_1.UI.UIElements
     {
         Text underlyingText;
         static readonly Color defaultC = Color.White;
-        public Label(string aText, Vector2 aPos, Vector2 aSize, Color? aColor = null, string aFontname = "Gloryse") : base(null, aPos, aSize)
+        public Label(string aText, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color? aColor = null, string aFontname = "Gloryse") : base(null, aPos, aSize)
         {
             if (aColor.HasValue)
             {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.Input;
 using Project_1.UI.UIElements;
 using System;
@@ -35,7 +36,7 @@ namespace Project_1.UI.OptionMenu
 
         static void InitPermanents()
         {
-            optionScreenPermanents.Add(new OptionScreenBox((int)OptionScreen.Count, new Vector2(0), new Vector2(0.3f,0.04f)));
+            optionScreenPermanents.Add(new OptionScreenBox((int)OptionScreen.Count, new RelativeScreenPosition(0), new RelativeScreenPosition(0.3f,0.04f)));
             exitOptionsButton = new ExitOptionsButton();
             optionScreenPermanents.Add(exitOptionsButton);
         }
@@ -49,19 +50,19 @@ namespace Project_1.UI.OptionMenu
         {
             optionElements[(int)OptionScreen.Video] = new List<UIElement>
             {
-                new CameraStyleSelect(new Vector2(0.1f, 0.22f), new Vector2(0.3f, 0.1f)),
-                new ScreenSizeSelect(new Vector2(0.1f, 0.1f), new Vector2(0.3f, 0.1f)),
+                new CameraStyleSelect(new RelativeScreenPosition(0.1f, 0.22f), new RelativeScreenPosition(0.3f, 0.1f)),
+                new ScreenSizeSelect(new RelativeScreenPosition(0.1f, 0.1f), new RelativeScreenPosition(0.3f, 0.1f)),
             };
         }
 
-        static Vector2 keybindingStartPos = new Vector2(0.2f, 0.1f);
-        static Vector2 keybindingSize = new Vector2(0.5f, 0.05f);
-        static Vector2 keybindingSpacing = new Vector2(0, 0.01f);
-        static Vector2 GetKeybindingPos
+        static RelativeScreenPosition keybindingStartPos = new RelativeScreenPosition(0.2f, 0.1f);
+        static RelativeScreenPosition keybindingSize = new RelativeScreenPosition(0.5f, 0.05f);
+        static RelativeScreenPosition keybindingSpacing = new RelativeScreenPosition(0, 0.01f);
+        static RelativeScreenPosition GetKeybindingPos
         {
             get
             {
-                Vector2 r = keybindingStartPos;
+                RelativeScreenPosition r = keybindingStartPos;
                 keybindingStartPos.Y += keybindingSize.Y + keybindingSpacing.Y;
 
                 return r;

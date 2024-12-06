@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
@@ -32,7 +33,7 @@ namespace Project_1.UI.UIElements
 
         Text text;
 
-        public Button(Vector2 aPos, Vector2 aSize, Color aColor, string aText = null, Color? aTextColor = null) : base(new UITexture("WhiteBackground", aColor), aPos, aSize)
+        public Button(RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColor, string aText = null, Color? aTextColor = null) : base(new UITexture("WhiteBackground", aColor), aPos, aSize)
         {
             Color denullifiedTextColor = aTextColor == null ? Color.White : aTextColor.Value;
             text = new Text("Gloryse", aText, denullifiedTextColor);

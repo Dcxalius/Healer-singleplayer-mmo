@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
 using System;
@@ -31,7 +32,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
         SelectBoxValueTypes type;
 
-        protected SelectBoxValue(SelectBoxValueTypes aType, UITexture aGfx, string aStartText, Vector2 aPos, Vector2 aSize) : base(aGfx, aPos, aSize)
+        protected SelectBoxValue(SelectBoxValueTypes aType, UITexture aGfx, string aStartText, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aGfx, aPos, aSize)
         {
             type = aType;
             text = new Text("Gloryse", aStartText, Color.Teal);

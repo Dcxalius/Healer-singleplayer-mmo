@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.Textures;
 using System;
@@ -17,7 +18,7 @@ namespace Project_1.UI.UIElements.PlateBoxes
         protected PlateBoxSegment[] rightVerticalSegments;
         protected PlateBoxSegment[] horizontalSegments;
 
-        public PlateBox(Vector2 aPos, Vector2 aSize) : base(new UITexture("GrayBackground", Color.White), aPos, aSize)
+        public PlateBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", Color.White), aPos, aSize)
         {
             //TODO: Make sure the segmentsizes add up to aSize
 

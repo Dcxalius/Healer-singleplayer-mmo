@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Players;
@@ -25,11 +26,11 @@ namespace Project_1.UI.HUD
         PlateBoxResourceSegment resourceSegment;
 
 
-        public TargetPlateBox(Vector2 aPos, Vector2 aSize) : base(aPos, aSize)
+        public TargetPlateBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize)
         {
-            nameSegment = new PlateBoxNameSegment(null, Color.White, Vector2.Zero, new Vector2(aSize.X, aSize.Y / 2));
-            healthSegment = new PlateBoxHealthSegment(null, new Vector2(0, aSize.Y / 2), new Vector2(aSize.X, aSize.Y / 4));
-            resourceSegment = new PlateBoxResourceSegment(null, new Vector2(0, aSize.Y / 4 * 3), new Vector2(aSize.X, aSize.Y / 4));
+            nameSegment = new PlateBoxNameSegment(null, Color.White, RelativeScreenPosition.Zero, new RelativeScreenPosition(aSize.X, aSize.Y / 2));
+            healthSegment = new PlateBoxHealthSegment(null, new RelativeScreenPosition(0, aSize.Y / 2), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
+            resourceSegment = new PlateBoxResourceSegment(null, new RelativeScreenPosition(0, aSize.Y / 4 * 3), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
 
             leftVerticalSegments = new PlateBoxSegment[] { };
             rightVerticalSegments = new PlateBoxSegment[] { };

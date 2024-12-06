@@ -17,8 +17,8 @@ namespace Project_1.Camera
 
 
         float cameraMoveBorderSize = 0.1f;
-        Vector2 velocity = Vector2.Zero;
-        Vector2 momentum = Vector2.Zero;
+        WorldSpace velocity = WorldSpace.Zero;
+        WorldSpace momentum = WorldSpace.Zero;
         int baseSpeed = 100;
         Vector2 drag = new Vector2(0.9f, 0.9f);
 
@@ -36,7 +36,7 @@ namespace Project_1.Camera
                 return;
             }
 
-            Vector2 relativeMousePos = InputManager.GetMousePosRelative();
+            RelativeScreenPosition relativeMousePos = InputManager.GetMousePosRelative();
             float movementFactor = 0;
 
             if (relativeMousePos.X < cameraMoveBorderSize)
@@ -77,11 +77,11 @@ namespace Project_1.Camera
 
             //DebugManager.Print(typeof(Camera), "Mouse pos = " + relativeMousePos);
 
-            Vector2 absoluteMosPos = InputManager.GetMousePosAbsolute().ToVector2();
+            AbsoluteScreenPosition absoluteMosPos = InputManager.GetMousePosAbsolute();
 
-            Vector2 mouseAbsoluteToCentre = absoluteMosPos - CentrePointInScreenSpace.ToVector2();
+            Vector2 mouseAbsoluteToCentre = (absoluteMosPos - CentrePointInScreenSpace).ToVector2();
             mouseAbsoluteToCentre.Normalize();
-            velocity = mouseAbsoluteToCentre * (float)(baseSpeed * TimeManager.SecondsSinceLastFrame) * movementFactor;
+            velocity = (WorldSpace)(mouseAbsoluteToCentre * (float)(baseSpeed * TimeManager.SecondsSinceLastFrame) * movementFactor);
             //DebugManager.Print(typeof(Camera), "Velocity = " + velocity.ToString());
         }
 
@@ -152,7 +152,7 @@ namespace Project_1.Camera
             {
                 Vector2 cameraRectIntersection = CalculateIntersection();
 
-                CentreInWorldSpace = boundObject.Position - cameraRectIntersection;
+                CentreInWorldSpace = boundObject.Position - (WorldSpace)cameraRectIntersection;
             }
         }
 
@@ -321,7 +321,7 @@ namespace Project_1.Camera
             {
                 Vector2 normalized = Vector2.Normalize(distanceToBinder);
                 Vector2 tele = normalized * maxCircleCameraMove * 0.9999f;
-                CentreInWorldSpace = boundObject.Position - tele;
+                CentreInWorldSpace = (WorldSpace)(boundObject.Position - tele);
                 //velocity = Vector2.Zero;
             }
         }
@@ -330,9 +330,9 @@ namespace Project_1.Camera
         {
             momentum += velocity;
 
-            velocity = Vector2.Zero;
+            velocity = WorldSpace.Zero;
             CentreInWorldSpace += momentum;
-            momentum = new Vector2(momentum.X * drag.X, momentum.Y * drag.Y);
+            momentum = new WorldSpace(momentum.X * drag.X, momentum.Y * drag.Y);
         }
 
     }

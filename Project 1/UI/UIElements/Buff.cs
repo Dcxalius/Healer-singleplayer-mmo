@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace Project_1.UI.UIElements
         public double Duration => buff.DurationRemaining;
         GameObjects.Spells.Buff buff;
         Text xdd;
-        public Buff(GameObjects.Spells.Buff aBuff, Vector2 aPos, Vector2 aSize) : base(new UITexture(aBuff.GfxPath, Color.White), aPos, aSize)
+        public Buff(GameObjects.Spells.Buff aBuff, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture(aBuff.GfxPath, Color.White), aPos, aSize)
         {
             xdd = new Text("Gloryse", "xdd", Color.Black);
             buff = aBuff;

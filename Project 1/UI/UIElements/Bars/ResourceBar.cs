@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -37,7 +38,7 @@ namespace Project_1.UI.UIElements.Bars
         Text fractionText;
         Text percentageText;
 
-        public ResourceBar(BarTexture aBarGfx, UITexture aBackgroundGfx, Vector2 aPos, Vector2 aSize) : base(aBarGfx, aBackgroundGfx, aPos, aSize)
+        public ResourceBar(BarTexture aBarGfx, UITexture aBackgroundGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aBarGfx, aBackgroundGfx, aPos, aSize)
         {
             fractionText = new Text("Gloryse", Color.Black);
             percentageText = new Text("Gloryse", Color.Black);

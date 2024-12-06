@@ -2,17 +2,18 @@
 using System.Linq;
 using Project_1.Input;
 using Project_1.UI.UIElements;
+using Project_1.Camera;
 namespace Project_1.Input
 {
     internal class ReleaseEvent
     {
 
-        public Vector2 RelativePos { get => releasePos; }
-        public Point AbsolutePos { get => Camera.Camera.TransformRelativeToAbsoluteScreenSpace(releasePos); }
+        public RelativeScreenPosition RelativePos { get => releasePos; }
+        public AbsoluteScreenPosition AbsolutePos { get => releasePos.ToAbsoluteScreenPos(); }
         public InputManager.ClickType ButtonPressed { get => buttonPressed; }
         public UIElement Parent { get => creator; }
 
-        Vector2 releasePos;
+        RelativeScreenPosition releasePos;
 
         InputManager.ClickType buttonPressed;
 
@@ -20,14 +21,14 @@ namespace Project_1.Input
 
         UIElement creator;
 
-        public ReleaseEvent(UIElement aCreator, Point aPos, InputManager.ClickType aButtonReleased, bool[] aModifiers)
+        public ReleaseEvent(UIElement aCreator, AbsoluteScreenPosition aPos, InputManager.ClickType aButtonReleased, bool[] aModifiers)
         {
-            releasePos = Camera.Camera.TransformAbsoluteToRelativeScreenSpace(aPos);
+            releasePos = aPos.ToRelativeScreenPosition();
             __ClickEvent__(aCreator, aButtonReleased, aModifiers);
 
         }
 
-        public ReleaseEvent(UIElement aCreator, Vector2 aClickPos, InputManager.ClickType aButtonReleased, bool[] aModifiers)
+        public ReleaseEvent(UIElement aCreator, RelativeScreenPosition aClickPos, InputManager.ClickType aButtonReleased, bool[] aModifiers)
         {
             releasePos = aClickPos;
             __ClickEvent__(aCreator, aButtonReleased, aModifiers);

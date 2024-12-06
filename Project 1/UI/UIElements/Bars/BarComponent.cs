@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace Project_1.UI.UIElements.Bars
     {
         public new Color Color { get => gfx.Color; set => gfx.Color = value; }
 
-        public BarComponent(BarTexture aGfx, Vector2 aPos, Vector2 aSize) : base(aGfx, aPos, aSize)
+        public BarComponent(BarTexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aGfx, aPos, aSize)
         {
 
         }
@@ -22,7 +23,7 @@ namespace Project_1.UI.UIElements.Bars
         public void UpdateBar(float aNewValue, float aMaxX)
         {
             ((BarTexture)gfx).Filled = aNewValue;
-            Vector2 v = RelativeSize;
+            RelativeScreenPosition v = RelativeSize;
             v.X = aMaxX * aNewValue;
             Resize(v);
         }

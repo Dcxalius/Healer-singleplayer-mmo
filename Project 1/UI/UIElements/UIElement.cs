@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
@@ -20,44 +21,44 @@ namespace Project_1.UI.UIElements
         protected bool Visible { get => visible; }
         bool visible;
         protected KeyBindManager.KeyListner? visibleKey = null;
-        public Vector2 RelativePos { get => relativePos; }
-        public Vector2 RelativeSize { get => relativeSize; }
+        public RelativeScreenPosition RelativePos { get => relativePos; }
+        public RelativeScreenPosition RelativeSize { get => relativeSize; }
 
         public Rectangle AbsolutePos
         {
             get
             {
                 Rectangle tempRec = Rectangle.Empty;
-                tempRec.Location = absolutePos;
-                tempRec.Size = Size;
+                tempRec.Location = absolutePos.ToPoint();
+                tempRec.Size = Size.ToPoint();
                 return tempRec;
             }
         }
 
 
-        public Point Size { get => pos.Size; }
+        public AbsoluteScreenPosition Size { get => new AbsoluteScreenPosition(pos.Size); }
 
         public UITexture Gfx { get => gfx; }
         public Color Color { get => gfx.Color; set => gfx.Color = value; }
 
-        bool Hovered { get => AbsolutePos.Contains(InputManager.GetMousePosAbsolute()); }
+        bool Hovered { get => AbsolutePos.Contains(InputManager.GetMousePosAbsolute().ToPoint()); }
         protected bool wasHovered = false;
 
         protected UITexture gfx;
-        Point absolutePos;
+        AbsoluteScreenPosition absolutePos;
         Rectangle pos;
-        Vector2 relativePos; //TODO: Change this so 1, 1 refers to parents bottom right instead of screen bottom right + parent top left
-        Vector2 relativeSize;
+        RelativeScreenPosition relativePos; //TODO: Change this so 1, 1 refers to parents bottom right instead of screen bottom right + parent top left
+        RelativeScreenPosition relativeSize;
 
         public HoldEvent heldEvents; //TODO: This should prob be cleansed on state change
 
 
 
         //protected UIElement? parent;
-        protected Point parentPos = Point.Zero;
+        protected AbsoluteScreenPosition parentPos = AbsoluteScreenPosition.Zero;
         protected List<UIElement> children = new List<UIElement>();
 
-        protected UIElement(UITexture aGfx, Vector2 aPos, Vector2 aSize) //aPos and aSize should be between 0 and 1
+        protected UIElement(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) //aPos and aSize should be between 0 and 1
         {
             //Debug.Assert(aPos > 0 && aPos < 0);
             visible = true;
@@ -66,8 +67,8 @@ namespace Project_1.UI.UIElements
             relativePos = aPos;
             relativeSize = aSize;
 
-            pos = TransformFromRelativeToValues(aPos, aSize);
-            absolutePos = pos.Location;
+            pos = RelativeScreenPosition.TransformToAbsoluteRect(aPos, aSize);
+            absolutePos = new AbsoluteScreenPosition(pos.Location);
         }
 
         public virtual void Update(in UIElement aParent)
@@ -77,11 +78,11 @@ namespace Project_1.UI.UIElements
             if (aParent != null) //TODO: Make this less ugly
             {
                 parentPos = aParent.absolutePos;
-                absolutePos = aParent.absolutePos + pos.Location;
+                absolutePos = aParent.absolutePos + new AbsoluteScreenPosition(pos.Location);
             }
             else
             {
-                absolutePos = pos.Location;
+                absolutePos = new AbsoluteScreenPosition(pos.Location);
             }
             foreach (UIElement child in children)
             {
@@ -130,12 +131,6 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        static protected Rectangle TransformFromRelativeToValues(Vector2 aPos, Vector2 aSize)
-        {
-            Point pos = new Point((int)(Camera.Camera.ScreenSize.X * aPos.X), (int)(Camera.Camera.ScreenSize.Y * aPos.Y));
-            Point size = new Point((int)(Camera.Camera.ScreenSize.X * aSize.X), (int)(Camera.Camera.ScreenSize.Y * aSize.Y));
-            return new Rectangle(pos, size);
-        }
 
         static protected Point TransformFromRelativeToPoint(Vector2 aValue)
         {
@@ -288,8 +283,8 @@ namespace Project_1.UI.UIElements
 
         public virtual void Rescale()
         {
-            pos = TransformFromRelativeToValues(relativePos, relativeSize);
-            absolutePos = parentPos + pos.Location;
+            pos = RelativeScreenPosition.TransformToAbsoluteRect(relativePos, relativeSize);
+            absolutePos = parentPos + new AbsoluteScreenPosition(pos.Location);
 
             for (int i = 0; i < children.Count; i++)
             {
@@ -297,15 +292,15 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        public void Move(Vector2 aNewPos)
+        public void Move(RelativeScreenPosition aNewPos)
         {
             if (aNewPos.X == float.NaN || aNewPos.Y == float.NaN) throw new ArgumentException("Invalid move.");
             relativePos = aNewPos;
             pos.Location = TransformFromRelativeToPoint(aNewPos);
-            absolutePos = pos.Location + parentPos;
+            absolutePos = new AbsoluteScreenPosition(pos.Location) + parentPos;
         }
 
-        protected void Resize(Vector2 aSize)
+        protected void Resize(RelativeScreenPosition aSize)
         {
             relativeSize = aSize;
             pos.Size = TransformFromRelativeToPoint(aSize);

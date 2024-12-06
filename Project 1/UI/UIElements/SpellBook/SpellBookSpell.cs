@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.GameObjects.Spells;
 using Project_1.Input;
 using Project_1.Managers;
@@ -29,10 +30,10 @@ namespace Project_1.UI.UIElements.SpellBook
         }
         Spell spellData;
 
-        public SpellBookSpell(Vector2 aPos, Vector2 aSize, Spell aSpell = null) : base(Spell.GetGfxPath(aSpell), aPos, aSize, Color.White)
+        public SpellBookSpell(RelativeScreenPosition aPos, RelativeScreenPosition aSize, Spell aSpell = null) : base(Spell.GetGfxPath(aSpell), aPos, aSize, Color.White)
         {
             onCooldownGfx = new CooldownTexture();
-            emptyBorder = new Border(Vector2.Zero, aSize);
+            emptyBorder = new Border(RelativeScreenPosition.Zero, aSize);
             //children.Add(emptyBorder);
             if (aSpell != null)
             {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.Managers;
 using Project_1.Textures;
 using System;
@@ -15,13 +16,12 @@ namespace Project_1.UI.UIElements
         public new bool Visible { get => visible; set => visible = value; }
 
         bool visible = true;
-        public CommandBorder(Color aColor, Vector2 aPos, Vector2 aSizeOfBoxToBorder) : base(null, aPos, aSizeOfBoxToBorder)
+        public CommandBorder(Color aColor, RelativeScreenPosition aPos, RelativeScreenPosition aSizeOfBoxToBorder) : base(null, aPos, aSizeOfBoxToBorder)
         //public Border(Color aColor, Vector2 aPos, Vector2 aSize) : base(new UITexture("GrayWhiteBorder", aColor), aPos, aSize)
         {
             //This probably should be broken out and called on rescale or be completly reworked and handled through shaders
-            Point size = Camera.Camera.TransformRelativeToAbsoluteScreenSpace(aSizeOfBoxToBorder);
-            size = (size.ToVector2()).ToPoint();
-            Texture2D text = Managers.GraphicsManager.CreateNewTexture(size);
+            AbsoluteScreenPosition size = aSizeOfBoxToBorder.ToAbsoluteScreenPos();
+            Texture2D text = Managers.GraphicsManager.CreateNewTexture(size.ToPoint());
 
             float borderWidth = 0.10f;
 
@@ -72,7 +72,7 @@ namespace Project_1.UI.UIElements
 
             text.SetData(0, 0, null, data, 0, size.X * size.Y);
 
-            gfx = new Textures.UITexture(text, size);
+            gfx = new Textures.UITexture(text, size.ToPoint());
         }
 
         public override void Draw(SpriteBatch aBatch)

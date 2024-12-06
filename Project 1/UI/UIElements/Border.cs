@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.Input;
 using Project_1.Textures;
 using System;
@@ -11,7 +12,7 @@ namespace Project_1.UI.UIElements
 {
     internal class Border : Box
     {
-        public Border(Vector2 aPos, Vector2 aSize) : base(new UITexture("GrayWhiteBorder", Color.White), aPos, aSize)
+        public Border(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayWhiteBorder", Color.White), aPos, aSize)
         {
         }
 

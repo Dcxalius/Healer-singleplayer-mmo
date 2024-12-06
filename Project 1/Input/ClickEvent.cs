@@ -1,30 +1,31 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Linq;
 using Project_1.Input;
+using Project_1.Camera;
 namespace Project_1.Input
 {
     internal class ClickEvent
     {
 
-        public Vector2 RelativePos { get => clickPos; }
-        public Point AbsolutePos { get => Camera.Camera.TransformRelativeToAbsoluteScreenSpace(clickPos); }
+        public RelativeScreenPosition RelativePos { get => clickPos; }
+        public AbsoluteScreenPosition AbsolutePos { get => AbsoluteScreenPosition.FromRelativeScreenPosition(clickPos); }
         public InputManager.ClickType ButtonPressed { get => buttonPressed; }
 
-        Vector2 clickPos;
+        RelativeScreenPosition clickPos;
 
         InputManager.ClickType buttonPressed;
 
         bool[] modifierHeld;
 
 
-        public ClickEvent(Point aPos, InputManager.ClickType aButtonPressed, bool[] aModifiers)
+        public ClickEvent(AbsoluteScreenPosition aPos, InputManager.ClickType aButtonPressed, bool[] aModifiers)
         {
-            clickPos = Camera.Camera.TransformAbsoluteToRelativeScreenSpace(aPos);
+            clickPos = aPos.ToRelativeScreenPosition();
             __ClickEvent__(aButtonPressed, aModifiers);
 
         }
 
-        public ClickEvent(Vector2 aClickPos, InputManager.ClickType aButtonPressed, bool[] aModifiers)
+        public ClickEvent(RelativeScreenPosition aClickPos, InputManager.ClickType aButtonPressed, bool[] aModifiers)
         {
             clickPos = aClickPos;
             __ClickEvent__(aButtonPressed, aModifiers);

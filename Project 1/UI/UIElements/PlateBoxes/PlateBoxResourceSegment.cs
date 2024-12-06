@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.GameObjects.Entities;
 using Project_1.Textures;
 using Project_1.UI.UIElements.Bars;
@@ -15,17 +16,17 @@ namespace Project_1.UI.UIElements.PlateBoxes
         ResourceBar resourceBar;
         Entity entity;
         static Color backgroundColor = new Color(255, 211, 211, 120);
-        public PlateBoxResourceSegment(Entity aEntity, Vector2 aPos, Vector2 aSize) : base(null, aPos, aSize)
+        public PlateBoxResourceSegment(Entity aEntity, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, aPos, aSize)
         {
             entity = aEntity;
             if (entity != null)
             {
-                resourceBar = new ResourceBar(new BarTexture(BarTexture.FillingDirection.Right, entity.ResourceColor), new UITexture("WhiteBackground", backgroundColor), Vector2.Zero, aSize);
+                resourceBar = new ResourceBar(new BarTexture(BarTexture.FillingDirection.Right, entity.ResourceColor), new UITexture("WhiteBackground", backgroundColor), RelativeScreenPosition.Zero, aSize);
                 resourceBar.MaxValue = aEntity.MaxResource;
             }
             else
             {
-                resourceBar = new ResourceBar(new BarTexture(BarTexture.FillingDirection.Right, Color.White), new UITexture("WhiteBackground", backgroundColor), Vector2.Zero, aSize);
+                resourceBar = new ResourceBar(new BarTexture(BarTexture.FillingDirection.Right, Color.White), new UITexture("WhiteBackground", backgroundColor), RelativeScreenPosition.Zero, aSize);
             }
             children.Add(resourceBar);
         }
