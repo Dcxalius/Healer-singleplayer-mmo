@@ -129,24 +129,7 @@ namespace Project_1.Camera
             }
         }
 
-        public static RelativeScreenPosition GetRelativeXSquare(float aSizeInX)
-        {
-            float a = screenRectangleSize.X * aSizeInX;
-            float b = a / screenRectangleSize.Y;
-            return new(aSizeInX, b);
-        }
 
-        public static AbsoluteScreenPosition TransformRelativeToAbsoluteScreenSpace(Vector2 aPos) //TODO: Change this to Relative and absolute and move it out of here
-        {
-            AbsoluteScreenPosition pos = new AbsoluteScreenPosition((int)(screenRectangleSize.X * aPos.X), (int)(screenRectangleSize.Y * aPos.Y));
-            //DebugManager.Print(typeof(Camera), "Abs pos = " + pos + ", and relative pos = " + aPos);
-            return pos;
-        }
-        public static Vector2 TransformAbsoluteToRelativeScreenSpace(Point aPos) //TODO: Change this to Relative and absolute and move it out of here
-        {
-            Vector2 pos = new Vector2(aPos.X / (float)screenRectangleSize.X, aPos.Y / (float)screenRectangleSize.Y);
-            return pos;
-        }
 
 
         public static void SetCamera(CameraSettings aCameraSettings)
@@ -175,35 +158,14 @@ namespace Project_1.Camera
         }
 
 
-        public static Rectangle WorldPosToCameraSpace(Rectangle aWorldPos)
+        public static Rectangle WorldRectToScreenRect(Rectangle aWorldPos)
         {
             Point topLeft = (centreInWorldSpace * scale - screenRectangleSize.ToVector2() / 2).ToPoint();
             Rectangle cameraPos = new Rectangle((aWorldPos.Location.ToVector2() * scale).ToPoint() - topLeft, (aWorldPos.Size.ToVector2() * scale).ToPoint());
             return cameraPos;
         }
 
-        public static Vector2 WorldPosToCameraSpace(Vector2 aWorldPos)
-        {
-            Vector2 topLeft = centreInWorldSpace * scale - new Vector2(screenRectangleSize.X / 2, screenRectangleSize.Y / 2);
 
-            return aWorldPos * scale - topLeft;
-        }
-
-        public static Vector2 ScreenSpaceToWorldSpace(AbsoluteScreenPosition aScreenPos)
-        {
-            Vector2 vectorInScreen = (CentrePointInScreenSpace - aScreenPos).ToVector2();
-
-            Vector2 vectorInWorld = centreInWorldSpace - vectorInScreen * Zoom;
-
-            return vectorInWorld;
-        }
-
-        public static Vector2 ScreenSpaceToWorldSpace(Vector2 aRelativeVector)
-        {
-            Vector2 vectorInScreen = CentrePointInScreenSpace.ToVector2() - TransformRelativeToAbsoluteScreenSpace(aRelativeVector).ToVector2();
-            Vector2 vectorInWorld = WorldRectangle.Center.ToVector2() - vectorInScreen * Zoom;
-            return vectorInWorld;
-        }
 
         public static bool MomAmIInFrame(Rectangle aRect)
         {

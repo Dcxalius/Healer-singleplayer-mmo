@@ -20,8 +20,8 @@ namespace Project_1.UI.HUD
         Corpse lootedCorpse;
         Loot[] loot;
 
-        RelativeScreenPosition lootSize = Camera.Camera.GetRelativeXSquare(0.05f);
-        RelativeScreenPosition spacing = Camera.Camera.GetRelativeXSquare(0.025f);
+        RelativeScreenPosition lootSize = RelativeScreenPosition.GetSquareFromX(0.05f);
+        RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.025f);
 
         bool tooMuchLootForWindow = false; //TODO: Break this out to a interface
         float scrollValue = 0;

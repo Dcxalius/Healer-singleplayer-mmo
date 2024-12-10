@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.Managers;
 using System;
 using System.Collections.Generic;
@@ -11,10 +12,10 @@ namespace Project_1.Particles
     internal class ParticleMovement
     {
 
-        public Vector2 Momentum => SplitVectorTuple(momentum);
-        (Vector2, Vector2) momentum;
-        public Vector2 Velocity { get => SplitVectorTuple(velocity); }
-        (Vector2, Vector2) velocity;
+        public WorldSpace Momentum => SplitVectorTuple(momentum);
+        (WorldSpace, WorldSpace) momentum;
+        public WorldSpace Velocity { get => SplitVectorTuple(velocity); }
+        (WorldSpace, WorldSpace) velocity;
 
         public float Drag
         {
@@ -30,21 +31,21 @@ namespace Project_1.Particles
         }
         (float, float) drag;
 
-        public ParticleMovement(Vector2 aMomentum, Vector2 aVelocity, float aDrag)
+        public ParticleMovement(WorldSpace aMomentum, WorldSpace aVelocity, float aDrag)
         {
             __constructor__((aMomentum, aMomentum), (aVelocity, aVelocity), (aDrag, aDrag));
         }
-        public ParticleMovement((Vector2, Vector2) aMomentum, (Vector2, Vector2) aVelocity, float aDrag)
+        public ParticleMovement((WorldSpace, WorldSpace) aMomentum, (WorldSpace, WorldSpace) aVelocity, float aDrag)
         {
             __constructor__(aMomentum, aVelocity, (aDrag, aDrag));
         }
 
-        public ParticleMovement((Vector2, Vector2) aMomentum, (Vector2, Vector2) aVelocity, (float, float) aDrag)
+        public ParticleMovement((WorldSpace, WorldSpace) aMomentum, (WorldSpace, WorldSpace) aVelocity, (float, float) aDrag)
         {
             __constructor__(aMomentum, aVelocity, aDrag);
         }
 
-        void __constructor__((Vector2, Vector2) aMomentum, (Vector2, Vector2) aVelocity, (float, float) aDrag)
+        void __constructor__((WorldSpace, WorldSpace) aMomentum, (WorldSpace, WorldSpace) aVelocity, (float, float) aDrag)
         {
 
             momentum = aMomentum;
@@ -53,14 +54,14 @@ namespace Project_1.Particles
         }
 
 
-        Vector2 SplitVectorTuple((Vector2, Vector2) aPairToSplit)
+        WorldSpace SplitVectorTuple((WorldSpace, WorldSpace) aPairToSplit)
         { 
             if (aPairToSplit.Item1 == aPairToSplit.Item2)
             {
                 return aPairToSplit.Item1;
             }
 
-            return new Vector2((float)RandomManager.RollDouble(aPairToSplit.Item1.X, aPairToSplit.Item2.X), (float)RandomManager.RollDouble(aPairToSplit.Item2.Y, aPairToSplit.Item2.Y));
+            return new WorldSpace((float)RandomManager.RollDouble(aPairToSplit.Item1.X, aPairToSplit.Item2.X), (float)RandomManager.RollDouble(aPairToSplit.Item2.Y, aPairToSplit.Item2.Y));
         }
     }
 }

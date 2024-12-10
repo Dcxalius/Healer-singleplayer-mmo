@@ -247,8 +247,8 @@ namespace Project_1.UI.UIElements.Inventory
         {
 
             base.Draw(aBatch);
-            itemCount.RightAllignedDraw(aBatch, (AbsolutePos.Location + AbsolutePos.Size).ToVector2() - new Vector2(0, itemCount.Offset.Y / 2));
-            itemCount.LeftAllignedDraw(aBatch, RelativePos);
+            itemCount.RightAllignedDraw(aBatch, new AbsoluteScreenPosition((AbsolutePos.Location + AbsolutePos.Size)) - new AbsoluteScreenPosition(0, (int)itemCount.Offset.Y / 2));
+            itemCount.LeftAllignedDraw(aBatch, RelativePos.ToAbsoluteScreenPos());
         }
     }
 }

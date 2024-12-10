@@ -27,7 +27,7 @@ namespace Project_1.UI.HUD
 
         public DescriptorBox() : base(new UITexture("GrayBackground", Color.White), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
         {
-            maxX = Camera.Camera.TransformRelativeToAbsoluteScreenSpace(new RelativeScreenPosition(0.15f)).X;
+            maxX = (new RelativeScreenPosition(0.15f).ToAbsoluteScreenPos()).X;
             descriptedName = new DescriptorText(maxX, "Gloryse", Color.White);
             description = new DescriptorText(maxX, "Gloryse", Color.White);
 
@@ -54,7 +54,7 @@ namespace Project_1.UI.HUD
             ToggleVisibilty();
             descriptedName.Value = item.Name;
             description.Value = item.Description;
-            RelativeScreenPosition spacing = Camera.Camera.GetRelativeXSquare(0.005f);
+            RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
             int y = (int)(descriptedName.Offset.Y + description.Offset.Y);
             int x = (int)Math.Max(descriptedName.Offset.X, description.Offset.X);
             Resize(new AbsoluteScreenPosition(x, y).ToRelativeScreenPosition() + spacing * 2 + new RelativeScreenPosition(0, spacing.Y));
@@ -83,7 +83,7 @@ namespace Project_1.UI.HUD
         public override void Rescale()
         {
             base.Rescale();
-            maxX = Camera.Camera.TransformRelativeToAbsoluteScreenSpace(new Vector2(0.15f)).X;
+            maxX = (new RelativeScreenPosition(0.15f).ToAbsoluteScreenPos()).X;
         }
 
         public override void Draw(SpriteBatch aBatch)
@@ -95,12 +95,12 @@ namespace Project_1.UI.HUD
         void DrawText(SpriteBatch aBatch)
         {
 
-            Vector2 spacing = Camera.Camera.TransformRelativeToAbsoluteScreenSpace(Camera.Camera.GetRelativeXSquare(0.005f)).ToVector2();
-            Vector2 offsetName = new Vector2(0, descriptedName.Offset.Y / 2);
-            Vector2 pos = (AbsolutePos.Location.ToVector2() + spacing + offsetName);
-            Vector2 offsetDesc = new Vector2(0, description.Offset.Y / 2);
+            AbsoluteScreenPosition spacing = (RelativeScreenPosition.GetSquareFromX(0.005f).ToAbsoluteScreenPos());
+            AbsoluteScreenPosition offsetName = new AbsoluteScreenPosition(0, (int)(descriptedName.Offset.Y / 2f));
+            AbsoluteScreenPosition pos = ((AbsoluteScreenPosition)AbsolutePos.Location + spacing + offsetName);
+            AbsoluteScreenPosition offsetDesc = new AbsoluteScreenPosition(0, (int)(description.Offset.Y / 2));
             descriptedName.LeftAllignedDraw(aBatch, pos);
-            description.LeftAllignedDraw(aBatch, pos + offsetDesc + new Vector2(0, spacing.Y) * (1 + descriptedName.NameLines));
+            description.LeftAllignedDraw(aBatch, pos + offsetDesc + new AbsoluteScreenPosition(0, spacing.Y) * (1 + descriptedName.NameLines));
         }
     }
 }

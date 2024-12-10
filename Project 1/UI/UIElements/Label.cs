@@ -29,7 +29,7 @@ namespace Project_1.UI.UIElements
 
         public override void Draw(SpriteBatch aBatch)
         {
-            underlyingText.LeftAllignedDraw(aBatch, AbsolutePos.Location.ToVector2() + new Vector2(0, AbsolutePos.Size.Y / 2));
+            underlyingText.LeftAllignedDraw(aBatch, new AbsoluteScreenPosition( AbsolutePos.Location + new Vector2(0, AbsolutePos.Size.Y / 2).ToPoint()));
 
             base.Draw(aBatch);
 

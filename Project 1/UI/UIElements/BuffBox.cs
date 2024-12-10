@@ -40,8 +40,8 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        RelativeScreenPosition buffSize = Camera.Camera.GetRelativeXSquare(0.015f);
-        RelativeScreenPosition spacing = Camera.Camera.GetRelativeXSquare(0.005f);
+        RelativeScreenPosition buffSize = RelativeScreenPosition.GetSquareFromX(0.015f);
+        RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
         RelativeScreenPosition textSpacing = new RelativeScreenPosition(0, 0.007f);
 
         public BuffBox(Entity aOwner, FillDirection aDir, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(UITexture.Null, aPos, aSize)

@@ -33,7 +33,7 @@ namespace Project_1.UI.UIElements
         {
             base.Draw(aBatch);
 
-            xdd.CentredDraw(aBatch, new Vector2(AbsolutePos.Center.X, AbsolutePos.Center.Y + AbsolutePos.Size.Y - 3));
+            xdd.CentredDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Center.X, AbsolutePos.Center.Y + AbsolutePos.Size.Y - 3));
         }
 
         

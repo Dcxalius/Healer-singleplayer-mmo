@@ -37,6 +37,8 @@ namespace Project_1.Camera
             position = new Point(aX, aY);
         }
 
+
+
         static public AbsoluteScreenPosition FromRelativeScreenPosition(RelativeScreenPosition aRelativePosition)
         {
             AbsoluteScreenPosition pos = new AbsoluteScreenPosition((int)(Camera.ScreenRectangle.Width * aRelativePosition.X), (int)(Camera.ScreenRectangle.Height * aRelativePosition.Y));

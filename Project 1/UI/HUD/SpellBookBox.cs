@@ -22,9 +22,9 @@ namespace Project_1.UI.HUD
         {
             visibleKey = Input.KeyBindManager.KeyListner.SpellBook;
             spellBookSpells = new SpellBookSpell[cols * rows];
-            RelativeScreenPosition startPos = Camera.Camera.GetRelativeXSquare(0.01f);
-            RelativeScreenPosition spacing = Camera.Camera.GetRelativeXSquare(0.005f);
-            RelativeScreenPosition size = Camera.Camera.GetRelativeXSquare(0.015f);
+            RelativeScreenPosition startPos = RelativeScreenPosition.GetSquareFromX(0.01f);
+            RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
+            RelativeScreenPosition size = RelativeScreenPosition.GetSquareFromX(0.015f);
 
             Spell[] spells = ObjectManager.Player.SpellBook.Spells;
 

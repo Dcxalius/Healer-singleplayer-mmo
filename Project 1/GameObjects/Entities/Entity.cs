@@ -324,12 +324,13 @@ namespace Project_1.GameObjects.Entities
         public virtual void TakeDamage(Entity aAttacker, float aDamageTaken)
         {
             unitData.CurrentHealth -= aDamageTaken;
-            Vector2 dirOfFlyingStuff = Vector2.Normalize(FeetPos - aAttacker.FeetPos);
+            WorldSpace dirOfFlyingStuff = (FeetPos - aAttacker.FeetPos);
+            dirOfFlyingStuff.Normalize();
             FloatingText floatingText = new FloatingText(aDamageTaken.ToString(), Color.Red, FeetPos, dirOfFlyingStuff); //TODO: Change to handle attacker and this being in the same place
             ObjectManager.SpawnFloatingText(floatingText);
 
 
-            ParticleMovement bloodMovement = new ParticleMovement(dirOfFlyingStuff, Vector2.Zero, 0.9f);
+            ParticleMovement bloodMovement = new ParticleMovement(dirOfFlyingStuff, WorldSpace.Zero, 0.9f);
             ParticleManager.SpawnParticle(bloodsplatter, WorldRectangle, this, bloodMovement, 10);
         }
 
@@ -341,7 +342,9 @@ namespace Project_1.GameObjects.Entities
             if (CurrentHealth + value > MaxHealth) value = MaxHealth - CurrentHealth;
 
             unitData.CurrentHealth += value;
-            FloatingText floatingText = new FloatingText(value.ToString(), Color.White, FeetPos, Vector2.Normalize(FeetPos - aHealer.FeetPos)); //TODO: Change color to green once text border has been implemented ALSO Change to handle attacker and this being in the same place
+            WorldSpace ws = (FeetPos - aHealer.FeetPos);
+            ws.Normalize();
+            FloatingText floatingText = new FloatingText(value.ToString(), Color.White, FeetPos, ws); //TODO: Change color to green once text border has been implemented ALSO Change to handle attacker and this being in the same place
             ObjectManager.SpawnFloatingText(floatingText);
             for (int i = 0; i < aggroTablesIAmOn.Count; i++)
             {
@@ -353,7 +356,7 @@ namespace Project_1.GameObjects.Entities
 
         public override bool Click(ClickEvent aClickEvent)
         {
-            if (Camera.Camera.WorldPosToCameraSpace(WorldRectangle).Contains(aClickEvent.AbsolutePos.ToPoint()))
+            if (Camera.Camera.WorldRectToScreenRect(WorldRectangle).Contains(aClickEvent.AbsolutePos.ToPoint()))
             {
                 if (aClickEvent.NoModifiers())
                 {
@@ -535,10 +538,10 @@ namespace Project_1.GameObjects.Entities
                     shadowColor = Color.DarkGreen;
                 }
             }
-            ShadowTexture.Draw(aBatch, Camera.Camera.WorldPosToCameraSpace(shadowPos).Location.ToVector2(), shadowColor, FeetPos.Y - 2);
+            ShadowTexture.Draw(aBatch, Camera.Camera.WorldRectToScreenRect(shadowPos).Location.ToVector2(), shadowColor, FeetPos.Y - 2);
             if (selected == true)
             {
-                SelectTexture.Draw(aBatch, Camera.Camera.WorldPosToCameraSpace(shadowPos).Location.ToVector2(), UnitData.RelationColor(), FeetPos.Y - 1);
+                SelectTexture.Draw(aBatch, Camera.Camera.WorldRectToScreenRect(shadowPos).Location.ToVector2(), UnitData.RelationColor(), FeetPos.Y - 1);
             }
             base.Draw(aBatch);
         }

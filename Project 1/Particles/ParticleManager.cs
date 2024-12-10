@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.Managers;
 using System;
@@ -19,14 +20,14 @@ namespace Project_1.Particles
             particles = new List<Particle>();
         }
 
-        public static void SpawnParticle(ParticleBase aParticle, Vector2 aWorldPos, GameObject aParent, ParticleMovement aParticleMovement)
+        public static void SpawnParticle(ParticleBase aParticle, WorldSpace aWorldPos, GameObject aParent, ParticleMovement aParticleMovement)
         {
             particles.Add(new Particle(aWorldPos, aParticle, aParent, aParticleMovement));
         }
 
         public static void SpawnParticle(ParticleBase aParticle, Rectangle aWorldPos, GameObject aParent, ParticleMovement aParticleMovement)
         {
-            Vector2 pos = new Vector2((float)RandomManager.RollDouble(aWorldPos.Left, aWorldPos.Right), (float)RandomManager.RollDouble(aWorldPos.Top, aWorldPos.Bottom));
+            WorldSpace pos = new WorldSpace((float)RandomManager.RollDouble(aWorldPos.Left, aWorldPos.Right), (float)RandomManager.RollDouble(aWorldPos.Top, aWorldPos.Bottom));
             SpawnParticle(aParticle, pos, aParent, aParticleMovement);
         }
 

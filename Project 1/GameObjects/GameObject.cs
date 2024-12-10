@@ -53,7 +53,8 @@ namespace Project_1.GameObjects
         public virtual void Draw(SpriteBatch aBatch)
         {
             Debug.Assert(gfx != null);
-            gfx.Draw(aBatch, Camera.Camera.WorldPosToCameraSpace(position), FeetPos.Y);
+            gfx.Draw(aBatch, position.ToAbsoltueScreenPosition().ToVector2(), FeetPos.Y);
+            //gfx.Draw(aBatch, Camera.Camera.WorldPosToCameraSpace(position), FeetPos.Y);
         }
     }
 }

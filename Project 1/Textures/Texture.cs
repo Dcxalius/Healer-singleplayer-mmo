@@ -133,7 +133,7 @@ namespace Project_1.Textures
         {
             if (gfx == null) return;
 
-            if (Camera.Camera.MomAmIInFrame(new Rectangle(aPos.ToPoint(), (size.ToVector2() * Camera.Camera.Scale).ToPoint())))
+            //if (Camera.Camera.MomAmIInFrame(new Rectangle(aPos.ToPoint(), (size.ToVector2() * Camera.Camera.Scale).ToPoint())))
             {
                 aBatch.Draw(gfx, aPos, visible, aColor, rotation, offset, Camera.Camera.Scale, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
             }

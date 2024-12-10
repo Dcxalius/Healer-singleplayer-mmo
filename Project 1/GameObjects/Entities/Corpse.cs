@@ -32,7 +32,7 @@ namespace Project_1.GameObjects.Entities
             loot = aLoot;
             lootLength = WorldRectangle.Size.ToVector2().Length();
             lootGlow = new ParticleBase((1000d, 1000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[]{ Color.Yellow }, new Point(1));
-            lootGlowMovement = new ParticleMovement(new Vector2(0, -1), new Vector2(0), 0.95f);
+            lootGlowMovement = new ParticleMovement(new WorldSpace(0, -1), WorldSpace.Zero, 0.95f);
         }
 
         public void SpawnCorpe(WorldSpace aPos)
@@ -47,7 +47,8 @@ namespace Project_1.GameObjects.Entities
 
         public override bool Click(ClickEvent aClickEvent)
         {
-            if (!Camera.Camera.WorldPosToCameraSpace(WorldRectangle).Contains(aClickEvent.AbsolutePos.ToPoint())) return false;
+            if (!Camera.Camera.WorldRectToScreenRect(WorldRectangle).Contains(aClickEvent.AbsolutePos.ToPoint())) return false;
+            //if (!Camera.Camera.WorldPosToCameraSpace(WorldRectangle).Contains(aClickEvent.AbsolutePos.ToPoint())) return false;
             if (aClickEvent.ButtonPressed != InputManager.ClickType.Right) return false;
             if (ObjectManager.Player.FeetPos.DistanceTo(Centre) > lootLength) return false;
             if (drop.All(drop => drop == null)) return false;
@@ -70,7 +71,8 @@ namespace Project_1.GameObjects.Entities
         public override void Draw(SpriteBatch aBatch)
         {
             Debug.Assert(gfx != null);
-            gfx.Draw(aBatch, Camera.Camera.WorldPosToCameraSpace(Position), Position.Y);
+            gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2(), Position.Y);
+            //gfx.Draw(aBatch, Camera.Camera.WorldPosToCameraSpace(Position), Position.Y);
         }
     }
 }

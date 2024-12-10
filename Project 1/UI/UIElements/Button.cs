@@ -84,7 +84,7 @@ namespace Project_1.UI.UIElements
             {
                 return;
             }
-            text.CentredDraw(aBatch, AbsolutePos.Center.ToVector2());
+            text.CentredDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Center));
 
             if (wasHovered)
             {

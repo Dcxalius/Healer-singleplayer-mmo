@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.Managers;
 using Project_1.Textures;
 using System;
@@ -16,10 +17,10 @@ namespace Project_1.GameObjects
     {
         Text text;
         Color color;
-        Vector2 position;
+        WorldSpace position;
         float speed;
-        Vector2 momentum;
-        Vector2 velocity;
+        WorldSpace momentum;
+        WorldSpace velocity;
         double spawnTime;
 
         double duration;
@@ -27,7 +28,7 @@ namespace Project_1.GameObjects
         RenderTarget2D renderTarget;
         SpriteBatch spriteBatch;
 
-        public FloatingText(string aTextToDisplay, Color aColor, Vector2 aStartPos, Vector2 aHeadingVector, Vector2? aVelocity = null, float aSpeed = 75, double aDuration = 600d)
+        public FloatingText(string aTextToDisplay, Color aColor, WorldSpace aStartPos, WorldSpace aHeadingVector, WorldSpace? aVelocity = null, float aSpeed = 75, double aDuration = 600d)
         {
             text = new Text("Gloryse", aTextToDisplay, aColor);
             Point textSize = text.Offset.ToPoint();
@@ -43,7 +44,7 @@ namespace Project_1.GameObjects
             }
             else
             {
-                velocity = new Vector2(0, 9.8f);
+                velocity = new WorldSpace(0, 9.8f);
             }
             duration = aDuration;
 
@@ -55,7 +56,7 @@ namespace Project_1.GameObjects
             GraphicsManager.ClearScreen(Color.Transparent);
             spriteBatch.Begin(SpriteSortMode.Deferred);
             //spriteBatch.Begin(samplerState : SamplerState.PointClamp, effect : TextureManager.textOutline);
-            text.LeftAllignedDraw(spriteBatch, new Vector2(0, textSize.Y / 2));
+            text.LeftAllignedDraw(spriteBatch, new AbsoluteScreenPosition(0, textSize.Y / 2));
             
             spriteBatch.End();
             GraphicsManager.SetRenderTarget(null);
@@ -79,7 +80,8 @@ namespace Project_1.GameObjects
 
         public void Draw(SpriteBatch aBatch)
         {
-            aBatch.Draw(renderTarget, Camera.Camera.WorldPosToCameraSpace(position), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+            aBatch.Draw(renderTarget, position.ToAbsoltueScreenPosition().ToVector2(), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+            //aBatch.Draw(renderTarget, Camera.Camera.WorldPosToCameraSpace(position), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
         }
     }
 }

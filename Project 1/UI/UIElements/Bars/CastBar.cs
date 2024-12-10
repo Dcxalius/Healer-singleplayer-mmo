@@ -59,7 +59,7 @@ namespace Project_1.UI.UIElements.Bars
             if (castSpell == null) return;
             base.Draw(aBatch);
             spellTexture.Draw(aBatch, new Rectangle(AbsolutePos.Location, new Point(AbsolutePos.Size.Y)));
-            remainingCast.RightAllignedDraw(aBatch, new Vector2(AbsolutePos.Right - 5, AbsolutePos.Center.Y));
+            remainingCast.RightAllignedDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Right - 5, AbsolutePos.Center.Y));
         }
     }
 }

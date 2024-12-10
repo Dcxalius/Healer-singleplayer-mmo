@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using SharpDX.Direct2D1.Effects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,9 +42,15 @@ namespace Project_1.Camera
             return (this - aOtherSpace).ToVector2().Length();
         }
 
+        public AbsoluteScreenPosition ToAbsoltueScreenPosition()
+        {
+            WorldSpace topLeft = Camera.CentreInWorldSpace * Camera.Scale - new WorldSpace(Camera.ScreenSize.ToVector2() / 2);
+
+            return new AbsoluteScreenPosition((int)(this.X * Camera.Scale - topLeft.X), (int)(this.Y * Camera.Scale - topLeft.Y));
+        }
         public static WorldSpace FromRelaticeScreenSpace(RelativeScreenPosition aScreenSpace)
         {
-            return FromAbsoluteScreenSpace(Camera.TransformRelativeToAbsoluteScreenSpace(aScreenSpace.ToVector2()));
+            return FromAbsoluteScreenSpace(aScreenSpace.ToAbsoluteScreenPos());
         }
 
         public static WorldSpace FromAbsoluteScreenSpace(AbsoluteScreenPosition aScreenSpace)

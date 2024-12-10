@@ -35,6 +35,14 @@ namespace Project_1.Camera
         {
             position = new Vector2(aX, aY);
         }
+
+        static public RelativeScreenPosition GetSquareFromX(float aSizeInX)
+        {
+            float a = Camera.ScreenRectangle.Size.X * aSizeInX;
+            float b = a / Camera.ScreenRectangle.Size.Y;
+            return new(aSizeInX, b);
+        }
+
         static public Rectangle TransformToAbsoluteRect(RelativeScreenPosition aPos, RelativeScreenPosition aSize)
         {
             Point pos = new Point((int)(Camera.ScreenSize.X * aPos.X), (int)(Camera.ScreenSize.Y * aPos.Y));

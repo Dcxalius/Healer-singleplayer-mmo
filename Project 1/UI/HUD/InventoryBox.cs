@@ -28,8 +28,8 @@ namespace Project_1.UI.HUD
         const float itemSizeX = 0.02f;
         const float spacingX = 0.005f;
 
-        public static RelativeScreenPosition itemSize = Camera.Camera.GetRelativeXSquare(itemSizeX);
-        public static RelativeScreenPosition spacing = Camera.Camera.GetRelativeXSquare(spacingX);
+        public static RelativeScreenPosition itemSize = RelativeScreenPosition.GetSquareFromX(itemSizeX);
+        public static RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(spacingX);
 
         int columnCount;
         public InventoryBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground",new Color(80, 80, 80, 80)), aPos, aSize) //this will scale down size to closest fit
@@ -172,8 +172,8 @@ namespace Project_1.UI.HUD
         {
             base.Rescale();
 
-            itemSize = Camera.Camera.GetRelativeXSquare(itemSizeX);
-            spacing = Camera.Camera.GetRelativeXSquare(spacingX);
+            itemSize = RelativeScreenPosition.GetSquareFromX(itemSizeX);
+            spacing = RelativeScreenPosition.GetSquareFromX(spacingX);
         }
 
         public override void Draw(SpriteBatch aBatch)

@@ -15,7 +15,7 @@ namespace Project_1.UI.UIElements.SpellBook
         Border border;
         public SpellBar(UITexture aGfx, int aButtonCount, RelativeScreenPosition aPos, float aSizeX) : base(aGfx, aPos, new RelativeScreenPosition(aSizeX, calcY(aSizeX, aButtonCount)))
         {
-            Vector2 offset = Camera.Camera.GetRelativeXSquare(calcOffset(aSizeX, aButtonCount));
+            Vector2 offset = RelativeScreenPosition.GetSquareFromX(calcOffset(aSizeX, aButtonCount));
             float buttonSize = calcButtonSize(aSizeX, aButtonCount);
             //border = new Border(Vector2.Zero, new Vector2(aSizeX, calcY(aSizeX, aButtonCount)));
             border = new Border(RelativeScreenPosition.Zero, RelativeSize);
@@ -25,7 +25,7 @@ namespace Project_1.UI.UIElements.SpellBook
 
             for (int i = 0; i < spellButtons.Length; i++)
             {
-                spellButtons[i] = new SpellButton(Input.KeyBindManager.KeyListner.SpellBar1Spell1 + i, new RelativeScreenPosition(offset.X + (offset.X + buttonSize) * i, offset.Y), Camera.Camera.GetRelativeXSquare(buttonSize));
+                spellButtons[i] = new SpellButton(Input.KeyBindManager.KeyListner.SpellBar1Spell1 + i, new RelativeScreenPosition(offset.X + (offset.X + buttonSize) * i, offset.Y), RelativeScreenPosition.GetSquareFromX(buttonSize));
             }
             children.AddRange(spellButtons);
         }
@@ -42,7 +42,7 @@ namespace Project_1.UI.UIElements.SpellBook
 
         static float calcY(float aSizeX, int aButtonCount)
         {
-            return Camera.Camera.GetRelativeXSquare(calcButtonSize(aSizeX, aButtonCount)).Y + Camera.Camera.GetRelativeXSquare(calcOffset(aSizeX, aButtonCount)).Y * 2;
+            return RelativeScreenPosition.GetSquareFromX(calcButtonSize(aSizeX, aButtonCount)).Y + RelativeScreenPosition.GetSquareFromX(calcOffset(aSizeX, aButtonCount)).Y * 2;
         }
     }
 }
