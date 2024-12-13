@@ -36,10 +36,11 @@ namespace Project_1.GameObjects
         }
         Point size;
 
-
+        List<VisualEffect> effects;
 
         public GameObject(Textures.Texture aGfx, WorldSpace aStartingPos)
         {
+            effects = new List<VisualEffect>();
             gfx = aGfx;
             position = aStartingPos;
             if (aGfx.Visible != null)
@@ -54,9 +55,15 @@ namespace Project_1.GameObjects
 
         public virtual bool Click(ClickEvent aClickEvent) { return false; }
 
+        public void AddEffect(VisualEffect aEffect) {  effects.Add(aEffect); }
+
         public virtual void Update()
         {
             gfx.Update();
+            for (int i = effects.Count - 1; i >= 0; i--)
+            {
+                if (effects[i].IsFinished) effects.RemoveAt(i);
+            }
         }
 
 
@@ -65,6 +72,10 @@ namespace Project_1.GameObjects
             Debug.Assert(gfx != null);
             //gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2());
             gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2(), FeetPos.Y);
+            for (int i = 0; i < effects.Count; i++)
+            {
+                effects[i].Draw(aBatch, Position, FeetPos.Y + 0.01f);
+            }
             //gfx.Draw(aBatch, Camera.Camera.WorldPosToCameraSpace(position), FeetPos.Y);
         }
     }

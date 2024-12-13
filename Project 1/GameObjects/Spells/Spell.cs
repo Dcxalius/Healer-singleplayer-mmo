@@ -25,7 +25,7 @@ namespace Project_1.GameObjects.Spells
         public float CastDistance { get => spellData.CastDistance; }
         public double CastTime { get => spellData.CastTime; }
         public float ResourceCost { get => spellData.ResourceCost; }
-        public GfxPath GfxPath { get => spellData.GfxPath; }
+        public GfxPath GfxPath { get => spellData.ButtonGfxPath; }
 
         public Entity Owner { get => owner; }
         Entity owner;
@@ -82,6 +82,7 @@ namespace Project_1.GameObjects.Spells
             for (int i = 0; i < spellData.Effects.Length; i++)
             {
                 spellData.Effects[i].Trigger(owner, aTarget);
+                aTarget.AddEffect(new VisualEffect(spellData.HitGfxPath, 1000));
             }
             return true;
         }

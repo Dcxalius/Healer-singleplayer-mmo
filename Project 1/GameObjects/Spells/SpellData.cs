@@ -38,8 +38,11 @@ namespace Project_1.GameObjects.Spells
         public double CastTime { get => castTime; }
         double castTime;
 
-        public GfxPath GfxPath { get => new GfxPath(GfxType.SpellImage, gfxName); }
-        string gfxName;
+        public GfxPath ButtonGfxPath { get => new GfxPath(GfxType.SpellImage, buttonGfxName); }
+        string buttonGfxName;
+
+        public GfxPath HitGfxPath { get => new GfxPath(GfxType.Effect, hitEffectName); }
+        string hitEffectName;
 
         public SpellEffect[] Effects { get => effects; }
         SpellEffect[] effects;
@@ -48,12 +51,13 @@ namespace Project_1.GameObjects.Spells
         TravelType travelType;
 
         [JsonConstructor]
-        public SpellData(string name, string gfxName, string[] effects, TravelType travelType, UnitData.RelationToPlayer[] acceptableTargets, float castDistance, double castTime = -1, double cooldown = -1, float resourceCost = -1)
+        public SpellData(string name, string buttonGfx, string hitEffectGfx, string[] effects, TravelType travelType, UnitData.RelationToPlayer[] acceptableTargets, float castDistance, double castTime = -1, double cooldown = -1, float resourceCost = -1)
         {
             this.name = name;
-            this.gfxName = gfxName;
+            this.buttonGfxName = buttonGfx;
             this.cooldown = cooldown * 1000;
             this.castTime = castTime * 1000;
+            this.hitEffectName = hitEffectGfx;
 
             List<SpellEffect> tempEffects = new List<SpellEffect>();
             for (int i = 0; i < effects.Length; i++)
