@@ -4,6 +4,8 @@ using Microsoft.Xna.Framework.Input;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spells;
+using Project_1.GameObjects.Spells.AoE;
+using Project_1.GameObjects.Spells.Projectiles;
 using Project_1.Input;
 using Project_1.Items;
 using Project_1.Managers;
@@ -34,6 +36,7 @@ namespace Project_1
             LootFactory.Init(Content);
             TextureManager.Init(Content);
             SpellFactory.Init(Content);
+            ProjectileFactory.Init(Content);
             KeyBindManager.Init(Content);
             GraphicsManager.Init();
             //Camera.Init();

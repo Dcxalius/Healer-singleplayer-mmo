@@ -110,7 +110,7 @@ namespace Project_1.UI.HUD
             targetBuffBox.AssignBox(ObjectManager.Player.Target);
         }
 
-        public static void AddBuff(GameObjects.Spells.Buff aBuff, Entity aEntity)
+        public static void AddBuff(GameObjects.Spells.Buff.Buff aBuff, Entity aEntity)
         {
             if (targetBuffBox.IsThisMine(aEntity))
             {

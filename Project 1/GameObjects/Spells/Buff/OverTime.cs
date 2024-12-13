@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.Spells
+namespace Project_1.GameObjects.Spells.Buff
 {
     internal class OverTime : SpellEffect
     {
@@ -32,7 +32,7 @@ namespace Project_1.GameObjects.Spells
         {
             this.duration = duration * 1000;
             this.tickRate = tickRate * 1000;
-            effects = new Instant[effectNames.Length]; 
+            effects = new Instant[effectNames.Length];
             for (int i = 0; i < effectNames.Length; i++)
             {
                 effects[i] = SpellFactory.GetSpellEffect(effectNames[i]) as Instant;

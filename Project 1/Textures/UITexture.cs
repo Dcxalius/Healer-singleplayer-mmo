@@ -29,7 +29,7 @@ namespace Project_1.Textures
 
         public virtual void Draw(SpriteBatch aBatch, Rectangle aPosRectangle)
         {
-            Draw(aBatch, aPosRectangle, color);
+            Draw(aBatch, aPosRectangle, Color);
         }
 
         public virtual void Draw(SpriteBatch aBatch, Rectangle aPosRectangle, Color aColor)
@@ -38,9 +38,9 @@ namespace Project_1.Textures
             {
                 return;
             }
-            //if (Camera.Camera.MomAmIInFrame(aPosRectangle))
+            if (Camera.Camera.MomAmIInFrame(aPosRectangle))
             {
-                aBatch.Draw(gfx, aPosRectangle, visible, aColor, rotation, offset, flip, 1f);
+                aBatch.Draw(gfx, aPosRectangle, Visible, aColor, Rotation, offset, flip, 1f);
 
             }
         }

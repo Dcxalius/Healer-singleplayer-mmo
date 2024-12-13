@@ -14,9 +14,9 @@ namespace Project_1.UI.UIElements
     internal class Buff : UIElement , IComparable
     {
         public double Duration => buff.DurationRemaining;
-        GameObjects.Spells.Buff buff;
+        GameObjects.Spells.Buff.Buff buff;
         Text xdd;
-        public Buff(GameObjects.Spells.Buff aBuff, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture(aBuff.GfxPath, Color.White), aPos, aSize)
+        public Buff(GameObjects.Spells.Buff.Buff aBuff, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture(aBuff.GfxPath, Color.White), aPos, aSize)
         {
             xdd = new Text("Gloryse", "xdd", Color.Black);
             buff = aBuff;

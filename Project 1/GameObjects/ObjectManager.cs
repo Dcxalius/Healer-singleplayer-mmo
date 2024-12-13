@@ -17,6 +17,7 @@ using Project_1.Managers;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.Camera;
+using Project_1.GameObjects.Spells.Projectiles;
 
 namespace Project_1.GameObjects
 {
@@ -26,6 +27,7 @@ namespace Project_1.GameObjects
 
         public static List<Entity> entities = new List<Entity>();
         public static List<Corpse> corpses = new List<Corpse>();
+        public static List<Projectile> projectiles = new List<Projectile>();
 
         static Player player = null;
 
@@ -38,7 +40,7 @@ namespace Project_1.GameObjects
 
 
 
-
+            
             entities.Add(new Walker(new WorldSpace(200, 200)));//Debug
             player.AddToParty(entities[entities.Count - 1] as Walker); //Debug
             for (int i = 0; i < 100; i++)
@@ -54,7 +56,10 @@ namespace Project_1.GameObjects
             floatingTexts.Remove(aText);
         }
 
-     
+        public static void AddProjectile(Projectile aProjectile)
+        {
+            projectiles.Add(aProjectile);
+        }
 
         public static void AddCorpse(Corpse aCorpse)
         {
@@ -73,6 +78,15 @@ namespace Project_1.GameObjects
 
         public static void Update()
         {
+            for (int i = projectiles.Count - 1; i >= 0; i--)
+            {
+                projectiles[i].Update();
+                if (projectiles[i].IsFinished)
+                {
+                    projectiles.RemoveAt(i);
+                }
+            }
+
             player.Update();
             for (int i = entities.Count - 1; i >= 0; i--)
             {
@@ -153,10 +167,16 @@ namespace Project_1.GameObjects
                 entities[i].Draw(aSpriteBatch);
             }
 
+            for (int i = 0; i < projectiles.Count; i++)
+            {
+                projectiles[i].Draw(aSpriteBatch);
+            }
+
             for (int i = 0; i < floatingTexts.Count; i++)
             {
                 floatingTexts[i].Draw(aSpriteBatch);
             }
+
         }
     }
 }

@@ -14,32 +14,41 @@ namespace Project_1.GameObjects.Spells
 {
     internal struct SpellData
     {
-        
+        public enum TravelType
+        {
+            None,
+            Instant,
+            Projectile
+        }
 
         public string Name { get => name; }
+        string name;
         public double Cooldown { get => cooldown; }
+        double cooldown;
 
         public bool Targetable(UnitData.RelationToPlayer aTarget) { return acceptableTargets.Contains(aTarget); }
+        UnitData.RelationToPlayer[] acceptableTargets;
 
         public float ResourceCost { get => resourceCost; }
+        float resourceCost;
 
         public float CastDistance { get => castDistance; }
+        float castDistance;
+
         public double CastTime { get => castTime; }
+        double castTime;
 
         public GfxPath GfxPath { get => new GfxPath(GfxType.SpellImage, gfxName); }
-        string name;
         string gfxName;
-        double cooldown;
-        double castTime;
-        float resourceCost;
-        float castDistance;
 
         public SpellEffect[] Effects { get => effects; }
         SpellEffect[] effects;
-        UnitData.RelationToPlayer[] acceptableTargets;
+
+        public TravelType Travel { get => travelType; }
+        TravelType travelType;
 
         [JsonConstructor]
-        public SpellData(string name, string gfxName, string[] effects, UnitData.RelationToPlayer[] acceptableTargets, float castDistance, double castTime = -1, double cooldown = -1, float resourceCost = -1)
+        public SpellData(string name, string gfxName, string[] effects, TravelType travelType, UnitData.RelationToPlayer[] acceptableTargets, float castDistance, double castTime = -1, double cooldown = -1, float resourceCost = -1)
         {
             this.name = name;
             this.gfxName = gfxName;
@@ -55,6 +64,7 @@ namespace Project_1.GameObjects.Spells
             this.resourceCost = resourceCost;
             this.acceptableTargets = acceptableTargets;
             this.castDistance = castDistance;
+            this.travelType = travelType;
             Assert();
         }
         
@@ -67,6 +77,7 @@ namespace Project_1.GameObjects.Spells
             Debug.Assert(effects.Length > 0, "Spell had no effects.");
             Debug.Assert(castDistance > 0, "distance had no value.");
             Debug.Assert(acceptableTargets.Length > 0, "Spell had no targets.");
+            Debug.Assert(travelType > TravelType.None, "Spell never assigned travel type.");
         }
 
         void Trigger(Entity aCaster, Entity aTarget)

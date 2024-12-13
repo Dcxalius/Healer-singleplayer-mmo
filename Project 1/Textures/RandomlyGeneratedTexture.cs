@@ -21,7 +21,7 @@ namespace Project_1.Textures
                 int xRoll = (int)(validPoints.X * RandomManager.RollDouble());
                 int yRoll = (int)(validPoints.Y * RandomManager.RollDouble());
 
-                visible = new Rectangle(new Point(xRoll, yRoll), aVisibleSize);
+                Visible = new Rectangle(new Point(xRoll, yRoll), aVisibleSize);
             }
             else 
             {
@@ -30,7 +30,7 @@ namespace Project_1.Textures
                 int xRoll = aVisibleSize.X * RandomManager.RollInt(RectsFitted.X);
                 int yRoll = aVisibleSize.Y * RandomManager.RollInt(RectsFitted.Y);
 
-                visible = new Rectangle(new Point(xRoll, yRoll), aVisibleSize);
+                Visible = new Rectangle(new Point(xRoll, yRoll), aVisibleSize);
             }
 
         }

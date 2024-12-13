@@ -27,11 +27,11 @@ namespace Project_1.Textures
                 {
                     case FillingDirection.Right:
                     case FillingDirection.Up:
-                        visible = new Rectangle(Point.Zero, new Point((int)(defaultVisible.X * value), defaultVisible.Y));
+                        Visible = new Rectangle(Point.Zero, new Point((int)(defaultVisible.X * value), defaultVisible.Y));
                         break;
                     case FillingDirection.Down:
                     case FillingDirection.Left:
-                        visible = new Rectangle(new Point((int)(defaultVisible.X - defaultVisible.X * value), 0), defaultVisible);
+                        Visible = new Rectangle(new Point((int)(defaultVisible.X - defaultVisible.X * value), 0), defaultVisible);
                         break;
                     default:
                         break;
@@ -48,9 +48,9 @@ namespace Project_1.Textures
             fillingDirection = aDir;
             if (fillingDirection == FillingDirection.Up || fillingDirection == FillingDirection.Down)
             {
-                rotation = 0.25f;
+                Rotation = 0.25f;
             }
-            visible = new Rectangle(Point.Zero, defaultVisible);
+            Visible = new Rectangle(Point.Zero, defaultVisible);
         }
 
     }

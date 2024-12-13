@@ -23,7 +23,7 @@ namespace Project_1.Textures
 
         public CooldownTexture() : base("Cooldown", Color.White)
         {
-            visible = new Rectangle(Point.Zero, size);
+            Visible = new Rectangle(Point.Zero, size);
         }
 
         public Point GetReducedSize(Point aSize)

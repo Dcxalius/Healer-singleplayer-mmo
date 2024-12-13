@@ -3,6 +3,7 @@ using Project_1.Camera;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Entities.Resources;
 using Project_1.GameObjects.Spells;
+using Project_1.GameObjects.Spells.Buff;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Particles;
@@ -89,7 +90,7 @@ namespace Project_1.GameObjects.Entities
             inCombat = false;
             buffs = new List<Buff>();
             corpse = aCorpse;
-            shadowPos = new Rectangle((Position + new Vector2(size.X / 2, size.Y)).ToPoint(), size);
+            shadowPos = new Rectangle((Position + new Vector2(Size.X / 2, Size.Y)).ToPoint(), Size);
             unitData = ObjectFactory.GetData(GetType().Name);
             bloodsplatter = new ParticleBase((1000d, 2000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[] { Color.Red }, new Point(1));
         }
@@ -232,7 +233,7 @@ namespace Project_1.GameObjects.Entities
         bool CastSpell(Spell aSpell)
         {
 
-            if (!aSpell.Trigger(Target)) return false;
+            if (!aSpell.Cast(Target)) return false;
             UnitData.Resource.CastSpell(aSpell.ResourceCost);
 
             return true;
@@ -523,9 +524,9 @@ namespace Project_1.GameObjects.Entities
                 }
             }
 
-            Vector2 offset = new Vector2(0, size.Y / 2.5f);
+            Vector2 offset = new Vector2(0, Size.Y / 2.5f);
             shadowPos.Location = (Position + offset).ToPoint();
-            shadowPos.Size = (size.ToVector2() * Camera.Camera.Scale).ToPoint();
+            shadowPos.Size = (Size.ToVector2() * Camera.Camera.Scale).ToPoint();
         }
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)

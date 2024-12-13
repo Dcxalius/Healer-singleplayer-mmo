@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.Managers;
 using Project_1.Tiles;
@@ -15,24 +16,30 @@ namespace Project_1.Textures
 {
     internal class Texture
     {
-        public Rectangle? Visible { get => visible; }
+        protected Texture2D gfx;
+        
+        //TODO: public WorldSpace Size { get => size; }
+        public Point Size { get => (size.ToVector2() * Camera.Camera.Scale).ToPoint(); }
+        public Point size;
+
+        public Rectangle? Visible { get => visible; protected set => visible = value; }
+        Rectangle? visible;
 
         public Color Color { get => color; set => color = value; }
+        Color color;
 
-        protected Texture2D gfx;
-        public Point size;
-        protected Color color;
-        public float scale;
-        protected Rectangle? visible;
+        public float Rotation { get =>  rotation; set => rotation = value; }
+        float rotation = 0f;
+
+        public Vector2 Offset { get => offset; set => offset = value; }
+
         protected Vector2 offset;
-        protected float rotation = 0f;
         protected SpriteEffects flip;
 
         public Texture(Texture2D aGfx, Point aSize)
         {
             gfx = aGfx;
             size = aSize;
-            scale = 1;
             color = Color.White;
             flip = SpriteEffects.None;
             visible = null;
@@ -44,7 +51,6 @@ namespace Project_1.Textures
             __Constructor__(aPath);
             color = Color.White;   
             size = gfx.Bounds.Size;
-            scale = 1;
         }
 
         public Texture(GfxPath aPath, Vector2 aOffset)
@@ -52,7 +58,6 @@ namespace Project_1.Textures
             __Constructor__(aPath);
             color = Color.White;
             size = gfx.Bounds.Size;
-            scale = 1;
             offset = aOffset;
         }
 
@@ -60,7 +65,6 @@ namespace Project_1.Textures
         {
             __Constructor__(aPath);
             color = Color.White;   
-            scale = 1;
             size = aSize;
             offset = Vector2.Zero;
         }
@@ -69,7 +73,6 @@ namespace Project_1.Textures
         {
             __Constructor__(aPath);
             color = Color.White;
-            scale = 1;
             size = aSize;
             offset = aOffset;
         }
@@ -78,7 +81,6 @@ namespace Project_1.Textures
         public Texture(GfxPath aPath,  Color aColor) 
         {
             __Constructor__(aPath);
-            scale = 1;
             color = aColor;
             offset = Vector2.Zero;
             if (gfx == null) return;
@@ -88,7 +90,6 @@ namespace Project_1.Textures
         public Texture(GfxPath aPath, Vector2 aOffset, Color aColor)
         {
             __Constructor__(aPath);
-            scale = 1;
             color = aColor;
             offset = aOffset;
             if (gfx == null) return;
@@ -137,8 +138,7 @@ namespace Project_1.Textures
             if (Camera.Camera.MomAmIInFrame(new Rectangle(aPos.ToPoint(), (size.ToVector2() * Camera.Camera.Scale).ToPoint())))
             {
                 //aBatch.Draw(gfx, aPos, visible, aColor, rotation, offset, Camera.Camera.Scale, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
-                //if (GetType().IsAssignableFrom(typeof(AnimatedTexture))) DebugManager.Print(GetType(), "Feet is " + aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
-                aBatch.Draw(gfx, aPos, visible, aColor, rotation, offset, Camera.Camera.Scale, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
+                aBatch.Draw(gfx, new Rectangle(aPos.ToPoint(),Size), visible, aColor, rotation, offset, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
             }
         }
     }

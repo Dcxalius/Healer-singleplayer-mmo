@@ -25,7 +25,7 @@ namespace Project_1.Textures
             durationBetweenFrames = (double)aTimePerFrame.TotalMilliseconds;
 
             CreateAnimationFrames(aDeadFrameCount);
-            visible = possibleFrames[0];
+            Visible = possibleFrames[0];
         }
 
         public override void Update()
@@ -65,7 +65,7 @@ namespace Project_1.Textures
 
         protected virtual void ChangeVisibleFrame()
         {
-            visible = possibleFrames[currentFrame];
+            Visible = possibleFrames[currentFrame];
         }
 
         public void ResetCurrentFrame()

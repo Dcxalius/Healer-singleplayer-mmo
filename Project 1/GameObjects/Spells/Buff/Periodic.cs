@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.Spells
+namespace Project_1.GameObjects.Spells.Buff
 {
     internal class Periodic : Buff
     {
@@ -21,7 +21,7 @@ namespace Project_1.GameObjects.Spells
         public Periodic(Entity aCaster, OverTime aOverTime) : base(aCaster, aOverTime)
         {
             tickCounter = 0;
-            
+
         }
 
         public override void Recast()

@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities;
-using Project_1.GameObjects.Spells;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -70,7 +69,7 @@ namespace Project_1.UI.UIElements
 
         }
 
-        void SetAllBuffs(List<GameObjects.Spells.Buff> aBuff)
+        void SetAllBuffs(List<GameObjects.Spells.Buff.Buff> aBuff)
         {
             ClearBuffs();
             for (int i = 0; i < aBuff.Count; i++)
@@ -81,7 +80,7 @@ namespace Project_1.UI.UIElements
             SortBuffs();
         }
 
-        public void AddBuff(GameObjects.Spells.Buff aBuff)
+        public void AddBuff(GameObjects.Spells.Buff.Buff aBuff)
         {
             buffs.Add(new Buff(aBuff, RelativeScreenPosition.Zero, buffSize));
             children.Add(buffs.Last());

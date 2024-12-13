@@ -24,7 +24,17 @@ namespace Project_1.GameObjects
 
 
         WorldSpace position;
-        protected Point size;
+
+        public Point Size
+        {
+            get => size; 
+            protected set
+            {
+                size = value;
+                gfx.size = value;
+            }
+        }
+        Point size;
 
 
 

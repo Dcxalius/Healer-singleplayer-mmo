@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.Spells
+namespace Project_1.GameObjects.Spells.AoE
 {
     internal static class AreaOfEffectFactory
     {

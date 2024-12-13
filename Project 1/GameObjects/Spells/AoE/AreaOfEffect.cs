@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Project_1.GameObjects.Spells
+namespace Project_1.GameObjects.Spells.AoE
 {
     internal class AreaOfEffect : GameObject
     {

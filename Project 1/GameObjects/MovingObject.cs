@@ -28,16 +28,31 @@ namespace Project_1.GameObjects
 
         public override void Update()
         {
+            SetVelocity();
+            ChangePosition();
+            FlipGfx();
+
+            base.Update();
+        }
+
+        protected virtual void SetVelocity()
+        {
             momentum += velocity;
             if (momentum.ToVector2().Length() > MaxSpeed)
             {
                 momentum = (WorldSpace)Vector2.Normalize(momentum) * MaxSpeed;
             }
-
             velocity = WorldSpace.Zero;
-            Position += momentum;
             momentum = new WorldSpace(momentum.X * TileManager.GetDragCoeficient(Centre), momentum.Y * TileManager.GetDragCoeficient(Centre));
+        }
 
+        void ChangePosition()
+        {
+            Position += momentum;
+        }
+
+        protected virtual void FlipGfx()
+        {
             if (momentum.X > 0 && facingRight == false)
             {
                 facingRight = true;
@@ -49,8 +64,6 @@ namespace Project_1.GameObjects
                 facingRight = false;
                 gfx.Flip();
             }
-
-            base.Update();
         }
     }
 }

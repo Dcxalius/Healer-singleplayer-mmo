@@ -130,6 +130,11 @@ namespace Project_1.Camera
             position.Normalize();
         }
 
+        static public WorldSpace Normalize(WorldSpace ws)
+        {
+            return new WorldSpace(Vector2.Normalize(ws.position));
+        }
+
         public Point ToPoint()
         {
             return position.ToPoint();
