@@ -34,11 +34,11 @@ namespace Project_1.GameObjects.Spells.Buff
         public override void Update(Entity aEntity)
         {
             base.Update(aEntity);
-            if (createTime + OverTime.TickRate * tickCounter < TimeManager.TotalFrameTime)
+            if (createTime + OverTime.TickRate * (tickCounter + 1) < TimeManager.TotalFrameTime)
             {
                 tickCounter++;
-                OverTime.Effects[Math.Min(OverTime.Effects.Length - 1, tickCounter)].Trigger(caster, aEntity); //TODO: Change this so it doesn't instaproc  
-
+                OverTime.Effects[Math.Min(OverTime.Effects.Length - 1, tickCounter)].Trigger(caster, aEntity);
+                aEntity.AddEffect(new VisualEffect(OverTime.HitGfxPath, 500));
             }
         }
     }

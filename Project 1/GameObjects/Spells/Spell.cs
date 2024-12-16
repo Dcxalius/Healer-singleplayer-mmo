@@ -72,7 +72,7 @@ namespace Project_1.GameObjects.Spells
                 return Trigger(aTarget);
             }
 
-            ObjectManager.AddProjectile(ProjectileFactory.CreateProjectile(this));
+            ObjectManager.AddProjectile(ProjectileFactory.CreateProjectile(owner.Centre, this, aTarget));
             return true;
         }
 

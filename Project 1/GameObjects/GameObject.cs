@@ -53,9 +53,14 @@ namespace Project_1.GameObjects
             }
         }
 
-        public virtual bool Click(ClickEvent aClickEvent) { return false; }
+        public virtual bool Click(ClickEvent aClickEvent) => false;
 
-        public void AddEffect(VisualEffect aEffect) {  effects.Add(aEffect); }
+        public void AddEffect(VisualEffect aEffect)
+        {
+            
+            effects.Add(aEffect);
+            effects.Last().Size = size;
+        }
 
         public virtual void Update()
         {

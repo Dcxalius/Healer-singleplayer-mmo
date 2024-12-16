@@ -14,7 +14,8 @@ namespace Project_1.GameObjects
     internal class VisualEffect
     {
         public bool IsFinished { get => startTime + duration < TimeManager.TotalFrameTime; }
-        
+        public Point Size { get => texture.ScaledSize; set => texture.size = value; }
+
         double startTime;
         double duration;
         Textures.Texture texture;

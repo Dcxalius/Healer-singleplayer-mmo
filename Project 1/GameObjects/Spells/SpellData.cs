@@ -84,9 +84,9 @@ namespace Project_1.GameObjects.Spells
             Debug.Assert(travelType > TravelType.None, "Spell never assigned travel type.");
         }
 
-        void Trigger(Entity aCaster, Entity aTarget)
-        {
-            effects[0].Trigger(aCaster, aTarget);
-        }
+        //void Trigger(Entity aCaster, Entity aTarget)
+        //{
+        //    effects[0].Trigger(aCaster, aTarget);
+        //}
     }
 }

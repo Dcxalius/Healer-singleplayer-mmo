@@ -26,9 +26,12 @@ namespace Project_1.GameObjects.Spells.Buff
         public GfxPath GfxPath { get => gfxPath; }
         GfxPath gfxPath;
 
+        public GfxPath HitGfxPath { get => hitEffectPath; }
+        GfxPath hitEffectPath;
+
 
         [JsonConstructor]
-        public OverTime(string name, string gfxName, string[] effectNames, double duration, double tickRate) : base(name)
+        public OverTime(string name, string gfxName, string hitEffectGfx, string[] effectNames, double duration, double tickRate) : base(name)
         {
             this.duration = duration * 1000;
             this.tickRate = tickRate * 1000;
@@ -39,6 +42,8 @@ namespace Project_1.GameObjects.Spells.Buff
             }
 
             gfxPath = new GfxPath(GfxType.SpellImage, gfxName);
+            hitEffectPath = new GfxPath(GfxType.Effect, hitEffectGfx);
+
             Debug.Assert(this.duration > this.tickRate);
         }
 

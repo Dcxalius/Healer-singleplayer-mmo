@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Newtonsoft.Json;
+using Project_1.Camera;
+using Project_1.GameObjects.Entities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -28,9 +30,9 @@ namespace Project_1.GameObjects.Spells.Projectiles
             }
         }
 
-        public static Projectile CreateProjectile(Spell aSpell)
+        public static Projectile CreateProjectile(WorldSpace aStartPosition, Spell aSpell, Entity aTarget)
         {
-            return new Projectile(aSpell.Owner.Centre, projectiles[aSpell.Name], aSpell, aSpell.Owner.Target);
+            return new Projectile(aStartPosition, projectiles[aSpell.Name], aSpell, aTarget);
         }
     }
 }
