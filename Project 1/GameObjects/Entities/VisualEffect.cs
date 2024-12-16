@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects
+namespace Project_1.GameObjects.Entities
 {
     internal class VisualEffect
     {
@@ -20,7 +20,7 @@ namespace Project_1.GameObjects
         double duration;
         Textures.Texture texture;
 
-        public VisualEffect(GfxPath aPath, double aDuration) 
+        public VisualEffect(GfxPath aPath, double aDuration)
         {
             startTime = TimeManager.TotalFrameTime;
             duration = aDuration;

@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.Entities
+namespace Project_1.GameObjects.Entities.Temp
 {
     internal class Sheep : NonFriendly
     {

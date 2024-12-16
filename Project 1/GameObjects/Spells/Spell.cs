@@ -25,6 +25,7 @@ namespace Project_1.GameObjects.Spells
         public float CastDistance { get => spellData.CastDistance; }
         public double CastTime { get => spellData.CastTime; }
         public float ResourceCost { get => spellData.ResourceCost; }
+        public bool Targetable(UnitData.RelationToPlayer aTarget) => spellData.Targetable(aTarget);
         public GfxPath GfxPath { get => spellData.ButtonGfxPath; }
 
         public Entity Owner { get => owner; }

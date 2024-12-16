@@ -16,6 +16,7 @@ using Project_1.Textures.AnimatedTextures;
 using Project_1.Items;
 using Project_1.GameObjects.Spells;
 using Project_1.Camera;
+using Project_1.GameObjects.Entities.Temp;
 
 namespace Project_1.GameObjects.Entities.Players
 {
@@ -32,23 +33,11 @@ namespace Project_1.GameObjects.Entities.Players
 
         const float lengthOfLeash = 500;
 
-        public override Entity Target
-        {
-            get => playerClickTarget;
-            set
-            {
-                if (playerClickTarget != null)
-                {
-                    playerClickTarget.Deselect();
-                }
-                playerClickTarget = value;
-                if (playerClickTarget != null)
-                {
-                    playerClickTarget.Select();
-                }
-            }
-        }
+        public override Entity Target { get => playerClickTarget; set => playerClickTarget = value; }
         Entity playerClickTarget;
+
+        public bool LockedMovement => lockedMovement;
+        bool lockedMovement = false;
 
         public Player(WorldSpace aStartPos) : base(new RandomAnimatedTexture(new GfxPath(GfxType.Object, "Player"), new Point(32), 0, TimeSpan.FromMilliseconds(500)), aStartPos)
         {

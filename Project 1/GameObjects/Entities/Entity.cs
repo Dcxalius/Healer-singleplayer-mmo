@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
+using Project_1.GameObjects.Entities.GroundEffect;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Entities.Resources;
+using Project_1.GameObjects.Entities.Temp;
 using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Spells.Buff;
 using Project_1.Input;
@@ -21,92 +23,109 @@ using System.Threading.Tasks;
 using System.Xml;
 
 namespace Project_1.GameObjects.Entities
-{
+{ 
     internal abstract class Entity : MovingObject
     {
-        public enum BehaviourWhenAttacked
-        {
-            Flee,
-            Retaliate,
-            RetaliateButFleeWhenLow
-        }
-
-        protected UnitData UnitData { get => unitData; }
-        public bool HasDestination { get => destinations.Count > 0; }
-        public Color RelationColor { get => unitData.RelationColor(); }
-        public UnitData.RelationToPlayer Relation { get => unitData.Relation; }
+        public bool Selected => ObjectManager.Player.Target == this;
         public virtual Entity Target { get => target; set => target = value; }
-
-        public string Name { get => unitData.Name; }
-        public bool Alive { get => unitData.CurrentHealth > 0; }
-        public bool FullHealth { get => unitData.MaxHealth == unitData.CurrentHealth; }
-        public float MaxHealth { get => unitData.MaxHealth; }
-        public float CurrentHealth { get => unitData.CurrentHealth; }
-
-        public Resource.ResourceType ResourceType { get => unitData.Resource.Type; }
-        public float MaxResource { get => unitData.MaxResource; }
-        public float CurrentResource { get => unitData.CurrentResource; }
-
-        public Color ResourceColor { get => unitData.ResourceColor; }
-
-        public override float MaxSpeed { get => unitData.MaxSpeed; }
-
-        Rectangle shadowPos;
-
-        List<NonFriendly> aggroTablesIAmOn = new List<NonFriendly>();
-
-        static Texture SelectTexture = new Texture(new GfxPath(GfxType.Object, "SelectRing"));
-        static Texture ShadowTexture = new Texture(new GfxPath(GfxType.Object, "Shadow"));
-
-        List<WorldSpace> destinations = new List<WorldSpace>();
-
         protected Entity target = null;
-        bool selected = false;
+        public virtual bool InCombat => aggroTablesIAmOn.Count > 0;
+
+        #region UnitData
+        protected UnitData UnitData => unitData;
+        UnitData unitData;
+
+        public bool HasDestination => destination.HasDestination;
+        public Color RelationColor => unitData.RelationColor();
+        public UnitData.RelationToPlayer Relation => unitData.Relation;
+        public string Name => unitData.Name;
+        public bool Alive => unitData.CurrentHealth > 0;
+        public bool FullHealth => unitData.MaxHealth == unitData.CurrentHealth;
+        public float MaxHealth => unitData.MaxHealth;
+        public float CurrentHealth => unitData.CurrentHealth;
+
+        public Resource.ResourceType ResourceType => unitData.Resource.Type;
+        public float MaxResource => unitData.MaxResource;
+        public float CurrentResource => unitData.CurrentResource;
+
+        public Resource Resource => unitData.Resource;
+
+        public Color ResourceColor => unitData.ResourceColor;
+
+        public override float MaxSpeed => unitData.MaxSpeed;
+        #endregion
+
+        List<NonFriendly> aggroTablesIAmOn;
+
 
         float timeSinceLastAttack = 0;
 
-        UnitData unitData;
+
+
 
         protected Corpse corpse;
-
-        List<Buff> buffs;
-
         ParticleBase bloodsplatter;
 
-        public virtual bool InCombat { get => inCombat; }
-        bool inCombat;
+        public bool OffGlobalCooldown => spellCast.OffGlobalCooldown;
+        public double RatioOfGlobalCooldownDone => spellCast.RatioOfGlobalCooldownDone;
+        SpellCast spellCast;
 
-        public bool OffGlobalCooldown { get => lastCastSpell + globalCooldown < TimeManager.TotalFrameTime; }
-        public double RatioOfGlobalCooldownDone { get => Math.Min((TimeManager.TotalFrameTime - lastCastSpell) / globalCooldown, 1); }
-        const double globalCooldown = 1500;
-        double lastCastSpell;
-        Spell channeledSpell;
-        WorldSpace channeledSpellStartPosition;
-        Entity channelTarget;
-        double startCastTime;
+        SelectRing selectRing;
+        Shadow shadow;
+
+        BuffList buffList;
+
+        protected Destination destination;
 
         public Entity(Texture aTexture, WorldSpace aStartingPos, Corpse aCorpse = null) : base(aTexture, aStartingPos)
         {
-            inCombat = false;
-            buffs = new List<Buff>();
             corpse = aCorpse;
-            shadowPos = new Rectangle((Position + new Vector2(Size.X / 2, Size.Y)).ToPoint(), Size);
             unitData = ObjectFactory.GetData(GetType().Name);
             bloodsplatter = new ParticleBase((1000d, 2000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[] { Color.Red }, new Point(1));
+            shadow = new Shadow();
+            selectRing = new SelectRing();
+            spellCast = new SpellCast(this);
+            buffList = new BuffList();
+            destination = new Destination(this);
+            aggroTablesIAmOn = new List<NonFriendly>();
         }
 
 
         public override void Update()
         {
-            Walk();
-            Vector2 oldPosition = Position;
+            if (Dead()) return;
+            TargetAliveCheck();
+            unitData.Update();
+            Movement();
+            AttackTarget();
+
+            shadow.UpdatePosition(Position, Size);
+            selectRing.UpdatePosition(Position, Size);
+            spellCast.UpdateSpellChannel();
+            buffList.Update(this);
+        }
+
+        public void Movement()
+        {
+            destination.Update();
+            WorldSpace oldPosition = Position;
+            velocity += destination.GetVelocity(unitData.AttackRange, unitData.Speed);
             base.Update();
             CheckForCollisions(oldPosition);
-            UpdateSpellChannel();
-            unitData.Update();
-            AttackTarget();
-            UpdateBuffs();
-            Death();
+        }
+
+        public bool StartCast(Spell aSpell) => spellCast.StartCast(aSpell);
+
+        public void AddBuff(Buff aBuff) => buffList.AddBuff(aBuff, this); 
+
+        public List<Buff> GetAllBuffs() => buffList.GetAllBuffs();
+
+        void TargetAliveCheck()
+        {
+            if (Target == null) return;
+            if (Target.Alive) return;
+
+            Target = null;
         }
 
         public bool ResourceGain(Entity aEntity, float aValue, Resource.ResourceType aResourceType)
@@ -117,9 +136,9 @@ namespace Project_1.GameObjects.Entities
 
             float value = aValue;
 
-            if (MaxResource < CurrentHealth + value)
+            if (MaxResource < CurrentResource + value)
             {
-                value = MaxResource - CurrentHealth;
+                value = MaxResource - CurrentResource;
             }
 
             for (int i = 0; i < aggroTablesIAmOn.Count; i++)
@@ -132,112 +151,7 @@ namespace Project_1.GameObjects.Entities
             return true;
         }
 
-        bool CastSpeedCheck()
-        {
-            const float graceSpeedWindow = 0.1f;
-            if (momentum.ToVector2().Length() < graceSpeedWindow)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        void UpdateSpellChannel()
-        {
-            if (channeledSpell == null) return;
-            if (CastSpeedCheck())
-            {
-                CancelChannel();
-                
-                return;
-            }
-
-            if (FinishChannel()) return;
-
-            HUDManager.UpdateChannelSpell((float)((TimeManager.TotalFrameTime - startCastTime) / channeledSpell.CastTime));
-        }
-
-        void CancelChannel()
-        {
-            HUDManager.CancelChannel();
-            channelTarget = null;
-            channeledSpell = null;
-            channeledSpellStartPosition = WorldSpace.Zero;
-        }
-
-        bool FinishChannel()
-        {
-            if (channeledSpell.CastTime < TimeManager.TotalFrameTime - startCastTime)
-            {
-                const float graceWidth = 5;
-                if (channeledSpell.CastDistance + graceWidth < (channelTarget.FeetPos - FeetPos).ToVector2().Length())
-                {
-                    CancelChannel();
-                    return true;
-
-                }
-
-                CastSpell(channeledSpell);
-
-                HUDManager.FinishChannel();
-                channeledSpell = null;
-                channelTarget = null;
-                channeledSpellStartPosition = WorldSpace.Zero;
-                return true;
-            }
-            return false;
-        }
-
-        bool StartChannel(Spell aSpell)
-        {
-            if (channeledSpell != null) return false;
-            if (aSpell == null) return false;
-            if (aSpell.CastTime == 0) return false;
-            if (!aSpell.OffCooldown) return false;
-            if (CastSpeedCheck()) return false;
-            lastCastSpell = TimeManager.TotalFrameTime;
-            channeledSpellStartPosition = FeetPos;
-            channeledSpell = aSpell;
-            startCastTime = TimeManager.TotalFrameTime;
-            channelTarget = Target;
-            if (channelTarget == null) { channelTarget = this; }
-            HUDManager.ChannelSpell(channeledSpell);
-            HUDManager.UpdateChannelSpell(0);
-            return true;
-        }
-
-        public bool StartCast(Spell aSpell)
-        {
-            if (aSpell == null) return false;
-            //if (!spellBook.HasSpell(aSpell)) return false;
-            if (!UnitData.Resource.isCastable(aSpell.ResourceCost)) return false;
-            if (!OffGlobalCooldown) return false;
-            if (!aSpell.OffCooldown) return false;
-
-            if (Target != null)
-            {
-                float d = (Target.FeetPos - FeetPos).ToVector2().Length();
-                if (d > aSpell.CastDistance) return false;
-            }
-
-
-            if (aSpell.CastTime > 0)
-            {
-                ObjectManager.Player.StartChannel(aSpell);
-                return true;
-            }
-            lastCastSpell = TimeManager.TotalFrameTime;
-            return CastSpell(aSpell);
-        }
-
-        bool CastSpell(Spell aSpell)
-        {
-
-            if (!aSpell.Cast(Target)) return false;
-            UnitData.Resource.CastSpell(aSpell.ResourceCost);
-
-            return true;
-        }
+        
 
         public void ServerTick() //"Server tick"
         {
@@ -247,38 +161,7 @@ namespace Project_1.GameObjects.Entities
             }
         }
 
-        void UpdateBuffs()
-        {
-            for (int i = buffs.Count - 1; i >= 0; i--)
-            {
-                if (buffs[i].IsOver)
-                {
-                    buffs.RemoveAt(i);
-                    continue;
-                }
-                buffs[i].Update(this);
-            }
-        }
-
-        public void AddBuff(Buff aBuff)
-        {
-            for (int i = 0; i < buffs.Count; i++)
-            {
-                if (buffs[i] == aBuff)
-                {
-                    buffs[i].Recast();
-                    return;
-                }
-            }
-
-            buffs.Add(aBuff);
-            HUDManager.AddBuff(buffs.Last(), this);
-        }
-
-        public List<Buff> GetAllBuffs()
-        {
-            return buffs;
-        }
+       
 
         public void AddedToAggroTable(NonFriendly aNonfriendly)
         {
@@ -287,7 +170,6 @@ namespace Project_1.GameObjects.Entities
                 DebugManager.Print(GetType(), aNonfriendly + " tried to add me to a table I thought I was on.");
                 return;
             }
-            inCombat = true;
             aggroTablesIAmOn.Add(aNonfriendly);
         }
 
@@ -299,27 +181,6 @@ namespace Project_1.GameObjects.Entities
                 return;
             }
             aggroTablesIAmOn.Remove(aNonfriendly);
-            Combat();
-        }
-        void Combat()
-        {
-            if (inCombat)
-            {
-                if (aggroTablesIAmOn.Count == 0)
-                {
-                    inCombat = false;
-                }
-            }
-        }
-
-        public void Select()
-        {
-            selected = true;
-        }
-
-        public void Deselect()
-        {
-            selected = false;
         }
 
         public virtual void TakeDamage(Entity aAttacker, float aDamageTaken)
@@ -332,7 +193,8 @@ namespace Project_1.GameObjects.Entities
 
 
             ParticleMovement bloodMovement = new ParticleMovement(dirOfFlyingStuff, WorldSpace.Zero, 0.9f);
-            ParticleManager.SpawnParticle(bloodsplatter, WorldRectangle, this, bloodMovement, 10);
+            DebugManager.Print(GetType(), ((aDamageTaken / MaxHealth) * 100).ToString());
+            ParticleManager.SpawnParticle(bloodsplatter, WorldRectangle, this, bloodMovement, (int)Math.Max(1, (aDamageTaken / MaxHealth) * 100));
         }
 
         public virtual bool TakeHealing(Entity aHealer, float aHealingTaken)
@@ -379,82 +241,23 @@ namespace Project_1.GameObjects.Entities
             }
         }
 
-        WorldSpace GetDirVectorToNextDestination(WorldSpace aDestination, out float aLenghtTillDestination)
-        {
-            WorldSpace dirV = aDestination - FeetPos;
-            aLenghtTillDestination = dirV.ToVector2().Length();
-            dirV.Normalize();
-            return dirV;
-        }
-
-        void Walk()
-        {
-            if (momentum.ToVector2().Length() < 0.1f)
-            {
-                momentum = WorldSpace.Zero;
-            }
-
-            if (destinations.Count == 0 && target == null)
-            {
-                return;
-            }
-
-            if (target != null)
-            {
-                OverwriteDestination(target.FeetPos);
-
-            }
-
-            WalkToDestination();
-        }
-
-        void WalkToDestination()
-        {
-
-            float length = 0;
-            WorldSpace directionToWalk = GetDirVectorToNextDestination(destinations[0], out length);
-
-            if (target == null)
-            {
-                if (length < momentum.ToVector2().Length() * 10f) //TODO: Find a good factor
-                {
-                    destinations.RemoveAt(0);
-
-                    return;
-                }
-
-            }
-            else
-            {
-                if (length < unitData.AttackRange)
-                {
-                    destinations.RemoveAt(0);
-                    momentum = momentum / 1.6f;
-
-                    return;
-                }
-            }
-
-            velocity += directionToWalk * unitData.Speed * (float)TimeManager.SecondsSinceLastFrame;
-        }
-
-        protected void OverwriteDestination(WorldSpace aDestination)
-        {
-            destinations.Clear();
-            destinations.Add(aDestination);
-        }
-
-        protected void AddDestination(WorldSpace aDestination) { destinations.Add(aDestination); }
 
 
 
-        protected virtual void Death()
+        protected virtual bool Dead()
         {
             if (unitData.CurrentHealth <= 0)
             {
+                for (int i = 0;  i < aggroTablesIAmOn.Count; i++)
+                {
+                    aggroTablesIAmOn[i].RemoveFromAggroTable(this);
+                }
+                
                 ObjectManager.RemoveEntity(this);
                 if (corpse != null) corpse.SpawnCorpe(Position); //Make this spawn a default corpse if corpse is null
+                return true;
             }
+            return false;
         }
 
         void AttackTarget()
@@ -497,7 +300,7 @@ namespace Project_1.GameObjects.Entities
             return false;
         }
 
-        void CheckForCollisions(Vector2 aOldPosition)
+        void CheckForCollisions(WorldSpace aOldPosition)
         {
 
             List<Rectangle> resultingCollisions = TileManager.CollisionsWithUnwalkable(WorldRectangle);
@@ -507,7 +310,7 @@ namespace Project_1.GameObjects.Entities
                 for (int i = 0; i < resultingCollisions.Count; i++)
                 {
 
-                    Vector2 collisionDir = Vector2.Normalize((resultingCollisions[i].Center - WorldRectangle.Center).ToVector2());
+                    WorldSpace collisionDir = WorldSpace.Normalize((WorldSpace)(resultingCollisions[i].Center - WorldRectangle.Center).ToVector2());
 
                     if (Math.Abs(collisionDir.X) > Math.Abs(collisionDir.Y))
                     {
@@ -524,26 +327,12 @@ namespace Project_1.GameObjects.Entities
                 }
             }
 
-            Vector2 offset = new Vector2(0, Size.Y / 2.5f);
-            shadowPos.Location = (Position + offset).ToPoint();
-            shadowPos.Size = (Size.ToVector2() * Camera.Camera.Scale).ToPoint();
         }
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)
         {
-            Color shadowColor = Color.Black;
-            if (GetType() == typeof(Walker))
-            {
-                if (ObjectManager.Player.IsInCommand(this as Walker))
-                {
-                    shadowColor = Color.DarkGreen;
-                }
-            }
-            ShadowTexture.Draw(aBatch, Camera.Camera.WorldRectToScreenRect(shadowPos).Location.ToVector2(), shadowColor, FeetPos.Y - 2);
-            if (selected == true)
-            {
-                SelectTexture.Draw(aBatch, Camera.Camera.WorldRectToScreenRect(shadowPos).Location.ToVector2(), UnitData.RelationColor(), FeetPos.Y - 1);
-            }
+            shadow.Draw(aBatch, this);
+            selectRing.Draw(aBatch, this);
             base.Draw(aBatch);
         }
     }

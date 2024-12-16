@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.Entities
+namespace Project_1.GameObjects.Entities.Temp
 {
     internal class Walker : Entity
     {
@@ -46,13 +46,13 @@ namespace Project_1.GameObjects.Entities
         public void RecieveDirectWalkingOrder(WorldSpace aPos)
         {
             target = null;
-            OverwriteDestination(aPos);
+            destination.OverwriteDestination(aPos);
         }
 
 
         public void AddWalkingOrder(WorldSpace aPos)
         {
-            AddDestination(aPos);
+            destination.AddDestination(aPos);
         }
 
     }

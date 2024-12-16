@@ -29,6 +29,18 @@ namespace Project_1.Managers
             }
 
         }
+
+        public static TimeSpan TotalFrameTimeAsTimeSpan
+        {
+            get
+            {
+                if (!timePaused.HasValue)
+                {
+                    return gt.TotalGameTime;
+                }
+                return timePaused.Value;
+            }
+        }
         
         public static void Update(GameTime aGameTime)
         {
