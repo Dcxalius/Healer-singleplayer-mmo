@@ -85,7 +85,7 @@ namespace Project_1.GameObjects.Entities.Players
         {
             for (int i = 0; i < party.Count; i++)
             {
-                if (party[i].HasDestination == false && (FeetPos - party[i].FeetPos).ToVector2().Length() > lengthOfLeash)
+                if (party[i].HasDestination == false && (FeetPosition - party[i].FeetPosition).ToVector2().Length() > lengthOfLeash)
                 {
                     party[i].Target = ObjectManager.Player;
                 }

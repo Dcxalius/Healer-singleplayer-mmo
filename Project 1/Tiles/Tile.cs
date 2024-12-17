@@ -8,28 +8,60 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Project_1.Camera;
+using Project_1.Managers;
 
 namespace Project_1.Tiles
 {
     internal class Tile : GameObject
     {
         readonly static Point tileSize = new Point(32);
-        public string Name { get => tileData.Name; }
-        public bool Walkable { get => tileData.Walkable; }
-        public float DragCoeficient { get => tileData.DragCoeficient; }
+        public string Name => tileData.Name;
+        public bool Walkable => tileData.Walkable;
+        public float DragCoeficient => tileData.DragCoeficient;
 
+        public bool Transparent
+        {
+            get
+            {
+                DebugManager.debugShapes.Add(new DebugTools.DebugSquare(new Rectangle(Position.ToPoint(), tileSize)));
+                return tileData.Transparent;
+            }
+        }
 
+        public Point TilePos => tilePos;
+        Point tilePos;
+
+        Text xText;
+        Text yText;
+
+        UITexture debugTexture;
         TileData tileData;
 
-        public Tile(TileData aTileData, Point aPos) : base(new Textures.RandomlyGeneratedTexture(true, tileSize, new GfxPath(GfxType.Tile, aTileData.Name)), (WorldSpace)aPos.ToVector2())
-        { 
+        //bool 
+
+        public Tile(TileData aTileData, Point aPos, Point aTilePos) : base(new Textures.RandomlyGeneratedTexture(true, tileSize, new GfxPath(GfxType.Tile, aTileData.Name)), (WorldSpace)aPos.ToVector2())
+        {
+            debugTexture = new UITexture(new GfxPath(GfxType.Debug, "Debug"), Color.White);
             tileData = aTileData;
+            tilePos = aTilePos;
+            if (DebugManager.Mode(DebugMode.TileCoords))
+            {
+                xText = new Text("Gloryse", tilePos.X.ToString(), Color.Black);
+                yText = new Text("Gloryse", tilePos.Y.ToString(), Color.Yellow);
+            }
         }
 
         public override void Draw(SpriteBatch aBatch)
         {
             //base.Draw(aBatch); Dont draw as a gameobject to make all tiles appear in the background
-            gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2(), 0); 
+            gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2(), 0);
+
+            //xText.LeftAllignedDraw(aBatch, new WorldSpace(Position - Size.ToVector2() / 2).ToAbsoltueScreenPosition());
+            if (DebugManager.Mode(DebugMode.TileCoords))
+            {
+                xText.LeftAllignedDraw(aBatch, new WorldSpace(Position).ToAbsoltueScreenPosition());
+                yText.LeftAllignedDraw(aBatch, new WorldSpace(Position + new WorldSpace(xText.Offset.X, 0)).ToAbsoltueScreenPosition());
+            }
             //Camera.Camera.WorldPosToCameraSpace(Position), 0); 
         }
     }

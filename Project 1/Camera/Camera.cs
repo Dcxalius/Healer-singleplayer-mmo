@@ -213,7 +213,7 @@ namespace Project_1.Camera
             DrawGameObjects(gameSpriteBatch);
             gameSpriteBatch.Draw(uiTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
 
-
+            DebugManager.Draw(gameSpriteBatch);
 
             gameSpriteBatch.End();
             GraphicsManager.SetRenderTarget(null);

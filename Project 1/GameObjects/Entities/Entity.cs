@@ -186,9 +186,9 @@ namespace Project_1.GameObjects.Entities
         public virtual void TakeDamage(Entity aAttacker, float aDamageTaken)
         {
             unitData.CurrentHealth -= aDamageTaken;
-            WorldSpace dirOfFlyingStuff = (FeetPos - aAttacker.FeetPos);
+            WorldSpace dirOfFlyingStuff = (FeetPosition - aAttacker.FeetPosition);
             dirOfFlyingStuff.Normalize();
-            FloatingText floatingText = new FloatingText(aDamageTaken.ToString(), Color.Red, FeetPos, dirOfFlyingStuff); //TODO: Change to handle attacker and this being in the same place
+            FloatingText floatingText = new FloatingText(aDamageTaken.ToString(), Color.Red, FeetPosition, dirOfFlyingStuff); //TODO: Change to handle attacker and this being in the same place
             ObjectManager.SpawnFloatingText(floatingText);
 
 
@@ -205,9 +205,9 @@ namespace Project_1.GameObjects.Entities
             if (CurrentHealth + value > MaxHealth) value = MaxHealth - CurrentHealth;
 
             unitData.CurrentHealth += value;
-            WorldSpace ws = (FeetPos - aHealer.FeetPos);
+            WorldSpace ws = (FeetPosition - aHealer.FeetPosition);
             ws.Normalize();
-            FloatingText floatingText = new FloatingText(value.ToString(), Color.White, FeetPos, ws); //TODO: Change color to green once text border has been implemented ALSO Change to handle attacker and this being in the same place
+            FloatingText floatingText = new FloatingText(value.ToString(), Color.White, FeetPosition, ws); //TODO: Change color to green once text border has been implemented ALSO Change to handle attacker and this being in the same place
             ObjectManager.SpawnFloatingText(floatingText);
             for (int i = 0; i < aggroTablesIAmOn.Count; i++)
             {
@@ -275,7 +275,7 @@ namespace Project_1.GameObjects.Entities
         void AttackIfInRange()
         {
 
-            if (CheckForRelation() && (target.FeetPos - FeetPos).ToVector2().Length() < unitData.AttackRange)
+            if (CheckForRelation() && (target.FeetPosition - FeetPosition).ToVector2().Length() < unitData.AttackRange)
             {
                 timeSinceLastAttack = 0;
                 target.TakeDamage(this, unitData.AttackDamage);

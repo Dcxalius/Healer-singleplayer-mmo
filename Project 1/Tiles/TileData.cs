@@ -8,18 +8,22 @@ namespace Project_1.Tiles
 {
     internal struct TileData
     {
-        public string Name { get => name; }
-        public bool Walkable { get => walkable; }
-        public float DragCoeficient { get => dragCoeficient; }
+        public string Name => name;
         string name;
+        public bool Walkable => walkable;
         bool walkable;
+        public float DragCoeficient => dragCoeficient;
         float dragCoeficient;
 
-        public TileData(string name, bool walkable, float dragCoeficient)
+        public bool Transparent => transparent;
+        bool transparent;
+
+        public TileData(string name, bool walkable, float dragCoeficient, bool transparent)
         {
             this.name = name;
             this.walkable = walkable;
             this.dragCoeficient = dragCoeficient;
+            this.transparent = transparent;
         }
     }
 }

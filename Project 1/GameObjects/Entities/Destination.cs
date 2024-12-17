@@ -49,7 +49,7 @@ namespace Project_1.GameObjects.Entities
 
             if (owner.Target != null)
             {
-                OverwriteDestination(owner.Target.FeetPos);
+                OverwriteDestination(owner.Target.FeetPosition);
 
             }
 
@@ -100,7 +100,7 @@ namespace Project_1.GameObjects.Entities
 
         void UpdateDirection(WorldSpace aDestination)
         {
-            WorldSpace dirV = aDestination - owner.FeetPos;
+            WorldSpace dirV = aDestination - owner.FeetPosition;
             lengthTo = dirV.ToVector2().Length();
             dirV.Normalize();
             directionToWalk = dirV;

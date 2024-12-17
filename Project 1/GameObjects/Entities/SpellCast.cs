@@ -1,6 +1,7 @@
 ﻿using Project_1.Camera;
 using Project_1.GameObjects.Spells;
 using Project_1.Managers;
+using Project_1.Tiles;
 using Project_1.UI.HUD;
 using System;
 using System.Collections.Generic;
@@ -65,7 +66,7 @@ namespace Project_1.GameObjects.Entities
             if (channeledSpell.CastTime < TimeManager.TotalFrameTime - startCastTime)
             {
                 const float graceWidth = 5;
-                if (channeledSpell.CastDistance + graceWidth < (channelTarget.FeetPos - owner.FeetPos).ToVector2().Length())
+                if (channeledSpell.CastDistance + graceWidth < (channelTarget.FeetPosition - owner.FeetPosition).ToVector2().Length())
                 {
                     CancelChannel();
                     return true;
@@ -89,7 +90,7 @@ namespace Project_1.GameObjects.Entities
             channelTarget = owner.Target;
             if (channelTarget == null) { channelTarget = owner; }
             lastCastSpell = TimeManager.TotalFrameTime;
-            channeledSpellStartPosition = owner.FeetPos;
+            channeledSpellStartPosition = owner.FeetPosition;
             channeledSpell = aSpell;
             startCastTime = TimeManager.TotalFrameTime;
             HUDManager.ChannelSpell(channeledSpell);
@@ -114,12 +115,19 @@ namespace Project_1.GameObjects.Entities
             if (!owner.Resource.isCastable(aSpell.ResourceCost)) return false;
             if (!OffGlobalCooldown) return false;
             if (!aSpell.OffCooldown) return false;
-            if (!aSpell.Targetable(owner.Target.Relation)) return false;
 
             if (owner.Target != null)
             {
-                float d = (owner.Target.FeetPos - owner.FeetPos).ToVector2().Length();
+                float d = (owner.Target.FeetPosition - owner.FeetPosition).ToVector2().Length();
                 if (d > aSpell.CastDistance) return false;
+
+                if (!aSpell.Targetable(owner.Target.Relation)) return false;
+                if (!TileManager.CheckLineOfSight(owner, owner.Target.FeetPosition)) return false;
+            }
+            else
+            {
+                if (!aSpell.Targetable(owner.Relation)) return false;
+
             }
 
 

@@ -31,7 +31,7 @@ namespace Project_1.GameObjects.Entities.GroundEffect
 
         protected void Draw(SpriteBatch aBatch, Entity aOwner, Color aColor, float aOrder)
         {
-            gfx.Draw(aBatch, Camera.Camera.WorldRectToScreenRect(Position).Location.ToVector2(), aColor, aOwner.FeetPos.Y - aOrder); //TODO: Make this actually use rects to draw
+            gfx.Draw(aBatch, Camera.Camera.WorldRectToScreenRect(Position).Location.ToVector2(), aColor, aOwner.FeetPosition.Y - aOrder); //TODO: Make this actually use rects to draw
 
         }
     }

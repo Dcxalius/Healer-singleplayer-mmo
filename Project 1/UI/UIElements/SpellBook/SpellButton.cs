@@ -62,7 +62,7 @@ namespace Project_1.UI.UIElements.SpellBook
                 gfx.Color = Color.White;
                 return;
             }
-            if (P.Target.FeetPos.DistanceTo(P.FeetPos) > spellData.CastDistance) gfx.Color = Color.Red;
+            if (P.Target.FeetPosition.DistanceTo(P.FeetPosition) > spellData.CastDistance) gfx.Color = Color.Red;
             else gfx.Color = Color.White;
         }
 

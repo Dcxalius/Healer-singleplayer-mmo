@@ -2,10 +2,14 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
+using Project_1.Camera;
 using Project_1.GameObjects;
+using Project_1.GameObjects.Entities;
 using Project_1.Managers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,9 +51,9 @@ namespace Project_1.Tiles
                 {
                     Point pos = new Point(aLeftUppermostTile.X + TileSize.X * i, aLeftUppermostTile.Y + TileSize.Y * j);
 
-                    if (i == 0 || j == 0 || i == aSize.X-1 || j == aSize.Y-1)
+                    if (i == 0 || j == 0 || i == aSize.X-1 || j == aSize.Y-1 || i == 4)
                     {
-                        tiles[i, j] = new Tile(tileData["Wall"], pos);
+                        tiles[i, j] = new Tile(tileData["Wall"], pos, new Point(i, j));
                     }
                     else
                     {
@@ -78,22 +82,97 @@ namespace Project_1.Tiles
 
                         if (RandomManager.RollDouble() < oddsOfDirt)
                         {
-                            tiles[i, j] = new Tile(tileData["Dirt"], pos);
+                            tiles[i, j] = new Tile(tileData["Dirt"], pos, new Point(i, j));
                         }
                         else
                         {
-                            tiles[i, j] = new Tile(tileData["Grass"], pos);
+                            tiles[i, j] = new Tile(tileData["Grass"], pos, new Point(i, j));
                         }
                     }
                 }
             }
         }
 
-        public static float GetDragCoeficient(Vector2 aCentreOfObject)
+        public static float GetDragCoeficient(WorldSpace aCentreOfObject)
         {
-            return tiles[(int)(aCentreOfObject.X / TileSize.X), (int)(aCentreOfObject.Y / TileSize.Y)].DragCoeficient;
+            return GetTileUnder(aCentreOfObject).DragCoeficient;
         }
         
+        public static bool CheckLineOfSight(Entity aCaster, WorldSpace aTarget)
+        {
+            WorldSpace start = aCaster.FeetPosition;
+
+            Vector2 line = aTarget - start;
+            Vector2 dirVector = Vector2.Normalize(line);
+
+            DebugManager.debugShapes.Add(new DebugTools.DebugLine(start, (WorldSpace)dirVector, line.Length()));
+
+            float dirX = dirVector.X / Math.Abs(dirVector.X);
+            float dirY = dirVector.Y / Math.Abs(dirVector.Y);
+            Tile startTile = GetTileUnder(start);
+            Tile targetTile = GetTileUnder(aTarget);
+            if (!startTile.Transparent || !targetTile.Transparent) return false;
+
+            Vector2 startInTileSpace = new Vector2(start.X / TileSize.X, (start.Y / TileSize.Y));
+            Vector2 targetInTileSpace = new Vector2(aTarget.X / TileSize.X, (aTarget.Y / TileSize.Y));
+            double m = (targetInTileSpace.Y - startInTileSpace.Y)/(targetInTileSpace.X - startInTileSpace.X);
+
+            double x = startInTileSpace.X;
+            double y = startInTileSpace.Y;
+            double c = y - m*x;
+            //float y = m * x + c;
+            //float x = (y - c) / m
+
+            Point lastTile = startTile.TilePos;
+            while (true) 
+            {
+                double yWhenXIsMoved = m * (lastTile.X + dirX) + c;
+                double xWhenYIsMoved = ((lastTile.Y + dirY) - c) / m;
+
+                double xDif = Math.Abs(lastTile.X - xWhenYIsMoved);
+                double yDif = Math.Abs(lastTile.Y - yWhenXIsMoved);
+
+
+                if (yDif == xDif)
+                {
+                    Tile xDTile = tiles[lastTile.X + (int)dirX, lastTile.Y ];
+                    Tile yDTile = tiles[lastTile.X, lastTile.Y + (int)dirY];
+                    lastTile.X += (int)dirX;
+                    lastTile.Y += (int)dirY;
+
+                    if (!xDTile.Transparent || !yDTile.Transparent)
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (yDif < xDif)
+                    {
+                        lastTile.X += (int)dirX;
+                    }
+                    else
+                    {
+                        lastTile.Y += (int)dirY;
+                    }
+                }
+
+                
+                Tile t = tiles[lastTile.X, lastTile.Y];
+
+                if (!t.Transparent)
+                {
+                    return false;
+                }
+
+                if (t == targetTile)
+                {
+                    return true;
+                }
+            }
+        }
+
+
         public static List<Rectangle> CollisionsWithUnwalkable(Rectangle aWorldRect)
         {
 
@@ -195,7 +274,10 @@ namespace Project_1.Tiles
             return finalColliders;
         }
 
-
+        static Tile GetTileUnder(WorldSpace aWorldSpace)
+        {
+            return tiles[(int)Math.Ceiling(aWorldSpace.X / TileSize.X), (int)Math.Ceiling(aWorldSpace.Y / TileSize.Y)];
+        }
 
         static Tile[,] GetSurroundingTiles(Point aIndex)
         {

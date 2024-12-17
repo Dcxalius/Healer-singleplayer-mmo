@@ -18,7 +18,7 @@ namespace Project_1.GameObjects
     {
         public WorldSpace Position { get => position; protected set => position = value; }
         public WorldSpace Centre { get => position + new WorldSpace(size.ToVector2()) / 2; }
-        public WorldSpace FeetPos { get => Position + (WorldSpace)new Vector2(size.X / 2, size.Y); }
+        public WorldSpace FeetPosition { get => Position + (WorldSpace)new Vector2(size.X / 2, size.Y); }
         public Rectangle WorldRectangle { get => new Rectangle(position.ToPoint(), size); }
         
         protected Textures.Texture gfx;
@@ -54,15 +54,6 @@ namespace Project_1.GameObjects
             }
         }
 
-        public virtual bool Click(ClickEvent aClickEvent) => false;
-
-        public void AddEffect(VisualEffect aEffect)
-        {
-            
-            effects.Add(aEffect);
-            effects.Last().Size = size;
-        }
-
         public virtual void Update()
         {
             gfx.Update();
@@ -72,15 +63,25 @@ namespace Project_1.GameObjects
             }
         }
 
+        public void Teleport(WorldSpace aNewPos) => position = aNewPos;
+
+        public virtual bool Click(ClickEvent aClickEvent) => false;
+
+        public void AddEffect(VisualEffect aEffect)
+        {
+
+            effects.Add(aEffect);
+            effects.Last().Size = size;
+        }
 
         public virtual void Draw(SpriteBatch aBatch)
         {
             Debug.Assert(gfx != null);
             //gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2());
-            gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2(), FeetPos.Y);
+            gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2(), FeetPosition.Y);
             for (int i = 0; i < effects.Count; i++)
             {
-                effects[i].Draw(aBatch, Position, FeetPos.Y + 0.01f);
+                effects[i].Draw(aBatch, Position, FeetPosition.Y + 0.01f);
             }
             //gfx.Draw(aBatch, Camera.Camera.WorldPosToCameraSpace(position), FeetPos.Y);
         }

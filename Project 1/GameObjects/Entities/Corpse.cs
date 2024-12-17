@@ -50,7 +50,7 @@ namespace Project_1.GameObjects.Entities
             if (!Camera.Camera.WorldRectToScreenRect(WorldRectangle).Contains(aClickEvent.AbsolutePos.ToPoint())) return false;
             //if (!Camera.Camera.WorldPosToCameraSpace(WorldRectangle).Contains(aClickEvent.AbsolutePos.ToPoint())) return false;
             if (aClickEvent.ButtonPressed != InputManager.ClickType.Right) return false;
-            if (ObjectManager.Player.FeetPos.DistanceTo(Centre) > lootLength) return false;
+            if (ObjectManager.Player.FeetPosition.DistanceTo(Centre) > lootLength) return false;
             if (drop.All(drop => drop == null)) return false;
 
             HUDManager.Loot(this);

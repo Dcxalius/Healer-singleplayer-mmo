@@ -36,13 +36,13 @@ namespace Project_1.GameObjects
 
         public static void Init()
         {
-            player = new Player(new WorldSpace(100));
+            player = new Player(new WorldSpace(10*32));
             Camera.Camera.BindCamera(player);
 
 
 
             
-            entities.Add(new Walker(new WorldSpace(200, 200)));//Debug
+            entities.Add(new Walker(new WorldSpace(11*32)));//Debug
             player.AddToParty(entities[entities.Count - 1] as Walker); //Debug
             for (int i = 0; i < 100; i++)
             {

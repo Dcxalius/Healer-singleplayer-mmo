@@ -165,7 +165,7 @@ namespace Project_1.UI.HUD
         {
             if (lootedCorpse == null) return;
 
-            if (lootedCorpse.Centre.DistanceTo(ObjectManager.Player.FeetPos) > lootedCorpse.LootLength)
+            if (lootedCorpse.Centre.DistanceTo(ObjectManager.Player.FeetPosition) > lootedCorpse.LootLength)
             {
                 StopLoot();
                 return;

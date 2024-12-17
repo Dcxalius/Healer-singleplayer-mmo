@@ -38,7 +38,7 @@ namespace Project_1.Items
                 }
             }
 
-            if (DebugManager.mode == DebugMode.On)
+            if (DebugManager.Mode(DebugMode.InvCheats))
             {
                 EquipBag( ItemFactory.CreateItem(ItemFactory.GetItemData("Small Bag") ) as Container);
                 items[0][22] = ItemFactory.CreateItem(ItemFactory.GetItemData("Medium Bag"));
