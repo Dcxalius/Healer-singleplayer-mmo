@@ -43,22 +43,27 @@ namespace Project_1.Managers
             modes[(int)DebugMode.Print] = true;
             modes[(int)DebugMode.InvCheats] = true;
             modes[(int)DebugMode.Teleport] = true;
+            modes[(int)DebugMode.TileCoords] = false;
             AllocConsole();
         }
 
         public static void Update()
         {
-            if (KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugPoop))
+            if (KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugHealthPotion))
             {
                 SpawnHealthPotion();
             }
-            if (KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugBanana))
+            if (KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugManaPotion))
             {
                 SpawnManaPotion();
             }
             if (KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugTeleport))
             {
                 TeleportPlayer();
+            }
+            if (KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugManaPotion))
+            {
+                debugShapes.Clear();
             }
         }
 

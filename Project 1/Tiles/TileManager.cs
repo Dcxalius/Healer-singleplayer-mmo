@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using Project_1.Camera;
+using Project_1.DebugTools;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.Managers;
@@ -100,6 +101,8 @@ namespace Project_1.Tiles
         
         public static bool CheckLineOfSight(Entity aCaster, WorldSpace aTarget)
         {
+            
+
             WorldSpace start = aCaster.FeetPosition;
 
             Vector2 line = aTarget - start;
@@ -109,66 +112,40 @@ namespace Project_1.Tiles
 
             float dirX = dirVector.X / Math.Abs(dirVector.X);
             float dirY = dirVector.Y / Math.Abs(dirVector.Y);
+
             Tile startTile = GetTileUnder(start);
+            DebugManager.Print(typeof(TileManager), "Start tile X: " + startTile.TilePos.X + " Y: " + startTile.TilePos.Y);
             Tile targetTile = GetTileUnder(aTarget);
+            DebugManager.Print(typeof(TileManager), "Target tile X: " + targetTile.TilePos.X + " Y: " + targetTile.TilePos.Y);
             if (!startTile.Transparent || !targetTile.Transparent) return false;
 
             Vector2 startInTileSpace = new Vector2(start.X / TileSize.X, (start.Y / TileSize.Y));
             Vector2 targetInTileSpace = new Vector2(aTarget.X / TileSize.X, (aTarget.Y / TileSize.Y));
-            double m = (targetInTileSpace.Y - startInTileSpace.Y)/(targetInTileSpace.X - startInTileSpace.X);
+            double m = (targetInTileSpace.Y - startInTileSpace.Y) / (targetInTileSpace.X - startInTileSpace.X);
 
-            double x = startInTileSpace.X;
-            double y = startInTileSpace.Y;
-            double c = y - m*x;
+            double x = start.X;
+            double y = start.Y;
+            double c = y - m * x;
             //float y = m * x + c;
             //float x = (y - c) / m
 
-            Point lastTile = startTile.TilePos;
-            while (true) 
+            Tile lastTile = startTile;
+            while (true)
             {
-                double yWhenXIsMoved = m * (lastTile.X + dirX) + c;
-                double xWhenYIsMoved = ((lastTile.Y + dirY) - c) / m;
 
-                double xDif = Math.Abs(lastTile.X - xWhenYIsMoved);
-                double yDif = Math.Abs(lastTile.Y - yWhenXIsMoved);
-
-
-                if (yDif == xDif)
+                float borderInX = dirX > 0 ? lastTile.WorldRectangle.Right : lastTile.WorldRectangle.Left;
+                double xdd = m * borderInX + c;
+                if (xdd > lastTile.WorldRectangle.Top && xdd < lastTile.WorldRectangle.Bottom)
                 {
-                    Tile xDTile = tiles[lastTile.X + (int)dirX, lastTile.Y ];
-                    Tile yDTile = tiles[lastTile.X, lastTile.Y + (int)dirY];
-                    lastTile.X += (int)dirX;
-                    lastTile.Y += (int)dirY;
-
-                    if (!xDTile.Transparent || !yDTile.Transparent)
-                    {
-                        return false;
-                    }
+                    lastTile = tiles[lastTile.TilePos.X + (int)dirX, lastTile.TilePos.Y];
                 }
                 else
                 {
-                    if (yDif < xDif)
-                    {
-                        lastTile.X += (int)dirX;
-                    }
-                    else
-                    {
-                        lastTile.Y += (int)dirY;
-                    }
+                    lastTile = tiles[lastTile.TilePos.X, lastTile.TilePos.Y + (int)dirY];
                 }
 
-                
-                Tile t = tiles[lastTile.X, lastTile.Y];
-
-                if (!t.Transparent)
-                {
-                    return false;
-                }
-
-                if (t == targetTile)
-                {
-                    return true;
-                }
+                if (!lastTile.Transparent) return false;
+                if (lastTile == targetTile) return true;
             }
         }
 
@@ -276,7 +253,7 @@ namespace Project_1.Tiles
 
         static Tile GetTileUnder(WorldSpace aWorldSpace)
         {
-            return tiles[(int)Math.Ceiling(aWorldSpace.X / TileSize.X), (int)Math.Ceiling(aWorldSpace.Y / TileSize.Y)];
+            return tiles[(int)Math.Floor(aWorldSpace.X / TileSize.X), (int)Math.Floor(aWorldSpace.Y / TileSize.Y)];
         }
 
         static Tile[,] GetSurroundingTiles(Point aIndex)

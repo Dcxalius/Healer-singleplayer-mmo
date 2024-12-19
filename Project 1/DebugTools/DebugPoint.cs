@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,19 +9,20 @@ using System.Threading.Tasks;
 
 namespace Project_1.DebugTools
 {
-    internal class DebugSquare : DebugShape
+    internal class DebugPoint : DebugShape
     {
-        Rectangle rect;
+        WorldSpace pos;
 
-        public DebugSquare(Rectangle position) : base(Color.Blue)
+        public DebugPoint(WorldSpace aPosition, float aSize) : base(Color.Yellow)
         {
-            rect = position;
-
+            pos = aPosition;
+            size = aSize;
         }
+
 
         public override void Draw(SpriteBatch aBatch)
         {
-            base.Draw(aBatch, rect);
+            base.Draw(aBatch, pos);
         }
     }
 }

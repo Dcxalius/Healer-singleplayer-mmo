@@ -4,6 +4,7 @@ using Project_1.Camera;
 using Project_1.Managers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,8 @@ namespace Project_1.DebugTools
         float length;
         //int width;
 
+
+        [DebuggerStepThrough]
         public DebugLine(WorldSpace aStartPos, WorldSpace aDirV, float aLength) : base (Color.Red)
         {
             
