@@ -71,7 +71,7 @@ namespace Project_1.GameObjects.Entities.Players
 
             if (velocity == WorldSpace.Zero) return;
             velocity.Normalize();
-            velocity *= (float)(UnitData.Speed * TimeManager.SecondsSinceLastFrame);
+            velocity *= (float)(UnitData.MovementData.Speed * TimeManager.SecondsSinceLastFrame);
         }
 
         public override void Update()

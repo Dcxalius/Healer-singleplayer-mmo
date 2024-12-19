@@ -1,4 +1,5 @@
-﻿using Project_1.GameObjects.Entities;
+﻿using Project_1.GameObjects.EnitityFactory;
+using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Spells.Projectiles;
 using Project_1.Managers;
@@ -25,7 +26,7 @@ namespace Project_1.GameObjects.Spells
         public float CastDistance { get => spellData.CastDistance; }
         public double CastTime { get => spellData.CastTime; }
         public float ResourceCost { get => spellData.ResourceCost; }
-        public bool Targetable(UnitData.RelationToPlayer aTarget) => spellData.Targetable(aTarget);
+        public bool Targetable(Relation.RelationToPlayer aTarget) => spellData.Targetable(aTarget);
         public GfxPath GfxPath { get => spellData.ButtonGfxPath; }
 
         public Entity Owner { get => owner; }
@@ -61,7 +62,7 @@ namespace Project_1.GameObjects.Spells
                 return Trigger(owner);
             }
 
-            if (!spellData.Targetable(aTarget.Relation))
+            if (!spellData.Targetable(aTarget.RelationToPlayer))
             {
                 return false;
             }

@@ -1,8 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
+using Project_1.GameObjects.EnitityFactory;
+using Project_1.GameObjects.EnitityFactory.Resources;
 using Project_1.GameObjects.Entities.GroundEffect;
 using Project_1.GameObjects.Entities.Players;
-using Project_1.GameObjects.Entities.Resources;
 using Project_1.GameObjects.Entities.Temp;
 using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Spells.Buff;
@@ -23,7 +24,7 @@ using System.Threading.Tasks;
 using System.Xml;
 
 namespace Project_1.GameObjects.Entities
-{ 
+{
     internal abstract class Entity : MovingObject
     {
         public bool Selected => ObjectManager.Player.Target == this;
@@ -36,23 +37,23 @@ namespace Project_1.GameObjects.Entities
         UnitData unitData;
 
         public bool HasDestination => destination.HasDestination;
-        public Color RelationColor => unitData.RelationColor();
-        public UnitData.RelationToPlayer Relation => unitData.Relation;
+        public Color RelationColor => unitData.RelationData.RelationColor();
+        public Relation.RelationToPlayer RelationToPlayer => unitData.RelationData.ToPlayer;
         public string Name => unitData.Name;
-        public bool Alive => unitData.CurrentHealth > 0;
-        public bool FullHealth => unitData.MaxHealth == unitData.CurrentHealth;
-        public float MaxHealth => unitData.MaxHealth;
-        public float CurrentHealth => unitData.CurrentHealth;
+        public bool Alive => unitData.HealthData.CurrentHealth > 0;
+        public bool FullHealth => unitData.HealthData.MaxHealth == unitData.HealthData.CurrentHealth;
+        public float MaxHealth => unitData.HealthData.MaxHealth;
+        public float CurrentHealth => unitData.HealthData.CurrentHealth;
 
         public Resource.ResourceType ResourceType => unitData.Resource.Type;
-        public float MaxResource => unitData.MaxResource;
-        public float CurrentResource => unitData.CurrentResource;
+        public float MaxResource => unitData.Resource.MaxValue;
+        public float CurrentResource => unitData.Resource.Value;
 
         public Resource Resource => unitData.Resource;
 
-        public Color ResourceColor => unitData.ResourceColor;
+        public Color ResourceColor => unitData.Resource.ResourceColor;
 
-        public override float MaxSpeed => unitData.MaxSpeed;
+        public override float MaxSpeed => unitData.MovementData.MaxSpeed;
         #endregion
 
         List<NonFriendly> aggroTablesIAmOn;
@@ -109,7 +110,7 @@ namespace Project_1.GameObjects.Entities
         {
             destination.Update();
             WorldSpace oldPosition = Position;
-            velocity += destination.GetVelocity(unitData.AttackRange, unitData.Speed);
+            velocity += destination.GetVelocity(unitData.AttackData.Range, unitData.MovementData.Speed);
             base.Update();
             CheckForCollisions(oldPosition);
         }
@@ -146,7 +147,7 @@ namespace Project_1.GameObjects.Entities
                 aggroTablesIAmOn[i].AddToAggroTable(aEntity, value);
             }
 
-            unitData.CurrentResource += value;
+            unitData.Resource.Value += value;
 
             return true;
         }
@@ -157,7 +158,7 @@ namespace Project_1.GameObjects.Entities
         {
             if (!InCombat)
             {
-                unitData.HealthRegen();
+                unitData.Tick();
             }
         }
 
@@ -185,7 +186,7 @@ namespace Project_1.GameObjects.Entities
 
         public virtual void TakeDamage(Entity aAttacker, float aDamageTaken)
         {
-            unitData.CurrentHealth -= aDamageTaken;
+            unitData.HealthData.CurrentHealth -= aDamageTaken;
             WorldSpace dirOfFlyingStuff = (FeetPosition - aAttacker.FeetPosition);
             dirOfFlyingStuff.Normalize();
             FloatingText floatingText = new FloatingText(aDamageTaken.ToString(), Color.Red, FeetPosition, dirOfFlyingStuff); //TODO: Change to handle attacker and this being in the same place
@@ -204,7 +205,7 @@ namespace Project_1.GameObjects.Entities
             if (FullHealth) return false;
             if (CurrentHealth + value > MaxHealth) value = MaxHealth - CurrentHealth;
 
-            unitData.CurrentHealth += value;
+            unitData.HealthData.CurrentHealth += value;
             WorldSpace ws = (FeetPosition - aHealer.FeetPosition);
             ws.Normalize();
             FloatingText floatingText = new FloatingText(value.ToString(), Color.White, FeetPosition, ws); //TODO: Change color to green once text border has been implemented ALSO Change to handle attacker and this being in the same place
@@ -246,7 +247,7 @@ namespace Project_1.GameObjects.Entities
 
         protected virtual bool Dead()
         {
-            if (unitData.CurrentHealth <= 0)
+            if (!Alive)
             {
                 for (int i = 0;  i < aggroTablesIAmOn.Count; i++)
                 {
@@ -264,7 +265,7 @@ namespace Project_1.GameObjects.Entities
         {
             if (target == null) return;
 
-            if (unitData.SecondsPerAttack > timeSinceLastAttack)
+            if (unitData.AttackData.SecondsPerAttack > timeSinceLastAttack)
             {
                 timeSinceLastAttack += (float)TimeManager.SecondsSinceLastFrame;
                 return;
@@ -275,11 +276,11 @@ namespace Project_1.GameObjects.Entities
         void AttackIfInRange()
         {
 
-            if (CheckForRelation() && (target.FeetPosition - FeetPosition).ToVector2().Length() < unitData.AttackRange)
+            if (CheckForRelation() && (target.FeetPosition - FeetPosition).ToVector2().Length() < unitData.AttackData.Range)
             {
                 timeSinceLastAttack = 0;
-                target.TakeDamage(this, unitData.AttackDamage);
-                if (target.unitData.CurrentHealth <= 0)
+                target.TakeDamage(this, unitData.AttackData.Damage);
+                if (target.unitData.HealthData.CurrentHealth <= 0)
                 {
                     target = null;
                 }
@@ -288,11 +289,11 @@ namespace Project_1.GameObjects.Entities
 
         bool CheckForRelation()
         {
-            if (target.Relation == UnitData.RelationToPlayer.Self && Relation == UnitData.RelationToPlayer.Friendly)
+            if (target.RelationToPlayer == Relation.RelationToPlayer.Self && RelationToPlayer == Relation.RelationToPlayer.Friendly)
             {
                 return false;
             }
-            if (target.Relation != Relation)
+            if (target.RelationToPlayer != RelationToPlayer)
             {
                 return true;
             }

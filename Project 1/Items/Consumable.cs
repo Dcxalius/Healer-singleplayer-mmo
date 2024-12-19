@@ -1,5 +1,5 @@
-﻿using Project_1.GameObjects.Entities;
-using Project_1.GameObjects.Entities.Resources;
+﻿using Project_1.GameObjects.EnitityFactory.Resources;
+using Project_1.GameObjects.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

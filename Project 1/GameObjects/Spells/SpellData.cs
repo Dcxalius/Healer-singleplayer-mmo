@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.EnitityFactory;
 using Project_1.Textures;
 using SharpDX.Direct3D11;
 using SharpDX.Direct3D9;
@@ -26,8 +26,8 @@ namespace Project_1.GameObjects.Spells
         public double Cooldown { get => cooldown; }
         double cooldown;
 
-        public bool Targetable(UnitData.RelationToPlayer aTarget) { return acceptableTargets.Contains(aTarget); }
-        UnitData.RelationToPlayer[] acceptableTargets;
+        public bool Targetable(Relation.RelationToPlayer aTarget) { return acceptableTargets.Contains(aTarget); }
+        Relation.RelationToPlayer[] acceptableTargets;
 
         public float ResourceCost { get => resourceCost; }
         float resourceCost;
@@ -51,7 +51,7 @@ namespace Project_1.GameObjects.Spells
         TravelType travelType;
 
         [JsonConstructor]
-        public SpellData(string name, string buttonGfx, string hitEffectGfx, string[] effects, TravelType travelType, UnitData.RelationToPlayer[] acceptableTargets, float castDistance, double castTime = -1, double cooldown = -1, float resourceCost = -1)
+        public SpellData(string name, string buttonGfx, string hitEffectGfx, string[] effects, TravelType travelType, Relation.RelationToPlayer[] acceptableTargets, float castDistance, double castTime = -1, double cooldown = -1, float resourceCost = -1)
         {
             this.name = name;
             this.buttonGfxName = buttonGfx;

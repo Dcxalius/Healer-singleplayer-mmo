@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.Entities.Resources
+namespace Project_1.GameObjects.EnitityFactory.Resources
 {
     internal abstract class Resource
     {
@@ -32,7 +32,7 @@ namespace Project_1.GameObjects.Entities.Resources
         Color resourceColor;
 
 
-        public Resource(ResourceType aResource, Color aColor) 
+        public Resource(ResourceType aResource, Color aColor)
         {
             resourceType = aResource;
             resourceColor = aColor;
@@ -42,15 +42,15 @@ namespace Project_1.GameObjects.Entities.Resources
 
         public bool isCastable(float aValue)
         {
-            return Value - aValue > 0;
+            return Value - aValue >= 0;
         }
 
-        public virtual void Update() 
+        public virtual void Update()
         {
             Value += RegenValue;
         }
 
-        public virtual void CastSpell(float aCost) 
+        public virtual void CastSpell(float aCost)
         {
             Value -= aCost;
         }

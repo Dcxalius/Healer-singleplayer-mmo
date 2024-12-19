@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Project_1.GameObjects;
-using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Spells.AoE;
 using Project_1.GameObjects.Spells.Projectiles;

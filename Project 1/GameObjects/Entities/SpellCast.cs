@@ -121,12 +121,12 @@ namespace Project_1.GameObjects.Entities
                 float d = (owner.Target.FeetPosition - owner.FeetPosition).ToVector2().Length();
                 if (d > aSpell.CastDistance) return false;
 
-                if (!aSpell.Targetable(owner.Target.Relation)) return false;
+                if (!aSpell.Targetable(owner.Target.RelationToPlayer)) return false;
                 if (!TileManager.CheckLineOfSight(owner, owner.Target.FeetPosition)) return false;
             }
             else
             {
-                if (!aSpell.Targetable(owner.Relation)) return false;
+                if (!aSpell.Targetable(owner.RelationToPlayer)) return false;
 
             }
 
