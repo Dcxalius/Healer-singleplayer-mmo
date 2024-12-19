@@ -23,7 +23,7 @@ namespace Project_1.Tiles
         {
             get
             {
-                DebugManager.debugShapes.Add(new DebugTools.DebugSquare(new Rectangle(Position.ToPoint(), tileSize)));
+                //DebugManager.debugShapes.Add(new DebugTools.DebugSquare(new Rectangle(Position.ToPoint(), tileSize)));
                 return tileData.Transparent;
             }
         }

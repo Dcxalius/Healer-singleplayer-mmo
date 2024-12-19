@@ -52,7 +52,7 @@ namespace Project_1.Tiles
                 {
                     Point pos = new Point(aLeftUppermostTile.X + TileSize.X * i, aLeftUppermostTile.Y + TileSize.Y * j);
 
-                    if (i == 0 || j == 0 || i == aSize.X-1 || j == aSize.Y-1 || i == 4)
+                    if (i == 0 || j == 0 || i == aSize.X-1 || j == aSize.Y-1 || (i >= 4 && i < 6 && j >= 4 && j < 6 ))
                     {
                         tiles[i, j] = new Tile(tileData["Wall"], pos, new Point(i, j));
                     }
@@ -108,15 +108,15 @@ namespace Project_1.Tiles
             Vector2 line = aTarget - start;
             Vector2 dirVector = Vector2.Normalize(line);
 
-            DebugManager.debugShapes.Add(new DebugTools.DebugLine(start, (WorldSpace)dirVector, line.Length()));
+            //DebugManager.debugShapes.Add(new DebugTools.DebugLine(start, (WorldSpace)dirVector, line.Length()));
 
             float dirX = dirVector.X / Math.Abs(dirVector.X);
             float dirY = dirVector.Y / Math.Abs(dirVector.Y);
 
             Tile startTile = GetTileUnder(start);
-            DebugManager.Print(typeof(TileManager), "Start tile X: " + startTile.TilePos.X + " Y: " + startTile.TilePos.Y);
+            //DebugManager.Print(typeof(TileManager), "Start tile X: " + startTile.TilePos.X + " Y: " + startTile.TilePos.Y);
             Tile targetTile = GetTileUnder(aTarget);
-            DebugManager.Print(typeof(TileManager), "Target tile X: " + targetTile.TilePos.X + " Y: " + targetTile.TilePos.Y);
+            //DebugManager.Print(typeof(TileManager), "Target tile X: " + targetTile.TilePos.X + " Y: " + targetTile.TilePos.Y);
             if (!startTile.Transparent || !targetTile.Transparent) return false;
 
             Vector2 startInTileSpace = new Vector2(start.X / TileSize.X, (start.Y / TileSize.Y));
@@ -134,8 +134,8 @@ namespace Project_1.Tiles
             {
 
                 float borderInX = dirX > 0 ? lastTile.WorldRectangle.Right : lastTile.WorldRectangle.Left;
-                double xdd = m * borderInX + c;
-                if (xdd > lastTile.WorldRectangle.Top && xdd < lastTile.WorldRectangle.Bottom)
+                double yAtBorder = m * borderInX + c;
+                if (yAtBorder > lastTile.WorldRectangle.Top && yAtBorder < lastTile.WorldRectangle.Bottom)
                 {
                     lastTile = tiles[lastTile.TilePos.X + (int)dirX, lastTile.TilePos.Y];
                 }
