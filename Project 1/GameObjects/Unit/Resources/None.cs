@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.EnitityFactory.Resources
+namespace Project_1.GameObjects.Unit.Resources
 {
     internal class None : Resource
     {

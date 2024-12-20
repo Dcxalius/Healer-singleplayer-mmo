@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.EnitityFactory
+namespace Project_1.GameObjects.Unit
 {
     internal class Level
     {
@@ -44,22 +44,42 @@ namespace Project_1.GameObjects.EnitityFactory
             return false;
         }
 
-        static public int ZD(int aKillerLevel)
+        static public int ZD(int aLevelOfMob)
         {
-            if (aKillerLevel <= 7) return 5;
-
-            if (aKillerLevel <= 9) return 6;
-            if (aKillerLevel <= 11) return 7;
-            if (aKillerLevel <= 15) return 8;
-            if (aKillerLevel <= 19) return 9;
-            if (aKillerLevel <= 29) return 11;
-            if (aKillerLevel <= 39) return 12;
-            if (aKillerLevel <= 44) return 13;
-            if (aKillerLevel <= 49) return 14;
-            if (aKillerLevel <= 54) return 15;
-            if (aKillerLevel <= 59) return 16;
+            if (aLevelOfMob <= 7) return 5;
+            if (aLevelOfMob <= 9) return 6;
+            if (aLevelOfMob <= 11) return 7;
+            if (aLevelOfMob <= 15) return 8;
+            if (aLevelOfMob <= 19) return 9;
+            if (aLevelOfMob <= 29) return 11;
+            if (aLevelOfMob <= 39) return 12;
+            if (aLevelOfMob <= 44) return 13;
+            if (aLevelOfMob <= 49) return 14;
+            if (aLevelOfMob <= 54) return 15;
+            if (aLevelOfMob <= 59) return 16;
 
             throw new Exception("The Level given should not be possible.");
+        }
+
+
+        public int ExpReward(int aLevelOfKiller)
+        {
+            if (aLevelOfKiller >= 60) return 0;
+
+            int levelOfMob = CurrentLevel;
+            int xp = levelOfMob * 5 + 45;
+            if (levelOfMob > aLevelOfKiller)
+            {
+                xp *= (int)(1 + 0.05 * Math.Min(levelOfMob - aLevelOfKiller, 4));
+            }
+            else if (levelOfMob < aLevelOfKiller)
+            {
+                xp *= 1 - (aLevelOfKiller - levelOfMob) / ZD(levelOfMob);
+            }
+
+            //TODO: Calculate reduction for group
+
+            return xp;
         }
     }
 }

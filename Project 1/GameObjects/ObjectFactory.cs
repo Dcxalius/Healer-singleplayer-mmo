@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Newtonsoft.Json;
-using Project_1.GameObjects.EnitityFactory;
+using Project_1.GameObjects.Unit;
 using Project_1.Managers;
 using System;
 using System.Collections.Generic;
@@ -29,7 +29,7 @@ namespace Project_1.GameObjects
             //UnitData data = new UnitData("Sheep", 100, UnitData.RelationToPlayer.Neutral, 50);
             //ExportData("C:\\Users\\Cassandra\\source\\repos\\Project 1\\Project 1\\Content\\UnitData.json", data);
             ImportUnitData(aC);
-
+            ImportClassData(aC);
             //ExportData(aC.RootDirectory + "\\UnitData.json", unitData["Sheep"]);
         }
 
@@ -87,24 +87,24 @@ namespace Project_1.GameObjects
                 {
                     string rawData = System.IO.File.ReadAllText(files[j]);
                     ClassData data = JsonConvert.DeserializeObject<ClassData>(rawData);
-                    AddToClassData(data, type);
+                    AddToClassData(data, Enum.Parse<ClassData.Type>(type));
                 }
             }
 
 
         }
 
-        static void AddToClassData(ClassData aData, string aType)
+        static void AddToClassData(ClassData aData, ClassData.Type aType)
         {
             switch (aType)
             {
-                case "Player":
+                case ClassData.Type.Player:
                     playerClassData.Add(aData.Name, aData);
                     break;
-                case "Ally":
+                case ClassData.Type.Ally:
                     allyClassData.Add(aData.Name, aData);
                     break;
-                case "Mob":
+                case ClassData.Type.Mob:
                     mobClassData.Add(aData.Name, aData);
                     break;
                 default:

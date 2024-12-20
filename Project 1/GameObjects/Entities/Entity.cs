@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects.EnitityFactory;
-using Project_1.GameObjects.EnitityFactory.Resources;
+using Project_1.GameObjects.Unit;
+using Project_1.GameObjects.Unit.Resources;
 using Project_1.GameObjects.Entities.GroundEffect;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Entities.Temp;

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.EnitityFactory.Resources
+namespace Project_1.GameObjects.Unit.Resources
 {
     internal abstract class Resource
     {
@@ -20,7 +20,7 @@ namespace Project_1.GameObjects.EnitityFactory.Resources
 
         public string Name { get => resourceType.ToString(); }
 
-        public virtual float MaxValue { get; }
+        public virtual float MaxValue { get; protected set; }
         public virtual float Value { get; set; }
 
         public virtual float RegenValue { get; protected set; }
@@ -30,6 +30,9 @@ namespace Project_1.GameObjects.EnitityFactory.Resources
 
         public Color ResourceColor => resourceColor;
         Color resourceColor;
+
+        protected virtual float BaseMaxValue { get; set; }
+        protected virtual float PerLevel { get; set; }
 
 
         public Resource(ResourceType aResource, Color aColor)
@@ -54,5 +57,19 @@ namespace Project_1.GameObjects.EnitityFactory.Resources
         {
             Value -= aCost;
         }
+
+        public void LevelUp()
+        {
+            BaseMaxValue += PerLevel;
+            MaxValue += PerLevel;
+            Value = MaxValue;
+        }
+
+        public void Refresh(PrimaryStats aStats)
+        {
+            MaxValue = CalculateMaxValue(aStats);
+        }
+
+        public abstract float CalculateMaxValue(PrimaryStats aStats);
     }
 }

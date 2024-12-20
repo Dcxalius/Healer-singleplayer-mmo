@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.EnitityFactory.Resources
+namespace Project_1.GameObjects.Unit.Resources
 {
     internal class Energy : Resource
     {
@@ -24,20 +24,34 @@ namespace Project_1.GameObjects.EnitityFactory.Resources
             }
         }
         float energyValue;
-        public override float MaxValue { get => maxValue; }
+        public override float MaxValue
+        {
+            get => maxValue; protected set
+            {
+                maxValue = BaseMaxValue;
+                if (energyValue > maxValue)
+                {
+                    energyValue = maxValue;
+                }
+            }
+        }
         float maxValue;
 
         public override float RegenValue { get => regenValue; }
         float regenValue;
 
+        protected override float BaseMaxValue => 100;
+        protected override float PerLevel => 0;
+
+
         double lastRegenTick;
         double regenTimer = 1000;
 
-        public Energy(float aMaxValue) : base(ResourceType.Energy, Color.Yellow)
+        public Energy(float aCurrentResource) : base(ResourceType.Energy, Color.Yellow)
         {
-            Debug.Assert(aMaxValue > 0, "Tried to set max to 0");
-            maxValue = aMaxValue;
-            energyValue = aMaxValue;
+            //Debug.Assert(aMaxValue > 0, "Tried to set max to 0");
+            maxValue = 100;
+            Value = aCurrentResource;
             regenValue = 20.0f;
         }
 
@@ -54,5 +68,7 @@ namespace Project_1.GameObjects.EnitityFactory.Resources
                 base.Update();
             }
         }
+
+        public override float CalculateMaxValue(PrimaryStats aStats) => maxValue;
     }
 }

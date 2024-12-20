@@ -1,4 +1,4 @@
-﻿using Project_1.GameObjects.EnitityFactory;
+﻿using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Spells.Projectiles;

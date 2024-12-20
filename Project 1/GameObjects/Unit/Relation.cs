@@ -5,9 +5,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Project_1.GameObjects.EnitityFactory.Relation;
+using static Project_1.GameObjects.Unit.Relation;
 
-namespace Project_1.GameObjects.EnitityFactory
+namespace Project_1.GameObjects.Unit
 {
     internal class Relation
     {

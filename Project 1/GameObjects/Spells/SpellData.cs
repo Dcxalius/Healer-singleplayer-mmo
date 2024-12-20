@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Project_1.GameObjects.EnitityFactory;
+using Project_1.GameObjects.Unit;
 using Project_1.Textures;
 using SharpDX.Direct3D11;
 using SharpDX.Direct3D9;
