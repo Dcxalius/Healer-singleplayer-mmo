@@ -94,7 +94,7 @@ namespace Project_1.GameObjects.Entities
 
         public override void Update()
         {
-            if (Dead()) return;
+            if (AmIDead()) return;
             TargetAliveCheck();
             unitData.Update();
             Movement();
@@ -243,23 +243,29 @@ namespace Project_1.GameObjects.Entities
         }
 
 
-
-
-        protected virtual bool Dead()
+        bool AmIDead()
         {
             if (!Alive)
             {
-                for (int i = 0;  i < aggroTablesIAmOn.Count; i++)
-                {
-                    aggroTablesIAmOn[i].RemoveFromAggroTable(this);
-                }
-                
-                ObjectManager.RemoveEntity(this);
-                if (corpse != null) corpse.SpawnCorpe(Position); //Make this spawn a default corpse if corpse is null
+                Death();
                 return true;
             }
             return false;
         }
+
+        protected virtual void Death()
+        {
+            for (int i = 0; i < aggroTablesIAmOn.Count; i++)
+            {
+                aggroTablesIAmOn[i].RemoveFromAggroTable(this);
+            }
+
+            ObjectManager.RemoveEntity(this);
+            if (corpse != null) corpse.SpawnCorpe(Position); //Make this spawn a default corpse if corpse is null
+            
+        }
+
+
 
         void AttackTarget()
         {

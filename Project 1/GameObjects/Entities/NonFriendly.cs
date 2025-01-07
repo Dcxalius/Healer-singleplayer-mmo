@@ -29,6 +29,13 @@ namespace Project_1.GameObjects.Entities
             aggroTable = new AggroTable(this);
         }
 
+        protected override void Death()
+        {
+            base.Death();
+
+            aggroTable.ClearTable();
+        }
+
         public override void Update()
         {
             base.Update();

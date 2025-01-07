@@ -13,7 +13,7 @@ namespace Project_1.GameObjects.Entities
     {
         public int Count => aggroEntities.Count;
 
-        List<(Entity, float, TimeSpan)> aggroEntities;
+        List<(Entity, float, TimeSpan)> aggroEntities; //TODO: Make tuple a seperate class
         readonly TimeSpan maxAggroDurationStaleness = TimeSpan.FromSeconds(10);
         NonFriendly owner;
 
@@ -21,6 +21,16 @@ namespace Project_1.GameObjects.Entities
         {
             owner = aOwner;
             aggroEntities = new List<(Entity, float, TimeSpan)>();
+        }
+
+        public void ClearTable()
+        {
+            for (int i = 0; i < aggroEntities.Count; i++)
+            {
+                aggroEntities[i].Item1.RemovedFromAggroTable(owner);
+            }
+
+            aggroEntities.Clear();
         }
 
         int Contains(Entity aEntity)
