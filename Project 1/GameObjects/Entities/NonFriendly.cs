@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
+using Project_1.GameObjects.Unit;
 using Project_1.Items;
 using Project_1.Managers;
 using Project_1.Textures;
@@ -20,13 +21,15 @@ namespace Project_1.GameObjects.Entities
             Retaliate,
             RetaliateButFleeWhenLow
         }
+        int spawnerId;
 
         public override bool InCombat => aggroTable.Count > 0;
 
         AggroTable aggroTable;
-        public NonFriendly(Texture aTexture, WorldSpace aStartingPos, Corpse aCorpse = null) : base(aTexture, aStartingPos, aCorpse)
+        public NonFriendly(int aSpawnerId, UnitData aUnitData, WorldSpace aStartingPos, Corpse aCorpse = null) : base(aUnitData, aStartingPos, aCorpse)
         {
             aggroTable = new AggroTable(this);
+            spawnerId = aSpawnerId;
         }
 
         protected override void Death()

@@ -12,6 +12,7 @@ namespace Project_1.Textures
     {
         Debug,
         Object,
+        Corpse,
         Tile,
         Item,
         UI,

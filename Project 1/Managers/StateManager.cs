@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Project_1.GameObjects;
+using Project_1.GameObjects.Spawners;
 using Project_1.Input;
 using Project_1.Particles;
 using Project_1.UI;
@@ -83,6 +84,7 @@ namespace Project_1.Managers
             }
             Camera.Camera.Update();
             ObjectManager.Update();
+            SpawnerManager.Update();
             UIManager.Update();
             ParticleManager.Update();
         }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.GameObjects.Spawners;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,6 +31,11 @@ namespace Project_1.GameObjects.Unit
 
             Debug.Assert(aRelation.HasValue);
             relationToPlayer = aRelation.Value;
+        }
+
+        public Relation(MobData.Aggresive aAggresive)
+        {
+            relationToPlayer = (RelationToPlayer)(aAggresive + 2); //xdd
         }
     }
 }

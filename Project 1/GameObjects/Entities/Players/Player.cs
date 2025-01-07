@@ -39,7 +39,7 @@ namespace Project_1.GameObjects.Entities.Players
         public bool LockedMovement => lockedMovement;
         bool lockedMovement = false;
 
-        public Player(WorldSpace aStartPos) : base(new RandomAnimatedTexture(new GfxPath(GfxType.Object, "Player"), new Point(32), 0, TimeSpan.FromMilliseconds(500)), aStartPos)
+        public Player(WorldSpace aStartPos) : base(ObjectFactory.GetData("Player"), aStartPos)
         {
             inventory = new Inventory(this);
             spellBook = new SpellBook(this);

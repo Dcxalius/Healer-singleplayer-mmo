@@ -14,7 +14,7 @@ namespace Project_1.GameObjects.Entities.Temp
 {
     internal class Walker : Entity
     {
-        public Walker(WorldSpace aStartingPos) : base(new RandomAnimatedTexture(new GfxPath(GfxType.Object, "Walker"), new Point(32), 0, TimeSpan.FromMilliseconds(500)), aStartingPos)
+        public Walker(WorldSpace aStartingPos) : base(ObjectFactory.GetData("Walker"), aStartingPos)
         {
         }
 

@@ -22,6 +22,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Project_1.Textures.AnimatedTextures;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -78,10 +79,10 @@ namespace Project_1.GameObjects.Entities
 
         protected Destination destination;
 
-        public Entity(Texture aTexture, WorldSpace aStartingPos, Corpse aCorpse = null) : base(aTexture, aStartingPos)
+        public Entity(UnitData aUnitData, WorldSpace aStartingPos, Corpse aCorpse = null) : base(new RandomAnimatedTexture(aUnitData.GfxPath, new Point(32), 0, TimeSpan.FromMilliseconds(500)), aStartingPos)
         {
             corpse = aCorpse;
-            unitData = ObjectFactory.GetData(GetType().Name);
+            unitData = aUnitData;
             bloodsplatter = new ParticleBase((1000d, 2000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[] { Color.Red }, new Point(1));
             shadow = new Shadow();
             selectRing = new SelectRing();
@@ -194,7 +195,7 @@ namespace Project_1.GameObjects.Entities
 
 
             ParticleMovement bloodMovement = new ParticleMovement(dirOfFlyingStuff, WorldSpace.Zero, 0.9f);
-            DebugManager.Print(GetType(), ((aDamageTaken / MaxHealth) * 100).ToString());
+            //DebugManager.Print(GetType(), ((aDamageTaken / MaxHealth) * 100).ToString());
             ParticleManager.SpawnParticle(bloodsplatter, WorldRectangle, this, bloodMovement, (int)Math.Max(1, (aDamageTaken / MaxHealth) * 100));
         }
 

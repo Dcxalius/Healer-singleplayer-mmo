@@ -87,6 +87,11 @@ namespace Project_1.Camera
             return new WorldSpace(aScreenPosition.position * aMultiplier);
         }
 
+        public static WorldSpace operator *(float aMultiplier, WorldSpace aScreenPosition)
+        {
+            return new WorldSpace(aScreenPosition.position * aMultiplier);
+        }
+
         public static WorldSpace operator /(WorldSpace aScreenPosition, WorldSpace bScreenPosition)
         {
             return new WorldSpace(aScreenPosition.position / bScreenPosition.position);

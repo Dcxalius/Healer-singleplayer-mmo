@@ -30,7 +30,7 @@ namespace Project_1.GameObjects.Unit
         }
         int attackPower;
 
-        public PrimaryStats(ClassData aClassData, int aLevel, float aCurrentHealth, float aCurrentResource) : base(aClassData.BaseStats, aClassData.PerLevelStats, aLevel)
+        public PrimaryStats(ClassData aClassData, int aLevel, float aCurrentHealth = float.MaxValue, float aCurrentResource = float.MaxValue) : base(aClassData.BaseStats, aClassData.PerLevelStats, aLevel)
         {
             health = new Health(aClassData, this, aLevel, aCurrentHealth);
 

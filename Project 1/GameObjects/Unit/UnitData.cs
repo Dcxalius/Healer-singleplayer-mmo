@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
+using Project_1.GameObjects.Spawners;
 using Project_1.GameObjects.Unit.Resources;
 using Project_1.Items;
+using Project_1.Textures;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -49,31 +51,61 @@ namespace Project_1.GameObjects.Unit
         public Equipment Equipment => equipment;
         Equipment equipment;
 
-        public Movement MovementData => movementData;
-        Movement movementData;
+        public Movement MovementData => classData.Movement;
 
         public Attack Attack => primaryStats.Attack;
 
+        public GfxPath GfxPath => gfxPath;
+        readonly GfxPath gfxPath;
+
+        public GfxPath CorpseGfxPath => corpseGfxPath;
+        readonly GfxPath corpseGfxPath;
 
 
         [JsonIgnore]
         public LootTable LootTable { get => LootFactory.GetData(name); }
 
+        public UnitData(MobData aData)
+        {
+            name = aData.Name;
+            relationData = aData.RelationData;
+            classData = aData.ClassData;
+            level = aData.Level;
+            equipment = aData.Equipment;
+
+            primaryStats = new PrimaryStats(classData, level.CurrentLevel);
+
+            gfxPath = aData.GfxPath;
+            corpseGfxPath = aData.CorpseGfxPath;
+
+            Assert();
+        }
+
+
         [JsonConstructor]
-        public UnitData(string name, string className, Relation.RelationToPlayer? relation, int level, int experience,
+        public UnitData(string name, string corpseGfxName, string className, Relation.RelationToPlayer? relation, int level, int experience,
             float currentHp, float currentResource, int?[] equipment)
         {
             this.name = name;
+            Debug.Assert(relation.HasValue);
             relationData = new Relation(relation);
             classData = new ClassData(relation.Value, className);
             this.level = new Level(level, experience);
-            movementData = new Movement(classData.Speed, classData.MaxSpeed);
             this.equipment = new Equipment(equipment);
 
-            Debug.Assert(relation.HasValue);
             
             primaryStats = new PrimaryStats(classData, this.level.CurrentLevel, currentHp, currentResource);
 
+            gfxPath = new GfxPath(GfxType.Object, name);
+
+            if (corpseGfxName != null)
+            {
+                corpseGfxPath = new GfxPath(GfxType.Corpse, corpseGfxName);
+            }
+            else
+            {
+                corpseGfxPath = new GfxPath(GfxType.Corpse, "Corpse");
+            }
 
             Assert();
         }

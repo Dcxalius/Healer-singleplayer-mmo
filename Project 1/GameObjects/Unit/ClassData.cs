@@ -49,11 +49,9 @@ namespace Project_1.GameObjects.Unit
         public float FistMaxAttackDamage => fistMaxAttackDamage;
         readonly float fistMaxAttackDamage;
 
-        public float Speed => speed;
-        float speed;
+        public Movement Movement => movementData;
+        Movement movementData;
 
-        public float MaxSpeed => maxSpeed;
-        float maxSpeed;
 
         [JsonConstructor]
         public ClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float baseHpPer5, float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed)
@@ -68,8 +66,7 @@ namespace Project_1.GameObjects.Unit
             this.fistMinAttackDamage = fistMinAttackDamage;
             this.fistMaxAttackDamage = fistMaxAttackDamage;
             this.fistAttackSpeed = fistAttackSpeed;
-            this.speed = speed;
-            this.maxSpeed = maxSpeed;
+            movementData = new Movement(speed, maxSpeed);
 
             Assert();
         }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Newtonsoft.Json;
+using Project_1.GameObjects.Spawners;
 using Project_1.GameObjects.Unit;
 using Project_1.Managers;
 using System;
@@ -13,7 +14,8 @@ namespace Project_1.GameObjects
     internal static class ObjectFactory
     {
         static Dictionary<string, UnitData> unitData;
-        static UnitData defaultData = new UnitData();
+        static Dictionary<string, MobData> mobData;
+        //static UnitData defaultData = new UnitData();
 
         static Dictionary<string, ClassData> playerClassData;
         static Dictionary<string, ClassData> allyClassData;
@@ -22,6 +24,7 @@ namespace Project_1.GameObjects
         public static void Init(ContentManager aC)
         {
             unitData = new Dictionary<string, UnitData>();
+            mobData = new Dictionary<string, MobData>();
             playerClassData = new Dictionary<string, ClassData>();
             allyClassData = new Dictionary<string, ClassData>();
             mobClassData = new Dictionary<string, ClassData>();
@@ -29,8 +32,22 @@ namespace Project_1.GameObjects
             //UnitData data = new UnitData("Sheep", 100, UnitData.RelationToPlayer.Neutral, 50);
             //ExportData("C:\\Users\\Cassandra\\source\\repos\\Project 1\\Project 1\\Content\\UnitData.json", data);
             ImportClassData(aC);
+            ImportMobData(aC);
             ImportUnitData(aC);
+
             //ExportData(aC.RootDirectory + "\\UnitData.json", unitData["Sheep"]);
+        }
+
+        public static MobData GetMobData(string aName)
+        {
+            if (mobData.ContainsKey(aName))
+            {
+                return mobData[aName];
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public static UnitData GetData(string aName)
@@ -43,7 +60,7 @@ namespace Project_1.GameObjects
             {
                 throw new NotImplementedException();
                 DebugManager.Print(typeof(ObjectManager), "Error getting data for unit " + aName);
-                return defaultData;
+                //return defaultData;
             }
         }
 
@@ -51,9 +68,24 @@ namespace Project_1.GameObjects
         public static ClassData GetAllyClass(string aName) => allyClassData[aName];
         public static ClassData GetMobClass(string aName) => mobClassData[aName];
 
+        static void ImportMobData(ContentManager aContentManager)
+        {
+            string path = aContentManager.RootDirectory + "\\Data\\MobData\\";
+
+           
+            string[] files = System.IO.Directory.GetFiles(path);
+            for (int i = 0; i < files.Length; i++)
+            {
+                string rawData = System.IO.File.ReadAllText(files[i]);
+                MobData data = JsonConvert.DeserializeObject<MobData>(rawData);
+                mobData.Add(data.Name, data);
+                
+            }
+        }
+
         static void ImportUnitData(ContentManager aContentManager)
         {
-            string path = aContentManager.RootDirectory + "\\Data\\Units\\";
+            string path = aContentManager.RootDirectory + "\\SaveData\\Units\\";
 
             string[] folders = System.IO.Directory.GetDirectories(path);
 

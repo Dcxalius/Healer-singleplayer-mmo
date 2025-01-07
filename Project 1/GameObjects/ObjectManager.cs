@@ -19,6 +19,7 @@ using Project_1.GameObjects.Entities.Players;
 using Project_1.Camera;
 using Project_1.GameObjects.Spells.Projectiles;
 using Project_1.GameObjects.Entities.Temp;
+using Project_1.GameObjects.Spawners;
 
 namespace Project_1.GameObjects
 {
@@ -44,11 +45,7 @@ namespace Project_1.GameObjects
             
             entities.Add(new Walker(new WorldSpace(11*32)));//Debug
             player.AddToParty(entities[entities.Count - 1] as Walker); //Debug
-            for (int i = 0; i < 1; i++)
-            {
-                entities.Add(new Sheep(new WorldSpace((float)500 + 30 * (i % 10), (float)(500 + 30 * Math.Floor(i / 10d)))));//Debug
 
-            }
 
         }
 
@@ -114,13 +111,12 @@ namespace Project_1.GameObjects
 
         public static void Click(ClickEvent aClickEvent)
         {
-            bool foundHit = false;
-            foundHit = player.Click(aClickEvent);
-            if (foundHit) { return; }
+            if (player.Click(aClickEvent)) { return; }
             for (int i = 0; i < entities.Count; i++)
             {
                 if (entities[i].Click(aClickEvent)) { return; }
             }
+            if (SpawnerManager.Click(aClickEvent)) { return; }
             for (int i = 0; i < corpses.Count; i++)
             {
                 if (corpses[i].Click(aClickEvent)) { return; }

@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Project_1.GameObjects;
+using Project_1.GameObjects.Spawners;
 using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Spells.AoE;
 using Project_1.GameObjects.Spells.Projectiles;
@@ -42,6 +43,7 @@ namespace Project_1
             RandomManager.Init();
             ObjectFactory.Init(Content);
             ObjectManager.Init();
+            SpawnerManager.Init(Content);
             TileManager.Init(Content);
             UIManager.Init();
             AreaOfEffectFactory.Init(Content);

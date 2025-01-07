@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects;
+using Project_1.GameObjects.Spawners;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Particles;
@@ -189,6 +190,7 @@ namespace Project_1.Camera
         {
             TileManager.Draw(aBatch);
             ObjectManager.Draw(aBatch);
+            SpawnerManager.Draw(aBatch);
             ParticleManager.Draw(aBatch);
         }
 
