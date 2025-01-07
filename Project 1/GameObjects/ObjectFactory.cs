@@ -28,8 +28,8 @@ namespace Project_1.GameObjects
 
             //UnitData data = new UnitData("Sheep", 100, UnitData.RelationToPlayer.Neutral, 50);
             //ExportData("C:\\Users\\Cassandra\\source\\repos\\Project 1\\Project 1\\Content\\UnitData.json", data);
-            ImportUnitData(aC);
             ImportClassData(aC);
+            ImportUnitData(aC);
             //ExportData(aC.RootDirectory + "\\UnitData.json", unitData["Sheep"]);
         }
 

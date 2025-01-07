@@ -110,7 +110,7 @@ namespace Project_1.GameObjects.Entities
         {
             destination.Update();
             WorldSpace oldPosition = Position;
-            velocity += destination.GetVelocity(unitData.AttackData.Range, unitData.MovementData.Speed);
+            velocity += destination.GetVelocity(unitData.Attack.Range, unitData.MovementData.Speed);
             base.Update();
             CheckForCollisions(oldPosition);
         }
@@ -265,7 +265,7 @@ namespace Project_1.GameObjects.Entities
         {
             if (target == null) return;
 
-            if (unitData.AttackData.SecondsPerAttack > timeSinceLastAttack)
+            if (unitData.Attack.SecondsPerAttack > timeSinceLastAttack)
             {
                 timeSinceLastAttack += (float)TimeManager.SecondsSinceLastFrame;
                 return;
@@ -276,10 +276,14 @@ namespace Project_1.GameObjects.Entities
         void AttackIfInRange()
         {
 
-            if (CheckForRelation() && (target.FeetPosition - FeetPosition).ToVector2().Length() < unitData.AttackData.Range)
+            if (CheckForRelation() && (target.FeetPosition - FeetPosition).ToVector2().Length() < unitData.Attack.Range)
             {
                 timeSinceLastAttack = 0;
-                target.TakeDamage(this, unitData.AttackData.Damage);
+                float damage = unitData.Attack.GetAttackDamage;
+
+                if (damage <= 0) return;
+
+                target.TakeDamage(this, damage);
                 if (target.unitData.HealthData.CurrentHealth <= 0)
                 {
                     target = null;

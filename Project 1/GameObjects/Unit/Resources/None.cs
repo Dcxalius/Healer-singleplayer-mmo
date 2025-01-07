@@ -17,5 +17,7 @@ namespace Project_1.GameObjects.Unit.Resources
         public override float MaxValue => 0;
 
         public override float Value { get => 0; }
+
+        public override float CalculateMaxValue(PrimaryStats aStats) { return 0; }
     }
 }

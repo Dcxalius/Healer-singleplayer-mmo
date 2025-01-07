@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Project_1.Managers;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -14,6 +15,12 @@ namespace Project_1.GameObjects.Unit
             Melee,
             Range
         }
+
+        public float GetAttackDamage => (float)RandomManager.RollDouble(Damage.Item1, Damage.Item2);
+
+
+        public float AttackPower { get => attackPower; set => attackPower = value; }
+        float attackPower;
 
         public float SecondsPerAttack => secondsPerAttack;
         float secondsPerAttack;
@@ -40,8 +47,6 @@ namespace Project_1.GameObjects.Unit
         const float rangeAR = 500;
         Type type;
 
-        public float AttackPower { get => attackPower; set => attackPower = value; }
-        float attackPower;
 
         public Attack(float aDmgMin, float aDmgMax, float aSecondsPerAttack)
         {

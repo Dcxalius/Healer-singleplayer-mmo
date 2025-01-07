@@ -104,7 +104,7 @@ namespace Project_1.Tiles
             
 
             WorldSpace start = aCaster.FeetPosition;
-
+            if (start == aTarget) return true;
             Vector2 line = aTarget - start;
             Vector2 dirVector = Vector2.Normalize(line);
 

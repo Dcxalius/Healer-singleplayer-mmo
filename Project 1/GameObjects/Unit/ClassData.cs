@@ -1,4 +1,5 @@
-﻿using Project_1.GameObjects.Unit.Resources;
+﻿using Newtonsoft.Json;
+using Project_1.GameObjects.Unit.Resources;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -36,16 +37,26 @@ namespace Project_1.GameObjects.Unit
         public int PerLevelHp => perLevelHp;
         readonly int perLevelHp;
 
-        public float HpPer5 => hpPer5;
-        readonly float hpPer5;
+        public float HpPer5 => baseHpPer5;
+        readonly float baseHpPer5;
 
         public float FistAttackSpeed => fistAttackSpeed;
         readonly float fistAttackSpeed;
 
-        public float FistAttackDamage => fistAttackDamage;
-        readonly float fistAttackDamage;
+        public float FistMinAttackDamage => fistMinAttackDamage;
+        readonly float fistMinAttackDamage;
 
-        public ClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float hpPer5, float fistAttackSpeed, float fistAttackDamage)
+        public float FistMaxAttackDamage => fistMaxAttackDamage;
+        readonly float fistMaxAttackDamage;
+
+        public float Speed => speed;
+        float speed;
+
+        public float MaxSpeed => maxSpeed;
+        float maxSpeed;
+
+        [JsonConstructor]
+        public ClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float baseHpPer5, float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed)
         {
             this.name = name;
             this.resource = resource;
@@ -53,9 +64,14 @@ namespace Project_1.GameObjects.Unit
             this.perLevelStats = new BasePrimaryStats(perLevelStats);
             this.baseHp = baseHp;
             this.perLevelHp = perLevelHp;
-            this.hpPer5 = hpPer5;
-            this.fistAttackDamage = fistAttackDamage;
+            this.baseHpPer5 = baseHpPer5;
+            this.fistMinAttackDamage = fistMinAttackDamage;
+            this.fistMaxAttackDamage = fistMaxAttackDamage;
             this.fistAttackSpeed = fistAttackSpeed;
+            this.speed = speed;
+            this.maxSpeed = maxSpeed;
+
+            Assert();
         }
 
         public ClassData(Relation.RelationToPlayer aRelation, string aClassName)
@@ -79,7 +95,7 @@ namespace Project_1.GameObjects.Unit
 
         void Assert()
         {
-            Debug.Assert(name != null && resource != Resources.Resource.ResourceType.None && baseHp > 0 && perLevelHp > 0);
+            Debug.Assert(name != null && baseHp > 0 && perLevelHp > 0 && baseStats != null && perLevelStats != null && baseHpPer5 > 0 && fistMinAttackDamage > 0 && fistAttackSpeed > 0);
         }
     }
 }

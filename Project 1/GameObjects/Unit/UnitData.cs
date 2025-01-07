@@ -38,7 +38,7 @@ namespace Project_1.GameObjects.Unit
         {
             get
             {
-                var weaponAttacks = eq.GetWeaponAttacks();
+                (Equipment.AttackStyle, Attack, Attack) weaponAttacks = equipment.GetWeaponAttacks();
 
                 if (weaponAttacks.Item1 == Equipment.AttackStyle.None) return (Equipment.AttackStyle.None, primaryStats.Attack, null);
                 
@@ -46,10 +46,13 @@ namespace Project_1.GameObjects.Unit
             }
         }
 
-        public Equipment eq;
+        public Equipment Equipment => equipment;
+        Equipment equipment;
 
         public Movement MovementData => movementData;
         Movement movementData;
+
+        public Attack Attack => primaryStats.Attack;
 
 
 
@@ -58,22 +61,19 @@ namespace Project_1.GameObjects.Unit
 
         [JsonConstructor]
         public UnitData(string name, string className, Relation.RelationToPlayer? relation, int level, int experience,
-            float currentHp, float currentResource,
-            float speed, float maxSpeed, //TODO: These are sus
-            float secondsPerAttack, float attackDamage, float attackRange) //And these too
+            float currentHp, float currentResource, int?[] equipment)
         {
             this.name = name;
             relationData = new Relation(relation);
+            classData = new ClassData(relation.Value, className);
             this.level = new Level(level, experience);
-            movementData = new Movement(speed, maxSpeed);
+            movementData = new Movement(classData.Speed, classData.MaxSpeed);
+            this.equipment = new Equipment(equipment);
 
             Debug.Assert(relation.HasValue);
-            classData = new ClassData(relation.Value, className);
             
             primaryStats = new PrimaryStats(classData, this.level.CurrentLevel, currentHp, currentResource);
-            attackData = new Attack(attackDamage, secondsPerAttack);
 
-            eq = new Equipment();
 
             Assert();
         }

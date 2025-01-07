@@ -1,6 +1,7 @@
 ﻿using Project_1.Items;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Remoting;
 using System.Text;
@@ -34,9 +35,18 @@ namespace Project_1.GameObjects.Unit
 
         Item[] equipped;
 
-        public Equipment()
+        public Equipment(int?[] aItemsEquiped)
         {
             equipped = new Item[(int)Slot.Count];
+
+            Debug.Assert(aItemsEquiped.Length == equipped.Length);
+
+            for (int i = 0; i < aItemsEquiped.Length; i++)
+            {
+                if (!aItemsEquiped[i].HasValue) continue;
+
+                equipped[i] = ItemFactory.CreateItem(ItemFactory.GetItemData(aItemsEquiped[i].Value), 1);
+            }
         }
 
         public (AttackStyle, Attack, Attack) GetWeaponAttacks() //TODO: Change this so it changes Attackstyle when a weapon is equiped

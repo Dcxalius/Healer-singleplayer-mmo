@@ -47,9 +47,9 @@ namespace Project_1.GameObjects.Unit
 
         public Health(ClassData aClassData, BasePrimaryStats aPrimaryStats, int aLevel, float aCurrentHp) 
         {
-            Debug.Assert(aClassData.BaseHealth > 0);
-            Debug.Assert(aClassData.HpPer5 > 0);
+            Debug.Assert(aCurrentHp > 0);
 
+            
             baseMaxHealth = aClassData.BaseHealth + aClassData.PerLevelHp * (aLevel - 1);
             maxHealth = baseMaxHealth + aPrimaryStats.Stamina * 10;
             currentHealth = aCurrentHp;

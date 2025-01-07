@@ -44,7 +44,7 @@ namespace Project_1.GameObjects
             
             entities.Add(new Walker(new WorldSpace(11*32)));//Debug
             player.AddToParty(entities[entities.Count - 1] as Walker); //Debug
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 1; i++)
             {
                 entities.Add(new Sheep(new WorldSpace((float)500 + 30 * (i % 10), (float)(500 + 30 * Math.Floor(i / 10d)))));//Debug
 
@@ -103,6 +103,7 @@ namespace Project_1.GameObjects
             }
             if (TimeManager.TotalFrameTime % 2000 < 1)
             {
+                player.ServerTick();
                 for (int i = 0; i < entities.Count; i++)
                 {
                     entities[i].ServerTick();

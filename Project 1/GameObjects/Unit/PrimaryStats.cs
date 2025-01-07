@@ -55,6 +55,8 @@ namespace Project_1.GameObjects.Unit
                     throw new NotImplementedException();
             }
 
+            attack = new Attack(aClassData.FistMinAttackDamage, aClassData.FistMaxAttackDamage, aClassData.FistAttackSpeed);
+
         }
 
 
