@@ -14,10 +14,6 @@ namespace Project_1.Textures
 
         public static UITexture Null => new UITexture(GfxPath.NullPath, Color.White);
 
-        public UITexture(Texture2D aText, Point aSize) : base(aText, aSize)
-        {
-
-        }
 
         public UITexture(GfxPath aPath, Color aColor) : base(aPath, aColor) { }
 

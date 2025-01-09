@@ -4,6 +4,7 @@ using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.Managers;
 using Project_1.Tiles;
+using SharpDX.MediaFoundation;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -35,77 +36,27 @@ namespace Project_1.Textures
 
         protected Vector2 offset;
         protected SpriteEffects flip;
-
-        public Texture(Texture2D aGfx, Point aSize)
+        public Texture(GfxPath aPath) : this(aPath, Vector2.Zero, Point.Zero, Color.White) { }
+        public Texture(GfxPath aPath, Vector2 aOffset) : this(aPath, aOffset, Point.Zero, Color.White) { }
+        public Texture(GfxPath aPath, Point aSize) : this(aPath, Vector2.Zero, aSize, Color.White) { }
+        public Texture(GfxPath aPath, Vector2 aOffset, Point aSize) : this(aPath, aOffset, aSize, Color.White) { }
+        public Texture(GfxPath aPath, Color aColor) : this(aPath, Vector2.Zero, Point.Zero, aColor) { }
+        public Texture(GfxPath aPath, Vector2 aOffset, Color aColor) : this(aPath, aOffset, Point.Zero, aColor) { }
+        public Texture(GfxPath aPath, Vector2 aOffset, Point aSize, Color aColor)
         {
-            gfx = aGfx;
-            size = aSize;
-            color = Color.White;
             flip = SpriteEffects.None;
             visible = null;
-            offset = Vector2.Zero;
-        }
-
-        public Texture(GfxPath aPath)
-        {
-            __Constructor__(aPath);
-            color = Color.White;   
-            size = gfx.Bounds.Size;
-        }
-
-        public Texture(GfxPath aPath, Vector2 aOffset)
-        {
-            __Constructor__(aPath);
-            color = Color.White;
-            size = gfx.Bounds.Size;
-            offset = aOffset;
-        }
-
-        public Texture(GfxPath aPath, Point aSize)
-        {
-            __Constructor__(aPath);
-            color = Color.White;   
-            size = aSize;
-            offset = Vector2.Zero;
-        }
-
-        public Texture(GfxPath aPath, Vector2 aOffset, Point aSize)
-        {
-            __Constructor__(aPath);
-            color = Color.White;
-            size = aSize;
-            offset = aOffset;
-        }
 
 
-        public Texture(GfxPath aPath,  Color aColor) 
-        {
-            __Constructor__(aPath);
-            color = aColor;
-            offset = Vector2.Zero;
-            if (gfx == null) return;
-            size = gfx.Bounds.Size;
-        }
-
-        public Texture(GfxPath aPath, Vector2 aOffset, Color aColor)
-        {
-            __Constructor__(aPath);
             color = aColor;
             offset = aOffset;
-            if (gfx == null) return;
-            size = gfx.Bounds.Size;
-        }
 
 
-        void __Constructor__(GfxPath aPath)
-        {
-            
-            flip = SpriteEffects.None;
-            visible = null;
-            offset = Vector2.Zero;
             if (aPath == null) return;
             if (aPath.Name == null) return;
             gfx = TextureManager.GetTexture(aPath);
+            if (aSize == Point.Zero) { size = gfx.Bounds.Size; }
+            else { size = aSize; }
         }
 
         public void Flip()

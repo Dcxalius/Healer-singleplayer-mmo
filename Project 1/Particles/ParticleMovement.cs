@@ -31,27 +31,17 @@ namespace Project_1.Particles
         }
         (float, float) drag;
 
-        public ParticleMovement(WorldSpace aMomentum, WorldSpace aVelocity, float aDrag)
-        {
-            __constructor__((aMomentum, aMomentum), (aVelocity, aVelocity), (aDrag, aDrag));
-        }
-        public ParticleMovement((WorldSpace, WorldSpace) aMomentum, (WorldSpace, WorldSpace) aVelocity, float aDrag)
-        {
-            __constructor__(aMomentum, aVelocity, (aDrag, aDrag));
-        }
+        public ParticleMovement(WorldSpace aMomentum, WorldSpace aVelocity, float aDrag) : this((aMomentum, aMomentum), (aVelocity, aVelocity), (aDrag, aDrag)) { }
+        public ParticleMovement((WorldSpace, WorldSpace) aMomentum, (WorldSpace, WorldSpace) aVelocity, float aDrag) : this(aMomentum, aVelocity, (aDrag, aDrag)) { }
 
         public ParticleMovement((WorldSpace, WorldSpace) aMomentum, (WorldSpace, WorldSpace) aVelocity, (float, float) aDrag)
-        {
-            __constructor__(aMomentum, aVelocity, aDrag);
-        }
-
-        void __constructor__((WorldSpace, WorldSpace) aMomentum, (WorldSpace, WorldSpace) aVelocity, (float, float) aDrag)
         {
 
             momentum = aMomentum;
             velocity = aVelocity;
             drag = aDrag;
         }
+
 
 
         WorldSpace SplitVectorTuple((WorldSpace, WorldSpace) aPairToSplit)
