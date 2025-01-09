@@ -32,7 +32,7 @@ namespace Project_1.GameObjects.Entities
         bool CastSpeedCheck()
         {
             const float graceSpeedWindow = 0.1f;
-            if (owner.Momentum.ToVector2().Length() < graceSpeedWindow)
+            if (owner.Momentum.ToVector2().Length() > graceSpeedWindow)
             {
                 return false;
             }
@@ -41,7 +41,7 @@ namespace Project_1.GameObjects.Entities
         public void UpdateSpellChannel()
         {
             if (channeledSpell == null) return;
-            if (CastSpeedCheck())
+            if (!CastSpeedCheck())
             {
                 CancelChannel();
 

@@ -19,20 +19,21 @@ namespace Project_1.GameObjects.Entities
     {
         ParticleBase lootGlow;
         ParticleMovement lootGlowMovement;
-        public Item[] Drop { get => drop; }
+        public Item[] Drop => drop;
         LootTable loot;
         Item[] drop;
-        public float LootLength { get => lootLength; }
+        public float LootLength => lootLength;
         float lootLength;
 
-        public bool IsEmpty { get => drop.All(drop => drop == null); }
+        public bool IsEmpty => drop.All(drop => drop == null);
 
-        public Corpse(Textures.Texture aGfx, LootTable aLoot) : base(aGfx, WorldSpace.Zero)
+        public Corpse(GfxPath aPath, LootTable aLoot) : base(new Textures.Texture(aPath), WorldSpace.Zero)
         {
             loot = aLoot;
             lootLength = WorldRectangle.Size.ToVector2().Length();
             lootGlow = new ParticleBase((1000d, 1000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[]{ Color.Yellow }, new Point(1));
             lootGlowMovement = new ParticleMovement(new WorldSpace(0, -1), WorldSpace.Zero, 0.95f);
+            drop = new Item[0];
         }
 
         public void SpawnCorpe(WorldSpace aPos)
@@ -47,9 +48,8 @@ namespace Project_1.GameObjects.Entities
 
         public override bool Click(ClickEvent aClickEvent)
         {
-            if (!Camera.Camera.WorldRectToScreenRect(WorldRectangle).Contains(aClickEvent.AbsolutePos.ToPoint())) return false;
-            //if (!Camera.Camera.WorldPosToCameraSpace(WorldRectangle).Contains(aClickEvent.AbsolutePos.ToPoint())) return false;
             if (aClickEvent.ButtonPressed != InputManager.ClickType.Right) return false;
+            if (!Camera.Camera.WorldRectToScreenRect(WorldRectangle).Contains(aClickEvent.AbsolutePos.ToPoint())) return false;
             if (ObjectManager.Player.FeetPosition.DistanceTo(Centre) > lootLength) return false;
             if (drop.All(drop => drop == null)) return false;
 

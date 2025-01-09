@@ -17,6 +17,9 @@ namespace Project_1.GameObjects.Spawners
 
         MobData mobData;
 
+        const double debugMinSpawnTimer = 5000; //TODO: Change this
+        const double debugMaxSpawnTimer = 10000;
+
         public SpawnZone(int aId, string aMobName)
         {
             id = aId;
@@ -40,13 +43,13 @@ namespace Project_1.GameObjects.Spawners
 
         void CreateSpawner(SpawnGeometry aSpawnGeometry, NonFriendly aUnit)
         {
-            Spawner s = new Spawner(id, spawners.Count, aSpawnGeometry, mobData, aUnit);
+            Spawner s = new Spawner(id, spawners.Count, debugMinSpawnTimer, debugMaxSpawnTimer, aSpawnGeometry, mobData, aUnit);
             spawners.Add(s);
         }
 
         public void CreateSpawner(SpawnGeometry aSpawnGeometry)
         {
-            Spawner s = new Spawner(id, spawners.Count, aSpawnGeometry, mobData);
+            Spawner s = new Spawner(id, spawners.Count, debugMinSpawnTimer, debugMaxSpawnTimer, aSpawnGeometry, mobData);
             spawners.Add(s);
         }
 

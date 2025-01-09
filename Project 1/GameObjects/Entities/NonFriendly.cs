@@ -26,7 +26,7 @@ namespace Project_1.GameObjects.Entities
         public override bool InCombat => aggroTable.Count > 0;
 
         AggroTable aggroTable;
-        public NonFriendly(int aSpawnerId, UnitData aUnitData, WorldSpace aStartingPos, Corpse aCorpse = null) : base(aUnitData, aStartingPos, aCorpse)
+        public NonFriendly(int aSpawnerId, UnitData aUnitData, WorldSpace aStartingPos) : base(aUnitData, aStartingPos)
         {
             aggroTable = new AggroTable(this);
             spawnerId = aSpawnerId;

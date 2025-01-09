@@ -79,9 +79,8 @@ namespace Project_1.GameObjects.Entities
 
         protected Destination destination;
 
-        public Entity(UnitData aUnitData, WorldSpace aStartingPos, Corpse aCorpse = null) : base(new RandomAnimatedTexture(aUnitData.GfxPath, new Point(32), 0, TimeSpan.FromMilliseconds(500)), aStartingPos)
+        public Entity(UnitData aUnitData, WorldSpace aStartingPos) : base(new RandomAnimatedTexture(aUnitData.GfxPath, new Point(32), 0, TimeSpan.FromMilliseconds(500)), aStartingPos)
         {
-            corpse = aCorpse;
             unitData = aUnitData;
             bloodsplatter = new ParticleBase((1000d, 2000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[] { Color.Red }, new Point(1));
             shadow = new Shadow();
@@ -90,6 +89,8 @@ namespace Project_1.GameObjects.Entities
             buffList = new BuffList();
             destination = new Destination(this);
             aggroTablesIAmOn = new List<NonFriendly>();
+
+            corpse = new Corpse(unitData.CorpseGfxPath, unitData.LootTable);
         }
 
 

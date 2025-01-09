@@ -25,37 +25,40 @@ namespace Project_1.GameObjects.Spawners
 
         NonFriendly spawn;
 
-        MobData unitToSpawn;
+        MobData[] unitToSpawn;
 
         SpawnGeometry xdd;
 
-        double spawnTime;
+        double minSpawnTime;
+        double maxSpawnTime;
+        double nextSpawnTime;
 
-        double deathtimeSpawn;
+        double lastSpawnDeathTime;
 
-        public Spawner(int aSpawnZoneId, int aId, SpawnGeometry aSpawnPlace, MobData aData, NonFriendly aUnit)
+        public Spawner(int aSpawnZoneId, int aId, double aMinSpawnTime, double aMaxSpawnTime, SpawnGeometry aSpawnPlace, MobData aData, NonFriendly aUnit) : this(aSpawnZoneId, aId, aMinSpawnTime, aMaxSpawnTime, aSpawnPlace, new MobData[] { aData })
         {
-            spawnZoneId = aSpawnZoneId;
-            id = aId;
-            xdd = aSpawnPlace;
             spawn = aUnit;
-            unitToSpawn = aData;
-
-
-            spawnTime = 5000;
-            deathtimeSpawn = double.NegativeInfinity;
         }
 
-        public Spawner(int aSpawnZoneId, int aId, SpawnGeometry aSpawnPlace, MobData aData)
+
+        public Spawner(int aSpawnZoneId, int aId, double aMinSpawnTime, double aMaxSpawnTime, SpawnGeometry aSpawnPlace, MobData[] aData, NonFriendly aUnit) : this(aSpawnZoneId, aId, aMinSpawnTime, aMaxSpawnTime, aSpawnPlace, aData)
+        {
+            spawn = aUnit;
+        }
+
+        public Spawner(int aSpawnZoneId, int aId, double aMinSpawnTime, double aMaxSpawnTime, SpawnGeometry aSpawnPlace, MobData aData) : this(aSpawnZoneId, aId, aMinSpawnTime, aMaxSpawnTime, aSpawnPlace, new MobData[] { aData }) {}
+        public Spawner(int aSpawnZoneId, int aId, double aMinSpawnTime, double aMaxSpawnTime, SpawnGeometry aSpawnPlace, MobData[] aData)
         {
             spawnZoneId = aSpawnZoneId;
             id = aId;
             unitToSpawn = aData;
             xdd = aSpawnPlace;
+            minSpawnTime = aMinSpawnTime;
+            maxSpawnTime = aMaxSpawnTime;
+            nextSpawnTime = RandomManager.RollDouble(minSpawnTime, maxSpawnTime);
 
 
-            spawnTime = 5000;
-            deathtimeSpawn = double.NegativeInfinity;
+            lastSpawnDeathTime = double.NegativeInfinity;
         }
 
         public void Update()
@@ -64,7 +67,7 @@ namespace Project_1.GameObjects.Spawners
             {
                 spawn.Update();
                 if (spawn.Alive) return;
-                deathtimeSpawn = TimeManager.TotalFrameTime;
+                lastSpawnDeathTime = TimeManager.TotalFrameTime;
                 spawn = null;
                 return;
             }
@@ -74,9 +77,20 @@ namespace Project_1.GameObjects.Spawners
 
         void Spawn()
         {
-            if (deathtimeSpawn + spawnTime > TimeManager.TotalFrameTime) return;
+            if (lastSpawnDeathTime + nextSpawnTime > TimeManager.TotalFrameTime) return;
 
-            spawn = new NonFriendly(id, new UnitData(unitToSpawn), xdd.Position);
+            nextSpawnTime = RandomManager.RollDouble(minSpawnTime, maxSpawnTime);
+
+            if (unitToSpawn.Length == 1)
+            {
+                spawn = new NonFriendly(id, new UnitData(unitToSpawn[0]), xdd.Position);
+
+            }
+            else
+            {
+                spawn = new NonFriendly(id, new UnitData(unitToSpawn[RandomManager.RollInt(unitToSpawn.Count())]), xdd.Position);
+
+            }
         }
 
         internal void Draw(SpriteBatch aBatch)

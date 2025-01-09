@@ -52,7 +52,7 @@ namespace Project_1.GameObjects.Unit
             
             baseMaxHealth = aClassData.BaseHealth + aClassData.PerLevelHp * (aLevel - 1);
             maxHealth = baseMaxHealth + aPrimaryStats.Stamina * 10;
-            currentHealth = aCurrentHp;
+            CurrentHealth = aCurrentHp;
             baseHealthPer5 = aClassData.HpPer5;
             healthPer5 = aClassData.HpPer5 + aPrimaryStats.Spirit;
         }
