@@ -10,11 +10,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Project_1.GameObjects.Spells
 {
     internal class Spell
     {
+        [DebuggerStepThrough]
         public static GfxPath GetGfxPath(Spell aSpell)
         {
             if (aSpell == null) return new GfxPath(GfxType.SpellImage, null);

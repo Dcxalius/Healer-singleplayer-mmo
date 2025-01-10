@@ -17,7 +17,7 @@ namespace Project_1.Managers
 {
     enum DebugMode
     {
-        Hitboxes,
+        DebugShapes,
         Print,
         TileCoords,
         InvCheats,
@@ -25,9 +25,10 @@ namespace Project_1.Managers
         Count
     }
 
+    [DebuggerStepThrough]
     internal static class DebugManager
     {
-        public static List<DebugShape> debugShapes = new List<DebugShape>();
+        static List<DebugShape> debugShapes = new List<DebugShape>();
 
         public static bool Mode(DebugMode aMode) => modes[(int)aMode];
         static readonly bool[] modes = new bool[(int)DebugMode.Count];
@@ -40,77 +41,109 @@ namespace Project_1.Managers
 
         public static void Init()
         {
+            modes[(int)DebugMode.DebugShapes] = true;
             modes[(int)DebugMode.Print] = true;
+            modes[(int)DebugMode.TileCoords] = false;
             modes[(int)DebugMode.InvCheats] = true;
             modes[(int)DebugMode.Teleport] = true;
-            modes[(int)DebugMode.TileCoords] = false;
             AllocConsole();
         }
 
         public static void Update()
         {
-            if (KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugHealthPotion))
-            {
-                SpawnHealthPotion();
-            }
-            if (KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugManaPotion))
-            {
-                SpawnManaPotion();
-            }
-            if (KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugTeleport))
-            {
-                TeleportPlayer();
-            }
-            if (KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugManaPotion))
-            {
-                debugShapes.Clear();
-            }
+            InventoryCheats();
+            TeleportPlayer();
+
+            ClearDebugShapes();
         }
 
-        public static void Draw(SpriteBatch aBatch)
+        public static void AddDebugShape(DebugShape aShape)
         {
-            for (int i = 0; i < debugShapes.Count; i++)
-            {
-                debugShapes[i].Draw(aBatch);
-            }
+            if (!modes[(int)DebugMode.DebugShapes]) return;
+            debugShapes.Add(aShape);
         }
 
-        [DebuggerStepThrough]
         public static void Print(Type test, string aMsg)
         {
-            Print(test, aMsg, DebugMode.Print);
-        }
-
-        [DebuggerStepThrough]
-        public static void Print(Type test, string aMsg, DebugMode aMode)
-        {
             if (!modes[(int)DebugMode.Print]) return;
-            
+
             Console.WriteLine(test.ToString() + ": " + aMsg);
-            
         }
 
-        public static void SpawnHealthPotion()
+        static void ClearDebugShapes()
+        {
+            if (!KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugDeleteShapes)) return;
+            
+            debugShapes.Clear();
+        }
+
+        static void InventoryCheats()
         {
             if (!modes[(int)DebugMode.InvCheats]) return;
-            Item poop = ItemFactory.CreateItem(ItemFactory.GetItemData("Health Potion"), 1);
-            ObjectManager.Player.Inventory.AddItem(poop);
+            SpawnTestGear();
+            SpawnHealthPotion();
+            SpawnManaPotion();
+        }
+        static void SpawnTestGear()
+        {
+            if (!KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugTestGear)) return;
+            
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("ZweiHander"), 1));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("Dagger"), 1));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("Bow"), 1));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("Shield"), 1));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("Helmet"), 1));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("Amulet of spoons"), 1));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("Big Shoulders"), 1));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("Backoff"), 1));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("Chesty"), 1));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("Bracers"), 1));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("Glovy"), 1));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("Belty"), 1));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("Panties"), 1));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("Booti"), 1));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("FIRST"), 1));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("Seocnd"), 1));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("thrd"), 1));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("FORSTA"), 1));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("Andra"), 1));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("tredg"), 1));
+
+        }
+
+        static void SpawnHealthPotion()
+        {
+            if (!KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugHealthPotion)) return;
+
+            Item hpPot = ItemFactory.CreateItem(ItemFactory.GetItemData("Health Potion"), 1);
+            ObjectManager.Player.Inventory.AddItem(hpPot);
             
         }
 
         static void SpawnManaPotion()
         {
-            if (!modes[(int)DebugMode.InvCheats]) return;
+            if (!KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugManaPotion)) return;
 
-            Item banana = ItemFactory.CreateItem(ItemFactory.GetItemData("Mana Potion"), 1);
-            ObjectManager.Player.Inventory.AddItem(banana);
+            Item mpPot = ItemFactory.CreateItem(ItemFactory.GetItemData("Mana Potion"), 1);
+            ObjectManager.Player.Inventory.AddItem(mpPot);
         }
 
         static void TeleportPlayer()
         {
             if (!modes[(int)DebugMode.Teleport]) return;
+            if (!KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugTeleport)) return;
+            
 
             ObjectManager.Player.Teleport(WorldSpace.FromRelaticeScreenSpace(InputManager.GetMousePosRelative()));
+        }
+        public static void Draw(SpriteBatch aBatch)
+        {
+            if (!modes[(int)DebugMode.DebugShapes]) return;
+
+            for (int i = 0; i < debugShapes.Count; i++)
+            {
+                debugShapes[i].Draw(aBatch);
+            }
         }
     }
 }

@@ -18,8 +18,8 @@ namespace Project_1.Input
         public enum KeyListner
         {
             MoveCharacterUp, MoveCharacterLeft, MoveCharacterDown, MoveCharacterRight,
-            DebugTeleport, DebugHealthPotion, DebugManaPotion,
-            Inventory, SpellBook, 
+            DebugTeleport, DebugHealthPotion, DebugManaPotion, DebugDeleteShapes, DebugTestGear,
+            Inventory, SpellBook, Character, 
             SpellBar1Spell1, SpellBar1Spell2, SpellBar1Spell3, SpellBar1Spell4, SpellBar1Spell5, SpellBar1Spell6, SpellBar1Spell7, SpellBar1Spell8, SpellBar1Spell9, SpellBar1Spell10,
 
             Count
@@ -30,13 +30,13 @@ namespace Project_1.Input
 
         readonly static Keys[] defaultFirstKeys = new Keys[(int)KeyListner.Count] //TODO: Make this have a variable per entry for modkeys
         {Keys.W, Keys.A, Keys.S, Keys.D, 
-         Keys.Q, Keys.NumPad0, Keys.NumPad1,
-         Keys.I, Keys.T,
+         Keys.Q, Keys.NumPad0, Keys.NumPad1, Keys.Delete, Keys.NumPad2,
+         Keys.I, Keys.T, Keys.C,
          Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9, Keys.D0};
         readonly static Keys[] defaultSecondKeys = new Keys[(int)KeyListner.Count] 
         {Keys.Up, Keys.Left, Keys.Down, Keys.Right, 
-         Keys.None, Keys.None, Keys.None,
-         Keys.None, Keys.None,
+         Keys.None, Keys.None, Keys.None, Keys.None, Keys.None,
+         Keys.None, Keys.None,Keys.None,
          Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None};
 
         static string rootDir;

@@ -29,7 +29,7 @@ namespace Project_1.UI.UIElements
 
         UITexture hoverGfx;
         UITexture pressedGfx;
-        bool pressed = false;
+        bool pressed;
 
         Text text;
 

@@ -47,6 +47,7 @@ namespace Project_1.Items
 
         static ItemData CreateData(string aRawData, string aFolder)
         {
+            JsonSerializerSettings settings = new JsonSerializerSettings() { ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor};
             switch (aFolder)
             {
                 case "Trash":
@@ -55,6 +56,10 @@ namespace Project_1.Items
                     return JsonConvert.DeserializeObject<ContainerData>(aRawData);
                 case "Consumable":
                     return JsonConvert.DeserializeObject<ConsumableData>(aRawData);
+                case "Equipment":
+                    return JsonConvert.DeserializeObject<EquipmentData>(aRawData, settings);
+                case "Weapon":
+                    return JsonConvert.DeserializeObject<WeaponData>(aRawData, settings);
                 default:
                     throw new NotImplementedException();
             }
@@ -75,7 +80,7 @@ namespace Project_1.Items
             return itemData.Single(data => data.Name == a); //TODO: Add handling for if multiple items have the same name.
         }
 
-        public static Item CreateItem(ItemData aData, int aCount = 0)
+        public static Item CreateItem(ItemData aData, int aCount = 1)
         {
             switch (aData.Type)
             {
@@ -87,10 +92,15 @@ namespace Project_1.Items
                     return new Item(aData, aCount);
                 case ItemData.ItemType.Consumable:
                     return new Consumable(aData as ConsumableData, aCount);
+                case ItemData.ItemType.Equipment:
+                    return new Equipment(aData as EquipmentData);
+                case ItemData.ItemType.Weapon:
+                    return new Weapon(aData as WeaponData);
                 default:
                     throw new NotImplementedException();
             }
         }
+
 
         public static Item CreateItem(LootData aLoot)
         {

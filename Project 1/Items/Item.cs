@@ -19,7 +19,7 @@ namespace Project_1.Items
 
         public int MaxStack { get => itemData.MaxStack; }
 
-        public GfxPath Gfx { get => itemData.GfxPath; }
+        public GfxPath GfxPath { get => itemData.GfxPath; }
 
         public ItemData.ItemType ItemType { get => itemData.Type; }
         

@@ -1,12 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Project_1.Camera
 {
+    [DebuggerStepThrough]
     internal struct RelativeScreenPosition
     {
         Vector2 position;
@@ -31,6 +33,7 @@ namespace Project_1.Camera
             position = new Vector2(aX);
         }
 
+
         public RelativeScreenPosition(float aX, float aY)
         {
             position = new Vector2(aX, aY);
@@ -41,6 +44,13 @@ namespace Project_1.Camera
             float a = Camera.ScreenRectangle.Size.X * aSizeInX;
             float b = a / Camera.ScreenRectangle.Size.Y;
             return new(aSizeInX, b);
+        }
+
+        static public RelativeScreenPosition GetSquareFromY(float aSizeInY)
+        {
+            float a = Camera.ScreenRectangle.Size.Y * aSizeInY;
+            float b = a / Camera.ScreenRectangle.Size.X;
+            return new(b, aSizeInY);
         }
 
         static public Rectangle TransformToAbsoluteRect(RelativeScreenPosition aPos, RelativeScreenPosition aSize)

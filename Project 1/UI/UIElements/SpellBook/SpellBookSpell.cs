@@ -33,11 +33,8 @@ namespace Project_1.UI.UIElements.SpellBook
         public SpellBookSpell(RelativeScreenPosition aPos, RelativeScreenPosition aSize, Spell aSpell = null) : base(Spell.GetGfxPath(aSpell), aPos, aSize, Color.White)
         {
             onCooldownGfx = new CooldownTexture();
-            emptyBorder = new Border(RelativeScreenPosition.Zero, aSize);
-            //children.Add(emptyBorder);
             if (aSpell != null)
             {
-                emptyBorder.ToggleVisibilty();
                 spellData = aSpell;
                 emptyBorder = null;
 

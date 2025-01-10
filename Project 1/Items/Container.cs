@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.Items
 {
-    internal class Container : Item
+    internal class Container : Item //TODO: Change Name this should be bag or similar, container should be an item you can right click to open and loot like clams
     {
         public int SlotCount { get => (itemData as ContainerData).SlotCount; }
 

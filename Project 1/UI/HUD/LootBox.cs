@@ -77,7 +77,7 @@ namespace Project_1.UI.HUD
             {
                 if (loots[i] != null)
                 {
-                    loot[i] = new Loot(i, loots[i], loots[i].Gfx, pos, lootSize);
+                    loot[i] = new Loot(i, loots[i], loots[i].GfxPath, pos, lootSize);
 
                 }
                 else

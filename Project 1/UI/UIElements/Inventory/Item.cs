@@ -25,7 +25,7 @@ namespace Project_1.UI.UIElements.Inventory
         public bool IsEmpty { get => isEmpty; }
 
         public (int, int) Index { get => (bagIndex, slotIndex); } //For bagslots -1 0 is default, unmovable bag, and then -1 1 for first movable bag and so on
-        public int bagIndex;
+        public int bagIndex; //BagIndex 0 and above is the inventory slots, -1 is for the slots for the bags themselves, -2 is for lootwindow, -3 is for equipped
         public int slotIndex;
 
         protected Text itemCount;
@@ -53,7 +53,7 @@ namespace Project_1.UI.UIElements.Inventory
             }
         }
 
-        public Item(int aBagIndex, int aSlotIndex, bool aHoldable, GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPath, aPos, aSize, Color.DarkGray)
+        public Item(int aBagIndex, int aSlotIndex, bool aHoldable, GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPath, aPos, aSize, Color.DarkGray) //TODO: Change this so a nulled path isn't required
         {
             bagIndex = aBagIndex;
             slotIndex = aSlotIndex;
@@ -81,7 +81,7 @@ namespace Project_1.UI.UIElements.Inventory
                 RemoveItem();
                 return;
             }
-            gfxOnButton = new UITexture(aItem.Gfx, Color.White);
+            gfxOnButton = new UITexture(aItem.GfxPath, Color.White);
             isEmpty = false;
             if (aItem.MaxStack == 1) return;
             itemCount.Value = aItem.Count.ToString();
@@ -122,15 +122,46 @@ namespace Project_1.UI.UIElements.Inventory
 
             Item droppedOnMe = aRelease.Parent as Item;
 
-            if (droppedOnMe.bagIndex == -1) // From bagrack in hand
+            FromBagrack(droppedOnMe);
+
+            ToBagRack(droppedOnMe);
+
+
+            FromLoot(droppedOnMe);
+
+
+
+
+            if (bagIndex == -2) return; //Tried to place items in loot, this isnt tibia buddy
+
+            if (droppedOnMe.bagIndex == -3)
+            {
+                return; //TODO: If dropped on gear for the same slot it should equip it if dropped on anything else it should dequip it
+                //Should also allow u to swap a onehander, trinket and ring to the other slot but disallow all other swaps
+            }
+
+            if (bagIndex == -3)
+            {
+                ObjectManager.Player.Inventory.SwapEquipment(droppedOnMe.Index, slotIndex);
+                return;
+            }
+
+            
+
+            ObjectManager.Player.Inventory.SwapItems(droppedOnMe.Index, Index);
+        }
+
+        void FromBagrack(Item aItemDroppedOnMe)
+        {
+            if (aItemDroppedOnMe.bagIndex == -1)
             {
                 if (bagIndex >= 0) //Onto Inventory
                 {
-                    if (droppedOnMe.slotIndex == bagIndex) return; //Bag is tried being placed in itself
+                    if (aItemDroppedOnMe.slotIndex == bagIndex) return; //Bag is tried being placed in itself
                     Items.Item i = ObjectManager.Player.Inventory.GetItemInSlot(bagIndex, slotIndex);
                     if (i == null)
                     {
-                        ObjectManager.Player.Inventory.UnequipBag(droppedOnMe.slotIndex, Index);
+                        ObjectManager.Player.Inventory.UnequipBag(aItemDroppedOnMe.slotIndex, Index);
                         return;
                     }
                     //Swap bags if dropped on bag no?
@@ -139,32 +170,34 @@ namespace Project_1.UI.UIElements.Inventory
 
                 if (bagIndex == -1) //Onto bagrack
                 {
-                    ObjectManager.Player.Inventory.SwapPlacesOfBags(droppedOnMe.slotIndex, slotIndex);
+                    ObjectManager.Player.Inventory.SwapPlacesOfBags(aItemDroppedOnMe.slotIndex, slotIndex);
                     return;
                 }
 
                 throw new NotImplementedException();
             }
+        }
 
+        void ToBagRack(Item aItemDroppedOnMe)
+        {
             if (bagIndex == -1) // Onto bagrack
             {
-                if (droppedOnMe.bagIndex == -2) return; //Drop from loot
+                if (aItemDroppedOnMe.bagIndex == -2) return; //Drop from loot
 
-                if (ObjectManager.Player.Inventory.GetItemInSlot(droppedOnMe.Index).ItemType != ItemData.ItemType.Container) return; //Dropped is not bag
+                if (ObjectManager.Player.Inventory.GetItemInSlot(aItemDroppedOnMe.Index).ItemType != ItemData.ItemType.Container) return; //Dropped is not bag
 
-                ObjectManager.Player.Inventory.SwapBags(droppedOnMe.Index, slotIndex);
+                ObjectManager.Player.Inventory.SwapBags(aItemDroppedOnMe.Index, slotIndex);
                 return;
             }
+        }
 
-            if (droppedOnMe.bagIndex == -2) //From loot
+        void FromLoot(Item aItemDroppedOnMe)
+        {
+            if (aItemDroppedOnMe.bagIndex == -2) //From loot
             {
-                ObjectManager.Player.Inventory.LootItem(droppedOnMe.slotIndex, Index);
+                ObjectManager.Player.Inventory.LootItem(aItemDroppedOnMe.slotIndex, Index);
                 return;
             }
-
-            if (bagIndex == -2) return; //Tried to place items in loot, this isnt tibia buddy
-
-            ObjectManager.Player.Inventory.SwapItems(droppedOnMe.Index, Index);
         }
 
         public override void HoldReleaseOnMe()
@@ -210,6 +243,10 @@ namespace Project_1.UI.UIElements.Inventory
                         break;
                     case ItemData.ItemType.Consumable:
                         ObjectManager.Player.Inventory.ConsumeItem(Index);
+                        break;
+                    case ItemData.ItemType.Equipment:
+                    case ItemData.ItemType.Weapon:
+                        ObjectManager.Player.Inventory.Equip(Index);
                         break;
                     default:
                         throw new NotImplementedException();

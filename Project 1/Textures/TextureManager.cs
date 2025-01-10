@@ -4,14 +4,18 @@ using Project_1.GameObjects.Spells;
 using Project_1.Managers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace Project_1.Textures
 {
+    [DebuggerStepThrough]
     internal static class TextureManager
     {
 
@@ -41,7 +45,7 @@ namespace Project_1.Textures
 
             for (int i = 0; i < dir.Length; i++)
             {
-                string filePath = TrimFilePath(dir[i]);
+                string filePath = TrimContentFolderAndImageFileExtention(dir[i]);
                 string fontName = filePath.Split('\\')[1];
 
                 fontDict.Add(fontName, contentManager.Load<SpriteFont>(filePath));
@@ -55,22 +59,41 @@ namespace Project_1.Textures
         {
             texturesDict = new Dictionary<string, Texture2D>[(int)GfxType.Count];
 
-
+            string root = contentManager.RootDirectory + "\\";
             string debug = "Textures loaded: ";
 
             for (int i = 0; i < texturesDict.Length; i++)
             {
-                string[] dir = Directory.GetFiles(contentManager.RootDirectory + "\\" + (GfxType)i);
+                string path =  root + (GfxType)i;
+                string[] dir = Directory.GetFiles(path);
 
                 texturesDict[i] = new Dictionary<string, Texture2D>();
 
+
                 for (int j = 0; j < dir.Length; j++)
                 {
-                    string filePath = TrimFilePath(dir[j]);
-                    string textureName = filePath.Split('\\')[1];
+                    string filePath = TrimContentFolderAndImageFileExtention(dir[j]); 
+                    string textureName = filePath.Split('\\')[1]; //Folder name\\ImageName is expected string so 1 here
 
                     texturesDict[i].Add(textureName, contentManager.Load<Texture2D>(filePath));
                     debug += textureName + ", ";
+
+                }
+
+                string[] dirsInDir = Directory.GetDirectories(path);
+                
+                for (int j = 0; j < dirsInDir.Length; j++)
+                {
+                    string[] filesInFolders = Directory.GetFiles(dirsInDir[j]);
+                    for (int k = 0; k < filesInFolders.Length; k++)
+                    {
+                        string filePath = TrimContentFolderAndImageFileExtention(filesInFolders[k]);
+                        string textureName = filePath.Split('\\')[2]; //Since we are 2 folders deep the 2 instead of 1
+
+                        texturesDict[i].Add(textureName, contentManager.Load<Texture2D>(filePath));
+                        debug += textureName + ", ";
+                    }
+                    
 
                 }
             }
@@ -78,7 +101,8 @@ namespace Project_1.Textures
             DebugManager.Print(typeof(GraphicsManager), debug);
         }
 
-        static string TrimFilePath(string aPath)
+
+        static string TrimContentFolderAndImageFileExtention(string aPath)
         {
             string filePath = aPath.Substring(contentManager.RootDirectory.Length + 1);
             return filePath.Substring(0, filePath.Length - 4);

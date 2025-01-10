@@ -45,6 +45,8 @@ namespace Project_1.Items
             }
         }
 
+        public int OpenSlots() { return items.Count(item => item == null); }
+
         public bool ConsumeItem((int, int) aBagAndSlotIndex)
         {
             return ConsumeItem(aBagAndSlotIndex.Item1, aBagAndSlotIndex.Item2);
@@ -363,7 +365,8 @@ namespace Project_1.Items
                 HUDManager.RefreshInventorySlot(aSlotToSwapWith.Item1, aSlotToSwapWith.Item2);
                 return;
             }
-            if (items[aSlot.Item1][aSlot.Item2].ID == items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2].ID)
+
+            if (items[aSlot.Item1][aSlot.Item2].ID == items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2].ID) //If same item, stack them
             {
                 int total = items[aSlot.Item1][aSlot.Item2].Count + items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2].Count;
                 if (total > items[aSlot.Item1][aSlot.Item2].MaxStack)
@@ -377,7 +380,7 @@ namespace Project_1.Items
                     items[aSlot.Item1][aSlot.Item2].Count = total; //Swap these
                 }
             }
-            else
+            else //Actually swap them
             {
                 Item tempItem = items[aSlot.Item1][aSlot.Item2];
                 items[aSlot.Item1][aSlot.Item2] = items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2];
@@ -446,8 +449,7 @@ namespace Project_1.Items
                 {
                     if (items[i][j] == aItem)
                     {
-                        items[i][j] = null;
-                        HUDManager.RefreshInventorySlot(i, j);
+                        AssignItem(null, i, j);
                         return true;
                     }
                 }
@@ -463,8 +465,7 @@ namespace Project_1.Items
             {
                 if (items[aInventory][i] == null)
                 {
-                    items[aInventory][i] = aItem;
-                    HUDManager.RefreshInventorySlot(aInventory, i);
+                    AssignItem(aItem, aInventory, i);
                     return;
                 }
             }
@@ -479,6 +480,71 @@ namespace Project_1.Items
         public Container[] GetBags()
         {
             return bags;
+        }
+
+        internal void Equip((int, int) aIndex)
+        {
+            Item item = items[aIndex.Item1][aIndex.Item2];
+
+            if (item == null) return;
+            if (!(item.ItemType == ItemData.ItemType.Equipment || item.ItemType == ItemData.ItemType.Weapon)) return;
+
+            Equipment equipment = item as Equipment;
+            GameObjects.Unit.Equipment wearing = owner.Equipment;
+
+            if (equipment.type == Equipment.Type.TwoHander) 
+            {
+                if (OpenSlots() < 1 && wearing.EquipedInSlot(GameObjects.Unit.Equipment.Slot.MainHand) != null && wearing.EquipedInSlot(GameObjects.Unit.Equipment.Slot.OffHand) != null) return;
+
+                (Item, Item) equipedInSlots = wearing.EquipTwoHander(equipment);
+                AssignItem(equipedInSlots.Item1, aIndex);
+                if (equipedInSlots.Item2 == null) return;
+                AddItem(equipedInSlots.Item2);
+                return;
+            }
+
+            Item equipedInSlot = wearing.Equip(equipment);
+            AssignItem(equipedInSlot, aIndex);
+        }
+
+        internal void SwapEquipment((int, int) aIndex, int aEquipmentSlot)
+        {
+            Item item = items[aIndex.Item1][aIndex.Item2];
+
+            if (item == null) return;
+            if (!(item.ItemType == ItemData.ItemType.Equipment || item.ItemType == ItemData.ItemType.Weapon)) return;
+
+            Equipment equipment = item as Equipment;
+            GameObjects.Unit.Equipment wearing = owner.Equipment;
+
+            if(equipment.type == Equipment.Type.TwoHander)
+            {
+                if (!(GameObjects.Unit.Equipment.Slot.MainHand == (GameObjects.Unit.Equipment.Slot)aEquipmentSlot || GameObjects.Unit.Equipment.Slot.OffHand == (GameObjects.Unit.Equipment.Slot)aEquipmentSlot)) return;
+                Equip(aIndex);
+                return;
+            }
+
+            if (equipment.type < Equipment.Type.Trinket || equipment.type >= Equipment.Type.MainHander)
+            {
+                if (GameObjects.Unit.Equipment.SlotToSlot(equipment.type) != (GameObjects.Unit.Equipment.Slot)aEquipmentSlot) return;
+                Equip(aIndex);
+                return;
+            }
+
+            //Only things here should be Trinkets, rings and one handers
+            Item equipedInSlot = wearing.EquipInParticularSlot(equipment, (GameObjects.Unit.Equipment.Slot)aEquipmentSlot);
+            AssignItem(equipedInSlot, aIndex);
+        }
+
+        void AssignItem(Item item, (int, int) aBagAndSlotIndex)
+        {
+            AssignItem(item, aBagAndSlotIndex.Item1, aBagAndSlotIndex.Item2);
+        }
+        
+        void AssignItem(Item aItem, int aBagIndex, int aSlotIndex)
+        {
+            items[aBagIndex][aSlotIndex] = aItem;
+            HUDManager.RefreshInventorySlot(aBagIndex, aSlotIndex);
         }
     }
 }

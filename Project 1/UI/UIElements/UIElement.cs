@@ -18,11 +18,12 @@ namespace Project_1.UI.UIElements
 {
     internal abstract class UIElement
     {
-        protected bool Visible { get => visible; }
+        protected bool Visible => visible;
         bool visible;
-        protected KeyBindManager.KeyListner? visibleKey = null;
-        public RelativeScreenPosition RelativePos { get => relativePos; }
-        public RelativeScreenPosition RelativeSize { get => relativeSize; }
+
+        protected KeyBindManager.KeyListner? visibleKey;
+        public RelativeScreenPosition RelativePos => relativePos;
+        public RelativeScreenPosition RelativeSize => relativeSize;
 
         public Rectangle AbsolutePos
         {
@@ -36,13 +37,13 @@ namespace Project_1.UI.UIElements
         }
 
 
-        public AbsoluteScreenPosition Size { get => new AbsoluteScreenPosition(pos.Size); }
+        public AbsoluteScreenPosition Size => new AbsoluteScreenPosition(pos.Size);
 
-        public UITexture Gfx { get => gfx; }
+        public UITexture Gfx => gfx;
         public Color Color { get => gfx.Color; set => gfx.Color = value; }
 
-        bool Hovered { get => AbsolutePos.Contains(InputManager.GetMousePosAbsolute().ToPoint()); }
-        protected bool wasHovered = false;
+        bool Hovered => AbsolutePos.Contains(InputManager.GetMousePosAbsolute().ToPoint());
+        protected bool wasHovered;
 
         protected UITexture gfx;
         AbsoluteScreenPosition absolutePos;
@@ -55,7 +56,7 @@ namespace Project_1.UI.UIElements
 
 
         //protected UIElement? parent;
-        protected AbsoluteScreenPosition parentPos = AbsoluteScreenPosition.Zero;
+        protected AbsoluteScreenPosition parentPos;
         protected List<UIElement> children = new List<UIElement>();
 
         protected UIElement(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) //aPos and aSize should be between 0 and 1
@@ -122,12 +123,12 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        public void ToggleVisibilty()
+        public virtual void ToggleVisibilty()
         {
             visible = !visible;
             foreach (UIElement child in children)
             {
-                child.ToggleVisibilty();
+                child.visible = visible;
             }
         }
 
@@ -201,30 +202,20 @@ namespace Project_1.UI.UIElements
 
         public virtual void ReleasedOnChild(ReleaseEvent aRelease)
         {
-
             if (!visible) return;
         }
 
         public virtual void ReleaseOnMe(ReleaseEvent aRelease)
         {
             if (!visible) return;
-
         }
 
-        public virtual void HoldReleaseOnMe()
-        {
-            heldEvents = null;
-        }
-
-        protected virtual void HoldReleaseAwayFromMe()
-        {
-            heldEvents = null;
-        }
+        public virtual void HoldReleaseOnMe() => heldEvents = null;
+        protected virtual void HoldReleaseAwayFromMe() => heldEvents = null;
 
         protected virtual void OnHover()
         {
             if (!visible) return;
-            //DebugManager.Print(GetType(), "Hovered on");
         }
 
         protected virtual void OnDeHover()
@@ -270,7 +261,6 @@ namespace Project_1.UI.UIElements
         protected virtual void ClickedOnChild(ClickEvent aClick)
         {
             if (!visible) return;
-
         }
 
         protected virtual void ClickedOnMe(ClickEvent aClick)

@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.Textures
 {
+    [DebuggerStepThrough]
     internal class Texture
     {
         protected Texture2D gfx;
@@ -40,7 +41,7 @@ namespace Project_1.Textures
         public Texture(GfxPath aPath, Vector2 aOffset) : this(aPath, aOffset, Point.Zero, Color.White) { }
         public Texture(GfxPath aPath, Point aSize) : this(aPath, Vector2.Zero, aSize, Color.White) { }
         public Texture(GfxPath aPath, Vector2 aOffset, Point aSize) : this(aPath, aOffset, aSize, Color.White) { }
-        public Texture(GfxPath aPath, Color aColor) : this(aPath, Vector2.Zero, Point.Zero, aColor) { }
+        public Texture(GfxPath aPath,Color aColor) : this(aPath, Vector2.Zero, Point.Zero, aColor) { }
         public Texture(GfxPath aPath, Vector2 aOffset, Color aColor) : this(aPath, aOffset, Point.Zero, aColor) { }
         public Texture(GfxPath aPath, Vector2 aOffset, Point aSize, Color aColor)
         {

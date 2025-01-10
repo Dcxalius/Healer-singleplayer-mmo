@@ -40,7 +40,7 @@ namespace Project_1.UI.UIElements.Inventory
                 }
                 else
                 {
-                    bags[i - 1] = new Item(-1, i, true, aBags[i].Gfx, pos , size);
+                    bags[i - 1] = new Item(-1, i, true, aBags[i].GfxPath, pos , size);
                 }
             }
 

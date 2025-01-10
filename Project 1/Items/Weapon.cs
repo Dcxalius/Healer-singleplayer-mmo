@@ -7,14 +7,15 @@ using System.Threading.Tasks;
 
 namespace Project_1.Items
 {
-    internal class Weapon : Item
+    internal class Weapon : Equipment
     {
         public enum HandRequirement
         {
             OneHand,
             TwoHand,
             MainHand,
-            OffHand
+            OffHand, 
+            Ranged
         }
 
         public Attack attack;
@@ -25,7 +26,7 @@ namespace Project_1.Items
         {
         }
 
-        public Weapon(ItemData aData, int aCount) : base(aData, aCount)
+        public Weapon(WeaponData aData) : base(aData)
         {
         }
     }

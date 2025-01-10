@@ -48,7 +48,7 @@ namespace Project_1.UI.UIElements.Inventory
 
                 if (items[i] != null)
                 {
-                    slots[i] = new Item(bagNr, i, true, items[i].Gfx, pos, size);
+                    slots[i] = new Item(bagNr, i, true, items[i].GfxPath, pos, size);
                 }
                 else
                 {

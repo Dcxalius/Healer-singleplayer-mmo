@@ -5,6 +5,7 @@ using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Temp;
 using Project_1.GameObjects.Spells;
+using Project_1.GameObjects.Unit;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.UI.UIElements;
@@ -34,11 +35,14 @@ namespace Project_1.UI.HUD
         static LootBox lootBox;
         static DescriptorBox descriptorBox;
 
-        static SpellBookBox spellBookBox;
+        static CharacterWindow characterWindow;
+        static SpellBookWindow spellBookBox;
+
         static CastBar playerCastBar;
         static FirstSpellBar firstSpellBar;
 
         static List<UIElement> hudElements = new List<UIElement>();
+
 
         static HeldItem heldItem;
         static HeldSpell heldSpell;
@@ -47,6 +51,7 @@ namespace Project_1.UI.HUD
 
         public static void Init()
         {
+            Window.Init(new RelativeScreenPosition(0.05f, 0.2f), new RelativeScreenPosition(0.1f, 0f), new RelativeScreenPosition(0.2f, 0.6f));
 
             playerPlateBox = new PlayerPlateBox(new RelativeScreenPosition(0.1f, 0.1f), new RelativeScreenPosition(0.2f, 0.1f));
             targetPlateBox = new TargetPlateBox(new RelativeScreenPosition(0.33f, 0.1f), new RelativeScreenPosition(0.2f, 0.1f));
@@ -57,11 +62,13 @@ namespace Project_1.UI.HUD
             inventoryBox = new InventoryBox(new RelativeScreenPosition(0.59f, 0.59f), new RelativeScreenPosition(0.4f));
             descriptorBox = new DescriptorBox();
 
-            spellBookBox = new SpellBookBox(new RelativeScreenPosition(0.2f, 0.4f), new RelativeScreenPosition(0.4f, 0.4f));
+            characterWindow = new CharacterWindow();
+            spellBookBox = new SpellBookWindow();
+
             firstSpellBar = new FirstSpellBar(10, new RelativeScreenPosition(0.2f, 0.86f), 0.6f);
             playerCastBar = new CastBar(new RelativeScreenPosition(0.1f, 0.203f), new RelativeScreenPosition(0.2f, 0.015f));
 
-            hudElements.Add(playerPlateBox);
+            hudElements.Add(playerPlateBox); //TODO: Make this less ugly
             hudElements.Add(targetPlateBox);
             hudElements.Add(playerBuffBox);
             hudElements.Add(targetBuffBox);
@@ -70,7 +77,9 @@ namespace Project_1.UI.HUD
             hudElements.Add(inventoryBox);
             hudElements.Add(descriptorBox);
 
+            hudElements.Add(characterWindow);
             hudElements.Add(firstSpellBar);
+
             hudElements.Add(spellBookBox);
             hudElements.Add(playerCastBar);
 
@@ -134,92 +143,32 @@ namespace Project_1.UI.HUD
             }
         }
 
-        public static void AddSpellToSpellBook(Spell aSpell)
-        {
-            spellBookBox.AssignSpell(aSpell);
-        }
 
-        public static void RefreshInventorySlot(int aBag, int aSlot)
-        {
-            inventoryBox.RefreshSlot(aBag, aSlot);
-        }
+        public static void RefreshInventorySlot(int aBag, int aSlot) => inventoryBox.RefreshSlot(aBag, aSlot);
+        public static void RefreshInventorySlot((int, int) aBagAndSlot) => RefreshInventorySlot(aBagAndSlot.Item1, aBagAndSlot.Item2);
 
-        public static void RefreshInventorySlot((int, int) aBagAndSlot)
-        {
-            RefreshInventorySlot(aBagAndSlot.Item1, aBagAndSlot.Item2);
-        }
+        public static void RefreshCharacterWindowSlot(Equipment.Slot aSlot) => characterWindow.SetSlot(aSlot);
 
-        public static void SetDescriptorBox(Item aItem)
-        {
-            descriptorBox.SetToItem(aItem);
-        }
+        public static void SetDescriptorBox(Item aItem) => descriptorBox.SetToItem(aItem);
 
 
-        //public static void RefreshInventory()
-        //{
-        //    inventoryBox.RefreshAllBags();
-        //}
+        public static void AddSpellToSpellBook(Spell aSpell) => spellBookBox.AssignSpell(aSpell);
+        public static void HoldSpell(Spell aSpell, Vector2 aGrabOffset) => heldSpell.HoldMe(aSpell, aGrabOffset);
+        public static void ReleaseSpell() => heldSpell.ReleaseMe();
 
-        //public static void RefeshSlot(int aBag, int aSlot)
-        //{
-        //    inventoryBox.RefreshSlot(aBag, aSlot);
-        //}
+        public static void FinishChannel() => playerCastBar.FinishCast();
+        public static void CancelChannel() => playerCastBar.CancelCast();
+        public static void UpdateChannelSpell(float aNewVal) => playerCastBar.Value = aNewVal;
+        public static void ChannelSpell(Spell aSpell) => playerCastBar.CastSpell(aSpell);
 
-        public static void FinishChannel()
-        {
-            playerCastBar.FinishCast();
-        }
 
-        public static void CancelChannel()
-        {
-            playerCastBar.CancelCast();
-        }
+        public static Items.Item GetLootItem(int aSlotInLoot) => lootBox.GetItem(aSlotInLoot);
+        public static void ReduceLootItem(int aSlotInLoot, int aCount) => lootBox.ReduceItem(aSlotInLoot, aCount);
+        public static void Loot(Corpse aCorpse) => lootBox.Loot(aCorpse);
 
-        public static void UpdateChannelSpell(float aNewVal)
-        {
-            playerCastBar.Value = aNewVal;
-        }
+        public static void HoldItem(Item aItem, Vector2 aGrabOffset) => heldItem.HoldItem(aItem, aGrabOffset);
+        public static void ReleaseItem() => heldItem.ReleaseMe();
 
-        public static void ChannelSpell(Spell aSpell)
-        {
-            playerCastBar.CastSpell(aSpell);
-        }
-
-        public static Items.Item GetLootItem(int aSlotInLoot)
-        {
-            return lootBox.GetItem(aSlotInLoot);
-        }
-
-        public static void ReduceLootItem(int aSlotInLoot, int aCount)
-        {
-            lootBox.ReduceItem(aSlotInLoot, aCount);
-        }
-
-        public static void HoldItem(Item aItem, Vector2 aGrabOffset)
-        {
-            heldItem.HoldItem(aItem, aGrabOffset);
-        }
-
-        public static void ReleaseItem()
-        {
-            heldItem.ReleaseMe();
-        }
-
-        public static void HoldSpell(Spell aSpell, Vector2 aGrabOffset)
-        {
-            heldSpell.HoldMe(aSpell, aGrabOffset);
-        }
-
-        public static void ReleaseSpell()
-        {
-            heldSpell.ReleaseMe();
-        }
-
-        public static void Loot(Corpse aCorpse)
-        {
-            lootBox.Loot(aCorpse);
-        }
-        
 
         public static void AddWalkerToControl(Walker aWalker)
         {
@@ -300,6 +249,5 @@ namespace Project_1.UI.HUD
                 hudElements[i].Rescale();
             }
         }
-
     }
 }

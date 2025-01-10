@@ -13,12 +13,12 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.HUD
 {
-    internal class SpellBookBox : Box
+    internal class SpellBookWindow : Window
     {
         SpellBookSpell[] spellBookSpells;
         const int rows = 3;
         const int cols = 2;
-        public SpellBookBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.SaddleBrown), aPos, aSize)
+        public SpellBookWindow() : base(new UITexture("WhiteBackground", Color.SaddleBrown))
         {
             visibleKey = Input.KeyBindManager.KeyListner.SpellBook;
             spellBookSpells = new SpellBookSpell[cols * rows];
@@ -40,8 +40,8 @@ namespace Project_1.UI.HUD
             }
 
             children.AddRange(spellBookSpells);
-            ToggleVisibilty();
 
+            ToggleVisibilty();
         }
 
         public void AssignSpell(Spell aSpell)

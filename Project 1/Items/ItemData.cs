@@ -19,7 +19,9 @@ namespace Project_1.Items
             NotSet,
             Container,
             Trash,
-            Consumable
+            Consumable,
+            Equipment,
+            Weapon
         }
 
 

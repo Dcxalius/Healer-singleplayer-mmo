@@ -46,6 +46,8 @@ namespace Project_1.GameObjects.Entities
         public float MaxHealth => unitData.HealthData.MaxHealth;
         public float CurrentHealth => unitData.HealthData.CurrentHealth;
 
+        public Equipment Equipment => unitData.Equipment;
+
         public Resource.ResourceType ResourceType => unitData.Resource.Type;
         public float MaxResource => unitData.Resource.MaxValue;
         public float CurrentResource => unitData.Resource.Value;

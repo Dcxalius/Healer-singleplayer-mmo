@@ -72,7 +72,7 @@ namespace Project_1.UI.UIElements
 
             text.SetData(0, 0, null, data, 0, size.X * size.Y);
 
-            gfx = new Textures.UITexture(text, size.ToPoint());
+            //gfx = new Textures.UITexture(text, size.ToPoint());
         }
 
         public override void Draw(SpriteBatch aBatch)
