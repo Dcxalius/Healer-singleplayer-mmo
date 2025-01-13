@@ -21,7 +21,8 @@ namespace Project_1.Textures
         protected Texture2D gfx;
         
         //TODO: public WorldSpace Size { get => size; }
-        public Point ScaledSize { get => (size.ToVector2() * Camera.Camera.Scale).ToPoint(); }
+        //public Point ScaledSize { get => (size.ToVector2() * Camera.Camera.Scale).ToPoint(); }
+        public Point ScaledSize { get => new Point((int)Math.Round(size.X * Camera.Camera.Scale), (int)Math.Round(size.Y * Camera.Camera.Scale)); }
         public Point size;
 
         public Rectangle? Visible { get => visible; protected set => visible = value; }
@@ -90,7 +91,8 @@ namespace Project_1.Textures
             if (Camera.Camera.MomAmIInFrame(new Rectangle(aPos.ToPoint(), (size.ToVector2() * Camera.Camera.Scale).ToPoint())))
             {
                 //aBatch.Draw(gfx, aPos, visible, aColor, rotation, offset, Camera.Camera.Scale, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
-                aBatch.Draw(gfx, new Rectangle(aPos.ToPoint(),ScaledSize), visible, aColor, rotation, offset, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
+                //aBatch.Draw(gfx, new Rectangle(aPos.ToPoint(),ScaledSize), visible, aColor, rotation, offset, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
+                aBatch.Draw(gfx, new Rectangle(new Point((int)Math.Round(aPos.X), (int)Math.Round(aPos.Y)),ScaledSize), visible, aColor, rotation, offset, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
             }
         }
     }

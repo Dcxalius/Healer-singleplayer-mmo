@@ -31,6 +31,7 @@ namespace Project_1.UI.HUD
         public LootBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", Color.NavajoWhite), aPos, aSize)
         {
             ToggleVisibilty();
+            capturesScroll = true;
         }
 
         public Items.Item GetItem(int aIndex)
@@ -110,41 +111,32 @@ namespace Project_1.UI.HUD
             base.Update(aParent);
 
             CheckIfShouldClose();
-            UpdateScroll();
         }
 
-        void UpdateScroll()
+
+        void UpdateLootPosition()
         {
-            if (tooMuchLootForWindow == true)
+            for (int i = 0; i < children.Count; i++)
             {
-                float lastScrollValue = GetLastAndCurrentScroll();
-                CapScroll();
-                UpdateLootPosition(lastScrollValue);
+                if (!loot.Contains(children[i])) continue;
+
+                children[i].Move(new RelativeScreenPosition(children[i].RelativePos.X, originalYPos[i] - scrollValue));
             }
         }
 
-        void UpdateLootPosition(float aLastScrollValue)
+        protected override void ScrolledOnMe(ScrollEvent aScrollEvent)
         {
-            if (aLastScrollValue != scrollValue)
-            {
-                for (int i = 0; i < children.Count; i++)
-                {
-                    if (loot.Contains(children[i]))
-                    {
-                        children[i].Move(new RelativeScreenPosition(children[i].RelativePos.X, originalYPos[i] - scrollValue));
-                    }
-                }
-            }
+            base.ScrolledOnMe(aScrollEvent);
 
-        }
+            if (!tooMuchLootForWindow) return;
 
-        float GetLastAndCurrentScroll()
-        {
-            float lastScrollValue = scrollValue;
+            //float lastScrollValue = scrollValue;
+            scrollValue += (aScrollEvent.DirectionAndSteps * 0.01f);
 
-            scrollValue += ((float)InputManager.ScrolledSinceLastFrame / 120 / totalLoot * 0.3f); //TODO: Make this stop camera from zooming
-            //Debug.Assert(scrollValue == 0);
-            return lastScrollValue;
+            CapScroll();
+            UpdateLootPosition();
+
+
         }
 
         void CapScroll()
@@ -164,6 +156,11 @@ namespace Project_1.UI.HUD
         void CheckIfShouldClose()
         {
             if (lootedCorpse == null) return;
+            if (lootedCorpse.Despawned)
+            {
+                StopLoot();
+                return;
+            }
 
             if (lootedCorpse.Centre.DistanceTo(ObjectManager.Player.FeetPosition) > lootedCorpse.LootLength)
             {

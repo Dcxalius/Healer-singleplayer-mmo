@@ -28,6 +28,7 @@ namespace Project_1.GameObjects.Entities
         float lootLength;
 
         public bool IsEmpty => drop.All(drop => drop == null);
+        public bool Despawned => isDespawning && timeDespawnStart + despawnTime < TimeManager.TotalFrameTime;
 
         const double hardDecayTime = 10000;
         const double softDecayTime = 20000;
@@ -92,7 +93,7 @@ namespace Project_1.GameObjects.Entities
         void FinishDespawn()
         {
             if (!isDespawning) return;
-            if (timeDespawnStart + despawnTime > TimeManager.TotalFrameTime) return;
+            if (!Despawned) return;
 
             ObjectManager.DespawnCorpse(this);
         }

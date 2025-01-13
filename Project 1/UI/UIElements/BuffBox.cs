@@ -48,6 +48,7 @@ namespace Project_1.UI.UIElements
             owner = aOwner;
             buffs = new List<Buff>();
             children.AddRange(buffs);
+            capturesClick = false;
         }
         public bool IsThisMine(Entity aOwner) => aOwner == owner;
 
@@ -57,9 +58,11 @@ namespace Project_1.UI.UIElements
             if (aOwner == null)
             {
                 ClearBuffs();
+                Visible = false;
                 return;
             }
             SetAllBuffs(aOwner.GetAllBuffs());
+            Visible = true;
         }
 
         void ClearBuffs()

@@ -18,10 +18,34 @@ namespace Project_1.UI.UIElements
 {
     internal abstract class UIElement
     {
-        protected bool Visible => visible;
+        #region Interactibility
+        protected bool Visible
+        {
+            get => visible;
+
+            set
+            {
+                visible = value;
+                for (int i = 0; i < children.Count; i++)
+                {
+                    children[i].Visible = value;
+                }
+            }
+        }
+
         bool visible;
 
         protected KeyBindManager.KeyListner? visibleKey;
+
+        bool Hovered => AbsolutePos.Contains(InputManager.GetMousePosAbsolute().ToPoint());
+        protected bool wasHovered;
+
+        protected bool capturesClick;
+        protected bool capturesScroll;
+
+        #endregion
+
+        #region Position
         public RelativeScreenPosition RelativePos => relativePos;
         public RelativeScreenPosition RelativeSize => relativeSize;
 
@@ -36,28 +60,26 @@ namespace Project_1.UI.UIElements
             }
         }
 
-
-        public AbsoluteScreenPosition Size => new AbsoluteScreenPosition(pos.Size);
-
-        public UITexture Gfx => gfx;
-        public Color Color { get => gfx.Color; set => gfx.Color = value; }
-
-        bool Hovered => AbsolutePos.Contains(InputManager.GetMousePosAbsolute().ToPoint());
-        protected bool wasHovered;
-
-        protected UITexture gfx;
         AbsoluteScreenPosition absolutePos;
-        Rectangle pos;
+        
         RelativeScreenPosition relativePos; //TODO: Change this so 1, 1 refers to parents bottom right instead of screen bottom right + parent top left
-        RelativeScreenPosition relativeSize;
+        RelativeScreenPosition relativeSize; 
+        public AbsoluteScreenPosition Size => new AbsoluteScreenPosition(pos.Size);
+        Rectangle pos;
+        #endregion
+
+        #region Graphics
+        public UITexture Gfx => gfx;
+        protected UITexture gfx;
+        public Color Color { get => gfx.Color; set => gfx.Color = value; }
+        #endregion
 
         public HoldEvent heldEvents; //TODO: This should prob be cleansed on state change
 
-
-
-        //protected UIElement? parent;
+        #region Parentage
         protected AbsoluteScreenPosition parentPos;
         protected List<UIElement> children = new List<UIElement>();
+        #endregion
 
         protected UIElement(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) //aPos and aSize should be between 0 and 1
         {
@@ -70,6 +92,8 @@ namespace Project_1.UI.UIElements
 
             pos = RelativeScreenPosition.TransformToAbsoluteRect(aPos, aSize);
             absolutePos = new AbsoluteScreenPosition(pos.Location);
+            capturesClick = true;
+            capturesScroll = false;
         }
 
         public virtual void Update(in UIElement aParent)
@@ -97,56 +121,6 @@ namespace Project_1.UI.UIElements
             GetVisibiltyPress();
         }
 
-        void HoverUpdate()
-        {
-            if (!visible) return;
-
-            if (!wasHovered && Hovered)
-            {
-                wasHovered = true;
-                OnHover();
-            }
-
-            if (wasHovered && !Hovered)
-            {
-                wasHovered = false;
-                OnDeHover();
-            }
-        }
-
-        void GetVisibiltyPress()
-        {
-            if (!visibleKey.HasValue) return;
-            if (KeyBindManager.GetPress(visibleKey.Value))
-            {
-                ToggleVisibilty();
-            }
-        }
-
-        public virtual void ToggleVisibilty()
-        {
-            visible = !visible;
-            foreach (UIElement child in children)
-            {
-                child.visible = visible;
-            }
-        }
-
-
-        static protected Point TransformFromRelativeToPoint(Vector2 aValue)
-        {
-            Point size = new Point((int)(Camera.Camera.ScreenSize.X * aValue.X), (int)(Camera.Camera.ScreenSize.Y * aValue.Y));
-            return size;
-        }
-
-        public virtual void Close()
-        {
-            for (int i = 0; i < children.Count; i++)
-            {
-                children[i].Close();
-            }
-        }
-
         public virtual void HoldUpdate()
         {
             if (heldEvents == null)
@@ -167,6 +141,68 @@ namespace Project_1.UI.UIElements
             }
         }
 
+        #region Change
+        void GetVisibiltyPress()
+        {
+            if (!visibleKey.HasValue) return;
+            if (KeyBindManager.GetPress(visibleKey.Value))
+            {
+                ToggleVisibilty();
+            }
+        }
+
+        public virtual void ToggleVisibilty()
+        {
+            visible = !visible;
+            foreach (UIElement child in children)
+            {
+                child.visible = visible;
+            }
+        }
+
+        public virtual void Rescale()
+        {
+            pos = RelativeScreenPosition.TransformToAbsoluteRect(relativePos, relativeSize);
+            absolutePos = parentPos + new AbsoluteScreenPosition(pos.Location);
+
+            for (int i = 0; i < children.Count; i++)
+            {
+                children[i].Rescale();
+            }
+        }
+
+        public void Move(RelativeScreenPosition aNewPos)
+        {
+            if (aNewPos.X == float.NaN || aNewPos.Y == float.NaN) throw new ArgumentException("Invalid move.");
+            relativePos = aNewPos;
+            pos.Location = TransformFromRelativeToPoint(aNewPos);
+            absolutePos = new AbsoluteScreenPosition(pos.Location) + parentPos;
+        }
+
+        protected void Resize(RelativeScreenPosition aSize)
+        {
+            relativeSize = aSize;
+            pos.Size = TransformFromRelativeToPoint(aSize);
+        }
+
+        public virtual void Close()
+        {
+            for (int i = 0; i < children.Count; i++)
+            {
+                children[i].Close();
+            }
+        }
+
+        #endregion
+
+        static protected Point TransformFromRelativeToPoint(Vector2 aValue) //TODO: ????
+        { 
+            Point size = new Point((int)(Camera.Camera.ScreenSize.X * aValue.X), (int)(Camera.Camera.ScreenSize.Y * aValue.Y));
+            return size;
+        }
+
+
+        #region Release
         public virtual bool ReleasedOn(ReleaseEvent aRelease)
         {
             if (!visible) return false;
@@ -212,6 +248,25 @@ namespace Project_1.UI.UIElements
 
         public virtual void HoldReleaseOnMe() => heldEvents = null;
         protected virtual void HoldReleaseAwayFromMe() => heldEvents = null;
+        #endregion
+
+        #region Hover
+        void HoverUpdate()
+        {
+            if (!visible) return;
+
+            if (!wasHovered && Hovered)
+            {
+                wasHovered = true;
+                OnHover();
+            }
+
+            if (wasHovered && !Hovered)
+            {
+                wasHovered = false;
+                OnDeHover();
+            }
+        }
 
         protected virtual void OnHover()
         {
@@ -222,21 +277,20 @@ namespace Project_1.UI.UIElements
         {
             if (!visible) return;
         }
+        #endregion
 
+        #region Click
         public virtual bool ClickedOn(ClickEvent aClick)
         {
             if (!visible) return false;
 
-            if (AbsolutePos.Contains(aClick.AbsolutePos))
-            {
-                bool clickedOnChild = ClickedOnChildren(aClick);
-                if (clickedOnChild == false)
-                {
-                    ClickedOnMe(aClick);
-                }
-                return true;
-            }
-            return false;
+            if (!AbsolutePos.Contains(aClick.AbsolutePos)) return false;
+
+
+            if (ClickedOnChildren(aClick)) return true;
+
+            ClickedOnMe(aClick);
+            return capturesClick;
         }
 
         protected virtual bool ClickedOnChildren(ClickEvent aClick)
@@ -245,14 +299,10 @@ namespace Project_1.UI.UIElements
 
             for (int i = 0; i < children.Count; i++)
             {
-                
-                bool clickedOn = children[i].ClickedOn(aClick);
-                if (clickedOn)
-                {
-                    ClickedOnChild(aClick);
-                    return true;
+                if (!children[i].ClickedOn(aClick)) continue;
 
-                }
+                ClickedOnChild(aClick);
+                return children[i].capturesClick;
             }
 
             return false;
@@ -270,31 +320,45 @@ namespace Project_1.UI.UIElements
 
             //DebugManager.Print(GetType(), "Clicked on " + pos);
         }
+        #endregion
 
-        public virtual void Rescale()
+        #region Scroll
+        internal virtual bool ScrolledOn(ScrollEvent aScrollEvent)
         {
-            pos = RelativeScreenPosition.TransformToAbsoluteRect(relativePos, relativeSize);
-            absolutePos = parentPos + new AbsoluteScreenPosition(pos.Location);
+            if (!visible) return false;
 
+            if (!AbsolutePos.Contains(aScrollEvent.AbsolutePos)) return false;
+
+            if (ScrolledOnChildren(aScrollEvent)) return true;
+
+            ScrolledOnMe(aScrollEvent);
+            return capturesScroll;
+        }
+
+        protected virtual void ScrolledOnMe(ScrollEvent aScrollEvent)
+        {
+            if (!visible) return;
+
+        }
+
+        protected virtual bool ScrolledOnChildren(ScrollEvent aScrollEvent)
+        {
+            if (!visible) return false;
             for (int i = 0; i < children.Count; i++)
             {
-                children[i].Rescale();
+                if (!children[i].ScrolledOn(aScrollEvent)) continue;
+
+                ScrolledOnChild(aScrollEvent);
+                return children[i].capturesScroll;
             }
+            return false;
         }
 
-        public void Move(RelativeScreenPosition aNewPos)
+        protected virtual void ScrolledOnChild(ScrollEvent aScrollEvent)
         {
-            if (aNewPos.X == float.NaN || aNewPos.Y == float.NaN) throw new ArgumentException("Invalid move.");
-            relativePos = aNewPos;
-            pos.Location = TransformFromRelativeToPoint(aNewPos);
-            absolutePos = new AbsoluteScreenPosition(pos.Location) + parentPos;
+            
         }
-
-        protected void Resize(RelativeScreenPosition aSize)
-        {
-            relativeSize = aSize;
-            pos.Size = TransformFromRelativeToPoint(aSize);
-        }
+        #endregion
 
         public virtual void Draw(SpriteBatch aBatch)
         {

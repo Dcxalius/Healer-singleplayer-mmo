@@ -76,9 +76,9 @@ namespace Project_1.UI.UIElements.SpellBook
         {
             base.ReleaseOnMe(aRelease);
 
-            if (aRelease.Parent.GetType() != typeof(SpellBookSpell)) return;
+            if (aRelease.Creator.GetType() != typeof(SpellBookSpell)) return;
 
-            AssignSpell((aRelease.Parent as SpellBookSpell).SpellData);
+            AssignSpell((aRelease.Creator as SpellBookSpell).SpellData);
         }
 
         void Triggered()

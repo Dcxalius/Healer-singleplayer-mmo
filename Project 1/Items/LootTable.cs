@@ -34,7 +34,7 @@ namespace Project_1.Items
         {
             List<Item> returnable = new List<Item>();
 
-            int count = RandomManager.RollInt(minDrops, maxDrops);
+            int count = RandomManager.RollInt(minDrops, maxDrops + 1);
             int[] dropCount = new int[loots.Length];
             for (int i = 0; i < count; i++)
             {
@@ -60,7 +60,7 @@ namespace Project_1.Items
             {
                 return null;
             }
-            int roll = RandomManager.RollInt(1, weights);
+            int roll = RandomManager.RollInt(1, weights + 1);
             for (int i = 0; i < loots.Length; i++)
             {
                 if (loots[i].MaxDrops <= aDropCount[i])

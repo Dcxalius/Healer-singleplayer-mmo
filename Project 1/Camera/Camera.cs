@@ -101,37 +101,40 @@ namespace Project_1.Camera
 
         public static void Update()
         {
-            ScrollZoom();
-
             cameraMover.Move();
         }
 
 
+        internal static void Scroll(ScrollEvent aScrollEvent)
+        {
+            ZoomIn(aScrollEvent);
+            ZoomOut(aScrollEvent);
+        }
+
+        static void ZoomIn(ScrollEvent aScrollEvent)
+        {
+            if (!aScrollEvent.Up) return;
+            if (scale <= minScale) return;
+            scale -= 0.05f * aScrollEvent.Steps;
+
+            DebugManager.Print(typeof(Camera), "Scale is now " + scale);
+            cameraMover.bindingRectangle.Size = new Point((int)(screenRectangleSize.X / 4 * 3 * Zoom), (int)(screenRectangleSize.Y / 4 * 3 * Zoom));
+        }
+
+        static void ZoomOut(ScrollEvent aScrollEvent)
+        {
+            if (!aScrollEvent.Down) return;
+            if (scale >= maxScale) return;
+            scale += 0.05f * aScrollEvent.Steps;
+            DebugManager.Print(typeof(Camera), "Scale is now " + scale);
+
+            cameraMover.bindingRectangle.Size = new Point((int)(screenRectangleSize.X / 4 * 3 * Zoom), (int)(screenRectangleSize.Y / 4 * 3 * Zoom));
+        }
 
         public static void BindCamera(MovingObject aBinder)
         {
             cameraMover.BindCamera(aBinder);
         }
-
-        static void ScrollZoom()
-        {
-            int scrolled = InputManager.ScrolledSinceLastFrame;
-            if (scrolled != 0)
-            {
-                if (scrolled > 0 && scale <= minScale || scrolled < 0 && scale >= maxScale)
-                {
-                    return;
-                }
-                scale -= scrolled / 2400f; //A single mousewheel step is 120 so 2400 gives a movement of 5% points per mousewheel step
-                //DebugManager.Print(typeof(Camera), "Centre point: " + centreInWorldSpace + ", " + CentrePointInScreenSpace);
-                //DebugManager.Print(typeof(Camera), "WorldRect size: " + WorldRectangle.Size);
-                cameraMover.bindingRectangle.Size = new Point((int)(screenRectangleSize.X / 4 * 3 * Zoom), (int)(screenRectangleSize.Y / 4 * 3 * Zoom));
-
-            }
-        }
-
-
-
 
         public static void SetCamera(CameraSettings aCameraSettings)
         {
@@ -265,5 +268,6 @@ namespace Project_1.Camera
             spriteBatch.End();
             GraphicsManager.SetRenderTarget(null);
         }
+
     }
 }

@@ -118,9 +118,9 @@ namespace Project_1.UI.UIElements.Inventory
         {
             base.ReleaseOnMe(aRelease);
 
-            if (!(aRelease.Parent.GetType().IsSubclassOf(GetType()) || aRelease.Parent.GetType() == GetType())) return;
+            if (!(aRelease.Creator.GetType().IsSubclassOf(GetType()) || aRelease.Creator.GetType() == GetType())) return;
 
-            Item droppedOnMe = aRelease.Parent as Item;
+            Item droppedOnMe = aRelease.Creator as Item;
 
             if (FromBagrack(droppedOnMe)) return;
             if (ToBagRack(droppedOnMe)) return;

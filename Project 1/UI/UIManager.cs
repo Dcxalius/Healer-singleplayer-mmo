@@ -133,6 +133,23 @@ namespace Project_1.UI
             }
         }
 
+        public static bool Scroll(ScrollEvent aScrollEvent)
+        {
+            switch (StateManager.currentState)
+            {
+                case StateManager.State.Game:
+                    return HUDManager.Scroll(aScrollEvent);
+                case StateManager.State.Pause:
+                    return false;
+                case StateManager.State.StartMenu:
+                    return false;
+                case StateManager.State.Options:
+                    return false;
+                default:
+                    return false;
+            }
+        }
+
         public static void Rescale()
         {
             if (pauseBox == null)

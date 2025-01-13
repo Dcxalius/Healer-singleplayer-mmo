@@ -87,7 +87,23 @@ namespace Project_1.UI.HUD
             heldItem = new HeldItem();
             heldSpell = new HeldSpell();
         }
+        public static void Update()
+        {
+            for (int i = 0; i < hudElements.Count; i++)
+            {
+                hudElements[i].Update(null);
+            }
+        }
 
+        public static void Rescale()
+        {
+            for (int i = 0; i < hudElements.Count; i++)
+            {
+                hudElements[i].Rescale();
+            }
+        }
+
+        #region Control
         public static void AddWalkerToParty(Walker aWalker)
         {
             int openIndex = -1;
@@ -112,14 +128,41 @@ namespace Project_1.UI.HUD
             hudElements.Add(partyPlateBoxes[openIndex]);
             hudElements.Add(partyBuffBoxes[openIndex]);
         }
+        public static void AddWalkerToControl(Walker aWalker)
+        {
+            for (int i = 0; i < partyPlateBoxes.Length; i++)
+            {
+                if (partyPlateBoxes[i].BelongsTo(aWalker))
+                {
+                    partyPlateBoxes[i].VisibleBorder = true;
+                    break;
+                }
 
+            }
+        }
+        public static void RemoveWalkersFromControl(Walker[] aWalkers)
+        {
+            for (int i = 0; i < aWalkers.Length; i++)
+            {
+                for (int j = 0; j < partyPlateBoxes.Length; j++)
+                {
+
+                    if (partyPlateBoxes[j].BelongsTo(aWalkers[i]))
+                    {
+                        partyPlateBoxes[j].VisibleBorder = false;
+                        break;
+                    }
+                }
+            }
+        }
 
         public static void SetNewTarget() //TODO: Make this use new target as arg
         {
             targetPlateBox.SetEntity();
             targetBuffBox.AssignBox(ObjectManager.Player.Target);
         }
-
+        #endregion
+        
         public static void AddBuff(GameObjects.Spells.Buff.Buff aBuff, Entity aEntity)
         {
             if (targetBuffBox.IsThisMine(aEntity))
@@ -143,15 +186,16 @@ namespace Project_1.UI.HUD
             }
         }
 
-
+        #region Inventory
         public static void RefreshInventorySlot(int aBag, int aSlot) => inventoryBox.RefreshSlot(aBag, aSlot);
         public static void RefreshInventorySlot((int, int) aBagAndSlot) => RefreshInventorySlot(aBagAndSlot.Item1, aBagAndSlot.Item2);
 
         public static void RefreshCharacterWindowSlot(Equipment.Slot aSlot) => characterWindow.SetSlot(aSlot);
 
         public static void SetDescriptorBox(Item aItem) => descriptorBox.SetToItem(aItem);
+        #endregion
 
-
+        #region Spell
         public static void AddSpellToSpellBook(Spell aSpell) => spellBookBox.AssignSpell(aSpell);
         public static void HoldSpell(Spell aSpell, Vector2 aGrabOffset) => heldSpell.HoldMe(aSpell, aGrabOffset);
         public static void ReleaseSpell() => heldSpell.ReleaseMe();
@@ -160,53 +204,24 @@ namespace Project_1.UI.HUD
         public static void CancelChannel() => playerCastBar.CancelCast();
         public static void UpdateChannelSpell(float aNewVal) => playerCastBar.Value = aNewVal;
         public static void ChannelSpell(Spell aSpell) => playerCastBar.CastSpell(aSpell);
+        #endregion
 
-
+        #region Loot
         public static Items.Item GetLootItem(int aSlotInLoot) => lootBox.GetItem(aSlotInLoot);
         public static void ReduceLootItem(int aSlotInLoot, int aCount) => lootBox.ReduceItem(aSlotInLoot, aCount);
         public static void Loot(Corpse aCorpse) => lootBox.Loot(aCorpse);
 
         public static void HoldItem(Item aItem, Vector2 aGrabOffset) => heldItem.HoldItem(aItem, aGrabOffset);
         public static void ReleaseItem() => heldItem.ReleaseMe();
+        #endregion
 
-
-        public static void AddWalkerToControl(Walker aWalker)
-        {
-            for (int i = 0; i < partyPlateBoxes.Length; i++)
-            {
-                if (partyPlateBoxes[i].BelongsTo(aWalker))
-                {
-                    partyPlateBoxes[i].VisibleBorder = true;
-                    break;
-                }
-            
-            }
-        }
-
-        public static void RemoveWalkersFromControl(Walker[] aWalkers)
-        {
-            for (int i = 0; i < aWalkers.Length; i++)
-            {
-                for (int j = 0; j < partyPlateBoxes.Length; j++)
-                {
-
-                    if (partyPlateBoxes[j].BelongsTo(aWalkers[i]))
-                    {
-                        partyPlateBoxes[j].VisibleBorder = false;
-                        break;
-                    }
-                }
-            }
-        }
+        
 
         public static bool Click(ClickEvent aClickEvent)
         {
             for (int i = hudElements.Count - 1; i >= 0; i--)
             {
-                if (hudElements[i].ClickedOn(aClickEvent))
-                {
-                    return true;
-                }
+                if (hudElements[i].ClickedOn(aClickEvent)) return true;
             }
             return false;
         }
@@ -215,20 +230,20 @@ namespace Project_1.UI.HUD
         {
             for (int i = hudElements.Count - 1; i >= 0; i--)
             {
-                if (hudElements[i].ReleasedOn(aReleaseEvent))
-                {
-                    return true;
-                }
+                if (hudElements[i].ReleasedOn(aReleaseEvent)) return true;
             }
             return false;
         }
 
-        public static void Update()
+        internal static bool Scroll(ScrollEvent aScrollEvent)
         {
             for (int i = 0; i < hudElements.Count; i++)
             {
-                hudElements[i].Update(null);
+                if (hudElements[i].ScrolledOn(aScrollEvent)) return true;
+
             }
+            return false;
+
         }
 
         public static void Draw(SpriteBatch aBatch)
@@ -240,14 +255,6 @@ namespace Project_1.UI.HUD
 
             heldItem.Draw(aBatch);
             heldSpell.Draw(aBatch);
-        }
-
-        public static void Rescale()
-        {
-            for (int i = 0; i < hudElements.Count; i++)
-            {
-                hudElements[i].Rescale();
-            }
         }
     }
 }

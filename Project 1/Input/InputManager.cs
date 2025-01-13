@@ -69,16 +69,6 @@ namespace Project_1.Input
             }
         }
 
-        public static int ScrolledSinceLastFrame
-        {
-            get
-            {
-                //Debug.Assert(scrolledSinceLastFrame == 0);
-                return scrolledSinceLastFrame;
-            }
-
-            private set => scrolledSinceLastFrame = value;
-        }
 
         public static Keys? GetAnyKey
         {
@@ -100,8 +90,6 @@ namespace Project_1.Input
         static MouseState newMouseState;
         static MouseState oldMouseState;
 
-        static int scrolledSinceLastFrame;
-
         public static void Update()
         {
             UpdateStates();
@@ -121,8 +109,9 @@ namespace Project_1.Input
 
         static void UpdateScrollWheel()
         {
-            ScrolledSinceLastFrame = oldMouseState.ScrollWheelValue - newMouseState.ScrollWheelValue;
+            if (oldMouseState.ScrollWheelValue == newMouseState.ScrollWheelValue) return;
 
+            CreateScrollEvent();
         }
 
         static void CheckButtonPress()
@@ -143,12 +132,8 @@ namespace Project_1.Input
             bool[] heldModifiers = CheckHoldModifiers();
 
             ClickEvent clickEvent = new ClickEvent(GetMousePosRelative(), aTypeOfClick, heldModifiers);
-            //DebugManager.Print(typeof(InputManager), "Mouse pos = " + GetMousePosRelative());
-            bool hitAnUIElement = UIManager.Click(clickEvent);
-            if (hitAnUIElement)
-            {
-                return;
-            }
+                
+            if (UIManager.Click(clickEvent)) return;
             ObjectManager.Click(clickEvent);
         }
 
@@ -158,6 +143,19 @@ namespace Project_1.Input
 
             ReleaseEvent releaseEvent = new ReleaseEvent(aCreator, GetMousePosRelative(), aTypeOfRelease, heldModifiers);
             UIManager.Release(releaseEvent);
+        }
+
+        static void CreateScrollEvent()
+        {
+            bool[] heldModifiers = CheckHoldModifiers();
+
+            int amount = Math.Abs(oldMouseState.ScrollWheelValue - newMouseState.ScrollWheelValue) / 120;
+            ScrollEvent.Direction direction = oldMouseState.ScrollWheelValue > newMouseState.ScrollWheelValue ? ScrollEvent.Direction.Up : ScrollEvent.Direction.Down;
+
+            ScrollEvent scrollEvent = new ScrollEvent(GetMousePosRelative(), amount, direction, heldModifiers);
+
+            if (UIManager.Scroll(scrollEvent)) return;
+            Camera.Camera.Scroll(scrollEvent);
         }
 
         static bool[] CheckHoldModifiers()
