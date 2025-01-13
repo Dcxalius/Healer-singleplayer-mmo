@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.GameObjects.Entities
 {
-    internal class Corpse : GameObject //TODO: FIX
+    internal class Corpse : GameObject
     {
         ParticleBase lootGlow;
         ParticleMovement lootGlowMovement;
