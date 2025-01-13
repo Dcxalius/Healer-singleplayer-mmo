@@ -78,7 +78,7 @@ namespace Project_1.GameObjects
         {
             Debug.Assert(gfx != null);
             //gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2());
-            gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2(), FeetPosition.Y);
+            gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition(), Color.White, FeetPosition.Y);
             for (int i = 0; i < effects.Count; i++)
             {
                 effects[i].Draw(aBatch, Position, FeetPosition.Y + 0.01f);

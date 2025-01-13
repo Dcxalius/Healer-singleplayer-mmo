@@ -54,7 +54,7 @@ namespace Project_1.Tiles
         public override void Draw(SpriteBatch aBatch)
         {
             //base.Draw(aBatch); Skip draw as a gameobject to make all tiles appear in the background
-            gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2(), 0);
+            gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition(), Color.White, 0);
 
             //xText.LeftAllignedDraw(aBatch, new WorldSpace(Position - Size.ToVector2() / 2).ToAbsoltueScreenPosition());
             if (DebugManager.Mode(DebugMode.TileCoords))
