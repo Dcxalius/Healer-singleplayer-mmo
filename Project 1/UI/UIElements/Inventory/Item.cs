@@ -60,6 +60,7 @@ namespace Project_1.UI.UIElements.Inventory
             if (aPath.Name != null) isEmpty = false;
             itemCount = new Text("Gloryse");
             holdable = aHoldable;
+            usesPressedGfx = false;
         }
 
         protected override void ClickedOnMe(ClickEvent aClick)

@@ -23,6 +23,17 @@ namespace Project_1.UI.UIElements
             gfxOnButton = new UITexture(aPath, Color.White);
         }
 
+        
+        Rectangle ConstructGfxRect() //TODO: Make this not calculate every update
+        {
+            Point pos = new Vector2(AbsolutePos.X + AbsolutePos.Size.X / 10, AbsolutePos.Y + AbsolutePos.Size.Y / 10).ToPoint();
+            Point size = new Vector2(AbsolutePos.Size.X * 0.8f, AbsolutePos.Size.Y * 0.8f).ToPoint();
+
+            return new Rectangle(pos, size);
+
+        }
+
+
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)
         {
             base.Draw(aBatch);
@@ -40,19 +51,5 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        Rectangle ConstructGfxRect() //TODO: Make this not calculate every update
-        {
-            Point pos = new Vector2(AbsolutePos.X + AbsolutePos.Size.X / 10, AbsolutePos.Y + AbsolutePos.Size.Y / 10).ToPoint();
-            Point size = new Vector2(AbsolutePos.Size.X * 0.8f, AbsolutePos.Size.Y * 0.8f).ToPoint();
-
-            return new Rectangle(pos, size);
-
-        }
-
-        public override void Rescale()
-        {
-            base.Rescale();
-
-        }
     }
 }
