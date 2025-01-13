@@ -49,6 +49,8 @@ namespace Project_1.UI.UIElements
         public RelativeScreenPosition RelativePos => relativePos;
         public RelativeScreenPosition RelativeSize => relativeSize;
 
+        public RelativeScreenPosition RelativePositionOnScreen => relativePos + parentPos.ToRelativeScreenPosition();
+
         public Rectangle AbsolutePos
         {
             get
@@ -156,7 +158,7 @@ namespace Project_1.UI.UIElements
             visible = !visible;
             foreach (UIElement child in children)
             {
-                child.visible = visible;
+                child.Visible = visible;
             }
         }
 

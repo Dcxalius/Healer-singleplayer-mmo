@@ -294,6 +294,11 @@ namespace Project_1.UI.UIElements.Inventory
         {
             base.OnDeHover();
 
+            HideDescriptorBox();
+        }
+
+        protected void HideDescriptorBox()
+        {
             if (holdable)
             {
                 HUDManager.SetDescriptorBox(null);

@@ -24,6 +24,7 @@ namespace Project_1.UI.HUD
         DescriptorText description;
 
         float maxX;
+        readonly RelativeScreenPosition spacingFromItem = RelativeScreenPosition.GetSquareFromX(0.0005f);
 
         public DescriptorBox() : base(new UITexture("GrayBackground", Color.White), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
         {
@@ -31,7 +32,7 @@ namespace Project_1.UI.HUD
             descriptedName = new DescriptorText(maxX, "Gloryse", Color.White);
             description = new DescriptorText(maxX, "Gloryse", Color.White);
 
-            ToggleVisibilty();
+            Visible = false;
         }
 
         public void SetToItem(Item aItem)
@@ -51,19 +52,19 @@ namespace Project_1.UI.HUD
                 return;
             }
 
-            ToggleVisibilty();
+            Visible = true;
             descriptedName.Value = item.Name;
             description.Value = item.Description;
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
             int y = (int)(descriptedName.Offset.Y + description.Offset.Y);
             int x = (int)Math.Max(descriptedName.Offset.X, description.Offset.X);
             Resize(new AbsoluteScreenPosition(x, y).ToRelativeScreenPosition() + spacing * 2 + new RelativeScreenPosition(0, spacing.Y));
-            Move(InputManager.GetMousePosRelative() - RelativeSize);
+            Move(aItem.RelativePositionOnScreen - spacingFromItem - RelativeSize);
         }
 
         void ResetDescriptor()
         {
-            ToggleVisibilty();
+            Visible = false;
             descriptedName.Value = null;
             description.Value = null;
             Resize(RelativeScreenPosition.Zero);
@@ -74,10 +75,6 @@ namespace Project_1.UI.HUD
         {
             base.Update(aParent);
 
-            if (Visible)
-            {
-                Move(InputManager.GetMousePosRelative() - RelativeSize);
-            }
         }
 
         public override void Rescale()
