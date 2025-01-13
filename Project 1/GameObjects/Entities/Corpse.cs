@@ -1,8 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json.Bson;
 using Project_1.Camera;
 using Project_1.Input;
 using Project_1.Items;
+using Project_1.Managers;
 using Project_1.Particles;
 using Project_1.Textures;
 using Project_1.UI.HUD;
@@ -27,6 +29,16 @@ namespace Project_1.GameObjects.Entities
 
         public bool IsEmpty => drop.All(drop => drop == null);
 
+        const double hardDecayTime = 10000;
+        const double softDecayTime = 20000;
+
+        const double despawnTime = 1000;
+
+        double timeDied;
+
+        bool isDespawning;
+        double timeDespawnStart;
+
         public Corpse(GfxPath aPath, LootTable aLoot) : base(new Textures.Texture(aPath), WorldSpace.Zero)
         {
             loot = aLoot;
@@ -34,6 +46,7 @@ namespace Project_1.GameObjects.Entities
             lootGlow = new ParticleBase((1000d, 1000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[]{ Color.Yellow }, new Point(1));
             lootGlowMovement = new ParticleMovement(new WorldSpace(0, -1), WorldSpace.Zero, 0.95f);
             drop = new Item[0];
+            isDespawning = false;
         }
 
         public void SpawnCorpe(WorldSpace aPos)
@@ -44,6 +57,8 @@ namespace Project_1.GameObjects.Entities
             }
             Position = aPos;
             ObjectManager.AddCorpse(this);
+
+            timeDied = TimeManager.TotalFrameTime;
         }
 
         public override bool Click(ClickEvent aClickEvent)
@@ -65,14 +80,58 @@ namespace Project_1.GameObjects.Entities
             if (!IsEmpty)
             {
                 ParticleManager.SpawnParticle(lootGlow, WorldRectangle, this, lootGlowMovement, 60d);
+
+                DespawnWithoutLootInside();
             }
+
+            DespawnWithLootStillInside();
+
+            FinishDespawn();
+        }
+
+        void FinishDespawn()
+        {
+            if (!isDespawning) return;
+            if (timeDespawnStart + despawnTime > TimeManager.TotalFrameTime) return;
+
+            ObjectManager.DespawnCorpse(this);
+        }
+
+        void DespawnWithoutLootInside()
+        {
+            if (isDespawning) return;
+            if (timeDied + softDecayTime < TimeManager.TotalFrameTime)
+            {
+                StartDespawn();
+            }
+        }
+
+        void DespawnWithLootStillInside()
+        {
+            if (isDespawning) return;
+            if (timeDied + hardDecayTime < TimeManager.TotalFrameTime)
+            {
+                StartDespawn();
+            }
+        }
+
+        void StartDespawn()
+        {
+            isDespawning = true; 
+            timeDespawnStart = TimeManager.TotalFrameTime;
         }
 
         public override void Draw(SpriteBatch aBatch)
         {
             Debug.Assert(gfx != null);
-            gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2(), Position.Y);
             //gfx.Draw(aBatch, Camera.Camera.WorldPosToCameraSpace(Position), Position.Y);
+            if (isDespawning)
+            {
+                gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2(), Color.White * (float)(1 - ((TimeManager.TotalFrameTime - timeDespawnStart) / despawnTime)), Position.Y);
+                return;
+            }
+            gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2(), Position.Y);
+
         }
     }
 }

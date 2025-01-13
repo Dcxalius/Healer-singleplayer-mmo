@@ -64,6 +64,11 @@ namespace Project_1.GameObjects
             corpses.Add(aCorpse);
         }
 
+        public static void DespawnCorpse(Corpse aCorpse)
+        {
+            corpses.Remove(aCorpse);
+        }
+
         public static void RemoveEntity(Entity aObject)
         {
             entities.Remove(aObject);

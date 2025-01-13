@@ -122,82 +122,102 @@ namespace Project_1.UI.UIElements.Inventory
 
             Item droppedOnMe = aRelease.Parent as Item;
 
-            FromBagrack(droppedOnMe);
+            if (FromBagrack(droppedOnMe)) return;
+            if (ToBagRack(droppedOnMe)) return;
 
-            ToBagRack(droppedOnMe);
+            if (FromLoot(droppedOnMe)) return;
+            if (ToLoot()) return;
 
+            if (FromCharacterPane(droppedOnMe)) return;
+            if (ToCharacterPane(droppedOnMe)) return;
 
-            FromLoot(droppedOnMe);
-
-
-
-
-            if (bagIndex == -2) return; //Tried to place items in loot, this isnt tibia buddy
-
-            if (droppedOnMe.bagIndex == -3)
-            {
-                return; //TODO: If dropped on gear for the same slot it should equip it if dropped on anything else it should dequip it
-                //Should also allow u to swap a onehander, trinket and ring to the other slot but disallow all other swaps
-            }
-
-            if (bagIndex == -3)
-            {
-                ObjectManager.Player.Inventory.SwapEquipment(droppedOnMe.Index, slotIndex);
-                return;
-            }
-
-            
-
-            ObjectManager.Player.Inventory.SwapItems(droppedOnMe.Index, Index);
+            InventoryToInventory(droppedOnMe);
         }
 
-        void FromBagrack(Item aItemDroppedOnMe)
+        bool FromBagrack(Item aItemDroppedOnMe)
         {
             if (aItemDroppedOnMe.bagIndex == -1)
             {
                 if (bagIndex >= 0) //Onto Inventory
                 {
-                    if (aItemDroppedOnMe.slotIndex == bagIndex) return; //Bag is tried being placed in itself
+                    if (aItemDroppedOnMe.slotIndex == bagIndex) return true; //Bag is tried being placed in itself
                     Items.Item i = ObjectManager.Player.Inventory.GetItemInSlot(bagIndex, slotIndex);
                     if (i == null)
                     {
                         ObjectManager.Player.Inventory.UnequipBag(aItemDroppedOnMe.slotIndex, Index);
-                        return;
+                        return true;
                     }
                     //Swap bags if dropped on bag no?
-                    return;
+                    return true;
                 }
 
                 if (bagIndex == -1) //Onto bagrack
                 {
                     ObjectManager.Player.Inventory.SwapPlacesOfBags(aItemDroppedOnMe.slotIndex, slotIndex);
-                    return;
+                    return true;
                 }
 
                 throw new NotImplementedException();
             }
+
+            return false;
         }
 
-        void ToBagRack(Item aItemDroppedOnMe)
+        bool ToBagRack(Item aItemDroppedOnMe)
         {
             if (bagIndex == -1) // Onto bagrack
             {
-                if (aItemDroppedOnMe.bagIndex == -2) return; //Drop from loot
+                if (aItemDroppedOnMe.bagIndex == -2) return true; //Drop from loot
 
-                if (ObjectManager.Player.Inventory.GetItemInSlot(aItemDroppedOnMe.Index).ItemType != ItemData.ItemType.Container) return; //Dropped is not bag
+                if (ObjectManager.Player.Inventory.GetItemInSlot(aItemDroppedOnMe.Index).ItemType != ItemData.ItemType.Container) return true; //Dropped is not bag
 
                 ObjectManager.Player.Inventory.SwapBags(aItemDroppedOnMe.Index, slotIndex);
-                return;
+                return true;
             }
+            return false;
         }
 
-        void FromLoot(Item aItemDroppedOnMe)
+        bool FromLoot(Item aItemDroppedOnMe)
         {
             if (aItemDroppedOnMe.bagIndex == -2) //From loot
             {
                 ObjectManager.Player.Inventory.LootItem(aItemDroppedOnMe.slotIndex, Index);
-                return;
+                return true;
             }
+            return false;
+        }
+
+        bool ToLoot()
+        {
+            if (bagIndex == -2) return true; //Tried to place items in loot, this isnt tibia buddy
+            return false;
+        }
+        
+        bool FromCharacterPane(Item aItemDroppedOnMe)
+        {
+            if (aItemDroppedOnMe.bagIndex == -3)
+            {
+                return true; //TODO: If dropped on gear for the same slot it should equip it if dropped on anything else it should dequip it
+                //Should also allow u to swap a onehander, trinket and ring to the other slot but disallow all other swaps
+            }
+
+            return false;
+        }
+
+        bool ToCharacterPane(Item aItemDroppedOnMe)
+        {
+            if (bagIndex == -3)
+            {
+                ObjectManager.Player.Inventory.SwapEquipment(aItemDroppedOnMe.Index, slotIndex);
+                return true;
+            }
+            return false;
+        }
+
+        bool InventoryToInventory(Item aItemDroppedOnMe)
+        {
+            ObjectManager.Player.Inventory.SwapItems(aItemDroppedOnMe.Index, Index);
+            return true;
         }
 
         public override void HoldReleaseOnMe()
