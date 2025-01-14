@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.Items
+namespace Project_1.Items.SubTypes
 {
     internal class Weapon : Equipment
     {
@@ -14,7 +14,7 @@ namespace Project_1.Items
             OneHand,
             TwoHand,
             MainHand,
-            OffHand, 
+            OffHand,
             Ranged
         }
 

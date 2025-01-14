@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.Items
+namespace Project_1.Items.SubTypes
 {
     internal class ConsumableData : ItemData
     {

@@ -59,7 +59,7 @@ namespace Project_1.UI.HUD
             targetBuffBox = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, new RelativeScreenPosition(0.33f, 0.21f), new RelativeScreenPosition(0.2f, 0.1f));
 
             lootBox = new LootBox(new RelativeScreenPosition(0.1f, 0.5f), new RelativeScreenPosition(0.4f, 0.4f));
-            inventoryBox = new InventoryBox(new RelativeScreenPosition(0.59f, 0.59f), new RelativeScreenPosition(0.4f));
+            inventoryBox = new InventoryBox(new RelativeScreenPosition(0.59f, 0.80f), new RelativeScreenPosition(0.4f));
             descriptorBox = new DescriptorBox();
 
             characterWindow = new CharacterWindow();

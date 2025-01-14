@@ -3,6 +3,7 @@ using Newtonsoft.Json.Bson;
 using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Unit;
+using Project_1.GameObjects.Unit.Stats;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Inventory;
@@ -18,6 +19,8 @@ namespace Project_1.UI.HUD
     {
         Item[] equiped;
 
+        Label statReport;
+
         static RelativeScreenPosition size = RelativeScreenPosition.GetSquareFromY(0.05f);
         static RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromY(0.003f);
         static RelativeScreenPosition leftSideTop = spacing;
@@ -31,36 +34,45 @@ namespace Project_1.UI.HUD
 
             RelativeScreenPosition yChange = new RelativeScreenPosition(0, spacing.Y) + new RelativeScreenPosition(0, size.Y);
             CreateItems(Equipment.Slot.Head, Equipment.Slot.Hands, leftSideTop, yChange);
-            CreateItems(Equipment.Slot.Belt, Equipment.Slot.Finger2, rightSideTop, yChange);
+            CreateItems(Equipment.Slot.Belt, Equipment.Slot.Trinket2, rightSideTop, yChange);
             RelativeScreenPosition xChange = new RelativeScreenPosition(spacing.X, 0) + new RelativeScreenPosition(size.X, 0);
             CreateItems(Equipment.Slot.MainHand, Equipment.Slot.Ranged, bottomSideLeft, xChange);
 
+            RelativeScreenPosition topPart = new RelativeScreenPosition(0, yChange.Y * ((int)Equipment.Slot.Hands + 1));
+            RelativeScreenPosition textBoxPos = topPart + spacing;
+            RelativeScreenPosition textBoxSize = new RelativeScreenPosition(WindowSize.X - spacing.X * 2, WindowSize.Y - topPart.Y - spacing.Y * 2);
+
+            statReport = new Label("asdf \n asdf \n asdf \n asdf \n asdf \n asdf", textBoxPos, textBoxSize, Color.Black);
+
             children.AddRange(equiped);
+            children.Add(statReport);
             ToggleVisibilty();
         }
 
-        void CreateItems(Equipment.Slot aStart, Equipment.Slot aEnd, RelativeScreenPosition aStartPos, RelativeScreenPosition aChangeInPos)
+        void CreateItems(Equipment.Slot aStart, Equipment.Slot aEnd, RelativeScreenPosition aStartPos, RelativeScreenPosition aChangeInPos)//TODO: Make this take an array 
         {
             for (int i = (int)aStart ; i <= (int)aEnd; i++)
             {
-                Items.Item item = ObjectManager.Player.Equipment.EquipedInSlot((Equipment.Slot)i);
+                Items.Item item = ObjectManager.Player.Equipment.EquipedInSlot((Equipment.Slot)i); //and use that to get item here instead
                 if (item != null)
                 {
                     equiped[i] = new Item(-3, i, true, item.GfxPath, aStartPos + aChangeInPos * (i - (int)aStart) , size);
-
                 }
                 else
                 {
                     equiped[i] = new Item(-3, i, true, new GfxPath(GfxType.Item, null), aStartPos + aChangeInPos * (i - (int)aStart), size);
-
                 }
-
             }
         }
 
         public void SetSlot(Equipment.Slot aSlot)
         {
-            equiped[(int)aSlot].AssignItem(ObjectManager.Player.Equipment.EquipedInSlot(aSlot));
+            equiped[(int)aSlot].AssignItem(ObjectManager.Player.Equipment.EquipedInSlot(aSlot)); //TODO: Remove player reference
+        }
+
+        public void SetReportBox(Report aReport)
+        {
+
         }
     }
 }

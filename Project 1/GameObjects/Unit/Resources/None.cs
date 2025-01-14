@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.GameObjects.Unit.Stats;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,6 @@ namespace Project_1.GameObjects.Unit.Resources
 
         public override float Value { get => 0; }
 
-        public override float CalculateMaxValue(PrimaryStats aStats) { return 0; }
+        public override float CalculateMaxValue(BasePrimaryStats aStats) { return 0; }
     }
 }

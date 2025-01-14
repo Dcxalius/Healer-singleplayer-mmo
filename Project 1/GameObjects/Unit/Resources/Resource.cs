@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.GameObjects.Unit.Stats;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -65,11 +66,11 @@ namespace Project_1.GameObjects.Unit.Resources
             Value = MaxValue;
         }
 
-        public void Refresh(PrimaryStats aStats)
+        public void Refresh(BasePrimaryStats aStats)
         {
             MaxValue = CalculateMaxValue(aStats);
         }
 
-        public abstract float CalculateMaxValue(PrimaryStats aStats);
+        public abstract float CalculateMaxValue(BasePrimaryStats aStats);
     }
 }

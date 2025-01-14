@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Project_1.GameObjects.Unit.Stats;
 
 namespace Project_1.GameObjects.Unit.Resources
 {
@@ -46,7 +47,7 @@ namespace Project_1.GameObjects.Unit.Resources
 
         protected override float PerLevel => 10;
 
-        public Mana(float aBaseValue, PrimaryStats aStats, float aCurrentValue, float aBaseRegen, int aLevel) : base(ResourceType.Mana, Color.Cyan)
+        public Mana(float aBaseValue, BasePrimaryStats aStats, float aCurrentValue, float aBaseRegen, int aLevel) : base(ResourceType.Mana, Color.Cyan)
         {
             Debug.Assert(aBaseValue > 0, "Tried to set base to 0");
             Debug.Assert(aBaseRegen > 0, "Tried to set regen to 0");
@@ -75,6 +76,6 @@ namespace Project_1.GameObjects.Unit.Resources
             base.CastSpell(aCost);
         }
 
-        public override float CalculateMaxValue(PrimaryStats aStats) => BaseMaxValue + aStats.Intellect * 15;
+        public override float CalculateMaxValue(BasePrimaryStats aStats) => BaseMaxValue + aStats.Intellect * 15;
     }
 }

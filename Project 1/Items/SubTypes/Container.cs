@@ -5,7 +5,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.Items
+namespace Project_1.Items.SubTypes
 {
     internal class Container : Item //TODO: Change Name this should be bag or similar, container should be an item you can right click to open and loot like clams
     {
@@ -17,7 +17,7 @@ namespace Project_1.Items
 
         public Container(LootData aLoot) : base(aLoot)
         {
-        
+
         }
     }
 }

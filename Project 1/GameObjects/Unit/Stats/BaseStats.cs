@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Project_1.GameObjects.Unit.BasePrimaryStats;
+using static Project_1.GameObjects.Unit.Stats.BasePrimaryStats;
 
-namespace Project_1.GameObjects.Unit
+namespace Project_1.GameObjects.Unit.Stats
 {
-    internal class PrimaryStats : BasePrimaryStats
+    internal class BaseStats
     {
         public Health Health => health;
         Health health;
@@ -18,6 +18,9 @@ namespace Project_1.GameObjects.Unit
 
         public Attack Attack => attack;
         Attack attack;
+
+        public BasePrimaryStats PrimaryStats => primaryStats;
+        BasePrimaryStats primaryStats;
 
         public int AttackPower
         {
@@ -30,10 +33,10 @@ namespace Project_1.GameObjects.Unit
         }
         int attackPower;
 
-        public PrimaryStats(ClassData aClassData, int aLevel, float aCurrentHealth = float.MaxValue, float aCurrentResource = float.MaxValue) : base(aClassData.BaseStats, aClassData.PerLevelStats, aLevel)
+        public BaseStats(ClassData aClassData, int aLevel, float aCurrentHealth = float.MaxValue, float aCurrentResource = float.MaxValue)
         {
-            health = new Health(aClassData, this, aLevel, aCurrentHealth);
-
+            primaryStats = new BasePrimaryStats(aClassData.BaseStats, aClassData.PerLevelStats, aLevel);
+            health = new Health(aClassData, primaryStats, aLevel, aCurrentHealth);
             switch (aClassData.Resource)
             {
                 case Resource.ResourceType.Mana:
@@ -41,7 +44,7 @@ namespace Project_1.GameObjects.Unit
                     float manaPer5 = 5; //TODO: Extranct these values from class
                     int maxResource = /*baseFromClass + */ 1;
 
-                    resource = new Mana(maxResource, this, aCurrentResource, manaPer5, aLevel);
+                    resource = new Mana(maxResource, primaryStats, aCurrentResource, manaPer5, aLevel);
                     break;
                 case Resource.ResourceType.Energy:
                     resource = new Energy(aCurrentResource);
@@ -63,13 +66,8 @@ namespace Project_1.GameObjects.Unit
 
         public void LevelUp(ClassData aClassData)
         {
-            strength += aClassData.PerLevelStats.Strength;
-            agility += aClassData.PerLevelStats.Agility;
-            intellect += aClassData.PerLevelStats.Intellect;
-            spirit += aClassData.PerLevelStats.Spirit;
-            stamina += aClassData.PerLevelStats.Stamina;
-
-            health.LevelUp(aClassData.PerLevelHp, Stamina);
+            primaryStats.LevelUp(aClassData.PerLevelStats);
+            health.LevelUp(aClassData.PerLevelHp, primaryStats.Stamina);
             resource.LevelUp();
 
             RefreshStats();
@@ -77,8 +75,8 @@ namespace Project_1.GameObjects.Unit
 
         public void RefreshStats()
         {
-            health.Refresh(this);
-            resource.Refresh(this);
+            health.Refresh(primaryStats);
+            resource.Refresh(primaryStats);
         }
     }
 }

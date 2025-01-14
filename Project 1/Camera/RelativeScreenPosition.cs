@@ -15,6 +15,8 @@ namespace Project_1.Camera
 
         public static RelativeScreenPosition Zero { get { return new RelativeScreenPosition(); } }
 
+        public RelativeScreenPosition OnlyX => new RelativeScreenPosition(position.X, 0);
+        public RelativeScreenPosition OnlyY => new RelativeScreenPosition(0, position.Y);
         public float X { get { return position.X; } set => position.X = value; }
         public float Y { get { return position.Y; } set => position.Y = value; }
 

@@ -48,7 +48,7 @@ namespace Project_1.UI.HUD
             children.Add(bagHolderBox);
             children.AddRange(bagBox);
 
-            CalculateSize();
+            CalculateSize(aPos); //TODO: Make this accept a enum that dictates wheter it grows up and down
             ToggleVisibilty();
         }
 
@@ -84,34 +84,19 @@ namespace Project_1.UI.HUD
                 if (inventory.bags[aSlot] != null)
                 {
                     bagBox[aSlot].RefreshBag(inventory.bags[aSlot].SlotCount, columnCount);
-                    CalculateSize();
+                    CalculateSize(RelativePos + RelativeSize.OnlyY);
                     return;
                 }
                 bagBox[aSlot].RefreshBag(0, 1);
 
-                CalculateSize();
+                CalculateSize(RelativePos + RelativeSize.OnlyY);
 
                 return;
             }
             bagBox[aBag].RefreshSlot(aSlot);
         }
 
-        //public void RefreshAllBags()
-        //{
-        //    //for (int i = 0; i < bagBox.Length; i++)
-        //    //{
-        //    //    bagBox[i].GetBagContent();
-        //    //}
-        //}
-
-        //public void RefreshSlot(int aBag, int aSlot)
-        //{
-        //    ////if (bagBox[aBag] == null) return false;
-        //    //Debug.Assert(bagBox[aBag].SlotCount == 0 || bagBox[aBag].SlotCount < aSlot, "Either tried to refresh empty bag or slot nr was to big.");
-        //    //bagBox[aBag].RefreshSlot(aSlot);
-        //}
-
-        void CalculateSize() //TODO: Find better name
+        void CalculateSize(RelativeScreenPosition aPos) //TODO: Find better name
         {
             RelativeScreenPosition resize = RelativeScreenPosition.Zero;
 
@@ -132,7 +117,7 @@ namespace Project_1.UI.HUD
 
             Resize(resize);
             bagHolderBox.Move(new RelativeScreenPosition(spacing.X, RelativeSize.Y - (itemSize.Y + spacing.Y * 3)));
-            Move(new RelativeScreenPosition(RelativePos.X, 0.9f - resize.Y));
+            Move(new RelativeScreenPosition(RelativePos.X, aPos.Y - resize.Y));
 
         }
 
@@ -160,13 +145,6 @@ namespace Project_1.UI.HUD
             return (int)Math.Ceiling((aSpacingX + (aItemSizeX + aSpacingX) * aSlotCount) / aWidthOfInventory);
         }
 
-        public override void Update(in UIElement aParent)
-        {
-            base.Update(aParent);
-
-            
-
-        }
 
         public override void Rescale()
         {
@@ -174,11 +152,6 @@ namespace Project_1.UI.HUD
 
             itemSize = RelativeScreenPosition.GetSquareFromX(itemSizeX);
             spacing = RelativeScreenPosition.GetSquareFromX(spacingX);
-        }
-
-        public override void Draw(SpriteBatch aBatch)
-        {
-            base.Draw(aBatch);
         }
     }
 }

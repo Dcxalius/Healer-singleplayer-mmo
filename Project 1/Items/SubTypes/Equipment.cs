@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.Items
+namespace Project_1.Items.SubTypes
 {
     internal class Equipment : Item
     {
@@ -20,12 +20,12 @@ namespace Project_1.Items
             Belt,
             Legs,
             Feet,
-            Trinket,
             Finger,
-            TwoHander,
+            Trinket,
             OneHander,
             MainHander,
             OffHander,
+            TwoHander,
             Ranged,
             Count
         }

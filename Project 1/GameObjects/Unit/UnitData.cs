@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Project_1.GameObjects.Spawners;
 using Project_1.GameObjects.Unit.Resources;
+using Project_1.GameObjects.Unit.Stats;
 using Project_1.Items;
 using Project_1.Textures;
 using System;
@@ -28,8 +29,8 @@ namespace Project_1.GameObjects.Unit
         public Level Level => level;
         Level level;
 
-        public PrimaryStats PrimaryStats => primaryStats;
-        PrimaryStats primaryStats;
+        public BaseStats PrimaryStats => primaryStats;
+        BaseStats primaryStats;
 
         
         public Health HealthData => primaryStats.Health;
@@ -73,7 +74,7 @@ namespace Project_1.GameObjects.Unit
             level = aData.Level;
             equipment = aData.Equipment;
 
-            primaryStats = new PrimaryStats(classData, level.CurrentLevel);
+            primaryStats = new BaseStats(classData, level.CurrentLevel);
 
             gfxPath = aData.GfxPath;
             corpseGfxPath = aData.CorpseGfxPath;
@@ -94,7 +95,7 @@ namespace Project_1.GameObjects.Unit
             this.equipment = new Equipment(equipment);
 
             
-            primaryStats = new PrimaryStats(classData, this.level.CurrentLevel, currentHp, currentResource);
+            primaryStats = new BaseStats(classData, this.level.CurrentLevel, currentHp, currentResource);
 
             gfxPath = new GfxPath(GfxType.Object, name);
 

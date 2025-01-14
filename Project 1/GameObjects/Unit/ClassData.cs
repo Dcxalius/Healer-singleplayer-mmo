@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Project_1.GameObjects.Unit.Resources;
+using Project_1.GameObjects.Unit.Stats;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

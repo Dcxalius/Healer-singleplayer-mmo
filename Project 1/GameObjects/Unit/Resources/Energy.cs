@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Project_1.GameObjects.Unit.Stats;
 
 namespace Project_1.GameObjects.Unit.Resources
 {
@@ -69,6 +70,6 @@ namespace Project_1.GameObjects.Unit.Resources
             }
         }
 
-        public override float CalculateMaxValue(PrimaryStats aStats) => maxValue;
+        public override float CalculateMaxValue(BasePrimaryStats aStats) => maxValue;
     }
 }

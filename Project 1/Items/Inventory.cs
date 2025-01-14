@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Bson;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
+using Project_1.Items.SubTypes;
 using Project_1.Managers;
 using Project_1.UI.HUD;
 using System;
@@ -105,8 +106,8 @@ namespace Project_1.Items
                     items[i] = new Item[bags[i].SlotCount];
 
                     items[aBagAndSlot.Item1][aBagAndSlot.Item2] = null;
-                    HUDManager.RefreshInventorySlot(aBagAndSlot);
                     HUDManager.RefreshInventorySlot(-1, i);
+                    HUDManager.RefreshInventorySlot(aBagAndSlot);
 
 
                     return true;
@@ -355,6 +356,19 @@ namespace Project_1.Items
             return false;
         }
 
+        public void AddItem(Item aItem, int aBagIndex, int aSlotIndex)
+        {
+            Debug.Assert(aItem != null);
+            Debug.Assert(GetItemInSlot(aBagIndex, aSlotIndex) == null);
+
+            AssignItem(aItem, aBagIndex, aSlotIndex);
+        }
+
+        public void AddItem(Item aItem, (int, int) aBagAndSlotIndex)
+        {
+            AddItem(aItem, aBagAndSlotIndex.Item1, aBagAndSlotIndex.Item2);
+        }
+
         public void SwapItems((int, int) aSlot, (int, int) aSlotToSwapWith)
         {
             if (items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2] == null)
@@ -536,12 +550,12 @@ namespace Project_1.Items
             AssignItem(equipedInSlot, aIndex);
         }
 
-        void AssignItem(Item item, (int, int) aBagAndSlotIndex)
+        public void AssignItem(Item item, (int, int) aBagAndSlotIndex)
         {
             AssignItem(item, aBagAndSlotIndex.Item1, aBagAndSlotIndex.Item2);
         }
         
-        void AssignItem(Item aItem, int aBagIndex, int aSlotIndex)
+        public void AssignItem(Item aItem, int aBagIndex, int aSlotIndex)
         {
             items[aBagIndex][aSlotIndex] = aItem;
             HUDManager.RefreshInventorySlot(aBagIndex, aSlotIndex);

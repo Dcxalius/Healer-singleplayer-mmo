@@ -5,6 +5,7 @@ using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.Input;
 using Project_1.Items;
+using Project_1.Items.SubTypes;
 using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.UI.HUD;
@@ -30,24 +31,18 @@ namespace Project_1.UI.UIElements.Inventory
 
         protected Text itemCount;
 
+
         public Items.Item GetActualItem 
         {
             get
             {
-                if (bagIndex >= 0)
-                {
-                    return ObjectManager.Player.Inventory.GetItemInSlot(Index);
-                }
+                if (bagIndex >= 0) return ObjectManager.Player.Inventory.GetItemInSlot(Index);
+                
+                if (bagIndex == -1) return ObjectManager.Player.Inventory.GetBag(slotIndex);
+                
+                if (bagIndex == -2) return HUDManager.GetLootItem(slotIndex);
 
-                if (bagIndex == -1)
-                {
-                    return ObjectManager.Player.Inventory.GetBag(slotIndex);
-                }
-
-                if (bagIndex == -2)
-                {
-                    return HUDManager.GetLootItem(slotIndex);
-                }
+                if (bagIndex == -3) return ObjectManager.Player.Equipment.EquipedInSlot((GameObjects.Unit.Equipment.Slot)slotIndex);
 
                 return null;
             }
@@ -119,6 +114,11 @@ namespace Project_1.UI.UIElements.Inventory
         {
             base.ReleaseOnMe(aRelease);
 
+            ItemDroppedOnMe(aRelease);
+        }
+
+        void ItemDroppedOnMe(ReleaseEvent aRelease)
+        {
             if (!(aRelease.Creator.GetType().IsSubclassOf(GetType()) || aRelease.Creator.GetType() == GetType())) return;
 
             Item droppedOnMe = aRelease.Creator as Item;
@@ -137,82 +137,114 @@ namespace Project_1.UI.UIElements.Inventory
 
         bool FromBagrack(Item aItemDroppedOnMe)
         {
-            if (aItemDroppedOnMe.bagIndex == -1)
+            if (aItemDroppedOnMe.bagIndex != -1) return false;
+
+            if (bagIndex >= 0) //Onto Inventory
             {
-                if (bagIndex >= 0) //Onto Inventory
+                if (aItemDroppedOnMe.slotIndex == bagIndex) return true; //Bag is tried being placed in itself
+                Items.Item i = ObjectManager.Player.Inventory.GetItemInSlot(bagIndex, slotIndex);
+                if (i == null)
                 {
-                    if (aItemDroppedOnMe.slotIndex == bagIndex) return true; //Bag is tried being placed in itself
-                    Items.Item i = ObjectManager.Player.Inventory.GetItemInSlot(bagIndex, slotIndex);
-                    if (i == null)
-                    {
-                        ObjectManager.Player.Inventory.UnequipBag(aItemDroppedOnMe.slotIndex, Index);
-                        return true;
-                    }
-                    //Swap bags if dropped on bag no?
+                    ObjectManager.Player.Inventory.UnequipBag(aItemDroppedOnMe.slotIndex, Index);
                     return true;
                 }
-
-                if (bagIndex == -1) //Onto bagrack
-                {
-                    ObjectManager.Player.Inventory.SwapPlacesOfBags(aItemDroppedOnMe.slotIndex, slotIndex);
-                    return true;
-                }
-
-                throw new NotImplementedException();
+                //Swap bags if dropped on bag no?
+                return true;
             }
 
-            return false;
+            if (bagIndex == -1) //Onto bagrack
+            {
+                ObjectManager.Player.Inventory.SwapPlacesOfBags(aItemDroppedOnMe.slotIndex, slotIndex);
+                return true;
+            }
+
+            throw new NotImplementedException();
         }
 
         bool ToBagRack(Item aItemDroppedOnMe)
         {
-            if (bagIndex == -1) // Onto bagrack
-            {
-                if (aItemDroppedOnMe.bagIndex == -2) return true; //Drop from loot
+            if (bagIndex != -1) return false;
 
-                if (ObjectManager.Player.Inventory.GetItemInSlot(aItemDroppedOnMe.Index).ItemType != ItemData.ItemType.Container) return true; //Dropped is not bag
+            if (aItemDroppedOnMe.bagIndex == -2) return true; //Drop from loot
 
-                ObjectManager.Player.Inventory.SwapBags(aItemDroppedOnMe.Index, slotIndex);
-                return true;
-            }
-            return false;
+            if (ObjectManager.Player.Inventory.GetItemInSlot(aItemDroppedOnMe.Index).ItemType != ItemData.ItemType.Container) return true; //Dropped is not bag
+
+            ObjectManager.Player.Inventory.SwapBags(aItemDroppedOnMe.Index, slotIndex);
+            return true;
         }
 
         bool FromLoot(Item aItemDroppedOnMe)
         {
-            if (aItemDroppedOnMe.bagIndex == -2) //From loot
-            {
-                ObjectManager.Player.Inventory.LootItem(aItemDroppedOnMe.slotIndex, Index);
-                return true;
-            }
-            return false;
+            if (aItemDroppedOnMe.bagIndex != -2) return false;
+
+            ObjectManager.Player.Inventory.LootItem(aItemDroppedOnMe.slotIndex, Index);
+            return true;
         }
 
         bool ToLoot()
         {
-            if (bagIndex == -2) return true; //Tried to place items in loot, this isnt tibia buddy
-            return false;
+            if (bagIndex != -2) return false;
+            return true; //Tried to place items in loot, this isnt tibia buddy
         }
-        
+
         bool FromCharacterPane(Item aItemDroppedOnMe)
         {
-            if (aItemDroppedOnMe.bagIndex == -3)
+            if (aItemDroppedOnMe.bagIndex != -3) return false;
+            
+            if (bagIndex == -3)
             {
-                return true; //TODO: If dropped on gear for the same slot it should equip it if dropped on anything else it should dequip it
-                //Should also allow u to swap a onehander, trinket and ring to the other slot but disallow all other swaps
+                Equipment thisItem = GetActualItem as Equipment;
+                Equipment droppedItem = aItemDroppedOnMe.GetActualItem as Equipment;
+
+                if (!GameObjects.Unit.Equipment.FitsInSlot(droppedItem.type, (GameObjects.Unit.Equipment.Slot)slotIndex)) return true;
+                if (thisItem == null)
+                {
+                    ObjectManager.Player.Equipment.EquipInParticularSlot(droppedItem, (GameObjects.Unit.Equipment.Slot)slotIndex);
+                    ObjectManager.Player.Equipment.EquipInParticularSlot(null, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
+                    return true;
+                }
+
+                if (droppedItem.type != thisItem.type) return true;
+                if (droppedItem.type >= Equipment.Type.MainHander) return true;
+                if (thisItem.type >= Equipment.Type.MainHander) return true;
+                ObjectManager.Player.Equipment.EquipInParticularSlot(droppedItem, (GameObjects.Unit.Equipment.Slot)slotIndex);
+                ObjectManager.Player.Equipment.EquipInParticularSlot(thisItem, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
+
+                return true;
             }
 
-            return false;
+            if (bagIndex >= 0)
+            {
+                Equipment thisItem = GetActualItem as Equipment;
+                Equipment droppedItem = aItemDroppedOnMe.GetActualItem as Equipment;
+
+                if (thisItem == null)
+                {
+                    ObjectManager.Player.Inventory.AddItem(droppedItem, Index);
+
+                    ObjectManager.Player.Equipment.EquipInParticularSlot(null, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
+                    return true;
+                }
+
+                if (!GameObjects.Unit.Equipment.FitsInSlot(thisItem.type, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex)) return true;
+
+                ObjectManager.Player.Inventory.AssignItem(droppedItem, Index);
+                ObjectManager.Player.Equipment.EquipInParticularSlot(thisItem, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
+
+                return true;
+            }
+            
+
+            return true; //TODO: If dropped on gear for the same slot it should equip it if dropped on anything else it should dequip it
+
         }
 
         bool ToCharacterPane(Item aItemDroppedOnMe)
         {
-            if (bagIndex == -3)
-            {
-                ObjectManager.Player.Inventory.SwapEquipment(aItemDroppedOnMe.Index, slotIndex);
-                return true;
-            }
-            return false;
+            if (bagIndex != -3) return false;
+
+            ObjectManager.Player.Inventory.SwapEquipment(aItemDroppedOnMe.Index, slotIndex);
+            return true;
         }
 
         bool InventoryToInventory(Item aItemDroppedOnMe)
