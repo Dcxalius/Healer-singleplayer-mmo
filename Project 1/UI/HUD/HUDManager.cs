@@ -190,9 +190,10 @@ namespace Project_1.UI.HUD
         public static void RefreshInventorySlot(int aBag, int aSlot) => inventoryBox.RefreshSlot(aBag, aSlot);
         public static void RefreshInventorySlot((int, int) aBagAndSlot) => RefreshInventorySlot(aBagAndSlot.Item1, aBagAndSlot.Item2);
 
-        public static void RefreshCharacterWindowSlot(Equipment.Slot aSlot) => characterWindow.SetSlot(aSlot);
-
         public static void SetDescriptorBox(Item aItem) => descriptorBox.SetToItem(aItem);
+
+        public static void RefreshCharacterWindowSlot(Equipment.Slot aSlot) => characterWindow.SetSlot(aSlot);
+        public static void RefreshCharacterWindowStats(PairReport aReport) => characterWindow.SetReportBox(aReport);
         #endregion
 
         #region Spell

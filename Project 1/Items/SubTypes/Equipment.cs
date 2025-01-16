@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Project_1.GameObjects.Unit.Stats;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -30,6 +31,7 @@ namespace Project_1.Items.SubTypes
             Count
         }
 
+        public EquipmentStats PrimaryStats => (itemData as EquipmentData).BaseStats;
         public Type type { get => (itemData as EquipmentData).Slot; }
 
 

@@ -3,7 +3,6 @@ using Newtonsoft.Json.Bson;
 using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Unit;
-using Project_1.GameObjects.Unit.Stats;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Inventory;
@@ -19,7 +18,8 @@ namespace Project_1.UI.HUD
     {
         Item[] equiped;
 
-        Label statReport;
+        Label nrStatReport;
+        Label stringStatReport;
 
         static RelativeScreenPosition size = RelativeScreenPosition.GetSquareFromY(0.05f);
         static RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromY(0.003f);
@@ -40,12 +40,14 @@ namespace Project_1.UI.HUD
 
             RelativeScreenPosition topPart = new RelativeScreenPosition(0, yChange.Y * ((int)Equipment.Slot.Hands + 1));
             RelativeScreenPosition textBoxPos = topPart + spacing;
-            RelativeScreenPosition textBoxSize = new RelativeScreenPosition(WindowSize.X - spacing.X * 2, WindowSize.Y - topPart.Y - spacing.Y * 2);
+            RelativeScreenPosition textBoxSize = new RelativeScreenPosition(WindowSize.X - spacing.X * 2, WindowSize.Y - topPart.Y - spacing.Y * 2) / 2;
 
-            statReport = new Label("asdf\nasdf\nasdf\nasdf\nasdf\nasdf", textBoxPos, textBoxSize, Label.TextAllignment.BottomRight, Color.Black);
+            nrStatReport = new Label(ObjectManager.Player.PrimaryStatReport.NumbersOnly, textBoxPos, textBoxSize - new RelativeScreenPosition(spacing.X,0), Label.TextAllignment.TopRight, Color.Black);
+            stringStatReport = new Label(ObjectManager.Player.PrimaryStatReport.StringsOnly, textBoxPos + new RelativeScreenPosition(textBoxSize.X, 0f) + new RelativeScreenPosition(spacing.X, 0), textBoxSize - new RelativeScreenPosition(spacing.X, 0), Label.TextAllignment.TopLeft, Color.Black);
 
             children.AddRange(equiped);
-            children.Add(statReport);
+            children.Add(nrStatReport);
+            children.Add(stringStatReport);
             ToggleVisibilty();
         }
 
@@ -70,9 +72,10 @@ namespace Project_1.UI.HUD
             equiped[(int)aSlot].AssignItem(ObjectManager.Player.Equipment.EquipedInSlot(aSlot)); //TODO: Remove player reference
         }
 
-        public void SetReportBox(Report aReport)
+        public void SetReportBox(PairReport aReport)
         {
-
+            stringStatReport.Text = aReport.StringsOnly;
+            nrStatReport.Text = aReport.NumbersOnly;
         }
     }
 }

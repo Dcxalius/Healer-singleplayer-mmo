@@ -1,4 +1,5 @@
 ﻿using Project_1.GameObjects.Unit.Resources;
+using Project_1.UI.HUD;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,8 +20,11 @@ namespace Project_1.GameObjects.Unit.Stats
         public Attack Attack => attack;
         Attack attack;
 
-        public BasePrimaryStats PrimaryStats => primaryStats;
-        BasePrimaryStats primaryStats;
+        public PrimaryStats PrimaryStats => totalPrimaryStats;
+        TotalPrimaryStats totalPrimaryStats;
+        BasePrimaryStats basePrimaryStats;
+
+
 
         public int AttackPower
         {
@@ -33,10 +37,11 @@ namespace Project_1.GameObjects.Unit.Stats
         }
         int attackPower;
 
-        public BaseStats(ClassData aClassData, int aLevel, float aCurrentHealth = float.MaxValue, float aCurrentResource = float.MaxValue)
+        public BaseStats(ClassData aClassData, int aLevel, EquipmentStats aEquipmentStats, float aCurrentHealth = float.MaxValue, float aCurrentResource = float.MaxValue)
         {
-            primaryStats = new BasePrimaryStats(aClassData.BaseStats, aClassData.PerLevelStats, aLevel);
-            health = new Health(aClassData, primaryStats, aLevel, aCurrentHealth);
+            basePrimaryStats = new BasePrimaryStats(aClassData.BaseStats, aClassData.PerLevelStats, aLevel);
+            totalPrimaryStats = new TotalPrimaryStats(basePrimaryStats, aEquipmentStats);
+            health = new Health(aClassData, basePrimaryStats, aLevel, aCurrentHealth);
             switch (aClassData.Resource)
             {
                 case Resource.ResourceType.Mana:
@@ -44,7 +49,7 @@ namespace Project_1.GameObjects.Unit.Stats
                     float manaPer5 = 5; //TODO: Extranct these values from class
                     int maxResource = /*baseFromClass + */ 1;
 
-                    resource = new Mana(maxResource, primaryStats, aCurrentResource, manaPer5, aLevel);
+                    resource = new Mana(maxResource, basePrimaryStats, aCurrentResource, manaPer5, aLevel);
                     break;
                 case Resource.ResourceType.Energy:
                     resource = new Energy(aCurrentResource);
@@ -59,15 +64,15 @@ namespace Project_1.GameObjects.Unit.Stats
             }
 
             attack = new Attack(aClassData.FistMinAttackDamage, aClassData.FistMaxAttackDamage, aClassData.FistAttackSpeed);
-
         }
 
 
 
         public void LevelUp(ClassData aClassData)
         {
-            primaryStats.LevelUp(aClassData.PerLevelStats);
-            health.LevelUp(aClassData.PerLevelHp, primaryStats.Stamina);
+            basePrimaryStats.LevelUp(aClassData.PerLevelStats);
+            totalPrimaryStats.UpdateBaseStats(basePrimaryStats);
+            health.LevelUp(aClassData.PerLevelHp, basePrimaryStats.Stamina);
             resource.LevelUp();
 
             RefreshStats();
@@ -75,8 +80,14 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void RefreshStats()
         {
-            health.Refresh(primaryStats);
-            resource.Refresh(primaryStats);
+            HUDManager.RefreshCharacterWindowStats(basePrimaryStats.NewReport);
+            health.Refresh(basePrimaryStats);
+            resource.Refresh(basePrimaryStats);
+        }
+
+        public void RefreshEquipmentStats(EquipmentStats aEquipmentStats)
+        {
+            totalPrimaryStats.UpdateEquipmentStats(aEquipmentStats);
         }
     }
 }

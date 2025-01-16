@@ -199,16 +199,16 @@ namespace Project_1.UI.UIElements.Inventory
                 if (!GameObjects.Unit.Equipment.FitsInSlot(droppedItem.type, (GameObjects.Unit.Equipment.Slot)slotIndex)) return true;
                 if (thisItem == null)
                 {
-                    ObjectManager.Player.Equipment.EquipInParticularSlot(droppedItem, (GameObjects.Unit.Equipment.Slot)slotIndex);
-                    ObjectManager.Player.Equipment.EquipInParticularSlot(null, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
+                    ObjectManager.Player.EquipInParticularSlot(droppedItem, (GameObjects.Unit.Equipment.Slot)slotIndex);
+                    ObjectManager.Player.EquipInParticularSlot(null, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
                     return true;
                 }
 
                 if (droppedItem.type != thisItem.type) return true;
                 if (droppedItem.type >= Equipment.Type.MainHander) return true;
                 if (thisItem.type >= Equipment.Type.MainHander) return true;
-                ObjectManager.Player.Equipment.EquipInParticularSlot(droppedItem, (GameObjects.Unit.Equipment.Slot)slotIndex);
-                ObjectManager.Player.Equipment.EquipInParticularSlot(thisItem, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
+                ObjectManager.Player.EquipInParticularSlot(droppedItem, (GameObjects.Unit.Equipment.Slot)slotIndex);
+                ObjectManager.Player.EquipInParticularSlot(thisItem, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
 
                 return true;
             }
@@ -222,14 +222,14 @@ namespace Project_1.UI.UIElements.Inventory
                 {
                     ObjectManager.Player.Inventory.AddItem(droppedItem, Index);
 
-                    ObjectManager.Player.Equipment.EquipInParticularSlot(null, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
+                    ObjectManager.Player.EquipInParticularSlot(null, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
                     return true;
                 }
 
                 if (!GameObjects.Unit.Equipment.FitsInSlot(thisItem.type, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex)) return true;
 
                 ObjectManager.Player.Inventory.AssignItem(droppedItem, Index);
-                ObjectManager.Player.Equipment.EquipInParticularSlot(thisItem, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
+                ObjectManager.Player.EquipInParticularSlot(thisItem, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
 
                 return true;
             }

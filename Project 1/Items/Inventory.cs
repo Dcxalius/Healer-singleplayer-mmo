@@ -16,7 +16,7 @@ namespace Project_1.Items
 {
     internal class Inventory
     {
-        Entity owner;
+        Entity owner; //TODO: Remove this dependency and move all of this into unitdata
 
         public int bagSlots = 4;
         public int defaultSlots = 32;
@@ -510,14 +510,14 @@ namespace Project_1.Items
             {
                 if (OpenSlots() < 1 && wearing.EquipedInSlot(GameObjects.Unit.Equipment.Slot.MainHand) != null && wearing.EquipedInSlot(GameObjects.Unit.Equipment.Slot.OffHand) != null) return;
 
-                (Item, Item) equipedInSlots = wearing.EquipTwoHander(equipment);
+                (Item, Item) equipedInSlots = owner.EquipTwoHander(equipment);
                 AssignItem(equipedInSlots.Item1, aIndex);
                 if (equipedInSlots.Item2 == null) return;
                 AddItem(equipedInSlots.Item2);
                 return;
             }
 
-            Item equipedInSlot = wearing.Equip(equipment);
+            Item equipedInSlot = owner.Equip(equipment);
             AssignItem(equipedInSlot, aIndex);
         }
 
@@ -546,7 +546,7 @@ namespace Project_1.Items
             }
 
             //Only things here should be Trinkets, rings and one handers
-            Item equipedInSlot = wearing.EquipInParticularSlot(equipment, (GameObjects.Unit.Equipment.Slot)aEquipmentSlot);
+            Item equipedInSlot = owner.EquipInParticularSlot(equipment, (GameObjects.Unit.Equipment.Slot)aEquipmentSlot);
             AssignItem(equipedInSlot, aIndex);
         }
 

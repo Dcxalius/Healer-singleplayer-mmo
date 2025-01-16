@@ -26,11 +26,11 @@ namespace Project_1.GameObjects.Unit
         public Resource.ResourceType Resource => resource;
         readonly Resource.ResourceType resource;
 
-        public BasePrimaryStats BaseStats => baseStats;
-        readonly BasePrimaryStats baseStats;
+        public PrimaryStats BaseStats => baseStats;
+        readonly PrimaryStats baseStats;
 
-        public BasePrimaryStats PerLevelStats => perLevelStats;
-        readonly BasePrimaryStats perLevelStats;
+        public PrimaryStats PerLevelStats => perLevelStats;
+        readonly PrimaryStats perLevelStats;
 
         public int BaseHealth => baseHp;
         readonly int baseHp;
@@ -59,8 +59,8 @@ namespace Project_1.GameObjects.Unit
         {
             this.name = name;
             this.resource = resource;
-            this.baseStats = new BasePrimaryStats(baseStats);
-            this.perLevelStats = new BasePrimaryStats(perLevelStats);
+            this.baseStats = new EquipmentStats(baseStats);
+            this.perLevelStats = new EquipmentStats(perLevelStats);
             this.baseHp = baseHp;
             this.perLevelHp = perLevelHp;
             this.baseHpPer5 = baseHpPer5;

@@ -25,6 +25,12 @@ namespace Project_1.UI.UIElements
             BottomRight
         }
 
+        public string Text
+        {
+            get => underlyingText.Value;
+            set => underlyingText.Value = value;
+        }
+
         TextAllignment textAlignment;
 
         Text underlyingText;

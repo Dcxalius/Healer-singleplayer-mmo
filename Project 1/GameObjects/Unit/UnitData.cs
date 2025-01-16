@@ -29,12 +29,12 @@ namespace Project_1.GameObjects.Unit
         public Level Level => level;
         Level level;
 
-        public BaseStats PrimaryStats => primaryStats;
-        BaseStats primaryStats;
+        public BaseStats BaseStats => baseStats;
+        BaseStats baseStats;
 
         
-        public Health HealthData => primaryStats.Health;
-        public Resource Resource => primaryStats.Resource;
+        public Health Health => baseStats.Health;
+        public Resource Resource => baseStats.Resource;
 
 
         public (Equipment.AttackStyle, Attack, Attack) AttackData
@@ -43,18 +43,18 @@ namespace Project_1.GameObjects.Unit
             {
                 (Equipment.AttackStyle, Attack, Attack) weaponAttacks = equipment.GetWeaponAttacks();
 
-                if (weaponAttacks.Item1 == Equipment.AttackStyle.None) return (Equipment.AttackStyle.None, primaryStats.Attack, null);
+                if (weaponAttacks.Item1 == Equipment.AttackStyle.None) return (Equipment.AttackStyle.None, baseStats.Attack, null);
                 
                 return weaponAttacks;
             }
         }
 
-        public Equipment Equipment => equipment;
+        public Equipment Equipment =>  equipment;
         Equipment equipment;
 
         public Movement MovementData => classData.Movement;
 
-        public Attack Attack => primaryStats.Attack;
+        public Attack Attack => baseStats.Attack;
 
         public GfxPath GfxPath => gfxPath;
         readonly GfxPath gfxPath;
@@ -74,7 +74,7 @@ namespace Project_1.GameObjects.Unit
             level = aData.Level;
             equipment = aData.Equipment;
 
-            primaryStats = new BaseStats(classData, level.CurrentLevel);
+            baseStats = new BaseStats(classData, level.CurrentLevel, equipment.EquipmentStats);
 
             gfxPath = aData.GfxPath;
             corpseGfxPath = aData.CorpseGfxPath;
@@ -95,7 +95,7 @@ namespace Project_1.GameObjects.Unit
             this.equipment = new Equipment(equipment);
 
             
-            primaryStats = new BaseStats(classData, this.level.CurrentLevel, currentHp, currentResource);
+            baseStats = new BaseStats(classData, this.level.CurrentLevel, this.equipment.EquipmentStats, currentHp, currentResource);
 
             gfxPath = new GfxPath(GfxType.Object, name);
 
@@ -127,14 +127,14 @@ namespace Project_1.GameObjects.Unit
 
         public void Tick()
         {
-            HealthData.HealthRegenTick();
+            Health.HealthRegenTick();
         }
 
         public void GainExp(int aExpAmount)
         {
             if (!level.GainExp(aExpAmount)) return;
             //Level up
-            primaryStats.LevelUp(classData);
+            baseStats.LevelUp(classData);
         }
 
     

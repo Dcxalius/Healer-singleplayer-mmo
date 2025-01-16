@@ -25,13 +25,15 @@ namespace Project_1.GameObjects.Unit.Stats
             value = aValue;
         }
 
-        public static implicit operator int(Stat stat) => stat.Value;
+
 
         public override string ToString()
         {
             if (value == 0) return "";
-            return value + " " + GetType().ToString();
+            return value + " " + GetType().Name.ToString();
         }
+
+        public static implicit operator int(Stat stat) => stat.Value;
 
         public static bool operator ==(Stat lhs, int aValue) => lhs.Equals(aValue);
         public static bool operator !=(Stat lhs, int aValue) => !lhs.Equals(aValue);
@@ -54,9 +56,19 @@ namespace Project_1.GameObjects.Unit.Stats
             throw new System.NotImplementedException();
         }
 
+        public void Decrease(int aAmount)
+        {
+            value -= aAmount;
+        }
+
         public override int GetHashCode()
         {
             throw new System.NotImplementedException();
+        }
+
+        internal void Increase(int aAmount)
+        {
+            value += aAmount;
         }
     }
 }

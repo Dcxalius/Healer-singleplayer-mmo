@@ -1,4 +1,6 @@
-﻿using Project_1.Items;
+﻿using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Unit.Stats;
+using Project_1.Items;
 using Project_1.Items.SubTypes;
 using Project_1.UI.HUD;
 using System;
@@ -41,6 +43,39 @@ namespace Project_1.GameObjects.Unit
             OneHander,
             TwoHander,
             DualWielding
+        }
+        Items.SubTypes.Equipment[] equipped;
+
+        public EquipmentStats EquipmentStats => equipmentStats;
+        EquipmentStats equipmentStats;
+
+        public Equipment(int?[] aItemsEquiped)
+        {
+            equipped = new Items.SubTypes.Equipment[(int)Slot.Count];
+            Debug.Assert(aItemsEquiped.Length == equipped.Length);
+
+            for (int i = 0; i < aItemsEquiped.Length; i++)
+            {
+                if (!aItemsEquiped[i].HasValue) continue;
+
+                equipped[i] = ItemFactory.CreateItem(ItemFactory.GetItemData(aItemsEquiped[i].Value), 1) as Items.SubTypes.Equipment;
+            }
+
+            RefreshStatsFromEquipment();
+        }
+
+        void RefreshStatsFromEquipment()
+        {
+            int[] totalStats = new int[(int)PrimaryStats.PrimaryStat.Count];
+            for(int i = 0; i < equipped.Length; i++)
+            {
+                if (equipped[i] == null) continue;
+                for (int j = 0; j < totalStats.Length; j++)
+                {
+                    totalStats[j] += equipped[i].PrimaryStats.Stats[j];
+                }
+            }
+            equipmentStats = new EquipmentStats(totalStats);
         }
 
         static public Slot SlotToSlot(Items.SubTypes.Equipment.Type aType) //TODO: FIX SHITE NAME
@@ -125,7 +160,6 @@ namespace Project_1.GameObjects.Unit
 
 
 
-        Items.SubTypes.Equipment[] equipped;
 
         public Item EquipedInSlot(Slot aSlot) => equipped[(int)aSlot];
 
@@ -133,18 +167,15 @@ namespace Project_1.GameObjects.Unit
         {
             if (aEquipment == null)
             {
-                equipped[(int)aSlot] = null;
-                HUDManager.RefreshCharacterWindowSlot(aSlot);
-                return equipped[(int)aSlot];
+                RemoveItem(aSlot);
+                return null;
             }
             Debug.Assert(FitsInSlot(aEquipment.type, aSlot));
             Item returnable = EquipInParticularSlotOneHanderWithATwoHanderEquiped(aEquipment, aSlot);
 
             if (returnable != null) return returnable;
 
-            returnable = equipped[(int)aSlot];
-            equipped[(int)aSlot] = aEquipment;
-            HUDManager.RefreshCharacterWindowSlot(aSlot);
+            returnable = SwapItem(aEquipment, aSlot);
 
             return returnable;
         }
@@ -155,11 +186,8 @@ namespace Project_1.GameObjects.Unit
             if (equipped[(int)Slot.MainHand] == null) return null;
             if (equipped[(int)Slot.MainHand].type != Items.SubTypes.Equipment.Type.TwoHander) return null;
 
-            Item returnable = equipped[(int)Slot.MainHand];
-            equipped[(int)Slot.MainHand] = null;
-            equipped[(int)aSlot] = aEquipment;
-            HUDManager.RefreshCharacterWindowSlot(Slot.MainHand);
-            HUDManager.RefreshCharacterWindowSlot(aSlot);
+            Item returnable = RemoveItem(Slot.MainHand);
+            EquipItem(aEquipment, aSlot);
             return returnable;
         }
 
@@ -178,7 +206,7 @@ namespace Project_1.GameObjects.Unit
                 case Items.SubTypes.Equipment.Type.Belt:
                 case Items.SubTypes.Equipment.Type.Legs:
                 case Items.SubTypes.Equipment.Type.Feet:
-                    return EquipAndSwap(aEquipment, (Slot)aEquipment.type); //TODO: Fix bad names the slot casted into is different from the slot from equipment
+                    return SwapItem(aEquipment, (Slot)aEquipment.type);
 
                 case Items.SubTypes.Equipment.Type.Trinket:
                     return CheckDoubleSlot(aEquipment, Slot.Trinket1, Slot.Trinket2);
@@ -199,7 +227,7 @@ namespace Project_1.GameObjects.Unit
                     return EqiupAndSwapWeapon(aEquipment, Slot.OffHand);
 
                 case Items.SubTypes.Equipment.Type.Ranged:
-                    return EquipAndSwap(aEquipment, Slot.Ranged);
+                    return SwapItem(aEquipment, Slot.Ranged);
 
                 default:
                     throw new NotImplementedException();
@@ -217,50 +245,26 @@ namespace Project_1.GameObjects.Unit
                 return CheckDoubleSlot(aEquipment, aSlot, Slot.OffHand);
             }
 
-            return EquipAndSwap(aEquipment, aSlot);
+            return SwapItem(aEquipment, aSlot);
         }
 
         Item EquipAndSwapWeaponWithTwoHander(Items.SubTypes.Equipment aEquipment, Slot aSlot)
         {
             if (equipped[(int)Slot.MainHand] == null) return null;
-
-            if ((equipped[(int)Slot.MainHand] as Items.SubTypes.Equipment).type != Items.SubTypes.Equipment.Type.TwoHander) return null;
+            if (equipped[(int)Slot.MainHand].type != Items.SubTypes.Equipment.Type.TwoHander) return null;
             
-            Item returnable = equipped[(int)Slot.MainHand];
+            Item returnable = RemoveItem(Slot.MainHand);
 
-            if (aSlot == Slot.OffHand)
-            {
-                equipped[(int)Slot.MainHand] = null;
-                equipped[(int)Slot.OffHand] = aEquipment;
-                HUDManager.RefreshCharacterWindowSlot(Slot.MainHand);
-                HUDManager.RefreshCharacterWindowSlot(Slot.OffHand);
-                return returnable;
-            }
-
-            equipped[(int)Slot.MainHand] = aEquipment;
-
-            HUDManager.RefreshCharacterWindowSlot(Slot.MainHand);
+            EquipItem(aEquipment, aSlot);
 
             return returnable;
         }
 
-        Item EquipAndSwap(Items.SubTypes.Equipment aEq, Slot aSlot)
-        {
-            Item returnItem = equipped[(int)aSlot];
-            equipped[(int)aSlot] = aEq;
-            HUDManager.RefreshCharacterWindowSlot(aSlot);
-            return returnItem;
-        }
 
         public (Item, Item) EquipTwoHander(Items.SubTypes.Equipment aEquipment)
         {
-            Item mh = equipped[(int)Slot.MainHand];
-            Item oh = equipped[(int)Slot.OffHand];
-            equipped[(int)Slot.MainHand] = aEquipment;
-            equipped[(int)Slot.OffHand] = null;
-
-            HUDManager.RefreshCharacterWindowSlot(Slot.MainHand);
-            HUDManager.RefreshCharacterWindowSlot(Slot.OffHand);
+            Item oh = RemoveItem(Slot.OffHand);
+            Item mh = SwapItem(aEquipment, Slot.MainHand);
 
             if (mh == null) return (oh, null);
             if (oh == null) return (mh, null);
@@ -273,34 +277,47 @@ namespace Project_1.GameObjects.Unit
             Item second = equipped[(int)aSlot2];
             if (first == null)
             {
-                equipped[(int)aSlot] = aEquipment;
-                HUDManager.RefreshCharacterWindowSlot(aSlot);
+                EquipItem(aEquipment, aSlot);
                 return null;
             }
             if (second == null)
             {
-                equipped[(int)aSlot2] = aEquipment;
-                HUDManager.RefreshCharacterWindowSlot(aSlot2);
+                EquipItem(aEquipment, aSlot2);
                 return null;
             }
-            equipped[(int)aSlot] = aEquipment;
-            HUDManager.RefreshCharacterWindowSlot(aSlot);
+            Item returnable = SwapItem(aEquipment, aSlot);
 
-            return first;
+            return returnable;
         }
 
-        public Equipment(int?[] aItemsEquiped)
+        Item SwapItem(Items.SubTypes.Equipment aEquipment, Slot aSlot)
         {
-            equipped = new Items.SubTypes.Equipment[(int)Slot.Count];
+            Items.SubTypes.Equipment previouslyEquiped = equipped[(int)aSlot];
+            if (previouslyEquiped != null) equipmentStats.RemoveStats(previouslyEquiped.PrimaryStats);
 
-            Debug.Assert(aItemsEquiped.Length == equipped.Length);
+            equipped[(int)aSlot] = aEquipment;
+            equipmentStats.AddStats(aEquipment.PrimaryStats);
+            
+            HUDManager.RefreshCharacterWindowSlot(aSlot); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
+            return previouslyEquiped;
+        }
 
-            for (int i = 0; i < aItemsEquiped.Length; i++)
-            {
-                if (!aItemsEquiped[i].HasValue) continue;
+        void EquipItem(Items.SubTypes.Equipment aEquipment, Slot aSlot)
+        {
+            Debug.Assert(equipped[(int)aSlot] == null);
+            equipped[(int)aSlot] = aEquipment;
+            equipmentStats.AddStats(aEquipment.PrimaryStats);
+            HUDManager.RefreshCharacterWindowSlot(aSlot); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
+        }
 
-                equipped[i] = ItemFactory.CreateItem(ItemFactory.GetItemData(aItemsEquiped[i].Value), 1) as Items.SubTypes.Equipment;
-            }
+        Item RemoveItem(Slot aSlot)
+        {
+            Items.SubTypes.Equipment item = equipped[(int)aSlot];
+            if (item == null) return null;
+            equipped[(int)aSlot] = null;
+            equipmentStats.RemoveStats(item.PrimaryStats);
+            HUDManager.RefreshCharacterWindowSlot(aSlot);
+            return item;
         }
 
         public (AttackStyle, Attack, Attack) GetWeaponAttacks() //TODO: Change this so it changes Attackstyle when a weapon is equiped

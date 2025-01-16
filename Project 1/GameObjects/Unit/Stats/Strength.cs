@@ -17,9 +17,6 @@ namespace Project_1.GameObjects.Unit.Stats
 
         }
 
-       
-
-
 
         public static bool operator ==(Strength lhs, Strength rhs) => lhs.Equals(rhs);
         public static bool operator !=(Strength lhs, Strength rhs) => !lhs.Equals(rhs);

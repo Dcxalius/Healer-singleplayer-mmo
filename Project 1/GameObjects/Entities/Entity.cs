@@ -23,6 +23,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Project_1.Textures.AnimatedTextures;
+using static Project_1.GameObjects.Unit.Equipment;
+using System.Diagnostics;
+using Project_1.Items;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -31,7 +34,6 @@ namespace Project_1.GameObjects.Entities
         public bool Selected => ObjectManager.Player.Target == this;
         public virtual Entity Target { get => target; set => target = value; }
         protected Entity target = null;
-        public virtual bool InCombat => aggroTablesIAmOn.Count > 0;
 
         #region UnitData
         protected UnitData UnitData => unitData;
@@ -41,10 +43,10 @@ namespace Project_1.GameObjects.Entities
         public Color RelationColor => unitData.RelationData.RelationColor();
         public Relation.RelationToPlayer RelationToPlayer => unitData.RelationData.ToPlayer;
         public string Name => unitData.Name;
-        public bool Alive => unitData.HealthData.CurrentHealth > 0;
-        public bool FullHealth => unitData.HealthData.MaxHealth == unitData.HealthData.CurrentHealth;
-        public float MaxHealth => unitData.HealthData.MaxHealth;
-        public float CurrentHealth => unitData.HealthData.CurrentHealth;
+        public bool Alive => unitData.Health.CurrentHealth > 0;
+        public bool FullHealth => unitData.Health.MaxHealth == unitData.Health.CurrentHealth;
+        public float MaxHealth => unitData.Health.MaxHealth;
+        public float CurrentHealth => unitData.Health.CurrentHealth;
 
         public Equipment Equipment => unitData.Equipment;
 
@@ -57,27 +59,18 @@ namespace Project_1.GameObjects.Entities
         public Color ResourceColor => unitData.Resource.ResourceColor;
 
         public override float MaxSpeed => unitData.MovementData.MaxSpeed;
+
+        public PairReport PrimaryStatReport => unitData.BaseStats.PrimaryStats.NewReport;
         #endregion
 
-        List<NonFriendly> aggroTablesIAmOn;
-
-
         float timeSinceLastAttack = 0;
-
-
-
 
         protected Corpse corpse;
         ParticleBase bloodsplatter;
 
-        public bool OffGlobalCooldown => spellCast.OffGlobalCooldown;
-        public double RatioOfGlobalCooldownDone => spellCast.RatioOfGlobalCooldownDone;
-        SpellCast spellCast;
-
         SelectRing selectRing;
         Shadow shadow;
 
-        BuffList buffList;
 
         protected Destination destination;
 
@@ -95,7 +88,7 @@ namespace Project_1.GameObjects.Entities
             corpse = new Corpse(unitData.CorpseGfxPath, unitData.LootTable);
         }
 
-
+        #region Update
         public override void Update()
         {
             if (AmIDead()) return;
@@ -109,143 +102,6 @@ namespace Project_1.GameObjects.Entities
             spellCast.UpdateSpellChannel();
             buffList.Update(this);
         }
-
-        public void Movement()
-        {
-            destination.Update();
-            WorldSpace oldPosition = Position;
-            velocity += destination.GetVelocity(unitData.Attack.Range, unitData.MovementData.Speed);
-            base.Update();
-            CheckForCollisions(oldPosition);
-        }
-
-        public bool StartCast(Spell aSpell) => spellCast.StartCast(aSpell);
-
-        public void AddBuff(Buff aBuff) => buffList.AddBuff(aBuff, this); 
-
-        public List<Buff> GetAllBuffs() => buffList.GetAllBuffs();
-
-        void TargetAliveCheck()
-        {
-            if (Target == null) return;
-            if (Target.Alive) return;
-
-            Target = null;
-        }
-
-        public bool ResourceGain(Entity aEntity, float aValue, Resource.ResourceType aResourceType)
-        {
-            if (aResourceType != ResourceType) return false;
-
-            if (MaxResource == CurrentResource) return false;
-
-            float value = aValue;
-
-            if (MaxResource < CurrentResource + value)
-            {
-                value = MaxResource - CurrentResource;
-            }
-
-            for (int i = 0; i < aggroTablesIAmOn.Count; i++)
-            {
-                aggroTablesIAmOn[i].AddToAggroTable(aEntity, value);
-            }
-
-            unitData.Resource.Value += value;
-
-            return true;
-        }
-
-        
-
-        public void ServerTick() //"Server tick"
-        {
-            if (!InCombat)
-            {
-                unitData.Tick();
-            }
-        }
-
-       
-
-        public void AddedToAggroTable(NonFriendly aNonfriendly)
-        {
-            if (aggroTablesIAmOn.Contains(aNonfriendly))
-            {
-                DebugManager.Print(GetType(), aNonfriendly + " tried to add me to a table I thought I was on.");
-                return;
-            }
-            aggroTablesIAmOn.Add(aNonfriendly);
-        }
-
-        public void RemovedFromAggroTable(NonFriendly aNonfriendly)
-        {
-            if (!aggroTablesIAmOn.Contains(aNonfriendly))
-            {
-                DebugManager.Print(GetType(), aNonfriendly + " tried to remove me from a table I didn't know I was on.");
-                return;
-            }
-            aggroTablesIAmOn.Remove(aNonfriendly);
-        }
-
-        public virtual void TakeDamage(Entity aAttacker, float aDamageTaken)
-        {
-            unitData.HealthData.CurrentHealth -= aDamageTaken;
-            WorldSpace dirOfFlyingStuff = (FeetPosition - aAttacker.FeetPosition);
-            dirOfFlyingStuff.Normalize();
-            FloatingText floatingText = new FloatingText(aDamageTaken.ToString(), Color.Red, FeetPosition, dirOfFlyingStuff); //TODO: Change to handle attacker and this being in the same place
-            ObjectManager.SpawnFloatingText(floatingText);
-
-
-            ParticleMovement bloodMovement = new ParticleMovement(dirOfFlyingStuff, WorldSpace.Zero, 0.9f);
-            //DebugManager.Print(GetType(), ((aDamageTaken / MaxHealth) * 100).ToString());
-            ParticleManager.SpawnParticle(bloodsplatter, WorldRectangle, this, bloodMovement, (int)Math.Max(1, (aDamageTaken / MaxHealth) * 100));
-        }
-
-        public virtual bool TakeHealing(Entity aHealer, float aHealingTaken)
-        {
-            float value = aHealingTaken;
-
-            if (FullHealth) return false;
-            if (CurrentHealth + value > MaxHealth) value = MaxHealth - CurrentHealth;
-
-            unitData.HealthData.CurrentHealth += value;
-            WorldSpace ws = (FeetPosition - aHealer.FeetPosition);
-            ws.Normalize();
-            FloatingText floatingText = new FloatingText(value.ToString(), Color.White, FeetPosition, ws); //TODO: Change color to green once text border has been implemented ALSO Change to handle attacker and this being in the same place
-            ObjectManager.SpawnFloatingText(floatingText);
-            for (int i = 0; i < aggroTablesIAmOn.Count; i++)
-            {
-                aggroTablesIAmOn[i].AddToAggroTable(aHealer, value);
-            }
-
-            return true;
-        }
-
-        public override bool Click(ClickEvent aClickEvent)
-        {
-            if (Camera.Camera.WorldRectToScreenRect(WorldRectangle).Contains(aClickEvent.AbsolutePos.ToPoint()))
-            {
-                if (aClickEvent.NoModifiers())
-                {
-                    ObjectManager.Player.Target = this;
-                    HUDManager.SetNewTarget();
-                }
-                ClickedOn(aClickEvent);
-
-                return true;
-            }
-            return false;
-        }
-
-        protected virtual void ClickedOn(ClickEvent aClickEvent)
-        {
-            if (aClickEvent.NoModifiers() && aClickEvent.ButtonPressed == InputManager.ClickType.Right)
-            {
-                ObjectManager.Player.IssueTargetOrder(this);
-            }
-        }
-
 
         bool AmIDead()
         {
@@ -266,54 +122,25 @@ namespace Project_1.GameObjects.Entities
 
             ObjectManager.RemoveEntity(this);
             if (corpse != null) corpse.SpawnCorpe(Position); //Make this spawn a default corpse if corpse is null
-            
+
         }
-
-
-
-        void AttackTarget()
+        void TargetAliveCheck()
         {
-            if (target == null) return;
+            if (Target == null) return;
+            if (Target.Alive) return;
 
-            if (unitData.Attack.SecondsPerAttack > timeSinceLastAttack)
-            {
-                timeSinceLastAttack += (float)TimeManager.SecondsSinceLastFrame;
-                return;
-            }
-            AttackIfInRange();
+            Target = null;
         }
 
-        void AttackIfInRange()
+        public void Movement()
         {
-
-            if (CheckForRelation() && (target.FeetPosition - FeetPosition).ToVector2().Length() < unitData.Attack.Range)
-            {
-                timeSinceLastAttack = 0;
-                float damage = unitData.Attack.GetAttackDamage;
-
-                if (damage <= 0) return;
-
-                target.TakeDamage(this, damage);
-                if (target.unitData.HealthData.CurrentHealth <= 0)
-                {
-                    target = null;
-                }
-            }
+            destination.Update();
+            WorldSpace oldPosition = Position;
+            velocity += destination.GetVelocity(unitData.Attack.Range, unitData.MovementData.Speed);
+            base.Update();
+            CheckForCollisions(oldPosition);
         }
 
-        bool CheckForRelation()
-        {
-            if (target.RelationToPlayer == Relation.RelationToPlayer.Self && RelationToPlayer == Relation.RelationToPlayer.Friendly)
-            {
-                return false;
-            }
-            if (target.RelationToPlayer != RelationToPlayer)
-            {
-                return true;
-            }
-
-            return false;
-        }
 
         void CheckForCollisions(WorldSpace aOldPosition)
         {
@@ -343,6 +170,205 @@ namespace Project_1.GameObjects.Entities
             }
 
         }
+
+
+        void AttackTarget()
+        {
+            if (target == null) return;
+
+            if (unitData.Attack.SecondsPerAttack > timeSinceLastAttack)
+            {
+                timeSinceLastAttack += (float)TimeManager.SecondsSinceLastFrame;
+                return;
+            }
+            AttackIfInRange();
+        }
+
+        void AttackIfInRange()
+        {
+
+            if (CheckForRelation() && (target.FeetPosition - FeetPosition).ToVector2().Length() < unitData.Attack.Range)
+            {
+                timeSinceLastAttack = 0;
+                float damage = unitData.Attack.GetAttackDamage;
+
+                if (damage <= 0) return;
+
+                target.TakeDamage(this, damage);
+                if (target.unitData.Health.CurrentHealth <= 0)
+                {
+                    target = null;
+                }
+            }
+        }
+
+        bool CheckForRelation()
+        {
+            if (target.RelationToPlayer == Relation.RelationToPlayer.Self && RelationToPlayer == Relation.RelationToPlayer.Friendly)
+            {
+                return false;
+            }
+            if (target.RelationToPlayer != RelationToPlayer)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public void ServerTick() //"Server tick"
+        {
+            if (!InCombat)
+            {
+                unitData.Tick();
+            }
+        }
+        #endregion
+
+        #region Spells
+        public bool OffGlobalCooldown => spellCast.OffGlobalCooldown;
+        public double RatioOfGlobalCooldownDone => spellCast.RatioOfGlobalCooldownDone;
+        SpellCast spellCast;
+        BuffList buffList;
+
+        public bool StartCast(Spell aSpell) => spellCast.StartCast(aSpell);
+
+        public void AddBuff(Buff aBuff) => buffList.AddBuff(aBuff, this); 
+
+        public List<Buff> GetAllBuffs() => buffList.GetAllBuffs();
+        #endregion
+
+        #region AggroTable
+        public virtual bool InCombat => aggroTablesIAmOn.Count > 0;
+        List<NonFriendly> aggroTablesIAmOn;
+
+        public void AddedToAggroTable(NonFriendly aNonfriendly)
+        {
+            if (aggroTablesIAmOn.Contains(aNonfriendly))
+            {
+                DebugManager.Print(GetType(), aNonfriendly + " tried to add me to a table I thought I was on.");
+                return;
+            }
+            aggroTablesIAmOn.Add(aNonfriendly);
+        }
+
+        public void RemovedFromAggroTable(NonFriendly aNonfriendly)
+        {
+            if (!aggroTablesIAmOn.Contains(aNonfriendly))
+            {
+                DebugManager.Print(GetType(), aNonfriendly + " tried to remove me from a table I didn't know I was on.");
+                return;
+            }
+            aggroTablesIAmOn.Remove(aNonfriendly);
+        }
+        #endregion
+
+        #region ValueChanges
+        public bool ResourceGain(Entity aEntity, float aValue, Resource.ResourceType aResourceType)
+        {
+            if (aResourceType != ResourceType) return false;
+
+            if (MaxResource == CurrentResource) return false;
+
+            float value = aValue;
+
+            if (MaxResource < CurrentResource + value)
+            {
+                value = MaxResource - CurrentResource;
+            }
+
+            for (int i = 0; i < aggroTablesIAmOn.Count; i++)
+            {
+                aggroTablesIAmOn[i].AddToAggroTable(aEntity, value);
+            }
+
+            unitData.Resource.Value += value;
+
+            return true;
+        }
+
+        public virtual void TakeDamage(Entity aAttacker, float aDamageTaken)
+        {
+            unitData.Health.CurrentHealth -= aDamageTaken;
+            WorldSpace dirOfFlyingStuff = (FeetPosition - aAttacker.FeetPosition);
+            dirOfFlyingStuff.Normalize();
+            FloatingText floatingText = new FloatingText(aDamageTaken.ToString(), Color.Red, FeetPosition, dirOfFlyingStuff); //TODO: Change to handle attacker and this being in the same place
+            ObjectManager.SpawnFloatingText(floatingText);
+
+
+            ParticleMovement bloodMovement = new ParticleMovement(dirOfFlyingStuff, WorldSpace.Zero, 0.9f);
+            //DebugManager.Print(GetType(), ((aDamageTaken / MaxHealth) * 100).ToString());
+            ParticleManager.SpawnParticle(bloodsplatter, WorldRectangle, this, bloodMovement, (int)Math.Max(1, (aDamageTaken / MaxHealth) * 100));
+        }
+
+        public virtual bool TakeHealing(Entity aHealer, float aHealingTaken)
+        {
+            float value = aHealingTaken;
+
+            if (FullHealth) return false;
+            if (CurrentHealth + value > MaxHealth) value = MaxHealth - CurrentHealth;
+
+            unitData.Health.CurrentHealth += value;
+            WorldSpace ws = (FeetPosition - aHealer.FeetPosition);
+            ws.Normalize();
+            FloatingText floatingText = new FloatingText(value.ToString(), Color.White, FeetPosition, ws); //TODO: Change color to green once text border has been implemented ALSO Change to handle attacker and this being in the same place
+            ObjectManager.SpawnFloatingText(floatingText);
+            for (int i = 0; i < aggroTablesIAmOn.Count; i++)
+            {
+                aggroTablesIAmOn[i].AddToAggroTable(aHealer, value);
+            }
+
+            return true;
+        }
+        #endregion
+
+        #region Click
+        public override bool Click(ClickEvent aClickEvent)
+        {
+            if (Camera.Camera.WorldRectToScreenRect(WorldRectangle).Contains(aClickEvent.AbsolutePos.ToPoint()))
+            {
+                if (aClickEvent.NoModifiers())
+                {
+                    ObjectManager.Player.Target = this;
+                    HUDManager.SetNewTarget();
+                }
+                ClickedOn(aClickEvent);
+
+                return true;
+            }
+            return false;
+        }
+
+        protected virtual void ClickedOn(ClickEvent aClickEvent)
+        {
+            if (aClickEvent.NoModifiers() && aClickEvent.ButtonPressed == InputManager.ClickType.Right)
+            {
+                ObjectManager.Player.IssueTargetOrder(this);
+            }
+        }
+        #endregion
+
+        #region Equipment
+        public Item EquipInParticularSlot(Items.SubTypes.Equipment aEquipment, Slot aSlot)
+        {
+            Item item = Equipment.EquipInParticularSlot(aEquipment, aSlot);
+            
+            return item;
+        }
+        public Item Equip(Items.SubTypes.Equipment aEquipment)
+        {
+            Item item = Equipment.Equip(aEquipment);
+            return item;
+        }
+
+        public (Item, Item) EquipTwoHander(Items.SubTypes.Equipment aEquipment)
+        {
+            (Item, Item) returnable = Equipment.EquipTwoHander(aEquipment);
+
+            return returnable;
+        }
+
+        #endregion
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)
         {

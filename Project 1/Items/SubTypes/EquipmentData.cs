@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Unit.Stats;
 using System;
 using System.Collections.Generic;
@@ -11,21 +12,21 @@ namespace Project_1.Items.SubTypes
 {
     internal class EquipmentData : ItemData
     {
-        Report StatReport
+        PairReport StatReport
         {
             get
             {
-                Report report = new Report();
+                PairReport report = new PairReport();
 
-                if (armor != 0) report.AddLine(armor + " Armor");
-                baseStats.StatReport(ref report);
+                if (armor != 0) report.AddLine("Armor", armor);
+                baseStats.AppendToExistingReport(ref report);
 
                 return report;
             }
         }
 
-        public BasePrimaryStats BaseStats => baseStats; 
-        BasePrimaryStats baseStats;
+        public EquipmentStats BaseStats => baseStats;
+        EquipmentStats baseStats;
 
         public int Armor => armor;
         int armor;
@@ -37,7 +38,10 @@ namespace Project_1.Items.SubTypes
         {
             this.slot = slot;
             this.armor = armor;
-            //this.baseStats = new BasePrimaryStats(baseStats);
+            //this.baseStats = new EquipmentStats(baseStats);
+            //DEBUG
+            this.baseStats = new EquipmentStats(new int[] { 1, 1, 1, 1, 1 });
+
         }
 
         [JsonConstructor]
