@@ -42,7 +42,7 @@ namespace Project_1.UI.HUD
             RelativeScreenPosition textBoxPos = topPart + spacing;
             RelativeScreenPosition textBoxSize = new RelativeScreenPosition(WindowSize.X - spacing.X * 2, WindowSize.Y - topPart.Y - spacing.Y * 2);
 
-            statReport = new Label("asdf \n asdf \n asdf \n asdf \n asdf \n asdf", textBoxPos, textBoxSize, Color.Black);
+            statReport = new Label("asdf\nasdf\nasdf\nasdf\nasdf\nasdf", textBoxPos, textBoxSize, Label.TextAllignment.BottomRight, Color.Black);
 
             children.AddRange(equiped);
             children.Add(statReport);

@@ -21,7 +21,7 @@ namespace Project_1.UI.OptionMenu
 
         public KeybindingObject(KeyBindManager.KeyListner aListner, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.Wheat), aPos, aSize)
         {
-            nameOfButton = new Label(aListner.ToString(), RelativeScreenPosition.Zero, new RelativeScreenPosition(aSize.X / 3, aSize.Y), Color.Black);
+            nameOfButton = new Label(aListner.ToString(), RelativeScreenPosition.Zero, new RelativeScreenPosition(aSize.X / 3, aSize.Y), Label.TextAllignment.Centred, Color.Black);
             firstKeybindingButton = new KeybindingButton(true, aListner, new RelativeScreenPosition(aSize.X/3, 0), new RelativeScreenPosition(aSize.X / 3, aSize.Y));
             secondKeybindingButton = new KeybindingButton(false, aListner, new RelativeScreenPosition(aSize.X * 2 / 3 + spacingX, 0), new RelativeScreenPosition(aSize.X / 3, aSize.Y));
 

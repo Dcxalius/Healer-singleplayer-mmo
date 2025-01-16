@@ -96,8 +96,8 @@ namespace Project_1.UI.HUD
             AbsoluteScreenPosition offsetName = new AbsoluteScreenPosition(0, (int)(descriptedName.Offset.Y / 2f));
             AbsoluteScreenPosition pos = ((AbsoluteScreenPosition)AbsolutePos.Location + spacing + offsetName);
             AbsoluteScreenPosition offsetDesc = new AbsoluteScreenPosition(0, (int)(description.Offset.Y / 2));
-            descriptedName.LeftAllignedDraw(aBatch, pos);
-            description.LeftAllignedDraw(aBatch, pos + offsetDesc + new AbsoluteScreenPosition(0, spacing.Y) * (1 + descriptedName.NameLines));
+            descriptedName.CentreLeftDraw(aBatch, pos);
+            description.CentreLeftDraw(aBatch, pos + offsetDesc + new AbsoluteScreenPosition(0, spacing.Y) * (1 + descriptedName.NameLines));
         }
     }
 }

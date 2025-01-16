@@ -59,8 +59,8 @@ namespace Project_1.UI.UIElements.Bars
             base.Draw(aBatch);
 
             //fractionText.CentredDraw(aBatch, AbsolutePos.Center.ToVector2());
-            fractionText.LeftAllignedDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Left + 5, AbsolutePos.Center.Y));
-            percentageText.RightAllignedDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Right - 5, AbsolutePos.Center.Y));
+            fractionText.CentreLeftDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Left + 5, AbsolutePos.Center.Y));
+            percentageText.CentreRightDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Right - 5, AbsolutePos.Center.Y));
         }
     }
 }

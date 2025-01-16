@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Managers;
+using SharpDX.Direct2D1.Effects;
 using SharpDX.MediaFoundation;
 using System;
 using System.Collections.Generic;
@@ -35,29 +36,9 @@ namespace Project_1.Textures
         Color color;
         float scale;
         
-        public Text(string aFontName)
-        {
-            font = TextureManager.GetFont(aFontName);
-            scale = Camera.Camera.Zoom;
-            textToDisplay = null;
-            color = Color.White;
-        }
-
-        public Text(string aFontName, string aTextToStart)
-        {
-            font = TextureManager.GetFont(aFontName);
-            scale = Camera.Camera.Zoom;
-            Value = aTextToStart;
-            color = Color.White;
-        }
-
-        public Text(string aFontName, Color aColor)
-        {
-            font = TextureManager.GetFont(aFontName);
-            scale = Camera.Camera.Zoom;
-            textToDisplay = null;
-            color = aColor;
-        }
+        public Text(string aFontName) : this(aFontName, null, Color.White) { }
+        public Text(string aFontName, string aTextToStart) : this(aFontName, aTextToStart, Color.White) { }
+        public Text(string aFontName, Color aColor) : this(aFontName, null, aColor) { }
 
         public Text(string aFontName, string aTextToStart, Color aColor)
         {
@@ -72,27 +53,25 @@ namespace Project_1.Textures
             scale = Camera.Camera.Zoom;
         }
 
-        public void CentredDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) //Offsets by half of textsize
-        {
-            Draw(aBatch, aPos, offset / 2);
-        }
 
-        public void LeftAllignedDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) //Offset by half y
-        {
-            Draw(aBatch, aPos, new Vector2(0, offset.Y / 2));
-        }
+        public void TopLeftDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, Vector2.Zero);
+        public void TopCentreDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X / 2, 0));
+        public void TopRightDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X, 0));
 
-        public void RightAllignedDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) //Offset by textlength and half y
-        {
-            Draw(aBatch, aPos, new Vector2(offset.X, offset.Y / 2));
-        }
+        public void CentreLeftDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(0, offset.Y / 2)); //Offset by half y
+        public void CentredDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, offset / 2); //Offsets by half of textsize
+        public void CentreRightDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X, offset.Y / 2)); //Offset by textlength and half y
+
+        public void BottomLeftDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(0, offset.Y));
+        public void BottomCentreDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X / 2, offset.Y));
+        public void BottomRightDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X, offset.Y));
+
+
 
         void Draw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, Vector2 aOffset)
         {
-            if (textToDisplay == null)
-            {
-                return;
-            }
+            if (textToDisplay == null) return;
+
             aBatch.DrawString(font, textToDisplay, aPos.ToVector2(), color, 0f, aOffset, scale, SpriteEffects.None, 1f);
         }
     }

@@ -338,12 +338,18 @@ namespace Project_1.UI.UIElements.Inventory
             }
         }
 
+        public override void Rescale()
+        {
+            base.Rescale();
+            itemCount.Rescale();
+        }
+
         public override void Draw(SpriteBatch aBatch)
         {
 
             base.Draw(aBatch);
-            itemCount.RightAllignedDraw(aBatch, new AbsoluteScreenPosition((AbsolutePos.Location + AbsolutePos.Size)) - new AbsoluteScreenPosition(0, (int)itemCount.Offset.Y / 2));
-            itemCount.LeftAllignedDraw(aBatch, RelativePos.ToAbsoluteScreenPos());
+            itemCount.CentreRightDraw(aBatch, new AbsoluteScreenPosition((AbsolutePos.Location + AbsolutePos.Size)) - new AbsoluteScreenPosition(0, (int)itemCount.Offset.Y / 2));
+            itemCount.CentreLeftDraw(aBatch, RelativePos.ToAbsoluteScreenPos());
         }
     }
 }
