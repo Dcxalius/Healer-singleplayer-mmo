@@ -309,10 +309,12 @@ namespace Project_1.GameObjects.Entities
 
         public virtual void TakeDamage(Entity aAttacker, float aDamageTaken)
         {
+            int beforeDamageTaken = (int)Math.Round(unitData.Health.CurrentHealth);
             unitData.Health.CurrentHealth -= aDamageTaken;
+            int afterDamageTaken = (int)Math.Round(unitData.Health.CurrentHealth);
             WorldSpace dirOfFlyingStuff = (FeetPosition - aAttacker.FeetPosition);
             dirOfFlyingStuff.Normalize();
-            FloatingText floatingText = new FloatingText(aDamageTaken.ToString(), Color.Red, FeetPosition, dirOfFlyingStuff); //TODO: Change to handle attacker and this being in the same place
+            FloatingText floatingText = new FloatingText((beforeDamageTaken - afterDamageTaken).ToString(), Color.Red, FeetPosition, dirOfFlyingStuff); //TODO: Change to handle attacker and this being in the same place
             ObjectManager.SpawnFloatingText(floatingText);
 
 
@@ -329,10 +331,12 @@ namespace Project_1.GameObjects.Entities
             if (FullHealth) return false;
             if (CurrentHealth + value > MaxHealth) value = MaxHealth - CurrentHealth;
 
+            int beforeHealingTaken = (int)Math.Round(unitData.Health.CurrentHealth);
             unitData.Health.CurrentHealth += value;
+            int afterHealingTaken = (int)Math.Round(unitData.Health.CurrentHealth);
             WorldSpace ws = (FeetPosition - aHealer.FeetPosition);
             ws.Normalize();
-            FloatingText floatingText = new FloatingText(value.ToString(), Color.White, FeetPosition, ws); //TODO: Change color to green once text border has been implemented ALSO Change to handle attacker and this being in the same place
+            FloatingText floatingText = new FloatingText((beforeHealingTaken - afterHealingTaken).ToString(), Color.White, FeetPosition, ws); //TODO: Change color to green once text border has been implemented ALSO Change to handle attacker and this being in the same place
             ObjectManager.SpawnFloatingText(floatingText);
             for (int i = 0; i < aggroTablesIAmOn.Count; i++)
             {
