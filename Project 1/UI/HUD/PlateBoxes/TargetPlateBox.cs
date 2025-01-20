@@ -53,6 +53,7 @@ namespace Project_1.UI.HUD.PlateBoxes
         {
             nameSegment.Name = aEntity.Name;
             healthSegment.Refresh(aEntity);
+            levelCircle.Refresh(aEntity);
             resourceSegment.Refresh(aEntity);
         }
 
@@ -73,6 +74,7 @@ namespace Project_1.UI.HUD.PlateBoxes
             nameSegment.Name = target.Name;
             nameSegment.BackgroundColor = target.RelationColor;
             healthSegment.SetTarget(target);
+            levelCircle.Refresh(target);
             resourceSegment.SetTarget(target);
         }
 

@@ -43,6 +43,7 @@ namespace Project_1.GameObjects.Entities
         public Color RelationColor => unitData.RelationData.RelationColor();
         public Relation.RelationToPlayer RelationToPlayer => unitData.RelationData.ToPlayer;
         public string Name => unitData.Name;
+        public int CurrentLevel => unitData.Level.CurrentLevel;
         public bool Alive => unitData.Health.CurrentHealth > 0;
         public bool FullHealth => unitData.Health.MaxHealth == unitData.Health.CurrentHealth;
         public float MaxHealth => unitData.Health.MaxHealth;
@@ -301,7 +302,7 @@ namespace Project_1.GameObjects.Entities
             ParticleMovement bloodMovement = new ParticleMovement(dirOfFlyingStuff, WorldSpace.Zero, 0.9f);
             //DebugManager.Print(GetType(), ((aDamageTaken / MaxHealth) * 100).ToString());
             ParticleManager.SpawnParticle(bloodsplatter, WorldRectangle, this, bloodMovement, (int)Math.Max(1, (aDamageTaken / MaxHealth) * 100));
-            HUDManager.RefreshPlateBox(this);
+            HUDManager.RefreshPlateBox(this); //TODO: Check death here?
         }
 
         public virtual bool TakeHealing(Entity aHealer, float aHealingTaken)

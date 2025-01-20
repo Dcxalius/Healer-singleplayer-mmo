@@ -19,14 +19,13 @@ namespace Project_1.UI.UIElements.Bars
             set
             {
                 maxValue = value;
-                if (currentValue == 0 && maxValue == 0)
+                if (currentValue == 0 && value == 0)
                 {
                     base.Value = 1f;
                     fractionText.Value = null;
                     percentageText.Value = null;
                     return;
                 }
-                maxValue = value;
                 base.Value = currentValue / maxValue;
                 fractionText.Value = currentValue + "/" + maxValue;
                 percentageText.Value = (int)(currentValue / maxValue * 100) + "%";
@@ -36,6 +35,7 @@ namespace Project_1.UI.UIElements.Bars
         {
             set
             {
+                currentValue = value;
                 if (value == 0 && maxValue == 0)
                 {
                     base.Value = 1f;
@@ -43,7 +43,6 @@ namespace Project_1.UI.UIElements.Bars
                     percentageText.Value = null;
                     return;
                 }
-                currentValue = value;
                 base.Value = currentValue / maxValue;
                 fractionText.Value = currentValue + "/" + maxValue;
                 percentageText.Value = (int)(currentValue / maxValue * 100) + "%";

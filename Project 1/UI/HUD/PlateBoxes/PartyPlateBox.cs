@@ -89,6 +89,7 @@ namespace Project_1.UI.HUD.PlateBoxes
             name.Name = aEntity.Name;
             health.Refresh(aEntity);
             resource.Refresh(aEntity);
+            levelCircle.Refresh(aEntity);
         }
     }
 }

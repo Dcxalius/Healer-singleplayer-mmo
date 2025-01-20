@@ -40,7 +40,7 @@ namespace Project_1.UI.UIElements.PlateBoxes
         {
             entity = aEntity;
             healthBar.MaxValue = aEntity.MaxHealth;
-            healthBar.Value = entity.MaxHealth;
+            healthBar.Value = entity.CurrentHealth;
         }
 
 

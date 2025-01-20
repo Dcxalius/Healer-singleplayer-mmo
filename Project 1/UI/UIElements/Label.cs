@@ -87,11 +87,12 @@ namespace Project_1.UI.UIElements
                 case TextAllignment.BottomCentre:
                     underlyingText.BottomCentreDraw(aBatch, (AbsoluteScreenPosition)AbsolutePos.Location + new AbsoluteScreenPosition(AbsolutePos.Size.X / 2, AbsolutePos.Size.Y));
                     break;
-                default:
 
                 case TextAllignment.BottomRight:
                     underlyingText.BottomRightDraw(aBatch, (AbsoluteScreenPosition)AbsolutePos.Location + new AbsoluteScreenPosition(AbsolutePos.Size.X, AbsolutePos.Size.Y));
                     break;
+
+                default:
                     throw new NotImplementedException();
             }
 
