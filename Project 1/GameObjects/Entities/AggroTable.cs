@@ -67,7 +67,7 @@ namespace Project_1.GameObjects.Entities
             {
                 if (item.Item2 > highestThreat * 1.05)
                 {
-                    owner.Target = item.Item1;
+                    owner.SetTarget(item.Item1);
 
                 }
             }
@@ -109,7 +109,7 @@ namespace Project_1.GameObjects.Entities
 
                     if (aggroEntities.Count == 0)
                     {
-                        owner.Target = null;
+                        owner.RemoveTarget();
                         return;
                     }
                     if (aggroEntities[j].Item2 > v)
@@ -118,7 +118,7 @@ namespace Project_1.GameObjects.Entities
                         v = aggroEntities[j].Item2;
                     }
                 }
-                owner.Target = newTarget;
+                owner.SetTarget(newTarget);
 
             }
         }

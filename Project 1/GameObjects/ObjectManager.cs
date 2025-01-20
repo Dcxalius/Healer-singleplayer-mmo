@@ -143,9 +143,7 @@ namespace Project_1.GameObjects
                 }
                 else
                 {
-                    player.Target = null;
-                    HUDManager.SetNewTarget();
-
+                    player.RemoveTarget();
                 }
             }
         }

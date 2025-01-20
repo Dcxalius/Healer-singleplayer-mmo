@@ -33,8 +33,6 @@ namespace Project_1.GameObjects.Entities.Players
 
         const float lengthOfLeash = 500;
 
-        public override Entity Target { get => playerClickTarget; set => playerClickTarget = value; }
-        Entity playerClickTarget;
 
         public bool LockedMovement => lockedMovement;
         bool lockedMovement = false;
@@ -87,7 +85,7 @@ namespace Project_1.GameObjects.Entities.Players
             {
                 if (party[i].HasDestination == false && (FeetPosition - party[i].FeetPosition).ToVector2().Length() > lengthOfLeash)
                 {
-                    party[i].Target = ObjectManager.Player;
+                    party[i].SetTarget(ObjectManager.Player);
                 }
             }
         }
@@ -148,7 +146,7 @@ namespace Project_1.GameObjects.Entities.Players
         {
             for (int i = 0; i < commands.Count; i++)
             {
-                commands[i].Target = aEntity;
+                commands[i].SetTarget(aEntity);
             }
         }
     }

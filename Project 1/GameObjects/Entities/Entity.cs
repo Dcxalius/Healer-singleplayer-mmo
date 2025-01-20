@@ -32,7 +32,7 @@ namespace Project_1.GameObjects.Entities
     internal abstract class Entity : MovingObject
     {
         public bool Selected => ObjectManager.Player.Target == this;
-        public virtual Entity Target { get => target; set => target = value; }
+        public virtual Entity Target { get => target; }
         protected Entity target = null;
 
         #region UnitData
@@ -89,6 +89,7 @@ namespace Project_1.GameObjects.Entities
             corpse = new Corpse(unitData.CorpseGfxPath, unitData.LootTable);
         }
 
+
         #region Update
         public override void Update()
         {
@@ -131,7 +132,8 @@ namespace Project_1.GameObjects.Entities
             if (Target == null) return;
             if (Target.Alive) return;
 
-            Target = null;
+            RemoveTarget();
+
         }
 
         public void Movement()
@@ -226,6 +228,21 @@ namespace Project_1.GameObjects.Entities
                 HUDManager.RefreshPlateBox(this);
             }
         }
+        #endregion
+
+        #region Target
+        public void SetTarget(Entity aEntity)
+        {
+            target = aEntity;
+            HUDManager.SetNewTarget(this, target);
+        }
+
+        public void RemoveTarget()
+        {
+            target = null;
+            HUDManager.SetNewTarget(this, null);
+        }
+
         #endregion
 
         #region Spells
@@ -334,8 +351,7 @@ namespace Project_1.GameObjects.Entities
             {
                 if (aClickEvent.NoModifiers())
                 {
-                    ObjectManager.Player.Target = this;
-                    HUDManager.SetNewTarget();
+                    ObjectManager.Player.SetTarget(this);
                 }
                 ClickedOn(aClickEvent);
 

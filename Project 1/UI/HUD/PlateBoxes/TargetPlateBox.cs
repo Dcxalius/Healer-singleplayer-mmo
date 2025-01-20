@@ -45,8 +45,8 @@ namespace Project_1.UI.HUD.PlateBoxes
         {
             base.Update(aParent);
 
-            if (ObjectManager.Player.Target == null) { return; }
-            if (ObjectManager.Player.Target.CurrentHealth <= 0) { SetEntity(); }
+            //if (ObjectManager.Player.Target == null) { return; }
+            //if (ObjectManager.Player.Target.CurrentHealth <= 0) { SetEntity(); }
         }
 
         public override void Refresh(Entity aEntity)
@@ -62,26 +62,25 @@ namespace Project_1.UI.HUD.PlateBoxes
             return targetEntity == aEntity;
 
         }
-        public void SetEntity() 
+        public void SetTarget(Entity aTarget) 
         {
-            Entity target = ObjectManager.Player.Target;//Todo: Generalize this
-            if (target == null)
+            targetEntity = aTarget;
+            if (targetEntity == null)
             {
                 nameSegment.Name = null;
                 return;
             }
-            targetEntity = target;
-            nameSegment.Name = target.Name;
-            nameSegment.BackgroundColor = target.RelationColor;
-            healthSegment.SetTarget(target);
-            levelCircle.Refresh(target);
-            resourceSegment.SetTarget(target);
+            nameSegment.Name = targetEntity.Name;
+            nameSegment.BackgroundColor = targetEntity.RelationColor;
+            healthSegment.SetTarget(targetEntity);
+            levelCircle.Refresh(targetEntity);
+            resourceSegment.SetTarget(targetEntity);
         }
 
 
         public override void Draw(SpriteBatch aBatch)
         {
-            if (ObjectManager.Player.Target == null) return;
+            if (targetEntity == null) return;
 
             base.Draw(aBatch);
         }

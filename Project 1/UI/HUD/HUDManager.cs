@@ -187,10 +187,21 @@ namespace Project_1.UI.HUD
             }
         }
 
-        public static void SetNewTarget() //TODO: Make this use new target as arg
+        public static void SetNewTarget(Entity aTargeter, Entity aTarget) //TODO: Make this use new target as arg
         {
-            targetPlateBox.SetEntity();
-            targetBuffBox.AssignBox(ObjectManager.Player.Target);
+            switch (aTargeter.RelationToPlayer)
+            {
+                case Relation.RelationToPlayer.Self:
+                    targetPlateBox.SetTarget(aTarget);
+                    targetBuffBox.AssignBox(aTarget);
+                    break;
+                case Relation.RelationToPlayer.Friendly:
+                case Relation.RelationToPlayer.Neutral:
+                case Relation.RelationToPlayer.Hostile:
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
         }
         #endregion
         

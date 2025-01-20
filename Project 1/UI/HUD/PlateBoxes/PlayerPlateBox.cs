@@ -55,8 +55,7 @@ namespace Project_1.UI.HUD.PlateBoxes
         {
             base.HoldReleaseOnMe();
 
-            ObjectManager.Player.Target = ObjectManager.Player;
-            HUDManager.SetNewTarget();
+            player.SetTarget(player);
         }
 
         protected override bool ClickedOnChildren(ClickEvent aClick)
