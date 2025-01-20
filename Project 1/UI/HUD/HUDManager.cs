@@ -37,7 +37,7 @@ namespace Project_1.UI.HUD
         static DescriptorBox descriptorBox;
 
         static CharacterWindow characterWindow;
-        static SpellBookWindow spellBookBox;
+        static SpellBookWindow spellBookWindow;
 
         static CastBar playerCastBar;
         static FirstSpellBar firstSpellBar;
@@ -52,38 +52,32 @@ namespace Project_1.UI.HUD
 
         public static void Init()
         {
-            Window.Init(new RelativeScreenPosition(0.05f, 0.2f), new RelativeScreenPosition(0.1f, 0f), new RelativeScreenPosition(0.2f, 0.6f));
-
             playerPlateBox = new PlayerPlateBox(new RelativeScreenPosition(0.1f, 0.1f), new RelativeScreenPosition(0.2f, 0.1f));
+            hudElements.Add(playerPlateBox);
             targetPlateBox = new TargetPlateBox(new RelativeScreenPosition(0.33f, 0.1f), new RelativeScreenPosition(0.2f, 0.1f));
-            playerBuffBox = new BuffBox(ObjectManager.Player, BuffBox.FillDirection.TopRightToDown, new RelativeScreenPosition(0.01f, 0.1f), new RelativeScreenPosition(0.08f, 0.1f));
-            targetBuffBox = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, new RelativeScreenPosition(0.33f, 0.21f), new RelativeScreenPosition(0.2f, 0.1f));
-
-            lootBox = new LootBox(new RelativeScreenPosition(0.1f, 0.5f), new RelativeScreenPosition(0.4f, 0.4f));
-            inventoryBox = new InventoryBox(new RelativeScreenPosition(0.59f, 0.80f), new RelativeScreenPosition(0.4f));
-            descriptorBox = new DescriptorBox();
-
-            characterWindow = new CharacterWindow();
-            spellBookBox = new SpellBookWindow();
-
-            firstSpellBar = new FirstSpellBar(10, new RelativeScreenPosition(0.2f, 0.86f), 0.6f);
-            playerCastBar = new CastBar(new RelativeScreenPosition(0.1f, 0.203f), new RelativeScreenPosition(0.2f, 0.015f));
-
-            hudElements.Add(playerPlateBox); //TODO: Make this less ugly
             hudElements.Add(targetPlateBox);
+            playerBuffBox = new BuffBox(ObjectManager.Player, BuffBox.FillDirection.TopRightToDown, new RelativeScreenPosition(0.01f, 0.1f), new RelativeScreenPosition(0.08f, 0.1f));
             hudElements.Add(playerBuffBox);
+            targetBuffBox = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, new RelativeScreenPosition(0.33f, 0.21f), new RelativeScreenPosition(0.2f, 0.1f));
             hudElements.Add(targetBuffBox);
 
+            lootBox = new LootBox(new RelativeScreenPosition(0.1f, 0.5f), new RelativeScreenPosition(0.4f, 0.4f));
             hudElements.Add(lootBox);
+            inventoryBox = new InventoryBox(new RelativeScreenPosition(0.59f, 0.80f), new RelativeScreenPosition(0.4f));
             hudElements.Add(inventoryBox);
+            descriptorBox = new DescriptorBox();
             hudElements.Add(descriptorBox);
 
+            Window.Init(new RelativeScreenPosition(0.05f, 0.2f), new RelativeScreenPosition(0.1f, 0f), new RelativeScreenPosition(0.2f, 0.6f));
+            characterWindow = new CharacterWindow();
             hudElements.Add(characterWindow);
+            spellBookWindow = new SpellBookWindow();
+            hudElements.Add(spellBookWindow);
+
+            firstSpellBar = new FirstSpellBar(10, new RelativeScreenPosition(0.2f, 0.86f), 0.6f);
             hudElements.Add(firstSpellBar);
-
-            hudElements.Add(spellBookBox);
+            playerCastBar = new CastBar(new RelativeScreenPosition(0.1f, 0.203f), new RelativeScreenPosition(0.2f, 0.015f));
             hudElements.Add(playerCastBar);
-
 
             heldItem = new HeldItem();
             heldSpell = new HeldSpell();
@@ -187,7 +181,7 @@ namespace Project_1.UI.HUD
             }
         }
 
-        public static void SetNewTarget(Entity aTargeter, Entity aTarget) //TODO: Make this use new target as arg
+        public static void SetNewTarget(Entity aTargeter, Entity aTarget)
         {
             switch (aTargeter.RelationToPlayer)
             {
@@ -239,8 +233,8 @@ namespace Project_1.UI.HUD
         #endregion
 
         #region Spell
-        public static void AddSpellToSpellBook(Spell aSpell) => spellBookBox.AssignSpell(aSpell);
-        public static void HoldSpell(Spell aSpell, Vector2 aGrabOffset) => heldSpell.HoldMe(aSpell, aGrabOffset);
+        public static void AddSpellToSpellBook(Spell aSpell) => spellBookWindow.AssignSpell(aSpell);
+        public static void HoldSpell(Spell aSpell, AbsoluteScreenPosition aGrabOffset) => heldSpell.HoldMe(aSpell, aGrabOffset);
         public static void ReleaseSpell() => heldSpell.ReleaseMe();
 
         public static void FinishChannel() => playerCastBar.FinishCast();
@@ -254,7 +248,7 @@ namespace Project_1.UI.HUD
         public static void ReduceLootItem(int aSlotInLoot, int aCount) => lootBox.ReduceItem(aSlotInLoot, aCount);
         public static void Loot(Corpse aCorpse) => lootBox.Loot(aCorpse);
 
-        public static void HoldItem(Item aItem, Vector2 aGrabOffset) => heldItem.HoldItem(aItem, aGrabOffset);
+        public static void HoldItem(Item aItem, AbsoluteScreenPosition aGrabOffset) => heldItem.HoldItem(aItem, aGrabOffset);
         public static void ReleaseItem() => heldItem.ReleaseMe();
         #endregion
 

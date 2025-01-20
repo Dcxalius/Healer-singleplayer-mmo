@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.Input;
 using Project_1.Textures;
 using System;
@@ -13,23 +14,23 @@ namespace Project_1.UI.UIElements.Inventory
     internal class HeldItem
     {
         Item heldItem;
-        Vector2 grabOffset;
-        public HeldItem()
-        {
-        }
+        AbsoluteScreenPosition grabOffset;
+        AbsoluteScreenPosition size = new AbsoluteScreenPosition(32);
 
-        public bool HoldItem(Item aItem, Vector2 aGrabOffset)
+        public bool HoldItem(Item aItem, AbsoluteScreenPosition aGrabOffset)
         {
             heldItem = aItem;
             heldItem.HoldMe();
             grabOffset = aGrabOffset;
+            if (grabOffset.X > size.ToVector2().X) grabOffset.X = size.X;
+            if (grabOffset.Y > size.ToVector2().Y) grabOffset.Y = size.Y;
             return true;
         }
 
         public bool ReleaseMe()
         {
             heldItem.ReleaseMe();
-            grabOffset = Vector2.Zero;
+            grabOffset = AbsoluteScreenPosition.Zero;
             heldItem = null;
             return true;
         }
@@ -41,7 +42,7 @@ namespace Project_1.UI.UIElements.Inventory
                 return;
             }
 
-            Rectangle pos = new Rectangle((InputManager.GetMousePosAbsolute().ToVector2() - grabOffset).ToPoint(), new Point(32));
+            Rectangle pos = new Rectangle((InputManager.GetMousePosAbsolute() - grabOffset), size);
             Color transparent = new Color(80, 80, 80, 80);
             heldItem.Gfx.Draw(aBatch, pos, transparent);
             heldItem.GfxOnButton.Draw(aBatch, pos, transparent);

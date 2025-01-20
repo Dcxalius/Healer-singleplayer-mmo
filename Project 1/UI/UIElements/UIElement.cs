@@ -62,6 +62,8 @@ namespace Project_1.UI.UIElements
             }
         }
 
+        public AbsoluteScreenPosition Location => absolutePos;
+
         AbsoluteScreenPosition absolutePos;
         
         RelativeScreenPosition relativePos; //TODO: Change this so 1, 1 refers to parents bottom right instead of screen bottom right + parent top left

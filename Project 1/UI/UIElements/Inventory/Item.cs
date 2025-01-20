@@ -66,7 +66,7 @@ namespace Project_1.UI.UIElements.Inventory
 
             if (isEmpty == false && holdable)
             {
-                HUDManager.HoldItem(this, (InputManager.GetMousePosAbsolute() - AbsolutePos.Location).ToVector2());
+                HUDManager.HoldItem(this, InputManager.GetMousePosAbsolute() - Location);
             }
         }
 

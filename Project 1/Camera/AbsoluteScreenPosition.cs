@@ -16,8 +16,17 @@ namespace Project_1.Camera
         Point position;
         public static AbsoluteScreenPosition Zero { get { return new AbsoluteScreenPosition(); } }
 
-        public int X { get { return position.X; } }
-        public int Y { get { return position.Y; } }
+        public int X
+        {
+            get => position.X;
+            set => position.X = value;
+        }
+
+        public int Y
+        {
+            get => position.Y;
+            set => position.Y = value;
+        }
 
         public AbsoluteScreenPosition()
         {

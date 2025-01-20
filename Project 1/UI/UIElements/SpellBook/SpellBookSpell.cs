@@ -51,7 +51,7 @@ namespace Project_1.UI.UIElements.SpellBook
 
             if (spellData != null)
             {
-                HUDManager.HoldSpell(spellData, (InputManager.GetMousePosAbsolute() - AbsolutePos.Location).ToVector2());
+                HUDManager.HoldSpell(spellData, InputManager.GetMousePosAbsolute() - Location);
             }
         }
 
