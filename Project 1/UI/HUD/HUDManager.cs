@@ -252,8 +252,8 @@ namespace Project_1.UI.HUD
         public static void ReleaseItem() => heldItem.ReleaseMe();
         #endregion
 
-        
 
+        #region Mouse
         public static bool Click(ClickEvent aClickEvent)
         {
             for (int i = hudElements.Count - 1; i >= 0; i--)
@@ -280,8 +280,18 @@ namespace Project_1.UI.HUD
 
             }
             return false;
-
         }
+
+        public static void PauseMenuActivated() //TODO: Find better name
+        {
+            for (int i = 0; i < hudElements.Count; i++)
+            {
+                hudElements[i].PauseMenuActivated();
+            }
+            heldItem.ReleaseMe();
+            heldSpell.ReleaseMe();
+        }
+        #endregion
 
         public static void Draw(SpriteBatch aBatch)
         {

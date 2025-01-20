@@ -125,7 +125,7 @@ namespace Project_1.UI.OptionMenu
             }
         }
 
-        public static bool SearchForHit(ClickEvent aClickEvent)
+        public static bool Click(ClickEvent aClickEvent)
         {
             for (int i = 0; i < optionScreenPermanents.Count; i++)
             {

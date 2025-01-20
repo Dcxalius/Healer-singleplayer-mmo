@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.Managers;
+using Project_1.Managers.States;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
 using System;

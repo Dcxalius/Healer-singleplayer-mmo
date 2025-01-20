@@ -9,6 +9,7 @@ using Project_1.GameObjects.Spells.Projectiles;
 using Project_1.Input;
 using Project_1.Items;
 using Project_1.Managers;
+using Project_1.Managers.States;
 using Project_1.Particles;
 using Project_1.Textures;
 using Project_1.Tiles;
@@ -18,9 +19,9 @@ using System.Runtime.InteropServices;
 
 namespace Project_1
 {
-    public class Game1 : Game
+    public class Game1 : Microsoft.Xna.Framework.Game
     {
-        public static Game Instance { get; private set; }
+        public static Microsoft.Xna.Framework.Game Instance { get; private set; }
         public Game1()
         {
             GraphicsManager.SetManager(this);
@@ -32,6 +33,7 @@ namespace Project_1
         protected override void Initialize() //TODO: Split all Inits so that all calls that are independant are called first and only after that the dependant ones are called
         {
             DebugManager.Init();
+            StateManager.Init();
             ItemFactory.Init(Content);
             LootFactory.Init(Content);
             TextureManager.Init(Content);

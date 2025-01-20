@@ -197,6 +197,15 @@ namespace Project_1.UI.UIElements
             }
         }
 
+        public virtual void PauseMenuActivated()
+        {
+            for (int i = 0; i < children.Count; i++)
+            {
+                children[i].PauseMenuActivated();
+            }
+            HoldReleaseAwayFromMe();
+        }
+
         #endregion
 
         static protected Point TransformFromRelativeToPoint(Vector2 aValue) //TODO: ????
