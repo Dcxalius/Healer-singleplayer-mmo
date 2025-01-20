@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
+using Project_1.GameObjects.Entities;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,9 @@ namespace Project_1.UI.UIElements.PlateBoxes
             text = new Text("Gloryse", Color.Black);
             
         }
+
+
+        public abstract void Refresh(Entity aEntity);
 
         public override void Draw(SpriteBatch aBatch)
         {

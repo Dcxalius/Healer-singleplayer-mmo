@@ -66,7 +66,7 @@ namespace Project_1.GameObjects.Unit
             if (currentHealth > maxHealth) currentHealth = maxHealth;
         }
 
-        public void Refresh(BasePrimaryStats aPrimaryStats)
+        public void Refresh(TotalPrimaryStats aPrimaryStats)
         {
             MaxHealth = baseMaxHealth + aPrimaryStats.Stamina * 10;
             healthPer5 = baseHealthPer5 + aPrimaryStats.Spirit;

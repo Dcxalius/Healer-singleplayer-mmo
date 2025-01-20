@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects;
+using Project_1.GameObjects.Entities;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,11 @@ namespace Project_1.UI.UIElements.PlateBoxes
         public override void Draw(SpriteBatch aBatch)
         {
             base.Draw(aBatch);
+        }
+
+        public override void Refresh(Entity aEntity)
+        {
+            throw new NotImplementedException();
         }
     }
 }

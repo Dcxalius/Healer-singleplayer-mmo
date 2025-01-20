@@ -10,10 +10,28 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.UIElements.Bars
 {
-    internal class ResourceBar : Bar
+    internal class ResourceBar : Bar //TODO: find better name
     {
 
-        public float MaxValue { get => maxValue; set => maxValue = value; }
+        public float MaxValue
+        {
+            get => maxValue; 
+            set
+            {
+                maxValue = value;
+                if (currentValue == 0 && maxValue == 0)
+                {
+                    base.Value = 1f;
+                    fractionText.Value = null;
+                    percentageText.Value = null;
+                    return;
+                }
+                maxValue = value;
+                base.Value = currentValue / maxValue;
+                fractionText.Value = currentValue + "/" + maxValue;
+                percentageText.Value = (int)(currentValue / maxValue * 100) + "%";
+            }
+        }
         public override float Value
         {
             set
@@ -26,7 +44,7 @@ namespace Project_1.UI.UIElements.Bars
                     return;
                 }
                 currentValue = value;
-                base.Value = value / maxValue;
+                base.Value = currentValue / maxValue;
                 fractionText.Value = currentValue + "/" + maxValue;
                 percentageText.Value = (int)(currentValue / maxValue * 100) + "%";
             }

@@ -14,13 +14,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace Project_1.UI.HUD
+namespace Project_1.UI.HUD.PlateBoxes
 {
     internal class PlayerPlateBox : PlateBox
     {
         static Player player;
 
-        
+
 
         static PlateBoxNameSegment name;
         static PlateBoxHealthSegment health;
@@ -37,12 +37,18 @@ namespace Project_1.UI.HUD
 
             leftVerticalSegments = new PlateBoxSegment[] { };
             rightVerticalSegments = new PlateBoxSegment[] { };
-            horizontalSegments = new PlateBoxSegment[] { name, health, resource};
+            horizontalSegments = new PlateBoxSegment[] { name, health, resource };
 
             AddSegmentsToChildren();
 
         }
 
+        public override void Refresh(Entity aEntity)
+        {
+            name.Name = aEntity.Name;
+            health.Refresh(aEntity);
+            resource.Refresh(aEntity);
+        }
 
         public override void HoldReleaseOnMe()
         {

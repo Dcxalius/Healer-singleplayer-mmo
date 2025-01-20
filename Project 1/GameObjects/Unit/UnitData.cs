@@ -120,10 +120,10 @@ namespace Project_1.GameObjects.Unit
             }
         }
 
-        public void Update()
-        {
-            Resource.Update();
-        }
+        //public void Update()
+        //{
+        //    Resource.Update();
+        //}
 
         public void Tick()
         {

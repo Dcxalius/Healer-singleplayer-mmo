@@ -20,7 +20,7 @@ namespace Project_1.GameObjects.Unit.Stats
         public Attack Attack => attack;
         Attack attack;
 
-        public PrimaryStats PrimaryStats => totalPrimaryStats;
+        public TotalPrimaryStats TotalPrimaryStats => totalPrimaryStats;
         TotalPrimaryStats totalPrimaryStats;
         BasePrimaryStats basePrimaryStats;
 
@@ -49,7 +49,7 @@ namespace Project_1.GameObjects.Unit.Stats
                     float manaPer5 = 5; //TODO: Extranct these values from class
                     int maxResource = /*baseFromClass + */ 1;
 
-                    resource = new Mana(maxResource, basePrimaryStats, aCurrentResource, manaPer5, aLevel);
+                    resource = new Mana(maxResource, TotalPrimaryStats, aCurrentResource, manaPer5, aLevel);
                     break;
                 case Resource.ResourceType.Energy:
                     resource = new Energy(aCurrentResource);
@@ -66,6 +66,11 @@ namespace Project_1.GameObjects.Unit.Stats
             attack = new Attack(aClassData.FistMinAttackDamage, aClassData.FistMaxAttackDamage, aClassData.FistAttackSpeed);
         }
 
+        public bool CheckIfResourceRegened()
+        {
+            if (resource.GetType() != typeof(Mana)) return false;
+            return (resource as Mana).CheckIfTicked();
+        }
 
 
         public void LevelUp(ClassData aClassData)
@@ -80,14 +85,15 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void RefreshStats()
         {
-            HUDManager.RefreshCharacterWindowStats(basePrimaryStats.NewReport);
-            health.Refresh(basePrimaryStats);
-            resource.Refresh(basePrimaryStats);
+            HUDManager.RefreshCharacterWindowStats(TotalPrimaryStats.NewReport);
+            health.Refresh(TotalPrimaryStats);
+            resource.Refresh(TotalPrimaryStats);
         }
 
         public void RefreshEquipmentStats(EquipmentStats aEquipmentStats)
         {
             totalPrimaryStats.UpdateEquipmentStats(aEquipmentStats);
+            RefreshStats();
         }
     }
 }

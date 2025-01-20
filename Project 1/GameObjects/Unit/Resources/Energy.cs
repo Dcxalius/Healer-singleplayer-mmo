@@ -70,6 +70,6 @@ namespace Project_1.GameObjects.Unit.Resources
             }
         }
 
-        public override float CalculateMaxValue(BasePrimaryStats aStats) => maxValue;
+        public override float CalculateMaxValue(TotalPrimaryStats aStats) => maxValue;
     }
 }

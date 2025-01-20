@@ -60,7 +60,7 @@ namespace Project_1.GameObjects.Entities
 
         public override float MaxSpeed => unitData.MovementData.MaxSpeed;
 
-        public PairReport PrimaryStatReport => unitData.BaseStats.PrimaryStats.NewReport;
+        public PairReport PrimaryStatReport => unitData.BaseStats.TotalPrimaryStats.NewReport;
         #endregion
 
         float timeSinceLastAttack = 0;
@@ -93,7 +93,7 @@ namespace Project_1.GameObjects.Entities
         {
             if (AmIDead()) return;
             TargetAliveCheck();
-            unitData.Update();
+            if (unitData.BaseStats.CheckIfResourceRegened()) HUDManager.RefreshPlateBox(this);
             Movement();
             AttackTarget();
 
@@ -101,6 +101,7 @@ namespace Project_1.GameObjects.Entities
             selectRing.UpdatePosition(Position, Size);
             spellCast.UpdateSpellChannel();
             buffList.Update(this);
+            //HUDManager.RefreshPlateBox(this);
         }
 
         bool AmIDead()
@@ -221,6 +222,7 @@ namespace Project_1.GameObjects.Entities
             if (!InCombat)
             {
                 unitData.Tick();
+                HUDManager.RefreshPlateBox(this);
             }
         }
         #endregion
@@ -283,7 +285,7 @@ namespace Project_1.GameObjects.Entities
             }
 
             unitData.Resource.Value += value;
-
+            HUDManager.RefreshPlateBox(this);
             return true;
         }
 
@@ -299,6 +301,7 @@ namespace Project_1.GameObjects.Entities
             ParticleMovement bloodMovement = new ParticleMovement(dirOfFlyingStuff, WorldSpace.Zero, 0.9f);
             //DebugManager.Print(GetType(), ((aDamageTaken / MaxHealth) * 100).ToString());
             ParticleManager.SpawnParticle(bloodsplatter, WorldRectangle, this, bloodMovement, (int)Math.Max(1, (aDamageTaken / MaxHealth) * 100));
+            HUDManager.RefreshPlateBox(this);
         }
 
         public virtual bool TakeHealing(Entity aHealer, float aHealingTaken)
@@ -318,6 +321,7 @@ namespace Project_1.GameObjects.Entities
                 aggroTablesIAmOn[i].AddToAggroTable(aHealer, value);
             }
 
+            HUDManager.RefreshPlateBox(this);
             return true;
         }
         #endregion
@@ -352,19 +356,26 @@ namespace Project_1.GameObjects.Entities
         public Item EquipInParticularSlot(Items.SubTypes.Equipment aEquipment, Slot aSlot)
         {
             Item item = Equipment.EquipInParticularSlot(aEquipment, aSlot);
-            
+            unitData.BaseStats.RefreshEquipmentStats(Equipment.EquipmentStats);
+            HUDManager.RefreshCharacterWindowStats(unitData.BaseStats.TotalPrimaryStats.NewReport);
+            HUDManager.RefreshPlateBox(this);
             return item;
         }
         public Item Equip(Items.SubTypes.Equipment aEquipment)
         {
             Item item = Equipment.Equip(aEquipment);
+            unitData.BaseStats.RefreshEquipmentStats(Equipment.EquipmentStats);
+            HUDManager.RefreshCharacterWindowStats(unitData.BaseStats.TotalPrimaryStats.NewReport);
+            HUDManager.RefreshPlateBox(this);
             return item;
         }
 
         public (Item, Item) EquipTwoHander(Items.SubTypes.Equipment aEquipment)
         {
             (Item, Item) returnable = Equipment.EquipTwoHander(aEquipment);
-
+            unitData.BaseStats.RefreshEquipmentStats(Equipment.EquipmentStats);
+            HUDManager.RefreshCharacterWindowStats(unitData.BaseStats.TotalPrimaryStats.NewReport);
+            HUDManager.RefreshPlateBox(this);
             return returnable;
         }
 

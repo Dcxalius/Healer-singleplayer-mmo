@@ -59,8 +59,8 @@ namespace Project_1.GameObjects.Unit
         {
             this.name = name;
             this.resource = resource;
-            this.baseStats = new EquipmentStats(baseStats);
-            this.perLevelStats = new EquipmentStats(perLevelStats);
+            this.baseStats = new PrimaryStats(baseStats);
+            this.perLevelStats = new PrimaryStats(perLevelStats);
             this.baseHp = baseHp;
             this.perLevelHp = perLevelHp;
             this.baseHpPer5 = baseHpPer5;

@@ -31,7 +31,7 @@ namespace Project_1.Items.SubTypes
             Count
         }
 
-        public EquipmentStats PrimaryStats => (itemData as EquipmentData).BaseStats;
+        public EquipmentStats Stats => (itemData as EquipmentData).BaseStats;
         public Type type { get => (itemData as EquipmentData).Slot; }
 
 

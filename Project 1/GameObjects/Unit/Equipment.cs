@@ -72,7 +72,7 @@ namespace Project_1.GameObjects.Unit
                 if (equipped[i] == null) continue;
                 for (int j = 0; j < totalStats.Length; j++)
                 {
-                    totalStats[j] += equipped[i].PrimaryStats.Stats[j];
+                    totalStats[j] += equipped[i].Stats.Stats[j];
                 }
             }
             equipmentStats = new EquipmentStats(totalStats);
@@ -293,10 +293,10 @@ namespace Project_1.GameObjects.Unit
         Item SwapItem(Items.SubTypes.Equipment aEquipment, Slot aSlot)
         {
             Items.SubTypes.Equipment previouslyEquiped = equipped[(int)aSlot];
-            if (previouslyEquiped != null) equipmentStats.RemoveStats(previouslyEquiped.PrimaryStats);
+            if (previouslyEquiped != null) equipmentStats.RemoveStats(previouslyEquiped.Stats);
 
             equipped[(int)aSlot] = aEquipment;
-            equipmentStats.AddStats(aEquipment.PrimaryStats);
+            equipmentStats.AddStats(aEquipment.Stats);
             
             HUDManager.RefreshCharacterWindowSlot(aSlot); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
             return previouslyEquiped;
@@ -306,7 +306,7 @@ namespace Project_1.GameObjects.Unit
         {
             Debug.Assert(equipped[(int)aSlot] == null);
             equipped[(int)aSlot] = aEquipment;
-            equipmentStats.AddStats(aEquipment.PrimaryStats);
+            equipmentStats.AddStats(aEquipment.Stats);
             HUDManager.RefreshCharacterWindowSlot(aSlot); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
         }
 
@@ -315,7 +315,7 @@ namespace Project_1.GameObjects.Unit
             Items.SubTypes.Equipment item = equipped[(int)aSlot];
             if (item == null) return null;
             equipped[(int)aSlot] = null;
-            equipmentStats.RemoveStats(item.PrimaryStats);
+            equipmentStats.RemoveStats(item.Stats);
             HUDManager.RefreshCharacterWindowSlot(aSlot);
             return item;
         }

@@ -8,6 +8,7 @@ using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Unit;
 using Project_1.Input;
 using Project_1.Managers;
+using Project_1.UI.HUD.PlateBoxes;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Bars;
 using Project_1.UI.UIElements.Inventory;
@@ -100,6 +101,36 @@ namespace Project_1.UI.HUD
             for (int i = 0; i < hudElements.Count; i++)
             {
                 hudElements[i].Rescale();
+            }
+        }
+
+        public static void RefreshPlateBox(Entity aEntity)
+        {
+            switch (aEntity.RelationToPlayer)
+            {
+                case Relation.RelationToPlayer.Self:
+                    playerPlateBox.Refresh(aEntity);
+                    if (!targetPlateBox.BelongsTo(aEntity)) return;
+                    targetPlateBox.Refresh(aEntity);
+                    break;
+                case Relation.RelationToPlayer.Friendly:
+                    for (int i = 0; i < partyPlateBoxes.Length; i++)
+                    {
+                        if (!partyPlateBoxes[i].BelongsTo(aEntity as Walker)) continue;
+                        partyPlateBoxes[i].Refresh(aEntity);
+
+                        if (!targetPlateBox.BelongsTo(aEntity)) return;
+                        targetPlateBox.Refresh(aEntity);
+                        return;
+                    }
+                    break;
+                case Relation.RelationToPlayer.Neutral:
+                case Relation.RelationToPlayer.Hostile:
+                    if (!targetPlateBox.BelongsTo(aEntity)) return;
+                    targetPlateBox.Refresh(aEntity);
+                    break;
+                default:
+                    break;
             }
         }
 

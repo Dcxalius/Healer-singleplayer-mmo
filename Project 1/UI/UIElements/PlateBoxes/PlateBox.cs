@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects;
+using Project_1.GameObjects.Entities;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,10 @@ namespace Project_1.UI.UIElements.PlateBoxes
             //TODO: Make sure the segmentsizes add up to aSize
 
         }
+
+        public abstract void Refresh(Entity aEntity);
+
+        
 
         protected void AddSegmentsToChildren()
         {

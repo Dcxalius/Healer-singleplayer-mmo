@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.GameObjects;
+using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Temp;
 using Project_1.Input;
 using Project_1.UI.UIElements;
@@ -12,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace Project_1.UI.HUD
+namespace Project_1.UI.HUD.PlateBoxes
 {
     internal class PartyPlateBox : PlateBox
     {
@@ -31,14 +32,14 @@ namespace Project_1.UI.HUD
 
             name = new PlateBoxNameSegment(walker.Name, walker.RelationColor, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(aSize.X, aSize.Y / 2));
             health = new PlateBoxHealthSegment(walker, new RelativeScreenPosition(0, aSize.Y / 2), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
-            resource = new PlateBoxResourceSegment(walker, new RelativeScreenPosition(0, aSize.Y / 4 * 3 ), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
+            resource = new PlateBoxResourceSegment(walker, new RelativeScreenPosition(0, aSize.Y / 4 * 3), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
 
             //health = new PlateBoxHealthSegment(walker, new Vector2(0, 0), new Vector2(aSize.X, aSize.Y / 2));
 
 
             leftVerticalSegments = new PlateBoxSegment[] { };
             rightVerticalSegments = new PlateBoxSegment[] { };
-            horizontalSegments = new PlateBoxSegment[] { name, health, resource};
+            horizontalSegments = new PlateBoxSegment[] { name, health, resource };
 
             AddSegmentsToChildren();
 
@@ -51,7 +52,7 @@ namespace Project_1.UI.HUD
         public bool BelongsTo(Walker aWalker)
         {
             return aWalker == walker;
-            
+
         }
 
 
@@ -75,12 +76,19 @@ namespace Project_1.UI.HUD
                 ObjectManager.Player.AddToCommand(walker);
                 return;
             }
-            if (aClick.Modifier(InputManager.HoldModifier.Ctrl ))
+            if (aClick.Modifier(InputManager.HoldModifier.Ctrl))
             {
                 ObjectManager.Player.NeedyAddToCommand(walker);
                 return;
             }
             base.ClickedOnMe(aClick);
+        }
+
+        public override void Refresh(Entity aEntity)
+        {
+            name.Name = aEntity.Name;
+            health.Refresh(aEntity);
+            resource.Refresh(aEntity);
         }
     }
 }

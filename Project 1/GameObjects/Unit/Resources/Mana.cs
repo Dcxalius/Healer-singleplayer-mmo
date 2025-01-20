@@ -47,7 +47,7 @@ namespace Project_1.GameObjects.Unit.Resources
 
         protected override float PerLevel => 10;
 
-        public Mana(float aBaseValue, BasePrimaryStats aStats, float aCurrentValue, float aBaseRegen, int aLevel) : base(ResourceType.Mana, Color.Cyan)
+        public Mana(float aBaseValue, TotalPrimaryStats aStats, float aCurrentValue, float aBaseRegen, int aLevel) : base(ResourceType.Mana, Color.Cyan)
         {
             Debug.Assert(aBaseValue > 0, "Tried to set base to 0");
             Debug.Assert(aBaseRegen > 0, "Tried to set regen to 0");
@@ -62,11 +62,19 @@ namespace Project_1.GameObjects.Unit.Resources
 
         public override void Update()
         {
+            
+        }
+
+        public bool CheckIfTicked()
+        {
             if (TimeManager.TotalFrameTime - lastCastSpellOrTick > regenTimer)
             {
                 lastCastSpellOrTick = TimeManager.TotalFrameTime;
-                base.Update();
+                base.Update(); //TODO: ????????
+                return true;
             }
+
+            return false;
         }
 
         public override void CastSpell(float aCost)
@@ -76,6 +84,6 @@ namespace Project_1.GameObjects.Unit.Resources
             base.CastSpell(aCost);
         }
 
-        public override float CalculateMaxValue(BasePrimaryStats aStats) => BaseMaxValue + aStats.Intellect * 15;
+        public override float CalculateMaxValue(TotalPrimaryStats aStats) => BaseMaxValue + aStats.Intellect * 15;
     }
 }

@@ -29,12 +29,11 @@ namespace Project_1.UI.UIElements.PlateBoxes
             children.Add(healthBar);
         }
 
-        public override void Update(in UIElement aParent)
+
+        public override void Refresh(Entity aEntity)
         {
-            base.Update(aParent);
-            if(entity == null) { return; }
+            healthBar.MaxValue = entity.MaxHealth;
             healthBar.Value = entity.CurrentHealth;
-            
         }
 
         public void SetTarget(Entity aEntity)

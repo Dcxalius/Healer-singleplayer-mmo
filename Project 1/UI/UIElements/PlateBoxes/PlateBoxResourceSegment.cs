@@ -31,12 +31,11 @@ namespace Project_1.UI.UIElements.PlateBoxes
             children.Add(resourceBar);
         }
 
-        public override void Update(in UIElement aParent)
+        public override void Refresh(Entity aEntity)
         {
-            base.Update(aParent);
-            if (entity == null) { return; }
-            resourceBar.Value = entity.CurrentResource;
 
+            resourceBar.Value = entity.CurrentResource;
+            resourceBar.MaxValue = entity.MaxResource;
         }
 
         public void SetTarget(Entity aEntity)
