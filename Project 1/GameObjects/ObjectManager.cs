@@ -44,7 +44,7 @@ namespace Project_1.GameObjects
 
             
             entities.Add(new Walker(new WorldSpace(11*32)));//Debug
-            player.AddToParty(entities[entities.Count - 1] as Walker); //Debug
+            player.Party.AddToParty(entities[entities.Count - 1] as Walker); //Debug
 
 
         }
@@ -144,7 +144,7 @@ namespace Project_1.GameObjects
 
             if (aClickEvent.ModifiersOr(new InputManager.HoldModifier[] { InputManager.HoldModifier.Shift, InputManager.HoldModifier.Ctrl }))
             {
-                player.ClearCommand();
+                player.Party.ClearCommand();
             }
             else
             {
@@ -156,8 +156,8 @@ namespace Project_1.GameObjects
         static bool RightClickGround(ClickEvent aClickEvent)
         {
             if (aClickEvent.ButtonPressed != InputManager.ClickType.Right) return false;
-            
-            player.IssueMoveOrder(aClickEvent);
+
+            player.Party.IssueMoveOrder(aClickEvent);
             return true;
         }
 

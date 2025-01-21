@@ -170,7 +170,8 @@ namespace Project_1.GameObjects.Unit
                 RemoveItem(aSlot);
                 return null;
             }
-            Debug.Assert(FitsInSlot(aEquipment.type, aSlot));
+            if (!FitsInSlot(aEquipment.type, aSlot)) return aEquipment;
+
             Item returnable = EquipInParticularSlotOneHanderWithATwoHanderEquiped(aEquipment, aSlot);
 
             if (returnable != null) return returnable;

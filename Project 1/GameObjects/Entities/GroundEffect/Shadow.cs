@@ -23,7 +23,7 @@ namespace Project_1.GameObjects.Entities.GroundEffect
             Color shadowColor = Color.Black;
             if (aOwner.GetType() == typeof(Walker))
             {
-                if (ObjectManager.Player.IsInCommand(aOwner as Walker))
+                if (ObjectManager.Player.Party.IsInCommand(aOwner as Walker))
                 {
                     shadowColor = Color.DarkGreen;
                 }

@@ -18,29 +18,27 @@ namespace Project_1.GameObjects.Entities.Temp
         {
         }
 
-        public void AddToControl(Player aPlayer)
-        {
-            aPlayer.AddToCommand(this);
-        }
-
-        public void NeedyControl(Player aPlayer)
-        {
-            aPlayer.NeedyAddToCommand(this);
-        }
-
-
         protected override void ClickedOn(ClickEvent aClickEvent)
         {
             base.ClickedOn(aClickEvent);
+            Command(aClickEvent);
 
+
+        }
+
+        public void Command(ClickEvent aClickEvent)
+        {
+            Party party = ObjectManager.Player.Party;
+            if (!party.IsInParty(this)) return;
             if (aClickEvent.Modifier(InputManager.HoldModifier.Shift))
             {
-                AddToControl(ObjectManager.Player);
+                party.AddToCommand(this);
             }
             else if (aClickEvent.Modifier(InputManager.HoldModifier.Ctrl))
             {
-                NeedyControl(ObjectManager.Player);
+                party.NeedyAddToCommand(this);
             }
+
         }
 
         public void RecieveDirectWalkingOrder(WorldSpace aPos)
@@ -50,10 +48,34 @@ namespace Project_1.GameObjects.Entities.Temp
         }
 
 
-        public void AddWalkingOrder(WorldSpace aPos)
+        public void AddWalkingOrder(WorldSpace aPos) => destination.AddDestination(aPos);
+
+        protected override bool CheckForRelation()
         {
-            destination.AddDestination(aPos);
+            if (target.RelationToPlayer == Unit.Relation.RelationToPlayer.Self || target.RelationToPlayer == Unit.Relation.RelationToPlayer.Friendly)
+            {
+                return false;
+            }
+            if (target.RelationToPlayer != RelationToPlayer)
+            {
+                return true;
+            }
+
+            return false;
+            
         }
 
+        public override void ExpToParty(int aExpAmount)
+        {
+            Party party = ObjectManager.Player.Party;
+            if (!party.IsInParty(this))
+            {
+                GainExperience(aExpAmount);
+                return;
+            }
+
+            party.DivideExpAmongParty(aExpAmount);
+
+        }
     }
 }

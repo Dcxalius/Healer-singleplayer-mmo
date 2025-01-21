@@ -32,18 +32,21 @@ namespace Project_1.GameObjects.Entities
             spawnerId = aSpawnerId;
         }
 
-        protected override void Death()
-        {
-            base.Death();
-
-            aggroTable.ClearTable();
-        }
-
         public override void Update()
         {
             base.Update();
 
             aggroTable.Update();
+        }
+        protected override void Death()
+        {
+
+            int[] xdd = aggroTable.CalculateAverageLevel();
+
+            int exp = UnitData.Level.ExpReward((int)Math.Round(xdd.Average()));
+            aggroTable.Tagger.ExpToParty(exp);
+            aggroTable.ClearTable();
+            base.Death();
         }
 
         public override void TakeDamage(Entity aAttacker, float aDamageTaken)
@@ -61,6 +64,20 @@ namespace Project_1.GameObjects.Entities
         public void RemoveFromAggroTable(Entity aEntity)
         {
             aggroTable.RemoveFromAggroTable(aEntity);
+        }
+
+        protected override bool CheckForRelation()
+        {
+            if (target.RelationToPlayer != RelationToPlayer) return true;
+            
+
+            return false;
+            
+        }
+
+        public override void ExpToParty(int aExpAmount)
+        {
+            throw new NotImplementedException();
         }
     }
 }

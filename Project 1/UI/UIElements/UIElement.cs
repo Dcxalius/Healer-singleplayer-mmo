@@ -42,6 +42,7 @@ namespace Project_1.UI.UIElements
 
         protected bool capturesClick;
         protected bool capturesScroll;
+        protected bool capturesRelease;
 
         #endregion
 
@@ -98,6 +99,7 @@ namespace Project_1.UI.UIElements
             absolutePos = new AbsoluteScreenPosition(pos.Location);
             capturesClick = true;
             capturesScroll = false;
+            capturesRelease = true;
         }
 
         public virtual void Update(in UIElement aParent)
@@ -219,16 +221,13 @@ namespace Project_1.UI.UIElements
         public virtual bool ReleasedOn(ReleaseEvent aRelease)
         {
             if (!visible) return false;
-            if (AbsolutePos.Contains(aRelease.AbsolutePos))
-            {
-                bool clickedOnChild = ReleasedOnChildren(aRelease);
-                if (clickedOnChild == false)
-                {
-                    ReleaseOnMe(aRelease);
-                }
-                return true;
-            }
-            return false;
+            if (!AbsolutePos.Contains(aRelease.AbsolutePos)) return false;
+
+
+            if (ReleasedOnChildren(aRelease)) return true;
+
+            ReleaseOnMe(aRelease);
+            return capturesRelease;
         }
 
         public bool ReleasedOnChildren(ReleaseEvent aRelease)

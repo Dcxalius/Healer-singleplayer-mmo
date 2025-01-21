@@ -16,7 +16,7 @@ namespace Project_1.GameObjects.Unit
         int experience;
 
         static int[] experienceToLevel = 
-            { 400, 900, 1400, 2800, 3600, 4500, 5400, 6500, 7600, 
+            {0, 400, 900, 1400, 2800, 3600, 4500, 5400, 6500, 7600, 
             8800, 10100, 11400, 12900, 14400, 16000, 17700, 19400, 21300, 23200, 
             25200, 27300, 29400, 31700, 34000, 36400, 38900, 41400, 44300, 47400, 
             50800, 54500, 58600, 62800, 67100, 71600, 76100, 80800, 85700, 90700, 
@@ -30,12 +30,14 @@ namespace Project_1.GameObjects.Unit
             Debug.Assert(level > 0);
         }
 
+        public static int ExpToNextLevel(int aLevel) => experienceToLevel[aLevel];
+
         public bool GainExp(int aExpAmount)
         {
-            if (level >= 60) return false;
+            if (level >= 60 || level <= 0 ) return false;
             experience += aExpAmount;
 
-            if (experience > experienceToLevel[level])
+            if (experience >= experienceToLevel[level])
             {
                 experience -= experienceToLevel[level];
                 level++;
@@ -68,6 +70,7 @@ namespace Project_1.GameObjects.Unit
 
             int levelOfMob = CurrentLevel;
             int xp = levelOfMob * 5 + 45;
+
             if (levelOfMob > aLevelOfKiller)
             {
                 xp *= (int)(1 + 0.05 * Math.Min(levelOfMob - aLevelOfKiller, 4));
@@ -77,8 +80,7 @@ namespace Project_1.GameObjects.Unit
                 xp *= 1 - (aLevelOfKiller - levelOfMob) / ZD(levelOfMob);
             }
 
-            //TODO: Calculate reduction for group
-
+            if (xp < 0) return 0;
             return xp;
         }
     }

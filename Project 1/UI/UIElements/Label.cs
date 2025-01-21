@@ -39,6 +39,8 @@ namespace Project_1.UI.UIElements
         {
             underlyingText = aColor.HasValue ? new Text(aFontname, aText, aColor.Value) : new Text(aFontname, aText);
             textAlignment = aTextAlignment;
+            capturesClick = false;
+            capturesRelease = false;
         }
 
         public override void Rescale()

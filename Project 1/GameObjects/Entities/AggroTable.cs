@@ -13,14 +13,17 @@ namespace Project_1.GameObjects.Entities
     {
         public int Count => aggroEntities.Count;
 
-        List<(Entity, float, TimeSpan)> aggroEntities; //TODO: Make tuple a seperate class
+        List<(Entity, float, TimeSpan, TimeSpan)> aggroEntities; //TODO: Make tuple a seperate class
         readonly TimeSpan maxAggroDurationStaleness = TimeSpan.FromSeconds(10);
+
+        public Entity Tagger => aggroEntities.Min().Item1;
+
         NonFriendly owner;
 
         public AggroTable(NonFriendly aOwner)
         {
             owner = aOwner;
-            aggroEntities = new List<(Entity, float, TimeSpan)>();
+            aggroEntities = new List<(Entity, float, TimeSpan, TimeSpan)>();
         }
 
         public void ClearTable()
@@ -37,7 +40,7 @@ namespace Project_1.GameObjects.Entities
         {
             for (int i = 0; i < aggroEntities.Count; i++)
             {
-                (Entity, float, TimeSpan) entry = aggroEntities[i];
+                (Entity, float, TimeSpan, TimeSpan) entry = aggroEntities[i];
                 if (entry.Item1 == aEntity)
                 {
                     return i;
@@ -128,13 +131,20 @@ namespace Project_1.GameObjects.Entities
             int i = Contains(aEntityToAdd);
             if (i >= 0)
             {
-                (Entity, float, TimeSpan) entry = (aEntityToAdd, aggroEntities[i].Item2 + aThreatValue, TimeManager.TotalFrameTimeAsTimeSpan);
+                //(Entity, float, TimeSpan, TimeSpan) entry = (aEntityToAdd, aggroEntities[i].Item2 + aThreatValue, TimeManager.TotalFrameTimeAsTimeSpan, aggroEntities[i].Item4);
+                //aggroEntities[i] = entry;
+
+                (Entity, float, TimeSpan, TimeSpan) entry = aggroEntities[i];
+
+                entry.Item2 = aggroEntities[i].Item2 + aThreatValue;
+                entry.Item3 = TimeManager.TotalFrameTimeAsTimeSpan;
+
                 aggroEntities[i] = entry;
                 return;
             }
 
 
-            aggroEntities.Add((aEntityToAdd, aThreatValue, TimeManager.TotalFrameTimeAsTimeSpan));
+            aggroEntities.Add((aEntityToAdd, aThreatValue, TimeManager.TotalFrameTimeAsTimeSpan, TimeManager.TotalFrameTimeAsTimeSpan));
 
             aEntityToAdd.AddedToAggroTable(owner);
         }
@@ -146,6 +156,16 @@ namespace Project_1.GameObjects.Entities
             Debug.Assert(index >= 0);
 
             aggroEntities.RemoveAt(index);
+        }
+
+        public int[] CalculateAverageLevel()
+        {
+            int[] returnable = new int[aggroEntities.Count];
+            for (int i = 0; i < aggroEntities.Count; i++)
+            {
+                returnable[i] = aggroEntities[i].Item1.CurrentLevel;
+            }
+            return returnable;
         }
     }
 }

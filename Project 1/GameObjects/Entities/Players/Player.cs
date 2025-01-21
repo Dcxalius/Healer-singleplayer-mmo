@@ -22,17 +22,14 @@ namespace Project_1.GameObjects.Entities.Players
 {
     internal class Player : Entity
     {
-        public Inventory Inventory { get => inventory; }
+        public Inventory Inventory => inventory;
         Inventory inventory;
 
-        public SpellBook SpellBook { get => spellBook; }
+        public SpellBook SpellBook => spellBook;
         SpellBook spellBook;
-       
-        List<Walker> commands = new List<Walker>();
-        List<Walker> party = new List<Walker>();
 
-        const float lengthOfLeash = 500;
-
+        public Party Party => party;
+        Party party;
 
         public bool LockedMovement => lockedMovement;
         bool lockedMovement = false;
@@ -41,11 +38,13 @@ namespace Project_1.GameObjects.Entities.Players
         {
             inventory = new Inventory(this);
             spellBook = new SpellBook(this);
+            party = new Party(this);
         }
-
-
-        public bool IsInCommand(Walker aWalker) { return commands.IndexOf(aWalker) >= 0; }
-        public bool IsInParty(Walker aWalker) { return party.IndexOf(aWalker) >= 0; }
+        public override void Update()
+        {
+            KeyboardWalk();
+            base.Update();
+        }
 
         void KeyboardWalk()
         {
@@ -72,82 +71,24 @@ namespace Project_1.GameObjects.Entities.Players
             velocity *= (float)(UnitData.MovementData.Speed * TimeManager.SecondsSinceLastFrame);
         }
 
-        public override void Update()
-        {
-            KeyboardWalk();
-            base.Update();
-            SummonPartyIfTooFarAway();
-        }
 
-        void SummonPartyIfTooFarAway()
+        protected override bool CheckForRelation()
         {
-            for (int i = 0; i < party.Count; i++)
+            if (target.RelationToPlayer == Unit.Relation.RelationToPlayer.Self || target.RelationToPlayer == Unit.Relation.RelationToPlayer.Friendly)
             {
-                if (party[i].HasDestination == false && (FeetPosition - party[i].FeetPosition).ToVector2().Length() > lengthOfLeash)
-                {
-                    party[i].SetTarget(ObjectManager.Player);
-                }
+                return false;
             }
-        }
-
-        public void ClearCommand()
-        {
-            HUDManager.RemoveWalkersFromControl(commands.ToArray());
-            commands.Clear();
-        }
-
-        public void AddToCommand(Walker aWalker)
-        {
-            if (commands.Contains(aWalker)) { return; }
-
-            HUDManager.AddWalkerToControl(aWalker);
-            commands.Add(aWalker);
-        }
-
-        public void NeedyAddToCommand(Walker aWalker)
-        {
-            commands.Clear();
-            AddToCommand(aWalker);
-
-        }
-
-        public void RemoveFromCommand(Walker aWalker)
-        {
-            if (!commands.Contains(aWalker)) { return; }
-
-            HUDManager.RemoveWalkersFromControl(new Walker[] { aWalker });
-            commands.Remove(aWalker);
-        }
-
-        public void AddToParty(Walker aWalker)
-        {
-            party.Add(aWalker);
-            HUDManager.AddWalkerToParty(party[party.Count - 1]);
-        }
-
-        public void IssueMoveOrder(ClickEvent aClick)
-        {
-            WorldSpace worldPosDestination = WorldSpace.FromRelaticeScreenSpace(aClick.RelativePos);
-            foreach (var walker in commands)
+            if (target.RelationToPlayer != RelationToPlayer)
             {
-                if (aClick.Modifier(InputManager.HoldModifier.Shift))
-                {
-                    walker.AddWalkingOrder(worldPosDestination);
-                }
-                else
-                {
-                    walker.RecieveDirectWalkingOrder(worldPosDestination);
-
-                }
+                return true;
             }
+
+            return false;
         }
 
-        public void IssueTargetOrder(Entity aEntity)
+        public override void ExpToParty(int aExpAmount)
         {
-            for (int i = 0; i < commands.Count; i++)
-            {
-                commands[i].SetTarget(aEntity);
-            }
+            party.ExpToParty(aExpAmount);
         }
     }
 }

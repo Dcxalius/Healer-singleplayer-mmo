@@ -70,16 +70,8 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         protected override void ClickedOnMe(ClickEvent aClick)
         {
-            if (aClick.Modifier(InputManager.HoldModifier.Shift))
-            {
-                ObjectManager.Player.AddToCommand(walker);
-                return;
-            }
-            if (aClick.Modifier(InputManager.HoldModifier.Ctrl))
-            {
-                ObjectManager.Player.NeedyAddToCommand(walker);
-                return;
-            }
+            walker.Command(aClick);
+
             base.ClickedOnMe(aClick);
         }
 

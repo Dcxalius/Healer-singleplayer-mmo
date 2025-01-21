@@ -538,7 +538,7 @@ namespace Project_1.Items
                 return;
             }
 
-            if (equipment.type < Equipment.Type.Trinket || equipment.type >= Equipment.Type.MainHander)
+            if (equipment.type <= Equipment.Type.Feet || equipment.type >= Equipment.Type.MainHander)
             {
                 if (GameObjects.Unit.Equipment.SlotToSlot(equipment.type) != (GameObjects.Unit.Equipment.Slot)aEquipmentSlot) return;
                 Equip(aIndex);
@@ -546,6 +546,7 @@ namespace Project_1.Items
             }
 
             //Only things here should be Trinkets, rings and one handers
+            if (!GameObjects.Unit.Equipment.FitsInSlot(equipment.type, (GameObjects.Unit.Equipment.Slot)aEquipmentSlot)) return;
             Item equipedInSlot = owner.EquipInParticularSlot(equipment, (GameObjects.Unit.Equipment.Slot)aEquipmentSlot);
             AssignItem(equipedInSlot, aIndex);
         }

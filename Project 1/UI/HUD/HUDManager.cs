@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Entities.Temp;
 using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Unit;
@@ -69,7 +70,7 @@ namespace Project_1.UI.HUD
             hudElements.Add(descriptorBox);
 
             Window.Init(new RelativeScreenPosition(0.05f, 0.2f), new RelativeScreenPosition(0.1f, 0f), new RelativeScreenPosition(0.2f, 0.6f));
-            characterWindow = new CharacterWindow();
+            characterWindow = new CharacterWindow(ObjectManager.Player);
             hudElements.Add(characterWindow);
             spellBookWindow = new SpellBookWindow();
             hudElements.Add(spellBookWindow);
@@ -228,8 +229,18 @@ namespace Project_1.UI.HUD
 
         public static void SetDescriptorBox(Item aItem) => descriptorBox.SetToItem(aItem);
 
+        #endregion
+
+        #region CharacterWindow
         public static void RefreshCharacterWindowSlot(Equipment.Slot aSlot) => characterWindow.SetSlot(aSlot);
         public static void RefreshCharacterWindowStats(PairReport aReport) => characterWindow.SetReportBox(aReport);
+        public static void RefreshCharacterWindowExpBar(Entity aEntity)
+        {
+            if (aEntity.GetType() == typeof(Player))
+            {
+                characterWindow.RefreshExp();
+            }
+        }
         #endregion
 
         #region Spell

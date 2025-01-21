@@ -42,6 +42,7 @@ namespace Project_1.GameObjects.Entities
         public bool HasDestination => destination.HasDestination;
         public Color RelationColor => unitData.RelationData.RelationColor();
         public Relation.RelationToPlayer RelationToPlayer => unitData.RelationData.ToPlayer;
+        protected Relation Relation => unitData.RelationData;
         public string Name => unitData.Name;
         public int CurrentLevel => unitData.Level.CurrentLevel;
         public bool Alive => unitData.Health.CurrentHealth > 0;
@@ -50,7 +51,7 @@ namespace Project_1.GameObjects.Entities
         public float CurrentHealth => unitData.Health.CurrentHealth;
 
         public Equipment Equipment => unitData.Equipment;
-
+        public Level Level => unitData.Level;
         public Resource.ResourceType ResourceType => unitData.Resource.Type;
         public float MaxResource => unitData.Resource.MaxValue;
         public float CurrentResource => unitData.Resource.Value;
@@ -206,19 +207,8 @@ namespace Project_1.GameObjects.Entities
             }
         }
 
-        bool CheckForRelation()
-        {
-            if (target.RelationToPlayer == Relation.RelationToPlayer.Self && RelationToPlayer == Relation.RelationToPlayer.Friendly)
-            {
-                return false;
-            }
-            if (target.RelationToPlayer != RelationToPlayer)
-            {
-                return true;
-            }
-
-            return false;
-        }
+        protected abstract bool CheckForRelation();
+        
 
         public void ServerTick() //"Server tick"
         {
@@ -346,6 +336,14 @@ namespace Project_1.GameObjects.Entities
             HUDManager.RefreshPlateBox(this);
             return true;
         }
+
+        public abstract void ExpToParty(int aExpAmount);
+
+        public void GainExperience(int aExpAmount)
+        {
+            unitData.GainExp(aExpAmount);
+            HUDManager.RefreshCharacterWindowExpBar(this);
+        }
         #endregion
 
         #region Click
@@ -368,7 +366,7 @@ namespace Project_1.GameObjects.Entities
         {
             if (aClickEvent.NoModifiers() && aClickEvent.ButtonPressed == InputManager.ClickType.Right)
             {
-                ObjectManager.Player.IssueTargetOrder(this);
+                ObjectManager.Player.Party.IssueTargetOrder(this);
             }
         }
         #endregion
