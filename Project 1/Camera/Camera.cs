@@ -47,18 +47,11 @@ namespace Project_1.Camera
 
         public static AbsoluteScreenPosition CentrePointInScreenSpace { get => screenRectangleSize / 2; }
 
-        public static Rectangle RenderTargetPosition { set => renderTargetPosition = value; }
 
 
         static WorldSpace centreInWorldSpace = new WorldSpace(100, 100);
 
-        //---
 
-        //--- debugText is fine but should pauseGfx be somewhere else?
-        static Texture2D debugTexture = TextureManager.GetTexture(new GfxPath(GfxType.Debug, "Debug"));
-        static Textures.Texture pauseGfx = new Textures.Texture(new GfxPath(GfxType.UI, "PauseBackground"));
-
-        //--
 
         public readonly static Point devScreenBorder = new Point(1500, 900);
         static AbsoluteScreenPosition screenRectangleSize;
@@ -69,34 +62,18 @@ namespace Project_1.Camera
         static float minScale = 0.7f;
         static float maxScale = 1.4f;
 
-        //--
         //static Rectangle maxRectangleCameraMove;
         static CameraSettings cameraSettings = CameraSettings.RectangleSoftBound;
 
-        //--
 
-        static RenderTarget2D cameraTarget;
-        static SpriteBatch spriteBatch;
-        static Rectangle renderTargetPosition;
-
-        static RenderTarget2D gameTarget;
-        static SpriteBatch gameSpriteBatch;
-
-        static RenderTarget2D uiTarget;
-        static SpriteBatch uiSpriteBatch;
 
         static CameraMover cameraMover = new CameraMover();
 
 
-        static RasterizerState rasterizerState = new RasterizerState() { ScissorTestEnable = true };
 
 
         public static void Init()
         {
-            spriteBatch = GraphicsManager.CreateSpriteBatch();
-            gameSpriteBatch = GraphicsManager.CreateSpriteBatch();
-            uiSpriteBatch = GraphicsManager.CreateSpriteBatch();
-
         }
 
         public static void Update()
@@ -144,9 +121,6 @@ namespace Project_1.Camera
 
         public static void SetWindowSize(AbsoluteScreenPosition aSize)
         {
-            cameraTarget = GraphicsManager.CreateRenderTarget(aSize.ToPoint());
-            uiTarget = GraphicsManager.CreateRenderTarget(aSize.ToPoint());
-            gameTarget = GraphicsManager.CreateRenderTarget(aSize.ToPoint());
             screenRectangleSize = aSize;
 
             float x = devScreenBorder.X / aSize.X;
@@ -181,93 +155,9 @@ namespace Project_1.Camera
             return WorldRectangle.Contains(aWorldPos);
         }
 
-        public static void DrawRenderTarget()
-        {
+        
 
-            spriteBatch.Begin();
-            spriteBatch.Draw(cameraTarget, renderTargetPosition, Color.White);
-            spriteBatch.End();
-        }
-
-        static void DrawGameObjects(SpriteBatch aBatch)
-        {
-            TileManager.Draw(aBatch);
-            ObjectManager.Draw(aBatch);
-            SpawnerManager.Draw(aBatch);
-            ParticleManager.Draw(aBatch);
-        }
-
-        public static void DrawGameToCamera()
-        {
-            GraphicsManager.SetRenderTarget(cameraTarget);
-            spriteBatch.Begin();
-            spriteBatch.Draw(gameTarget, Vector2.Zero, Color.White);
-            spriteBatch.End();
-            GraphicsManager.SetRenderTarget(null);
-        }
-
-        public static void GameDraw()
-        {
-            UIDraw();
-            GraphicsManager.SetRenderTarget(gameTarget);
-            gameSpriteBatch.Begin(SpriteSortMode.FrontToBack);
-            //spriteBatch.Begin();
-            GraphicsManager.ClearScreen(Color.White);
-
-
-            DrawGameObjects(gameSpriteBatch);
-            gameSpriteBatch.Draw(uiTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
-
-            DebugManager.Draw(gameSpriteBatch);
-
-            gameSpriteBatch.End();
-            GraphicsManager.SetRenderTarget(null);
-
-        }
-
-        public static void PauseDraw()
-        {
-
-            GraphicsManager.SetRenderTarget(cameraTarget);
-            spriteBatch.Begin();
-            GraphicsManager.ClearScreen(Color.Purple);
-
-
-            DrawGameObjects(spriteBatch); //draw game
-            spriteBatch.Draw(uiTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f); //draw game ui
-            pauseGfx.Draw(spriteBatch, Vector2.Zero); //draw gray screen overlay
-            UIManager.Draw(spriteBatch); //draw pause menu
-
-
-
-            spriteBatch.End();
-
-            GraphicsManager.SetRenderTarget(null);
-
-        }
-
-        static void UIDraw()
-        {
-            GraphicsManager.SetRenderTarget(uiTarget);
-            uiSpriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, rasterizerState);
-            GraphicsManager.ClearScreen(Color.Transparent);
-            HUDManager.Draw(uiSpriteBatch);
-
-            uiSpriteBatch.End();
-
-            GraphicsManager.SetRenderTarget(null);
-        }
-
-        public static void OptionDraw()
-        {
-            GraphicsManager.SetRenderTarget(cameraTarget);
-            spriteBatch.Begin();
-
-            UIManager.Draw(spriteBatch);
-
-            spriteBatch.End();
-            GraphicsManager.SetRenderTarget(null);
-        }
+        
 
     }
 }

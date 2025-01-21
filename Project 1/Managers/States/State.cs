@@ -14,10 +14,12 @@ namespace Project_1.Managers.States
         public abstract void OnEnter();
         public abstract void OnLeave();
 
+        public abstract void Rescale();
+
         public abstract bool Click(ClickEvent aClickEvent);
         public abstract bool Release(ReleaseEvent aReleaseEvent);
         public abstract bool Scroll(ScrollEvent aScrollEvent);
-        public abstract void Draw(SpriteBatch aBatch);
+        public abstract RenderTarget2D Draw();
 
     }
 }

@@ -105,6 +105,7 @@ namespace Project_1.UI.UIElements.Inventory
             Debug.Assert(isHeld, "Tried to release me without holding me");
 
             isHeld = false;
+            Pressed = false;
             Color = Color.DarkGray;
         }
 

@@ -14,13 +14,33 @@ namespace Project_1.Managers.States
 {
     internal class OptionMenu : State
     {
-        public OptionMenu() => OptionManager.Init();
+        RenderTarget2D optionDraw;
+        SpriteBatch optionBatch;
+        public OptionMenu()
+        {
+            OptionManager.Init();
+            optionBatch = GraphicsManager.CreateSpriteBatch();
+            optionDraw = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
+        }
 
         public override void Update() => OptionManager.Update();
 
         public override bool Click(ClickEvent aClickEvent) => OptionManager.Click(aClickEvent);
 
+        public override bool Release(ReleaseEvent aReleaseEvent)
+        {
+            throw new NotImplementedException();
+        }
+        public override bool Scroll(ScrollEvent aScrollEvent)
+        {
+            throw new NotImplementedException();
+        }
 
+        public override void Rescale()
+        {
+            optionDraw = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
+            OptionManager.Rescale();
+        }
 
         public override void OnEnter()
         {
@@ -29,14 +49,18 @@ namespace Project_1.Managers.States
         public override void OnLeave()
         {
         }
-
-        public override void Draw(SpriteBatch aBatch)
+        public override RenderTarget2D Draw()
         {
-
             GraphicsManager.ClearScreen(Color.LightGray);
-            OptionManager.Draw(aBatch);
+            GraphicsManager.SetRenderTarget(optionDraw);
+            optionBatch.Begin();
 
-            Camera.Camera.OptionDraw();
+            OptionManager.Draw(optionBatch);
+
+            optionBatch.End();
+            GraphicsManager.SetRenderTarget(null);
+
+            return optionDraw;
         }
     }
 }

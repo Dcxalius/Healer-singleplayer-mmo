@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.Managers;
+using Project_1.Managers.States;
 using Project_1.UI;
 using Project_1.UI.UIElements;
 using System;
@@ -133,8 +134,7 @@ namespace Project_1.Input
 
             ClickEvent clickEvent = new ClickEvent(GetMousePosRelative(), aTypeOfClick, heldModifiers);
                 
-            if (UIManager.Click(clickEvent)) return;
-            ObjectManager.Click(clickEvent);
+            StateManager.Click(clickEvent);
         }
 
         public static void CreateReleaseEvent(UIElement aCreator, InputManager.ClickType aTypeOfRelease)
@@ -142,7 +142,7 @@ namespace Project_1.Input
             bool[] heldModifiers = CheckHoldModifiers();
 
             ReleaseEvent releaseEvent = new ReleaseEvent(aCreator, GetMousePosRelative(), aTypeOfRelease, heldModifiers);
-            UIManager.Release(releaseEvent);
+            StateManager.Release(releaseEvent);
         }
 
         static void CreateScrollEvent()
@@ -154,8 +154,7 @@ namespace Project_1.Input
 
             ScrollEvent scrollEvent = new ScrollEvent(GetMousePosRelative(), amount, direction, heldModifiers);
 
-            if (UIManager.Scroll(scrollEvent)) return;
-            Camera.Camera.Scroll(scrollEvent);
+            StateManager.Scroll(scrollEvent);
         }
 
         static bool[] CheckHoldModifiers()

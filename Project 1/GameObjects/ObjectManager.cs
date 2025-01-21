@@ -114,46 +114,51 @@ namespace Project_1.GameObjects
         }
 
 
-        public static void Click(ClickEvent aClickEvent)
+        public static bool Click(ClickEvent aClickEvent)
         {
-            if (player.Click(aClickEvent)) { return; }
+            if (player.Click(aClickEvent)) return true;
+
             for (int i = 0; i < entities.Count; i++)
             {
-                if (entities[i].Click(aClickEvent)) { return; }
+                if (entities[i].Click(aClickEvent)) return true;
             }
-            if (SpawnerManager.Click(aClickEvent)) { return; }
+
+            if (SpawnerManager.Click(aClickEvent)) return true; 
+
             for (int i = 0; i < corpses.Count; i++)
             {
-                if (corpses[i].Click(aClickEvent)) { return; }
+                if (corpses[i].Click(aClickEvent)) return true; 
             }
 
 
-            LeftClickedGround(aClickEvent);
-            RightClickGround(aClickEvent);
+            if (LeftClickedGround(aClickEvent)) return true;
+            if (RightClickGround(aClickEvent)) return true;
+
+            return false;
         }
 
-        static void LeftClickedGround(ClickEvent aClickEvent)
+        static bool LeftClickedGround(ClickEvent aClickEvent)
         {
 
-            if (aClickEvent.ButtonPressed == InputManager.ClickType.Left)
+            if (aClickEvent.ButtonPressed != InputManager.ClickType.Left) return false;
+
+            if (aClickEvent.ModifiersOr(new InputManager.HoldModifier[] { InputManager.HoldModifier.Shift, InputManager.HoldModifier.Ctrl }))
             {
-                if (aClickEvent.ModifiersOr(new InputManager.HoldModifier[]{ InputManager.HoldModifier.Shift, InputManager.HoldModifier.Ctrl}))
-                {
-                    player.ClearCommand();
-                }
-                else
-                {
-                    player.RemoveTarget();
-                }
+                player.ClearCommand();
             }
+            else
+            {
+                player.RemoveTarget();
+            }
+            return true;
         }
 
-        static void RightClickGround(ClickEvent aClickEvent)
+        static bool RightClickGround(ClickEvent aClickEvent)
         {
-            if (aClickEvent.ButtonPressed == InputManager.ClickType.Right)
-            {
-                player.IssueMoveOrder(aClickEvent);
-            }
+            if (aClickEvent.ButtonPressed != InputManager.ClickType.Right) return false;
+            
+            player.IssueMoveOrder(aClickEvent);
+            return true;
         }
 
         public static void Draw(SpriteBatch aSpriteBatch)

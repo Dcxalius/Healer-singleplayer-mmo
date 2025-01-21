@@ -203,7 +203,7 @@ namespace Project_1.UI.UIElements
             {
                 children[i].PauseMenuActivated();
             }
-            HoldReleaseAwayFromMe();
+            heldEvents = null;
         }
 
         #endregion

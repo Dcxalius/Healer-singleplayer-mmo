@@ -25,6 +25,7 @@ namespace Project_1.UI.UIElements
         protected bool Pressed
         {
             get => pressed;
+            set => pressed = value;
         }
 
         UITexture hoverGfx;

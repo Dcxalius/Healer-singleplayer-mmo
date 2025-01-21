@@ -31,6 +31,7 @@ namespace Project_1.UI.UIElements.SpellBook
 
         public void ReleaseMe()
         {
+            if (heldSpell == null) return;
             heldSpell = null;
             grabOffset = AbsoluteScreenPosition.Zero;
 

@@ -4,11 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Spawners;
 using Project_1.Input;
 using Project_1.Particles;
 using Project_1.UI;
+using Project_1.UI.OptionMenu;
+using Project_1.UI.PauseMenu;
 
 namespace Project_1.Managers.States
 {
@@ -30,10 +34,25 @@ namespace Project_1.Managers.States
         static Pause pause;
         static OptionMenu optionMenu;
 
-        
+        static SpriteBatch finalBatch;
 
-        public static void Init()
+        public static RenderTarget2D FinalGameFrame { get => finalGameFrame; set => finalGameFrame = value; }
+        static RenderTarget2D finalGameFrame;
+        public static Rectangle RenderTargetPosition { set => renderTargetPosition = value; }
+        static Rectangle renderTargetPosition;
+
+        public static void Init(ContentManager aContentManager)
         {
+            ObjectFactory.Init(aContentManager);
+
+
+
+            GraphicsManager.Init();
+            finalBatch = GraphicsManager.CreateSpriteBatch();
+
+
+
+
             startMenu = new StartMenu();
             game = new Game();
             pause = new Pause();
@@ -45,14 +64,6 @@ namespace Project_1.Managers.States
         public static void Update()
         {
             currentState.Update();
-        }
-
-        public static void Draw()
-        {
-            currentState.Draw();
-
-
-            Camera.Camera.DrawRenderTarget();
         }
 
         public static void SetState(States aState)
@@ -76,6 +87,33 @@ namespace Project_1.Managers.States
                     throw new NotImplementedException();
             }
             currentState.OnEnter();
+        }
+
+        public static bool Click(ClickEvent aClick) => currentState.Click(aClick);
+        public static bool Release(ReleaseEvent aRelease) => currentState.Release(aRelease);
+
+        public static bool Scroll(ScrollEvent aScroll)
+        {
+            if (currentState.Scroll(aScroll)) return true;
+            Camera.Camera.Scroll(aScroll);
+            return true;
+        }
+
+        public static void Rescale()
+        {
+            if (currentState == null) return;
+            game.Rescale();
+            optionMenu.Rescale();
+            pause.Rescale();
+            startMenu.Rescale();
+        }
+        public static void Draw()
+        {
+            RenderTarget2D target = currentState.Draw();
+
+            finalBatch.Begin();
+            finalBatch.Draw(target, renderTargetPosition, Color.White);
+            finalBatch.End();
         }
     }
 }

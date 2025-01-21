@@ -1,8 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.GameObjects.Spawners;
 using Project_1.Input;
+using Project_1.Managers.States;
+using Project_1.Particles;
+using Project_1.Tiles;
 using Project_1.UI;
+using Project_1.UI.HUD;
+using Project_1.UI.PauseMenu;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,6 +18,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using static Project_1.GameObjects.Spells.AoE.AreaOfEffectData;
 
 namespace Project_1.Managers
 {
@@ -95,7 +102,7 @@ namespace Project_1.Managers
             graphicsDeviceManager.GraphicsDevice.SetRenderTarget(aRenderTarget);
         }
 
-        public static void SetManager(Game aGame)
+        public static void SetManager(Microsoft.Xna.Framework.Game aGame)
         {
             graphicsDeviceManager = new GraphicsDeviceManager(aGame);
             graphicsAdapter = GraphicsAdapter.DefaultAdapter;
@@ -148,13 +155,13 @@ namespace Project_1.Managers
             {
                 graphicsDeviceManager.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
                 graphicsDeviceManager.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-                Camera.Camera.RenderTargetPosition = GetRenderTargetDestination(Camera.Camera.devScreenBorder, graphicsDeviceManager.PreferredBackBufferWidth, graphicsDeviceManager.PreferredBackBufferHeight);
+                StateManager.RenderTargetPosition = GetRenderTargetDestination(Camera.Camera.devScreenBorder, graphicsDeviceManager.PreferredBackBufferWidth, graphicsDeviceManager.PreferredBackBufferHeight);
             }
             else
             {
                 graphicsDeviceManager.PreferredBackBufferWidth = aSize.X;
                 graphicsDeviceManager.PreferredBackBufferHeight = aSize.Y;
-                Camera.Camera.RenderTargetPosition = new Rectangle(0, 0, aSize.X, aSize.Y);
+                StateManager.RenderTargetPosition = new Rectangle(0, 0, aSize.X, aSize.Y);
             }
 
             graphicsDeviceManager.IsFullScreen = aFullscreen;
@@ -165,7 +172,7 @@ namespace Project_1.Managers
 
 
             Camera.Camera.SetWindowSize(new Camera.AbsoluteScreenPosition(aSize));
-            UIManager.Rescale();
+            StateManager.Rescale();
             unCaptueredScissorRect = graphicsDeviceManager.GraphicsDevice.ScissorRectangle;
 
         }
@@ -255,6 +262,16 @@ namespace Project_1.Managers
         {
 
             fullsceen = !fullsceen;
+        }
+
+        public static void DrawGameToCamera()
+        {
+            
+        }
+
+        public static void OptionDraw()
+        {
+            
         }
     }
 }

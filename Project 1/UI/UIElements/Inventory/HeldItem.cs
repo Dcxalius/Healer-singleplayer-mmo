@@ -29,6 +29,7 @@ namespace Project_1.UI.UIElements.Inventory
 
         public bool ReleaseMe()
         {
+            if (heldItem == null) return false;
             heldItem.ReleaseMe();
             grabOffset = AbsoluteScreenPosition.Zero;
             heldItem = null;

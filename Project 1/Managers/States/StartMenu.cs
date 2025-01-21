@@ -16,6 +16,16 @@ namespace Project_1.Managers.States
             throw new NotImplementedException();
         }
 
+        public override void Rescale()
+        {
+            //throw new NotImplementedException();
+        }
+
+        public override bool Scroll(ScrollEvent aScrollEvent)
+        {
+            throw new NotImplementedException();
+        }
+
         public override bool Click(ClickEvent aClickEvent)
         {
             throw new NotImplementedException();
@@ -32,15 +42,16 @@ namespace Project_1.Managers.States
             throw new NotImplementedException();
         }
 
-        public override void Draw(SpriteBatch aBatch)
-        {
-            GraphicsManager.ClearScreen(Color.White);
-            throw new NotImplementedException();
 
-        }
+        
 
         public override bool Release(ReleaseEvent aReleaseEvent)
         {
+            throw new NotImplementedException();
+        }
+        public override RenderTarget2D Draw()
+        {
+            GraphicsManager.ClearScreen(Color.White);
             throw new NotImplementedException();
         }
     }
