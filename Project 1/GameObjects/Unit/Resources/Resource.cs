@@ -49,10 +49,9 @@ namespace Project_1.GameObjects.Unit.Resources
             return Value - aValue >= 0;
         }
 
-        public virtual void Update()
-        {
-            Value += RegenValue; //TODO: ????????????
-        }
+        public abstract void Update();
+
+        public abstract void TickRegen();
 
         public virtual void CastSpell(float aCost)
         {
@@ -66,11 +65,6 @@ namespace Project_1.GameObjects.Unit.Resources
             Value = MaxValue;
         }
 
-        public void Refresh(TotalPrimaryStats aStats)
-        {
-            MaxValue = CalculateMaxValue(aStats);
-        }
-
-        public abstract float CalculateMaxValue(TotalPrimaryStats aStats);
+        public abstract void Refresh(TotalPrimaryStats aStats);
     }
 }

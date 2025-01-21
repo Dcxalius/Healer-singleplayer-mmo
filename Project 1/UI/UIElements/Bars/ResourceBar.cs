@@ -18,8 +18,10 @@ namespace Project_1.UI.UIElements.Bars
             get => maxValue; 
             set
             {
-                if (currentValue == 0 && value == 0)
+                if (value < 0) value = 0;
+                if (value == 0)
                 {
+                    maxValue = 0;
                     base.Value = 1f;
                     fractionText.Value = null;
                     percentageText.Value = null;
@@ -35,8 +37,11 @@ namespace Project_1.UI.UIElements.Bars
         {
             set
             {
+                if (value < 0) value = 0;
+
                 if (value == 0 && maxValue == 0)
                 {
+                    //currentValue = 0;
                     base.Value = 1f;
                     fractionText.Value = null;
                     percentageText.Value = null;

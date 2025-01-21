@@ -41,6 +41,7 @@ namespace Project_1.GameObjects.Unit.Resources
 
         public override float RegenValue { get => regenValue; }
         float regenValue;
+        float baseRegen;
 
         double lastCastSpellOrTick;
         double regenTimer = 5000;
@@ -53,10 +54,9 @@ namespace Project_1.GameObjects.Unit.Resources
             Debug.Assert(aBaseRegen > 0, "Tried to set regen to 0");
 
             BaseMaxValue = aBaseValue + PerLevel * (aLevel - 1);
-            PerLevel = 10;
-            lastCastSpellOrTick = double.NegativeInfinity;
-            maxValue = CalculateMaxValue(aStats) ;
-            regenValue = aBaseRegen + aStats.Spirit ;
+            lastCastSpellOrTick = double.NegativeInfinity; //TODO: Implement loading from file
+            baseRegen = aBaseRegen;
+            CalculateMaxValue(aStats);
             Value = aCurrentValue;
         }
 
@@ -70,12 +70,13 @@ namespace Project_1.GameObjects.Unit.Resources
             if (TimeManager.TotalFrameTime - lastCastSpellOrTick > regenTimer)
             {
                 lastCastSpellOrTick = TimeManager.TotalFrameTime;
-                base.Update(); //TODO: ????????
+                Value += regenValue;
                 return true;
             }
 
             return false;
         }
+        public override void TickRegen() { }
 
         public override void CastSpell(float aCost)
         {
@@ -84,6 +85,15 @@ namespace Project_1.GameObjects.Unit.Resources
             base.CastSpell(aCost);
         }
 
-        public override float CalculateMaxValue(TotalPrimaryStats aStats) => BaseMaxValue + aStats.Intellect * 15;
+        public override void Refresh(TotalPrimaryStats aStats)
+        {
+            CalculateMaxValue(aStats);
+        }
+
+        void CalculateMaxValue(TotalPrimaryStats aStats)
+        {
+            regenValue = baseRegen + aStats.Spirit;
+            maxValue = BaseMaxValue + aStats.Intellect * 15;
+        }
     }
 }

@@ -128,6 +128,7 @@ namespace Project_1.GameObjects.Unit
         public void Tick()
         {
             Health.HealthRegenTick();
+            Resource.TickRegen();
         }
 
         public void GainExp(int aExpAmount)

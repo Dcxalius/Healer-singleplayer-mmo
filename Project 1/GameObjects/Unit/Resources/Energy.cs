@@ -45,8 +45,6 @@ namespace Project_1.GameObjects.Unit.Resources
         protected override float PerLevel => 0;
 
 
-        double lastRegenTick;
-        double regenTimer = 1000;
 
         public Energy(float aCurrentResource) : base(ResourceType.Energy, Color.Yellow)
         {
@@ -61,15 +59,14 @@ namespace Project_1.GameObjects.Unit.Resources
             base.CastSpell(aCost);
         }
 
-        public override void Update()
+        public override void TickRegen()
         {
-            if (TimeManager.TotalFrameTime - lastRegenTick < regenTimer)
-            {
-                lastRegenTick = TimeManager.TotalFrameTime;
-                base.Update();
-            }
+            Value += regenValue;
         }
 
-        public override float CalculateMaxValue(TotalPrimaryStats aStats) => maxValue;
+        public override void Update()
+        {
+        }
+        public override void Refresh(TotalPrimaryStats aStats) { }
     }
 }

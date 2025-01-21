@@ -19,6 +19,9 @@ namespace Project_1.GameObjects.Unit.Resources
 
         public override float Value { get => 0; }
 
-        public override float CalculateMaxValue(TotalPrimaryStats aStats) { return 0; }
+        public override void Refresh(TotalPrimaryStats aStats) { }
+        public override void Update() { }
+
+        public override void TickRegen() { }
     }
 }
