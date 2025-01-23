@@ -14,7 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI.HUD
+namespace Project_1.UI.HUD.Windows
 {
     internal class CharacterWindow : Window
     {
@@ -55,7 +55,7 @@ namespace Project_1.UI.HUD
             RelativeScreenPosition textBoxPos = topPart + itemSpacing;
             RelativeScreenPosition textBoxSize = new RelativeScreenPosition(WindowSize.X - itemSpacing.X * 2, WindowSize.Y - topPart.Y - itemSpacing.Y * 2) / 2;
 
-            nrStatReport = new Label(owner.PrimaryStatReport.NumbersOnly, textBoxPos, textBoxSize - new RelativeScreenPosition(itemSpacing.X,0), Label.TextAllignment.TopRight, Color.Black);
+            nrStatReport = new Label(owner.PrimaryStatReport.NumbersOnly, textBoxPos, textBoxSize - new RelativeScreenPosition(itemSpacing.X, 0), Label.TextAllignment.TopRight, Color.Black);
             stringStatReport = new Label(owner.PrimaryStatReport.StringsOnly, textBoxPos + new RelativeScreenPosition(textBoxSize.X, 0f) + new RelativeScreenPosition(itemSpacing.X, 0), textBoxSize - new RelativeScreenPosition(itemSpacing.X, 0), Label.TextAllignment.TopLeft, Color.Black);
 
             expBar = new ExpBar(expBarPos, expBarSize);
@@ -70,12 +70,12 @@ namespace Project_1.UI.HUD
 
         void CreateItems(Equipment.Slot aStart, Equipment.Slot aEnd, RelativeScreenPosition aStartPos, RelativeScreenPosition aChangeInPos)//TODO: Make this take an array 
         {
-            for (int i = (int)aStart ; i <= (int)aEnd; i++)
+            for (int i = (int)aStart; i <= (int)aEnd; i++)
             {
                 Items.Item item = owner.Equipment.EquipedInSlot((Equipment.Slot)i); //and use that to get item here instead
                 if (item != null)
                 {
-                    equiped[i] = new Item(-3, i, true, item.GfxPath, aStartPos + aChangeInPos * (i - (int)aStart) , itemSize);
+                    equiped[i] = new Item(-3, i, true, item.GfxPath, aStartPos + aChangeInPos * (i - (int)aStart), itemSize);
                 }
                 else
                 {

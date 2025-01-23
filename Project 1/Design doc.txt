@@ -1,216 +1,463 @@
+Key
+[Maybe]
+{Changeable setting}
+
+
 Name
-	TBD
+	Singleplayer MMO healer simulator
 
 Genre
-	Single player MMO healer simulator
+	Single player
+	MMO style RPG
+	Healer Main Character
+	Guild Orginizator
+	[Automation elements]
 
 Controls
-	Control the player character by keyboard movements (WASD/Keys)
+	Control the player character by keyboard movements {WASD/Keys}
+	The player can see theirs, their party/raids, and their target/bosses; name, health, resource, cast bars
 	Control the players allies with orders by mouse, and can set the units to aggressive/passive/defensive
-	Cast healing/buff spells either on targeted allies, self cast, at mouseover or in an area
+	Click buttons {1 through 0} to cast healing/buff spells either on targeted allies, self cast, at mouseover or in an area
+		Certain spells are instant cast, others channel and then cast after a set amount of time, others are channeled and during the channel they have an ongoing triggering effect
+			If the player is channeling and press a movement key they will interupt the casting
+
+	Right click items in their inventory to activate/equip it
+		The player can also drag equipment to their appropiate slots
+
+	The player can right click enemies to aggresivly target them and do a weak attack
+		If allies are being control they will also attack
+
+	The player can press {tab} to cycle through targets based on distance from player character
+		also {ALT + Tab} to cycle through friendly targets
+
+	The player can change the game through an options menu
+		Gameplay
+			Autosave
+			[Configure an auto sell, if upgrade is gotten]
+
+		Audio
+		Video
+			Screen resolution
+			Fullscreen
+			[Particle amount]
+				[Can set to a range from 0% to 200%]
+
+		Keybindings
+			The player can through this menu change all of the keybinds
+
+		UI
+			The player can change their UI settings
+			Incease/Decrease the size of all UI elements
+			Increse/Decrease the size of individual UI Elements
+			Change the positioning of most UI Elements
+			Enable/Disable certain UI Elements
+				Target of target
+				Floating names
+				Floating healthbars
+
+	The player can save their game
+		The player can later load this save
+		[Decide when/where/how you can save]
+
+	The plater can talk to NPC and sell/buy, accept quests
+		Quests will have a questie/cata style map bubble that will guide you to where you need to go next for the quest.
+
+	The player can orient themselves with maps
+		The player can press {M} to bring up a large scale map that is interactable with
+		The player can see a minimap in the {top right} that allows them to orient themselves and see nearby point of interest 
+
+	The player can press {T} to open their spellbook and from there drag the spells to a spellbar slot to cast it
+		[Make it castable from book] 
+
+	[The player can press {} to see a list of notable npc and their [[assumed]] location]
+
+
+
 
 World
 	Procedually generated
-	Devided into chunks, further divided into tiles
+		First a town network will be generated
+			This is so certain questlines can continue to other cities
+			Every town will have a level range, usually around 5 levels
+				Neighbouring towns will have some overlap on these ranges
+
+		Secondly a biome map will be generated
+		Thirdly terrain features will be generated
+			Rivers, oceans, mountains, lakes
+
+	Generated into chunks by biome, further divided into tiles
+		Inbetween the biomes there should be a "borderlands" biome containing tiles, entites, and doodads from both biomes
+
+	Names
+		The npc names will randomly generated
+ 			Consisting of a first name with 1 to 3 set of syllables
+ 			The last name will be drawn from either a list (for major story characters) or composite from two lists (for guild members and normal npcs) [Ah, Green, etc + berg, strom, etc]
+ 	
+ 	Divided up into areas
+ 		Tutorial island
+ 			Levels 1 through 10
+ 		Open world
+ 			Towns [Villages, cities, etc]
+ 				Large quest hubs
+ 					Mostly procedually generated questlines
+ 				In centres of towns there will be waystone that if the player have completed enough quests in the area they can use to travell to other waystones
+ 				Depending on a [corruption, decay smthg like that] value will determine how safe the roads in the area is.
+
+ 			Hamlets
+ 				Small quests hub
+ 					Longer questchains but most of the steps are hand crafted
+ 					Usually has a quest that takes u to the closest city and back
+
+ 			
+
+ 		Dungeons
+ 			15-60
+ 			Randomly generated the first time they are entered, after that it will be the same dungeon
+ 			[Modifier system?]
+ 				[Example of modifiers could be like a chaotic system that randomizes the dungeon everytime]
+ 			Should aim to give roughly 1.5 levels worth of exp in the level 15 dungeons to roughly 0.05 at level 59 dungeons
+ 				Quests should be a huge chuck of the exp, making repeat clears still pretty good but not better than open world questing
+ 			Dungeons should be easiest to find through doing a quest and getting a quest that guides you there
+
+ 		Raids
+ 			25-60
+ 			Not randomly generated
+
+ 			Should give roughly 1 level worth of exp per clear, but should be aimed to be impossible to clear on the first try
+ 				The main reward should be the loot upgrades
+ 					The biggest grandest quests should end in raids
+ 	Religion
+ 		12 gods
+ 			Creation
+ 			Isolation/Self
+ 			Community
+ 			Youth/Freshness/Growth
+ 			[Construction]
+ 			Sun/Moon/Fire
+ 			Ocean/Water/Life
+ 			Land
+ 			Creativity
+ 			Inspiration
+ 			---
+ 			Envy
+
+
 	
 Gameloop
 	Multiple
 	Progression based
-		1. Alone
+		1. Alone (Level 1-15)
 			The player has to run from mobs due to no offensive tools
-			Find an injured adventurer (a tank)
-			Get the choice to heal the adventurer
-			If the player does the adventurer will swear loyalty to the player and join the player after a short dialogue
+			 Find an injured adventurer (a dps)
+			 Get the choice to heal the adventurer
+			 If the player does the adventurer will swear loyalty to the player and join the player after a short dialogue
+			 Can now with the help of injured adventurer kill mobs as long as you keep the adventurer alive
+			 The player can now do more than the simple gathering stuff of floor quests
 
-		2. Can now with the help of injured adventurer kill mobs as long as you keep the adventurer alive
-			The player can now do more than the simple gathering stuff of floor quests
-			Eventually the player will find a second adventurer that needs help (a dps)
-			The dps will suggest doing a dungeon with just the three of them
-			Wipe is all but garanteed
-			The player will then be able to start recruiting more adventurers at an inn.
-			Once a dungeon is cleared the clearing party members will want to stick with the healer and asks the player to lead a guild
+		2.  Eventually the player will find a second adventurer that needs help (a tank)
+			 The dps will suggest doing a dungeon with just the three of them
+			 Wipe is all but garanteed but the first two bosses should be doable by most players
+			 The player will then be able to start recruiting more adventurers at an inn.
+			 Once a dungeon is cleared the clearing party members will want to stick with the healer and asks the player to lead a guild
 
-		3. This is the start of the final? gameloop, the player can now select to send guild members out to do simple quests. Or the player can bring up to 4 of them with them to do more rewarding quests. The player can also form dungeon clearing teams, mix and matching the different guild members to beat differrent encounters
+		3. This is the start of the [final] gameloop, the player can now select to send guild members out to do simple quests. Or the player can bring up to 4 of them with them to do more rewarding quests. The player can also form dungeon clearing teams, mix and matching the different guild members to beat differrent encounters
 
-		4. Eventually the player will unlock raids which are technically just 25? person dungeons.
+		4. Eventually the player will unlock raids which are technically just [25] person dungeons.
 
+
+Character
+	Name
+ 		The player can set their own name at character creation
+ 			This can be changed at a town register/office
+ 	
+ 	The player can click {C} to bring up a window displaying the gearslots and stats	
+		Health
+			If this hits zero the unit dies and has to respawn
+
+		Resource
+			Allows the character to use stronger attacks but at a greater cost
+			Mana
+				Generates every 5 seconds after a spell with more than 0 cost was cast
+					Can be increased by the spirit 
+				Can also be generated through gear/effects that give raw mana regen, this bonus wont be affected by spell casting
+				
+			Energy
+				Regains a static amount on a static timer
+					Certain abilities/items can increase or give energy
+			Rage
+				If damaged or deals damage gain a certain amount of rage
+					Should try to balance so two handers gain less rage but their abilities on average hit harder
+
+		Primary Stats
+			Strength
+				Gives attack power depending on the class
+			Agility
+				Gives attack for certain classes
+				Gives crit for physical damage dealing classes
+				Gives dodge for certain classes
+
+			Intellect
+				Gives 15 mana if the class has mana
+				Gives crit
+			Spirit
+				Increases health regen
+				Increases mana regen
+
+			Stamina
+				Gives 10 health
+
+		Secondary Stats
+			Attack crit chance
+			Attack crit damage
+			Spell crit chance
+			Spell crit damage
+			Armor
+				Reduces damage taken by physical attack
+			Resistance
+				Increases the chance of spell doing nothing
+				Increases the chance of a partial resist, turning it into a lesser version of itself
+				One for each school of magic
+			Movement Speed
+				The player should be slower than most mobs.
+			Attack Power
+				Increases damage by 1 dps per 14
+			Spell damage
+				School dependant
+					An item can have + holy for example
+
+		Gear
+			Weapons
+				Has an attack value range
+				Has at least one damage type
+					If it has multiple types the weapon will have one seperate range for each type
+					Physical
+					Magical
+						One for each school of magic
+				Has an attack range
+				Has an attack speed
+				Has a hands required
+					Main hand/Off hand/One hand/Two hand [yes shields are technically weapons, dont believe me? hit urself with a plank xdd]
+
+				Melee
+					Strength based
+					Agility based
+				Ranged
+					Agility based
+					Int based
+						Free to cast
+						Only magic based damage
+
+
+			Armor
+				Head
+				Neck
+				Shoulders
+				Back
+				Chest
+				Wrist
+				Hand
+				Waist
+				Legs
+				Boots
+				2 Fingers
+				2 Trinket slots
+
+				3 weapon slots, 
+					main hand
+					off hand
+					ranged weapon
+						[ammo]
+					
+
+				Armor Type
+					Cloth
+					Leather
+					Mail
+					Plate
+					Certain classes has a cap count of amount of pieces they can have
+						This cap can be 0 making them unable to equip that armor type
+
+			Each piece of gear has an item level and a quality
+				Roughly based on the level of the mob or similar scaling
+
+				Item levels and quality determine the amount of stats the piece of gear has to distribute among the different stats
+					Also changes the reward given by destroying an item with enchanting
+
+	Inventory
+		The player can manage their own inventory by pressing {I}
+		The player can pick up quest items to hand in to NPCs
+		The player can equip items through their inventory
+		The player can hand out gear to their guild members
+
+		Consumables
+			The player can consume items through the inventory interface
+			Guildies can consume items through a strategy/rotation being developed
+			Potions
+				Share cooldown
+				Either gives an immediate stat (hp mana etc)
+					Or a short buff to Primary/secondary (agi crit ms etc)
+
+			Flask/[scrolls]
+				Depending on tier collides with lower qualities
+					Only the best will be applied other will have no effects
+					no other cooldowns or shared slots
+				Gives a long buff to stats
+
+			Food/drink
+				Allows the consumer to quickly regain health/mana
+
+			Grenades/traps/Mechanism
+				Damages enemies/status effects
+
+
+	
 Guild members
 	Name
 	Class
 		Tank
 			Mitigation based tank
 				Really efficient to heal but dies to quick burst or very easily if specced to the wrong type of attack
+
 			Health pool tank
 				Can almost never be oneshot but healing won't be as good on them as other tanks
+
 			Evasion based tanks
 				Very luck based, but can against slow attacking bosses go several seconds without needing a single heal
+
 		Mdps
 			Fast attacker
 			Slow hard hitting attacker
 			Dot based
+
 		Rpds
 			Kiting based
 			Aoe based
 			Dot based
+
 		No healers as the players character is the only healer.
-	"Personality"
-	Traits
-		Can both be negative and positive
-		Some of these are tiered
-		"Cowardly"
-			Always tries to flee while below 25% hp
-		"Selfish Interupter"
-			If targeted by an enemy spell will interupt it with an internal cd
-		"Masterful Interupter"
-			Will always interupt the enemy if able to but deals 5% less damage
+
+	[Personality]
+		[Traits]
+			[Can both be negative and positive]
+			[Some of these are tiered]
+			["Cowardly"]
+				[Always tries to flee while below 25% hp]
+
+			["Selfish Interupter"]
+				[If targeted by an enemy spell will interupt it with an internal cd]
+
+			["Masterful Interupter"]
+				[Will always interupt the enemy if able to but deals 5% less damage]
+
+			["Lazy looter"]
+				[Will only loot corpses they are right ontop off]
+
+
 	Proffesion
+		The guildmembers will learn proffesions
+			At first at their own volition/time but after enough upgrades have been made they can be ordered around
+
 		Allows the player to access the upgrades and gathering of resources outside the players chosen profession.
 		Reduced expected gains based on personality and guild upgrades.
 		The player can also assign certain jobs to instead of adding their "tax" in the form of resource donation they instead sell that portion and offers gold as tax
+
 	Gear
 		The player can assign gear upgrades
 		Weapons should be more dynamic and feel like the choice of weapon will have more of an impact
 			For example a rogue with can be handed a bow and then be played more like a wow hunter or if given dagger will be a faster hit and run type character, taking more damage but dealing more damage than the other classes, or if given maces will work more as a cc bot
+
 		[Loot drama?]
 			[If a guild member hasn't been given loot for a while they might turn upset and leave the guild]
 
 
-Character
-	Name
-	Health
-		If this hits zero the unit dies and has to respawn
-	Resource
-		Allows the character to use stronger attacks but at a greater cost
-		Mana
-			Regains based on a regen stat and spirit after a spell with more than 0 cost was cast
-		Energy
-			Regains a static amount on a static timer
-				Certain abilities/items can increase or give energy
-		Rage
-			If damaged or deals damage gain a certain amount of rage
-				Should try to balance so two handers gain less rage but their abilities on average hit harder
-
-	Primary Stats
-		Strength
-		Agility
-		Intellect
-		Spirit
-		Stamina
-	Secondary Stats
-		Attack crit chance
-		Attack crit damage
-		Spell crit chance
-		Spell crit damage
-		Armor
-			Reduces damage taken by physical attack
-		Resistance
-			Increases the chance of spell doing nothing
-			Increases the chance of a partial resist, turning it into a lesser version of itself
-			One for each school of magic
-		Movement Speed
-		Attack Power
-			Increases damage
-		Spell damage
-			School dependant
-				An item can have + holy for example
-
-	Gear
-		Weapons
-			Has an attack value range
-			Has at least one damage type
-				If it has multiple types the weapon will have one seperate range for each type
-				Physical
-				Magical
-					One for each school of magic
-			Has an attack range
-			Has an attack speed
-			Has a hands required
-				Main hand/Off hand/One hand/Two hand [yes shields are technically weapons, dont believe me? hit urself with a plank xdd]
-
-			Melee
-				Strength based
-				Agility based
-			Ranged
-				Agility based
-				Int based
-					Free to cast
-					Only magic based damage
 
 
-		Armor
-			Helmet
-			Shoulders
-			Cape
-			Chest
-			Hand
-			Legs
-			Boots
+NPC
+	The player can right click to interact with NPC in range of them
+		If the NPC have multiple roles (eg. QG and seller the player will be brought to an intermediate screen where they can select what they want to do)
 
-			Armor Type
-				Cloth
-				Leather
-				Mail
-				Plate
-				Certain classes has a cap count of amount of pieces they can have
-					This cap can be 0 making them unable to equip that armor type
+	Quest givers
+		Certain NPC have quests that the player can accept and complete and then turn in for a reward.
 
-		Each piece of gear has an item level and a quality
-			Roughly based on the level of the mob or similar scaling
+	Sellers
+		Sellers have a subset of a list of items they can sell to the player
+			This list will have [30] items and upon creation the npc will pick 0-2 from different level ranges
+			Every [30 minutes] the seller has a chance to generate a rarer item
+				If the player doesnt buy it/notices it within the time window there is a increasing chance the item will be gone the next refresh
 
-			Item levels and quality determine the amount of stats the piece of gear has to distribute among the different stats
-				Also changes the reward given by destroying an item with enchanting
 
-	Inventory
-		The player can manage their own inventory
-		The player can pick up quest items to hand in to NPCs
-		The player can equip items through their inventory
-		The player can hand out gear to their guild members
 
-	Consumables
-		The player can consume items through the invetory interface
-		NPC can consume items through a strategy/rotation being developed
 
 Magic Schools
 	Holy - Order
 		Gives benifits to the caster if certain spells are cast in order
 			For example a spell could say "if the previous spell had a shorter cast time get this bonus"
+
 	Unholy - Chaos
 		Gives punishments to the caster if certain spells are cast to much
+
 	Fire
 		Overtime focused
+
 	Water
-		[Punished by downtime] //isnt this everything pretty much? xdd
+		Tidal, periods of activity followed by periods of weakness that get extended by using magic
+
 	Earth
-		Direct numbers
+		Direct numbers, but very bad against mobility
+
 	Air
 		CC focused, all spells have a knockback/move component
+
 	Heat
 		Ramps slowly, in short fights does almost nothing but in long enough fights will always deal the most dps by the end 
+
 	Cold
 		Very burst based magic, will if to active be locked out of casting more spells
 
+
+
 Party
-	The player can while in the guild buildings (at first only there) select a team to bring out into the world
+	The player can while in the guild buildings [at first only there] select a team to bring out into the world
+		The party shares all exp equally
 		The more they bring the less exp/gold they will get per kill
-			Should aim to be roughly, asuming 1x for 2, 0.5 for 3, 0.2 for 4, 0.1 for 5
-		This is to cause interplay between efficency with not being able to do all quests in a zone 
+			Should aim to be roughly, 1x for 2, [0.5] for 3, [0.2] for 4, [0.15] for 5]
+			This is to cause interplay between efficency with not being able to do all quests in a zone
+
+
 
 Proffesion
+	The player can learn/unlearn proffesions allowing them to gather/craft items
+
+ 	The player have to track down proffesion trainers themselves
+ 		Certain NPC will after you've done their quests lines become proffesion trainers
+ 			Certain NPC will instead point you to someone that can train you
+
+ 	The tutorial island should have a start trainer that will teach you the one of the appropiate crafting proffesions for your class as a part of an intruductionary questline to crafting, the player is free to drop this later
+
 	Crafting proffesions
 		Turns reagents into base line upgrades for all guildmembers of the professions armor type target
 		Alchemy
 			Allows the player to turn flowers into potions
+
 		Blacksmithing
 			Allows the player to turn mined ores into weapons/armor
+
 		Engineering
 			Allows the player to turn mined ores into weapons/trinkets
+
 		Leatherworking 
 			Allows the player to turn skins and leather into armor
+
+		Tailoring
+			Allows the player to turn cloth into armor and bandages
+
 		Enchanting
 			Allows the player to turn unwanted gear into magical dust and essence and then use those for upgrading gear
+
 		Carpentry/Base building
 			Allows the player to unlock upgrades for their guild
 			Allows the player to upgrade towns, increasing their population
+
 		Cooking 
 			Allows the player to turn raw materials into edible/drinkable food that can give different buffs.
 
@@ -219,84 +466,127 @@ Proffesion
 		Mini games that allows the player to do simple skill checks for a reward scaling with performance
 		Herbalism
 			Allows the player to pick up flowers / disasemble plant based enemies
+
 		Mining
 			Allows the player to mine nodes around the map/in the mine
+
 		Skinning
 			Allows the player to skin animals/beastial enemies
+
 		Scaveging
 			Allows the player to gather cloth and other things from humanoids
+
 		Lumbering
 			Allows the player to gather wood to turn into upgrades for their guild
 
 
 
 Guild control
-	Allows the player to recruit and kick members
-	Upgrades
-		Bunker
-			Allows for more members
+	The player can recruit and kick members aswell as manager their gear, inventory and order them to do proffesions.
+		
+	By pressing {G} the player can bring up a menu that allows them to see all their current members.
+		They can click on a corresponding button to bring up the following menus
+			Character pane
+				Allows the player to set the gear of the guild members
+				Allows the player to see the stats of guild members
 
-		Research lab
-			Allows the player to upgrade certail abilities/gear/buildings
+			Inventory screen
+				Allows the player to manage their inventory [Needs to be unlocked]
 
-		Strategy hall
-			Allows the player to constuct "plays"; set a key to cause the party members to do an action for example gather at a marked target, rotate 90 degrees around the boss, etc
-			Limited amount of strategies that can be brought into a fight at once
+			Spell Rotation Screen
+				Allows the player to set the spell rotation used by the members [Needs to be unlocked]
 
-		Training Hall
-			Allows the player to configure the classes rotation of spells 
-			Allows the player to set the talent pages of the guild members
+	Base
+		Upgrades
+			Bunker
+				Allows for more members
 
-		Officers Hall
-			Allows the player to set guild members to become officers for the different classes, making the guild members copy the officers talent/rotation/gear
-			Upgrable
-				The player can set "specs" allowing multiple different ways to play a class 
-				Increase the amount of officer slots available
+			Research lab
+				Allows the player to upgrade certail abilities/gear/buildings
 
-		Quartermaster
-			Allows the player to configure the gear the guild members are using
-			Allows the player to set stat weights for the different classes/specs, making the guild members upgrade their gear according to it
+			Strategy hall
+				Allows the player to constuct "plays"; set a key to cause the party members to do an action for example gather at a marked target, rotate 90 degrees around the boss, etc
+				Limited amount of strategies that can be brought into a fight at once
 
-		["Training dummies
-			Allows the player to teach out stuff like dont stand in fire]
+			Training Hall
+				Allows the player to configure the classes rotation of spells 
+				Allows the player to set the talent pages of the guild members
 
-		Airship
-			Allows the player to change their party while out in the world.
+			Officers Hall
+				Allows the player to set guild members to become officers for the different classes, making the guild members copy the officers talent/rotation/gear
+				Upgrable
+					The player can set "specs" allowing multiple different ways to play a class 
+					Increase the amount of officer slots available
 
-		Scouting department
-			Upgradable
-			Allows the player to know what bosses drop what loot
-				Amount of loots that can be revealed increases with level of building
-			Allows the player to know mechanics of the bosses beforehand
-				Amount of mechanics known increases with upgrades
+			Quartermaster
+				Allows the player to configure the gear the guild members are using
+				Allows the player to set stat weights for the different classes/specs, making the guild members upgrade their gear according to it
+
+			["Training dummies"]
+				[Allows the player to teach out stuff like dont stand in fire]
+
+			Airship
+				Allows the player to change their party while out in the world.
+
+			Scouting department
+				Upgradable
+				Allows the player to know what bosses drop what loot
+					Amount of loots that can be revealed increases with level of building
+				Allows the player to know mechanics of the bosses beforehand
+					Amount of mechanics known increases with upgrades
 
 Town buildings
 	Religious building
 		Allows the player to replenish long cooldowns as well as mana/health
+
 	Town hall
 		A lot of quests are offered to the player/guild here
 		A good place for part 2 and 3 to find more members
-	Farm Instances
+
+	[Farm Instances]
 		While the player can find the resources they offer in the world the most efficent way to get them should be in their respective instance, some however can be found in the ones they dont belong, for example a lone pine species that can only be found in the flower field or an plant that only grows underground can only be found in the mines.
 			Always "infested" by enemies, the player can clear them for a short while in return for gathering resources
 		Mine 
 		Lumberyard
 			The player can find a lot of trees to chop down
+
 		Flower field
 		Farm
 			Can slaughter animals for food/skin
 				If you kill to many in a single instance the farmers will become angry and attack you
+
 	Guild hall
 		You have to tie your guild hall to a city, this choice isn't permanent but if you do change your old town won't like you as much.
 
+	Bank
+		Lets the player store items in a building
+			Those items can be accessed through any bank
+
+		Should aim for [10] bank slots for ever 1 inventory slot
+
+	Shops
+		Has NPC that will trade with you
+
+	Auction house
+		Can buy almost all items for a price
+			The rare the item the pricier, way more pricier than any shop
+				If you missed an rare item in a shop you might just see it in here for sale
+			
+				Can buy out the auctionhouse inventory
+					This is PRICY
+
+			Most materials work similar to the stockmarket, price varies with time, you can pretty easily flip things for profit.
+
+
+
 Instances
-	Dungeons 3-5 characters recommended
+	Dungeons [3]-5 characters recommended
 		Should have 3-5 bosses
 		Inbetween bosses there should be packs of adds that need to be killed to progress
 		Progress shouldnt be a straight forward, kill all ads all the time, some packs are skippable, some are directly in the way, some are patrolling and can be dodge if the player wants to risk it, sometimes the player might need to look for a switch to open a door/gate if they havent brought a rogue/blacksmith/engineer
 		Some add packs, especially if you are bringing lower numbers will have to be managed with cc
 
-	Mega dungeons 5-10 characters recommended
+	Mega dungeons 5-[10] characters recommended
 		10-15 bosses 
 		Should be divided up into wings, basicly 3-5 dungeons merge into one, if cleared all wings unlock the final locked wing
 		Otherwise pretty much similar to normal dungeons

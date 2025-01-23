@@ -35,6 +35,8 @@ namespace Project_1.GameObjects.Entities
         public virtual Entity Target { get => target; }
         protected Entity target = null;
 
+        Text nameDisplay;
+
         #region UnitData
         protected UnitData UnitData => unitData;
         UnitData unitData;
@@ -86,6 +88,8 @@ namespace Project_1.GameObjects.Entities
             buffList = new BuffList();
             destination = new Destination(this);
             aggroTablesIAmOn = new List<NonFriendly>();
+
+            nameDisplay = new Text("Gloryse", Name, RelationColor);
 
             corpse = new Corpse(unitData.CorpseGfxPath, unitData.LootTable);
         }
@@ -405,6 +409,7 @@ namespace Project_1.GameObjects.Entities
             shadow.Draw(aBatch, this);
             selectRing.Draw(aBatch, this);
             base.Draw(aBatch);
+            nameDisplay.CentredDraw(aBatch, (FeetPosition - new WorldSpace(0, Size.Y + nameDisplay.Offset.Y)).ToAbsoltueScreenPosition());
         }
     }
 }

@@ -10,6 +10,7 @@ using Project_1.GameObjects.Unit;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.UI.HUD.PlateBoxes;
+using Project_1.UI.HUD.Windows;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Bars;
 using Project_1.UI.UIElements.Inventory;
@@ -39,6 +40,7 @@ namespace Project_1.UI.HUD
 
         static CharacterWindow characterWindow;
         static SpellBookWindow spellBookWindow;
+        static GuildWindow guildWindow;
 
         static CastBar playerCastBar;
         static FirstSpellBar firstSpellBar;
@@ -74,6 +76,8 @@ namespace Project_1.UI.HUD
             hudElements.Add(characterWindow);
             spellBookWindow = new SpellBookWindow();
             hudElements.Add(spellBookWindow);
+            guildWindow = new GuildWindow();
+            hudElements.Add(guildWindow);
 
             firstSpellBar = new FirstSpellBar(10, new RelativeScreenPosition(0.2f, 0.86f), 0.6f);
             hudElements.Add(firstSpellBar);
