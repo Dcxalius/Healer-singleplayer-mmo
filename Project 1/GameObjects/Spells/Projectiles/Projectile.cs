@@ -64,7 +64,7 @@ namespace Project_1.GameObjects.Spells.Projectiles
             }
         }
 
-        protected override void SetVelocity()
+        protected override void SetMomentum()
         {
             WorldSpace dir = WorldSpace.Normalize(target.Centre - Centre);
             momentum = dir * MaxSpeed;

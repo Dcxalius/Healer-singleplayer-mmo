@@ -15,32 +15,26 @@ namespace Project_1.UI.UIElements.PlateBoxes
     internal class PlateBoxHealthSegment : PlateBoxSegment
     {
         ResourceBar healthBar;
-        Entity entity;
         static Color backgroundColor = new Color(255, 211, 211, 120);
 
-        public PlateBoxHealthSegment(Entity aEntity , RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, aPos, aSize)
+        public PlateBoxHealthSegment(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, aPos, aSize)
         {
-            entity = aEntity;
             healthBar = new ResourceBar(new BarTexture(BarTexture.FillingDirection.Right, Color.Red), new UITexture("WhiteBackground", backgroundColor), RelativeScreenPosition.Zero, aSize);
-            if (entity != null)
-            {
-                healthBar.MaxValue = aEntity.MaxHealth;
-            }
+            
             children.Add(healthBar);
         }
 
 
         public override void Refresh(Entity aEntity)
         {
-            healthBar.MaxValue = entity.MaxHealth;
-            healthBar.Value = entity.CurrentHealth;
+            healthBar.MaxValue = aEntity.MaxHealth;
+            healthBar.Value = aEntity.CurrentHealth;
         }
 
         public void SetTarget(Entity aEntity)
         {
-            entity = aEntity;
             healthBar.MaxValue = aEntity.MaxHealth;
-            healthBar.Value = entity.CurrentHealth;
+            healthBar.Value = aEntity.CurrentHealth;
         }
 
 

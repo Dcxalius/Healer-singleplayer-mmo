@@ -1,20 +1,39 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities.Players;
+using Project_1.GameObjects.Unit;
 using Project_1.Input;
 using Project_1.Textures;
 using Project_1.Textures.AnimatedTextures;
+using Project_1.UI.UIElements.Guild;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.Entities.Temp
+namespace Project_1.GameObjects.Entities
 {
-    internal class Walker : Entity
+    internal class GuildMember : Friendly
     {
-        public Walker(WorldSpace aStartingPos) : base(ObjectFactory.GetData("Walker"), aStartingPos)
+        public struct GuildMemberData
+        {
+            public string Name => name;
+            public string Level => level;
+            public string Class => @class;
+
+            string name;
+            string level;
+            string @class;
+
+            public GuildMemberData(string aName, int aLevel, string aClass)
+            {
+                name = aName;
+                level = aLevel.ToString();
+                @class = aClass;
+            }
+        }
+        public GuildMember(UnitData aData) : base(aData)
         {
         }
 
@@ -52,7 +71,7 @@ namespace Project_1.GameObjects.Entities.Temp
 
         protected override bool CheckForRelation()
         {
-            if (target.RelationToPlayer == Unit.Relation.RelationToPlayer.Self || target.RelationToPlayer == Unit.Relation.RelationToPlayer.Friendly)
+            if (target.RelationToPlayer == Relation.RelationToPlayer.Self || target.RelationToPlayer == Relation.RelationToPlayer.Friendly)
             {
                 return false;
             }
@@ -62,7 +81,7 @@ namespace Project_1.GameObjects.Entities.Temp
             }
 
             return false;
-            
+
         }
 
         public override void ExpToParty(int aExpAmount)

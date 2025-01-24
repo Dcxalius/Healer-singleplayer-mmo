@@ -31,8 +31,8 @@ namespace Project_1.Managers.States
 
         public Game()
         {
-            ObjectManager.Init();
             HUDManager.Init();
+            ObjectManager.Init();
 
             gameDraw = GraphicsManager.CreateSpriteBatch();
             uIDraw = GraphicsManager.CreateSpriteBatch();

@@ -20,7 +20,7 @@ namespace Project_1.UI.HUD
     internal class InventoryBox : Box
     {
 
-        Inventory inventory;
+        //Inventory inventory;
 
         BagHolderBox bagHolderBox;
         BagBox[] bagBox;
@@ -36,54 +36,63 @@ namespace Project_1.UI.HUD
         {
             visibleKey = KeyBindManager.KeyListner.Inventory;
 
-            inventory = ObjectManager.Player.Inventory;
-            bagHolderBox = new BagHolderBox(new RelativeScreenPosition(spacing.X, aSize.Y - (itemSize.Y + spacing.Y * 3)), new RelativeScreenPosition(itemSize.X * (inventory.bagSlots + 1) + spacing.X * (inventory.bagSlots + 2), itemSize.Y + spacing.Y * 2));
-            bagHolderBox.SetBags(inventory.GetBags());
+            //inventory = ObjectManager.Player.Inventory;
+            bagHolderBox = new BagHolderBox(new RelativeScreenPosition(spacing.X, aSize.Y - (itemSize.Y + spacing.Y * 3)), new RelativeScreenPosition(itemSize.X * (Inventory.bagSlots + 1) + spacing.X * (Inventory.bagSlots + 2), itemSize.Y + spacing.Y * 2));
 
-            columnCount = CalculateColumns(inventory.defaultSlots, itemSize.X, spacing.X, aSize.X);
-            bagBox = new BagBox[inventory.bagSlots + 1];
+            columnCount = CalculateColumns(Inventory.defaultSlots, itemSize.X, spacing.X, aSize.X);
+            bagBox = new BagBox[Inventory.bagSlots + 1];
 
-            CreateBagBoxes(aSize);
-
+            bagBox[0] = new BagBox(0, 0, columnCount, spacing, CalculateBagBoxSize(Inventory.defaultSlots, itemSize, spacing, aSize.X));
+            for (int i = 1; i < bagBox.Length; i++)
+            {
+                bagBox[i] = new BagBox(i, 0, 1, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
+            }
             children.Add(bagHolderBox);
             children.AddRange(bagBox);
 
-            CalculateSize(aPos); //TODO: Make this accept a enum that dictates wheter it grows up and down
             ToggleVisibilty();
         }
 
-        void CreateBagBoxes(RelativeScreenPosition aSize)
+        public void SetInventory(Inventory aInventory)
+        {
+            bagHolderBox.SetBags(aInventory.GetBags());
+
+            CreateBagBoxes(RelativeSize, aInventory);
+            CalculateSize(RelativePos); //TODO: Make this accept a enum that dictates wheter it grows up and down
+        }
+
+        void CreateBagBoxes(RelativeScreenPosition aSize, Inventory aInventory)
         {
             RelativeScreenPosition bagPos = RelativeScreenPosition.Zero;
             bagPos.X = spacing.X;
-            bagPos.Y = CalculateBagBoxSize(inventory.defaultSlots, itemSize, spacing, aSize.X).Y;
-            bagBox[0] = new BagBox(0, inventory.defaultSlots, columnCount, spacing, CalculateBagBoxSize(inventory.defaultSlots, itemSize, spacing, aSize.X));
+            bagPos.Y = CalculateBagBoxSize(Inventory.defaultSlots, itemSize, spacing, aSize.X).Y;
+            bagBox[0] = new BagBox(0, Inventory.defaultSlots, columnCount, spacing, CalculateBagBoxSize(Inventory.defaultSlots, itemSize, spacing, aSize.X));
             bagPos.Y += spacing.Y;
             bagPos.Y += spacing.Y;
 
             for (int i = 1; i < bagBox.Length; i++)
             {
-                if (inventory.bags[i] == null)
+                if (aInventory.bags[i] == null)
                 {
                     bagBox[i] = new BagBox(i, 0, 1, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
                     continue;
                 }
 
-                RelativeScreenPosition size = CalculateBagBoxSize(inventory.bags[i].SlotCount, itemSize, spacing, aSize.X);
+                RelativeScreenPosition size = CalculateBagBoxSize(aInventory.bags[i].SlotCount, itemSize, spacing, aSize.X);
 
-                bagBox[i] = new BagBox(i, inventory.bags[i].SlotCount, columnCount, bagPos, size);
+                bagBox[i] = new BagBox(i, aInventory.bags[i].SlotCount, columnCount, bagPos, size);
                 bagPos.Y += size.Y + spacing.Y;
             }
         }
 
-        public void RefreshSlot(int aBag, int aSlot)
+        public void RefreshSlot(int aBag, int aSlot, Inventory aInventory)
         {
             if (aBag == -1)
             {
                 bagHolderBox.RefreshSlot(aSlot);
-                if (inventory.bags[aSlot] != null)
+                if (aInventory.bags[aSlot] != null)
                 {
-                    bagBox[aSlot].RefreshBag(inventory.bags[aSlot].SlotCount, columnCount);
+                    bagBox[aSlot].RefreshBag(aInventory.bags[aSlot].SlotCount, columnCount);
                     CalculateSize(RelativePos + RelativeSize.OnlyY);
                     return;
                 }

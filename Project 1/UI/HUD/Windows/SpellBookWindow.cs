@@ -26,16 +26,16 @@ namespace Project_1.UI.HUD.Windows
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
             RelativeScreenPosition size = RelativeScreenPosition.GetSquareFromX(0.015f);
 
-            Spell[] spells = ObjectManager.Player.SpellBook.Spells;
+            //Spell[] spells = ObjectManager.Player.SpellBook.Spells;
 
             for (int i = 0; i < spellBookSpells.Length; i++)
             {
                 RelativeScreenPosition pos = new RelativeScreenPosition(startPos.X + (float)Math.Floor((double)i / rows) * (size.X + spacing.X), startPos.Y + i % rows * (size.Y + spacing.Y));
-                if (i < spells.Length)
-                {
-                    spellBookSpells[i] = new SpellBookSpell(pos, size, spells[i]);
-                    continue;
-                }
+                //if (i < spells.Length)
+                //{
+                //    spellBookSpells[i] = new SpellBookSpell(pos, size, spells[i]);
+                //    continue;
+                //}
                 spellBookSpells[i] = new SpellBookSpell(pos, size);
             }
 

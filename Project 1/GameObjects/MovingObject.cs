@@ -12,30 +12,39 @@ namespace Project_1.GameObjects
 {
     internal abstract class MovingObject : GameObject
     {
+        public enum FacingDirection
+        {
+            Right,
+            Left
+        }
+
         public WorldSpace Velocity { get => velocity; protected set => velocity = value; }
         public WorldSpace Momentum { get => momentum; protected set => velocity = momentum; }
         public abstract float MaxSpeed { get; }
 
-        bool facingRight = true;
+        FacingDirection facing;
 
         protected WorldSpace momentum = WorldSpace.Zero;
         protected WorldSpace velocity = WorldSpace.Zero;
         //float maxSpeed;
 
+
+
         public MovingObject(Texture aTexture, WorldSpace aStartingPos) : base(aTexture, aStartingPos)
         {
+            facing = FacingDirection.Right;
         }
 
         public override void Update()
         {
-            SetVelocity();
+            SetMomentum();
             ChangePosition();
             FlipGfx();
 
             base.Update();
         }
 
-        protected virtual void SetVelocity()
+        protected virtual void SetMomentum()
         {
             momentum += velocity;
             if (momentum.ToVector2().Length() > MaxSpeed)
@@ -53,15 +62,15 @@ namespace Project_1.GameObjects
 
         protected virtual void FlipGfx()
         {
-            if (momentum.X > 0 && facingRight == false)
+            if (momentum.X > 0 && facing == FacingDirection.Left)
             {
-                facingRight = true;
+                facing = FacingDirection.Right;
                 gfx.Flip();
             }
 
-            if (momentum.X < 0 && facingRight == true)
+            if (momentum.X < 0 && facing == FacingDirection.Right)
             {
-                facingRight = false;
+                facing = FacingDirection.Left;
                 gfx.Flip();
             }
         }

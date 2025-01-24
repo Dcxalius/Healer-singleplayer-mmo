@@ -30,9 +30,9 @@ namespace Project_1.UI.HUD.PlateBoxes
         {
             player = ObjectManager.Player;
 
-            name = new PlateBoxNameSegment(player.Name, player.RelationColor, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(aSize.X, aSize.Y / 2));
-            health = new PlateBoxHealthSegment(player, new RelativeScreenPosition(0, aSize.Y / 2), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
-            resource = new PlateBoxResourceSegment(player, new RelativeScreenPosition(0, aSize.Y / 4 * 3), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
+            name = new PlateBoxNameSegment(null, Color.White, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(aSize.X, aSize.Y / 2));
+            health = new PlateBoxHealthSegment(new RelativeScreenPosition(0, aSize.Y / 2), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
+            resource = new PlateBoxResourceSegment(new RelativeScreenPosition(0, aSize.Y / 4 * 3), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
 
 
             leftVerticalSegments = new PlateBoxSegment[] { };
@@ -43,9 +43,16 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         }
 
+        public void SetData(Entity aEntity)
+        {
+            name.Refresh(aEntity);
+            resource.SetTarget(aEntity);
+            health.Refresh(aEntity);
+            levelCircle.Refresh(aEntity);
+        }
+
         public override void Refresh(Entity aEntity)
         {
-            name.Name = aEntity.Name;
             health.Refresh(aEntity);
             resource.Refresh(aEntity);
             levelCircle.Refresh(aEntity);

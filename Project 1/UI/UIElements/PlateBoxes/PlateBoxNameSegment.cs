@@ -32,7 +32,8 @@ namespace Project_1.UI.UIElements.PlateBoxes
 
         public override void Refresh(Entity aEntity)
         {
-            throw new NotImplementedException();
+            Name = aEntity.Name;
+            gfx.Color = aEntity.RelationColor;
         }
     }
 }

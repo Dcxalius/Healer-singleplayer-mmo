@@ -4,7 +4,6 @@ using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Unit.Resources;
 using Project_1.GameObjects.Entities.GroundEffect;
 using Project_1.GameObjects.Entities.Players;
-using Project_1.GameObjects.Entities.Temp;
 using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Spells.Buff;
 using Project_1.Input;
@@ -26,6 +25,7 @@ using Project_1.Textures.AnimatedTextures;
 using static Project_1.GameObjects.Unit.Equipment;
 using System.Diagnostics;
 using Project_1.Items;
+using Project_1.UI.UIElements.Guild;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -46,6 +46,7 @@ namespace Project_1.GameObjects.Entities
         public Relation.RelationToPlayer RelationToPlayer => unitData.RelationData.ToPlayer;
         protected Relation Relation => unitData.RelationData;
         public string Name => unitData.Name;
+        public string Class => unitData.ClassData.Name;
         public int CurrentLevel => unitData.Level.CurrentLevel;
         public bool Alive => unitData.Health.CurrentHealth > 0;
         public bool FullHealth => unitData.Health.MaxHealth == unitData.Health.CurrentHealth;
@@ -78,7 +79,7 @@ namespace Project_1.GameObjects.Entities
 
         protected Destination destination;
 
-        public Entity(UnitData aUnitData, WorldSpace aStartingPos) : base(new RandomAnimatedTexture(aUnitData.GfxPath, new Point(32), 0, TimeSpan.FromMilliseconds(500)), aStartingPos)
+        public Entity(UnitData aUnitData) : base(new RandomAnimatedTexture(aUnitData.GfxPath, new Point(32), 0, TimeSpan.FromMilliseconds(500)), aUnitData.Position)
         {
             unitData = aUnitData;
             bloodsplatter = new ParticleBase((1000d, 2000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[] { Color.Red }, new Point(1));
@@ -88,6 +89,9 @@ namespace Project_1.GameObjects.Entities
             buffList = new BuffList();
             destination = new Destination(this);
             aggroTablesIAmOn = new List<NonFriendly>();
+
+            velocity = unitData.Velocity;
+            momentum = UnitData.Momentum;
 
             nameDisplay = new Text("Gloryse", Name, RelationColor);
 
@@ -410,6 +414,11 @@ namespace Project_1.GameObjects.Entities
             selectRing.Draw(aBatch, this);
             base.Draw(aBatch);
             nameDisplay.CentredDraw(aBatch, (FeetPosition - new WorldSpace(0, Size.Y + nameDisplay.Offset.Y)).ToAbsoltueScreenPosition());
+        }
+
+        public GuildMember.GuildMemberData CreateGuildMemberData()
+        {
+            return new GuildMember.GuildMemberData(Name, CurrentLevel, Class);
         }
     }
 }

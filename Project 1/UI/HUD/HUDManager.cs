@@ -4,15 +4,16 @@ using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Players;
-using Project_1.GameObjects.Entities.Temp;
 using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Unit;
 using Project_1.Input;
+using Project_1.Items;
 using Project_1.Managers;
 using Project_1.UI.HUD.PlateBoxes;
 using Project_1.UI.HUD.Windows;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Bars;
+using Project_1.UI.UIElements.Guild;
 using Project_1.UI.UIElements.Inventory;
 using Project_1.UI.UIElements.SpellBook;
 using SharpDX.MediaFoundation.DirectX;
@@ -22,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Item = Project_1.UI.UIElements.Inventory.Item;
 
 namespace Project_1.UI.HUD
 {
@@ -103,6 +105,13 @@ namespace Project_1.UI.HUD
             }
         }
 
+        #region PlateBox
+        public static void SetPlayerPlateBox(Player aPlayer)
+        {
+
+            playerPlateBox.SetData(aPlayer);
+        }
+
         public static void RefreshPlateBox(Entity aEntity)
         {
             switch (aEntity.RelationToPlayer)
@@ -113,13 +122,12 @@ namespace Project_1.UI.HUD
                     targetPlateBox.Refresh(aEntity);
                     break;
                 case Relation.RelationToPlayer.Friendly:
+                    if (targetPlateBox.BelongsTo(aEntity)) targetPlateBox.Refresh(aEntity); 
                     for (int i = 0; i < partyPlateBoxes.Length; i++)
                     {
-                        if (!partyPlateBoxes[i].BelongsTo(aEntity as Walker)) continue;
+                        if (partyPlateBoxes[i] == null) return;
+                        if (!partyPlateBoxes[i].BelongsTo(aEntity as GuildMember)) continue;
                         partyPlateBoxes[i].Refresh(aEntity);
-
-                        if (!targetPlateBox.BelongsTo(aEntity)) return;
-                        targetPlateBox.Refresh(aEntity);
                         return;
                     }
                     break;
@@ -132,9 +140,26 @@ namespace Project_1.UI.HUD
                     break;
             }
         }
+        public static void SetNewTarget(Entity aTargeter, Entity aTarget)
+        {
+            switch (aTargeter.RelationToPlayer)
+            {
+                case Relation.RelationToPlayer.Self:
+                    targetPlateBox.SetTarget(aTarget);
+                    targetBuffBox.AssignBox(aTarget);
+                    break;
+                case Relation.RelationToPlayer.Friendly:
+                case Relation.RelationToPlayer.Neutral:
+                case Relation.RelationToPlayer.Hostile:
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+        #endregion
 
         #region Control
-        public static void AddWalkerToParty(Walker aWalker)
+        public static void AddWalkerToParty(GameObjects.Entities.GuildMember aWalker)
         {
             int openIndex = -1;
             for (int i = 0; i < partyPlateBoxes.Length; i++)
@@ -158,7 +183,7 @@ namespace Project_1.UI.HUD
             hudElements.Add(partyPlateBoxes[openIndex]);
             hudElements.Add(partyBuffBoxes[openIndex]);
         }
-        public static void AddWalkerToControl(Walker aWalker)
+        public static void AddWalkerToControl(GameObjects.Entities.GuildMember aWalker)
         {
             for (int i = 0; i < partyPlateBoxes.Length; i++)
             {
@@ -170,7 +195,7 @@ namespace Project_1.UI.HUD
 
             }
         }
-        public static void RemoveWalkersFromControl(Walker[] aWalkers)
+        public static void RemoveWalkersFromControl(GameObjects.Entities.GuildMember[] aWalkers)
         {
             for (int i = 0; i < aWalkers.Length; i++)
             {
@@ -186,24 +211,57 @@ namespace Project_1.UI.HUD
             }
         }
 
-        public static void SetNewTarget(Entity aTargeter, Entity aTarget)
+        #endregion
+
+        #region Guild
+        public static void AddGuildMember(Friendly aData)
         {
-            switch (aTargeter.RelationToPlayer)
+            //guildWindow.
+        }
+
+        public static void SetGuildMembers(Friendly[] aData)
+        {
+            guildWindow.SetRoster(aData);
+        }
+
+
+        #endregion
+
+
+
+        #region Inventory
+        public static void SetInventory(Inventory aInventory) => inventoryBox.SetInventory(aInventory);
+        public static void RefreshInventorySlot(int aBag, int aSlot, Inventory aInventory) => inventoryBox.RefreshSlot(aBag, aSlot, aInventory);
+        public static void RefreshInventorySlot((int, int) aBagAndSlot, Inventory aInventory) => RefreshInventorySlot(aBagAndSlot.Item1, aBagAndSlot.Item2, aInventory);
+
+        public static void SetDescriptorBox(Item aItem) => descriptorBox.SetToItem(aItem);
+
+        #endregion
+
+        #region CharacterWindow
+        public static void SetCharacterWindow(Friendly aFriendly, PairReport aRaport) => characterWindow.SetData(aFriendly, aRaport);
+
+        public static void RefreshCharacterWindowSlot(Equipment.Slot aSlot, Equipment aEquipment) => characterWindow.SetSlot(aSlot, aEquipment);
+        public static void RefreshCharacterWindowStats(PairReport aReport) => characterWindow.SetReportBox(aReport);
+        public static void RefreshCharacterWindowExpBar(Entity aEntity)
+        {
+            if (aEntity.GetType() == typeof(Player))
             {
-                case Relation.RelationToPlayer.Self:
-                    targetPlateBox.SetTarget(aTarget);
-                    targetBuffBox.AssignBox(aTarget);
-                    break;
-                case Relation.RelationToPlayer.Friendly:
-                case Relation.RelationToPlayer.Neutral:
-                case Relation.RelationToPlayer.Hostile:
-                    break;
-                default:
-                    throw new NotImplementedException();
+                characterWindow.RefreshExp(aEntity.Level);
             }
         }
         #endregion
-        
+
+        #region Spell
+        public static void AddSpellToSpellBook(Spell aSpell) => spellBookWindow.AssignSpell(aSpell);
+        public static void HoldSpell(Spell aSpell, AbsoluteScreenPosition aGrabOffset) => heldSpell.HoldMe(aSpell, aGrabOffset);
+        public static void ReleaseSpell() => heldSpell.ReleaseMe();
+
+        public static void FinishChannel() => playerCastBar.FinishCast();
+        public static void CancelChannel() => playerCastBar.CancelCast();
+        public static void UpdateChannelSpell(float aNewVal) => playerCastBar.Value = aNewVal;
+        public static void ChannelSpell(Spell aSpell) => playerCastBar.CastSpell(aSpell);
+
         public static void AddBuff(GameObjects.Spells.Buff.Buff aBuff, Entity aEntity)
         {
             if (targetBuffBox.IsThisMine(aEntity))
@@ -226,36 +284,6 @@ namespace Project_1.UI.HUD
                 }
             }
         }
-
-        #region Inventory
-        public static void RefreshInventorySlot(int aBag, int aSlot) => inventoryBox.RefreshSlot(aBag, aSlot);
-        public static void RefreshInventorySlot((int, int) aBagAndSlot) => RefreshInventorySlot(aBagAndSlot.Item1, aBagAndSlot.Item2);
-
-        public static void SetDescriptorBox(Item aItem) => descriptorBox.SetToItem(aItem);
-
-        #endregion
-
-        #region CharacterWindow
-        public static void RefreshCharacterWindowSlot(Equipment.Slot aSlot) => characterWindow.SetSlot(aSlot);
-        public static void RefreshCharacterWindowStats(PairReport aReport) => characterWindow.SetReportBox(aReport);
-        public static void RefreshCharacterWindowExpBar(Entity aEntity)
-        {
-            if (aEntity.GetType() == typeof(Player))
-            {
-                characterWindow.RefreshExp();
-            }
-        }
-        #endregion
-
-        #region Spell
-        public static void AddSpellToSpellBook(Spell aSpell) => spellBookWindow.AssignSpell(aSpell);
-        public static void HoldSpell(Spell aSpell, AbsoluteScreenPosition aGrabOffset) => heldSpell.HoldMe(aSpell, aGrabOffset);
-        public static void ReleaseSpell() => heldSpell.ReleaseMe();
-
-        public static void FinishChannel() => playerCastBar.FinishCast();
-        public static void CancelChannel() => playerCastBar.CancelCast();
-        public static void UpdateChannelSpell(float aNewVal) => playerCastBar.Value = aNewVal;
-        public static void ChannelSpell(Spell aSpell) => playerCastBar.CastSpell(aSpell);
         #endregion
 
         #region Loot

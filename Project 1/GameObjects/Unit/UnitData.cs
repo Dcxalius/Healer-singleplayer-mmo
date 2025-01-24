@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
+using Project_1.Camera;
 using Project_1.GameObjects.Spawners;
 using Project_1.GameObjects.Unit.Resources;
 using Project_1.GameObjects.Unit.Stats;
@@ -36,6 +37,14 @@ namespace Project_1.GameObjects.Unit
         public Health Health => baseStats.Health;
         public Resource Resource => baseStats.Resource;
 
+        public WorldSpace Position => position;
+        WorldSpace position;
+
+        public WorldSpace Momentum => momentum;
+        WorldSpace momentum;
+
+        public WorldSpace Velocity => velocity;
+        WorldSpace velocity;
 
         public (Equipment.AttackStyle, Attack, Attack) AttackData
         {
@@ -66,7 +75,7 @@ namespace Project_1.GameObjects.Unit
         [JsonIgnore]
         public LootTable LootTable { get => LootFactory.GetData(name); }
 
-        public UnitData(MobData aData)
+        public UnitData(MobData aData, WorldSpace aSpawn)
         {
             name = aData.Name;
             relationData = aData.RelationData;
@@ -79,13 +88,16 @@ namespace Project_1.GameObjects.Unit
             gfxPath = aData.GfxPath;
             corpseGfxPath = aData.CorpseGfxPath;
 
+            position = aSpawn;
+            velocity = WorldSpace.Zero;
+            momentum = WorldSpace.Zero;
             Assert();
         }
 
 
         [JsonConstructor]
         public UnitData(string name, string corpseGfxName, string className, Relation.RelationToPlayer? relation, int level, int experience,
-            float currentHp, float currentResource, int?[] equipment)
+            float currentHp, float currentResource, int?[] equipment, Vector2 position, Vector2 momentum, Vector2 velocity)
         {
             this.name = name;
             Debug.Assert(relation.HasValue);
@@ -93,7 +105,9 @@ namespace Project_1.GameObjects.Unit
             classData = new ClassData(relation.Value, className);
             this.level = new Level(level, experience);
             this.equipment = new Equipment(equipment);
-
+            this.position = new WorldSpace(position);
+            this.momentum = new WorldSpace(momentum);
+            this.velocity = new WorldSpace(velocity);
             
             baseStats = new BaseStats(classData, this.level.CurrentLevel, this.equipment.EquipmentStats, currentHp, currentResource);
 

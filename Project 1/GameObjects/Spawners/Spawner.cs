@@ -83,12 +83,12 @@ namespace Project_1.GameObjects.Spawners
 
             if (unitToSpawn.Length == 1)
             {
-                spawn = new NonFriendly(id, new UnitData(unitToSpawn[0]), xdd.Position);
+                spawn = new NonFriendly(id, new UnitData(unitToSpawn[0], xdd.Position));
 
             }
             else
             {
-                spawn = new NonFriendly(id, new UnitData(unitToSpawn[RandomManager.RollInt(unitToSpawn.Count())]), xdd.Position);
+                spawn = new NonFriendly(id, new UnitData(unitToSpawn[RandomManager.RollInt(unitToSpawn.Count())], xdd.Position));
 
             }
         }

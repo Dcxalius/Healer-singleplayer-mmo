@@ -2,7 +2,6 @@
 using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
-using Project_1.GameObjects.Entities.Temp;
 using Project_1.Input;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.PlateBoxes;
@@ -18,7 +17,7 @@ namespace Project_1.UI.HUD.PlateBoxes
     internal class PartyPlateBox : PlateBox
     {
         public bool VisibleBorder { get => border.Visible; set => border.Visible = value; }
-        static Walker walker;
+        static GuildMember walker;
 
         static PlateBoxNameSegment name;
         static PlateBoxHealthSegment health;
@@ -26,13 +25,16 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         CommandBorder border;
 
-        public PartyPlateBox(Walker aWalker, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize)
+        public PartyPlateBox(GuildMember aWalker, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize)
         {
             walker = aWalker;
 
             name = new PlateBoxNameSegment(walker.Name, walker.RelationColor, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(aSize.X, aSize.Y / 2));
-            health = new PlateBoxHealthSegment(walker, new RelativeScreenPosition(0, aSize.Y / 2), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
-            resource = new PlateBoxResourceSegment(walker, new RelativeScreenPosition(0, aSize.Y / 4 * 3), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
+            health = new PlateBoxHealthSegment(new RelativeScreenPosition(0, aSize.Y / 2), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
+
+            health.SetTarget(aWalker);
+            resource = new PlateBoxResourceSegment(new RelativeScreenPosition(0, aSize.Y / 4 * 3), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
+            resource.SetTarget(aWalker);
 
             //health = new PlateBoxHealthSegment(walker, new Vector2(0, 0), new Vector2(aSize.X, aSize.Y / 2));
 
@@ -49,7 +51,7 @@ namespace Project_1.UI.HUD.PlateBoxes
         }
 
 
-        public bool BelongsTo(Walker aWalker)
+        public bool BelongsTo(GuildMember aWalker)
         {
             return aWalker == walker;
 
@@ -77,7 +79,7 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         public override void Refresh(Entity aEntity)
         {
-            name.Name = aEntity.Name;
+            //name.Name = aEntity.Name;
             health.Refresh(aEntity);
             resource.Refresh(aEntity);
             levelCircle.Refresh(aEntity);

@@ -13,12 +13,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace Project_1.UI.HUD.Windows
 {
     internal class CharacterWindow : Window
     {
-        Entity owner;
+        //Entity owner;
 
         Label nameLabel;
         Item[] equiped;
@@ -38,9 +39,7 @@ namespace Project_1.UI.HUD.Windows
 
         public CharacterWindow(Entity aEntity) : base(new UITexture("WhiteBackground", Color.Turquoise))
         {
-            owner = aEntity;
-
-            nameLabel = new Label(owner.Name, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(WindowSize.X, itemSize.Y), Label.TextAllignment.TopCentre, Color.Black);
+            nameLabel = new Label(null, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(WindowSize.X, itemSize.Y), Label.TextAllignment.TopCentre, Color.Black);
 
             visibleKey = Input.KeyBindManager.KeyListner.Character;
             equiped = new Item[(int)Equipment.Slot.Count];
@@ -55,11 +54,10 @@ namespace Project_1.UI.HUD.Windows
             RelativeScreenPosition textBoxPos = topPart + itemSpacing;
             RelativeScreenPosition textBoxSize = new RelativeScreenPosition(WindowSize.X - itemSpacing.X * 2, WindowSize.Y - topPart.Y - itemSpacing.Y * 2) / 2;
 
-            nrStatReport = new Label(owner.PrimaryStatReport.NumbersOnly, textBoxPos, textBoxSize - new RelativeScreenPosition(itemSpacing.X, 0), Label.TextAllignment.TopRight, Color.Black);
-            stringStatReport = new Label(owner.PrimaryStatReport.StringsOnly, textBoxPos + new RelativeScreenPosition(textBoxSize.X, 0f) + new RelativeScreenPosition(itemSpacing.X, 0), textBoxSize - new RelativeScreenPosition(itemSpacing.X, 0), Label.TextAllignment.TopLeft, Color.Black);
+            nrStatReport = new Label(null, textBoxPos, textBoxSize - new RelativeScreenPosition(itemSpacing.X, 0), Label.TextAllignment.TopRight, Color.Black);
+            stringStatReport = new Label(null, textBoxPos + new RelativeScreenPosition(textBoxSize.X, 0f) + new RelativeScreenPosition(itemSpacing.X, 0), textBoxSize - new RelativeScreenPosition(itemSpacing.X, 0), Label.TextAllignment.TopLeft, Color.Black);
 
             expBar = new ExpBar(expBarPos, expBarSize);
-            RefreshExp();
             children.Add(nameLabel);
             children.AddRange(equiped);
             children.Add(nrStatReport);
@@ -68,25 +66,41 @@ namespace Project_1.UI.HUD.Windows
             ToggleVisibilty();
         }
 
+        public void SetData(Friendly aFriendly, PairReport aReport)
+        {
+            nameLabel.Text = aFriendly.Name;
+            SetReportBox(aReport);
+            RefreshExp(aFriendly.Level);
+            SetAllSlots(aFriendly.Equipment);
+        }
+
         void CreateItems(Equipment.Slot aStart, Equipment.Slot aEnd, RelativeScreenPosition aStartPos, RelativeScreenPosition aChangeInPos)//TODO: Make this take an array 
         {
             for (int i = (int)aStart; i <= (int)aEnd; i++)
             {
-                Items.Item item = owner.Equipment.EquipedInSlot((Equipment.Slot)i); //and use that to get item here instead
-                if (item != null)
-                {
-                    equiped[i] = new Item(-3, i, true, item.GfxPath, aStartPos + aChangeInPos * (i - (int)aStart), itemSize);
-                }
-                else
+                //Items.Item item = owner.Equipment.EquipedInSlot((Equipment.Slot)i); //and use that to get item here instead
+                //if (item != null)
+                //{
+                //    equiped[i] = new Item(-3, i, true, item.GfxPath, aStartPos + aChangeInPos * (i - (int)aStart), itemSize);
+                //}
+                //else
                 {
                     equiped[i] = new Item(-3, i, true, new GfxPath(GfxType.Item, null), aStartPos + aChangeInPos * (i - (int)aStart), itemSize);
                 }
             }
         }
 
-        public void SetSlot(Equipment.Slot aSlot)
+        public void SetAllSlots(Equipment aEquipment)
         {
-            equiped[(int)aSlot].AssignItem(owner.Equipment.EquipedInSlot(aSlot));
+            for (int i = 0; i < (int)Equipment.Slot.Count; i++)
+            {
+                SetSlot((Equipment.Slot)i, aEquipment);
+            }
+        }
+
+        public void SetSlot(Equipment.Slot aSlot, Equipment aEquipment)
+        {
+            equiped[(int)aSlot].AssignItem(aEquipment.EquipedInSlot(aSlot));
         }
 
         public void SetReportBox(PairReport aReport)
@@ -95,10 +109,10 @@ namespace Project_1.UI.HUD.Windows
             nrStatReport.Text = aReport.NumbersOnly;
         }
 
-        public void RefreshExp()
+        public void RefreshExp(Level aLevel)
         {
-            expBar.MaxValue = Level.ExpToNextLevel(owner.Level.CurrentLevel);
-            expBar.Value = owner.Level.Experience;
+            expBar.MaxValue = Level.ExpToNextLevel(aLevel.CurrentLevel);
+            expBar.Value = aLevel.Experience;
         }
     }
 }

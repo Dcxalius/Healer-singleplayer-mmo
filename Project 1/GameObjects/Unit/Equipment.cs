@@ -299,7 +299,7 @@ namespace Project_1.GameObjects.Unit
             equipped[(int)aSlot] = aEquipment;
             equipmentStats.AddStats(aEquipment.Stats);
             
-            HUDManager.RefreshCharacterWindowSlot(aSlot); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
+            HUDManager.RefreshCharacterWindowSlot(aSlot, this); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
             return previouslyEquiped;
         }
 
@@ -308,7 +308,7 @@ namespace Project_1.GameObjects.Unit
             Debug.Assert(equipped[(int)aSlot] == null);
             equipped[(int)aSlot] = aEquipment;
             equipmentStats.AddStats(aEquipment.Stats);
-            HUDManager.RefreshCharacterWindowSlot(aSlot); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
+            HUDManager.RefreshCharacterWindowSlot(aSlot, this); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
         }
 
         Item RemoveItem(Slot aSlot)
@@ -317,7 +317,7 @@ namespace Project_1.GameObjects.Unit
             if (item == null) return null;
             equipped[(int)aSlot] = null;
             equipmentStats.RemoveStats(item.Stats);
-            HUDManager.RefreshCharacterWindowSlot(aSlot);
+            HUDManager.RefreshCharacterWindowSlot(aSlot, this);
             return item;
         }
 

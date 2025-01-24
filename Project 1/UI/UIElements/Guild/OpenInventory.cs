@@ -11,7 +11,7 @@ namespace Project_1.UI.UIElements.Guild
 {
     internal class OpenInventory : GFXButton
     {
-        public OpenInventory(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new GfxPath(GfxType.Item, "TestDagger"), aPos, aSize, Color.White)
+        public OpenInventory(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new GfxPath(GfxType.Item, "DefaultBag"), aPos, aSize, Color.White)
         {
         }
     }

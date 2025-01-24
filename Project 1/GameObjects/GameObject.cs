@@ -63,7 +63,7 @@ namespace Project_1.GameObjects
             }
         }
 
-        public void Teleport(WorldSpace aNewPos) => position = aNewPos;
+        public void Teleport(WorldSpace aNewPos) => Position = aNewPos;
 
         public virtual bool Click(ClickEvent aClickEvent) => false;
 
@@ -83,7 +83,7 @@ namespace Project_1.GameObjects
             {
                 effects[i].Draw(aBatch, Position, FeetPosition.Y + 0.01f);
             }
-            //gfx.Draw(aBatch, Camera.Camera.WorldPosToCameraSpace(position), FeetPos.Y);
+            //gfx.Draw(aBatch, Camera.Camera.WorldPosToCameraSpace(Position), FeetPos.Y);
         }
     }
 }

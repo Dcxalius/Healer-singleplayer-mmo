@@ -18,8 +18,8 @@ using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.Camera;
 using Project_1.GameObjects.Spells.Projectiles;
-using Project_1.GameObjects.Entities.Temp;
 using Project_1.GameObjects.Spawners;
+using System.Diagnostics;
 
 namespace Project_1.GameObjects
 {
@@ -28,6 +28,7 @@ namespace Project_1.GameObjects
         public static Player Player { get => player; }
 
         public static List<Entity> entities = new List<Entity>();
+        public static List<GuildMember> guild = new List<GuildMember>();
         public static List<Corpse> corpses = new List<Corpse>();
         public static List<Projectile> projectiles = new List<Projectile>();
 
@@ -37,47 +38,40 @@ namespace Project_1.GameObjects
 
         public static void Init()
         {
-            player = new Player(new WorldSpace(10*32));
+            guild.AddRange(ObjectFactory.GetGuildMemebers());
+            player = new Player();
             Camera.Camera.BindCamera(player);
 
 
-
             
-            entities.Add(new Walker(new WorldSpace(11*32)));//Debug
-            player.Party.AddToParty(entities[entities.Count - 1] as Walker); //Debug
+            //entities.Add(new Walker(new WorldSpace(11*32)));//Debug
+            //player.Party.AddToParty(entities[entities.Count - 1] as GuildMember); //Debug
 
 
         }
 
-        public static void DoWhatLeaguePlayersTellMe(FloatingText aText)
+        public static List<GuildMember> GetGuildMembers() => guild;
+
+        public static bool SpawnGuildMemberToParty(GuildMember aMember)
         {
-            floatingTexts.Remove(aText);
+            Debug.Assert(guild.Contains(aMember));
+            Debug.Assert(!player.Party.IsInParty(aMember));
+
+            entities.Add(guild.Find(member => member == aMember));
+            return player.Party.AddToParty(entities[entities.Count - 1] as GuildMember);
         }
 
-        public static void AddProjectile(Projectile aProjectile)
-        {
-            projectiles.Add(aProjectile);
-        }
+        public static void DoWhatLeaguePlayersTellMe(FloatingText aText) => floatingTexts.Remove(aText);
 
-        public static void AddCorpse(Corpse aCorpse)
-        {
-            corpses.Add(aCorpse);
-        }
+        public static void AddProjectile(Projectile aProjectile) => projectiles.Add(aProjectile);
 
-        public static void DespawnCorpse(Corpse aCorpse)
-        {
-            corpses.Remove(aCorpse);
-        }
+        public static void AddCorpse(Corpse aCorpse) => corpses.Add(aCorpse);
 
-        public static void RemoveEntity(Entity aObject)
-        {
-            entities.Remove(aObject);
-        }
+        public static void DespawnCorpse(Corpse aCorpse) => corpses.Remove(aCorpse);
 
-        public static void SpawnFloatingText(FloatingText aFloatingText)
-        {
-            floatingTexts.Add(aFloatingText);
-        }
+        public static void RemoveEntity(Entity aObject) => entities.Remove(aObject);
+
+        public static void SpawnFloatingText(FloatingText aFloatingText) => floatingTexts.Add(aFloatingText);
 
         public static void Update()
         {
@@ -95,6 +89,10 @@ namespace Project_1.GameObjects
             {
                 entities[i].Update();
             }
+            for (int i = guild.Count - 1; i >= 0; i--)
+            {
+                guild[i].Update();
+            }
             for (int i = corpses.Count - 1; i >= 0; i--)
             {
                 corpses[i].Update();
@@ -109,6 +107,10 @@ namespace Project_1.GameObjects
                 for (int i = 0; i < entities.Count; i++)
                 {
                     entities[i].ServerTick();
+                }
+                for (int i = 0; i < guild.Count; i++)
+                {
+                    guild[i].ServerTick();
                 }
             }
         }

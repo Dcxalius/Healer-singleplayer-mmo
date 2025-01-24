@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Newtonsoft.Json;
+using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spawners;
 using Project_1.GameObjects.Unit;
 using Project_1.Managers;
@@ -14,6 +15,7 @@ namespace Project_1.GameObjects
     internal static class ObjectFactory
     {
         static Dictionary<string, UnitData> unitData;
+        static List<UnitData> guildData;
         static Dictionary<string, MobData> mobData;
         //static UnitData defaultData = new UnitData();
 
@@ -23,17 +25,11 @@ namespace Project_1.GameObjects
 
         public static void Init(ContentManager aC)
         {
-            unitData = new Dictionary<string, UnitData>();
-            mobData = new Dictionary<string, MobData>();
-            playerClassData = new Dictionary<string, ClassData>();
-            allyClassData = new Dictionary<string, ClassData>();
-            mobClassData = new Dictionary<string, ClassData>();
-
-            //UnitData data = new UnitData("Sheep", 100, UnitData.RelationToPlayer.Neutral, 50);
             //ExportData("C:\\Users\\Cassandra\\source\\repos\\Project 1\\Project 1\\Content\\UnitData.json", data);
             ImportClassData(aC);
             ImportMobData(aC);
             ImportUnitData(aC);
+            ImportGuildData(aC);
 
             //ExportData(aC.RootDirectory + "\\UnitData.json", unitData["Sheep"]);
         }
@@ -59,9 +55,17 @@ namespace Project_1.GameObjects
             else
             {
                 throw new NotImplementedException();
-                DebugManager.Print(typeof(ObjectManager), "Error getting data for unit " + aName);
-                //return defaultData;
             }
+        }
+
+        public static List<GuildMember> GetGuildMemebers()
+        {
+            List<GuildMember> returnable = new List<GuildMember>();
+            for (int i = 0; i < guildData.Count; i++)
+            {
+                returnable.Add(new GuildMember(guildData[i]));
+            }
+            return returnable;
         }
 
         public static ClassData GetPlayerClass(string aName) => playerClassData[aName];
@@ -70,6 +74,7 @@ namespace Project_1.GameObjects
 
         static void ImportMobData(ContentManager aContentManager)
         {
+            mobData = new Dictionary<string, MobData>();
             string path = aContentManager.RootDirectory + "\\Data\\MobData\\";
 
            
@@ -85,11 +90,13 @@ namespace Project_1.GameObjects
 
         static void ImportUnitData(ContentManager aContentManager)
         {
-            string path = aContentManager.RootDirectory + "\\SaveData\\Units\\";
+            unitData = new Dictionary<string, UnitData>();
+
+            string path = aContentManager.RootDirectory + "\\SaveData\\Units\\World";
 
             string[] folders = System.IO.Directory.GetDirectories(path);
 
-            string playerData = System.IO.File.ReadAllText(path + "PlayerData.unit");
+            string playerData = System.IO.File.ReadAllText(aContentManager.RootDirectory + "\\SaveData\\Units\\PlayerData.unit");
             UnitData data = JsonConvert.DeserializeObject<UnitData>(playerData);
             unitData.Add(data.Name, data);
 
@@ -104,9 +111,30 @@ namespace Project_1.GameObjects
                 }
             }
         }
+
+        static void ImportGuildData(ContentManager aContentManager)
+        {
+            guildData = new List<UnitData>();
+
+            string path = aContentManager.RootDirectory + "\\SaveData\\Units\\Guild\\";
+
+            string[] files = System.IO.Directory.GetFiles(path);
+
+
+            for (int j = 0; j < files.Length; j++)
+            {
+                string rawData = System.IO.File.ReadAllText(files[j]);
+                UnitData data = JsonConvert.DeserializeObject<UnitData>(rawData);
+                guildData.Add(data);
+            }
+        }
         
         static void ImportClassData(ContentManager aContentManager)
         {
+            playerClassData = new Dictionary<string, ClassData>();
+            allyClassData = new Dictionary<string, ClassData>();
+            mobClassData = new Dictionary<string, ClassData>();
+
             string path = aContentManager.RootDirectory + "\\Data\\Class\\";
 
             string[] folders = System.IO.Directory.GetDirectories(path);

@@ -18,8 +18,8 @@ namespace Project_1.Items
     {
         Entity owner; //TODO: Remove this dependency and move all of this into unitdata
 
-        public int bagSlots = 4;
-        public int defaultSlots = 32;
+        public const int bagSlots = 4;
+        public const int defaultSlots = 32;
 
         Item[][] items;
         public Container[] bags;
@@ -60,7 +60,7 @@ namespace Project_1.Items
             if (!(items[aBagIndex][aSlotIndex] as Consumable).Use(owner)) return false;
 
             TrimStack(aBagIndex, aSlotIndex, 1);
-            HUDManager.RefreshInventorySlot(aBagIndex, aSlotIndex);
+            HUDManager.RefreshInventorySlot(aBagIndex, aSlotIndex, this);
             return true;
         }
 
@@ -106,8 +106,8 @@ namespace Project_1.Items
                     items[i] = new Item[bags[i].SlotCount];
 
                     items[aBagAndSlot.Item1][aBagAndSlot.Item2] = null;
-                    HUDManager.RefreshInventorySlot(-1, i);
-                    HUDManager.RefreshInventorySlot(aBagAndSlot);
+                    HUDManager.RefreshInventorySlot(-1, i, this);
+                    HUDManager.RefreshInventorySlot(aBagAndSlot, this);
 
 
                     return true;
@@ -123,7 +123,7 @@ namespace Project_1.Items
             Debug.Assert(bags[aEmptySlotToAddTo] == null, "Tried to add to occupied slot.");
             bags[aEmptySlotToAddTo] = aBag;
             items[aEmptySlotToAddTo] = new Item[aBag.SlotCount];
-            HUDManager.RefreshInventorySlot(-1, aEmptySlotToAddTo);
+            HUDManager.RefreshInventorySlot(-1, aEmptySlotToAddTo, this);
         }
 
         public bool UnequipBag(int aBagSlot)
@@ -136,7 +136,7 @@ namespace Project_1.Items
                 {
                     bags[aBagSlot] = null;
                     items[aBagSlot] = null;
-                    HUDManager.RefreshInventorySlot(-1, aBagSlot);
+                    HUDManager.RefreshInventorySlot(-1, aBagSlot, this);
                 }
                 return true;
             }
@@ -151,8 +151,8 @@ namespace Project_1.Items
             items[aInventorySlot.Item1][aInventorySlot.Item2] = bags[aBag];
             bags[aBag] = null;
             items[aBag] = null;
-            HUDManager.RefreshInventorySlot(aInventorySlot);
-            HUDManager.RefreshInventorySlot(-1, aBag);
+            HUDManager.RefreshInventorySlot(aInventorySlot, this);
+            HUDManager.RefreshInventorySlot(-1, aBag, this);
 
         }
 
@@ -164,8 +164,8 @@ namespace Project_1.Items
             bags[aBagSlot] = bags[aSlotToSwapWith];
             items[aSlotToSwapWith] = tempItems;
             bags[aSlotToSwapWith] = tempBag;
-            HUDManager.RefreshInventorySlot(-1, aBagSlot);
-            HUDManager.RefreshInventorySlot(-1, aSlotToSwapWith);
+            HUDManager.RefreshInventorySlot(-1, aBagSlot, this);
+            HUDManager.RefreshInventorySlot(-1, aSlotToSwapWith, this);
         }
 
         public void SwapPlacesOfBags(int aBagSlot, int aSlotToSwapWith)
@@ -181,8 +181,8 @@ namespace Project_1.Items
                 bags[aBagSlot] = null;
                 items[aBagSlot] = null;
 
-                HUDManager.RefreshInventorySlot(-1, aBagSlot);
-                HUDManager.RefreshInventorySlot(-1, aSlotToSwapWith);
+                HUDManager.RefreshInventorySlot(-1, aBagSlot, this);
+                HUDManager.RefreshInventorySlot(-1, aSlotToSwapWith, this);
                 return;
             }
 
@@ -195,8 +195,8 @@ namespace Project_1.Items
             bags[aSlotToSwapWith] = tempBag;
             items[aSlotToSwapWith] = tempItems;
 
-            HUDManager.RefreshInventorySlot(-1, aBagSlot);
-            HUDManager.RefreshInventorySlot(-1, aSlotToSwapWith);
+            HUDManager.RefreshInventorySlot(-1, aBagSlot, this);
+            HUDManager.RefreshInventorySlot(-1, aSlotToSwapWith, this);
         }
 
         public void SwapBags((int, int) aSlot, int aSlotToSwapWith)
@@ -209,8 +209,8 @@ namespace Project_1.Items
                 //Bag to empty
                 AddBag(items[aSlot.Item1][aSlot.Item2] as Container, aSlotToSwapWith);
                 items[aSlot.Item1][aSlot.Item2] = null;
-                HUDManager.RefreshInventorySlot(aSlot);
-                HUDManager.RefreshInventorySlot(-1, aSlotToSwapWith);
+                HUDManager.RefreshInventorySlot(aSlot, this);
+                HUDManager.RefreshInventorySlot(-1, aSlotToSwapWith, this);
                 return;
             }
 
@@ -231,8 +231,8 @@ namespace Project_1.Items
 
             }
             items[aSlot.Item1][aSlot.Item2] = tempBag;
-            HUDManager.RefreshInventorySlot(aSlot);
-            HUDManager.RefreshInventorySlot(-1, aSlotToSwapWith);
+            HUDManager.RefreshInventorySlot(aSlot, this);
+            HUDManager.RefreshInventorySlot(-1, aSlotToSwapWith, this);
         }
 
 
@@ -252,7 +252,7 @@ namespace Project_1.Items
                     {
                         items[i][j] = item;
                         HUDManager.ReduceLootItem(aLootIndex, item.Count);
-                        HUDManager.RefreshInventorySlot(i, j);
+                        HUDManager.RefreshInventorySlot(i, j, this);
                         return;
                     }
 
@@ -262,14 +262,14 @@ namespace Project_1.Items
                     {
                         items[i][j].Count += item.Count;
                         HUDManager.ReduceLootItem(aLootIndex, item.Count);
-                        HUDManager.RefreshInventorySlot(i, j);
+                        HUDManager.RefreshInventorySlot(i, j, this);
                         return;
                     }
 
                     int c = item.MaxStack - items[i][j].Count;
                     items[i][j].Count = item.MaxStack;
                     HUDManager.ReduceLootItem(aLootIndex, c);
-                    HUDManager.RefreshInventorySlot(i, j);
+                    HUDManager.RefreshInventorySlot(i, j, this);
                 }
             }
         }
@@ -281,7 +281,7 @@ namespace Project_1.Items
             {
                 items[aBagAndSlot.Item1][aBagAndSlot.Item2] = item;
                 HUDManager.ReduceLootItem(aLootIndex, item.Count);
-                HUDManager.RefreshInventorySlot(aBagAndSlot);
+                HUDManager.RefreshInventorySlot(aBagAndSlot, this);
                 return;
             }
             if (item.ID != items[aBagAndSlot.Item1][aBagAndSlot.Item2].ID) return;
@@ -291,14 +291,14 @@ namespace Project_1.Items
             {
                 items[aBagAndSlot.Item1][aBagAndSlot.Item2].Count += item.Count;
                 HUDManager.ReduceLootItem(aLootIndex, item.Count);
-                HUDManager.RefreshInventorySlot(aBagAndSlot);
+                HUDManager.RefreshInventorySlot(aBagAndSlot, this);
                 return;
             }
 
             int c = item.MaxStack - items[aBagAndSlot.Item1][aBagAndSlot.Item2].Count;
             items[aBagAndSlot.Item1][aBagAndSlot.Item2].Count = item.MaxStack;
             HUDManager.ReduceLootItem(aLootIndex, c);
-            HUDManager.RefreshInventorySlot(aBagAndSlot);
+            HUDManager.RefreshInventorySlot(aBagAndSlot, this);
 
         }
 
@@ -315,7 +315,7 @@ namespace Project_1.Items
                     if (items[i][j].ID == aItem.ID)
                     {
                         int tempCount = items[i][j].AddToStack(count);
-                        HUDManager.RefreshInventorySlot(i, j);
+                        HUDManager.RefreshInventorySlot(i, j, this);
                         if (tempCount == 0)
                         {
                             return true;
@@ -341,12 +341,12 @@ namespace Project_1.Items
                         {
                             items[i][j].Count = aItem.MaxStack;
                             count -= aItem.MaxStack;
-                            HUDManager.RefreshInventorySlot(i, j);
+                            HUDManager.RefreshInventorySlot(i, j, this);
                         }
                         else
                         {
                             items[i][j].Count = count;
-                            HUDManager.RefreshInventorySlot(i, j);
+                            HUDManager.RefreshInventorySlot(i, j, this);
                             return true;
                         }
                     }
@@ -375,8 +375,8 @@ namespace Project_1.Items
             {
                 items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2] = items[aSlot.Item1][aSlot.Item2];
                 items[aSlot.Item1][aSlot.Item2] = null;
-                HUDManager.RefreshInventorySlot(aSlot.Item1, aSlot.Item2);
-                HUDManager.RefreshInventorySlot(aSlotToSwapWith.Item1, aSlotToSwapWith.Item2);
+                HUDManager.RefreshInventorySlot(aSlot.Item1, aSlot.Item2, this);
+                HUDManager.RefreshInventorySlot(aSlotToSwapWith.Item1, aSlotToSwapWith.Item2, this);
                 return;
             }
 
@@ -401,8 +401,8 @@ namespace Project_1.Items
                 items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2] = tempItem;
             }
 
-            HUDManager.RefreshInventorySlot(aSlot.Item1, aSlot.Item2);
-            HUDManager.RefreshInventorySlot(aSlotToSwapWith.Item1, aSlotToSwapWith.Item2);
+            HUDManager.RefreshInventorySlot(aSlot.Item1, aSlot.Item2, this);
+            HUDManager.RefreshInventorySlot(aSlotToSwapWith.Item1, aSlotToSwapWith.Item2, this);
         }
 
         public bool RemoveItem(Item aItem, int aCountToRemove)
@@ -447,7 +447,7 @@ namespace Project_1.Items
             {
                 items[aBagIndex][aSlotIndex] = null;
             }
-            HUDManager.RefreshInventorySlot(aBagIndex, aSlotIndex);
+            HUDManager.RefreshInventorySlot(aBagIndex, aSlotIndex, this);
         }
 
         public void TrimStack((int, int) aBagAndSlotIndex, int aCount)
@@ -559,7 +559,7 @@ namespace Project_1.Items
         public void AssignItem(Item aItem, int aBagIndex, int aSlotIndex)
         {
             items[aBagIndex][aSlotIndex] = aItem;
-            HUDManager.RefreshInventorySlot(aBagIndex, aSlotIndex);
+            HUDManager.RefreshInventorySlot(aBagIndex, aSlotIndex, this);
         }
     }
 }

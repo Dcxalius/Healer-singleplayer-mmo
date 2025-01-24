@@ -1,5 +1,4 @@
 ﻿using Project_1.Camera;
-using Project_1.GameObjects.Entities.Temp;
 using Project_1.GameObjects.Unit;
 using Project_1.Input;
 using Project_1.UI.HUD;
@@ -14,14 +13,14 @@ namespace Project_1.GameObjects.Entities.Players
     internal class Party
     {
         Entity owner;
-        List<Walker> commands = new List<Walker>();
+        List<GuildMember> commands = new List<GuildMember>();
 
         public int PartyCount => party.Count;
-        List<Walker> party = new List<Walker>();
+        List<GuildMember> party = new List<GuildMember>();
         const float lengthOfLeash = 500;
 
-        public bool IsInCommand(Walker aWalker) { return commands.IndexOf(aWalker) >= 0; }
-        public bool IsInParty(Walker aWalker) { return party.IndexOf(aWalker) >= 0; }
+        public bool IsInCommand(GuildMember aWalker) { return commands.IndexOf(aWalker) >= 0; }
+        public bool IsInParty(GuildMember aWalker) { return party.IndexOf(aWalker) >= 0; }
 
         public Party(Entity aOwner)
         {
@@ -50,7 +49,7 @@ namespace Project_1.GameObjects.Entities.Players
             commands.Clear();
         }
 
-        public void AddToCommand(Walker aWalker)
+        public void AddToCommand(GuildMember aWalker)
         {
             if (commands.Contains(aWalker)) { return; }
 
@@ -58,27 +57,28 @@ namespace Project_1.GameObjects.Entities.Players
             commands.Add(aWalker);
         }
 
-        public void NeedyAddToCommand(Walker aWalker)
+        public void NeedyAddToCommand(GuildMember aWalker)
         {
             commands.Clear();
             AddToCommand(aWalker);
 
         }
 
-        public void RemoveFromCommand(Walker aWalker)
+        public void RemoveFromCommand(GuildMember aWalker)
         {
             if (!commands.Contains(aWalker)) { return; }
 
-            HUDManager.RemoveWalkersFromControl(new Walker[] { aWalker });
+            HUDManager.RemoveWalkersFromControl(new GuildMember[] { aWalker });
             commands.Remove(aWalker);
         }
 
-        public void AddToParty(Walker aWalker)
+        public bool AddToParty(GuildMember aWalker)
         {
-            if (PartyCount >= 5) return;
+            if (PartyCount >= 5) return false;
 
             party.Add(aWalker);
             HUDManager.AddWalkerToParty(party[party.Count - 1]);
+            return true;
         }
 
         public void IssueMoveOrder(ClickEvent aClick)

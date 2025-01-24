@@ -4,9 +4,9 @@ using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Players;
-using Project_1.GameObjects.Entities.Temp;
 using Project_1.GameObjects.Unit;
 using Project_1.Input;
+using Project_1.Managers.States;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.PlateBoxes;
 using System;
@@ -31,8 +31,8 @@ namespace Project_1.UI.HUD.PlateBoxes
         public TargetPlateBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize)
         {
             nameSegment = new PlateBoxNameSegment(null, Color.White, RelativeScreenPosition.Zero, new RelativeScreenPosition(aSize.X, aSize.Y / 2));
-            healthSegment = new PlateBoxHealthSegment(null, new RelativeScreenPosition(0, aSize.Y / 2), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
-            resourceSegment = new PlateBoxResourceSegment(null, new RelativeScreenPosition(0, aSize.Y / 4 * 3), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
+            healthSegment = new PlateBoxHealthSegment(new RelativeScreenPosition(0, aSize.Y / 2), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
+            resourceSegment = new PlateBoxResourceSegment(new RelativeScreenPosition(0, aSize.Y / 4 * 3), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
 
             leftVerticalSegments = new PlateBoxSegment[] { };
             rightVerticalSegments = new PlateBoxSegment[] { };
@@ -51,7 +51,6 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         public override void Refresh(Entity aEntity)
         {
-            nameSegment.Name = aEntity.Name;
             healthSegment.Refresh(aEntity);
             levelCircle.Refresh(aEntity);
             resourceSegment.Refresh(aEntity);
@@ -70,8 +69,8 @@ namespace Project_1.UI.HUD.PlateBoxes
                 nameSegment.Name = null;
                 return;
             }
-            nameSegment.Name = targetEntity.Name;
-            nameSegment.BackgroundColor = targetEntity.RelationColor;
+
+            nameSegment.Refresh(targetEntity);
             healthSegment.SetTarget(targetEntity);
             levelCircle.Refresh(targetEntity);
             resourceSegment.SetTarget(targetEntity);

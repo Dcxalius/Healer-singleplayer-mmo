@@ -16,11 +16,10 @@ using Project_1.Textures.AnimatedTextures;
 using Project_1.Items;
 using Project_1.GameObjects.Spells;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities.Temp;
 
 namespace Project_1.GameObjects.Entities.Players
 {
-    internal class Player : Entity
+    internal class Player : Friendly
     {
         public Inventory Inventory => inventory;
         Inventory inventory;
@@ -31,14 +30,19 @@ namespace Project_1.GameObjects.Entities.Players
         public Party Party => party;
         Party party;
 
+        public Guild Guild => guild;
+        Guild guild;
         public bool LockedMovement => lockedMovement;
         bool lockedMovement = false;
 
-        public Player(WorldSpace aStartPos) : base(ObjectFactory.GetData("Player"), aStartPos)
+        public Player() : base(ObjectFactory.GetData("Player"))
         {
             inventory = new Inventory(this);
             spellBook = new SpellBook(this);
             party = new Party(this);
+            guild = new Guild(this);
+            HUDManager.SetCharacterWindow(this, PrimaryStatReport);
+            HUDManager.SetPlayerPlateBox(this);
         }
         public override void Update()
         {
