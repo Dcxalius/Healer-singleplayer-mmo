@@ -71,10 +71,5 @@ namespace Project_1.Items
             return false;
             
         }
-
-        //public void Draw(SpriteBatch aBatch, Rectangle aPos)
-        //{
-        //    itemData.Draw(aBatch, aPos);
-        //}
     }
 }

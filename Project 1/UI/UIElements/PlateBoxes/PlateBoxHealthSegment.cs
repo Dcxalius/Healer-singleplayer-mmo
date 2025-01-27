@@ -21,7 +21,7 @@ namespace Project_1.UI.UIElements.PlateBoxes
         {
             healthBar = new ResourceBar(new BarTexture(BarTexture.FillingDirection.Right, Color.Red), new UITexture("WhiteBackground", backgroundColor), RelativeScreenPosition.Zero, aSize);
             
-            children.Add(healthBar);
+            AddChild(healthBar);
         }
 
 
@@ -38,9 +38,9 @@ namespace Project_1.UI.UIElements.PlateBoxes
         }
 
 
-        public override void Draw(SpriteBatch aBatch)
+        public override void Draw(SpriteBatch aBatch, float aLayer)
         {
-            base.Draw(aBatch);
+            base.Draw(aBatch, aLayer);
         }
     }
 }

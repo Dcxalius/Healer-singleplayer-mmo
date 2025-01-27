@@ -45,11 +45,11 @@ namespace Project_1.UI.UIElements.SelectBoxes
             text.Rescale();
         }
 
-        public override void Draw(SpriteBatch aBatch)
+        public override void Draw(SpriteBatch aBatch, float aLayer)
         {
-            base.Draw(aBatch);
+            base.Draw(aBatch, aLayer);
 
-            text.CentredDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Center));
+            text.CentredDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Center), aLayer + 0.01f);
         }
     }
 }

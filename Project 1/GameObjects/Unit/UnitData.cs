@@ -111,7 +111,7 @@ namespace Project_1.GameObjects.Unit
             
             baseStats = new BaseStats(classData, this.level.CurrentLevel, this.equipment.EquipmentStats, currentHp, currentResource);
 
-            gfxPath = new GfxPath(GfxType.Object, name);
+            gfxPath = new GfxPath(GfxType.Object, className);
 
             if (corpseGfxName != null)
             {

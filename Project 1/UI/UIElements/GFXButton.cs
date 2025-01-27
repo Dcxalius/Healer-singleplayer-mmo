@@ -34,19 +34,19 @@ namespace Project_1.UI.UIElements
         }
 
 
-        public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)
+        public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch, float aLayer)
         {
-            base.Draw(aBatch);
+            base.Draw(aBatch, aLayer);
 
             if (gfxOnButton == null) return;
 
             if (!Pressed)
             {
-                gfxOnButton.Draw(aBatch, ConstructGfxRect());
+                gfxOnButton.Draw(aBatch, ConstructGfxRect(), aLayer + 0.1f);
             }
             else
             {
-                gfxOnButton.Draw(aBatch, ConstructGfxRect(), Color.DarkGray);
+                gfxOnButton.Draw(aBatch, ConstructGfxRect(), Color.DarkGray, aLayer + 0.1f);
 
             }
         }

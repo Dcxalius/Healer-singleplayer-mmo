@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities.Players;
@@ -18,13 +19,13 @@ namespace Project_1.UI.UIElements.Inventory
         int bagNr;
         
 
-        public BagBox(int aBagNr, int aSlotCount, int aColumnCount, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.Beige), aPos, aSize)
+        public BagBox(Items.Inventory aInventory, int aBagNr, int aSlotCount, int aColumnCount, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.Beige), aPos, aSize)
         {
             bagNr = aBagNr;
-            GetBagContent(aSlotCount, aColumnCount);
+            GetBagContent(aInventory, aSlotCount, aColumnCount);
         }
 
-        void GetBagContent(int aSlotCount, int aColumnCount)
+        void GetBagContent(Items.Inventory aInventory, int aSlotCount, int aColumnCount)
         {
             if (aSlotCount == 0)
             {
@@ -34,7 +35,7 @@ namespace Project_1.UI.UIElements.Inventory
             slots = new Item[aSlotCount];
 
             columnCount = aColumnCount;
-            Items.Item[] items = ObjectManager.Player.Inventory.GetItemsInBox(bagNr);
+            Items.Item[] items = aInventory.GetItemsInBox(bagNr);
 
             float rowCount = (float)Math.Ceiling(aSlotCount / (double)aColumnCount);
             Resize(new RelativeScreenPosition(aColumnCount * InventoryBox.itemSize.X + aColumnCount * InventoryBox.spacing.X + InventoryBox.spacing.X, rowCount * InventoryBox.itemSize.Y + rowCount * InventoryBox.spacing.Y + InventoryBox.spacing.Y));
@@ -56,12 +57,14 @@ namespace Project_1.UI.UIElements.Inventory
                 }
             }
 
-            children.AddRange(slots);
+            AddChildren(slots);
         }
+
+        
 
         void MakeZero()
         {
-            children.Clear();
+            KillAllChildren();
             Resize(RelativeScreenPosition.Zero);
         }
 
@@ -70,10 +73,15 @@ namespace Project_1.UI.UIElements.Inventory
             slots[aSlot].AssignItem(ObjectManager.Player.Inventory.GetItemInSlot(bagNr, aSlot));
         }
 
-        public void RefreshBag(int aSlotCount, int aColumnCount)
+        public void RefreshBag(Items.Inventory aInventory, int aSlotCount, int aColumnCount)
         {
-            children.Clear();
-            GetBagContent(aSlotCount, aColumnCount);
+            KillAllChildren();
+            GetBagContent(aInventory, aSlotCount, aColumnCount);
+        }
+
+        public override void Draw(SpriteBatch aBatch, float aLayer)
+        {
+            base.Draw(aBatch, aLayer);
         }
     }
 }

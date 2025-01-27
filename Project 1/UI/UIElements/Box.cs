@@ -20,23 +20,5 @@ namespace Project_1.UI.UIElements
         {
 
         }
-
-        public override bool ClickedOn(ClickEvent aClick)
-        {
-            return base.ClickedOn(aClick);
-
-        }
-
-        public override void Update(in UIElement aParent)
-        {
-            base.Update(aParent);
-        }
-
-
-
-        public override void Draw(SpriteBatch aBatch)
-        { 
-            base.Draw(aBatch);
-        }
     }
 }

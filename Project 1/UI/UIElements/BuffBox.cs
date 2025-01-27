@@ -47,7 +47,7 @@ namespace Project_1.UI.UIElements
         {
             owner = aOwner;
             buffs = new List<Buff>();
-            children.AddRange(buffs);
+            AddChildren(buffs);
             capturesClick = false;
         }
         public bool IsThisMine(Entity aOwner) => aOwner == owner;
@@ -68,8 +68,7 @@ namespace Project_1.UI.UIElements
         void ClearBuffs()
         {
             buffs.Clear();
-            children.Clear();
-
+            KillAllChildren();
         }
 
         void SetAllBuffs(List<GameObjects.Spells.Buff.Buff> aBuff)
@@ -79,14 +78,15 @@ namespace Project_1.UI.UIElements
             {
                 buffs.Add(new Buff(aBuff[i], RelativeScreenPosition.Zero, buffSize));
             }
-            children.AddRange(buffs);
+
+            AddChildren(buffs);
             SortBuffs();
         }
 
         public void AddBuff(GameObjects.Spells.Buff.Buff aBuff)
         {
             buffs.Add(new Buff(aBuff, RelativeScreenPosition.Zero, buffSize));
-            children.Add(buffs.Last());
+            AddChild(buffs.Last());
             SortBuffs();
         }
 
@@ -103,7 +103,7 @@ namespace Project_1.UI.UIElements
             if (buffs.Count == 0) return;
             if (buffs.Last().Duration <= 0)
             {
-                children.Remove(buffs.Last());
+                KillChild(buffs.Count - 1);
                 buffs.RemoveAt(buffs.Count - 1);
                 CheckLast();
             }
@@ -136,11 +136,6 @@ namespace Project_1.UI.UIElements
                 default:
                     throw new NotImplementedException();
             }
-        }
-
-        public override void Draw(SpriteBatch aBatch)
-        {
-            base.Draw(aBatch);
         }
     }
 }

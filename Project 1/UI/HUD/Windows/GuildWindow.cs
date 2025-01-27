@@ -20,8 +20,8 @@ namespace Project_1.UI.HUD.Windows
             roster = new GuildRoster(RelativeScreenPosition.Zero, new (WindowSize.X, 0.17f));
             visibleKey = Input.KeyBindManager.KeyListner.GuildRoster;
 
-            children.Add(roster);
-            ToggleVisibilty();
+            AddChild(roster);
+            //ToggleVisibilty();
         }
 
         public void SetRoster(Friendly[] aData)

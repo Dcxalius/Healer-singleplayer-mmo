@@ -35,22 +35,20 @@ namespace Project_1.UI.HUD
         public InventoryBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground",new Color(80, 80, 80, 80)), aPos, aSize) //this will scale down size to closest fit
         {
             visibleKey = KeyBindManager.KeyListner.Inventory;
-
+            Visible = false;
             //inventory = ObjectManager.Player.Inventory;
             bagHolderBox = new BagHolderBox(new RelativeScreenPosition(spacing.X, aSize.Y - (itemSize.Y + spacing.Y * 3)), new RelativeScreenPosition(itemSize.X * (Inventory.bagSlots + 1) + spacing.X * (Inventory.bagSlots + 2), itemSize.Y + spacing.Y * 2));
 
             columnCount = CalculateColumns(Inventory.defaultSlots, itemSize.X, spacing.X, aSize.X);
             bagBox = new BagBox[Inventory.bagSlots + 1];
 
-            bagBox[0] = new BagBox(0, 0, columnCount, spacing, CalculateBagBoxSize(Inventory.defaultSlots, itemSize, spacing, aSize.X));
+            bagBox[0] = new BagBox(null, 0, 0, columnCount, spacing, CalculateBagBoxSize(Inventory.defaultSlots, itemSize, spacing, aSize.X));
             for (int i = 1; i < bagBox.Length; i++)
             {
-                bagBox[i] = new BagBox(i, 0, 1, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
+                bagBox[i] = new BagBox(null, i, 0, 1, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
             }
-            children.Add(bagHolderBox);
-            children.AddRange(bagBox);
-
-            ToggleVisibilty();
+            AddChild(bagHolderBox);
+            AddChildren(bagBox);
         }
 
         public void SetInventory(Inventory aInventory)
@@ -63,10 +61,12 @@ namespace Project_1.UI.HUD
 
         void CreateBagBoxes(RelativeScreenPosition aSize, Inventory aInventory)
         {
+            KillAllChildren();
+            AddChild(bagHolderBox);
             RelativeScreenPosition bagPos = RelativeScreenPosition.Zero;
             bagPos.X = spacing.X;
             bagPos.Y = CalculateBagBoxSize(Inventory.defaultSlots, itemSize, spacing, aSize.X).Y;
-            bagBox[0] = new BagBox(0, Inventory.defaultSlots, columnCount, spacing, CalculateBagBoxSize(Inventory.defaultSlots, itemSize, spacing, aSize.X));
+            bagBox[0] = new BagBox(aInventory, 0, Inventory.defaultSlots, columnCount, spacing, CalculateBagBoxSize(Inventory.defaultSlots, itemSize, spacing, aSize.X));
             bagPos.Y += spacing.Y;
             bagPos.Y += spacing.Y;
 
@@ -74,15 +74,18 @@ namespace Project_1.UI.HUD
             {
                 if (aInventory.bags[i] == null)
                 {
-                    bagBox[i] = new BagBox(i, 0, 1, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
+                    bagBox[i] = new BagBox(aInventory, i, 0, 1, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
                     continue;
                 }
 
                 RelativeScreenPosition size = CalculateBagBoxSize(aInventory.bags[i].SlotCount, itemSize, spacing, aSize.X);
 
-                bagBox[i] = new BagBox(i, aInventory.bags[i].SlotCount, columnCount, bagPos, size);
+                bagBox[i] = new BagBox(aInventory, i, aInventory.bags[i].SlotCount, columnCount, bagPos, size);
                 bagPos.Y += size.Y + spacing.Y;
             }
+
+            AddChildren(bagBox);
+
         }
 
         public void RefreshSlot(int aBag, int aSlot, Inventory aInventory)
@@ -92,11 +95,11 @@ namespace Project_1.UI.HUD
                 bagHolderBox.RefreshSlot(aSlot);
                 if (aInventory.bags[aSlot] != null)
                 {
-                    bagBox[aSlot].RefreshBag(aInventory.bags[aSlot].SlotCount, columnCount);
+                    bagBox[aSlot].RefreshBag(aInventory, aInventory.bags[aSlot].SlotCount, columnCount);
                     CalculateSize(RelativePos + RelativeSize.OnlyY);
                     return;
                 }
-                bagBox[aSlot].RefreshBag(0, 1);
+                bagBox[aSlot].RefreshBag(aInventory, 0, 1);
 
                 CalculateSize(RelativePos + RelativeSize.OnlyY);
 
@@ -157,10 +160,15 @@ namespace Project_1.UI.HUD
 
         public override void Rescale()
         {
-            base.Rescale();
 
             itemSize = RelativeScreenPosition.GetSquareFromX(itemSizeX);
             spacing = RelativeScreenPosition.GetSquareFromX(spacingX);
+            base.Rescale();
+        }
+
+        public override void Draw(SpriteBatch aBatch, float aLayer)
+        {
+            base.Draw(aBatch, aLayer);
         }
     }
 }

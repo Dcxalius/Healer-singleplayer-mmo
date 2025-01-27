@@ -56,15 +56,15 @@ namespace Project_1.UI.UIElements.Guild
             level = new Label(aGuildMember.CurrentLevel.ToString(), new RelativeScreenPosition(spacing.X + labelPosX, 0), labelSize, Label.TextAllignment.Centred);
             @class = new Label(aGuildMember.Class, new RelativeScreenPosition(spacing.X + labelPosX * 2, 0), labelSize, Label.TextAllignment.CentreRight);
 
-            children.Add(name);
-            children.Add(level);
-            children.Add(@class);
-            children.Add(openCharacterWindow);
-            children.Add(openInventory);
+            AddChild(name);
+            AddChild(level);
+            AddChild(@class);
+            AddChild(openCharacterWindow);
+            AddChild(openInventory);
 
             if (aGuildMember.GetType() != typeof(Player))
             {
-                children.Add(invite);
+                AddChild(invite);
             }
         }
 

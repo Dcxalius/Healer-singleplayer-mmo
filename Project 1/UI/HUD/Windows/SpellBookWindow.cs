@@ -39,9 +39,9 @@ namespace Project_1.UI.HUD.Windows
                 spellBookSpells[i] = new SpellBookSpell(pos, size);
             }
 
-            children.AddRange(spellBookSpells);
+            AddChildren(spellBookSpells);
 
-            ToggleVisibilty();
+            //ToggleVisibilty();
         }
 
         public void AssignSpell(Spell aSpell)

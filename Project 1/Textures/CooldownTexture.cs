@@ -47,9 +47,9 @@ namespace Project_1.Textures
 
 
 
-        public override void Draw(SpriteBatch aBatch, Rectangle aPosition, Color aColor)
+        public override void Draw(SpriteBatch aBatch, Rectangle aPosition, Color aColor, float aLayer)
         {
-            base.Draw(aBatch, new Rectangle(aPosition.Location, GetReducedSize(aPosition.Size)), aColor);
+            base.Draw(aBatch, new Rectangle(aPosition.Location, GetReducedSize(aPosition.Size)), aColor, layer);
             //aBatch.Draw(gfx, aPosRectangle, visRect, aColor);
         }
     }

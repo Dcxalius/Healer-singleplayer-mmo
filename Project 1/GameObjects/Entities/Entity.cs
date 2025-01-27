@@ -413,7 +413,7 @@ namespace Project_1.GameObjects.Entities
             shadow.Draw(aBatch, this);
             selectRing.Draw(aBatch, this);
             base.Draw(aBatch);
-            nameDisplay.CentredDraw(aBatch, (FeetPosition - new WorldSpace(0, Size.Y + nameDisplay.Offset.Y)).ToAbsoltueScreenPosition());
+            nameDisplay.CentredDraw(aBatch, (FeetPosition - new WorldSpace(0, Size.Y + nameDisplay.Offset.Y)).ToAbsoltueScreenPosition(), 1f);
         }
 
         public GuildMember.GuildMemberData CreateGuildMemberData()

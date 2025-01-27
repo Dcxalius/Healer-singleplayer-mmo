@@ -23,7 +23,7 @@ namespace Project_1.UI.UIElements.Inventory
         public BagHolderBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.White), aPos, aSize)
         {
             defaultBag = new Item(-1, 0, false, new GfxPath(GfxType.Item, "DefaultBag"), InventoryBox.spacing, InventoryBox.itemSize);
-            children.Add(defaultBag);
+            AddChild(defaultBag);
         }
 
         public void SetBags(Container[] aBags)
@@ -44,7 +44,7 @@ namespace Project_1.UI.UIElements.Inventory
                 }
             }
 
-            children.AddRange(bags);
+            AddChildren(bags);
         }
 
         public void RefreshSlot(int aSlot)

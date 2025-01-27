@@ -107,11 +107,11 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
         }
 
-        public override void Draw(SpriteBatch aBatch)
+        public override void Draw(SpriteBatch aBatch, float aLayer)
         {
-            base.Draw(aBatch);
+            base.Draw(aBatch, aLayer);
          
-            displayValue.Draw(aBatch); 
+            displayValue.Draw(aBatch, aLayer); 
 
             if (isOpen == false)
             {
@@ -119,7 +119,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
             }
             for (int i = 0; i < values.Length; i++)
             {
-                values[i].Draw(aBatch);
+                values[i].Draw(aBatch, aLayer);
             }
         }
 

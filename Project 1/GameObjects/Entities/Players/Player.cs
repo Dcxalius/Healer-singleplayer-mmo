@@ -38,6 +38,7 @@ namespace Project_1.GameObjects.Entities.Players
         public Player() : base(ObjectFactory.GetData("Player"))
         {
             inventory = new Inventory(this);
+            HUDManager.SetInventory(inventory);
             spellBook = new SpellBook(this);
             party = new Party(this);
             guild = new Guild(this);

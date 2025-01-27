@@ -77,18 +77,39 @@ namespace Project_1.UI.UIElements
         public UITexture Gfx => gfx;
         protected UITexture gfx;
         public Color Color { get => gfx.Color; set => gfx.Color = value; }
+        
+        public float Layer
+        {
+            get => layer;
+            set
+            {
+                layer = (float)value;
+                for (int i = 0; i < children.Count; i++)
+                {
+                    children[i].layer = value + 0.02f;
+                }
+            }
+
+        }
+        float layer;
         #endregion
 
-        public HoldEvent heldEvents; //TODO: This should prob be cleansed on state change
+        public HoldEvent heldEvents;
+
+
 
         #region Parentage
         protected AbsoluteScreenPosition parentPos;
-        protected List<UIElement> children = new List<UIElement>();
+        List<UIElement> children = new List<UIElement>();
+        protected int ChildCount => children.Count;
+
+        protected void KillAllChildren() => children.Clear();
+        protected void KillChild(int aIndex) => children.RemoveAt(aIndex);
+
         #endregion
 
         protected UIElement(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) //aPos and aSize should be between 0 and 1
         {
-            //Debug.Assert(aPos > 0 && aPos < 0);
             visible = true;
             gfx = aGfx;
 
@@ -125,6 +146,33 @@ namespace Project_1.UI.UIElements
 
             HoverUpdate();
             GetVisibiltyPress();
+        }
+
+        protected void AddChild(UIElement aUIElement)
+        {
+            if (aUIElement.gfx != null)
+            {
+                aUIElement.layer = layer + 0.02f;
+
+            }
+            aUIElement.Visible = Visible;
+            children.Add(aUIElement);
+        }
+
+        protected void AddChildren(UIElement[] aUIElement)
+        {
+            for (int i = 0; i < aUIElement.Length; i++)
+            {
+                AddChild(aUIElement[i]);
+            }
+        }
+
+        protected void AddChildren<T>(List<T> aUIElement) where T : UIElement
+        {
+            for (int i = 0; i < aUIElement.Count; i++)
+            {
+                AddChild(aUIElement[i]);
+            }
         }
 
         public virtual void HoldUpdate()
@@ -372,20 +420,20 @@ namespace Project_1.UI.UIElements
         }
         #endregion
 
-        public virtual void Draw(SpriteBatch aBatch)
+        public virtual void Draw(SpriteBatch aBatch, float aLayer)
         {
             if (!visible) return;
 
             if (gfx != null)
             {
 
-                gfx.Draw(aBatch, AbsolutePos);
+                gfx.Draw(aBatch, AbsolutePos, aLayer);
             }
 
             GraphicsManager.CaptureScissor(this, pos);
             foreach (UIElement child in children)
             {
-                child.Draw(aBatch);
+                child.Draw(aBatch, aLayer + 0.01f);
             }
             GraphicsManager.ReleaseScissor(this);
         }

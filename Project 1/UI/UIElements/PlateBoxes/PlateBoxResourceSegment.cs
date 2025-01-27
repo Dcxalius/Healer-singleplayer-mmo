@@ -19,7 +19,7 @@ namespace Project_1.UI.UIElements.PlateBoxes
         {
             resourceBar = new ResourceBar(new BarTexture(BarTexture.FillingDirection.Right, Color.White), new UITexture("WhiteBackground", backgroundColor), RelativeScreenPosition.Zero, aSize);
             
-            children.Add(resourceBar);
+            AddChild(resourceBar);
         }
 
         public override void Refresh(Entity aEntity)

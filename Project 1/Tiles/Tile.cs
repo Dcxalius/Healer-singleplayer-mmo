@@ -59,8 +59,8 @@ namespace Project_1.Tiles
             //xText.LeftAllignedDraw(aBatch, new WorldSpace(Position - Size.ToVector2() / 2).ToAbsoltueScreenPosition());
             if (DebugManager.Mode(DebugMode.TileCoords))
             {
-                xText.CentreLeftDraw(aBatch, new WorldSpace(Position).ToAbsoltueScreenPosition());
-                yText.CentreLeftDraw(aBatch, new WorldSpace(Position + new WorldSpace(xText.Offset.X, 0)).ToAbsoltueScreenPosition());
+                xText.CentreLeftDraw(aBatch, new WorldSpace(Position).ToAbsoltueScreenPosition(), 1f);
+                yText.CentreLeftDraw(aBatch, new WorldSpace(Position + new WorldSpace(xText.Offset.X, 0)).ToAbsoltueScreenPosition(), 1f);
             }
             //Camera.Camera.WorldPosToCameraSpace(Position), 0); 
         }

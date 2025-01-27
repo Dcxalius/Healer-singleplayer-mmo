@@ -19,7 +19,8 @@ namespace Project_1.UI.UIElements.PlateBoxes
         {
             numberLabel = new Label("1", RelativeScreenPosition.Zero, aSize, Label.TextAllignment.Centred);
             capturesClick = false;
-            children.Add(numberLabel);
+
+            AddChild(numberLabel);
         }
 
         public void Refresh(Entity aEntity)
@@ -27,9 +28,9 @@ namespace Project_1.UI.UIElements.PlateBoxes
             numberLabel.Text = aEntity.CurrentLevel.ToString();
         }
 
-        public override void Draw(SpriteBatch aBatch)
+        public override void Draw(SpriteBatch aBatch, float aLayer)
         {
-            base.Draw(aBatch);
+            base.Draw(aBatch, aLayer + 0.1f);
         }
     }
 }

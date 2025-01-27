@@ -15,7 +15,7 @@ namespace Project_1.UI.UIElements.Guild
     internal class InviteButton : GFXButton
     {
         GuildMember friendly;
-        public InviteButton(Friendly aFriendly, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new GfxPath(GfxType.Object, "Walker"), aPos, aSize, Color.White)
+        public InviteButton(Friendly aFriendly, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new GfxPath(GfxType.Object, "Rogue"), aPos, aSize, Color.White)
         {
             if (aFriendly.GetType() != typeof(GuildMember)) return;
             

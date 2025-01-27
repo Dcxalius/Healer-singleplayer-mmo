@@ -72,9 +72,9 @@ namespace Project_1.Managers.States
             GraphicsManager.ClearScreen(Color.Purple);
 
 
-            pauseBatch.Draw(StateManager.FinalGameFrame, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f); //draw game
+            pauseBatch.Draw(StateManager.FinalGameFrame, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f); //draw game
             pauseBackground.Draw(pauseBatch, Vector2.Zero); //draw gray screen overlay
-            pauseBox.Draw(pauseBatch); //draw pause menu
+            pauseBox.Draw(pauseBatch, 1); //draw pause menu
 
 
             pauseBatch.End();

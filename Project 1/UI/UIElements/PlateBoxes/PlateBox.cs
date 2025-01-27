@@ -36,10 +36,10 @@ namespace Project_1.UI.UIElements.PlateBoxes
 
         protected void AddSegmentsToChildren()
         {
-            children.AddRange(leftVerticalSegments);
-            children.AddRange(rightVerticalSegments);
-            children.AddRange(horizontalSegments);
-            children.Add(levelCircle);
+            AddChildren(leftVerticalSegments);
+            AddChildren(rightVerticalSegments);
+            AddChildren(horizontalSegments);
+            AddChild(levelCircle);
         }
     }
 }

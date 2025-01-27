@@ -30,9 +30,5 @@ namespace Project_1.UI.UIElements.SelectBoxes
             
         }
 
-        public override void Draw(SpriteBatch spriteBatch)
-        {
-            base.Draw(spriteBatch);
-        }
     }
 }

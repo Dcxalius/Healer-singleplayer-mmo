@@ -38,20 +38,20 @@ namespace Project_1.UI.UIElements.Guild
         public void SetData(Friendly[] aData)
         {
             guildMembers.Clear();
-            children.Clear();
+            KillAllChildren();
 
             for (int i = 0; i < aData.Length; i++)
             {
                 guildMembers.Add(new GuildMemberListing(aData[i], firstPosition + changeInY * i, size));
             }
             Sort();
-            children.AddRange(guildMembers);
+            AddChildren(guildMembers);
         }
 
         public void AddMember(Friendly aData)
         {
             guildMembers.Add(new GuildMemberListing(aData, firstPosition, size));
-            children.Add(guildMembers.Last());
+            AddChild(guildMembers.Last());
             Sort();
         }
 

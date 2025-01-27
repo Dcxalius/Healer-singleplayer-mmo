@@ -25,11 +25,6 @@ namespace Project_1.UI.UIElements.PlateBoxes
             
         }
 
-        public override void Draw(SpriteBatch aBatch)
-        {
-            base.Draw(aBatch);
-        }
-
         public override void Refresh(Entity aEntity)
         {
             Name = aEntity.Name;

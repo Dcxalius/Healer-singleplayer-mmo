@@ -26,11 +26,11 @@ namespace Project_1.UI.UIElements.Bars
         public Bar(BarTexture aBarGfx, UITexture aBackgroundGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aBackgroundGfx, aPos, aSize)
         {
             barComponent = new BarComponent(aBarGfx, RelativeScreenPosition.Zero, aSize);
-            children.Add(barComponent);
+            AddChild(barComponent);
         }
-        public override void Draw(SpriteBatch aBatch)
+        public override void Draw(SpriteBatch aBatch, float aLayer)
         {
-            base.Draw(aBatch);
+            base.Draw(aBatch, aLayer);
         }
     }
 }

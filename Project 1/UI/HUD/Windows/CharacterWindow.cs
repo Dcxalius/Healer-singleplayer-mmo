@@ -58,12 +58,12 @@ namespace Project_1.UI.HUD.Windows
             stringStatReport = new Label(null, textBoxPos + new RelativeScreenPosition(textBoxSize.X, 0f) + new RelativeScreenPosition(itemSpacing.X, 0), textBoxSize - new RelativeScreenPosition(itemSpacing.X, 0), Label.TextAllignment.TopLeft, Color.Black);
 
             expBar = new ExpBar(expBarPos, expBarSize);
-            children.Add(nameLabel);
-            children.AddRange(equiped);
-            children.Add(nrStatReport);
-            children.Add(stringStatReport);
-            children.Add(expBar);
-            ToggleVisibilty();
+            AddChild(nameLabel);
+            AddChildren(equiped);
+            AddChild(nrStatReport);
+            AddChild(stringStatReport);
+            AddChild(expBar);
+            //ToggleVisibilty();
         }
 
         public void SetData(Friendly aFriendly, PairReport aReport)

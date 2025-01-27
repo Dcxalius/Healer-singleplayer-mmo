@@ -103,7 +103,7 @@ namespace Project_1.UI.HUD
                 totalLoot = 0;
             }
 
-            children.AddRange(loot);
+            AddChildren(loot);
         }
 
         public override void Update(in UIElement aParent)
@@ -116,11 +116,11 @@ namespace Project_1.UI.HUD
 
         void UpdateLootPosition()
         {
-            for (int i = 0; i < children.Count; i++)
+            //for (int i = 0; i < children.Count; i++)
             {
-                if (!loot.Contains(children[i])) continue;
+                //if (!loot.Contains(children[i])) continue;
 
-                children[i].Move(new RelativeScreenPosition(children[i].RelativePos.X, originalYPos[i] - scrollValue));
+                //children[i].Move(new RelativeScreenPosition(children[i].RelativePos.X, originalYPos[i] - scrollValue));
             }
         }
 
@@ -185,7 +185,7 @@ namespace Project_1.UI.HUD
 
         void ClearLoot()
         {
-            children.RemoveAll(child => loot.Contains(child));
+            //children.RemoveAll(child => loot.Contains(child));
             loot = null;
             lootedCorpse = null;
         }

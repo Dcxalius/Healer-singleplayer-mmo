@@ -25,9 +25,9 @@ namespace Project_1.UI.OptionMenu
             firstKeybindingButton = new KeybindingButton(true, aListner, new RelativeScreenPosition(aSize.X/3, 0), new RelativeScreenPosition(aSize.X / 3, aSize.Y));
             secondKeybindingButton = new KeybindingButton(false, aListner, new RelativeScreenPosition(aSize.X * 2 / 3 + spacingX, 0), new RelativeScreenPosition(aSize.X / 3, aSize.Y));
 
-            children.Add(nameOfButton);
-            children.Add(firstKeybindingButton);
-            children.Add(secondKeybindingButton);
+            AddChild(nameOfButton);
+            AddChild(firstKeybindingButton);
+            AddChild(secondKeybindingButton);
         }
     }
 }

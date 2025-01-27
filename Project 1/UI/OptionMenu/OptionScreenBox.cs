@@ -22,10 +22,10 @@ namespace Project_1.UI.OptionMenu
             videoOptionsButton = new VideoOptionsButton(new RelativeScreenPosition(0), buttonSize);
             keybindingsOptionButton = new KeybindingsOptionButton(new RelativeScreenPosition(buttonSize.X, 0), buttonSize);
 
-            children.Add(videoOptionsButton);  
-            children.Add(keybindingsOptionButton);
+            AddChild(videoOptionsButton);  
+            AddChild(keybindingsOptionButton);
 
-            Debug.Assert(children.Count == aCountOfButtons, "Missing buttons in optionpagebox");
+            Debug.Assert(ChildCount == aCountOfButtons, "Missing buttons in optionpagebox");
         }
     }
 }

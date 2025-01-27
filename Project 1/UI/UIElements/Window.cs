@@ -1,4 +1,5 @@
-﻿using Project_1.Camera;
+﻿using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,10 @@ namespace Project_1.UI.UIElements
         }
         public Window(UITexture aGfx) : base(aGfx, RelativeScreenPosition.Zero, size)
         {
-            nrOfBookletsOpen++;//This is because every booklet is technically visible on creation before ToggleVisibilty is called
+            Visible = false;
+            //nrOfBookletsOpen++;//This is because every booklet is technically visible on creation before ToggleVisibilty is called
+
+            Layer = (float)UITexture.Layer.Window / (float)UITexture.Layer.Count;
         }
 
         public override void ToggleVisibilty()
@@ -68,6 +72,11 @@ namespace Project_1.UI.UIElements
                 nextPos = lastPos;
             }
             openWindows.Remove(this);
+        }
+
+        public override void Draw(SpriteBatch aBatch, float aLayer)
+        {
+            base.Draw(aBatch, aLayer + 0.1f);
         }
     }
 }

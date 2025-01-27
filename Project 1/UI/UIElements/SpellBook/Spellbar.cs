@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Textures;
 using System;
@@ -19,7 +20,7 @@ namespace Project_1.UI.UIElements.SpellBook
             float buttonSize = calcButtonSize(aSizeX, aButtonCount);
             //border = new Border(Vector2.Zero, new Vector2(aSizeX, calcY(aSizeX, aButtonCount)));
             border = new Border(RelativeScreenPosition.Zero, RelativeSize);
-            children.Add(border);
+            AddChild(border);
             //Vector2 size = new Vector2(aSize.Y - 0.05f);
             spellButtons = new SpellButton[aButtonCount];
 
@@ -27,7 +28,7 @@ namespace Project_1.UI.UIElements.SpellBook
             {
                 spellButtons[i] = new SpellButton(Input.KeyBindManager.KeyListner.SpellBar1Spell1 + i, new RelativeScreenPosition(offset.X + (offset.X + buttonSize) * i, offset.Y), RelativeScreenPosition.GetSquareFromX(buttonSize));
             }
-            children.AddRange(spellButtons);
+            AddChildren(spellButtons);
         }
 
         static float calcOffset(float aSizeX, int aButtonCount)
@@ -43,6 +44,11 @@ namespace Project_1.UI.UIElements.SpellBook
         static float calcY(float aSizeX, int aButtonCount)
         {
             return RelativeScreenPosition.GetSquareFromX(calcButtonSize(aSizeX, aButtonCount)).Y + RelativeScreenPosition.GetSquareFromX(calcOffset(aSizeX, aButtonCount)).Y * 2;
+        }
+
+        public override void Draw(SpriteBatch aBatch, float aLayer)
+        {
+            base.Draw(aBatch, aLayer + 0.1f);
         }
     }
 }

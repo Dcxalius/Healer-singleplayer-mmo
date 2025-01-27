@@ -100,16 +100,16 @@ namespace Project_1.UI.OptionMenu
             }
         }
 
-        public static void Draw(SpriteBatch aBatch)
+        public static void Draw(SpriteBatch aBatch, float aLayer)
         {
             for (int i = 0; i < optionScreenPermanents.Count; i++)
             {
-                optionScreenPermanents[i].Draw(aBatch);
+                optionScreenPermanents[i].Draw(aBatch, aLayer);
             }
 
             for (int i = 0; i < optionElements[(int)currentScreen].Count; i++)
             {
-                optionElements[(int)currentScreen][i].Draw(aBatch);
+                optionElements[(int)currentScreen][i].Draw(aBatch, aLayer);
             }
         }
 

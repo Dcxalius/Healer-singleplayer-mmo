@@ -56,7 +56,7 @@ namespace Project_1.GameObjects
             GraphicsManager.ClearScreen(Color.Transparent);
             spriteBatch.Begin(SpriteSortMode.Deferred);
             //spriteBatch.Begin(samplerState : SamplerState.PointClamp, effect : TextureManager.textOutline);
-            text.CentreLeftDraw(spriteBatch, new AbsoluteScreenPosition(0, textSize.Y / 2));
+            text.CentreLeftDraw(spriteBatch, new AbsoluteScreenPosition(0, textSize.Y / 2), 1f);
             
             spriteBatch.End();
             GraphicsManager.SetRenderTarget(null);
