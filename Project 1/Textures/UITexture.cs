@@ -48,7 +48,6 @@ namespace Project_1.Textures
             }
             if (Camera.Camera.MomAmIInFrame(aPosRectangle))
             {
-                DebugManager.Print(GetType(), "layer:" + aLayer);
                 aBatch.Draw(gfx, aPosRectangle, Visible, aColor, Rotation, offset, flip, aLayer); //TODO: Layer is hacky AF, fix pls
 
             }

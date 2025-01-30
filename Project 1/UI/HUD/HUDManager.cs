@@ -20,6 +20,7 @@ using SharpDX.MediaFoundation.DirectX;
 using SharpDX.XAudio2;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,7 +32,7 @@ namespace Project_1.UI.HUD
     {
         static PlayerPlateBox playerPlateBox;
         static TargetPlateBox targetPlateBox;
-        static PartyPlateBox[] partyPlateBoxes = new PartyPlateBox[4];
+        static PartyPlateBox[] partyPlateBoxes;
         static BuffBox playerBuffBox;
         static BuffBox targetBuffBox;
         static BuffBox[] partyBuffBoxes = new BuffBox[4];
@@ -61,10 +62,25 @@ namespace Project_1.UI.HUD
             hudElements.Add(playerPlateBox);
             targetPlateBox = new TargetPlateBox(new RelativeScreenPosition(0.33f, 0.1f), new RelativeScreenPosition(0.2f, 0.1f));
             hudElements.Add(targetPlateBox);
+            partyPlateBoxes = new PartyPlateBox[4];
+            for (int i = 0; i < partyPlateBoxes.Length; i++)
+            {
+                partyPlateBoxes[i] = new PartyPlateBox(i);
+            }
+            hudElements.AddRange(partyPlateBoxes);
+
+
             playerBuffBox = new BuffBox(ObjectManager.Player, BuffBox.FillDirection.TopRightToDown, new RelativeScreenPosition(0.01f, 0.1f), new RelativeScreenPosition(0.08f, 0.1f));
             hudElements.Add(playerBuffBox);
             targetBuffBox = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, new RelativeScreenPosition(0.33f, 0.21f), new RelativeScreenPosition(0.2f, 0.1f));
             hudElements.Add(targetBuffBox);
+            partyBuffBoxes = new BuffBox[4];
+            RelativeScreenPosition pBuffBoxSize = new RelativeScreenPosition(0.08f, 0.1f);
+            for (int i = 0; i < partyBuffBoxes.Length; i++)
+            {
+                partyBuffBoxes[i] = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, partyPlateBoxes[i].RelativePos - pBuffBoxSize.OnlyX, pBuffBoxSize);
+            }
+            hudElements.AddRange(partyBuffBoxes);
 
             lootBox = new LootBox(new RelativeScreenPosition(0.1f, 0.5f), new RelativeScreenPosition(0.4f, 0.4f));
             hudElements.Add(lootBox);
@@ -159,56 +175,83 @@ namespace Project_1.UI.HUD
         #endregion
 
         #region Control
-        public static void AddWalkerToParty(GameObjects.Entities.GuildMember aWalker)
+        public static void AddWalkerToParty(GuildMember aGuildMember)
         {
-            int openIndex = -1;
-            for (int i = 0; i < partyPlateBoxes.Length; i++)
-            {
-                if (partyPlateBoxes[i] == null)
-                {
-                    openIndex = i;
-                    break;
-                }
-            }
-
-            if (openIndex == -1)
+            if (PartyPlateBox.PartyBoxesActive >= 4)
             {
                 DebugManager.Print(typeof(HUDManager), "Tried to add to full party.");
                 return;
             }
 
-            partyPlateBoxes[openIndex] = new PartyPlateBox(aWalker, new RelativeScreenPosition(0.1f, 0.24f), new RelativeScreenPosition(0.2f, 0.1f)); //TODO: Fix temp values
-            partyBuffBoxes[openIndex] = new BuffBox(aWalker, BuffBox.FillDirection.TopRightToDown, new RelativeScreenPosition(0.01f, 0.24f), new RelativeScreenPosition(0.08f, 0.1f));
-            partyBuffBoxes[openIndex].AssignBox(aWalker);
-            hudElements.Add(partyPlateBoxes[openIndex]);
-            hudElements.Add(partyBuffBoxes[openIndex]);
+            partyPlateBoxes[PartyPlateBox.PartyBoxesActive].SetTarget(aGuildMember);
+            partyBuffBoxes[PartyPlateBox.PartyBoxesActive - 1].AssignBox(aGuildMember);
         }
-        public static void AddWalkerToControl(GameObjects.Entities.GuildMember aWalker)
+
+        public static void RemoveWalkerFromParty(GuildMember aGuildMember)
+        {
+            int index = FindGuildMemberPartyIndex(aGuildMember);
+
+            Debug.Assert(index >= 0);
+
+            if (PartyPlateBox.PartyBoxesActive - 1 == index)
+            {
+                partyPlateBoxes[index].RemoveTarget();
+                return;
+            }
+
+            for (int i = index; i < PartyPlateBox.PartyBoxesActive - index - 1; i++)
+            {
+                partyPlateBoxes[i].SetTarget(partyPlateBoxes[i + 1].GuildMember);
+            }
+
+            partyPlateBoxes[PartyPlateBox.PartyBoxesActive - 1].RemoveTarget();
+        }
+
+        public static int FindGuildMemberPartyIndex(GuildMember aGuildMember)
         {
             for (int i = 0; i < partyPlateBoxes.Length; i++)
             {
-                if (partyPlateBoxes[i].BelongsTo(aWalker))
+                if (partyPlateBoxes[i].BelongsTo(aGuildMember))
                 {
-                    partyPlateBoxes[i].VisibleBorder = true;
-                    break;
+                    return i;
                 }
 
+            }
+
+            return -1;
+        }
+
+        public static void AddWalkersToControl(GuildMember[] aGuildMembers)
+        {
+            for (int i = 0; i < aGuildMembers.Length; i++)
+            {
+                AddWalkerToControl(aGuildMembers[i]);
             }
         }
-        public static void RemoveWalkersFromControl(GameObjects.Entities.GuildMember[] aWalkers)
-        {
-            for (int i = 0; i < aWalkers.Length; i++)
-            {
-                for (int j = 0; j < partyPlateBoxes.Length; j++)
-                {
 
-                    if (partyPlateBoxes[j].BelongsTo(aWalkers[i]))
-                    {
-                        partyPlateBoxes[j].VisibleBorder = false;
-                        break;
-                    }
-                }
+        public static void AddWalkerToControl(GuildMember aGuildMember)
+        {
+            int index = FindGuildMemberPartyIndex(aGuildMember);
+
+            if (index == -1) return;
+
+            partyPlateBoxes[index].VisibleBorder = false;
+        }
+        public static void RemoveWalkersFromControl(GuildMember[] aGuildMembers)
+        {
+            for (int i = 0; i < aGuildMembers.Length; i++)
+            {
+                RemoveWalkerFromControl(aGuildMembers[i]);
             }
+        }
+
+        public static void RemoveWalkerFromControl(GuildMember aGuildmember)
+        {
+            int index = FindGuildMemberPartyIndex(aGuildmember);
+
+            if (index == -1) return;
+
+            partyPlateBoxes[index].VisibleBorder = false;
         }
 
         #endregion

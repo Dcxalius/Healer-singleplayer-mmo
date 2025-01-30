@@ -48,11 +48,12 @@ namespace Project_1.Managers
 
         static Rectangle unCaptueredScissorRect;
         static object scissorRectCaptor = null;
+        static List<(object, Rectangle)> scissors;
 
         public static void Init()
         {
 
-
+            scissors = new List<(object, Rectangle)>();
             SetWindowSize(Camera.Camera.devScreenBorder, fullsceen, borderlessFullscreen);
 
         }
@@ -64,28 +65,59 @@ namespace Project_1.Managers
 
         public static bool CaptureScissor(object aCaptor, Rectangle aRect)
         {
-            if (scissorRectCaptor != null)
+
+            Rectangle r = aRect;
+
+            for (int i = 0; i < scissors.Count; i++)
             {
-                return false;
+                r = Rectangle.Intersect(r, scissors[i].Item2);
+                //r = Rectangle.Union(aRect, scissors[i].Item2);
             }
 
-            scissorRectCaptor = aCaptor;
-            graphicsDeviceManager.GraphicsDevice.ScissorRectangle = aRect;
+            //Debug.Assert(r == aRect);
+
+            scissors.Add((aCaptor, r));
+
+            graphicsDeviceManager.GraphicsDevice.ScissorRectangle = r;
+
+
 
             return true;
+            //if (scissorRectCaptor != null)
+            //{
+            //    return false;
+            //}
+
+            //scissorRectCaptor = aCaptor;
+            //graphicsDeviceManager.GraphicsDevice.ScissorRectangle = aRect;
+
+            //return true;
         }
 
         public static bool ReleaseScissor(object aReleaser)
         {
-            if (scissorRectCaptor != aReleaser ) 
+
+            Debug.Assert(aReleaser == scissors[scissors.Count - 1].Item1);
+            scissors.RemoveAt((scissors.Count - 1));
+
+
+            if (scissors.Count == 0)
             {
-                return false;
+                graphicsDeviceManager.GraphicsDevice.ScissorRectangle = unCaptueredScissorRect;
+                return true;
             }
 
-            scissorRectCaptor = null;
-            graphicsDeviceManager.GraphicsDevice.ScissorRectangle = unCaptueredScissorRect;
-
+            graphicsDeviceManager.GraphicsDevice.ScissorRectangle = scissors[scissors.Count - 1].Item2;
             return true;
+            //if (scissorRectCaptor != aReleaser ) 
+            //{
+            //    return false;
+            //}
+
+            //scissorRectCaptor = null;
+            //graphicsDeviceManager.GraphicsDevice.ScissorRectangle = unCaptueredScissorRect;
+
+            //return true;
         }
         public static SpriteBatch CreateSpriteBatch()
         {
@@ -262,16 +294,6 @@ namespace Project_1.Managers
         {
 
             fullsceen = !fullsceen;
-        }
-
-        public static void DrawGameToCamera()
-        {
-            
-        }
-
-        public static void OptionDraw()
-        {
-            
         }
     }
 }

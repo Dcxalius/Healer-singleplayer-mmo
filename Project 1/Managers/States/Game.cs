@@ -107,7 +107,7 @@ namespace Project_1.Managers.States
         void UIDraw()
         {
             GraphicsManager.SetRenderTarget(uITarget);
-            uIDraw.Begin(SpriteSortMode.FrontToBack, null, null, null, rasterizerState);
+            uIDraw.Begin(SpriteSortMode.Immediate, null, null, null, rasterizerState);
             
             GraphicsManager.ClearScreen(Color.Transparent);
             HUDManager.Draw(uIDraw);

@@ -430,7 +430,7 @@ namespace Project_1.UI.UIElements
                 gfx.Draw(aBatch, AbsolutePos, aLayer);
             }
 
-            GraphicsManager.CaptureScissor(this, pos);
+            GraphicsManager.CaptureScissor(this, AbsolutePos);
             foreach (UIElement child in children)
             {
                 child.Draw(aBatch, aLayer + 0.01f);

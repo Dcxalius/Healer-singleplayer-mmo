@@ -17,24 +17,29 @@ namespace Project_1.UI.HUD.PlateBoxes
     internal class PartyPlateBox : PlateBox
     {
         public bool VisibleBorder { get => border.Visible; set => border.Visible = value; }
-        static GuildMember walker;
+        public GuildMember GuildMember => guildMember;
+        GuildMember guildMember;
 
-        static PlateBoxNameSegment name;
-        static PlateBoxHealthSegment health;
-        static PlateBoxResourceSegment resource;
+        PlateBoxNameSegment name;
+        PlateBoxHealthSegment health;
+        PlateBoxResourceSegment resource;
 
         CommandBorder border;
 
-        public PartyPlateBox(GuildMember aWalker, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize)
+        static RelativeScreenPosition firstPosition = new RelativeScreenPosition(0.1f, 0.24f); //Check values
+        static RelativeScreenPosition size = new RelativeScreenPosition(0.2f, 0.1f);
+        static float spacing = 0.05f;
+
+        static RelativeScreenPosition GetPosition(int aIndex) => firstPosition + new RelativeScreenPosition(0, size.Y + spacing) * aIndex;
+        public static int PartyBoxesActive => partyBoxesActive;
+        static int partyBoxesActive = 0;
+
+        public PartyPlateBox(int aIndex) : base(GetPosition(aIndex), size)
         {
-            walker = aWalker;
+            name = new PlateBoxNameSegment(null, Color.White, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(size.X, size.Y / 2));
+            health = new PlateBoxHealthSegment(new RelativeScreenPosition(0, size.Y / 2), new RelativeScreenPosition(size.X, size.Y / 4));
 
-            name = new PlateBoxNameSegment(walker.Name, walker.RelationColor, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(aSize.X, aSize.Y / 2));
-            health = new PlateBoxHealthSegment(new RelativeScreenPosition(0, aSize.Y / 2), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
-
-            health.SetTarget(aWalker);
-            resource = new PlateBoxResourceSegment(new RelativeScreenPosition(0, aSize.Y / 4 * 3), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
-            resource.SetTarget(aWalker);
+            resource = new PlateBoxResourceSegment(new RelativeScreenPosition(0, size.Y / 4 * 3), new RelativeScreenPosition(size.X, size.Y / 4));
 
             //health = new PlateBoxHealthSegment(walker, new Vector2(0, 0), new Vector2(aSize.X, aSize.Y / 2));
 
@@ -45,24 +50,43 @@ namespace Project_1.UI.HUD.PlateBoxes
 
             AddSegmentsToChildren();
 
-            border = new CommandBorder(Color.YellowGreen, RelativeScreenPosition.Zero, aSize);
+            border = new CommandBorder(Color.YellowGreen, RelativeScreenPosition.Zero, size);
             AddChild(border);
             VisibleBorder = false;
+            Visible = false;
         }
 
 
-        public bool BelongsTo(GuildMember aWalker)
+        public bool BelongsTo(GuildMember aGuildMember)
         {
-            return aWalker == walker;
+            return aGuildMember == guildMember;
 
         }
 
+        public void SetTarget(GuildMember aGuildMember)
+        {
+            if (guildMember == null) partyBoxesActive += 1;
+
+            guildMember = aGuildMember;
+            health.SetTarget(aGuildMember);
+            resource.SetTarget(aGuildMember);
+            name.Refresh(aGuildMember);
+            Visible = true;
+
+        }
+
+        public void RemoveTarget()
+        {
+            guildMember = null;
+            partyBoxesActive -= 1;
+            Visible = false;
+        }
 
         public override void HoldReleaseOnMe()
         {
             base.HoldReleaseOnMe();
 
-            ObjectManager.Player.SetTarget(walker);
+            ObjectManager.Player.SetTarget(guildMember);
         }
 
         protected override bool ClickedOnChildren(ClickEvent aClick)
@@ -72,7 +96,7 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         protected override void ClickedOnMe(ClickEvent aClick)
         {
-            walker.Command(aClick);
+            guildMember.Command(aClick);
 
             base.ClickedOnMe(aClick);
         }
