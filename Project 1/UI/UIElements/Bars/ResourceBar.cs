@@ -76,13 +76,13 @@ namespace Project_1.UI.UIElements.Bars
             percentageText.Rescale();
         }
 
-        public override void Draw(SpriteBatch aBatch, float aLayer)
+        public override void Draw(SpriteBatch aBatch)
         {
-            base.Draw(aBatch, aLayer);
+            base.Draw(aBatch);
 
             //fractionText.CentredDraw(aBatch, AbsolutePos.Center.ToVector2());
-            fractionText.CentreLeftDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Left + 5, AbsolutePos.Center.Y), aLayer + 0.05f);
-            percentageText.CentreRightDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Right - 5, AbsolutePos.Center.Y), aLayer + 0.05f);
+            fractionText.CentreLeftDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Left + 5, AbsolutePos.Center.Y));
+            percentageText.CentreRightDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Right - 5, AbsolutePos.Center.Y));
         }
     }
 }

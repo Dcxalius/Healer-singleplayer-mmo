@@ -95,9 +95,9 @@ namespace Project_1.UI.UIElements.SpellBook
             //emptyBorder.Rescale();
         }
 
-        public override void Draw(SpriteBatch aBatch, float aLayer)
+        public override void Draw(SpriteBatch aBatch)
         {
-            base.Draw(aBatch, aLayer + 0.01f);
+            base.Draw(aBatch);
 
             if (spellData == null)
             {
@@ -107,7 +107,7 @@ namespace Project_1.UI.UIElements.SpellBook
 
             if (!spellData.OffCooldown || !ObjectManager.Player.OffGlobalCooldown)
             {
-                onCooldownGfx.Draw(aBatch, AbsolutePos, Color.White, aLayer + 0.05f);
+                onCooldownGfx.Draw(aBatch, AbsolutePos, Color.White);
             }
 
 

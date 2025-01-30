@@ -53,25 +53,25 @@ namespace Project_1.Textures
         }
 
 
-        public void TopLeftDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, float aLayer) => Draw(aBatch, aPos, Vector2.Zero, aLayer);
-        public void TopCentreDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, float aLayer) => Draw(aBatch, aPos, new Vector2(offset.X / 2, 0), aLayer);
-        public void TopRightDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, float aLayer) => Draw(aBatch, aPos, new Vector2(offset.X, 0), aLayer);
+        public void TopLeftDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, Vector2.Zero);
+        public void TopCentreDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X / 2, 0));
+        public void TopRightDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X, 0));
 
-        public void CentreLeftDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, float aLayer) => Draw(aBatch, aPos, new Vector2(0, offset.Y / 2), aLayer); //Offset by half y
-        public void CentredDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, float aLayer) => Draw(aBatch, aPos, offset / 2, aLayer); //Offsets by half of textsize
-        public void CentreRightDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, float aLayer) => Draw(aBatch, aPos, new Vector2(offset.X, offset.Y / 2), aLayer); //Offset by textlength and half y
+        public void CentreLeftDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(0, offset.Y / 2)); //Offset by half y
+        public void CentredDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, offset / 2); //Offsets by half of textsize
+        public void CentreRightDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X, offset.Y / 2)); //Offset by textlength and half y
 
-        public void BottomLeftDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, float aLayer) => Draw(aBatch, aPos, new Vector2(0, offset.Y), aLayer);
-        public void BottomCentreDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, float aLayer) => Draw(aBatch, aPos, new Vector2(offset.X / 2, offset.Y), aLayer);
-        public void BottomRightDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, float aLayer) => Draw(aBatch, aPos, new Vector2(offset.X, offset.Y), aLayer);
+        public void BottomLeftDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(0, offset.Y));
+        public void BottomCentreDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X / 2, offset.Y));
+        public void BottomRightDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X, offset.Y));
 
 
 
-        void Draw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, Vector2 aOffset, float aLayer)
+        void Draw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, Vector2 aOffset)
         {
             if (textToDisplay == null) return;
 
-            aBatch.DrawString(font, textToDisplay, aPos.ToVector2(), color, 0f, aOffset, scale, SpriteEffects.None, aLayer);
+            aBatch.DrawString(font, textToDisplay, aPos.ToVector2(), color, 0f, aOffset, scale, SpriteEffects.None, 1f);
         }
     }
 }

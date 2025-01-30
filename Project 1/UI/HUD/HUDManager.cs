@@ -383,7 +383,7 @@ namespace Project_1.UI.HUD
         {
             for (int i = 0; i < hudElements.Count; i++)
             {
-                hudElements[i].Draw(aBatch, 0);
+                hudElements[i].Draw(aBatch);
             }
 
             heldItem.Draw(aBatch);

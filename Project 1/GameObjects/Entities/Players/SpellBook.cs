@@ -26,7 +26,7 @@ namespace Project_1.GameObjects.Entities.Players
         public void AddSpell(Spell aSpell)
         {
             knownSpells.Add(aSpell);
-            //HUDManager.AddSpellToSpellBook(aSpell);
+            HUDManager.AddSpellToSpellBook(aSpell);
         }
 
         public bool HasSpell(Spell aSpell)

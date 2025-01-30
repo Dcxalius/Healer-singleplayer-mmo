@@ -75,10 +75,10 @@ namespace Project_1.UI.UIElements
             //gfx = new Textures.UITexture(text, size.ToPoint());
         }
 
-        public override void Draw(SpriteBatch aBatch, float aLayer)
+        public override void Draw(SpriteBatch aBatch)
         {
             if (!visible) return;
-            base.Draw(aBatch, aLayer);
+            base.Draw(aBatch);
         }
     }
 }

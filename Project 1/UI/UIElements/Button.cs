@@ -65,26 +65,26 @@ namespace Project_1.UI.UIElements
         }
 
 
-        public override void Draw(SpriteBatch aBatch, float aLayer)
+        public override void Draw(SpriteBatch aBatch)
         {
             if (!pressed || !usesPressedGfx)
             {
-                base.Draw(aBatch, aLayer);
+                base.Draw(aBatch);
             }
             else
             {
-                pressedGfx.Draw(aBatch, AbsolutePos, aLayer);
+                pressedGfx.Draw(aBatch, AbsolutePos);
             }
 
             if (text.Value == null)
             {
                 return;
             }
-            text.CentredDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Center), aLayer + 0.01f);
+            text.CentredDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Center));
 
             if (wasHovered)
             {
-                //hoverGfx.Draw(aBatch, AbsolutePos, Layer);
+                //hoverGfx.Draw(aBatch, AbsolutePos);
             }
         }
     }

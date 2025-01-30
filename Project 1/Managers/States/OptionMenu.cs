@@ -55,7 +55,7 @@ namespace Project_1.Managers.States
             GraphicsManager.SetRenderTarget(optionDraw);
             optionBatch.Begin();
 
-            OptionManager.Draw(optionBatch, 1f);
+            OptionManager.Draw(optionBatch);
 
             optionBatch.End();
             GraphicsManager.SetRenderTarget(null);

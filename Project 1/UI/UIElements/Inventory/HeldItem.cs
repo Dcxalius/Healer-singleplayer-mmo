@@ -45,8 +45,8 @@ namespace Project_1.UI.UIElements.Inventory
 
             Rectangle pos = new Rectangle((InputManager.GetMousePosAbsolute() - grabOffset), size);
             Color transparent = new Color(80, 80, 80, 80);
-            heldItem.Gfx.Draw(aBatch, pos, transparent, 1f);
-            heldItem.GfxOnButton.Draw(aBatch, pos, transparent, 1f);
+            heldItem.Gfx.Draw(aBatch, pos, transparent);
+            heldItem.GfxOnButton.Draw(aBatch, pos, transparent);
         }
     }
 }

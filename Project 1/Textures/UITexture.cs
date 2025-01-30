@@ -35,12 +35,12 @@ namespace Project_1.Textures
         }
 
 
-        public virtual void Draw(SpriteBatch aBatch, Rectangle aPosRectangle, float aLayer)
+        public virtual void Draw(SpriteBatch aBatch, Rectangle aPosRectangle)
         {
-            Draw(aBatch, aPosRectangle, Color, aLayer);
+            Draw(aBatch, aPosRectangle, Color);
         }
 
-        public virtual void Draw(SpriteBatch aBatch, Rectangle aPosRectangle, Color aColor, float aLayer)
+        public virtual void Draw(SpriteBatch aBatch, Rectangle aPosRectangle, Color aColor)
         {
             if (gfx == null)
             {
@@ -48,7 +48,7 @@ namespace Project_1.Textures
             }
             if (Camera.Camera.MomAmIInFrame(aPosRectangle))
             {
-                aBatch.Draw(gfx, aPosRectangle, Visible, aColor, Rotation, offset, flip, aLayer); //TODO: Layer is hacky AF, fix pls
+                aBatch.Draw(gfx, aPosRectangle, Visible, aColor, Rotation, offset, flip, 1f);
 
             }
         }

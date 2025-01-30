@@ -77,11 +77,11 @@ namespace Project_1.UI.HUD.PlateBoxes
         }
 
 
-        public override void Draw(SpriteBatch aBatch, float aLayer)
+        public override void Draw(SpriteBatch aBatch)
         {
             if (targetEntity == null) return;
 
-            base.Draw(aBatch, aLayer);
+            base.Draw(aBatch);
         }
 
     }

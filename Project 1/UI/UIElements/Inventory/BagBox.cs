@@ -79,9 +79,9 @@ namespace Project_1.UI.UIElements.Inventory
             GetBagContent(aInventory, aSlotCount, aColumnCount);
         }
 
-        public override void Draw(SpriteBatch aBatch, float aLayer)
+        public override void Draw(SpriteBatch aBatch)
         {
-            base.Draw(aBatch, aLayer);
+            base.Draw(aBatch);
         }
     }
 }

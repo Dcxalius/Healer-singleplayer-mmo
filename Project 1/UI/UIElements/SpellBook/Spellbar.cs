@@ -46,9 +46,9 @@ namespace Project_1.UI.UIElements.SpellBook
             return RelativeScreenPosition.GetSquareFromX(calcButtonSize(aSizeX, aButtonCount)).Y + RelativeScreenPosition.GetSquareFromX(calcOffset(aSizeX, aButtonCount)).Y * 2;
         }
 
-        public override void Draw(SpriteBatch aBatch, float aLayer)
+        public override void Draw(SpriteBatch aBatch)
         {
-            base.Draw(aBatch, aLayer + 0.1f);
+            base.Draw(aBatch);
         }
     }
 }

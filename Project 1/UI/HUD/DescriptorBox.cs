@@ -83,21 +83,21 @@ namespace Project_1.UI.HUD
             maxX = (new RelativeScreenPosition(0.15f).ToAbsoluteScreenPos()).X;
         }
 
-        public override void Draw(SpriteBatch aBatch, float aLayer)
+        public override void Draw(SpriteBatch aBatch)
         {
-            base.Draw(aBatch, aLayer);
-            DrawText(aBatch, aLayer);
+            base.Draw(aBatch);
+            DrawText(aBatch);
         }
 
-        void DrawText(SpriteBatch aBatch, float aLayer)
+        void DrawText(SpriteBatch aBatch)
         {
 
             AbsoluteScreenPosition spacing = (RelativeScreenPosition.GetSquareFromX(0.005f).ToAbsoluteScreenPos());
             AbsoluteScreenPosition offsetName = new AbsoluteScreenPosition(0, (int)(descriptedName.Offset.Y / 2f));
             AbsoluteScreenPosition pos = ((AbsoluteScreenPosition)AbsolutePos.Location + spacing + offsetName);
             AbsoluteScreenPosition offsetDesc = new AbsoluteScreenPosition(0, (int)(description.Offset.Y / 2));
-            descriptedName.CentreLeftDraw(aBatch, pos, 0.9f);
-            description.CentreLeftDraw(aBatch, pos + offsetDesc + new AbsoluteScreenPosition(0, spacing.Y) * (1 + descriptedName.NameLines), 0.9f);
+            descriptedName.CentreLeftDraw(aBatch, pos);
+            description.CentreLeftDraw(aBatch, pos + offsetDesc + new AbsoluteScreenPosition(0, spacing.Y) * (1 + descriptedName.NameLines));
         }
     }
 }

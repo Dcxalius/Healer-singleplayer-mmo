@@ -44,7 +44,7 @@ namespace Project_1.UI.UIElements.SpellBook
             Rectangle pos = new Rectangle(InputManager.GetMousePosAbsolute() - grabOffset, size);
 
             Color transparent = new Color(80, 80, 80, 80);
-            gfx.Draw(aBatch, pos, transparent, (float)UITexture.Layer.Count);
+            gfx.Draw(aBatch, pos, transparent);
         }
             
     }

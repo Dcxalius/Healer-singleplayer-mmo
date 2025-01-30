@@ -54,12 +54,12 @@ namespace Project_1.UI.UIElements.Bars
             castSpell = aSpell;
         }
 
-        public override void Draw(SpriteBatch aBatch, float aLayer)
+        public override void Draw(SpriteBatch aBatch)
         {
             if (castSpell == null) return;
-            base.Draw(aBatch, aLayer);
-            spellTexture.Draw(aBatch, new Rectangle(AbsolutePos.Location, new Point(AbsolutePos.Size.Y)), aLayer);
-            remainingCast.CentreRightDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Right - 5, AbsolutePos.Center.Y), aLayer + 0.001f);
+            base.Draw(aBatch);
+            spellTexture.Draw(aBatch, new Rectangle(AbsolutePos.Location, new Point(AbsolutePos.Size.Y)));
+            remainingCast.CentreRightDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Right - 5, AbsolutePos.Center.Y));
         }
     }
 }

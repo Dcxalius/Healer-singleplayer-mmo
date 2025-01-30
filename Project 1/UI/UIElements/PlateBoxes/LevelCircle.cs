@@ -28,9 +28,9 @@ namespace Project_1.UI.UIElements.PlateBoxes
             numberLabel.Text = aEntity.CurrentLevel.ToString();
         }
 
-        public override void Draw(SpriteBatch aBatch, float aLayer)
+        public override void Draw(SpriteBatch aBatch)
         {
-            base.Draw(aBatch, aLayer + 0.1f);
+            base.Draw(aBatch);
         }
     }
 }

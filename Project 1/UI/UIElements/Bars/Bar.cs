@@ -28,9 +28,9 @@ namespace Project_1.UI.UIElements.Bars
             barComponent = new BarComponent(aBarGfx, RelativeScreenPosition.Zero, aSize);
             AddChild(barComponent);
         }
-        public override void Draw(SpriteBatch aBatch, float aLayer)
+        public override void Draw(SpriteBatch aBatch)
         {
-            base.Draw(aBatch, aLayer);
+            base.Draw(aBatch);
         }
     }
 }

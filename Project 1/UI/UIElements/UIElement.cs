@@ -420,20 +420,20 @@ namespace Project_1.UI.UIElements
         }
         #endregion
 
-        public virtual void Draw(SpriteBatch aBatch, float aLayer)
+        public virtual void Draw(SpriteBatch aBatch)
         {
             if (!visible) return;
 
             if (gfx != null)
             {
 
-                gfx.Draw(aBatch, AbsolutePos, aLayer);
+                gfx.Draw(aBatch, AbsolutePos);
             }
 
             GraphicsManager.CaptureScissor(this, AbsolutePos);
             foreach (UIElement child in children)
             {
-                child.Draw(aBatch, aLayer + 0.01f);
+                child.Draw(aBatch);
             }
             GraphicsManager.ReleaseScissor(this);
         }

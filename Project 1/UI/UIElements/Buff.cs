@@ -29,11 +29,11 @@ namespace Project_1.UI.UIElements
 
             xdd.Value = Math.Round(Duration / 1000, 1).ToString();
         }
-        public override void Draw(SpriteBatch aBatch, float aLayer)
+        public override void Draw(SpriteBatch aBatch)
         {
-            base.Draw(aBatch, aLayer);
+            base.Draw(aBatch);
 
-            xdd.CentredDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Center.X, AbsolutePos.Center.Y + AbsolutePos.Size.Y - 3), aLayer + 0.01f);
+            xdd.CentredDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Center.X, AbsolutePos.Center.Y + AbsolutePos.Size.Y - 3));
         }
 
         
