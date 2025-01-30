@@ -31,6 +31,8 @@ namespace Project_1.UI.UIElements
             set => underlyingText.Value = value;
         }
 
+        public Vector2 UnderlyingTextOffset => underlyingText.Offset;
+
         TextAllignment textAlignment;
 
         Text underlyingText;

@@ -14,6 +14,8 @@ namespace Project_1.Camera
 
         public static WorldSpace Zero { get { return new WorldSpace(); } }
 
+        public WorldSpace OnlyX => new WorldSpace(position.X, 0);
+        public WorldSpace OnlyY => new WorldSpace(0, position.Y);
         public float X { get { return position.X; }  set { position.X = value; } }
         public float Y { get { return position.Y; } set { position.Y = value; } }
 
@@ -49,7 +51,7 @@ namespace Project_1.Camera
             //return new AbsoluteScreenPosition((int)Math.Round(this.X * Camera.Scale - topLeft.X, MidpointRounding.ToPositiveInfinity), (int)Math.Round(this.Y * Camera.Scale - topLeft.Y, MidpointRounding.ToPositiveInfinity));
             return new AbsoluteScreenPosition((int)Math.Floor(this.X * Camera.Scale - topLeft.X), (int)Math.Floor(this.Y * Camera.Scale - topLeft.Y)); //TODO: Find out wtf is wrong with this.
         }
-        public static WorldSpace FromRelaticeScreenSpace(RelativeScreenPosition aScreenSpace)
+        public static WorldSpace FromRelativeScreenSpace(RelativeScreenPosition aScreenSpace)
         {
             return FromAbsoluteScreenSpace(aScreenSpace.ToAbsoluteScreenPos());
         }

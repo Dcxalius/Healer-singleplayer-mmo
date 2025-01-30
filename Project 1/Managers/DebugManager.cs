@@ -135,7 +135,7 @@ namespace Project_1.Managers
             if (!KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugTeleport)) return;
             
 
-            ObjectManager.Player.Teleport(WorldSpace.FromRelaticeScreenSpace(InputManager.GetMousePosRelative()));
+            ObjectManager.Player.Teleport(WorldSpace.FromRelativeScreenSpace(InputManager.GetMousePosRelative()));
         }
         public static void Draw(SpriteBatch aBatch)
         {

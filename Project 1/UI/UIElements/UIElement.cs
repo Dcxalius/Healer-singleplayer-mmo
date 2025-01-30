@@ -19,7 +19,7 @@ namespace Project_1.UI.UIElements
     internal abstract class UIElement
     {
         #region Interactibility
-        protected bool Visible
+        public bool Visible
         {
             get => visible;
 
@@ -76,22 +76,7 @@ namespace Project_1.UI.UIElements
         #region Graphics
         public UITexture Gfx => gfx;
         protected UITexture gfx;
-        public Color Color { get => gfx.Color; set => gfx.Color = value; }
-        
-        public float Layer
-        {
-            get => layer;
-            set
-            {
-                layer = (float)value;
-                for (int i = 0; i < children.Count; i++)
-                {
-                    children[i].layer = value + 0.02f;
-                }
-            }
-
-        }
-        float layer;
+        public Color Color { get => gfx.Color; set => gfx.Color = value; } 
         #endregion
 
         public HoldEvent heldEvents;
@@ -150,11 +135,6 @@ namespace Project_1.UI.UIElements
 
         protected void AddChild(UIElement aUIElement)
         {
-            if (aUIElement.gfx != null)
-            {
-                aUIElement.layer = layer + 0.02f;
-
-            }
             aUIElement.Visible = Visible;
             children.Add(aUIElement);
         }
@@ -230,10 +210,10 @@ namespace Project_1.UI.UIElements
             if (aNewPos.X == float.NaN || aNewPos.Y == float.NaN) throw new ArgumentException("Invalid move.");
             relativePos = aNewPos;
             pos.Location = TransformFromRelativeToPoint(aNewPos);
-            absolutePos = new AbsoluteScreenPosition(pos.Location) + parentPos;
+           //absolutePos = new AbsoluteScreenPosition(pos.Location) + parentPos;
         }
 
-        protected void Resize(RelativeScreenPosition aSize)
+        public void Resize(RelativeScreenPosition aSize)
         {
             relativeSize = aSize;
             pos.Size = TransformFromRelativeToPoint(aSize);
@@ -429,6 +409,8 @@ namespace Project_1.UI.UIElements
 
                 gfx.Draw(aBatch, AbsolutePos);
             }
+            
+            if (children.Count == 0) return;
 
             GraphicsManager.CaptureScissor(this, AbsolutePos);
             foreach (UIElement child in children)

@@ -4,6 +4,7 @@ using Project_1.Input;
 using Project_1.UI.HUD;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,8 @@ namespace Project_1.GameObjects.Entities.Players
 {
     internal class Party
     {
+        public const int maxPartySize = 4;
+
         Entity owner;
         List<GuildMember> commands = new List<GuildMember>();
 
@@ -19,8 +22,8 @@ namespace Project_1.GameObjects.Entities.Players
         List<GuildMember> party = new List<GuildMember>();
         const float lengthOfLeash = 500;
 
-        public bool IsInCommand(GuildMember aWalker) { return commands.IndexOf(aWalker) >= 0; }
-        public bool IsInParty(GuildMember aWalker) { return party.IndexOf(aWalker) >= 0; }
+        public bool IsInCommand(GuildMember aGuildMember) => commands.IndexOf(aGuildMember) >= 0;
+        public bool IsInParty(GuildMember aGuildMember) => party.IndexOf(aGuildMember) >= 0;
 
         public Party(Entity aOwner)
         {
@@ -49,41 +52,55 @@ namespace Project_1.GameObjects.Entities.Players
             commands.Clear();
         }
 
-        public void AddToCommand(GuildMember aWalker)
+        public void AddToCommand(GuildMember aGuildMember)
         {
-            if (commands.Contains(aWalker)) { return; }
+            if (commands.Contains(aGuildMember)) { return; }
 
-            HUDManager.AddWalkerToControl(aWalker);
-            commands.Add(aWalker);
+            HUDManager.AddWalkerToControl(aGuildMember);
+            commands.Add(aGuildMember);
         }
 
-        public void NeedyAddToCommand(GuildMember aWalker)
+        public void NeedyAddToCommand(GuildMember aGuildMember)
         {
             commands.Clear();
-            AddToCommand(aWalker);
+            AddToCommand(aGuildMember);
 
         }
 
-        public void RemoveFromCommand(GuildMember aWalker)
+        public void RemoveFromCommand(GuildMember aGuildMember)
         {
-            if (!commands.Contains(aWalker)) { return; }
+            if (!commands.Contains(aGuildMember)) { return; }
 
-            HUDManager.RemoveWalkersFromControl(new GuildMember[] { aWalker });
-            commands.Remove(aWalker);
+            HUDManager.RemoveWalkersFromControl(new GuildMember[] { aGuildMember });
+            commands.Remove(aGuildMember);
         }
 
-        public bool AddToParty(GuildMember aWalker)
+        public bool AddToParty(GuildMember aGuildMember)
         {
-            if (PartyCount >= 5) return false;
+            if (PartyCount >= maxPartySize) return false;
 
-            party.Add(aWalker);
-            HUDManager.AddWalkerToParty(party[party.Count - 1]);
+            party.Add(aGuildMember);
+            aGuildMember.AddedToParty();
+
+            HUDManager.AddGuildMemberToParty(party[party.Count - 1]);
+            return true;
+        }
+
+        public bool RemoveFromParty(GuildMember aGuildMember)
+        {
+            Debug.Assert(PartyCount > 0);
+            Debug.Assert(aGuildMember != null);
+            Debug.Assert(IsInParty(aGuildMember));
+
+            party.Remove(aGuildMember);
+            aGuildMember.RemovedFromParty();
+            HUDManager.RemoveGuildMemberFromParty(party[party.Count - 1]);
             return true;
         }
 
         public void IssueMoveOrder(ClickEvent aClick)
         {
-            WorldSpace worldPosDestination = WorldSpace.FromRelaticeScreenSpace(aClick.RelativePos);
+            WorldSpace worldPosDestination = WorldSpace.FromRelativeScreenSpace(aClick.RelativePos);
             foreach (var walker in commands)
             {
                 if (aClick.Modifier(InputManager.HoldModifier.Shift))

@@ -15,6 +15,11 @@ namespace Project_1.GameObjects.Entities
 
         }
 
+
+        public GuildMember.GuildMemberData CreateGuildMemberData()
+        {
+            return new GuildMember.GuildMemberData(Name, CurrentLevel, Class);
+        }
         public override void ExpToParty(int aExpAmount)
         {
             throw new NotImplementedException();

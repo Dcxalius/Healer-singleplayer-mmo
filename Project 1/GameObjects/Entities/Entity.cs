@@ -26,6 +26,7 @@ using static Project_1.GameObjects.Unit.Equipment;
 using System.Diagnostics;
 using Project_1.Items;
 using Project_1.UI.UIElements.Guild;
+using System.Security.Cryptography;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -35,7 +36,7 @@ namespace Project_1.GameObjects.Entities
         public virtual Entity Target { get => target; }
         protected Entity target = null;
 
-        Text nameDisplay;
+        protected NamePlate namePlate;
 
         #region UnitData
         protected UnitData UnitData => unitData;
@@ -92,9 +93,7 @@ namespace Project_1.GameObjects.Entities
 
             velocity = unitData.Velocity;
             momentum = UnitData.Momentum;
-
-            nameDisplay = new Text("Gloryse", Name, RelationColor);
-
+            CreateNamePlate();
             corpse = new Corpse(unitData.CorpseGfxPath, unitData.LootTable);
         }
 
@@ -104,7 +103,8 @@ namespace Project_1.GameObjects.Entities
         {
             if (AmIDead()) return;
             TargetAliveCheck();
-            if (unitData.BaseStats.CheckIfResourceRegened()) HUDManager.RefreshPlateBox(this);
+            if (unitData.BaseStats.CheckIfResourceRegened()) RefreshPlates();
+            
             Movement();
             AttackTarget();
 
@@ -112,6 +112,9 @@ namespace Project_1.GameObjects.Entities
             selectRing.UpdatePosition(Position, Size);
             spellCast.UpdateSpellChannel();
             buffList.Update(this);
+
+            MoveNamePlate();
+
             //HUDManager.RefreshPlateBox(this);
         }
 
@@ -133,7 +136,8 @@ namespace Project_1.GameObjects.Entities
             }
 
             ObjectManager.RemoveEntity(this);
-            if (corpse != null) corpse.SpawnCorpe(Position); //Make this spawn a default corpse if corpse is null
+            RemoveNamePlate();
+            if (corpse != null) corpse.SpawnCorpe(Position);
 
         }
         void TargetAliveCheck()
@@ -223,7 +227,7 @@ namespace Project_1.GameObjects.Entities
             if (!InCombat)
             {
                 unitData.Tick();
-                HUDManager.RefreshPlateBox(this);
+                RefreshPlates();
             }
         }
         #endregion
@@ -301,7 +305,7 @@ namespace Project_1.GameObjects.Entities
             }
 
             unitData.Resource.Value += value;
-            HUDManager.RefreshPlateBox(this);
+            RefreshPlates();
             return true;
         }
 
@@ -319,7 +323,7 @@ namespace Project_1.GameObjects.Entities
             ParticleMovement bloodMovement = new ParticleMovement(dirOfFlyingStuff, WorldSpace.Zero, 0.9f);
             //DebugManager.Print(GetType(), ((aDamageTaken / MaxHealth) * 100).ToString());
             ParticleManager.SpawnParticle(bloodsplatter, WorldRectangle, this, bloodMovement, (int)Math.Max(1, (aDamageTaken / MaxHealth) * 100));
-            HUDManager.RefreshPlateBox(this); //TODO: Check death here?
+            RefreshPlates(); //TODO: Check death here?
         }
 
         public virtual bool TakeHealing(Entity aHealer, float aHealingTaken)
@@ -340,8 +344,7 @@ namespace Project_1.GameObjects.Entities
             {
                 aggroTablesIAmOn[i].AddToAggroTable(aHealer, value);
             }
-
-            HUDManager.RefreshPlateBox(this);
+            RefreshPlates();
             return true;
         }
 
@@ -352,6 +355,31 @@ namespace Project_1.GameObjects.Entities
             unitData.GainExp(aExpAmount);
             HUDManager.RefreshCharacterWindowExpBar(this);
         }
+        protected void CreateNamePlate()
+        {
+
+            namePlate = new NamePlate(this);
+            HUDManager.AddNamePlate(this, namePlate);
+
+        }
+
+        protected void RemoveNamePlate()
+        {
+            namePlate = null;
+            HUDManager.RemoveNamePlate(this);
+        }
+
+        protected virtual void RefreshPlates()
+        {
+            HUDManager.RefreshPlates(this);
+
+        }
+
+        protected virtual void MoveNamePlate()
+        {
+            namePlate.Reposition(this);
+        }
+
         #endregion
 
         #region Click
@@ -385,7 +413,8 @@ namespace Project_1.GameObjects.Entities
             Item item = Equipment.EquipInParticularSlot(aEquipment, aSlot);
             unitData.BaseStats.RefreshEquipmentStats(Equipment.EquipmentStats);
             HUDManager.RefreshCharacterWindowStats(unitData.BaseStats.TotalPrimaryStats.NewReport);
-            HUDManager.RefreshPlateBox(this);
+            RefreshPlates();
+
             return item;
         }
         public Item Equip(Items.SubTypes.Equipment aEquipment)
@@ -393,7 +422,8 @@ namespace Project_1.GameObjects.Entities
             Item item = Equipment.Equip(aEquipment);
             unitData.BaseStats.RefreshEquipmentStats(Equipment.EquipmentStats);
             HUDManager.RefreshCharacterWindowStats(unitData.BaseStats.TotalPrimaryStats.NewReport);
-            HUDManager.RefreshPlateBox(this);
+            RefreshPlates();
+
             return item;
         }
 
@@ -402,23 +432,20 @@ namespace Project_1.GameObjects.Entities
             (Item, Item) returnable = Equipment.EquipTwoHander(aEquipment);
             unitData.BaseStats.RefreshEquipmentStats(Equipment.EquipmentStats);
             HUDManager.RefreshCharacterWindowStats(unitData.BaseStats.TotalPrimaryStats.NewReport);
-            HUDManager.RefreshPlateBox(this);
+            RefreshPlates();
+
             return returnable;
         }
 
         #endregion
+
+        
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)
         {
             shadow.Draw(aBatch, this);
             selectRing.Draw(aBatch, this);
             base.Draw(aBatch);
-            nameDisplay.CentredDraw(aBatch, (FeetPosition - new WorldSpace(0, Size.Y + nameDisplay.Offset.Y)).ToAbsoltueScreenPosition());
-        }
-
-        public GuildMember.GuildMemberData CreateGuildMemberData()
-        {
-            return new GuildMember.GuildMemberData(Name, CurrentLevel, Class);
         }
     }
 }

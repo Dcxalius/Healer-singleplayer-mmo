@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.Textures
 {
-    //[DebuggerStepThrough]
+    [DebuggerStepThrough]
     internal class UITexture : Texture
     {
         public enum Layer

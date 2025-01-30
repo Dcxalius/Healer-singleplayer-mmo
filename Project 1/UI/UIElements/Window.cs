@@ -35,9 +35,6 @@ namespace Project_1.UI.UIElements
         public Window(UITexture aGfx) : base(aGfx, RelativeScreenPosition.Zero, size)
         {
             Visible = false;
-            //nrOfBookletsOpen++;//This is because every booklet is technically visible on creation before ToggleVisibilty is called
-
-            Layer = (float)UITexture.Layer.Window / (float)UITexture.Layer.Count;
         }
 
         public override void ToggleVisibilty()

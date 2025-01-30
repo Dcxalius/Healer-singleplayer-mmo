@@ -96,6 +96,11 @@ namespace Project_1.Textures
             }
         }
 
+        public virtual void Draw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, float aFeetPosY)
+        {
+            Draw(aBatch, aPos, Color.White, aFeetPosY);
+        }
+
         public virtual void Draw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, Color aColor, float aFeetPosY)
         {
             if (gfx == null) return;

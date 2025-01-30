@@ -30,6 +30,11 @@ namespace Project_1.UI.HUD
 {
     internal static class HUDManager
     {
+        static Dictionary<Entity, NamePlate> namePlates = new Dictionary<Entity, NamePlate>();
+
+
+        static List<UIElement> hudElements = new List<UIElement>();
+
         static PlayerPlateBox playerPlateBox;
         static TargetPlateBox targetPlateBox;
         static PartyPlateBox[] partyPlateBoxes;
@@ -48,7 +53,6 @@ namespace Project_1.UI.HUD
         static CastBar playerCastBar;
         static FirstSpellBar firstSpellBar;
 
-        static List<UIElement> hudElements = new List<UIElement>();
 
 
         static HeldItem heldItem;
@@ -107,6 +111,11 @@ namespace Project_1.UI.HUD
         }
         public static void Update()
         {
+            foreach (KeyValuePair<Entity, NamePlate> namePlate in namePlates)
+            {
+                namePlate.Value.Update(null);
+            }
+
             for (int i = 0; i < hudElements.Count; i++)
             {
                 hudElements[i].Update(null);
@@ -121,27 +130,37 @@ namespace Project_1.UI.HUD
             }
         }
 
-        #region PlateBox
+        #region Plate
+        public static void AddNamePlate(Entity aEntity, NamePlate aNamePlate)
+        {
+            namePlates.Add(aEntity, aNamePlate);
+        }
+
+        public static void RemoveNamePlate(Entity aEntity)
+        {
+            namePlates.Remove(aEntity);
+        }
+
         public static void SetPlayerPlateBox(Player aPlayer)
         {
 
             playerPlateBox.SetData(aPlayer);
         }
 
-        public static void RefreshPlateBox(Entity aEntity)
+        public static void RefreshPlates(Entity aEntity)
         {
             switch (aEntity.RelationToPlayer)
             {
                 case Relation.RelationToPlayer.Self:
                     playerPlateBox.Refresh(aEntity);
-                    if (!targetPlateBox.BelongsTo(aEntity)) return;
+                    if (!targetPlateBox.BelongsTo(aEntity)) break;
                     targetPlateBox.Refresh(aEntity);
                     break;
                 case Relation.RelationToPlayer.Friendly:
                     if (targetPlateBox.BelongsTo(aEntity)) targetPlateBox.Refresh(aEntity); 
                     for (int i = 0; i < partyPlateBoxes.Length; i++)
                     {
-                        if (partyPlateBoxes[i] == null) return;
+                        if (partyPlateBoxes[i].BelongsTo(null)) break;
                         if (!partyPlateBoxes[i].BelongsTo(aEntity as GuildMember)) continue;
                         partyPlateBoxes[i].Refresh(aEntity);
                         return;
@@ -149,12 +168,14 @@ namespace Project_1.UI.HUD
                     break;
                 case Relation.RelationToPlayer.Neutral:
                 case Relation.RelationToPlayer.Hostile:
-                    if (!targetPlateBox.BelongsTo(aEntity)) return;
+                    if (!targetPlateBox.BelongsTo(aEntity)) break;
                     targetPlateBox.Refresh(aEntity);
                     break;
                 default:
                     break;
             }
+
+            namePlates[aEntity].Refresh(aEntity);
         }
         public static void SetNewTarget(Entity aTargeter, Entity aTarget)
         {
@@ -175,9 +196,9 @@ namespace Project_1.UI.HUD
         #endregion
 
         #region Control
-        public static void AddWalkerToParty(GuildMember aGuildMember)
+        public static void AddGuildMemberToParty(GuildMember aGuildMember)
         {
-            if (PartyPlateBox.PartyBoxesActive >= 4)
+            if (PartyPlateBox.PartyBoxesActive >= Party.maxPartySize)
             {
                 DebugManager.Print(typeof(HUDManager), "Tried to add to full party.");
                 return;
@@ -187,7 +208,7 @@ namespace Project_1.UI.HUD
             partyBuffBoxes[PartyPlateBox.PartyBoxesActive - 1].AssignBox(aGuildMember);
         }
 
-        public static void RemoveWalkerFromParty(GuildMember aGuildMember)
+        public static void RemoveGuildMemberFromParty(GuildMember aGuildMember)
         {
             int index = FindGuildMemberPartyIndex(aGuildMember);
 
@@ -381,6 +402,11 @@ namespace Project_1.UI.HUD
 
         public static void Draw(SpriteBatch aBatch)
         {
+            foreach (KeyValuePair<Entity, NamePlate> namePlate in namePlates)
+            {
+                namePlate.Value.Draw(aBatch);
+            }
+
             for (int i = 0; i < hudElements.Count; i++)
             {
                 hudElements[i].Draw(aBatch);

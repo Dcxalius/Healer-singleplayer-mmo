@@ -35,6 +35,7 @@ namespace Project_1.GameObjects.Entities
         }
         public GuildMember(UnitData aData) : base(aData)
         {
+            RemoveNamePlate(); //TODO: Think of a better way to handle this
         }
 
         protected override void ClickedOn(ClickEvent aClickEvent)
@@ -43,6 +44,28 @@ namespace Project_1.GameObjects.Entities
             Command(aClickEvent);
 
 
+        }
+
+        protected override void MoveNamePlate()
+        {
+            if (namePlate != null) base.MoveNamePlate();
+        }
+
+        protected override void RefreshPlates()
+        {
+            if (namePlate != null) base.RefreshPlates();
+        }
+
+        public void AddedToParty()
+        {
+            CreateNamePlate();
+            base.MoveNamePlate();
+            base.RefreshPlates();
+        }
+
+        public void RemovedFromParty()
+        {
+            RemoveNamePlate();
         }
 
         public void Command(ClickEvent aClickEvent)
