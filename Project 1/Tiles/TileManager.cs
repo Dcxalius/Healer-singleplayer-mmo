@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Printing;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,15 +20,24 @@ namespace Project_1.Tiles
 {
     internal static class TileManager
     {
+        static Tile Tile(int aX, int aY)
+        {
+            if (aX < 0 || aX >= debugSize.X || aY < 0 || aY >= debugSize.Y) return null;
+
+            return tiles[aX, aY];
+        }
+
         static Tile[,] tiles;
         readonly static Point TileSize = new Point(32, 32);
         const int sizeOfSquareToCheck = 3; // this should always be odd
         static Dictionary<string, TileData> tileData = new Dictionary<string, TileData>();
 
+        static Point debugSize = new Point(100, 100);
+
         public static void Init(ContentManager aContentManager)
         {
             ImportData(aContentManager.RootDirectory, aContentManager);
-            GenerateTiles(new Point(0), new Point(100, 100));
+            GenerateTiles(new Point(0), debugSize);
         }
 
 
@@ -286,6 +296,31 @@ namespace Project_1.Tiles
 
             return colliders;
         }
+
+        public static Tile[] GetTilesAroundPoint(WorldSpace aPosition, float aDistance)
+        {
+            List<Tile> returnable = new List<Tile>();
+            Tile midTile = GetTileUnder(aPosition);
+            float distanceInTiles = aDistance / TileSize.X;
+            int tilesAround = (int)(distanceInTiles * Math.PI) * 2;
+            for (int i = 0; i < tilesAround; i++)
+            {
+                Point tilePos = midTile.TilePos;
+                //DebugManager.Print(typeof(TileManager), "Sine = " + (Math.Sin((i * 2 * Math.PI / tilesAround))).ToString());
+                //DebugManager.Print(typeof(TileManager), "Tile = " + ((int)Math.Round(tilePos.X + distanceInTiles * Math.Sin((i * 2 * Math.PI / tilesAround)))).ToString());
+                
+                Tile t = Tile((int)Math.Round(tilePos.X + distanceInTiles * Math.Sin((i * 2 * Math.PI / tilesAround))), (int)Math.Floor(tilePos.Y + distanceInTiles * Math.Cos(i * 2 * Math.PI / tilesAround)));
+                //DebugManager.Print(typeof(TileManager), "Tile is at X: " + t.TilePos.X + " and Y: " + t.TilePos.Y);
+
+                if (t == null) continue;
+
+                if (!t.Walkable) continue;
+                returnable.Add(t);
+            }
+
+            return returnable.ToArray();
+        }
+
 
         public static void Draw(SpriteBatch aBatch)
         {

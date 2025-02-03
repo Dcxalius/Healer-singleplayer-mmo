@@ -51,6 +51,11 @@ namespace Project_1.Tiles
             }
         }
 
+        public void AddDebugSquare()
+        {
+            DebugManager.AddDebugShape(new DebugTools.DebugSquare(new Rectangle(Position.ToPoint(), tileSize)));
+        }
+
         public override void Draw(SpriteBatch aBatch)
         {
             //base.Draw(aBatch); Skip draw as a gameobject to make all tiles appear in the background

@@ -48,6 +48,7 @@ namespace Project_1.GameObjects.Entities.Players
         public override void Update()
         {
             KeyboardWalk();
+            Party.Update();
             base.Update();
         }
 

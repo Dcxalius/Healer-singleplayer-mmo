@@ -63,7 +63,7 @@ namespace Project_1.GameObjects
             }
         }
 
-        public void Teleport(WorldSpace aNewPos) => Position = aNewPos;
+        public void Teleport(WorldSpace aNewPos) => Position = aNewPos + (WorldSpace)new Vector2(size.X / 2, size.Y);
 
         public virtual bool Click(ClickEvent aClickEvent) => false;
 

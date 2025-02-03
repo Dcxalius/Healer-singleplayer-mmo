@@ -20,6 +20,7 @@ using Project_1.Camera;
 using Project_1.GameObjects.Spells.Projectiles;
 using Project_1.GameObjects.Spawners;
 using System.Diagnostics;
+using Project_1.Tiles;
 
 namespace Project_1.GameObjects
 {
@@ -52,13 +53,32 @@ namespace Project_1.GameObjects
 
         public static List<GuildMember> GetGuildMembers() => guild;
 
-        public static bool SpawnGuildMemberToParty(GuildMember aMember)
+        public static bool SpawnGuildMemberToParty(GuildMember aMember, WorldSpace? aPosition)
         {
             Debug.Assert(guild.Contains(aMember));
             Debug.Assert(!player.Party.IsInParty(aMember));
 
+            WorldSpace position = ( aPosition ??= FindTileAroundPlayer());
+
+            aMember.Teleport(position);
             entities.Add(guild.Find(member => member == aMember));
             return player.Party.AddToParty(entities[entities.Count - 1] as GuildMember);
+        }
+
+        static WorldSpace FindTileAroundPlayer()
+        {
+            Tile[] tiles = new Tile[0];
+            float start = 5000; //TODO: Find better way to get these values
+            float step = 500;
+            while (tiles.Length == 0)
+            {
+
+                tiles = TileManager.GetTilesAroundPoint(Player.FeetPosition, start);
+                start -= step;
+                Debug.Assert(start > 0);
+            }
+            Tile tile = tiles[RandomManager.RollInt(tiles.Length)];
+            return tile.Position;
         }
 
         public static void DoWhatLeaguePlayersTellMe(FloatingText aText) => floatingTexts.Remove(aText);

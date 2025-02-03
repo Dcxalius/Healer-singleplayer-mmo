@@ -2,7 +2,9 @@
 using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
+using Project_1.Managers;
 using Project_1.Textures;
+using Project_1.Tiles;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,9 +27,11 @@ namespace Project_1.UI.UIElements.Guild
         public override void HoldReleaseOnMe()
         {
             base.HoldReleaseOnMe();
-            Debug.Assert(!ObjectManager.Player.Party.IsInParty(friendly));
 
-            ObjectManager.SpawnGuildMemberToParty(friendly);
+
+            
+            Debug.Assert(!ObjectManager.Player.Party.IsInParty(friendly));
+            ObjectManager.SpawnGuildMemberToParty(friendly, null);
         }
     }
 }
