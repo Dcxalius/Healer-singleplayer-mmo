@@ -4,6 +4,7 @@ using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.Textures;
 using Project_1.UI.UIElements.Boxes;
+using Project_1.UI.UIElements.Buttons;
 using SharpDX.XAudio2;
 using System;
 using System.Collections.Generic;
@@ -40,7 +41,7 @@ namespace Project_1.UI.UIElements.Guild
         }
 
 
-        public GuildMemberListing(Friendly aGuildMember, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.Pink), aPos, aSize)
+        public GuildMemberListing(Friendly aGuildMember, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.Pink), aPos, aSize) //TODO: Make this sortable
         {
             buttonSize = RelativeScreenPosition.GetSquareFromY(aSize.Y - spacing.Y - spacing.Y);
             buttonPos = new RelativeScreenPosition(aSize.X, spacing.Y);
@@ -48,7 +49,6 @@ namespace Project_1.UI.UIElements.Guild
             
             openCharacterWindow = new OpenCharacterWindow(GetButtonPos, buttonSize);
             openInventory = new OpenInventory(GetButtonPos, buttonSize);
-            invite = new InviteButton(aGuildMember, GetButtonPos, buttonSize);
 
             float labelPosX = (buttonPos.X - spacing.X - spacing.X) / 3;
             RelativeScreenPosition labelSize = new RelativeScreenPosition(labelPosX, aSize.Y);
@@ -65,8 +65,14 @@ namespace Project_1.UI.UIElements.Guild
 
             if (aGuildMember.GetType() != typeof(Player))
             {
+                invite = new InviteButton(aGuildMember, GetButtonPos, buttonSize);
                 AddChild(invite);
             }
+        }
+
+        public void SetInviteButtonState(TwoStateGFXButton.State aState)
+        {
+            invite.state = aState;
         }
 
         public void RefreshData(GameObjects.Entities.GuildMember.GuildMemberData aGuildMember)
@@ -76,6 +82,10 @@ namespace Project_1.UI.UIElements.Guild
             @class.Text = aGuildMember.Class;
         }
 
+        public bool BelongsTo(string aName)
+        {
+            return name.Text == aName;
+        }
         public int CompareTo(object obj)
         {
             Debug.Assert(obj.GetType() == GetType());

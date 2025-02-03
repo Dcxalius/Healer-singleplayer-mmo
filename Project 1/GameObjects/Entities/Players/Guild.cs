@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Project_1.GameObjects.Entities.Players
 {
@@ -15,11 +16,20 @@ namespace Project_1.GameObjects.Entities.Players
 
         public Guild(Friendly aOwner)
         {
+            owner = aOwner;
             guildMembers = new List<Friendly>();
             guildMembers.Add(aOwner);
 
             guildMembers.AddRange(ObjectManager.GetGuildMembers());
             SetRosterWindow();
+        }
+
+        public GuildMember GetGuildMemberByName(string aName)
+        {
+            Debug.Assert(aName != null);
+            Debug.Assert(aName != owner.Name, "Tried to get Player.");
+
+            return guildMembers.Single(guildMember =>  guildMember.Name == aName) as GuildMember;
         }
 
         void SetRosterWindow()

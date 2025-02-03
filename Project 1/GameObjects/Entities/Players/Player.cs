@@ -16,11 +16,13 @@ using Project_1.Textures.AnimatedTextures;
 using Project_1.Items;
 using Project_1.GameObjects.Spells;
 using Project_1.Camera;
+using Project_1.UI.UIElements.Buttons;
 
 namespace Project_1.GameObjects.Entities.Players
 {
     internal class Player : Friendly
     {
+        public PlayerData PlayerData => UnitData as PlayerData;
         public Inventory Inventory => inventory;
         Inventory inventory;
 
@@ -42,6 +44,7 @@ namespace Project_1.GameObjects.Entities.Players
             spellBook = new SpellBook(this);
             party = new Party(this);
             guild = new Guild(this);
+
             HUDManager.SetCharacterWindow(this, PrimaryStatReport);
             HUDManager.SetPlayerPlateBox(this);
         }
@@ -50,6 +53,19 @@ namespace Project_1.GameObjects.Entities.Players
             KeyboardWalk();
             Party.Update();
             base.Update();
+        }
+
+        public void GetPartyMembersFromGuild()
+        {
+            string[] partyMembers = PlayerData.Party;
+            for (int i = 0; i < partyMembers.Length; i++)
+            {
+                GuildMember guildMember = guild.GetGuildMemberByName(partyMembers[i]);
+                ObjectManager.SpawnGuildMemberToParty(guildMember, guildMember.FeetPosition);
+            }
+
+
+            HUDManager.SetGuildMemberInviteStatus(partyMembers.ToList(), Enumerable.Repeat(TwoStateGFXButton.State.Second, partyMembers.Length).ToList());
         }
 
         void KeyboardWalk()

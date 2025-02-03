@@ -92,9 +92,9 @@ namespace Project_1.GameObjects.Entities.Players
             Debug.Assert(aGuildMember != null);
             Debug.Assert(IsInParty(aGuildMember));
 
+            HUDManager.RemoveGuildMemberFromParty(aGuildMember);
             party.Remove(aGuildMember);
             aGuildMember.RemovedFromParty();
-            HUDManager.RemoveGuildMemberFromParty(party[party.Count - 1]);
             return true;
         }
 

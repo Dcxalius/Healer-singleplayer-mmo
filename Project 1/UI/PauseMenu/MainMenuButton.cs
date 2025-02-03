@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Managers.States;
-using Project_1.UI.UIElements;
+using Project_1.UI.UIElements.Buttons;
 using System;
 using System.Collections.Generic;
 using System.Linq;

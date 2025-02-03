@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using Project_1.Camera;
 using Project_1.Input;
 using Project_1.UI.OptionMenu;
-using Project_1.UI.UIElements;
+using Project_1.UI.UIElements.Buttons;
 using System;
 using System.Collections.Generic;
 using System.Linq;

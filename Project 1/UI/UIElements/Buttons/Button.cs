@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI.UIElements
+namespace Project_1.UI.UIElements.Buttons
 {
     internal class Button : UIElement
     {
@@ -36,9 +36,10 @@ namespace Project_1.UI.UIElements
 
         protected bool usesPressedGfx;
 
+        public virtual List<Action> Actions => actions;
         List<Action> actions;
 
-        public Button(List<Action> aActions, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColor, string aText = null, Color? aTextColor = null) : this(aPos, aSize, aColor, aText, aTextColor) 
+        public Button(List<Action> aActions, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColor, string aText = null, Color? aTextColor = null) : this(aPos, aSize, aColor, aText, aTextColor)
         {
             actions = aActions ?? new List<Action>();
         }
@@ -66,13 +67,13 @@ namespace Project_1.UI.UIElements
         {
             pressed = false;
 
-            if (actions.Count != 0)
+            if (Actions.Count != 0)
             {
-                for (int i = 0; i < actions.Count; i++)
+                for (int i = 0; i < Actions.Count; i++)
                 {
-                    if (actions[i] == null) continue;
+                    if (Actions[i] == null) continue;
 
-                    actions[i].Invoke();
+                    Actions[i].Invoke();
                 }
             }
 

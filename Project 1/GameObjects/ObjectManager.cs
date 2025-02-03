@@ -41,6 +41,7 @@ namespace Project_1.GameObjects
         {
             guild.AddRange(ObjectFactory.GetGuildMemebers());
             player = new Player();
+            player.GetPartyMembersFromGuild();
             Camera.Camera.BindCamera(player);
 
 
@@ -65,11 +66,22 @@ namespace Project_1.GameObjects
             return player.Party.AddToParty(entities[entities.Count - 1] as GuildMember);
         }
 
+        public static bool RemoveGuildMemberFromParty(GuildMember aMember)
+        {
+            Debug.Assert(guild.Contains(aMember));
+            Debug.Assert(player.Party.IsInParty(aMember));
+
+            WorldSpace position = FindTileAroundPlayer();
+            aMember.RecieveDirectWalkingOrder(position);
+            //entities.Remove(guild.Find(member => member == aMember)); //TODO: Keep this in until its further than the value found in FindTileAroundPlayer
+            return player.Party.RemoveFromParty(aMember);
+        }
+
         static WorldSpace FindTileAroundPlayer()
         {
             Tile[] tiles = new Tile[0];
-            float start = 5000; //TODO: Find better way to get these values
-            float step = 500;
+            float start = 700; //TODO: Find better way to get these values
+            float step = 50;
             while (tiles.Length == 0)
             {
 

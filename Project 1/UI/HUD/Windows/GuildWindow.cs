@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Project_1.UI.UIElements.Guild;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities;
+using Project_1.UI.UIElements.Buttons;
 
 namespace Project_1.UI.HUD.Windows
 {
@@ -22,6 +23,11 @@ namespace Project_1.UI.HUD.Windows
 
             AddChild(roster);
             //ToggleVisibilty();
+        }
+
+        public void SetGuildMemberInviteStatus(List<string> aName, List<TwoStateGFXButton.State> aState)
+        {
+            roster.SetGuildMemberInviteStatus(aName, aState);
         }
 
         public void SetRoster(Friendly[] aData)

@@ -689,6 +689,18 @@
 /processorParam:TextureFormat=Color
 /build:UI/GrayWhiteBorder.png
 
+#begin UI/Invite.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:UI/Invite.png
+
 #begin UI/LevelCircle.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -712,6 +724,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:UI/PauseBackground.png
+
+#begin UI/Uninvite.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:UI/Uninvite.png
 
 #begin UI/WhiteBackground.png
 /importer:TextureImporter

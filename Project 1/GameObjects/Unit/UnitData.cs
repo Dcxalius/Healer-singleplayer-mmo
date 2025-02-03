@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.GameObjects.Unit
 {
-    struct UnitData
+    class UnitData
     {
         public string Name => name;
         string name;

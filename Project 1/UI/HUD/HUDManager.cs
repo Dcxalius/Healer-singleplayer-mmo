@@ -15,6 +15,7 @@ using Project_1.UI.HUD.Windows;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Bars;
 using Project_1.UI.UIElements.Boxes;
+using Project_1.UI.UIElements.Buttons;
 using Project_1.UI.UIElements.Guild;
 using Project_1.UI.UIElements.Inventory;
 using Project_1.UI.UIElements.SpellBook;
@@ -279,9 +280,6 @@ namespace Project_1.UI.HUD
             partyPlateBoxes[index].VisibleBorder = false;
         }
 
-        #endregion
-
-        #region Guild
         public static void AddGuildMember(Friendly aData)
         {
             //guildWindow.
@@ -292,6 +290,10 @@ namespace Project_1.UI.HUD
             guildWindow.SetRoster(aData);
         }
 
+        public static void SetGuildMemberInviteStatus(List<string> aName, List<TwoStateGFXButton.State> aState)
+        {
+            guildWindow.SetGuildMemberInviteStatus(aName, aState);
+        }
 
         #endregion
 

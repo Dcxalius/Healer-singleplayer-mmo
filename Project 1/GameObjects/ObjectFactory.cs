@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Newtonsoft.Json;
 using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Spawners;
 using Project_1.GameObjects.Unit;
 using Project_1.Managers;
@@ -96,17 +97,17 @@ namespace Project_1.GameObjects
 
             string[] folders = System.IO.Directory.GetDirectories(path);
 
-            string playerData = System.IO.File.ReadAllText(aContentManager.RootDirectory + "\\SaveData\\Units\\PlayerData.unit");
-            UnitData data = JsonConvert.DeserializeObject<UnitData>(playerData);
-            unitData.Add(data.Name, data);
+            string rawData = System.IO.File.ReadAllText(aContentManager.RootDirectory + "\\SaveData\\Units\\PlayerData.unit");
+            PlayerData playerData = JsonConvert.DeserializeObject<PlayerData>(rawData);
+            unitData.Add(playerData.Name, playerData);
 
             for (int i = 0; i < folders.Length; i++)
             {
                 string[] files = System.IO.Directory.GetFiles(folders[i]);
                 for (int j = 0; j < files.Length; j++)
                 {
-                    string rawData = System.IO.File.ReadAllText(files[j]);
-                    data = JsonConvert.DeserializeObject<UnitData>(rawData);
+                    rawData = System.IO.File.ReadAllText(files[j]);
+                    UnitData data = JsonConvert.DeserializeObject<UnitData>(rawData);
                     unitData.Add(data.Name, data);
                 }
             }
