@@ -7,6 +7,7 @@ using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
+using Project_1.UI.UIElements.Boxes;
 using Project_1.UI.UIElements.Inventory;
 using SharpDX.DirectWrite;
 using System;

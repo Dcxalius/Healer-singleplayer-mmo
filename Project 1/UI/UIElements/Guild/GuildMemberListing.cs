@@ -3,6 +3,7 @@ using Project_1.Camera;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.Textures;
+using Project_1.UI.UIElements.Boxes;
 using SharpDX.XAudio2;
 using System;
 using System.Collections.Generic;

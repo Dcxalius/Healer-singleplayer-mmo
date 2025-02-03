@@ -43,7 +43,7 @@ namespace Project_1.UI.OptionMenu
             }
             onExit.Clear();
 
-            StateManager.SetState(StateManager.States.Pause);
+            StateManager.SetState(StateManager.States.PauseMenu);
         }
     }
 }

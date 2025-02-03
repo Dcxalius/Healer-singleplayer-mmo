@@ -9,15 +9,15 @@ using Project_1.GameObjects.Unit;
 using Project_1.Input;
 using Project_1.Items;
 using Project_1.Managers;
+using Project_1.Textures;
 using Project_1.UI.HUD.PlateBoxes;
 using Project_1.UI.HUD.Windows;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Bars;
+using Project_1.UI.UIElements.Boxes;
 using Project_1.UI.UIElements.Guild;
 using Project_1.UI.UIElements.Inventory;
 using Project_1.UI.UIElements.SpellBook;
-using SharpDX.MediaFoundation.DirectX;
-using SharpDX.XAudio2;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -58,6 +58,7 @@ namespace Project_1.UI.HUD
         static HeldItem heldItem;
         static HeldSpell heldSpell;
 
+        static List<DialogueBox> dialogueBoxes;
 
 
         public static void Init()
@@ -108,12 +109,20 @@ namespace Project_1.UI.HUD
 
             heldItem = new HeldItem();
             heldSpell = new HeldSpell();
+
+            dialogueBoxes = new List<DialogueBox>();
+
         }
         public static void Update()
         {
             foreach (KeyValuePair<Entity, NamePlate> namePlate in namePlates)
             {
                 namePlate.Value.Update(null);
+            }
+
+            for (int i = 0; i < dialogueBoxes.Count; i++)
+            {
+                dialogueBoxes[i].Update(null);
             }
 
             for (int i = 0; i < hudElements.Count; i++)
@@ -130,22 +139,17 @@ namespace Project_1.UI.HUD
             }
         }
 
+        public static void AddDialogueBox(DialogueBox aDialogueBox) => dialogueBoxes.Add(aDialogueBox);
+
+        public static void RemoveDialogueBox(DialogueBox aDialogueBox) => dialogueBoxes.Remove(aDialogueBox);
+
+
         #region Plate
-        public static void AddNamePlate(Entity aEntity, NamePlate aNamePlate)
-        {
-            namePlates.Add(aEntity, aNamePlate);
-        }
+        public static void AddNamePlate(Entity aEntity, NamePlate aNamePlate) => namePlates.Add(aEntity, aNamePlate);
 
-        public static void RemoveNamePlate(Entity aEntity)
-        {
-            namePlates.Remove(aEntity);
-        }
+        public static void RemoveNamePlate(Entity aEntity) => namePlates.Remove(aEntity);
 
-        public static void SetPlayerPlateBox(Player aPlayer)
-        {
-
-            playerPlateBox.SetData(aPlayer);
-        }
+        public static void SetPlayerPlateBox(Player aPlayer) => playerPlateBox.SetData(aPlayer);
 
         public static void RefreshPlates(Entity aEntity)
         {
@@ -363,6 +367,11 @@ namespace Project_1.UI.HUD
         #region Mouse
         public static bool Click(ClickEvent aClickEvent)
         {
+            for (int i = 0; i < dialogueBoxes.Count; i++)
+            {
+                if (dialogueBoxes[i].ClickedOn(aClickEvent)) return true;
+            }
+
             for (int i = hudElements.Count - 1; i >= 0; i--)
             {
                 if (hudElements[i].ClickedOn(aClickEvent)) return true;
@@ -381,6 +390,10 @@ namespace Project_1.UI.HUD
 
         internal static bool Scroll(ScrollEvent aScrollEvent)
         {
+            for (int i = 0; i < dialogueBoxes.Count; i++)
+            {
+                if (dialogueBoxes[i].ScrolledOn(aScrollEvent)) return true;
+            }
             for (int i = 0; i < hudElements.Count; i++)
             {
                 if (hudElements[i].ScrolledOn(aScrollEvent)) return true;
@@ -389,11 +402,11 @@ namespace Project_1.UI.HUD
             return false;
         }
 
-        public static void PauseMenuActivated() //TODO: Find better name
+        public static void LeavingGameState()
         {
             for (int i = 0; i < hudElements.Count; i++)
             {
-                hudElements[i].PauseMenuActivated();
+                hudElements[i].LeavingGameState();
             }
             heldItem.ReleaseMe();
             heldSpell.ReleaseMe();
@@ -410,6 +423,11 @@ namespace Project_1.UI.HUD
             for (int i = 0; i < hudElements.Count; i++)
             {
                 hudElements[i].Draw(aBatch);
+            }
+
+            for (int i = 0; i < dialogueBoxes.Count; i++)
+            {
+                dialogueBoxes[i].Draw(aBatch);
             }
 
             heldItem.Draw(aBatch);

@@ -227,11 +227,11 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        public virtual void PauseMenuActivated()
+        public virtual void LeavingGameState()
         {
             for (int i = 0; i < children.Count; i++)
             {
-                children[i].PauseMenuActivated();
+                children[i].LeavingGameState();
             }
             heldEvents = null;
         }

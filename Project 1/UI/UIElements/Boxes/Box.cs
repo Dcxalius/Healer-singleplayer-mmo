@@ -4,14 +4,13 @@ using Project_1.Camera;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
-using Project_1.UI.UIElements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI.UIElements
+namespace Project_1.UI.UIElements.Boxes
 {
     internal abstract class Box : UIElement
     {

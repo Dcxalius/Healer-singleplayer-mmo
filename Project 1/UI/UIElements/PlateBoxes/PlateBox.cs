@@ -5,6 +5,7 @@ using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Unit;
 using Project_1.Textures;
+using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

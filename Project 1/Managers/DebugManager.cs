@@ -1,10 +1,13 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.DebugTools;
 using Project_1.GameObjects;
 using Project_1.Input;
 using Project_1.Items;
+using Project_1.Textures;
 using Project_1.UI.HUD;
+using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -87,6 +90,10 @@ namespace Project_1.Managers
         static void SpawnTestGear()
         {
             if (!KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugTestGear)) return;
+            RelativeScreenPosition dialogueBoxSize = new RelativeScreenPosition(0.2f);
+            DialogueBox testDialogueBox = new DialogueBox("Hello Cheater!\n\nxdd", Color.White, DialogueBox.PausesGame.Pauses, null, new UITexture(new GfxPath(GfxType.UI, "GrayBackground"), Color.White), new RelativeScreenPosition(0.5f) - dialogueBoxSize / 2, dialogueBoxSize, "Close");
+
+            HUDManager.AddDialogueBox(testDialogueBox);
             
             ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("ZweiHander"), 1));
             ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("Axe"), 1));

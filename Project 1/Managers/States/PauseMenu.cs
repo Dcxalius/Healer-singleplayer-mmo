@@ -13,17 +13,17 @@ using System.Threading.Tasks;
 
 namespace Project_1.Managers.States
 {
-    internal class Pause : State
+    internal class PauseMenu : State
     {
         static PauseBox pauseBox;
-        RenderTarget2D pauseDraw;
-        SpriteBatch pauseBatch;
+        RenderTarget2D pauseTarget;
+        SpriteBatch pauseDraw;
         Textures.Texture pauseBackground;
 
-        public Pause()
+        public PauseMenu()
         {
-            pauseDraw = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
-            pauseBatch = GraphicsManager.CreateSpriteBatch();
+            pauseTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
+            pauseDraw = GraphicsManager.CreateSpriteBatch();
             pauseBox = new PauseBox();
             pauseBackground = new Textures.Texture(new GfxPath(GfxType.UI, "PauseBackground"));
         }
@@ -38,7 +38,7 @@ namespace Project_1.Managers.States
         }
         public override void Rescale()
         {
-            pauseDraw = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
+            pauseTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
             pauseBox.Rescale();
 
         }
@@ -67,19 +67,19 @@ namespace Project_1.Managers.States
 
         public override RenderTarget2D Draw()
         {
-            GraphicsManager.SetRenderTarget(pauseDraw);
-            pauseBatch.Begin();
+            GraphicsManager.SetRenderTarget(pauseTarget);
+            pauseDraw.Begin();
             GraphicsManager.ClearScreen(Color.Purple);
 
 
-            pauseBatch.Draw(StateManager.FinalGameFrame, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f); //draw game
-            pauseBackground.Draw(pauseBatch, Vector2.Zero); //draw gray screen overlay
-            pauseBox.Draw(pauseBatch); //draw pause menu
+            pauseDraw.Draw(StateManager.FinalGameFrame, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f); //draw game
+            pauseBackground.Draw(pauseDraw, Vector2.Zero); //draw gray screen overlay
+            pauseBox.Draw(pauseDraw); //draw pause menu
 
 
-            pauseBatch.End();
+            pauseDraw.End();
             GraphicsManager.SetRenderTarget(null);
-            return pauseDraw;
+            return pauseTarget;
         }
     }
 }

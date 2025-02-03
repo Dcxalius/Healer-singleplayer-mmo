@@ -5,7 +5,7 @@ using Project_1.GameObjects;
 using Project_1.Items.SubTypes;
 using Project_1.Textures;
 using Project_1.UI.HUD;
-using Project_1.UI.UIElements;
+using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;
 using System.Linq;

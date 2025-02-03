@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework;
 using Project_1.GameObjects.Entities;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Managers;
+using Project_1.UI.UIElements.Boxes;
 
 namespace Project_1.UI.HUD
 {

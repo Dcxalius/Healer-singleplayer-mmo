@@ -19,55 +19,48 @@ using static Project_1.GameObjects.Spells.AoE.AreaOfEffectData;
 
 namespace Project_1.Managers.States
 {
-    internal class Game : State
+    internal class Game : GameState
     {
         SpriteBatch gameDraw;
-        SpriteBatch uIDraw;
-
         RenderTarget2D gameTarget;
-        RenderTarget2D uITarget;
 
-        RasterizerState rasterizerState = new RasterizerState() { ScissorTestEnable = true };
 
-        public Game()
+
+        public Game() : base()
         {
             HUDManager.Init();
             ObjectManager.Init();
 
             gameDraw = GraphicsManager.CreateSpriteBatch();
-            uIDraw = GraphicsManager.CreateSpriteBatch();
 
             gameTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
-            uITarget = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
         }
 
         public override void Update()
         {
             if (InputManager.GetPress(Microsoft.Xna.Framework.Input.Keys.Escape))
             {
-                StateManager.SetState(StateManager.States.Pause);
+                StateManager.SetState(StateManager.States.PauseMenu);
             }
             Camera.Camera.Update();
             ObjectManager.Update();
             SpawnerManager.Update();
-            HUDManager.Update();
             ParticleManager.Update();
+            base.Update();
         }
         public override void Rescale()
         {
             gameTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
-            uITarget = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
-            HUDManager.Rescale();
+            base.Rescale();
         }
 
         public override bool Click(ClickEvent aClickEvent)
         {
-            if (HUDManager.Click(aClickEvent)) return true;
+            if (base.Click(aClickEvent)) return true;
 
             return ObjectManager.Click(aClickEvent);
         }
 
-        public override bool Release(ReleaseEvent aReleaseEvent) => HUDManager.Release(aReleaseEvent);
 
         public override void OnEnter() => TimeManager.StopPause();
 
@@ -75,7 +68,7 @@ namespace Project_1.Managers.States
         {
             StateManager.FinalGameFrame = gameTarget;
             TimeManager.StartPause();
-            HUDManager.PauseMenuActivated();
+            HUDManager.LeavingGameState();
         }
 
         public override RenderTarget2D Draw()
@@ -104,23 +97,7 @@ namespace Project_1.Managers.States
             ParticleManager.Draw(aBatch);
         }
 
-        void UIDraw()
-        {
-            GraphicsManager.SetRenderTarget(uITarget);
-            uIDraw.Begin(SpriteSortMode.Immediate, null, null, null, rasterizerState);
-            
-            GraphicsManager.ClearScreen(Color.Transparent);
-            HUDManager.Draw(uIDraw);
-            DebugManager.Draw(uIDraw);
+        
 
-            uIDraw.End();
-            GraphicsManager.SetRenderTarget(null);
-        }
-
-        public override bool Scroll(ScrollEvent aScrollEvent)
-        {
-            return HUDManager.Scroll(aScrollEvent);
-
-        }
     }
 }

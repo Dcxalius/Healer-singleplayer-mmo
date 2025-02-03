@@ -23,7 +23,8 @@ namespace Project_1.Managers.States
         {
             StartMenu,
             Game,
-            Pause,
+            PausedGame,
+            PauseMenu,
             OptionMenu
         }
 
@@ -31,7 +32,8 @@ namespace Project_1.Managers.States
 
         static StartMenu startMenu;
         static Game game;
-        static Pause pause;
+        static PausedGame pausedGame;
+        static PauseMenu pauseMenu;
         static OptionMenu optionMenu;
 
         static SpriteBatch finalBatch;
@@ -55,7 +57,8 @@ namespace Project_1.Managers.States
 
             startMenu = new StartMenu();
             game = new Game();
-            pause = new Pause();
+            pausedGame = new PausedGame();
+            pauseMenu = new PauseMenu();
             optionMenu = new OptionMenu();
 
             currentState = game;
@@ -77,11 +80,14 @@ namespace Project_1.Managers.States
                 case States.Game:
                     currentState = game;
                     break;
-                case States.Pause:
-                    currentState = pause;
+                case States.PauseMenu:
+                    currentState = pauseMenu;
                     break;
                 case States.OptionMenu:
                     currentState = optionMenu;
+                    break;
+                case States.PausedGame:
+                    currentState = pausedGame;
                     break;
                 default:
                     throw new NotImplementedException();
@@ -104,7 +110,7 @@ namespace Project_1.Managers.States
             if (currentState == null) return;
             game.Rescale();
             optionMenu.Rescale();
-            pause.Rescale();
+            pauseMenu.Rescale();
             startMenu.Rescale();
         }
         public static void Draw()
