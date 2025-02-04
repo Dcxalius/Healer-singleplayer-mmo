@@ -38,6 +38,16 @@ namespace Project_1.GameObjects
 
         static List<FloatingText> floatingTexts = new List<FloatingText>();
 
+        static List<Entity> All
+        {
+            get
+            {
+                var r = entities.Union(guild).ToList();
+                r.Add(player);
+                return r;
+            }
+        }
+
         public static void Init()
         {
             guild.AddRange(ObjectFactory.GetGuildMemebers());
@@ -74,14 +84,13 @@ namespace Project_1.GameObjects
 
             WorldSpace position = FindTileAroundPlayer();
             aMember.RecieveDirectWalkingOrder(position);
-            //entities.Remove(guild.Find(member => member == aMember)); //TODO: Keep this in until its further than the value found in FindTileAroundPlayer
             return player.Party.RemoveFromParty(aMember);
         }
 
         static WorldSpace FindTileAroundPlayer()
         {
             Tile[] tiles = new Tile[0];
-            float start = DistanceOfCircleAroundPlayer; //TODO: Find better way to get these values
+            float start = DistanceOfCircleAroundPlayer; //TODO: Find better way to get these values relating to max camera distance
             float step = 50;
             while (tiles.Length == 0)
             {
@@ -118,14 +127,9 @@ namespace Project_1.GameObjects
                 }
             }
 
-            player.Update();
-            for (int i = entities.Count - 1; i >= 0; i--)
+            for (int i = All.Count - 1; i >= 0; i--)
             {
-                entities[i].Update();
-            }
-            for (int i = guild.Count - 1; i >= 0; i--)
-            {
-                guild[i].Update();
+                All[i].Update();
             }
             for (int i = corpses.Count - 1; i >= 0; i--)
             {
@@ -137,15 +141,15 @@ namespace Project_1.GameObjects
             }
             if (TimeManager.TotalFrameTime % 2000 < 1)
             {
-                player.ServerTick();
-                for (int i = 0; i < entities.Count; i++)
+                for (int i = 0; i < All.Count; i++)
                 {
-                    entities[i].ServerTick();
+                    All[i].ServerTick();
                 }
-                for (int i = 0; i < guild.Count; i++)
-                {
-                    guild[i].ServerTick();
-                }
+            }
+
+            for (int i = 0; i < All.Count; i++)
+            {
+                All[i].RefreshPlates();
             }
         }
 

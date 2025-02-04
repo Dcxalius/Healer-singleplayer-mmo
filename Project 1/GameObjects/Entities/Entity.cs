@@ -73,6 +73,7 @@ namespace Project_1.GameObjects.Entities
 
         protected Corpse corpse;
         ParticleBase bloodsplatter;
+        bool namePlateRequiresUpdate;
 
         SelectRing selectRing;
         Shadow shadow;
@@ -83,7 +84,9 @@ namespace Project_1.GameObjects.Entities
         public Entity(UnitData aUnitData) : base(new RandomAnimatedTexture(aUnitData.GfxPath, new Point(32), 0, TimeSpan.FromMilliseconds(500)), aUnitData.Position)
         {
             unitData = aUnitData;
+            corpse = new Corpse(unitData.CorpseGfxPath, unitData.LootTable);
             bloodsplatter = new ParticleBase((1000d, 2000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[] { Color.Red }, new Point(1));
+            namePlateRequiresUpdate = false;
             shadow = new Shadow();
             selectRing = new SelectRing();
             spellCast = new SpellCast(this);
@@ -94,7 +97,6 @@ namespace Project_1.GameObjects.Entities
             velocity = unitData.Velocity;
             momentum = UnitData.Momentum;
             CreateNamePlate();
-            corpse = new Corpse(unitData.CorpseGfxPath, unitData.LootTable);
         }
 
 
@@ -103,7 +105,7 @@ namespace Project_1.GameObjects.Entities
         {
             if (AmIDead()) return;
             TargetAliveCheck();
-            if (unitData.BaseStats.CheckIfResourceRegened()) RefreshPlates();
+            if (unitData.BaseStats.CheckIfResourceRegened()) FlagForRefresh();
             
             Movement();
             AttackTarget();
@@ -232,7 +234,7 @@ namespace Project_1.GameObjects.Entities
             if (!InCombat)
             {
                 unitData.Tick();
-                RefreshPlates();
+                FlagForRefresh();
             }
         }
         #endregion
@@ -310,7 +312,7 @@ namespace Project_1.GameObjects.Entities
             }
 
             unitData.Resource.Value += value;
-            RefreshPlates();
+            FlagForRefresh();
             return true;
         }
 
@@ -328,7 +330,7 @@ namespace Project_1.GameObjects.Entities
             ParticleMovement bloodMovement = new ParticleMovement(dirOfFlyingStuff, WorldSpace.Zero, 0.9f);
             //DebugManager.Print(GetType(), ((aDamageTaken / MaxHealth) * 100).ToString());
             ParticleManager.SpawnParticle(bloodsplatter, WorldRectangle, this, bloodMovement, (int)Math.Max(1, (aDamageTaken / MaxHealth) * 100));
-            RefreshPlates(); //TODO: Check death here?
+            FlagForRefresh(); //TODO: Check death here?
         }
 
         public virtual bool TakeHealing(Entity aHealer, float aHealingTaken)
@@ -349,7 +351,7 @@ namespace Project_1.GameObjects.Entities
             {
                 aggroTablesIAmOn[i].AddToAggroTable(aHealer, value);
             }
-            RefreshPlates();
+            FlagForRefresh();
             return true;
         }
 
@@ -374,10 +376,12 @@ namespace Project_1.GameObjects.Entities
             HUDManager.RemoveNamePlate(this);
         }
 
-        protected virtual void RefreshPlates()
-        {
-            HUDManager.RefreshPlates(this);
+        protected void FlagForRefresh() => namePlateRequiresUpdate = true;
 
+        public virtual void RefreshPlates()
+        {
+            if (!namePlateRequiresUpdate) return;
+            HUDManager.RefreshPlates(this);
         }
 
         protected virtual void MoveNamePlate()
@@ -418,7 +422,7 @@ namespace Project_1.GameObjects.Entities
             Item item = Equipment.EquipInParticularSlot(aEquipment, aSlot);
             unitData.BaseStats.RefreshEquipmentStats(Equipment.EquipmentStats);
             HUDManager.RefreshCharacterWindowStats(unitData.BaseStats.TotalPrimaryStats.NewReport);
-            RefreshPlates();
+            FlagForRefresh();
 
             return item;
         }
@@ -427,7 +431,7 @@ namespace Project_1.GameObjects.Entities
             Item item = Equipment.Equip(aEquipment);
             unitData.BaseStats.RefreshEquipmentStats(Equipment.EquipmentStats);
             HUDManager.RefreshCharacterWindowStats(unitData.BaseStats.TotalPrimaryStats.NewReport);
-            RefreshPlates();
+            FlagForRefresh();
 
             return item;
         }
@@ -437,7 +441,7 @@ namespace Project_1.GameObjects.Entities
             (Item, Item) returnable = Equipment.EquipTwoHander(aEquipment);
             unitData.BaseStats.RefreshEquipmentStats(Equipment.EquipmentStats);
             HUDManager.RefreshCharacterWindowStats(unitData.BaseStats.TotalPrimaryStats.NewReport);
-            RefreshPlates();
+            FlagForRefresh();
 
             return returnable;
         }

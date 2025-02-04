@@ -77,7 +77,7 @@ namespace Project_1.GameObjects.Entities
             if (namePlate != null) base.MoveNamePlate();
         }
 
-        protected override void RefreshPlates()
+        public override void RefreshPlates()
         {
             if (namePlate != null) base.RefreshPlates();
         }
@@ -86,7 +86,7 @@ namespace Project_1.GameObjects.Entities
         {
             CreateNamePlate();
             base.MoveNamePlate();
-            base.RefreshPlates();
+            base.FlagForRefresh();
             leaving = false;
             RefreshEffects();
         }

@@ -18,6 +18,7 @@ using Project_1.UI.UIElements.Boxes;
 using Project_1.UI.UIElements.Buttons;
 using Project_1.UI.UIElements.Guild;
 using Project_1.UI.UIElements.Inventory;
+using Project_1.UI.UIElements.PlateBoxes;
 using Project_1.UI.UIElements.SpellBook;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,7 @@ namespace Project_1.UI.HUD
     internal static class HUDManager
     {
         static Dictionary<Entity, NamePlate> namePlates = new Dictionary<Entity, NamePlate>();
-
+        //static Dictionary<Entity, PlateBox> plateBoxes = new Dictionary<Entity, PlateBox>(); //TODO: Ponder about this
 
         static List<UIElement> hudElements = new List<UIElement>();
 
@@ -168,7 +169,7 @@ namespace Project_1.UI.HUD
                         if (partyPlateBoxes[i].BelongsTo(null)) break;
                         if (!partyPlateBoxes[i].BelongsTo(aEntity as GuildMember)) continue;
                         partyPlateBoxes[i].Refresh(aEntity);
-                        return;
+                        break;
                     }
                     break;
                 case Relation.RelationToPlayer.Neutral:
