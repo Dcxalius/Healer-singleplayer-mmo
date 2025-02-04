@@ -16,6 +16,8 @@ namespace Project_1.GameObjects.Entities
 {
     internal class GuildMember : Friendly
     {
+        
+
         public struct GuildMemberData
         {
             public string Name => name;
@@ -33,9 +35,33 @@ namespace Project_1.GameObjects.Entities
                 @class = aClass;
             }
         }
+
+        public bool Leaving => leaving;
+        bool leaving;
+
         public GuildMember(UnitData aData) : base(aData)
         {
             RemoveNamePlate(); //TODO: Think of a better way to handle this
+            leaving = false;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+
+
+            CheckLeavingDistance();
+        }
+
+        void CheckLeavingDistance()
+        {
+            if (!leaving || HasDestination)
+            {
+                return;
+            }
+
+            RemoveNamePlate();
+            ObjectManager.RemoveEntity(this);
         }
 
         protected override void ClickedOn(ClickEvent aClickEvent)
@@ -61,11 +87,13 @@ namespace Project_1.GameObjects.Entities
             CreateNamePlate();
             base.MoveNamePlate();
             base.RefreshPlates();
+            leaving = false;
+            RefreshEffects();
         }
 
         public void RemovedFromParty()
         {
-            RemoveNamePlate();
+            leaving = true ;
         }
 
         public void Command(ClickEvent aClickEvent)

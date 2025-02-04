@@ -107,15 +107,20 @@ namespace Project_1.GameObjects.Entities
             
             Movement();
             AttackTarget();
-
-            shadow.UpdatePosition(Position, Size);
-            selectRing.UpdatePosition(Position, Size);
+            RefreshEffects();
             spellCast.UpdateSpellChannel();
             buffList.Update(this);
 
             MoveNamePlate();
 
             //HUDManager.RefreshPlateBox(this);
+        }
+
+        protected void RefreshEffects()
+        {
+            shadow.UpdatePosition(Position, Size);
+            selectRing.UpdatePosition(Position, Size);
+
         }
 
         bool AmIDead()

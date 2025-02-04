@@ -20,6 +20,7 @@ namespace Project_1.GameObjects
         public WorldSpace Centre { get => position + new WorldSpace(size.ToVector2()) / 2; }
         public WorldSpace FeetPosition { get => Position + (WorldSpace)new Vector2(size.X / 2, size.Y); }
         public Rectangle WorldRectangle { get => new Rectangle(position.ToPoint(), size); }
+        public float DistanceTo(WorldSpace aPoint) => FeetPosition.DistanceTo(aPoint);
         
         protected Textures.Texture gfx;
 

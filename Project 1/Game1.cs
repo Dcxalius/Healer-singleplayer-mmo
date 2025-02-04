@@ -56,10 +56,10 @@ namespace Project_1
 
         protected override void Update(GameTime gameTime)
         {
+            TimeManager.Update(gameTime);
 
             GraphicsManager.Update();
             InputManager.Update();
-            TimeManager.Update(gameTime);
             StateManager.Update();
             DebugManager.Update();
 

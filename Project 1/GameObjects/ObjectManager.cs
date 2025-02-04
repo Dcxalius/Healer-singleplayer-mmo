@@ -26,6 +26,7 @@ namespace Project_1.GameObjects
 {
     internal static class ObjectManager
     {
+        public const float DistanceOfCircleAroundPlayer = 700;
         public static Player Player { get => player; }
 
         public static List<Entity> entities = new List<Entity>();
@@ -80,7 +81,7 @@ namespace Project_1.GameObjects
         static WorldSpace FindTileAroundPlayer()
         {
             Tile[] tiles = new Tile[0];
-            float start = 700; //TODO: Find better way to get these values
+            float start = DistanceOfCircleAroundPlayer; //TODO: Find better way to get these values
             float step = 50;
             while (tiles.Length == 0)
             {
@@ -90,6 +91,7 @@ namespace Project_1.GameObjects
                 Debug.Assert(start > 0);
             }
             Tile tile = tiles[RandomManager.RollInt(tiles.Length)];
+            //tile = tiles[tiles.Length - 1];
             return tile.Position;
         }
 

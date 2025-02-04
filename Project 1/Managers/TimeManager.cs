@@ -10,12 +10,13 @@ namespace Project_1.Managers
 {
     internal static class TimeManager
     {
-        static GameTime gt;
+        static GameTime gameTime;
         static TimeSpan? timePaused;
         public static double SecondsSinceLastFrame
         {
-            get => gt.ElapsedGameTime.TotalSeconds;
+            get => gameTime.ElapsedGameTime.TotalSeconds;
         }
+
         
         public static double TotalFrameTime
         {
@@ -23,7 +24,7 @@ namespace Project_1.Managers
             {
                 if (!timePaused.HasValue)
                 {
-                    return gt.TotalGameTime.TotalMilliseconds;
+                    return gameTime.TotalGameTime.TotalMilliseconds;
                 }
                 return timePaused.Value.TotalMilliseconds;
             }
@@ -36,7 +37,7 @@ namespace Project_1.Managers
             {
                 if (!timePaused.HasValue)
                 {
-                    return gt.TotalGameTime;
+                    return gameTime.TotalGameTime;
                 }
                 return timePaused.Value;
             }
@@ -44,19 +45,19 @@ namespace Project_1.Managers
         
         public static void Update(GameTime aGameTime)
         {
-            gt = aGameTime;
+            gameTime = aGameTime;
         }
 
         public static void StartPause()
         {
             Debug.Assert(!timePaused.HasValue, "Tried to pause paused game.");
-            timePaused = gt.TotalGameTime;
+            timePaused = gameTime.TotalGameTime;
         }
 
         public static void StopPause()
         {
             Debug.Assert(timePaused.HasValue, "Tried to unpause unpaused game.");
-            gt.TotalGameTime = timePaused.Value;
+            gameTime.TotalGameTime = timePaused.Value;
             timePaused = null;
         }
     }
