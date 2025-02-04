@@ -147,6 +147,11 @@ namespace Project_1.GameObjects
                 }
             }
 
+            
+        }
+
+        public static void RefreshPlates()
+        {
             for (int i = 0; i < All.Count; i++)
             {
                 All[i].RefreshPlates();

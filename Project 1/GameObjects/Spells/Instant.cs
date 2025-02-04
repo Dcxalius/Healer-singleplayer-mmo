@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Project_1.GameObjects.Entities;
+using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -17,12 +18,22 @@ namespace Project_1.GameObjects.Spells
             Attack
         }
 
-        int value;
+        int RandomValue
+        {
+            get
+            {
+                if (minValue == maxValue) return minValue;
+                return RandomManager.RollInt(minValue, maxValue);
+            }
+        }
+
+        int minValue;
+        int maxValue;
         Type type 
         {
             get
             {
-                if (value > 0)
+                if (minValue > 0)
                 {
                     return Type.Heal;
                 }
@@ -34,24 +45,24 @@ namespace Project_1.GameObjects.Spells
         }
 
         [JsonConstructor]
-        public Instant(string name, int value) : base(name)
+        public Instant(string name, int minValue, int maxValue) : base(name)
         {
-            Debug.Assert(value != 0, "Tried to make effect with no effect.");
-            this.value = value;
-            
+            Debug.Assert(maxValue != 0, "Tried to make effect with no effect.");
+            this.minValue = minValue;
+            this.maxValue = maxValue;
         }
 
         public override bool Trigger(Entity aCaster, Entity aTarget)
         {
             if (type == Type.Attack)
             {
-                aTarget.TakeDamage(aCaster, value);
+                aTarget.TakeDamage(aCaster, RandomValue);
                 return true;
             }
 
             if (type == Type.Heal)
             {
-                aTarget.TakeHealing(aCaster, value);
+                aTarget.TakeHealing(aCaster, RandomValue);
                 return true;
 
             }

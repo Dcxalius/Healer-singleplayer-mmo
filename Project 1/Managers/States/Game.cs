@@ -47,6 +47,9 @@ namespace Project_1.Managers.States
             SpawnerManager.Update();
             ParticleManager.Update();
             base.Update();
+
+            ObjectManager.RefreshPlates();
+            SpawnerManager.RefreshPlates();
         }
         public override void Rescale()
         {

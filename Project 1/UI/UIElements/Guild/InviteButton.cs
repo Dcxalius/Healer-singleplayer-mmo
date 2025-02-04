@@ -28,13 +28,6 @@ namespace Project_1.UI.UIElements.Guild
             AddAction(new Action(() => Kick()), State.Second);
         }
 
-        public override void HoldReleaseOnMe()
-        {
-            base.HoldReleaseOnMe();
-
-
-        }
-
         void Invite()
         {
             Debug.Assert(!ObjectManager.Player.Party.IsInParty(guildMember));

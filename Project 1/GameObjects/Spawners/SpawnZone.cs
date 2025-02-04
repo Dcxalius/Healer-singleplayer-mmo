@@ -82,5 +82,13 @@ namespace Project_1.GameObjects.Spawners
             }
             return false;
         }
+
+        internal void RefreshPlates()
+        {
+            for (int i = 0; i < spawners.Count; i++)
+            {
+                spawners[i].RefreshPlates();
+            }
+        }
     }
 }

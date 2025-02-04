@@ -106,5 +106,12 @@ namespace Project_1.GameObjects.Spawners
 
             return spawn.Click(aClickEvent);
         }
+
+        internal void RefreshPlates()
+        {
+            if (spawn == null) return;
+
+            spawn.RefreshPlates();
+        }
     }
 }

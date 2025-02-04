@@ -66,6 +66,14 @@ namespace Project_1.GameObjects.Spawners
             }
         }
 
+        public static void RefreshPlates()
+        {
+            for (int i = 0; i < spawnZones.Count; i++)
+            {
+                spawnZones[i].RefreshPlates();
+            }
+        }
+
         internal static void Draw(SpriteBatch aBatch)
         {
             for (int i = 0; i < spawnZones.Count; i++)
