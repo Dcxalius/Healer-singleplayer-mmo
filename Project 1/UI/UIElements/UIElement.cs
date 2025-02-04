@@ -19,7 +19,7 @@ namespace Project_1.UI.UIElements
     internal abstract class UIElement
     {
         #region Interactibility
-        public bool Visible
+        public virtual bool Visible
         {
             get => visible;
 
@@ -187,11 +187,7 @@ namespace Project_1.UI.UIElements
 
         public virtual void ToggleVisibilty()
         {
-            visible = !visible;
-            foreach (UIElement child in children)
-            {
-                child.Visible = visible;
-            }
+            Visible = !visible;
         }
 
         public virtual void Rescale()
@@ -210,7 +206,11 @@ namespace Project_1.UI.UIElements
             if (aNewPos.X == float.NaN || aNewPos.Y == float.NaN) throw new ArgumentException("Invalid move.");
             relativePos = aNewPos;
             pos.Location = TransformFromRelativeToPoint(aNewPos);
-           //absolutePos = new AbsoluteScreenPosition(pos.Location) + parentPos;
+            absolutePos = new AbsoluteScreenPosition(pos.Location) + parentPos;
+            for (int i = 0; i < children.Count; i++)
+            {
+                children[i].parentPos = absolutePos;//TODO: Expand on this
+            }
         }
 
         public void Resize(RelativeScreenPosition aSize)

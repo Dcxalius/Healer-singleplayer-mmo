@@ -54,7 +54,7 @@ namespace Project_1.GameObjects.Unit
             attackDamageMax = aDmgMax;
             secondsPerAttack = aSecondsPerAttack;
 
-            Debug.Assert(secondsPerAttack > 0 && attackDamageMin > 0 && attackDamageMax > 0);
+            //Debug.Assert(secondsPerAttack > 0 && attackDamageMin > 0 && attackDamageMax > 0);
         }
     }
 }

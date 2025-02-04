@@ -16,7 +16,7 @@ namespace Project_1.Items
 {
     internal class Inventory
     {
-        Entity owner; //TODO: Remove this dependency and move all of this into unitdata
+        //TODO: Move all of this into unitdata
 
         public const int bagSlots = 4;
         public const int defaultSlots = 32;
@@ -25,9 +25,6 @@ namespace Project_1.Items
         public Container[] bags;
         public Inventory(Entity aOwner)
         {
-            owner = aOwner;
-
-
             bags = new Container[bagSlots + 1]; //Bag 0 is fornow always null
             items = new Item[bagSlots + 1][];
             items[0] = new Item[defaultSlots];
@@ -48,16 +45,16 @@ namespace Project_1.Items
 
         public int OpenSlots() { return items.Count(item => item == null); }
 
-        public bool ConsumeItem((int, int) aBagAndSlotIndex)
+        public bool ConsumeItem((int, int) aBagAndSlotIndex, Friendly aFriendly)
         {
-            return ConsumeItem(aBagAndSlotIndex.Item1, aBagAndSlotIndex.Item2);
+            return ConsumeItem(aBagAndSlotIndex.Item1, aBagAndSlotIndex.Item2, aFriendly);
         }
 
-        public bool ConsumeItem(int aBagIndex, int aSlotIndex)
+        public bool ConsumeItem(int aBagIndex, int aSlotIndex, Friendly aFriendly)
         {
             Debug.Assert(items[aBagIndex][aSlotIndex].ItemType == ItemData.ItemType.Consumable, "Tried to consume nonconcumable.");
 
-            if (!(items[aBagIndex][aSlotIndex] as Consumable).Use(owner)) return false;
+            if (!(items[aBagIndex][aSlotIndex] as Consumable).Use(aFriendly)) return false;
 
             TrimStack(aBagIndex, aSlotIndex, 1);
             HUDManager.RefreshInventorySlot(aBagIndex, aSlotIndex, this);
@@ -496,7 +493,7 @@ namespace Project_1.Items
             return bags;
         }
 
-        internal void Equip((int, int) aIndex)
+        internal void Equip((int, int) aIndex, Friendly aFriendly)
         {
             Item item = items[aIndex.Item1][aIndex.Item2];
 
@@ -504,24 +501,24 @@ namespace Project_1.Items
             if (!(item.ItemType == ItemData.ItemType.Equipment || item.ItemType == ItemData.ItemType.Weapon)) return;
 
             Equipment equipment = item as Equipment;
-            GameObjects.Unit.Equipment wearing = owner.Equipment;
+            GameObjects.Unit.Equipment wearing = aFriendly.Equipment;
 
             if (equipment.type == Equipment.Type.TwoHander) 
             {
                 if (OpenSlots() < 1 && wearing.EquipedInSlot(GameObjects.Unit.Equipment.Slot.MainHand) != null && wearing.EquipedInSlot(GameObjects.Unit.Equipment.Slot.OffHand) != null) return;
 
-                (Item, Item) equipedInSlots = owner.EquipTwoHander(equipment);
+                (Item, Item) equipedInSlots = aFriendly.EquipTwoHander(equipment);
                 AssignItem(equipedInSlots.Item1, aIndex);
                 if (equipedInSlots.Item2 == null) return;
                 AddItem(equipedInSlots.Item2);
                 return;
             }
 
-            Item equipedInSlot = owner.Equip(equipment);
+            Item equipedInSlot = aFriendly.Equip(equipment);
             AssignItem(equipedInSlot, aIndex);
         }
 
-        internal void SwapEquipment((int, int) aIndex, int aEquipmentSlot)
+        internal void SwapEquipment((int, int) aIndex, int aEquipmentSlot, Friendly aFriendly)
         {
             Item item = items[aIndex.Item1][aIndex.Item2];
 
@@ -529,25 +526,25 @@ namespace Project_1.Items
             if (!(item.ItemType == ItemData.ItemType.Equipment || item.ItemType == ItemData.ItemType.Weapon)) return;
 
             Equipment equipment = item as Equipment;
-            GameObjects.Unit.Equipment wearing = owner.Equipment;
+            GameObjects.Unit.Equipment wearing = aFriendly.Equipment;
 
             if(equipment.type == Equipment.Type.TwoHander)
             {
                 if (!(GameObjects.Unit.Equipment.Slot.MainHand == (GameObjects.Unit.Equipment.Slot)aEquipmentSlot || GameObjects.Unit.Equipment.Slot.OffHand == (GameObjects.Unit.Equipment.Slot)aEquipmentSlot)) return;
-                Equip(aIndex);
+                Equip(aIndex, aFriendly);
                 return;
             }
 
             if (equipment.type <= Equipment.Type.Feet || equipment.type >= Equipment.Type.MainHander)
             {
                 if (GameObjects.Unit.Equipment.SlotToSlot(equipment.type) != (GameObjects.Unit.Equipment.Slot)aEquipmentSlot) return;
-                Equip(aIndex);
+                Equip(aIndex, aFriendly);
                 return;
             }
 
             //Only things here should be Trinkets, rings and one handers
             if (!GameObjects.Unit.Equipment.FitsInSlot(equipment.type, (GameObjects.Unit.Equipment.Slot)aEquipmentSlot)) return;
-            Item equipedInSlot = owner.EquipInParticularSlot(equipment, (GameObjects.Unit.Equipment.Slot)aEquipmentSlot);
+            Item equipedInSlot = aFriendly.EquipInParticularSlot(equipment, (GameObjects.Unit.Equipment.Slot)aEquipmentSlot);
             AssignItem(equipedInSlot, aIndex);
         }
 

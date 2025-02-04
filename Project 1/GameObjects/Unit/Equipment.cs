@@ -44,6 +44,9 @@ namespace Project_1.GameObjects.Unit
             TwoHander,
             DualWielding
         }
+
+        Entity owner;
+
         Items.SubTypes.Equipment[] equipped;
 
         public EquipmentStats EquipmentStats => equipmentStats;
@@ -63,6 +66,8 @@ namespace Project_1.GameObjects.Unit
 
             RefreshStatsFromEquipment();
         }
+
+        public void SetOwner(Entity aOwner) => owner = aOwner;
 
         void RefreshStatsFromEquipment()
         {
@@ -299,7 +304,7 @@ namespace Project_1.GameObjects.Unit
             equipped[(int)aSlot] = aEquipment;
             equipmentStats.AddStats(aEquipment.Stats);
             
-            HUDManager.RefreshCharacterWindowSlot(aSlot, this); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
+            HUDManager.RefreshCharacterWindowSlot(aSlot, this, owner as Friendly); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
             return previouslyEquiped;
         }
 
@@ -308,7 +313,7 @@ namespace Project_1.GameObjects.Unit
             Debug.Assert(equipped[(int)aSlot] == null);
             equipped[(int)aSlot] = aEquipment;
             equipmentStats.AddStats(aEquipment.Stats);
-            HUDManager.RefreshCharacterWindowSlot(aSlot, this); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
+            HUDManager.RefreshCharacterWindowSlot(aSlot, this, owner as Friendly); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
         }
 
         Item RemoveItem(Slot aSlot)
@@ -317,7 +322,7 @@ namespace Project_1.GameObjects.Unit
             if (item == null) return null;
             equipped[(int)aSlot] = null;
             equipmentStats.RemoveStats(item.Stats);
-            HUDManager.RefreshCharacterWindowSlot(aSlot, this);
+            HUDManager.RefreshCharacterWindowSlot(aSlot, this, owner as Friendly);
             return item;
         }
 
@@ -328,20 +333,24 @@ namespace Project_1.GameObjects.Unit
             if (equipped[(int)Slot.MainHand] != null)
             {
                 Weapon mhw = (equipped[(int)Slot.MainHand] as Weapon);
-                mh = mhw.attack;
+                mh = mhw.Attack;
 
                 if (mhw.handRequirement == Weapon.HandRequirement.TwoHand) return (AttackStyle.TwoHander, mh, null);
             }
 
-            Attack oh = null;
-
-            if (equipped[(int)Slot.OffHand] == null) 
+            if (equipped[(int)Slot.OffHand] == null)
             {
                 if (mh == null) return (AttackStyle.None, null, null);
                 return (AttackStyle.OneHander, mh, null);
             }
 
-            oh = (equipped[(int)Slot.OffHand] as Weapon).attack;
+            Attack oh = (equipped[(int)Slot.OffHand] as Weapon).Attack;
+            
+            if (oh.dps == 0)
+            {
+                if (mh == null) return (AttackStyle.None, null, null);
+                return (AttackStyle.OneHander, mh, null);
+            }
 
             if (mh == null) return (AttackStyle.OneHander, null, oh);
 

@@ -243,9 +243,19 @@ namespace Project_1.UI.UIElements.Inventory
 
         bool ToCharacterPane(Item aItemDroppedOnMe)
         {
-            if (bagIndex != -3) return false;
+            if (bagIndex != -3 && bagIndex != -4) return false;
 
-            ObjectManager.Player.Inventory.SwapEquipment(aItemDroppedOnMe.Index, slotIndex);
+            if (bagIndex == -3)
+            {
+                ObjectManager.Player.Inventory.SwapEquipment(aItemDroppedOnMe.Index, slotIndex, ObjectManager.Player);
+                return true;
+            }
+
+            if (bagIndex == -4) //TODO: Break this out and expand to other scenarios
+            {
+                ObjectManager.Player.Inventory.SwapEquipment(aItemDroppedOnMe.Index, slotIndex, HUDManager.GetGuildMemberInspectWindowTarget());
+
+            }
             return true;
         }
 
@@ -297,11 +307,11 @@ namespace Project_1.UI.UIElements.Inventory
                     case ItemData.ItemType.Trash:
                         break;
                     case ItemData.ItemType.Consumable:
-                        ObjectManager.Player.Inventory.ConsumeItem(Index);
+                        ObjectManager.Player.Inventory.ConsumeItem(Index, ObjectManager.Player);
                         break;
                     case ItemData.ItemType.Equipment:
                     case ItemData.ItemType.Weapon:
-                        ObjectManager.Player.Inventory.Equip(Index);
+                        ObjectManager.Player.Inventory.Equip(Index, ObjectManager.Player);
                         break;
                     default:
                         throw new NotImplementedException();

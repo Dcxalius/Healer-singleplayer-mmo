@@ -19,11 +19,12 @@ namespace Project_1.UI.UIElements.Guild
 {
     internal class GuildMemberListing : Box, IComparable //TODO: Should this be button?
     {
+        Friendly friendly;
         Label name;
         Label level;
         Label @class;
         OpenInventory openInventory;
-        OpenCharacterWindow openCharacterWindow;
+        OpenInspectWindow openInspectWindow;
         InviteButton invite;
 
         RelativeScreenPosition buttonSize;
@@ -41,31 +42,33 @@ namespace Project_1.UI.UIElements.Guild
         }
 
 
-        public GuildMemberListing(Friendly aGuildMember, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.Pink), aPos, aSize) //TODO: Make this sortable
+        public GuildMemberListing(Friendly aFriendly, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.Pink), aPos, aSize) //TODO: Make this sortable
         {
+            friendly = aFriendly;
+
             buttonSize = RelativeScreenPosition.GetSquareFromY(aSize.Y - spacing.Y - spacing.Y);
             buttonPos = new RelativeScreenPosition(aSize.X, spacing.Y);
             changeInY = new RelativeScreenPosition(-buttonSize.X - spacing.X, 0);
             
-            openCharacterWindow = new OpenCharacterWindow(GetButtonPos, buttonSize);
+            openInspectWindow = new OpenInspectWindow(friendly, GetButtonPos, buttonSize);
             openInventory = new OpenInventory(GetButtonPos, buttonSize);
 
             float labelPosX = (buttonPos.X - spacing.X - spacing.X) / 3;
             RelativeScreenPosition labelSize = new RelativeScreenPosition(labelPosX, aSize.Y);
 
-            name = new Label(aGuildMember.Name, new RelativeScreenPosition(spacing.X, 0), labelSize, Label.TextAllignment.CentreLeft);
-            level = new Label(aGuildMember.CurrentLevel.ToString(), new RelativeScreenPosition(spacing.X + labelPosX, 0), labelSize, Label.TextAllignment.Centred);
-            @class = new Label(aGuildMember.Class, new RelativeScreenPosition(spacing.X + labelPosX * 2, 0), labelSize, Label.TextAllignment.CentreRight);
+            name = new Label(aFriendly.Name, new RelativeScreenPosition(spacing.X, 0), labelSize, Label.TextAllignment.CentreLeft);
+            level = new Label(aFriendly.CurrentLevel.ToString(), new RelativeScreenPosition(spacing.X + labelPosX, 0), labelSize, Label.TextAllignment.Centred);
+            @class = new Label(aFriendly.Class, new RelativeScreenPosition(spacing.X + labelPosX * 2, 0), labelSize, Label.TextAllignment.CentreRight);
 
             AddChild(name);
             AddChild(level);
             AddChild(@class);
-            AddChild(openCharacterWindow);
+            AddChild(openInspectWindow);
             AddChild(openInventory);
 
-            if (aGuildMember.GetType() != typeof(Player))
+            if (aFriendly.GetType() != typeof(Player))
             {
-                invite = new InviteButton(aGuildMember, GetButtonPos, buttonSize);
+                invite = new InviteButton(aFriendly, GetButtonPos, buttonSize);
                 AddChild(invite);
             }
         }

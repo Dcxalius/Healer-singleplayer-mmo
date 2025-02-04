@@ -19,14 +19,14 @@ namespace Project_1.UI.HUD.Windows
 {
     internal class CharacterWindow : Window
     {
-        //Entity owner;
-
-        Label nameLabel;
+        protected Label nameLabel;
         Item[] equiped;
 
         Label nrStatReport;
         Label stringStatReport;
         ExpBar expBar;
+
+        protected virtual int BagIndexForItem => -3;
 
         static RelativeScreenPosition itemSize = RelativeScreenPosition.GetSquareFromY(0.05f);
         static RelativeScreenPosition itemSpacing = RelativeScreenPosition.GetSquareFromY(0.003f);
@@ -37,7 +37,7 @@ namespace Project_1.UI.HUD.Windows
         static RelativeScreenPosition expBarSize = new RelativeScreenPosition(WindowSize.X, 0.05f);
         static RelativeScreenPosition expBarPos = new RelativeScreenPosition(0, WindowSize.Y - expBarSize.Y);
 
-        public CharacterWindow(Entity aEntity) : base(new UITexture("WhiteBackground", Color.Turquoise))
+        public CharacterWindow() : base(new UITexture("WhiteBackground", Color.Turquoise))
         {
             nameLabel = new Label(null, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(WindowSize.X, itemSize.Y), Label.TextAllignment.TopCentre, Color.Black);
 
@@ -63,34 +63,26 @@ namespace Project_1.UI.HUD.Windows
             AddChild(nrStatReport);
             AddChild(stringStatReport);
             AddChild(expBar);
-            //ToggleVisibilty();
+
         }
 
-        public void SetData(Friendly aFriendly, PairReport aReport)
+        public virtual void SetData(Friendly aFriendly)
         {
             nameLabel.Text = aFriendly.Name;
-            SetReportBox(aReport);
+            SetReportBox(aFriendly.PrimaryStatReport);
             RefreshExp(aFriendly.Level);
             SetAllSlots(aFriendly.Equipment);
         }
 
-        void CreateItems(Equipment.Slot aStart, Equipment.Slot aEnd, RelativeScreenPosition aStartPos, RelativeScreenPosition aChangeInPos)//TODO: Make this take an array 
+        void CreateItems(Equipment.Slot aStart, Equipment.Slot aEnd, RelativeScreenPosition aStartPos, RelativeScreenPosition aChangeInPos)
         {
             for (int i = (int)aStart; i <= (int)aEnd; i++)
             {
-                //Items.Item item = owner.Equipment.EquipedInSlot((Equipment.Slot)i); //and use that to get item here instead
-                //if (item != null)
-                //{
-                //    equiped[i] = new Item(-3, i, true, item.GfxPath, aStartPos + aChangeInPos * (i - (int)aStart), itemSize);
-                //}
-                //else
-                {
-                    equiped[i] = new Item(-3, i, true, new GfxPath(GfxType.Item, null), aStartPos + aChangeInPos * (i - (int)aStart), itemSize);
-                }
+                equiped[i] = new Item(BagIndexForItem, i, true, new GfxPath(GfxType.Item, null), aStartPos + aChangeInPos * (i - (int)aStart), itemSize);
             }
         }
 
-        public void SetAllSlots(Equipment aEquipment)
+        void SetAllSlots(Equipment aEquipment)
         {
             for (int i = 0; i < (int)Equipment.Slot.Count; i++)
             {

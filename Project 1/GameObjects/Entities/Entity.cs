@@ -84,6 +84,8 @@ namespace Project_1.GameObjects.Entities
         public Entity(UnitData aUnitData) : base(new RandomAnimatedTexture(aUnitData.GfxPath, new Point(32), 0, TimeSpan.FromMilliseconds(500)), aUnitData.Position)
         {
             unitData = aUnitData;
+            unitData.Equipment.SetOwner(this);
+            unitData.BaseStats.SetOwner(this);
             corpse = new Corpse(unitData.CorpseGfxPath, unitData.LootTable);
             bloodsplatter = new ParticleBase((1000d, 2000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[] { Color.Red }, new Point(1));
             namePlateRequiresUpdate = false;
@@ -360,7 +362,9 @@ namespace Project_1.GameObjects.Entities
         public void GainExperience(int aExpAmount)
         {
             unitData.GainExp(aExpAmount);
-            HUDManager.RefreshCharacterWindowExpBar(this);
+
+            if (!(this is Friendly)) return;
+            HUDManager.RefreshCharacterWindowExpBar(this as Friendly);
         }
         protected void CreateNamePlate()
         {
@@ -421,16 +425,22 @@ namespace Project_1.GameObjects.Entities
         {
             Item item = Equipment.EquipInParticularSlot(aEquipment, aSlot);
             unitData.BaseStats.RefreshEquipmentStats(Equipment.EquipmentStats);
-            HUDManager.RefreshCharacterWindowStats(unitData.BaseStats.TotalPrimaryStats.NewReport);
             FlagForRefresh();
 
+            if (this is Friendly)
+            {
+                HUDManager.RefreshCharacterWindowStats(unitData.BaseStats.TotalPrimaryStats.NewReport, this as Friendly);
+            }
             return item;
         }
         public Item Equip(Items.SubTypes.Equipment aEquipment)
         {
             Item item = Equipment.Equip(aEquipment);
             unitData.BaseStats.RefreshEquipmentStats(Equipment.EquipmentStats);
-            HUDManager.RefreshCharacterWindowStats(unitData.BaseStats.TotalPrimaryStats.NewReport);
+            if (this is Friendly)
+            {
+                HUDManager.RefreshCharacterWindowStats(unitData.BaseStats.TotalPrimaryStats.NewReport, this as Friendly);
+            }
             FlagForRefresh();
 
             return item;
@@ -440,7 +450,10 @@ namespace Project_1.GameObjects.Entities
         {
             (Item, Item) returnable = Equipment.EquipTwoHander(aEquipment);
             unitData.BaseStats.RefreshEquipmentStats(Equipment.EquipmentStats);
-            HUDManager.RefreshCharacterWindowStats(unitData.BaseStats.TotalPrimaryStats.NewReport);
+            if (this is Friendly)
+            {
+                HUDManager.RefreshCharacterWindowStats(unitData.BaseStats.TotalPrimaryStats.NewReport, this as Friendly);
+            }
             FlagForRefresh();
 
             return returnable;

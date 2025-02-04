@@ -1,4 +1,5 @@
-﻿using Project_1.GameObjects.Unit.Resources;
+﻿using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Unit.Resources;
 using Project_1.UI.HUD;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace Project_1.GameObjects.Unit.Stats
 {
     internal class BaseStats
     {
+        Entity owner;
         public Health Health => health;
         Health health;
 
@@ -66,6 +68,8 @@ namespace Project_1.GameObjects.Unit.Stats
             attack = new Attack(aClassData.FistMinAttackDamage, aClassData.FistMaxAttackDamage, aClassData.FistAttackSpeed);
         }
 
+        public void SetOwner(Entity aEntity) => owner = aEntity;
+
         public bool CheckIfResourceRegened()
         {
             if (resource.GetType() != typeof(Mana)) return false;
@@ -85,9 +89,11 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void RefreshStats()
         {
-            HUDManager.RefreshCharacterWindowStats(TotalPrimaryStats.NewReport);
             health.Refresh(TotalPrimaryStats);
             resource.Refresh(TotalPrimaryStats);
+            if (!(owner is Friendly)) return;
+
+            HUDManager.RefreshCharacterWindowStats(TotalPrimaryStats.NewReport, owner as Friendly);
         }
 
         public void RefreshEquipmentStats(EquipmentStats aEquipmentStats)

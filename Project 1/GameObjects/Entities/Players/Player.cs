@@ -45,7 +45,7 @@ namespace Project_1.GameObjects.Entities.Players
             party = new Party(this);
             guild = new Guild(this);
 
-            HUDManager.SetCharacterWindow(this, PrimaryStatReport);
+            HUDManager.SetCharacterWindow(this);
             HUDManager.SetPlayerPlateBox(this);
         }
         public override void Update()

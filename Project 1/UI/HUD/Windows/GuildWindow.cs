@@ -16,13 +16,25 @@ namespace Project_1.UI.HUD.Windows
     internal class GuildWindow : Window
     {
         GuildRoster roster;
+        public override bool Visible
+        {
+            get => base.Visible; 
+            set
+            {
+                base.Visible = value;
+
+                if (!value)
+                {
+                    HUDManager.CloseGuildWindow();
+                }
+            }
+        }
         public GuildWindow() : base(new UITexture("WhiteBackground", Color.SaddleBrown))
         {
             roster = new GuildRoster(RelativeScreenPosition.Zero, new (WindowSize.X, 0.17f));
             visibleKey = Input.KeyBindManager.KeyListner.GuildRoster;
 
             AddChild(roster);
-            //ToggleVisibilty();
         }
 
         public void SetGuildMemberInviteStatus(List<string> aName, List<TwoStateGFXButton.State> aState)

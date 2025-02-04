@@ -51,6 +51,7 @@ namespace Project_1.UI.HUD
         static CharacterWindow characterWindow;
         static SpellBookWindow spellBookWindow;
         static GuildWindow guildWindow;
+        static InspectWindow inspectWindow;
 
         static CastBar playerCastBar;
         static FirstSpellBar firstSpellBar;
@@ -97,12 +98,16 @@ namespace Project_1.UI.HUD
             hudElements.Add(descriptorBox);
 
             Window.Init(new RelativeScreenPosition(0.05f, 0.2f), new RelativeScreenPosition(0.1f, 0f), new RelativeScreenPosition(0.2f, 0.6f));
-            characterWindow = new CharacterWindow(ObjectManager.Player);
+            characterWindow = new CharacterWindow();
             hudElements.Add(characterWindow);
             spellBookWindow = new SpellBookWindow();
             hudElements.Add(spellBookWindow);
+            inspectWindow = new InspectWindow();
+            hudElements.Add(inspectWindow);
             guildWindow = new GuildWindow();
             hudElements.Add(guildWindow);
+
+
 
             firstSpellBar = new FirstSpellBar(10, new RelativeScreenPosition(0.2f, 0.86f), 0.6f);
             hudElements.Add(firstSpellBar);
@@ -296,6 +301,8 @@ namespace Project_1.UI.HUD
             guildWindow.SetGuildMemberInviteStatus(aName, aState);
         }
 
+
+
         #endregion
 
 
@@ -309,17 +316,71 @@ namespace Project_1.UI.HUD
 
         #endregion
 
-        #region CharacterWindow
-        public static void SetCharacterWindow(Friendly aFriendly, PairReport aRaport) => characterWindow.SetData(aFriendly, aRaport);
+        #region CharacterAndInspectWindow
+        public static void SetCharacterWindow(Player aPlayer) => characterWindow.SetData(aPlayer);
+        public static void ToggleCharacterWindow() => characterWindow.ToggleVisibilty();
 
-        public static void RefreshCharacterWindowSlot(Equipment.Slot aSlot, Equipment aEquipment) => characterWindow.SetSlot(aSlot, aEquipment);
-        public static void RefreshCharacterWindowStats(PairReport aReport) => characterWindow.SetReportBox(aReport);
-        public static void RefreshCharacterWindowExpBar(Entity aEntity)
+        public static void RefreshCharacterWindowSlot(Equipment.Slot aSlot, Equipment aEquipment, Friendly aFriendly)
         {
-            if (aEntity.GetType() == typeof(Player))
+            if (aFriendly.RelationToPlayer == Relation.RelationToPlayer.Self)
             {
-                characterWindow.RefreshExp(aEntity.Level);
+                characterWindow.SetSlot(aSlot, aEquipment);
+                return;
             }
+
+            if (!inspectWindow.BelongsTo(aFriendly as GuildMember)) return;
+
+            inspectWindow.SetSlot(aSlot, aEquipment);
+        }
+
+        public static void RefreshCharacterWindowStats(PairReport aReport, Friendly aFriendly)
+        {
+            if (aFriendly.RelationToPlayer == Relation.RelationToPlayer.Self)
+            {
+                characterWindow.SetReportBox(aReport);
+                return;
+            }
+            if (!inspectWindow.BelongsTo(aFriendly as GuildMember)) return;
+
+            inspectWindow.SetReportBox(aReport);
+        }
+
+        public static void RefreshCharacterWindowExpBar(Friendly aFriendly)
+        {
+            if (aFriendly.RelationToPlayer == Relation.RelationToPlayer.Self)
+            {
+                characterWindow.RefreshExp(aFriendly.Level);
+                return;
+            }
+
+            if (!inspectWindow.BelongsTo(aFriendly as GuildMember)) return;
+
+            inspectWindow.RefreshExp(aFriendly.Level);
+
+        }
+
+        public static GuildMember GetGuildMemberInspectWindowTarget() => inspectWindow.GuildMember;
+
+        public static void ToggleInspectWindow(GuildMember aGuildMember)
+        {
+            if (inspectWindow.Visible == true && inspectWindow.BelongsTo(aGuildMember))
+            {
+                inspectWindow.ToggleVisibilty();
+                inspectWindow.RemoveData();
+                return;
+            }
+            inspectWindow.SetData(aGuildMember);
+            if (inspectWindow.Visible == false)
+            {
+                inspectWindow.ToggleVisibilty();
+            }
+        }
+
+        public static void CloseGuildWindow()
+        {
+            if (inspectWindow.Visible == false) return;
+
+            inspectWindow.ToggleVisibilty();
         }
         #endregion
 
@@ -425,7 +486,7 @@ namespace Project_1.UI.HUD
 
             for (int i = 0; i < hudElements.Count; i++)
             {
-                hudElements[i].Draw(aBatch);
+                hudElements[i].Draw(aBatch); //TODO: Add something that on clicked elements moves them to the front
             }
 
             for (int i = 0; i < dialogueBoxes.Count; i++)

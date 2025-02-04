@@ -18,7 +18,8 @@ namespace Project_1.Items.SubTypes
             Ranged
         }
 
-        public Attack attack;
+        public Attack Attack => (itemData as WeaponData).Attack;
+
 
         public HandRequirement handRequirement;
 
