@@ -118,7 +118,11 @@ namespace Project_1.GameObjects.Entities
         }
 
 
-        public void AddWalkingOrder(WorldSpace aPos) => destination.AddDestination(aPos);
+        public void AddWalkingOrder(WorldSpace aPos)
+        {
+            
+            destination.AddDestination(aPos);
+        }
 
         protected override bool CheckForRelation()
         {

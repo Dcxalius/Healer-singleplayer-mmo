@@ -18,17 +18,12 @@ namespace Project_1.UI.HUD.PlateBoxes
 {
     internal class PlayerPlateBox : PlateBox
     {
-        static Player player;
-
-
-
         static PlateBoxNameSegment name;
         static PlateBoxHealthSegment health;
         static PlateBoxResourceSegment resource;
 
         public PlayerPlateBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize)
         {
-            player = ObjectManager.Player;
 
             name = new PlateBoxNameSegment(null, Color.White, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(aSize.X, aSize.Y / 2));
             health = new PlateBoxHealthSegment(new RelativeScreenPosition(0, aSize.Y / 2), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
@@ -62,7 +57,7 @@ namespace Project_1.UI.HUD.PlateBoxes
         {
             base.HoldReleaseOnMe();
 
-            player.SetTarget(player);
+            ObjectManager.Player.SetTarget(ObjectManager.Player);
         }
 
         protected override bool ClickedOnChildren(ClickEvent aClick)

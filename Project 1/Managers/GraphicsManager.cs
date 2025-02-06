@@ -58,6 +58,7 @@ namespace Project_1.Managers
 
         }
 
+        [DebuggerStepThrough]
         public static Texture2D CreateNewTexture(Point aSize)
         {
             return new Texture2D(graphicsDeviceManager.GraphicsDevice, aSize.X, aSize.Y);

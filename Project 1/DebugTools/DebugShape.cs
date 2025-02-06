@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.DebugTools
 {
+    [DebuggerStepThrough]
     internal class DebugShape
     {
         protected Texture2D texture;

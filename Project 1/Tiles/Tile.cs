@@ -28,7 +28,7 @@ namespace Project_1.Tiles
             }
         }
 
-        public Point TilePos => tilePos;
+        public Point GridPos => tilePos;
         Point tilePos;
 
         Text xText;

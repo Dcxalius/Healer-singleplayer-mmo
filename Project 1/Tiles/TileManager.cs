@@ -34,6 +34,8 @@ namespace Project_1.Tiles
 
         static Point debugSize = new Point(100, 100);
 
+        static PathFinder pathFinder = new PathFinder();
+
         public static void Init(ContentManager aContentManager)
         {
             ImportData(aContentManager.RootDirectory, aContentManager);
@@ -147,11 +149,11 @@ namespace Project_1.Tiles
                 double yAtBorder = m * borderInX + c;
                 if (yAtBorder > lastTile.WorldRectangle.Top && yAtBorder < lastTile.WorldRectangle.Bottom)
                 {
-                    lastTile = tiles[lastTile.TilePos.X + (int)dirX, lastTile.TilePos.Y];
+                    lastTile = tiles[lastTile.GridPos.X + (int)dirX, lastTile.GridPos.Y];
                 }
                 else
                 {
-                    lastTile = tiles[lastTile.TilePos.X, lastTile.TilePos.Y + (int)dirY];
+                    lastTile = tiles[lastTile.GridPos.X, lastTile.GridPos.Y + (int)dirY];
                 }
 
                 if (!lastTile.Transparent) return false;
@@ -159,6 +161,7 @@ namespace Project_1.Tiles
             }
         }
 
+        public static Path GetPath(WorldSpace aStartPosition, WorldSpace aTargetPosition) => pathFinder.GeneratePath(aStartPosition, aTargetPosition);
 
         public static List<Rectangle> CollisionsWithUnwalkable(Rectangle aWorldRect)
         {
@@ -261,7 +264,7 @@ namespace Project_1.Tiles
             return finalColliders;
         }
 
-        static Tile GetTileUnder(WorldSpace aWorldSpace)
+        public static Tile GetTileUnder(WorldSpace aWorldSpace)
         {
             return tiles[(int)Math.Floor(aWorldSpace.X / TileSize.X), (int)Math.Floor(aWorldSpace.Y / TileSize.Y)];
         }
@@ -297,7 +300,36 @@ namespace Project_1.Tiles
             return colliders;
         }
 
-        public static Tile[] GetTilesAroundPoint(WorldSpace aPosition, float aDistance)
+        public static Tile GetTileAt(Point aCoord) => GetTileAt(aCoord.X, aCoord.Y);
+
+        public static Tile GetTileAt(int aX, int aY) => Tile(aX, aY);
+
+        public static Tile[] GetNeighbours(Point aCoord)
+        {
+            Tile[] neighbours = new Tile[8];
+            neighbours[0] = GetTileAt(aCoord.X - 1, aCoord.Y - 0);
+            neighbours[1] = GetTileAt(aCoord.X + 1, aCoord.Y - 0);
+            neighbours[2] = GetTileAt(aCoord.X + 0, aCoord.Y - 1);
+            neighbours[3] = GetTileAt(aCoord.X + 0, aCoord.Y + 1);
+            neighbours[4] = GetTileAt(aCoord.X + 1, aCoord.Y + 1);
+            neighbours[5] = GetTileAt(aCoord.X + 1, aCoord.Y - 1);
+            neighbours[6] = GetTileAt(aCoord.X - 1, aCoord.Y + 1);
+            neighbours[7] = GetTileAt(aCoord.X - 1, aCoord.Y - 1);
+            //int index = 0;
+            //for (int i = -1; i <= 1; i++)
+            //{
+            //    for (int j = -1; j <= 1; j++)
+            //    {
+            //        if (i == 0 && j == 0) continue;
+            //        neighbours[index] = GetTileAt(aCoord.X - i, aCoord.Y - j);
+
+            //        index++;
+            //    }
+            //}
+            return neighbours;
+        }
+
+        public static Tile[] GetTilesAroundPosition(WorldSpace aPosition, float aDistance)
         {
             List<Tile> returnable = new List<Tile>();
             Tile midTile = GetTileUnder(aPosition);
@@ -305,7 +337,7 @@ namespace Project_1.Tiles
             int tilesAround = (int)(distanceInTiles * Math.PI) * 2;
             for (int i = 0; i < tilesAround; i++)
             {
-                Point tilePos = midTile.TilePos;
+                Point tilePos = midTile.GridPos;
                 //DebugManager.Print(typeof(TileManager), "Sine = " + (Math.Sin((i * 2 * Math.PI / tilesAround))).ToString());
                 //DebugManager.Print(typeof(TileManager), "Tile = " + ((int)Math.Round(tilePos.X + distanceInTiles * Math.Sin((i * 2 * Math.PI / tilesAround)))).ToString());
                 

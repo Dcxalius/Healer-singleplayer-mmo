@@ -1,6 +1,7 @@
 ﻿using Project_1.Camera;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.Managers;
+using Project_1.Tiles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,8 @@ namespace Project_1.GameObjects.Entities
         
         List<WorldSpace> destinations;
         Entity owner;
-        
+
+        Path currentPath;
         public Destination(Entity aOwner)
         {
             destinations = new List<WorldSpace>();
@@ -39,6 +41,14 @@ namespace Project_1.GameObjects.Entities
                 if (!(owner as Player).LockedMovement) return;
             }
 
+            if (currentPath != null && currentPath.Count == 0) currentPath = null;
+            if (destinations.Count == 0 && owner.Target == null && currentPath != null)
+            {
+                destinations.Add(currentPath.ComsumeNextPoint);
+                //directionToWalk = WorldSpace.Zero;
+                //lengthTo = 0;
+                //return;
+            }
 
             if (destinations.Count == 0 && owner.Target == null)
             {
@@ -60,13 +70,14 @@ namespace Project_1.GameObjects.Entities
         {
             if (owner.Target == null)
             {
-                if (LengthTo < owner.Momentum.ToVector2().Length() * 10f) //TODO: Find a good factor
+                if (LengthTo < 10f) //TODO: Find a good factor
                 {
                     if (HasDestination)
                     {
                         RemoveFirst();
                     }
 
+                    
                     return WorldSpace.Zero;
                 }
 
@@ -96,7 +107,12 @@ namespace Project_1.GameObjects.Entities
             destinations.Add(aDestination);
         }
 
-        public void AddDestination(WorldSpace aDestination) => destinations.Add(aDestination);
+        public void AddDestination(WorldSpace aDestination)
+        {
+            destinations.Clear();
+            currentPath = TileManager.GetPath(owner.FeetPosition, aDestination);
+            //destinations.AddRange();
+        }
 
         void UpdateDirection(WorldSpace aDestination)
         {

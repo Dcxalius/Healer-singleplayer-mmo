@@ -95,7 +95,7 @@ namespace Project_1.GameObjects
             while (tiles.Length == 0)
             {
 
-                tiles = TileManager.GetTilesAroundPoint(Player.FeetPosition, start);
+                tiles = TileManager.GetTilesAroundPosition(Player.FeetPosition, start);
                 start -= step;
                 Debug.Assert(start > 0);
             }
