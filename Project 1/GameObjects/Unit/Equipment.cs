@@ -6,11 +6,6 @@ using Project_1.UI.HUD;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.Remoting;
-using System.Text;
-using System.Threading.Tasks;
-using static Project_1.GameObjects.Unit.Equipment;
 
 namespace Project_1.GameObjects.Unit
 {
@@ -36,13 +31,6 @@ namespace Project_1.GameObjects.Unit
             OffHand,
             Ranged,
             Count
-        }
-        public enum AttackStyle
-        {
-            None,
-            OneHander,
-            TwoHander,
-            DualWielding
         }
 
         Entity owner;
@@ -326,7 +314,7 @@ namespace Project_1.GameObjects.Unit
             return item;
         }
 
-        public (AttackStyle, Attack, Attack) GetWeaponAttacks() //TODO: Change this so it changes Attackstyle when a weapon is equiped
+        public AttackData GetWeaponAttacks() //TODO: Change this so it changes Attackstyle when a weapon is equiped
         {
             Attack mh = null;
             
@@ -335,26 +323,26 @@ namespace Project_1.GameObjects.Unit
                 Weapon mhw = (equipped[(int)Slot.MainHand] as Weapon);
                 mh = mhw.Attack;
 
-                if (mhw.handRequirement == Weapon.HandRequirement.TwoHand) return (AttackStyle.TwoHander, mh, null);
+                if (mhw.handRequirement == Weapon.HandRequirement.TwoHand) return new AttackData(AttackData.AttackStyle.TwoHander, mh, null);
             }
 
             if (equipped[(int)Slot.OffHand] == null)
             {
-                if (mh == null) return (AttackStyle.None, null, null);
-                return (AttackStyle.OneHander, mh, null);
+                if (mh == null) return new AttackData(AttackData.AttackStyle.None, null, null);
+                return new AttackData(AttackData.AttackStyle.OneHander, mh, null);
             }
 
             Attack oh = (equipped[(int)Slot.OffHand] as Weapon).Attack;
             
             if (oh.dps == 0)
             {
-                if (mh == null) return (AttackStyle.None, null, null);
-                return (AttackStyle.OneHander, mh, null);
+                if (mh == null) return new AttackData(AttackData.AttackStyle.None, null, null);
+                return new AttackData(AttackData.AttackStyle.OneHander, mh, null);
             }
 
-            if (mh == null) return (AttackStyle.OneHander, null, oh);
+            if (mh == null) return new AttackData(AttackData.AttackStyle.OneHander, null, oh);
 
-            return (AttackStyle.DualWielding, mh, oh);
+            return new AttackData(AttackData.AttackStyle.DualWielding, mh, oh);
         }
     }
 }

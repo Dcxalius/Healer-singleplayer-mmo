@@ -13,24 +13,24 @@ namespace Project_1.GameObjects.Entities
     {
         public int Count => aggroEntities.Count;
 
-        List<(Entity, float, TimeSpan, TimeSpan)> aggroEntities; //TODO: Make tuple a seperate class
+        List<AggroEntity> aggroEntities; //TODO: Ponder if this should be a dict or a heap
         readonly TimeSpan maxAggroDurationStaleness = TimeSpan.FromSeconds(10);
 
-        public Entity Tagger => aggroEntities.Min().Item1;
+        public Entity Tagger => aggroEntities.MinBy(aggroEntity => aggroEntity.TimeSinceLastHit).Entity;
 
         NonFriendly owner;
 
         public AggroTable(NonFriendly aOwner)
         {
             owner = aOwner;
-            aggroEntities = new List<(Entity, float, TimeSpan, TimeSpan)>();
+            aggroEntities = new List<AggroEntity>();
         }
 
         public void ClearTable()
         {
             for (int i = 0; i < aggroEntities.Count; i++)
             {
-                aggroEntities[i].Item1.RemovedFromAggroTable(owner);
+                aggroEntities[i].Entity.RemovedFromAggroTable(owner);
             }
 
             aggroEntities.Clear();
@@ -40,11 +40,8 @@ namespace Project_1.GameObjects.Entities
         {
             for (int i = 0; i < aggroEntities.Count; i++)
             {
-                (Entity, float, TimeSpan, TimeSpan) entry = aggroEntities[i];
-                if (entry.Item1 == aEntity)
-                {
-                    return i;
-                }
+                AggroEntity entry = aggroEntities[i];
+                if (entry.Entity == aEntity) return i;
             }
             return -1;
         }
@@ -60,19 +57,11 @@ namespace Project_1.GameObjects.Entities
             if (owner.Target != null)
             {
                 int index = Contains(owner.Target);
-                if (index >= 0)
-                {
-                    highestThreat = aggroEntities[index].Item2;
-
-                }
+                if (index >= 0) highestThreat = aggroEntities[index].Threat;
             }
             foreach (var item in aggroEntities)
             {
-                if (item.Item2 > highestThreat * 1.05)
-                {
-                    owner.SetTarget(item.Item1);
-
-                }
+                if (item.Threat > highestThreat * 1.05) owner.SetTarget(item.Entity);
             }
         }
 
@@ -86,7 +75,7 @@ namespace Project_1.GameObjects.Entities
 
         void ClearStaleAggro(int i)
         {
-            if (aggroEntities[i].Item3 + maxAggroDurationStaleness < TimeManager.TotalFrameTimeAsTimeSpan)
+            if (aggroEntities[i].TimeSinceLastHit + maxAggroDurationStaleness < TimeManager.TotalFrameTimeAsTimeSpan)
             {
                 ClearAggro(i);
             }
@@ -95,17 +84,17 @@ namespace Project_1.GameObjects.Entities
         void ClearAggro(int i)
         {
 
-            aggroEntities[i].Item1.RemovedFromAggroTable(owner);
-            AquireNewTarget(i);
+            aggroEntities[i].Entity.RemovedFromAggroTable(owner);
+            AquireNewTargetIfClearedWasHighest(i);
             aggroEntities.Remove(aggroEntities[i]);
         }
 
-        void AquireNewTarget(int i)
+        void AquireNewTargetIfClearedWasHighest(int i)
         {
-            if (owner.Target == aggroEntities[i].Item1)
+            if (owner.Target == aggroEntities[i].Entity)
             {
                 Entity newTarget = null;
-                float v = 0;
+                float highestNewAggro = 0;
                 for (int j = 0; j < aggroEntities.Count; j++)
                 {
                     if (i == j) continue;
@@ -115,10 +104,10 @@ namespace Project_1.GameObjects.Entities
                         owner.RemoveTarget();
                         return;
                     }
-                    if (aggroEntities[j].Item2 > v)
+                    if (aggroEntities[j].Threat > highestNewAggro)
                     {
-                        newTarget = aggroEntities[j].Item1;
-                        v = aggroEntities[j].Item2;
+                        newTarget = aggroEntities[j].Entity;
+                        highestNewAggro = aggroEntities[j].Threat;
                     }
                 }
                 owner.SetTarget(newTarget);
@@ -134,17 +123,17 @@ namespace Project_1.GameObjects.Entities
                 //(Entity, float, TimeSpan, TimeSpan) entry = (aEntityToAdd, aggroEntities[i].Item2 + aThreatValue, TimeManager.TotalFrameTimeAsTimeSpan, aggroEntities[i].Item4);
                 //aggroEntities[i] = entry;
 
-                (Entity, float, TimeSpan, TimeSpan) entry = aggroEntities[i];
+                AggroEntity entry = aggroEntities[i];
 
-                entry.Item2 = aggroEntities[i].Item2 + aThreatValue;
-                entry.Item3 = TimeManager.TotalFrameTimeAsTimeSpan;
+                entry.Threat = aggroEntities[i].Threat + aThreatValue;
+                entry.TimeFirstHitMe = TimeManager.TotalFrameTimeAsTimeSpan;
 
                 aggroEntities[i] = entry;
                 return;
             }
 
-
-            aggroEntities.Add((aEntityToAdd, aThreatValue, TimeManager.TotalFrameTimeAsTimeSpan, TimeManager.TotalFrameTimeAsTimeSpan));
+            AggroEntity aggroEntity = new AggroEntity(aEntityToAdd, aThreatValue, TimeManager.TotalFrameTimeAsTimeSpan);
+            aggroEntities.Add(aggroEntity);
 
             aEntityToAdd.AddedToAggroTable(owner);
         }
@@ -163,7 +152,7 @@ namespace Project_1.GameObjects.Entities
             int[] returnable = new int[aggroEntities.Count];
             for (int i = 0; i < aggroEntities.Count; i++)
             {
-                returnable[i] = aggroEntities[i].Item1.CurrentLevel;
+                returnable[i] = aggroEntities[i].Entity.CurrentLevel;
             }
             return returnable;
         }

@@ -46,24 +46,34 @@ namespace Project_1.GameObjects.Unit
         public WorldSpace Velocity => velocity;
         WorldSpace velocity;
 
-        public (Equipment.AttackStyle, Attack, Attack) AttackData
+        public AttackData AttackData
         {
             get
             {
-                (Equipment.AttackStyle, Attack, Attack) weaponAttacks = equipment.GetWeaponAttacks();
+                AttackData weaponAttacks = equipment.GetWeaponAttacks();
 
-                if (weaponAttacks.Item1 == Equipment.AttackStyle.None) return (Equipment.AttackStyle.None, baseStats.Attack, null);
-                
+                if (weaponAttacks.Style == AttackData.AttackStyle.None) return baseStats.FistAttack;
+                weaponAttacks.AttackPower = baseStats.AttackPower;
                 return weaponAttacks;
             }
         }
+        public ref TimeSpan NextAvailableMainHandAttack 
+        {
+            get => ref nextAvailableMainHandAttack;
+        }
+        TimeSpan nextAvailableMainHandAttack;//TODO: Load from save
+
+
+        public ref TimeSpan NextAvailableOffHandAttack 
+        {
+            get => ref nextAvailableOffHandAttack;
+        }
+        TimeSpan nextAvailableOffHandAttack;//TODO: Load from save
 
         public Equipment Equipment =>  equipment;
         Equipment equipment;
 
         public Movement MovementData => classData.Movement;
-
-        public Attack Attack => baseStats.Attack;
 
         public GfxPath GfxPath => gfxPath;
         readonly GfxPath gfxPath;
@@ -122,6 +132,8 @@ namespace Project_1.GameObjects.Unit
                 corpseGfxPath = new GfxPath(GfxType.Corpse, "Corpse");
             }
 
+            nextAvailableMainHandAttack = TimeSpan.Zero;
+            nextAvailableOffHandAttack = TimeSpan.Zero;
             Assert();
         }
 

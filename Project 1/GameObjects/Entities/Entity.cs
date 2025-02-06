@@ -162,7 +162,7 @@ namespace Project_1.GameObjects.Entities
         {
             destination.Update();
             WorldSpace oldPosition = Position;
-            velocity += destination.GetVelocity(unitData.Attack.Range, unitData.MovementData.Speed);
+            velocity += destination.GetVelocity(unitData.AttackData.MainHandAttack.Range, unitData.MovementData.Speed);
             base.Update();
             CheckForCollisions(oldPosition);
         }
@@ -201,31 +201,38 @@ namespace Project_1.GameObjects.Entities
         void AttackTarget()
         {
             if (target == null) return;
+            if (!CheckForRelation()) return;
 
-            if (unitData.Attack.SecondsPerAttack > timeSinceLastAttack)
-            {
-                timeSinceLastAttack += (float)TimeManager.SecondsSinceLastFrame;
-                return;
-            }
-            AttackIfInRange();
+            AttackData a = unitData.AttackData;
+            if ((target.FeetPosition - FeetPosition).ToVector2().Length() >= a.MainHandAttack.Range - Size.X / 2 - target.Size.X / 2) return;
+            
+            CheckAttackSpeed(ref unitData.NextAvailableMainHandAttack, a.MainHandAttack);
+            if (target == null) return;
+            CheckAttackSpeed(ref unitData.NextAvailableOffHandAttack, a.OffHandAttack);
         }
 
-        void AttackIfInRange()
+        void CheckAttackSpeed(ref TimeSpan aLockoutTime, Attack aAttack)
+        {
+            if (aAttack == null) return;
+            if (aLockoutTime > TimeManager.TotalFrameTimeAsTimeSpan) return;
+
+            aLockoutTime = TimeManager.TotalFrameTimeAsTimeSpan + TimeSpan.FromSeconds(aAttack.SecondsPerAttack);
+            AttackIfInRange(aAttack);
+        }
+
+        void AttackIfInRange(Attack aAttack)
         {
 
-            if (CheckForRelation() && (target.FeetPosition - FeetPosition).ToVector2().Length() < unitData.Attack.Range)
-            {
-                timeSinceLastAttack = 0;
-                float damage = unitData.Attack.GetAttackDamage;
+            timeSinceLastAttack = 0;
+            float damage = aAttack.GetAttackDamage;
 
-                if (damage <= 0) return;
-
-                target.TakeDamage(this, damage);
-                if (target.unitData.Health.CurrentHealth <= 0)
-                {
-                    target = null;
-                }
-            }
+            if (damage <= 0) return;
+            //TODO: Calculate misses
+            //TODO: Calculate mitigation (dodge, parry, block)
+            //TODO: Calculate crit
+            //TODO: Proc onhits
+            target.TakeDamage(this, damage);
+            TargetAliveCheck();
         }
 
         protected abstract bool CheckForRelation();

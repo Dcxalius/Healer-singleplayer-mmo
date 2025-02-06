@@ -19,8 +19,9 @@ namespace Project_1.GameObjects.Unit.Stats
         public Resource Resource => resource;
         Resource resource;
 
-        public Attack Attack => attack;
-        Attack attack;
+        public AttackData FistAttack => fistAttack;
+        AttackData fistAttack;
+        
 
         public TotalPrimaryStats TotalPrimaryStats => totalPrimaryStats;
         TotalPrimaryStats totalPrimaryStats;
@@ -34,7 +35,7 @@ namespace Project_1.GameObjects.Unit.Stats
             set
             {
                 attackPower = value;
-                attack.AttackPower = value;
+                fistAttack.AttackPower = value;
             }
         }
         int attackPower;
@@ -65,7 +66,7 @@ namespace Project_1.GameObjects.Unit.Stats
                     throw new NotImplementedException();
             }
 
-            attack = new Attack(aClassData.FistMinAttackDamage, aClassData.FistMaxAttackDamage, aClassData.FistAttackSpeed);
+            fistAttack = new AttackData(AttackData.AttackStyle.OneHander, new Attack(aClassData.FistMinAttackDamage, aClassData.FistMaxAttackDamage, aClassData.FistAttackSpeed), null);
         }
 
         public void SetOwner(Entity aEntity) => owner = aEntity;

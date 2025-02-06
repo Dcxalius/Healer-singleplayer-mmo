@@ -73,7 +73,7 @@ namespace Project_1.GameObjects.Entities
             }
             else
             {
-                if (LengthTo < aAttackRange)
+                if (LengthTo < aAttackRange - owner.Target.Size.X / 2 - owner.Size.X / 2)
                 {
                     if (HasDestination)
                     {
