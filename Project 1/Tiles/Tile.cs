@@ -28,6 +28,13 @@ namespace Project_1.Tiles
             }
         }
 
+        public bool IsAdjacent(Tile aPossibleNeighbour)
+        {
+            if (Math.Abs(aPossibleNeighbour.GridPos.X-GridPos.X) > 1 || Math.Abs(aPossibleNeighbour.GridPos.Y-GridPos.Y) > 1) return false;
+            if (!(aPossibleNeighbour.GridPos.X == GridPos.X || aPossibleNeighbour.GridPos.Y == GridPos.Y)) return false;
+            return true;
+        }
+
         public Point GridPos => tilePos;
         Point tilePos;
 

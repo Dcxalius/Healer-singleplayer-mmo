@@ -3,6 +3,7 @@ using Project_1.Camera;
 using Project_1.Managers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -12,12 +13,12 @@ namespace Project_1.Tiles
 {
     internal class PathFinder
     {
-        List<PathFindingTile> availableTiles;
+        Heap<PathFindingTile> availableTiles;
         List<PathFindingTile> searchedTiles;
 
         public PathFinder()
         {
-            availableTiles = new List<PathFindingTile>();
+            availableTiles = new Heap<PathFindingTile>();
             searchedTiles = new List<PathFindingTile>();
         }
 
@@ -34,7 +35,7 @@ namespace Project_1.Tiles
 
             while (true)
             {
-                currentTile = GetLowestTotalTile(availableTiles);
+                currentTile = availableTiles.PopFirst();
                 DebugManager.AddDebugShape(new DebugTools.DebugSquare(currentTile.Tile.WorldRectangle, Color.Yellow * 0.4f));
 
                 if (currentTile.Tile == endTile)
@@ -63,7 +64,17 @@ namespace Project_1.Tiles
                     }
                     else
                     {
-                        //if (wallIndicies.Contains())
+                        bool adjecentToWall = false;
+                        for (int j = 0; j < wallIndicies.Count; j++)
+                        {
+                            if (neighbours[wallIndicies[j]].IsAdjacent(neighbour.Tile))
+                            {
+                                adjecentToWall = true;
+                                break;
+                            }
+                        }
+                        if (adjecentToWall) break;
+
                         neighbour.SetHomeCost(currentTile.HomeCost + 14, currentTile);
                     }
                     if (searchedTiles.Contains(neighbour)) continue;
@@ -71,7 +82,7 @@ namespace Project_1.Tiles
                     availableTiles.Add(neighbour);
                     searchedTiles.Add(neighbour);
 
-                    DebugManager.AddDebugShape(new DebugTools.DebugSquare(neighbour.Tile.WorldRectangle, Color.Red * 0.2f));
+                    DebugManager.AddDebugShape(new DebugTools.DebugSquare(neighbour.Tile.WorldRectangle, Color.Red * 0.1f));
                 }
             }
 
@@ -90,22 +101,15 @@ namespace Project_1.Tiles
             searchedTiles.Clear();
             return new Path(returnTiles);
         }
-
-
-        PathFindingTile GetLowestTotalTile(List<PathFindingTile> aList)
-        {
-
-            PathFindingTile t = aList.MinBy(t => t.TotalCost);
-            aList.Remove(t);
-            return t;
-        }
     }
 
 
 
-    internal class PathFindingTile
+    internal class PathFindingTile : IHeapItem<PathFindingTile>
     {
         public int TotalCost => homeCost + goalCost;
+        public int HeapIndex { get => heapIndex; set => heapIndex = value; }
+        int heapIndex;
 
         public int HomeCost
         {
@@ -130,6 +134,8 @@ namespace Project_1.Tiles
         public PathFindingTile Parent => parent;
         PathFindingTile parent;
         public Tile Tile => tile;
+
+
         Tile tile;
 
 
@@ -157,6 +163,15 @@ namespace Project_1.Tiles
         public override int GetHashCode()
         {
             return HashCode.Combine(TotalCost, HomeCost, homeCost, goalCost, parent, Tile, tile);
+        }
+
+        [DebuggerStepThrough]
+
+        public int CompareTo(PathFindingTile other)
+        {
+            int totalCostCompare = TotalCost.CompareTo(other.TotalCost);
+            if (totalCostCompare != 0) return -totalCostCompare;
+            return -goalCost.CompareTo(other.goalCost);
         }
     }
 }

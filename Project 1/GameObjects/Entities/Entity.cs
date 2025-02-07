@@ -36,6 +36,16 @@ namespace Project_1.GameObjects.Entities
         public virtual Entity Target { get => target; }
         protected Entity target = null;
 
+        public override Rectangle WorldRectangle
+        {
+            get
+            {
+                Point size = new Point(64,16);
+                Point pos = FeetPosition.ToPoint() - new Point(size.X / 2, size.Y / 2);
+                return new Rectangle(pos, size);
+            }
+        }
+
         protected NamePlate namePlate;
 
         #region UnitData
@@ -168,10 +178,10 @@ namespace Project_1.GameObjects.Entities
         }
 
 
-        void CheckForCollisions(WorldSpace aOldPosition)
+        void CheckForCollisions(WorldSpace aOldPosition) //TODO: Rework this?
         {
 
-            List<Rectangle> resultingCollisions = TileManager.CollisionsWithUnwalkable(WorldRectangle);
+            List<Rectangle> resultingCollisions = TileManager.CollisionsWithUnwalkable(WorldRectangle); //??????????????????????????????????????????????
 
             if (resultingCollisions.Count != 0)
             {
@@ -184,13 +194,14 @@ namespace Project_1.GameObjects.Entities
                     {
                         velocity.X = 0;
                         momentum.X = 0;
-                        Position = new WorldSpace(aOldPosition.X, Position.Y);
+                        Position = new WorldSpace(Position.X - resultingCollisions[i].Size.X * MathF.Round(collisionDir.X), Position.Y);
                     }
                     if (Math.Abs(collisionDir.X) < Math.Abs(collisionDir.Y))
                     {
                         velocity.Y = 0;
                         momentum.Y = 0;
-                        Position = new WorldSpace(Position.X, aOldPosition.Y);
+                        //Position = new WorldSpace(Position.X, aOldPosition.Y);
+                        Position = new WorldSpace(Position.X, Position.Y - (resultingCollisions[i].Size.Y) * MathF.Round(collisionDir.Y) );
                     }
                 }
             }
