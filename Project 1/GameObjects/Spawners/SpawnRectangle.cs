@@ -10,7 +10,9 @@ namespace Project_1.GameObjects.Spawners
 {
     internal class SpawnRectangle : SpawnGeometry
     {
-        public override WorldSpace Position => new WorldSpace( topLeft + (topLeft - bottomRight) * ((float)RandomManager.RollDouble()));
+        public override WorldSpace GetNewSpawnPosition => new WorldSpace( topLeft + (bottomRight - topLeft) * ((float)RandomManager.RollDouble())); //TODO: This is wrong //i think xdd
+        public override WorldSpace Centre => new WorldSpace(topLeft + bottomRight / 2);
+        public override float Length => MathF.Min(Math.Abs(topLeft.X - bottomRight.X), Math.Abs(topLeft.Y - bottomRight.Y));
 
         WorldSpace topLeft;
         WorldSpace bottomRight;

@@ -173,14 +173,13 @@ namespace Project_1.GameObjects.Entities
         public void Movement()
         {
             destination.Update();
-            WorldSpace oldPosition = Position;
             velocity += destination.GetVelocity(unitData.AttackData.MainHandAttack.Range, unitData.MovementData.Speed);
-            base.Update();
-            CheckForCollisions(oldPosition);
+            base.Update(); //TODO: This shouldnt be here
+            CheckForCollisions();
         }
 
 
-        void CheckForCollisions(WorldSpace aOldPosition) //TODO: Rework this?
+        void CheckForCollisions() //TODO: Rework this?
         {
 
             List<(Rectangle, Rectangle)> resultingCollisions = TileManager.CollisionsWithUnwalkable(WorldRectangle);
@@ -189,7 +188,8 @@ namespace Project_1.GameObjects.Entities
             {
                 for (int i = 0; i < resultingCollisions.Count; i++)
                 {
-                    //TODO: Ponder how to make it now jump
+                    //TODO: Ponder how to make it not jump
+                    //Related to the fact that when colliding with corners it uses feetpos rather than the border of feet
                     
                     if (FeetPosition.X - resultingCollisions[i].Item1.Left < 0)
                     {

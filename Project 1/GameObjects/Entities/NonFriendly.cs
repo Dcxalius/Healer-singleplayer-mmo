@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
+using Project_1.GameObjects.Spawners;
 using Project_1.GameObjects.Unit;
 using Project_1.Items;
 using Project_1.Managers;
@@ -25,11 +26,15 @@ namespace Project_1.GameObjects.Entities
 
         public override bool InCombat => aggroTable.Count > 0;
 
+        MobPathing pathing;
+
         AggroTable aggroTable;
-        public NonFriendly(int aSpawnerId, UnitData aUnitData) : base(aUnitData)
+        public NonFriendly(int aSpawnerId, MobPathing aPathing, UnitData aUnitData) : base(aUnitData)
         {
             aggroTable = new AggroTable(this);
             spawnerId = aSpawnerId;
+            pathing = aPathing;
+            
         }
 
         public override void Update()
@@ -37,6 +42,11 @@ namespace Project_1.GameObjects.Entities
             base.Update();
 
             aggroTable.Update();
+
+            
+            WorldSpace? newPath = pathing.Update(FeetPosition);
+            if (newPath != null) destination.AddDestination(newPath.Value);
+            
         }
         protected override void Death()
         {

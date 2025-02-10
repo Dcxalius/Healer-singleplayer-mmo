@@ -9,11 +9,12 @@ namespace Project_1.GameObjects.Spawners
 {
     internal abstract class SpawnGeometry
     {
-        public virtual WorldSpace Position { get; }
-
+        public virtual WorldSpace GetNewSpawnPosition { get; }
+        public abstract WorldSpace Centre { get; }
+        public abstract float Length { get; }
         public SpawnGeometry() { }
 
-        static public SpawnGeometry CreateGeometry(WorldSpace[] aWorldSpaces)
+        static public SpawnGeometry CreateGeometry(WorldSpace[] aWorldSpaces) //TODO: Honestly wtf xdd
         {
             if (aWorldSpaces.Length == 1)
             {

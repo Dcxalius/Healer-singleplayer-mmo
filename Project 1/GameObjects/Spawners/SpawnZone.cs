@@ -37,19 +37,19 @@ namespace Project_1.GameObjects.Spawners
             Debug.Assert(aGeometries.Length == aUnits.Length);
             for (int i = 0; i < aGeometries.Length; i++)
             {
-                CreateSpawner(aGeometries[i], aUnits[i]);
+                CreateSpawner(aGeometries[i], new Bound(aGeometries[i].Centre, aGeometries[i].Length) , aUnits[i]);
             }
         }
 
-        void CreateSpawner(SpawnGeometry aSpawnGeometry, NonFriendly aUnit)
+        void CreateSpawner(SpawnGeometry aSpawnGeometry, MobPathing aPath, NonFriendly aUnit)
         {
-            Spawner s = new Spawner(id, spawners.Count, debugMinSpawnTimer, debugMaxSpawnTimer, aSpawnGeometry, mobData, aUnit);
+            Spawner s = new Spawner(id, spawners.Count, aPath, debugMinSpawnTimer, debugMaxSpawnTimer, aSpawnGeometry, mobData, aUnit);
             spawners.Add(s);
         }
 
-        public void CreateSpawner(SpawnGeometry aSpawnGeometry)
+        public void CreateSpawner(SpawnGeometry aSpawnGeometry, MobPathing aPath)
         {
-            Spawner s = new Spawner(id, spawners.Count, debugMinSpawnTimer, debugMaxSpawnTimer, aSpawnGeometry, mobData);
+            Spawner s = new Spawner(id, spawners.Count, aPath, debugMinSpawnTimer, debugMaxSpawnTimer, aSpawnGeometry, mobData);
             spawners.Add(s);
         }
 

@@ -27,6 +27,7 @@ namespace Project_1.Tiles
             Tile startTile = TileManager.GetTileUnder(aStartPos);
             Tile endTile = TileManager.GetTileUnder(aEndPos);
 
+            if (!endTile.Walkable) return new Path(new List<Tile> { startTile }); //TODO: Ponder on what should be done here
             if (endTile == startTile) return new Path(new List<Tile> { startTile });
 
             availableTiles.Add(new PathFindingTile(startTile, endTile));

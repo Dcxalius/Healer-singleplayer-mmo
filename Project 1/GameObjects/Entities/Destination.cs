@@ -30,7 +30,7 @@ namespace Project_1.GameObjects.Entities
             owner = aOwner;
         }
 
-        public void Update()
+        public void Update() //TOOD: Rework this ASAP
         {
             //if (owner.Momentum.ToVector2().Length() < 0.1f)
             //{

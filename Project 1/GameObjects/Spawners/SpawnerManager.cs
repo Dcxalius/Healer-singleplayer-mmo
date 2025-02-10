@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using Project_1.Camera;
@@ -25,8 +26,8 @@ namespace Project_1.GameObjects.Spawners
             //DEBUG
 
             CreateNewSpawnZone("Sheep");
-            spawnZones[0].CreateSpawner(new SpawnPoint(new WorldSpace(50, 50)));
-            spawnZones[0].CreateSpawner(new SpawnRectangle(new WorldSpace(500, 200), new WorldSpace(600, 300)));
+            spawnZones[0].CreateSpawner(new SpawnPoint(new WorldSpace(30, 18)), new Patrol(new WorldSpace[] { new WorldSpace(50,50), new WorldSpace(50, 150), new WorldSpace(150, 150), new WorldSpace(150, 50) }, Patrol.Type.Circular));
+            spawnZones[0].CreateSpawner(new SpawnRectangle(new WorldSpace(500, 200), new WorldSpace(1000, 1000)), new Wander(new Rectangle(new Point(500, 200), new Point(1000, 1000))));
         }
 
         static void ImportZones(ContentManager aContentManager)
