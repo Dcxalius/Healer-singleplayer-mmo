@@ -18,7 +18,8 @@ namespace Project_1.GameObjects
     {
         public WorldSpace Position { get => position; protected set => position = value; }
         public WorldSpace Centre { get => position + new WorldSpace(size.ToVector2()) / 2; }
-        public WorldSpace FeetPosition { get => Position + (WorldSpace)new Vector2(size.X / 2, size.Y); }
+        public WorldSpace FeetPosition { get => Position + new WorldSpace(size.X / 2, size.Y); set => Position = value - new WorldSpace(size.X / 2, size.Y); }
+        public virtual Point FeetSize { get => Size; set => Size = value; }
         public virtual Rectangle WorldRectangle { get => new Rectangle(position.ToPoint(), size); }
         public float DistanceTo(WorldSpace aPoint) => FeetPosition.DistanceTo(aPoint);
         
@@ -64,7 +65,7 @@ namespace Project_1.GameObjects
             }
         }
 
-        public void Teleport(WorldSpace aNewPos) => Position = aNewPos + (WorldSpace)new Vector2(size.X / 2, size.Y);
+        public void Teleport(WorldSpace aNewPos) => FeetPosition = aNewPos;
 
         public virtual bool Click(ClickEvent aClickEvent) => false;
 

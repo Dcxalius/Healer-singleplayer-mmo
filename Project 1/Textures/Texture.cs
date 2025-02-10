@@ -74,17 +74,13 @@ namespace Project_1.Textures
 
         public virtual void Update() {}
 
-        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos)
-        {
-            Draw(aBatch, aPos, color, Camera.Camera.WorldRectangle.Bottom);
-        }
+        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos) => Draw(aBatch, aPos, color, offset, Camera.Camera.WorldRectangle.Bottom);
 
-        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, float aFeetPosY)
-        {
-            Draw(aBatch, aPos, color, aFeetPosY);
-        }
+        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, float aFeetPosY) => Draw(aBatch, aPos, color, offset, aFeetPosY);
 
-        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, Color aColor, float aFeetPosY)
+        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, Color aColor, float aFeetPosY) => Draw(aBatch, aPos, aColor, offset, aFeetPosY);
+
+        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, Color aColor, Vector2 aOffset, float aFeetPosY)
         {
             if (gfx == null) return;
 
@@ -92,23 +88,21 @@ namespace Project_1.Textures
             {
                 //aBatch.Draw(gfx, aPos, visible, aColor, rotation, offset, Camera.Camera.Scale, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
                 //aBatch.Draw(gfx, new Rectangle(aPos.ToPoint(),ScaledSize), visible, aColor, rotation, offset, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
-                aBatch.Draw(gfx, new Rectangle(new Point((int)Math.Round(aPos.X), (int)Math.Round(aPos.Y)),ScaledSize), visible, aColor, rotation, offset, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
+                aBatch.Draw(gfx, new Rectangle(new Point((int)Math.Round(aPos.X), (int)Math.Round(aPos.Y)), ScaledSize), visible, aColor, rotation, aOffset, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
             }
         }
 
-        public virtual void Draw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, float aFeetPosY)
-        {
-            Draw(aBatch, aPos, Color.White, aFeetPosY);
-        }
-
-        public virtual void Draw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, Color aColor, float aFeetPosY)
+        public virtual void Draw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, float aFeetPosY) => Draw(aBatch, aPos, Color.White, aFeetPosY);
+        public virtual void Draw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, Color aColor, float aFeetPosY) => Draw(aBatch, aPos, aColor, offset, aFeetPosY);
+        public virtual void Draw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, Color aColor, Vector2 aOffset, float aFeetPosY)
         {
             if (gfx == null) return;
 
             if (Camera.Camera.MomAmIInFrame(new Rectangle(aPos, (size.ToVector2() * Camera.Camera.Scale).ToPoint())))
             {
-                aBatch.Draw(gfx, new Rectangle(aPos, ScaledSize), visible, aColor, rotation, offset, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
+                aBatch.Draw(gfx, new Rectangle(aPos, ScaledSize), visible, aColor, rotation, aOffset, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
             }
         }
+
     }
 }

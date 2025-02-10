@@ -27,6 +27,7 @@ using System.Diagnostics;
 using Project_1.Items;
 using Project_1.UI.UIElements.Guild;
 using System.Security.Cryptography;
+using System.Drawing.Printing;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -36,13 +37,14 @@ namespace Project_1.GameObjects.Entities
         public virtual Entity Target { get => target; }
         protected Entity target = null;
 
+        public override Point FeetSize { get => new Point(Size.X, Size.Y / 2); set => base.FeetSize = new Point(value.X, value.Y * 4); }
+
         public override Rectangle WorldRectangle
         {
             get
             {
-                Point size = new Point(64,16);
-                Point pos = FeetPosition.ToPoint() - new Point(size.X / 2, size.Y / 2);
-                return new Rectangle(pos, size);
+                Point pos = FeetPosition.ToPoint() - new Point(FeetSize.X / 2, FeetSize.Y / 2);
+                return new Rectangle(pos, FeetSize);
             }
         }
 
@@ -119,13 +121,13 @@ namespace Project_1.GameObjects.Entities
             TargetAliveCheck();
             if (unitData.BaseStats.CheckIfResourceRegened()) FlagForRefresh();
             
+            MoveNamePlate();
             Movement();
             AttackTarget();
             RefreshEffects();
             spellCast.UpdateSpellChannel();
             buffList.Update(this);
 
-            MoveNamePlate();
 
             //HUDManager.RefreshPlateBox(this);
         }
@@ -181,27 +183,42 @@ namespace Project_1.GameObjects.Entities
         void CheckForCollisions(WorldSpace aOldPosition) //TODO: Rework this?
         {
 
-            List<Rectangle> resultingCollisions = TileManager.CollisionsWithUnwalkable(WorldRectangle); //??????????????????????????????????????????????
+            List<(Rectangle, Rectangle)> resultingCollisions = TileManager.CollisionsWithUnwalkable(WorldRectangle);
 
             if (resultingCollisions.Count != 0)
             {
                 for (int i = 0; i < resultingCollisions.Count; i++)
                 {
-
-                    WorldSpace collisionDir = WorldSpace.Normalize((WorldSpace)(resultingCollisions[i].Center - WorldRectangle.Center).ToVector2());
-
-                    if (Math.Abs(collisionDir.X) > Math.Abs(collisionDir.Y))
+                    //TODO: Ponder how to make it now jump
+                    
+                    if (FeetPosition.X - resultingCollisions[i].Item1.Left < 0)
                     {
+                        FeetPosition = FeetPosition - new WorldSpace(resultingCollisions[i].Item1.Width, 0);
                         velocity.X = 0;
                         momentum.X = 0;
-                        Position = new WorldSpace(Position.X - resultingCollisions[i].Size.X * MathF.Round(collisionDir.X), Position.Y);
+                        DebugManager.Print(GetType(), (FeetPosition.X - resultingCollisions[i].Item1.Left).ToString());
                     }
-                    if (Math.Abs(collisionDir.X) < Math.Abs(collisionDir.Y))
+                    if (FeetPosition.X - resultingCollisions[i].Item1.Right > 0)
                     {
+                        FeetPosition = FeetPosition + new WorldSpace(resultingCollisions[i].Item1.Width, 0);
+                        velocity.X = 0;
+                        momentum.X = 0;
+                        DebugManager.Print(GetType(), (FeetPosition.X - resultingCollisions[i].Item1.Right).ToString());
+
+                    }
+                    if (FeetPosition.Y - resultingCollisions[i].Item1.Top < 0)
+                    {
+                        FeetPosition = FeetPosition - new WorldSpace(0, resultingCollisions[i].Item1.Height);
                         velocity.Y = 0;
                         momentum.Y = 0;
-                        //Position = new WorldSpace(Position.X, aOldPosition.Y);
-                        Position = new WorldSpace(Position.X, Position.Y - (resultingCollisions[i].Size.Y) * MathF.Round(collisionDir.Y) );
+                        DebugManager.Print(GetType(), (FeetPosition.Y - resultingCollisions[i].Item1.Top).ToString());
+                    }
+                    if (FeetPosition.Y - resultingCollisions[i].Item1.Bottom > 0)
+                    {
+                        FeetPosition = FeetPosition + new WorldSpace(0, resultingCollisions[i].Item1.Height);
+                        velocity.Y = 0;
+                        momentum.Y = 0;
+                        DebugManager.Print(GetType(), (FeetPosition.Y - resultingCollisions[i].Item1.Bottom).ToString());
                     }
                 }
             }

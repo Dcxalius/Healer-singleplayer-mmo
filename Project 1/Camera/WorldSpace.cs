@@ -152,5 +152,10 @@ namespace Project_1.Camera
         {
             return position;
         }
+
+        public override string ToString()
+        {
+            return position.ToString();
+        }
     }
 }

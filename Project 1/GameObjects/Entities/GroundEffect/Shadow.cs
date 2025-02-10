@@ -28,7 +28,7 @@ namespace Project_1.GameObjects.Entities.GroundEffect
                 }
             }
 
-            Draw(aBatch, aOwner, shadowColor, 2);
+            Draw(aBatch, aOwner.FeetPosition, shadowColor, 2);
 
         }
     }

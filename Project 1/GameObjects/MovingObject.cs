@@ -52,7 +52,7 @@ namespace Project_1.GameObjects
                 momentum = (WorldSpace)Vector2.Normalize(momentum) * MaxSpeed;
             }
             velocity = WorldSpace.Zero;
-            momentum = new WorldSpace(momentum.X * TileManager.GetDragCoeficient(Centre), momentum.Y * TileManager.GetDragCoeficient(Centre));
+            momentum = new WorldSpace(momentum.X * TileManager.GetDragCoeficient(FeetPosition), momentum.Y * TileManager.GetDragCoeficient(FeetPosition));
         }
 
         void ChangePosition()

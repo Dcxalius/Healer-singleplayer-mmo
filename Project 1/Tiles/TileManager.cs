@@ -163,17 +163,17 @@ namespace Project_1.Tiles
 
         public static Path GetPath(WorldSpace aStartPosition, WorldSpace aTargetPosition) => pathFinder.GeneratePath(aStartPosition, aTargetPosition);
 
-        public static List<Rectangle> CollisionsWithUnwalkable(Rectangle aWorldRect)
+        public static List<(Rectangle, Rectangle)> CollisionsWithUnwalkable(Rectangle aWorldRect)
         {
 
             List<Rectangle> finalColliders = ConvertUnwalkableTilesToRectangles(aWorldRect.Center);
 
-            List<Rectangle> collisions = new List<Rectangle>();
+            List<(Rectangle, Rectangle)> collisions = new List<(Rectangle, Rectangle)>();
             foreach (var collider in finalColliders)
             {
                 if (aWorldRect.Intersects(collider))
                 {
-                    collisions.Add(Rectangle.Intersect(aWorldRect, collider));
+                    collisions.Add((Rectangle.Intersect(aWorldRect, collider), collider));
                 }
             }
             return collisions;

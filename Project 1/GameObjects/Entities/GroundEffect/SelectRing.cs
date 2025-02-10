@@ -21,7 +21,7 @@ namespace Project_1.GameObjects.Entities.GroundEffect
         {
             if (aOwner.Selected == true)
             {
-                Draw(aBatch, aOwner, aOwner.RelationColor, 1);
+                Draw(aBatch, aOwner.FeetPosition, aOwner.RelationColor, 1);
             }
         }
     }
