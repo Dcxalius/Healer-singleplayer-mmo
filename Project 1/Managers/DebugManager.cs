@@ -46,7 +46,7 @@ namespace Project_1.Managers
         {
             modes[(int)DebugMode.DebugShapes] = true;
             modes[(int)DebugMode.Print] = true;
-            modes[(int)DebugMode.TileCoords] = false;
+            modes[(int)DebugMode.TileCoords] = true;
             modes[(int)DebugMode.InvCheats] = true;
             modes[(int)DebugMode.Teleport] = true;
             AllocConsole();

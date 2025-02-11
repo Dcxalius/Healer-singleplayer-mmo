@@ -1,13 +1,16 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
 using Newtonsoft.Json;
 using Project_1.Camera;
 using Project_1.DebugTools;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.Managers;
+using SharpDX.Direct3D9;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Printing;
@@ -15,6 +18,8 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using static Project_1.GameObjects.Spells.AoE.AreaOfEffectData;
 
 namespace Project_1.Tiles
 {
@@ -117,31 +122,26 @@ namespace Project_1.Tiles
 
             WorldSpace start = aCaster.FeetPosition;
             if (start == aTarget) return true;
-            Vector2 line = aTarget - start;
-            Vector2 dirVector = Vector2.Normalize(line);
 
-            //DebugManager.debugShapes.Add(new DebugTools.DebugLine(start, (WorldSpace)dirVector, line.Length()));
 
-            float dirX = dirVector.X / Math.Abs(dirVector.X);
-            float dirY = dirVector.Y / Math.Abs(dirVector.Y);
 
             Tile startTile = GetTileUnder(start);
-            //DebugManager.Print(typeof(TileManager), "Start tile X: " + startTile.TilePos.X + " Y: " + startTile.TilePos.Y);
             Tile targetTile = GetTileUnder(aTarget);
-            //DebugManager.Print(typeof(TileManager), "Target tile X: " + targetTile.TilePos.X + " Y: " + targetTile.TilePos.Y);
             if (!startTile.Transparent || !targetTile.Transparent) return false;
 
-            Vector2 startInTileSpace = new Vector2(start.X / TileSize.X, (start.Y / TileSize.Y));
-            Vector2 targetInTileSpace = new Vector2(aTarget.X / TileSize.X, (aTarget.Y / TileSize.Y));
-            double m = (targetInTileSpace.Y - startInTileSpace.Y) / (targetInTileSpace.X - startInTileSpace.X);
+            return LineOfSight(start, aTarget, lastTile => !lastTile.Transparent, lastTile => lastTile == targetTile);
+        }
 
-            double x = start.X;
-            double y = start.Y;
-            double c = y - m * x;
-            //float y = m * x + c;
-            //float x = (y - c) / m
+        static bool LineOfSight(WorldSpace aStartPos, WorldSpace aEndPos, Func<Tile, bool> aFalseCondition, Func<Tile, bool> aTrueCondition)
+        {
+            Vector2 dirVector = Vector2.Normalize(aEndPos - aStartPos);
 
-            Tile lastTile = startTile;
+            float dirX = Math.Sign(dirVector.X);
+            float dirY = Math.Sign(dirVector.Y);
+            double m = (aEndPos.Y - aStartPos.Y) / (aEndPos.X - aStartPos.X);
+            double c = aStartPos.Y - m * aStartPos.X;
+
+            Tile lastTile = GetTileUnder(aStartPos);
             while (true)
             {
 
@@ -156,12 +156,13 @@ namespace Project_1.Tiles
                     lastTile = tiles[lastTile.GridPos.X, lastTile.GridPos.Y + (int)dirY];
                 }
 
-                if (!lastTile.Transparent) return false;
-                if (lastTile == targetTile) return true;
+                if (aFalseCondition(lastTile)) return false;
+                if (aTrueCondition(lastTile)) return true;
             }
         }
 
-        public static Path GetPath(WorldSpace aStartPosition, WorldSpace aTargetPosition) => pathFinder.GeneratePath(aStartPosition, aTargetPosition);
+
+        public static Path GetPath(WorldSpace aStartPosition, WorldSpace aTargetPosition, WorldSpace aSize) => pathFinder.GeneratePath(aStartPosition, aTargetPosition, aSize);
 
         public static List<(Rectangle, Rectangle)> CollisionsWithUnwalkable(Rectangle aWorldRect)
         {
@@ -266,8 +267,184 @@ namespace Project_1.Tiles
 
         public static Tile GetTileUnder(WorldSpace aWorldSpace)
         {
+            if (aWorldSpace.X < 0 || aWorldSpace.X > debugSize.X * TileSize.X || aWorldSpace.Y < 0 || aWorldSpace.Y > debugSize.Y * TileSize.Y) return null; //DEBUG
             return tiles[(int)Math.Floor(aWorldSpace.X / TileSize.X), (int)Math.Floor(aWorldSpace.Y / TileSize.Y)];
         }
+
+        public static WorldSpace FindClosestWalkableWorldSpace(WorldSpace aWorldSpace, WorldSpace aSize)
+        {
+            Tile closestTile = FindClosestWalkable(aWorldSpace);
+
+            DebugManager.Print(typeof(TileManager), "Tileboundries are " + closestTile.WorldRectangle);
+
+            Vector2 dirVector = Vector2.Normalize(aWorldSpace - closestTile.Centre);
+
+            float dirX = Math.Sign(dirVector.X);
+            float dirY = Math.Sign(dirVector.Y);
+            float m = (aWorldSpace.Y - closestTile.Centre.Y) / (aWorldSpace.X - closestTile.Centre.X);
+            float c = aWorldSpace.Y - m * aWorldSpace.X;
+
+            if (Math.Abs(dirVector.X) >= Math.Abs(dirVector.Y))
+            {
+                float borderInX = dirX > 0 ? closestTile.WorldRectangle.Right - aSize.X / 2 : closestTile.WorldRectangle.Left + aSize.X / 2;
+                float yAtBorder = m * borderInX + c;
+                return new WorldSpace(borderInX, yAtBorder);
+            }
+            else
+            {
+                float borderInY = dirY > 0 ? closestTile.WorldRectangle.Bottom - aSize.Y / 2 : closestTile.WorldRectangle.Top + aSize.Y / 2;
+                float xAtBorder = (borderInY - c) / m;
+                return new WorldSpace(xAtBorder, borderInY);
+            }
+            
+
+            //if (s.X > s.Y) //TODO: Fix names
+            //{
+            //    float lengthToSide = TileSize.X / 2 * Math.Sign(s.X);
+            //    WorldSpace xdd = closestTile.Centre;
+            //    //WorldSpace xdd = closestTile.Centre - new WorldSpace(lengthToSide, lengthToSide / s.X * s.Y);
+            //    //WorldSpace xddd = xdd - new WorldSpace(aSize.X / 2 * Math.Sign(s.X), aSize.Y / 2 * Math.Sign(s.Y));
+            //    DebugManager.Print(typeof(TileManager), "X was bigger and is " + xdd);
+            //    return xdd;
+            //}
+            //else
+            //{
+            //    float lengthToSide = TileSize.Y / 2 * Math.Sign(s.Y);
+            //    WorldSpace xdd = closestTile.Centre;
+            //    //WorldSpace xdd = closestTile.Centre - new WorldSpace(lengthToSide / s.Y * s.X, lengthToSide);
+            //    //WorldSpace xddd = xdd - new WorldSpace(aSize.X / 2 * Math.Sign(s.X), aSize.Y / 2 * Math.Sign(s.Y));
+            //    DebugManager.Print(typeof(TileManager), "Y was bigger and is " + xdd);
+            //    return xdd;
+
+            //}
+        }
+
+        public static Tile FindClosestWalkable(WorldSpace aWorldSpace)
+        {
+            Tile underStart = GetTileUnder(aWorldSpace);
+            if (underStart.Walkable) return underStart;
+            DebugManager.Print(typeof(TileManager), "Started looking for better tile around " + underStart.GridPos);
+            float x = aWorldSpace.X / TileSize.X;
+            x -= (MathF.Floor(x) + 0.5f);
+            float y = aWorldSpace.Y / TileSize.Y;
+            y -=( MathF.Floor(y) + 0.5f);
+
+            return LookThroughNeighboursForWalkable(aWorldSpace, new WorldSpace(x, y), new WorldSpace(x, 0), new WorldSpace(Math.Abs(x) + 0.5f * -Math.Sign(x), 0), new WorldSpace(0, y), new WorldSpace(0, Math.Abs(y) + 0.5f * -Math.Sign(y)));
+
+
+        }
+
+        static Tile LookThroughNeighboursForWalkable(WorldSpace aStart, WorldSpace aStartInRelationToStartTile, WorldSpace aCloserDistanceToLeftRight, WorldSpace aFurtherDistanceToLeftRight, WorldSpace aCloserDistanceToTopBottom, WorldSpace aFurtherDistanceToTopBottom)
+        {
+
+            List<WorldSpace> spaces = new List<WorldSpace>();
+            WorldSpace closerCloserDistance;
+            WorldSpace closerFurtherDistance;
+            WorldSpace furtherCloserDistance;
+            WorldSpace furtherFurtherDistance;
+
+            if (aCloserDistanceToLeftRight.DistanceTo(WorldSpace.Zero) > aCloserDistanceToTopBottom.DistanceTo(WorldSpace.Zero))
+            {
+                closerCloserDistance = aCloserDistanceToLeftRight;
+                closerFurtherDistance = aCloserDistanceToTopBottom;
+            }
+            else
+            {
+                closerCloserDistance = aCloserDistanceToTopBottom;
+                closerFurtherDistance = aCloserDistanceToLeftRight;
+            }
+
+            spaces.Add(closerCloserDistance);
+            spaces.Add(closerFurtherDistance);
+            spaces.Add(new WorldSpace(aCloserDistanceToLeftRight.X, aCloserDistanceToTopBottom.Y));
+
+            if (aFurtherDistanceToLeftRight.DistanceTo(WorldSpace.Zero) > aFurtherDistanceToTopBottom.DistanceTo(WorldSpace.Zero))
+            {
+                furtherCloserDistance = aFurtherDistanceToLeftRight;
+                furtherFurtherDistance = aFurtherDistanceToTopBottom;
+                spaces.Add(furtherCloserDistance);
+                spaces.Add(new WorldSpace(aFurtherDistanceToLeftRight.X, aCloserDistanceToTopBottom.Y));
+                spaces.Add(furtherFurtherDistance);
+                spaces.Add(new WorldSpace(aCloserDistanceToLeftRight.X, aFurtherDistanceToTopBottom.Y));
+            }
+            else
+            {
+                furtherCloserDistance = aFurtherDistanceToTopBottom;
+                furtherFurtherDistance = aFurtherDistanceToLeftRight;
+
+                spaces.Add(furtherCloserDistance);
+                spaces.Add(new WorldSpace(aCloserDistanceToLeftRight.X, aFurtherDistanceToTopBottom.Y));
+                spaces.Add(furtherFurtherDistance);
+                spaces.Add(new WorldSpace(aFurtherDistanceToLeftRight.X, aCloserDistanceToTopBottom.Y));
+            }
+
+            spaces.Add(new WorldSpace(furtherFurtherDistance.X, furtherFurtherDistance.Y));
+
+            for (int i = 0; i < spaces.Count; i++)
+            {
+                WorldSpace s = new WorldSpace(Math.Sign(spaces[i].X), Math.Sign(spaces[i].Y));
+                spaces[i] = s;
+            }
+
+            int counter = 0;
+            while (true)
+            {
+                counter++;
+                List<int> removables = new List<int>();
+                for (int i = 0; i < spaces.Count; i++)
+                {
+                    Tile t = GetTileUnder(aStart + new WorldSpace(TileSize.X, TileSize.Y) * spaces[i]);
+                    if (t == null)
+                    {
+                        removables.Add(i);
+                        DebugManager.Print(typeof(TileManager), "Remove tile at index: " + i);
+                        continue;
+                    }
+
+                    DebugManager.Print(typeof(TileManager), "Check tile at: " + t.GridPos);
+                    if (t.Walkable)
+                    {
+                        DebugManager.Print(typeof(TileManager), "Found tile at: " + t.GridPos);
+                        return t;
+                    }
+                }
+                for (int i = removables.Count - 1; i >= 0; i--)
+                {
+                    spaces.RemoveAt(removables[i]);
+                }
+
+                for (int i = spaces.Count - 1; i >= 0; i--)
+                {
+                    float x = Math.Sign(spaces[i].X);
+                    float y = Math.Sign(spaces[i].Y);
+                    spaces[i] += new WorldSpace(x, y);
+                    WorldSpace s = spaces[i];
+                    if (Math.Abs(spaces[i].X) == counter && Math.Abs(spaces[i].Y) == counter)
+                    {
+                        WorldSpace closerNew;
+                        WorldSpace furtherNew;
+
+                        WorldSpace newInXDir = new WorldSpace(s.X, y);
+                        WorldSpace newInYDir = new WorldSpace(x, s.Y);
+
+                        if (newInXDir.DistanceTo(aStartInRelationToStartTile) >= newInYDir.DistanceTo(aStartInRelationToStartTile))
+                        {
+                            closerNew = newInXDir;
+                            furtherNew = newInYDir;
+                        }
+                        else
+                        {
+                            closerNew = newInYDir;
+                            furtherNew = newInXDir;
+                        }
+
+                        spaces.Insert(i, closerNew);
+                        spaces.Insert(i + 1, furtherNew);
+                    }
+                }
+            }
+        }
+
 
         static Tile[,] GetSurroundingTiles(Point aIndex)
         {

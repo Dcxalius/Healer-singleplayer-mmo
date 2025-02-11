@@ -110,7 +110,7 @@ namespace Project_1.GameObjects.Entities
         public void AddDestination(WorldSpace aDestination)
         {
             destinations.Clear();
-            currentPath = TileManager.GetPath(owner.FeetPosition, aDestination);
+            currentPath = TileManager.GetPath(owner.FeetPosition, aDestination, new WorldSpace(owner.FeetSize));
             //destinations.AddRange();
         }
 

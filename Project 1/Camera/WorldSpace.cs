@@ -2,12 +2,14 @@
 using SharpDX.Direct2D1.Effects;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Project_1.Camera
 {
+    [DebuggerStepThrough]
     internal struct WorldSpace
     {
         Vector2 position;
@@ -24,20 +26,15 @@ namespace Project_1.Camera
             position = Vector2.Zero;
         }
 
+        public WorldSpace(Point aPoint) : this(aPoint.ToVector2()) { }
+
         public WorldSpace(Vector2 aPosition)
         {
             position = aPosition;
         }
 
-        public WorldSpace(float aX)
-        {
-            position = new Vector2(aX);
-        }
-
-        public WorldSpace(float aX, float aY)
-        {
-            position = new Vector2(aX, aY);
-        }
+        public WorldSpace(float aX) : this(aX, aX) { }
+        public WorldSpace(float aX, float aY) : this(new Vector2(aX, aY)) { }
 
         public float DistanceTo(WorldSpace aOtherSpace)
         {

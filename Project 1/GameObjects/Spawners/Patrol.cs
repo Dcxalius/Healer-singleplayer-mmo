@@ -1,4 +1,5 @@
 ﻿using Project_1.Camera;
+using Project_1.Tiles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,6 +38,17 @@ namespace Project_1.GameObjects.Spawners
 
         public Patrol(WorldSpace[] aQueue, Type aType)
         {
+            for (int i = 0; i < aQueue.Length; i++)
+            {
+                //if (TileManager.GetTileUnder(aQueue[i]).Walkable) continue;
+                //while(true)
+                //{
+                //    //if ()
+                //    //{
+
+                //    //}
+                //}
+            }
             type = aType;
             nextIndex = 1; //Make it take the closest one as first index??
             queue = aQueue;

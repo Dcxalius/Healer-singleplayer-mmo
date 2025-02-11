@@ -196,14 +196,14 @@ namespace Project_1.GameObjects.Entities
                         FeetPosition = new WorldSpace(MathF.Round(FeetPosition.X), FeetPosition.Y) - new WorldSpace(resultingCollisions[i].Item1.Width, 0);
                         velocity.X = 0;
                         momentum.X = 0;
-                        DebugManager.Print(GetType(), (FeetPosition.X - resultingCollisions[i].Item1.Left).ToString());
+                        //DebugManager.Print(GetType(), (FeetPosition.X - resultingCollisions[i].Item1.Left).ToString());
                     }
                     if (FeetPosition.X - resultingCollisions[i].Item1.Right > 0)
                     {
                         FeetPosition = new WorldSpace(MathF.Round(FeetPosition.X), FeetPosition.Y) + new WorldSpace(resultingCollisions[i].Item1.Width, 0);
                         velocity.X = 0;
                         momentum.X = 0;
-                        DebugManager.Print(GetType(), (FeetPosition.X - resultingCollisions[i].Item1.Right).ToString());
+                        //DebugManager.Print(GetType(), (FeetPosition.X - resultingCollisions[i].Item1.Right).ToString());
 
                     }
                     if (FeetPosition.Y - resultingCollisions[i].Item1.Top < 0)
@@ -211,14 +211,14 @@ namespace Project_1.GameObjects.Entities
                         FeetPosition = new WorldSpace(FeetPosition.X, MathF.Round(FeetPosition.Y)) - new WorldSpace(0, resultingCollisions[i].Item1.Height);
                         velocity.Y = 0;
                         momentum.Y = 0;
-                        DebugManager.Print(GetType(), (FeetPosition.Y - resultingCollisions[i].Item1.Top).ToString());
+                        //DebugManager.Print(GetType(), (FeetPosition.Y - resultingCollisions[i].Item1.Top).ToString());
                     }
                     if (FeetPosition.Y - resultingCollisions[i].Item1.Bottom > 0)
                     {
                         FeetPosition = new WorldSpace(FeetPosition.X, MathF.Round(FeetPosition.Y)) + new WorldSpace(0, resultingCollisions[i].Item1.Height);
                         velocity.Y = 0;
                         momentum.Y = 0;
-                        DebugManager.Print(GetType(), (FeetPosition.Y - resultingCollisions[i].Item1.Bottom).ToString());
+                        //DebugManager.Print(GetType(), (FeetPosition.Y - resultingCollisions[i].Item1.Bottom).ToString());
                     }
                 }
             }

@@ -25,7 +25,7 @@ namespace Project_1.Tiles
 
         List<WorldSpace> pointsOnPath;
         
-        public Path(List<Tile> aPath) //TODO: Include offset
+        public Path(List<Tile> aPath, WorldSpace aEndPosition) //TODO: Include offset
         {
             pointsOnPath = new List<WorldSpace>();
             //pointsOnPath.Add(aPath[aPath.Count - 1].Centre);
@@ -40,7 +40,7 @@ namespace Project_1.Tiles
                 DebugManager.AddDebugShape(new DebugTools.DebugPoint(pointsOnPath.Last(), 10f));
             }
 
-            pointsOnPath.Add(aPath[0].Centre);
+            pointsOnPath.Add(aEndPosition);
             DebugManager.AddDebugShape(new DebugTools.DebugPoint(pointsOnPath.Last(), 10f));
         }
     }

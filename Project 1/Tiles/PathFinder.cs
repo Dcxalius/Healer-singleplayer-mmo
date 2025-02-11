@@ -22,13 +22,17 @@ namespace Project_1.Tiles
             searchedTiles = new List<PathFindingTile>();
         }
 
-        public Path GeneratePath(WorldSpace aStartPos, WorldSpace aEndPos)
+        public Path GeneratePath(WorldSpace aStartPos, WorldSpace aEndPos, WorldSpace aSize)
         {
             Tile startTile = TileManager.GetTileUnder(aStartPos);
             Tile endTile = TileManager.GetTileUnder(aEndPos);
 
-            if (!endTile.Walkable) return new Path(new List<Tile> { startTile }); //TODO: Ponder on what should be done here
-            if (endTile == startTile) return new Path(new List<Tile> { startTile });
+            if (!endTile.Walkable)
+            {
+                return GeneratePath(aStartPos, TileManager.FindClosestWalkableWorldSpace(aEndPos, aSize), aSize); //TODO: Ponder on what should be done here
+            }
+
+            if (endTile == startTile) return new Path(new List<Tile> { }, aEndPos);
 
             availableTiles.Add(new PathFindingTile(startTile, endTile));
 
@@ -100,7 +104,7 @@ namespace Project_1.Tiles
 
             availableTiles.Clear();
             searchedTiles.Clear();
-            return new Path(returnTiles);
+            return new Path(returnTiles, aEndPos);
         }
     }
 
