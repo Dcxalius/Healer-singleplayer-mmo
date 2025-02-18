@@ -397,14 +397,14 @@ namespace Project_1.Tiles
                     if (t == null)
                     {
                         removables.Add(i);
-                        DebugManager.Print(typeof(TileManager), "Remove tile at index: " + i);
+                        //DebugManager.Print(typeof(TileManager), "Remove tile at index: " + i);
                         continue;
                     }
 
-                    DebugManager.Print(typeof(TileManager), "Check tile at: " + t.GridPos);
+                    //DebugManager.Print(typeof(TileManager), "Check tile at: " + t.GridPos);
                     if (t.Walkable)
                     {
-                        DebugManager.Print(typeof(TileManager), "Found tile at: " + t.GridPos);
+                        //DebugManager.Print(typeof(TileManager), "Found tile at: " + t.GridPos);
                         return t;
                     }
                 }

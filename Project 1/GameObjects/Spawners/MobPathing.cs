@@ -13,16 +13,15 @@ namespace Project_1.GameObjects.Spawners
 
         TimeSpan timeSinceMovedLast;
         double waitDuration;
-        public abstract WorldSpace GetNextSpace { get; }
+        public abstract WorldSpace? GetNextSpace { get; }
         public abstract WorldSpace GetLatestSpace { get; }
-
-        public abstract WorldSpace? Update(WorldSpace aPosition);
 
 
         protected void StartTimer()
         {
             if (timeSinceMovedLast != TimeSpan.Zero) return;
             timeSinceMovedLast = TimeManager.TotalFrameTimeAsTimeSpan;
+            waitDuration = RandomManager.RollDouble() * 5;
 
         }
 
@@ -31,21 +30,11 @@ namespace Project_1.GameObjects.Spawners
             if (timeSinceMovedLast + TimeSpan.FromSeconds(waitDuration) > TimeManager.TotalFrameTimeAsTimeSpan) return false;
 
             timeSinceMovedLast = TimeSpan.Zero;
-            waitDuration = RandomManager.RollDouble()* 5000;
 
             return true;
         }
 
-        protected WorldSpace? UpdateTimer(WorldSpace aSpace) //TODO: Better name pls
-        {
-            if (GetLatestSpace.DistanceTo(aSpace) < 1f) return null;
-            StartTimer();
-            if (!TimeForMove()) return null;
-
-            return GetNextSpace;
-        }
-
-        public virtual void Reset(WorldSpace aSpawn)
+        public virtual void Reset()
         {
             timeSinceMovedLast = TimeSpan.Zero;
             waitDuration = 0;

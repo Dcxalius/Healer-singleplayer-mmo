@@ -3,6 +3,7 @@ using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,14 +11,19 @@ namespace Project_1.GameObjects.Spawners
 {
     internal class Bound : MobPathing
     {
-        public override WorldSpace GetNextSpace
+        public enum Type
+        {
+            Square,
+            Circle
+        }
+        public override WorldSpace? GetNextSpace
         {
             get
             {
-                WorldSpace space = WorldSpace.Zero;
-                space.X = (float)(RandomManager.RollDouble() * 2 * leash - leash);
-                space.Y = (float)(RandomManager.RollDouble() * 2 * leash - leash);
-                return space;
+                StartTimer();
+                if (!TimeForMove()) return null;
+                Reset();
+                return GetNext();
             }
         }
 
@@ -27,26 +33,42 @@ namespace Project_1.GameObjects.Spawners
         WorldSpace bindPoint;
         float leash;
 
-        public Bound(WorldSpace aBindPoint , float aMaxDistanceOfLeash)
+        Type type;
+
+        public Bound(WorldSpace aBindPoint , float aMaxDistanceOfLeash, Type aType)
         {
             bindPoint = aBindPoint;
             leash = aMaxDistanceOfLeash;
+            type = aType;
         }
 
-        public override WorldSpace? Update(WorldSpace aPosition)
+        WorldSpace GetNext()
         {
-
-            WorldSpace? r = UpdateTimer(aPosition);
-            if (!r.HasValue) return null;
-            lastDirection = r.Value;
-            return lastDirection;
+            switch (type)
+            {
+                case Type.Square:
+                    return GetNextSquare();
+                case Type.Circle:
+                    return GetNextCircle();
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
-        public override void Reset(WorldSpace aSpawn)
+        WorldSpace GetNextSquare()
         {
-            base.Reset(aSpawn);
 
-            lastDirection = bindPoint;
+            WorldSpace space = WorldSpace.Zero;
+            space.X = (float)(RandomManager.RollDouble() * 2 * leash - leash);
+            space.Y = (float)(RandomManager.RollDouble() * 2 * leash - leash);
+            return space;
+        }
+
+        WorldSpace GetNextCircle()
+        {
+            WorldSpace randomDir = new WorldSpace((float)RandomManager.RollDouble() * 2 - 1, (float)RandomManager.RollDouble() * 2 - 1);
+            float randomDistance = (float)(leash * RandomManager.RollDouble());
+            return randomDir * randomDistance;
         }
     }
 }

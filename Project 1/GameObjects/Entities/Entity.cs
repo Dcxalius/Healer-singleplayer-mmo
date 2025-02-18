@@ -173,7 +173,7 @@ namespace Project_1.GameObjects.Entities
         public void Movement()
         {
             destination.Update();
-            velocity += destination.GetVelocity(unitData.AttackData.MainHandAttack.Range, unitData.MovementData.Speed);
+            velocity += destination.GetVelocity(unitData.AttackData.MainHandAttack.Range, unitData.MovementData.Speed, new WorldSpace(FeetSize));
             base.Update(); //TODO: This shouldnt be here
             CheckForCollisions();
         }

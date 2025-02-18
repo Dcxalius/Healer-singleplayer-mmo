@@ -37,7 +37,7 @@ namespace Project_1.GameObjects.Spawners
             Debug.Assert(aGeometries.Length == aUnits.Length);
             for (int i = 0; i < aGeometries.Length; i++)
             {
-                CreateSpawner(aGeometries[i], new Bound(aGeometries[i].Centre, aGeometries[i].Length) , aUnits[i]);
+                CreateSpawner(aGeometries[i], new Bound(aGeometries[i].Centre, aGeometries[i].Length, Bound.Type.Square), aUnits[i]);
             }
         }
 

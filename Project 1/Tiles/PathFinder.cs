@@ -29,7 +29,7 @@ namespace Project_1.Tiles
 
             if (!endTile.Walkable)
             {
-                return GeneratePath(aStartPos, TileManager.FindClosestWalkableWorldSpace(aEndPos, aSize), aSize); //TODO: Ponder on what should be done here
+                return GeneratePath(aStartPos, TileManager.FindClosestWalkableWorldSpace(aEndPos, aSize), aSize);
             }
 
             if (endTile == startTile) return new Path(new List<Tile> { }, aEndPos);
@@ -41,7 +41,7 @@ namespace Project_1.Tiles
             while (true)
             {
                 currentTile = availableTiles.PopFirst();
-                DebugManager.AddDebugShape(new DebugTools.DebugSquare(currentTile.Tile.WorldRectangle, Color.Yellow * 0.4f));
+                //DebugManager.AddDebugShape(new DebugTools.DebugSquare(currentTile.Tile.WorldRectangle, Color.Yellow * 0.4f));
 
                 if (currentTile.Tile == endTile)
                 {
@@ -87,7 +87,7 @@ namespace Project_1.Tiles
                     availableTiles.Add(neighbour);
                     searchedTiles.Add(neighbour);
 
-                    DebugManager.AddDebugShape(new DebugTools.DebugSquare(neighbour.Tile.WorldRectangle, Color.Red * 0.1f));
+                    //DebugManager.AddDebugShape(new DebugTools.DebugSquare(neighbour.Tile.WorldRectangle, Color.Red * 0.1f));
                 }
             }
 
@@ -96,7 +96,7 @@ namespace Project_1.Tiles
             {
                 returnTiles.Add(currentTile.Tile);
                 
-                DebugManager.AddDebugShape(new DebugTools.DebugSquare(currentTile.Tile.WorldRectangle, Color.Green * 1f));
+                //DebugManager.AddDebugShape(new DebugTools.DebugSquare(currentTile.Tile.WorldRectangle, Color.Green * 1f));
                 
                 currentTile = currentTile.Parent;
                 

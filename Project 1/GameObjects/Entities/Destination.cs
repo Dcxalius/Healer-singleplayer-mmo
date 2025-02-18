@@ -13,14 +13,14 @@ namespace Project_1.GameObjects.Entities
 {
     internal class Destination
     {
-        public bool HasDestination => destinations.Count > 0;
+        public bool HasDestination => destinations.Count > 0 || currentPath != null;
         public WorldSpace DirectionToWalk => directionToWalk;
         public float LengthTo => lengthTo;
         float lengthTo; 
         
         WorldSpace directionToWalk;
         
-        List<WorldSpace> destinations;
+        List<WorldSpace> destinations; //TODO: Remove this and rely only on the path
         Entity owner;
 
         Path currentPath;
@@ -66,11 +66,20 @@ namespace Project_1.GameObjects.Entities
             UpdateDirection(destinations[0]);
         }
 
-        public WorldSpace GetVelocity(float aAttackRange, float aSpeed)
+        public WorldSpace GetVelocity(float aAttackRange, float aSpeed, WorldSpace aSize)
         {
             if (owner.Target == null)
             {
-                if (LengthTo < 10f) //TODO: Find a good factor
+                bool xIsBigger = Math.Abs(DirectionToWalk.X) >= Math.Abs(DirectionToWalk.Y);
+                if(directionToWalk.X != 0)
+                {
+
+                }
+                float lengthOfCross;
+                if (xIsBigger) lengthOfCross = aSize.X * (aSize.X / (aSize.X * Math.Abs(DirectionToWalk.X)));
+                else lengthOfCross = aSize.Y * (aSize.Y / (aSize.Y * Math.Abs(DirectionToWalk.Y)));
+
+                if (LengthTo < lengthOfCross / 2)
                 {
                     if (HasDestination)
                     {
@@ -117,6 +126,10 @@ namespace Project_1.GameObjects.Entities
         void UpdateDirection(WorldSpace aDestination)
         {
             WorldSpace dirV = aDestination - owner.FeetPosition;
+            if (dirV.X == 0 && dirV.Y == 0)
+            {
+                //TODO: Bugfix, if the destination is the same as feetposition it will teleport the entity to Infinity
+            }
             lengthTo = dirV.ToVector2().Length();
             dirV.Normalize();
             directionToWalk = dirV;

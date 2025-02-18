@@ -78,7 +78,7 @@ namespace Project_1.GameObjects.Spawners
             nextSpawnTime = RandomManager.RollDouble(minSpawnTime, maxSpawnTime);
 
             WorldSpace spawnPosition = spawnGeometry.GetNewSpawnPosition;
-            pathing.Reset(spawnPosition);
+            pathing.Reset();
             if (unitToSpawn.Length == 1)
             {
                 spawn = new NonFriendly(id, pathing, new UnitData(unitToSpawn[0], spawnPosition));

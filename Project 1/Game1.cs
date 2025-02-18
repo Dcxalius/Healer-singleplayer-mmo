@@ -33,6 +33,7 @@ namespace Project_1
         protected override void Initialize() //TODO: Split all Inits so that all calls that are independant are called first and only after that the dependant ones are called
         {
             DebugManager.Init();
+            RandomManager.Init();
             ItemFactory.Init(Content);
             LootFactory.Init(Content);
             TextureManager.Init(Content);
@@ -40,10 +41,9 @@ namespace Project_1
             ProjectileFactory.Init(Content);
             KeyBindManager.Init(Content);
             //Camera.Init();
-            StateManager.Init(Content);
-            RandomManager.Init();
-            SpawnerManager.Init(Content);
             TileManager.Init(Content);
+            StateManager.Init(Content);
+            SpawnerManager.Init(Content);
             AreaOfEffectFactory.Init(Content);
             ParticleManager.Init();
             base.Initialize();

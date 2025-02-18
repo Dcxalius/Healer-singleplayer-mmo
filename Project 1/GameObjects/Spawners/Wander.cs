@@ -12,13 +12,16 @@ namespace Project_1.GameObjects.Spawners
 {
     internal class Wander : MobPathing
     {
-        public override WorldSpace GetNextSpace
+        public override WorldSpace? GetNextSpace
         {
             get
             {
+                StartTimer();
+                if (!TimeForMove()) return null;
                 WorldSpace newSpace = new WorldSpace();
                 newSpace.X = (float)(boundry.Location.X + RandomManager.RollDouble() * boundry.Width);
                 newSpace.Y = (float)(boundry.Location.Y + RandomManager.RollDouble() * boundry.Height);
+                Reset();
                 return newSpace;
             }
         }
@@ -30,24 +33,7 @@ namespace Project_1.GameObjects.Spawners
 
         public Wander(Rectangle aBoundry)
         {
-            boundry = aBoundry; //TODO: Need to add something to ensure point is not in wall
-        }
-
-        
-
-        public override WorldSpace? Update(WorldSpace aPosition)
-        {
-            WorldSpace? r = UpdateTimer(aPosition);
-            if (!r.HasValue) return null;
-            lastDirection = r.Value;
-            return lastDirection;
-        }
-
-        public override void Reset(WorldSpace aSpawn)
-        {
-            lastDirection = aSpawn;
-
-            base.Reset(aSpawn);
+            boundry = aBoundry;
         }
     }
 }

@@ -32,22 +32,18 @@ namespace Project_1.GameObjects.Spawners
         Type type;
         bool hasBounced;
 
-        public override WorldSpace GetNextSpace => GetNextInQueue();
+        public override WorldSpace? GetNextSpace => GetNextInQueue();
 
         public override WorldSpace GetLatestSpace => queue[CurrentIndex];
 
-        public Patrol(WorldSpace[] aQueue, Type aType)
+        public Patrol(WorldSpace[] aQueue, Type aType, WorldSpace aUnitSize)
         {
             for (int i = 0; i < aQueue.Length; i++)
             {
-                //if (TileManager.GetTileUnder(aQueue[i]).Walkable) continue;
-                //while(true)
-                //{
-                //    //if ()
-                //    //{
+                Tile t = TileManager.GetTileUnder(aQueue[i]);
+                if (t.Walkable) continue;
 
-                //    //}
-                //}
+                TileManager.FindClosestWalkableWorldSpace(aQueue[i], aUnitSize);
             }
             type = aType;
             nextIndex = 1; //Make it take the closest one as first index??
@@ -55,9 +51,12 @@ namespace Project_1.GameObjects.Spawners
             hasBounced = false;
         }
 
-        public WorldSpace GetNextInQueue()
+        public WorldSpace? GetNextInQueue()
         {
+            StartTimer();
+            if (!TimeForMove()) return null;
             WorldSpace nextWorldSpaceInQueue;
+            Reset();
             switch (type)
             {
                 case Type.Circular:
@@ -75,25 +74,6 @@ namespace Project_1.GameObjects.Spawners
                 default:
                     throw new NotImplementedException();
             }
-        }
-
-        public override WorldSpace? Update(WorldSpace aPosition)
-        {
-            if (aPosition.DistanceTo(GetLatestSpace) < 1f) //TODO: Find a better point here
-            {
-                return GetNextSpace;
-            }
-
-            return null;
-        }
-
-        public override void Reset(WorldSpace aSpawn)
-        {
-            base.Reset(aSpawn);
-
-
-            nextIndex = 1; //Make it take the closest one as first index??
-            hasBounced = false;
         }
     }
 }

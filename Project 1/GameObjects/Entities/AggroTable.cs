@@ -126,7 +126,7 @@ namespace Project_1.GameObjects.Entities
                 AggroEntity entry = aggroEntities[i];
 
                 entry.Threat = aggroEntities[i].Threat + aThreatValue;
-                entry.TimeFirstHitMe = TimeManager.TotalFrameTimeAsTimeSpan;
+                entry.TimeSinceLastHit = TimeManager.TotalFrameTimeAsTimeSpan;
 
                 aggroEntities[i] = entry;
                 return;

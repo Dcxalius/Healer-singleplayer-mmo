@@ -43,10 +43,13 @@ namespace Project_1.GameObjects.Entities
 
             aggroTable.Update();
 
-            
-            WorldSpace? newPath = pathing.Update(FeetPosition);
-            if (newPath != null) destination.AddDestination(newPath.Value);
-            
+            if (!destination.HasDestination)
+            {
+                WorldSpace? nextSpace = pathing.GetNextSpace;
+                if (!nextSpace.HasValue) return;
+                destination.AddDestination(nextSpace.Value);
+            }
+
         }
         protected override void Death()
         {
