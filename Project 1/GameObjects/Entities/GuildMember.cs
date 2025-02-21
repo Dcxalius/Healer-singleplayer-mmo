@@ -88,7 +88,6 @@ namespace Project_1.GameObjects.Entities
             base.MoveNamePlate();
             base.FlagForRefresh();
             leaving = false;
-            RefreshEffects();
         }
 
         public void RemovedFromParty()

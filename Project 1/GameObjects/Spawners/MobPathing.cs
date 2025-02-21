@@ -10,12 +10,19 @@ namespace Project_1.GameObjects.Spawners
 {
     internal abstract class MobPathing
     {
+        public enum PathingType
+        {
+            Wander,
+            Bound, 
+            Patrol
+        }
 
         TimeSpan timeSinceMovedLast;
         double waitDuration;
         public abstract WorldSpace? GetNextSpace { get; }
         public abstract WorldSpace GetLatestSpace { get; }
 
+        public abstract PathingType UnderlyingType { get; }
 
         protected void StartTimer()
         {
@@ -39,5 +46,7 @@ namespace Project_1.GameObjects.Spawners
             timeSinceMovedLast = TimeSpan.Zero;
             waitDuration = 0;
         }
+
+        public abstract WorldSpace NewSpawn(WorldSpace aSize); //TODO: Rename
     }
 }

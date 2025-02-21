@@ -15,11 +15,12 @@ namespace Project_1.DebugTools
     {
         WorldSpace pos;
 
-        public DebugPoint(WorldSpace aPosition, float aSize) : base(Color.Yellow)
+        public DebugPoint(WorldSpace aPosition, float aSize, Color aColor) : base(aColor)
         {
             pos = aPosition;
             size = aSize;
         }
+        public DebugPoint(WorldSpace aPosition, float aSize) : this(aPosition, aSize, Color.Yellow) { }
 
 
         public override void Draw(SpriteBatch aBatch)

@@ -13,7 +13,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing.Printing;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
@@ -111,9 +110,9 @@ namespace Project_1.Tiles
             }
         }
 
-        public static float GetDragCoeficient(WorldSpace aCentreOfObject)
+        public static float GetDragCoeficient(WorldSpace aFeetPos)
         {
-            return GetTileUnder(aCentreOfObject).DragCoeficient;
+            return GetTileUnder(aFeetPos).DragCoeficient;
         }
         
         public static bool CheckLineOfSight(Entity aCaster, WorldSpace aTarget)
@@ -164,27 +163,27 @@ namespace Project_1.Tiles
 
         public static Path GetPath(WorldSpace aStartPosition, WorldSpace aTargetPosition, WorldSpace aSize) => pathFinder.GeneratePath(aStartPosition, aTargetPosition, aSize);
 
-        public static List<(Rectangle, Rectangle)> CollisionsWithUnwalkable(Rectangle aWorldRect)
+        public static List<(Rectangle, Rectangle)> CollisionsWithUnwalkable(Entity aEntity)
         {
 
-            List<Rectangle> finalColliders = ConvertUnwalkableTilesToRectangles(aWorldRect.Center);
-
+            List<Rectangle> finalColliders = ConvertUnwalkableTilesToRectangles(aEntity.FeetPosition);
+            Rectangle entityRectangle = aEntity.WorldRectangle;
             List<(Rectangle, Rectangle)> collisions = new List<(Rectangle, Rectangle)>();
             foreach (var collider in finalColliders)
             {
-                if (aWorldRect.Intersects(collider))
+                if (entityRectangle.Intersects(collider))
                 {
-                    collisions.Add((Rectangle.Intersect(aWorldRect, collider), collider));
+                    collisions.Add((Rectangle.Intersect(entityRectangle, collider), collider));
                 }
             }
             return collisions;
         }
 
-        static List<Rectangle> ConvertUnwalkableTilesToRectangles(Point aPos)
+        static List<Rectangle> ConvertUnwalkableTilesToRectangles(WorldSpace aPos)
         {
-            Tile[,] tilesSurroundingPlayer = GetSurroundingTiles(aPos / TileSize);
+            Tile[,] tilesSurroundingObject = GetSurroundingTiles(GetTileUnder(aPos));
 
-            Rectangle?[,] colliders = GetColliders(tilesSurroundingPlayer);
+            Rectangle?[,] colliders = GetColliders(tilesSurroundingObject);
 
             return Merge(colliders);
         }
@@ -268,14 +267,21 @@ namespace Project_1.Tiles
         public static Tile GetTileUnder(WorldSpace aWorldSpace)
         {
             if (aWorldSpace.X < 0 || aWorldSpace.X > debugSize.X * TileSize.X || aWorldSpace.Y < 0 || aWorldSpace.Y > debugSize.Y * TileSize.Y) return null; //DEBUG
-            return tiles[(int)Math.Floor(aWorldSpace.X / TileSize.X), (int)Math.Floor(aWorldSpace.Y / TileSize.Y)];
+            Tile t = tiles[(int)Math.Floor(aWorldSpace.X / TileSize.X), (int)Math.Floor(aWorldSpace.Y / TileSize.Y)];
+            return t;
         }
 
         public static WorldSpace FindClosestWalkableWorldSpace(WorldSpace aWorldSpace, WorldSpace aSize)
         {
+            if (GetTileUnder(aWorldSpace).Walkable)
+            {
+                return aWorldSpace;
+            }
+
             Tile closestTile = FindClosestWalkable(aWorldSpace);
 
-            DebugManager.Print(typeof(TileManager), "Tileboundries are " + closestTile.WorldRectangle);
+            //DebugManager.Print(typeof(TileManager), "Tileboundries are " + closestTile.WorldRectangle);
+
 
             Vector2 dirVector = Vector2.Normalize(aWorldSpace - closestTile.Centre);
 
@@ -323,7 +329,7 @@ namespace Project_1.Tiles
         {
             Tile underStart = GetTileUnder(aWorldSpace);
             if (underStart.Walkable) return underStart;
-            DebugManager.Print(typeof(TileManager), "Started looking for better tile around " + underStart.GridPos);
+            //DebugManager.Print(typeof(TileManager), "Started looking for better tile around " + underStart.GridPos);
             float x = aWorldSpace.X / TileSize.X;
             x -= (MathF.Floor(x) + 0.5f);
             float y = aWorldSpace.Y / TileSize.Y;
@@ -393,7 +399,7 @@ namespace Project_1.Tiles
                 List<int> removables = new List<int>();
                 for (int i = 0; i < spaces.Count; i++)
                 {
-                    Tile t = GetTileUnder(aStart + new WorldSpace(TileSize.X, TileSize.Y) * spaces[i]);
+                    Tile t = GetTileUnder(aStart + new WorldSpace(TileSize.X, TileSize.Y) * spaces[i]); //TODO: Inefficent I think
                     if (t == null)
                     {
                         removables.Add(i);
@@ -446,7 +452,7 @@ namespace Project_1.Tiles
         }
 
 
-        static Tile[,] GetSurroundingTiles(Point aIndex)
+        static Tile[,] GetSurroundingTiles(Tile aTile)
         {
             Tile[,] a = new Tile[sizeOfSquareToCheck, sizeOfSquareToCheck];
 
@@ -454,7 +460,9 @@ namespace Project_1.Tiles
             {
                 for (int j = 0; j < sizeOfSquareToCheck; j++)
                 {
-                    a[i, j] = tiles[aIndex.X - (int)Math.Floor(sizeOfSquareToCheck/2m) + i, aIndex.Y - (int)Math.Floor(sizeOfSquareToCheck / 2m) + j];
+                    int x = aTile.GridPos.X - (int)Math.Floor(sizeOfSquareToCheck / 2m) + i;
+                    int y = aTile.GridPos.Y - (int)Math.Floor(sizeOfSquareToCheck / 2m) + j;
+                    a[i, j] = tiles[x, y];
                 }
             }
             return a;
@@ -467,7 +475,8 @@ namespace Project_1.Tiles
             {
                 for (int j = 0; j < aTileArray.GetLength(1); j++)
                 {
-                    if (!aTileArray[i,j].Walkable)
+                    if (aTileArray[i, j] == null) continue;
+                    if (!aTileArray[i, j].Walkable)
                     {
                         colliders[i,j] = aTileArray[i, j].WorldRectangle;
                     }

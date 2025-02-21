@@ -13,44 +13,52 @@ namespace Project_1.GameObjects.Entities
 {
     internal class Destination
     {
-        public bool HasDestination => destinations.Count > 0 || currentPath != null;
+        public bool HasDestination => CurrentPath != null;
         public WorldSpace DirectionToWalk => directionToWalk;
         public float LengthTo => lengthTo;
         float lengthTo; 
         
         WorldSpace directionToWalk;
         
-        List<WorldSpace> destinations; //TODO: Remove this and rely only on the path
         Entity owner;
+        private void CheckIfClear()
+        {
+            if (!HasDestination) return;
 
-        Path currentPath;
+            if (CurrentPath.Count == 0) paths.RemoveAt(0);
+        }
+
+        Path CurrentPath
+        {
+            get
+            {
+                if (paths.Count == 0) return null;
+                return paths[0];
+            }
+        }
+
+        List<Path> paths;
+        WorldSpace? destination;
         public Destination(Entity aOwner)
         {
-            destinations = new List<WorldSpace>();
             owner = aOwner;
         }
 
-        public void Update() //TOOD: Rework this ASAP
+        public void Update()
         {
-            //if (owner.Momentum.ToVector2().Length() < 0.1f)
-            //{
-            //    owner.Momentum = WorldSpace.Zero;
-            //}
+            
             if (owner is Player)
             {
                 if (!(owner as Player).LockedMovement) return;
             }
 
-            if (currentPath != null && currentPath.Count == 0) currentPath = null;
-            if (destinations.Count == 0 && owner.Target == null && currentPath != null)
+            if (!HasDestination) destination = null;
+            if (owner.Target == null && CurrentPath != null && destination == null)
             {
-                destinations.Add(currentPath.ComsumeNextPoint);
-                //directionToWalk = WorldSpace.Zero;
-                //lengthTo = 0;
-                //return;
+                destination = CurrentPath.ComsumeNextPoint;
             }
 
-            if (destinations.Count == 0 && owner.Target == null)
+            if (owner.Target == null && destination == null)
             {
                 directionToWalk = WorldSpace.Zero;
                 lengthTo = 0;
@@ -63,7 +71,7 @@ namespace Project_1.GameObjects.Entities
 
             }
 
-            UpdateDirection(destinations[0]);
+            UpdateDirection(destination.Value);
         }
 
         public WorldSpace GetVelocity(float aAttackRange, float aSpeed, WorldSpace aSize)
@@ -71,22 +79,16 @@ namespace Project_1.GameObjects.Entities
             if (owner.Target == null)
             {
                 bool xIsBigger = Math.Abs(DirectionToWalk.X) >= Math.Abs(DirectionToWalk.Y);
-                if(directionToWalk.X != 0)
+                
+                float lengthOfBiggestCrossSection;
+
+                if (xIsBigger) lengthOfBiggestCrossSection = aSize.X * (aSize.X / (aSize.X * Math.Abs(DirectionToWalk.X)));
+                else lengthOfBiggestCrossSection = aSize.Y * (aSize.Y / (aSize.Y * Math.Abs(DirectionToWalk.Y)));
+
+                if (LengthTo < lengthOfBiggestCrossSection / 2)
                 {
-
-                }
-                float lengthOfCross;
-                if (xIsBigger) lengthOfCross = aSize.X * (aSize.X / (aSize.X * Math.Abs(DirectionToWalk.X)));
-                else lengthOfCross = aSize.Y * (aSize.Y / (aSize.Y * Math.Abs(DirectionToWalk.Y)));
-
-                if (LengthTo < lengthOfCross / 2)
-                {
-                    if (HasDestination)
-                    {
-                        RemoveFirst();
-                    }
-
-                    
+                    CheckIfClear();
+                    destination = null;
                     return WorldSpace.Zero;
                 }
 
@@ -95,12 +97,8 @@ namespace Project_1.GameObjects.Entities
             {
                 if (LengthTo < aAttackRange - owner.Target.Size.X / 2 - owner.Size.X / 2)
                 {
-                    if (HasDestination)
-                    {
-                        RemoveFirst();
-                    }
-                    //Momentum = owner.Momentum / 1.6f;
-
+                    CheckIfClear();
+                    destination = null;
                     return WorldSpace.Zero;
                 }
             }
@@ -108,19 +106,22 @@ namespace Project_1.GameObjects.Entities
             return DirectionToWalk * aSpeed * (float)TimeManager.SecondsSinceLastFrame;
         }
 
-        public void RemoveFirst() => destinations.RemoveAt(0);
 
         public void OverwriteDestination(WorldSpace aDestination)
         {
-            destinations.Clear();
-            destinations.Add(aDestination);
+            paths.Clear();
+            paths.Add(TileManager.GetPath(owner.FeetPosition, aDestination, new WorldSpace(owner.FeetSize)));
         }
 
         public void AddDestination(WorldSpace aDestination)
         {
-            destinations.Clear();
-            currentPath = TileManager.GetPath(owner.FeetPosition, aDestination, new WorldSpace(owner.FeetSize));
-            //destinations.AddRange();
+            if (paths.Count > 0)
+            {
+                paths.Add(TileManager.GetPath(paths[paths.Count - 1].CheckLastSpace, aDestination, new WorldSpace(owner.FeetSize)));
+
+                return;
+            }
+            paths.Add(TileManager.GetPath(owner.FeetPosition, aDestination, new WorldSpace(owner.FeetSize)));
         }
 
         void UpdateDirection(WorldSpace aDestination)

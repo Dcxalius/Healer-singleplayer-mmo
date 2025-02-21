@@ -16,7 +16,7 @@ namespace Project_1.GameObjects
 {
     internal abstract class GameObject
     {
-        public WorldSpace Position { get => position; protected set => position = value; }
+        protected WorldSpace Position { get => position; set => position = value; }
         public WorldSpace Centre { get => position + new WorldSpace(size.ToVector2()) / 2; }
         public WorldSpace FeetPosition { get => Position + new WorldSpace(size.X / 2, size.Y); set => Position = value - new WorldSpace(size.X / 2, size.Y); }
         public virtual Point FeetSize { get => Size; set => Size = value; }
@@ -45,7 +45,6 @@ namespace Project_1.GameObjects
         {
             effects = new List<VisualEffect>();
             gfx = aGfx;
-            position = aStartingPos;
             if (aGfx.Visible != null)
             {
                 size = aGfx.Visible.Value.Size;
@@ -54,6 +53,7 @@ namespace Project_1.GameObjects
             {
                 size = gfx.size;
             }
+            FeetPosition = aStartingPos;
         }
 
         public virtual void Update()

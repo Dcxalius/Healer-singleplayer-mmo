@@ -122,7 +122,7 @@ namespace Project_1.Camera
                     SetCamera(CameraSettings.Free);
                     return;
                 }
-                CentreInWorldSpace = boundObject.Position;
+                CentreInWorldSpace = boundObject.FeetPosition;
             }
         }
 
@@ -146,21 +146,21 @@ namespace Project_1.Camera
 
         void CheckIfCameraTriesToLeavePlayer()
         {
-            bindingRectangle.Location = (boundObject.Position - bindingRectangle.Size.ToVector2() / 2).ToPoint();
+            bindingRectangle.Location = (boundObject.FeetPosition - bindingRectangle.Size.ToVector2() / 2).ToPoint();
 
             if (!bindingRectangle.Contains(CentreInWorldSpace))
             {
                 Vector2 cameraRectIntersection = CalculateIntersection();
 
-                CentreInWorldSpace = boundObject.Position - (WorldSpace)cameraRectIntersection;
+                CentreInWorldSpace = boundObject.FeetPosition - (WorldSpace)cameraRectIntersection;
             }
         }
 
         Vector2 CalculateIntersection() //TODO: split this function more
         {
 
-            Vector2 playerStart = boundObject.Position;
-            Vector2 playerToCameraRay = Vector2.Normalize(CentreInWorldSpace - boundObject.Position);
+            Vector2 playerStart = boundObject.FeetPosition;
+            Vector2 playerToCameraRay = Vector2.Normalize(CentreInWorldSpace - boundObject.FeetPosition);
 
             Vector2 rectangleCornerStart = GetClosestRectangleCorner(playerToCameraRay);
             (Vector2 rectangleSideRay, Vector2 rectangleFurtherSideRay) = GetRectangleRays(rectangleCornerStart);
@@ -170,18 +170,18 @@ namespace Project_1.Camera
 
             Vector2 intersection = playerStart + playerToCameraRay * u;
 
-            Vector2 distanceToBinder = boundObject.Position - intersection;
+            Vector2 distanceToBinder = boundObject.FeetPosition - intersection;
             float length = distanceToBinder.Length();
 
             Vector2 normalized = Vector2.Normalize(distanceToBinder);
             Vector2 tele = normalized * length * 0.9999f;
 
-            if (!bindingRectangle.Contains(boundObject.Position - tele))
+            if (!bindingRectangle.Contains(boundObject.FeetPosition - tele))
             {
 
                 float furtherU = LengthToCollisionFromFirstVector(playerStart, playerToCameraRay, rectangleCornerStart, rectangleFurtherSideRay);
                 Vector2 furtherIntersection = playerStart + playerToCameraRay * furtherU;
-                distanceToBinder = boundObject.Position - furtherIntersection;
+                distanceToBinder = boundObject.FeetPosition - furtherIntersection;
                 length = distanceToBinder.Length();
 
                 normalized = Vector2.Normalize(distanceToBinder);
@@ -305,7 +305,7 @@ namespace Project_1.Camera
                 return;
             }
 
-            CentreInWorldSpace = boundObject.Position;
+            CentreInWorldSpace = boundObject.FeetPosition;
         }
 
         void MoveFree()
@@ -316,12 +316,12 @@ namespace Project_1.Camera
 
         void StayWithinCircleBind()
         {
-            Vector2 distanceToBinder = boundObject.Position - CentreInWorldSpace;
+            Vector2 distanceToBinder = boundObject.FeetPosition - CentreInWorldSpace;
             if (distanceToBinder.Length() >= maxCircleCameraMove)
             {
                 Vector2 normalized = Vector2.Normalize(distanceToBinder);
                 Vector2 tele = normalized * maxCircleCameraMove * 0.9999f;
-                CentreInWorldSpace = (WorldSpace)(boundObject.Position - tele);
+                CentreInWorldSpace = (WorldSpace)(boundObject.FeetPosition - tele);
                 //velocity = Vector2.Zero;
             }
         }

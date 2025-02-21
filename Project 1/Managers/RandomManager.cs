@@ -12,6 +12,11 @@ namespace Project_1.Managers
         static Random random;
         public static void Init()
         {
+            if (DebugManager.Mode(DebugMode.FalseRandom)) 
+            {
+                random = new Random(1);
+                return;
+            }
             random = new Random();
         }
 

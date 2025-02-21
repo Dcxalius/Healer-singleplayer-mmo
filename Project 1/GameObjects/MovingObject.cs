@@ -53,11 +53,15 @@ namespace Project_1.GameObjects
             }
             velocity = WorldSpace.Zero;
             momentum = new WorldSpace(momentum.X * TileManager.GetDragCoeficient(FeetPosition), momentum.Y * TileManager.GetDragCoeficient(FeetPosition));
+            if (momentum.ToVector2().Length() < 0.01f)
+            {
+                momentum = WorldSpace.Zero;
+            }
         }
 
         void ChangePosition()
         {
-            Position += momentum;
+            FeetPosition += momentum;
         }
 
         protected virtual void FlipGfx()

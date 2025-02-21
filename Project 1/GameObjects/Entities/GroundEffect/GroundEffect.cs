@@ -20,15 +20,6 @@ namespace Project_1.GameObjects.Entities.GroundEffect
         {
             gfx = new Textures.Texture(gfxPath);
         }
-
-        public void UpdatePosition(WorldSpace aPos, Point aSize)
-        {
-            //Vector2 offset = new Vector2(0, aSize.Y / 2.5f);
-
-            //position.Location = (aPos + offset).ToPoint();
-            //position.Size = (aSize.ToVector2() * Camera.Camera.Scale).ToPoint();
-        }
-
         protected void Draw(SpriteBatch aBatch, WorldSpace aFeetPos, Color aColor, float aOrder)
         {
             gfx.Draw(aBatch, aFeetPos.ToAbsoltueScreenPosition(), aColor, gfx.size.ToVector2() / 2, aFeetPos.Y - aOrder); //TODO: Make this actually use rects to draw

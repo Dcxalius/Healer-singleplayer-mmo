@@ -56,7 +56,7 @@ namespace Project_1.GameObjects.Entities
             {
                 drop = loot.GenerateDrop();
             }
-            Position = aPos;
+            FeetPosition = aPos;
             ObjectManager.AddCorpse(this);
 
             timeDied = TimeManager.TotalFrameTime;
@@ -128,10 +128,10 @@ namespace Project_1.GameObjects.Entities
             //gfx.Draw(aBatch, Camera.Camera.WorldPosToCameraSpace(Position), Position.Y);
             if (isDespawning)
             {
-                gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2(), Color.White * (float)(1 - ((TimeManager.TotalFrameTime - timeDespawnStart) / despawnTime)), Position.Y);
+                gfx.Draw(aBatch, FeetPosition.ToAbsoltueScreenPosition().ToVector2(), Color.White * (float)(1 - ((TimeManager.TotalFrameTime - timeDespawnStart) / despawnTime)), FeetPosition.Y);
                 return;
             }
-            gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2(), Position.Y);
+            gfx.Draw(aBatch, FeetPosition.ToAbsoltueScreenPosition().ToVector2(), FeetPosition.Y);
 
         }
     }

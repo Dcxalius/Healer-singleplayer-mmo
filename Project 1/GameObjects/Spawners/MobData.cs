@@ -1,10 +1,12 @@
 ﻿using Newtonsoft.Json;
+using Project_1.Camera;
 using Project_1.GameObjects.Unit;
 using Project_1.Managers;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,6 +42,8 @@ namespace Project_1.GameObjects.Spawners
 
         public GfxPath CorpseGfxPath => corpseGfxPath;
         readonly GfxPath corpseGfxPath;
+
+        public WorldSpace Size => new WorldSpace(32, 16); //TODO: Fix
 
         [JsonConstructor]
         public MobData(string name, string corpseGfxName, string className, Aggresive relation, int minLevel, int maxLevel, int?[] equipment)

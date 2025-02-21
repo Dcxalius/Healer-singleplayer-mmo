@@ -22,6 +22,7 @@ namespace Project_1.Managers
     {
         DebugShapes,
         Print,
+        FalseRandom,
         TileCoords,
         InvCheats,
         Teleport,
@@ -45,8 +46,9 @@ namespace Project_1.Managers
         public static void Init()
         {
             modes[(int)DebugMode.DebugShapes] = true;
+            modes[(int)DebugMode.FalseRandom] = false;
             modes[(int)DebugMode.Print] = true;
-            modes[(int)DebugMode.TileCoords] = true;
+            modes[(int)DebugMode.TileCoords] = false;
             modes[(int)DebugMode.InvCheats] = true;
             modes[(int)DebugMode.Teleport] = true;
             AllocConsole();

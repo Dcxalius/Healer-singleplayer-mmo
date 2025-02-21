@@ -12,10 +12,15 @@ using Project_1.Managers;
 
 namespace Project_1.Tiles
 {
-    internal class Tile : GameObject
+    internal class Tile
     {
         readonly static Point tileSize = new Point(32);
         public string Name => tileData.Name;
+        public WorldSpace Position { get => position; protected set => position = value; }
+        WorldSpace position;
+        public WorldSpace Centre { get => position + new WorldSpace(tileSize.ToVector2()) / 2; }
+        public virtual Rectangle WorldRectangle { get => new Rectangle(position.ToPoint(), tileSize); }
+
         public bool Walkable => tileData.Walkable;
         public float DragCoeficient => tileData.DragCoeficient;
 
@@ -44,10 +49,12 @@ namespace Project_1.Tiles
         UITexture debugTexture;
         TileData tileData;
 
+        Textures.Texture gfx;
         //bool 
 
-        public Tile(TileData aTileData, Point aPos, Point aTilePos) : base(new Textures.RandomlyGeneratedTexture(true, tileSize, new GfxPath(GfxType.Tile, aTileData.Name)), (WorldSpace)aPos.ToVector2())
+        public Tile(TileData aTileData, Point aPos, Point aTilePos)
         {
+            gfx = new Textures.RandomlyGeneratedTexture(true, tileSize, new GfxPath(GfxType.Tile, aTileData.Name));
             debugTexture = new UITexture(new GfxPath(GfxType.Debug, "Debug"), Color.White);
             tileData = aTileData;
             tilePos = aTilePos;
@@ -56,6 +63,7 @@ namespace Project_1.Tiles
                 xText = new Text("Gloryse", tilePos.X.ToString(), Color.Black);
                 yText = new Text("Gloryse", tilePos.Y.ToString(), Color.Yellow);
             }
+            Position = new WorldSpace(aPos);
         }
 
         public void AddDebugSquare()
@@ -63,7 +71,7 @@ namespace Project_1.Tiles
             DebugManager.AddDebugShape(new DebugTools.DebugSquare(new Rectangle(Position.ToPoint(), tileSize)));
         }
 
-        public override void Draw(SpriteBatch aBatch)
+        public void Draw(SpriteBatch aBatch)
         {
             //base.Draw(aBatch); Skip draw as a gameobject to make all tiles appear in the background
             gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition(), Color.White, 0);
@@ -71,8 +79,8 @@ namespace Project_1.Tiles
             //xText.LeftAllignedDraw(aBatch, new WorldSpace(Position - Size.ToVector2() / 2).ToAbsoltueScreenPosition());
             if (DebugManager.Mode(DebugMode.TileCoords))
             {
-                xText.CentreLeftDraw(aBatch, new WorldSpace(Position).ToAbsoltueScreenPosition());
-                yText.CentreLeftDraw(aBatch, new WorldSpace(Position + new WorldSpace(xText.Offset.X, 0)).ToAbsoltueScreenPosition());
+                xText.TopLeftDraw(aBatch, new WorldSpace(Position).ToAbsoltueScreenPosition());
+                yText.TopLeftDraw(aBatch, new WorldSpace(Position + new WorldSpace(xText.Offset.X, 0)).ToAbsoltueScreenPosition());
             }
             //Camera.Camera.WorldPosToCameraSpace(Position), 0); 
         }

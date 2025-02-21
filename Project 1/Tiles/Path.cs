@@ -21,7 +21,9 @@ namespace Project_1.Tiles
             }
         }
 
+        public WorldSpace CheckLastSpace => pointsOnPath[pointsOnPath.Count - 1];
         public int Count => pointsOnPath.Count;
+
 
         List<WorldSpace> pointsOnPath;
         
@@ -37,11 +39,11 @@ namespace Project_1.Tiles
 
                 lastDir = dir;
                 pointsOnPath.Add(aPath[i].Centre);
-                DebugManager.AddDebugShape(new DebugTools.DebugPoint(pointsOnPath.Last(), 10f));
+                //DebugManager.AddDebugShape(new DebugTools.DebugPoint(pointsOnPath.Last(), 10f));
             }
 
             pointsOnPath.Add(aEndPosition);
-            DebugManager.AddDebugShape(new DebugTools.DebugPoint(pointsOnPath.Last(), 10f));
+            //DebugManager.AddDebugShape(new DebugTools.DebugPoint(pointsOnPath.Last(), 10f));
         }
     }
 }

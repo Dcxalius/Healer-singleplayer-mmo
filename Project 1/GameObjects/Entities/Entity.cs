@@ -124,19 +124,11 @@ namespace Project_1.GameObjects.Entities
             MoveNamePlate();
             Movement();
             AttackTarget();
-            RefreshEffects();
             spellCast.UpdateSpellChannel();
             buffList.Update(this);
 
 
             //HUDManager.RefreshPlateBox(this);
-        }
-
-        protected void RefreshEffects()
-        {
-            shadow.UpdatePosition(Position, Size);
-            selectRing.UpdatePosition(Position, Size);
-
         }
 
         bool AmIDead()
@@ -158,7 +150,7 @@ namespace Project_1.GameObjects.Entities
 
             ObjectManager.RemoveEntity(this);
             RemoveNamePlate();
-            if (corpse != null) corpse.SpawnCorpe(Position);
+            if (corpse != null) corpse.SpawnCorpe(FeetPosition);
 
         }
         void TargetAliveCheck()
@@ -182,7 +174,7 @@ namespace Project_1.GameObjects.Entities
         void CheckForCollisions() //TODO: Rework this?
         {
 
-            List<(Rectangle, Rectangle)> resultingCollisions = TileManager.CollisionsWithUnwalkable(WorldRectangle);
+            List<(Rectangle, Rectangle)> resultingCollisions = TileManager.CollisionsWithUnwalkable(this);
 
             if (resultingCollisions.Count != 0)
             {
