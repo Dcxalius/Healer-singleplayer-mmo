@@ -117,11 +117,11 @@ namespace Project_1.UI.HUD
 
         void UpdateLootPosition()
         {
-            //for (int i = 0; i < children.Count; i++)
+            for (int i = 0; i < ChildCount; i++)
             {
-                //if (!loot.Contains(children[i])) continue;
+                if (!loot.Contains(GetChild(i))) continue;
 
-                //children[i].Move(new RelativeScreenPosition(children[i].RelativePos.X, originalYPos[i] - scrollValue));
+                GetChild(i).Move(new RelativeScreenPosition(GetChild(i).RelativePos.X, originalYPos[i] - scrollValue));
             }
         }
 

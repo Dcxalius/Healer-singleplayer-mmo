@@ -37,14 +37,14 @@ namespace Project_1.GameObjects.Entities
         public virtual Entity Target { get => target; }
         protected Entity target = null;
 
-        public override Point FeetSize { get => new Point(Size.X, Size.Y / 2); set => base.FeetSize = new Point(value.X, value.Y * 4); }
+        public override WorldSpace FeetSize { get => new WorldSpace(Size.X, Size.Y / 2); }
 
         public override Rectangle WorldRectangle
         {
             get
             {
-                Point pos = FeetPosition.ToPoint() - new Point(FeetSize.X / 2, FeetSize.Y / 2);
-                return new Rectangle(pos, FeetSize);
+                Point pos = FeetPosition.ToPoint() - new Point((int)(FeetSize.X / 2), (int)(FeetSize.Y / 2));
+                return new Rectangle(pos, FeetSize.ToPoint());
             }
         }
 
@@ -150,7 +150,7 @@ namespace Project_1.GameObjects.Entities
 
             ObjectManager.RemoveEntity(this);
             RemoveNamePlate();
-            if (corpse != null) corpse.SpawnCorpe(FeetPosition);
+            if (corpse != null) corpse.SpawnCorpe(Position);
 
         }
         void TargetAliveCheck()
@@ -165,9 +165,30 @@ namespace Project_1.GameObjects.Entities
         public void Movement()
         {
             destination.Update();
-            velocity += destination.GetVelocity(unitData.AttackData.MainHandAttack.Range, unitData.MovementData.Speed, new WorldSpace(FeetSize));
+
+            float minAttackRange = GetMinAttackRange();
+            
+            velocity += destination.GetVelocity(minAttackRange, unitData.MovementData.Speed, new WorldSpace(FeetSize));
             base.Update(); //TODO: This shouldnt be here
             CheckForCollisions();
+        }
+
+        float GetMinAttackRange()
+        {
+            float minAttackRange;
+            if (unitData.AttackData.OffHandAttack != null && unitData.AttackData.MainHandAttack != null)
+            {
+                minAttackRange = Math.Min(unitData.AttackData.MainHandAttack.Range, unitData.AttackData.OffHandAttack.Range);
+            }
+            else if (unitData.AttackData.MainHandAttack == null)
+            {
+                minAttackRange = unitData.AttackData.OffHandAttack.Range;
+            }
+            else
+            {
+                minAttackRange = unitData.AttackData.MainHandAttack.Range;
+            }
+            return minAttackRange;
         }
 
 
@@ -224,7 +245,7 @@ namespace Project_1.GameObjects.Entities
             if (!CheckForRelation()) return;
 
             AttackData a = unitData.AttackData;
-            if ((target.FeetPosition - FeetPosition).ToVector2().Length() >= a.MainHandAttack.Range - Size.X / 2 - target.Size.X / 2) return;
+            if ((target.FeetPosition - FeetPosition).ToVector2().Length() >= GetMinAttackRange() - Size.X / 2 - target.Size.X / 2) return;
             
             CheckAttackSpeed(ref unitData.NextAvailableMainHandAttack, a.MainHandAttack);
             if (target == null) return;

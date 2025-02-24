@@ -19,7 +19,7 @@ namespace Project_1.GameObjects
         protected WorldSpace Position { get => position; set => position = value; }
         public WorldSpace Centre { get => position + new WorldSpace(size.ToVector2()) / 2; }
         public WorldSpace FeetPosition { get => Position + new WorldSpace(size.X / 2, size.Y); set => Position = value - new WorldSpace(size.X / 2, size.Y); }
-        public virtual Point FeetSize { get => Size; set => Size = value; }
+        public virtual WorldSpace FeetSize { get => new WorldSpace(Size); } //TODO: ??
         public virtual Rectangle WorldRectangle { get => new Rectangle(position.ToPoint(), size); }
         public float DistanceTo(WorldSpace aPoint) => FeetPosition.DistanceTo(aPoint);
         

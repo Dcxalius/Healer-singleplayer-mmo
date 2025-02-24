@@ -41,6 +41,7 @@ namespace Project_1.GameObjects.Entities
         WorldSpace? destination;
         public Destination(Entity aOwner)
         {
+            paths = new List<Path>();
             owner = aOwner;
         }
 
@@ -58,7 +59,7 @@ namespace Project_1.GameObjects.Entities
                 destination = CurrentPath.ComsumeNextPoint;
             }
 
-            if (owner.Target == null && destination == null)
+            if (owner.Target == null &&  destination == null)
             {
                 directionToWalk = WorldSpace.Zero;
                 lengthTo = 0;
@@ -68,7 +69,7 @@ namespace Project_1.GameObjects.Entities
             if (owner.Target != null)
             {
                 OverwriteDestination(owner.Target.FeetPosition);
-
+                destination = CurrentPath.ComsumeNextPoint;
             }
 
             UpdateDirection(destination.Value);

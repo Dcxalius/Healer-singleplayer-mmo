@@ -90,6 +90,7 @@ namespace Project_1.UI.UIElements
 
         protected void KillAllChildren() => children.Clear();
         protected void KillChild(int aIndex) => children.RemoveAt(aIndex);
+        protected UIElement GetChild(int aIndex) => children[aIndex];
 
         #endregion
 
