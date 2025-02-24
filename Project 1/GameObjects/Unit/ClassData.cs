@@ -20,6 +20,13 @@ namespace Project_1.GameObjects.Unit
             Mob
         }
 
+        public enum MeleeAttackPowerBonus
+        {
+            None,
+            Strength,
+            Agility
+        }
+
 
         public string Name => name;
         readonly string name;
@@ -54,9 +61,18 @@ namespace Project_1.GameObjects.Unit
         public Movement Movement => movementData;
         Movement movementData;
 
+        public MeleeAttackPowerBonus MeleeAttackBonus => meleeAttackPowerBonus;
+        MeleeAttackPowerBonus meleeAttackPowerBonus;
+
+        public float DodgeScaling => dodgeScaling;
+        float dodgeScaling;
+
+        public float MeleeCritScaling => meleeCritScaling;
+        float meleeCritScaling;
 
         [JsonConstructor]
-        public ClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float baseHpPer5, float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed)
+        public ClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float baseHpPer5, 
+            float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed, MeleeAttackPowerBonus meleeAttackPowerBonus, float dodgeScaling, float meleeCritScaling)
         {
             this.name = name;
             this.resource = resource;
@@ -68,8 +84,10 @@ namespace Project_1.GameObjects.Unit
             this.fistMinAttackDamage = fistMinAttackDamage;
             this.fistMaxAttackDamage = fistMaxAttackDamage;
             this.fistAttackSpeed = fistAttackSpeed;
+            this.meleeAttackPowerBonus = meleeAttackPowerBonus;
             movementData = new Movement(speed, maxSpeed);
-
+            this.dodgeScaling = dodgeScaling == 0 ? 0.01f / 20f : dodgeScaling;
+            this.meleeCritScaling = meleeCritScaling == 0 ? 0.01f / 20f : meleeCritScaling;
             Assert();
         }
 

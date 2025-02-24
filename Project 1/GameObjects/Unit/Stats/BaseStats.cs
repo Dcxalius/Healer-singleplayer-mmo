@@ -21,30 +21,35 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public AttackData FistAttack => fistAttack;
         AttackData fistAttack;
-        
+
+        public Armor TotalArmor => baseArmor + totalPrimaryStats.Agility.Armor;
+        Armor baseArmor;
+
+        ClassData classData;
 
         public TotalPrimaryStats TotalPrimaryStats => totalPrimaryStats;
         TotalPrimaryStats totalPrimaryStats;
         BasePrimaryStats basePrimaryStats;
 
-
-
-        public int AttackPower
+        public PairReport StatReport
         {
-            get { return attackPower; }
-            set
+            get
             {
-                attackPower = value;
-                fistAttack.AttackPower = value;
+                PairReport report = TotalPrimaryStats.NewReport;
+                report.AddLine("Armor", baseArmor);
+                return report;
             }
         }
-        int attackPower;
+
+        public int GetAttackPower(ClassData aClassData) => totalPrimaryStats.Agility.GetMeleeAttackPower(aClassData) + totalPrimaryStats.Strength.GetMeleeAttackPower(aClassData);
+
 
         public BaseStats(ClassData aClassData, int aLevel, EquipmentStats aEquipmentStats, float aCurrentHealth = float.MaxValue, float aCurrentResource = float.MaxValue)
         {
             basePrimaryStats = new BasePrimaryStats(aClassData.BaseStats, aClassData.PerLevelStats, aLevel);
             totalPrimaryStats = new TotalPrimaryStats(basePrimaryStats, aEquipmentStats);
             health = new Health(aClassData, basePrimaryStats, aLevel, aCurrentHealth);
+            classData = aClassData;
             switch (aClassData.Resource)
             {
                 case Resource.ResourceType.Mana:
@@ -67,6 +72,8 @@ namespace Project_1.GameObjects.Unit.Stats
             }
 
             fistAttack = new AttackData(AttackData.AttackStyle.OneHander, new Attack(aClassData.FistMinAttackDamage, aClassData.FistMaxAttackDamage, aClassData.FistAttackSpeed), null);
+            fistAttack.AttackPower = GetAttackPower(aClassData);
+            baseArmor = new Armor(0);
         }
 
         public void SetOwner(Entity aEntity) => owner = aEntity;
@@ -78,11 +85,11 @@ namespace Project_1.GameObjects.Unit.Stats
         }
 
 
-        public void LevelUp(ClassData aClassData)
+        public void LevelUp()
         {
-            basePrimaryStats.LevelUp(aClassData.PerLevelStats);
+            basePrimaryStats.LevelUp(classData.PerLevelStats);
             totalPrimaryStats.UpdateBaseStats(basePrimaryStats);
-            health.LevelUp(aClassData.PerLevelHp, basePrimaryStats.Stamina);
+            health.LevelUp(classData.PerLevelHp, basePrimaryStats.Stamina);
             resource.LevelUp();
 
             RefreshStats();
@@ -92,14 +99,18 @@ namespace Project_1.GameObjects.Unit.Stats
         {
             health.Refresh(TotalPrimaryStats);
             resource.Refresh(TotalPrimaryStats);
-            if (!(owner is Friendly)) return;
+            owner.Equipment.MeleeAttackPower = GetAttackPower(classData);
+            fistAttack.AttackPower = GetAttackPower(classData);
 
-            HUDManager.RefreshCharacterWindowStats(TotalPrimaryStats.NewReport, owner as Friendly);
+
+            if (!(owner is Friendly)) return;
+            HUDManager.RefreshCharacterWindowStats(StatReport, owner as Friendly);
         }
 
         public void RefreshEquipmentStats(EquipmentStats aEquipmentStats)
         {
             totalPrimaryStats.UpdateEquipmentStats(aEquipmentStats);
+            baseArmor = aEquipmentStats.TotalArmor;
             RefreshStats();
         }
     }

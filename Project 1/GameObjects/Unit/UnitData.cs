@@ -98,7 +98,7 @@ namespace Project_1.GameObjects.Unit
                 AttackData weaponAttacks = equipment.GetWeaponAttacks();
 
                 if (weaponAttacks.Style == AttackData.AttackStyle.None) return baseStats.FistAttack;
-                weaponAttacks.AttackPower = baseStats.AttackPower;
+
                 return weaponAttacks;
             }
         }
@@ -217,7 +217,7 @@ namespace Project_1.GameObjects.Unit
         {
             if (!level.GainExp(aExpAmount)) return;
             //Level up
-            baseStats.LevelUp(classData);
+            baseStats.LevelUp();
         }
 
     

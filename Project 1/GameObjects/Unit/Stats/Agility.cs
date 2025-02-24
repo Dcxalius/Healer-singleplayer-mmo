@@ -9,15 +9,16 @@ namespace Project_1.GameObjects.Unit.Stats
 {
     internal class Agility : Stat
     {
-        //TODO
-        //public double Armor => throw new NotImplementedException();
-        //public double CritChance => throw new NotImplementedException();
-        //public double AttackPower(ClassData aClass )
-        //{
+        public int Armor => Value * 2;
 
-        //}
 
-        //public double Dodge => throw new NotImplementedException();
+        public int GetMeleeAttackPower(ClassData aClass)
+        {
+            if (aClass.MeleeAttackBonus != ClassData.MeleeAttackPowerBonus.Agility) return 0; 
+            return Value;
+        }
+        public double GetMeleeCritChance(ClassData aClass) => Value * aClass.MeleeCritScaling;
+        public double GetDodge(ClassData aClass) => Value * aClass.DodgeScaling;
 
         public Agility(int aValue) : base(aValue)
         {

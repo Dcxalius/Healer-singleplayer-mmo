@@ -18,7 +18,7 @@ namespace Project_1.Items.SubTypes
             {
                 PairReport report = new PairReport();
 
-                if (armor != 0) report.AddLine("Armor", armor);
+                if (baseStats.TotalArmor != 0) report.AddLine("Armor", baseStats.TotalArmor);
                 baseStats.AppendToExistingReport(ref report);
 
                 return report;
@@ -28,19 +28,15 @@ namespace Project_1.Items.SubTypes
         public EquipmentStats BaseStats => baseStats;
         EquipmentStats baseStats;
 
-        public int Armor => armor;
-        int armor;
-
         public Equipment.Type Slot { get => slot; } //TODO: Find better name
         Equipment.Type slot;
 
         public EquipmentData(int id, string gfxName, string name, string description, Equipment.Type slot, ItemType itemType, int armor, int[] baseStats) : base(id, gfxName, name, description, 1, itemType)
         {
             this.slot = slot;
-            this.armor = armor;
             //this.baseStats = new EquipmentStats(baseStats);
             //DEBUG
-            this.baseStats = new EquipmentStats(new int[] { 1, 1, 1, 1, 1 });
+            this.baseStats = new EquipmentStats(baseStats, armor);
 
         }
 

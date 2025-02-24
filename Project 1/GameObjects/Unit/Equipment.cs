@@ -38,6 +38,18 @@ namespace Project_1.GameObjects.Unit
 
         Items.SubTypes.Equipment[] equipped;
 
+        public int MeleeAttackPower
+        {
+            set
+            {
+                if (equipped[(int)Slot.MainHand] != null) (equipped[(int)Slot.MainHand] as Weapon).Attack.AttackPower = value;
+                if (equipped[(int)Slot.OffHand] != null)
+                {
+                    if (equipped[(int)Slot.OffHand] is Weapon) (equipped[(int)Slot.OffHand] as Weapon).Attack.AttackPower = value;
+                }
+            }
+        }
+
         public int?[] GetEquipementAsIds
         {
             get
@@ -80,6 +92,7 @@ namespace Project_1.GameObjects.Unit
         void RefreshStatsFromEquipment()
         {
             int[] totalStats = new int[(int)PrimaryStats.PrimaryStat.Count];
+            int armor = 0;
             for(int i = 0; i < equipped.Length; i++)
             {
                 if (equipped[i] == null) continue;
@@ -87,8 +100,9 @@ namespace Project_1.GameObjects.Unit
                 {
                     totalStats[j] += equipped[i].Stats.Stats[j];
                 }
+                armor += equipped[i].Stats.TotalArmor;
             }
-            equipmentStats = new EquipmentStats(totalStats);
+            equipmentStats = new EquipmentStats(totalStats, armor);
         }
 
         static public Slot SlotToSlot(Items.SubTypes.Equipment.Type aType) //TODO: FIX SHITE NAME

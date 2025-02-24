@@ -55,7 +55,7 @@ namespace Project_1.GameObjects.Unit
             maxHealth = baseMaxHealth + aPrimaryStats.Stamina * 10;
             CurrentHealth = aCurrentHp;
             baseHealthPer5 = aClassData.HpPer5;
-            healthPer5 = aClassData.HpPer5 + aPrimaryStats.Spirit;
+            healthPer5 = aClassData.HpPer5 + aPrimaryStats.Spirit.Hp5Bonus;
         }
 
         public void HealthRegenTick() => CurrentHealth += healthPer5;
@@ -69,7 +69,7 @@ namespace Project_1.GameObjects.Unit
         public void Refresh(TotalPrimaryStats aPrimaryStats)
         {
             MaxHealth = baseMaxHealth + aPrimaryStats.Stamina * 10;
-            healthPer5 = baseHealthPer5 + aPrimaryStats.Spirit;
+            healthPer5 = baseHealthPer5 + aPrimaryStats.Spirit.Hp5Bonus;
         }
 
         internal void LevelUp(float aPerLevelHp, int aStamina)

@@ -19,7 +19,7 @@ namespace Project_1.GameObjects.Unit
         public float GetAttackDamage => (float)RandomManager.RollDouble(Damage.Item1, Damage.Item2);
 
 
-        public float AttackPower { get => attackPower; set => attackPower = value; }
+        public float AttackPower { set => attackPower = value; }
         float attackPower;
 
         public float SecondsPerAttack => secondsPerAttack;

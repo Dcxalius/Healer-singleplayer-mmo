@@ -9,8 +9,13 @@ namespace Project_1.GameObjects.Unit.Stats
 {
     internal class Strength : Stat
     {
-        public double AttackPower(ClassData aClass) => throw new NotImplementedException();
-        //TODO: public double BlockValue => throw new NotImplementedException();
+        public int GetMeleeAttackPower(ClassData aClass)
+        {
+            if (aClass.MeleeAttackBonus != ClassData.MeleeAttackPowerBonus.Strength) return Value;
+            return Value * 2;
+        }
+
+        public double BlockValue => Value / 20;
 
         public Strength(int aValue) : base(aValue)
         {

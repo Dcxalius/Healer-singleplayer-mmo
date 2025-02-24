@@ -79,7 +79,7 @@ namespace Project_1.GameObjects.Entities
 
         public override float MaxSpeed => unitData.MovementData.MaxSpeed;
 
-        public PairReport PrimaryStatReport => unitData.BaseStats.TotalPrimaryStats.NewReport;
+        public PairReport PrimaryStatReport => unitData.BaseStats.StatReport;
         #endregion
 
         float timeSinceLastAttack = 0;
@@ -370,12 +370,11 @@ namespace Project_1.GameObjects.Entities
 
         public virtual void TakeDamage(Entity aAttacker, float aDamageTaken)
         {
-            int beforeDamageTaken = (int)Math.Round(unitData.Health.CurrentHealth);
-            unitData.Health.CurrentHealth -= aDamageTaken;
-            int afterDamageTaken = (int)Math.Round(unitData.Health.CurrentHealth);
+            float damageAfterArmor = (1f - unitData.BaseStats.TotalArmor.GetGetReductionPercentage(aAttacker.CurrentLevel)) * aDamageTaken; //TODO: Check if this gives right values
+            unitData.Health.CurrentHealth -= damageAfterArmor;
             WorldSpace dirOfFlyingStuff = (FeetPosition - aAttacker.FeetPosition);
             dirOfFlyingStuff.Normalize();
-            FloatingText floatingText = new FloatingText((beforeDamageTaken - afterDamageTaken).ToString(), Color.Red, FeetPosition, dirOfFlyingStuff); //TODO: Change to handle attacker and this being in the same place
+            FloatingText floatingText = new FloatingText(damageAfterArmor.ToString(), Color.Red, FeetPosition, dirOfFlyingStuff); //TODO: Change to handle attacker and this being in the same place
             ObjectManager.SpawnFloatingText(floatingText);
 
 
@@ -476,21 +475,12 @@ namespace Project_1.GameObjects.Entities
             Item item = Equipment.EquipInParticularSlot(aEquipment, aSlot);
             unitData.BaseStats.RefreshEquipmentStats(Equipment.EquipmentStats);
             FlagForRefresh();
-
-            if (this is Friendly)
-            {
-                HUDManager.RefreshCharacterWindowStats(unitData.BaseStats.TotalPrimaryStats.NewReport, this as Friendly);
-            }
             return item;
         }
         public Item Equip(Items.SubTypes.Equipment aEquipment)
         {
             Item item = Equipment.Equip(aEquipment);
             unitData.BaseStats.RefreshEquipmentStats(Equipment.EquipmentStats);
-            if (this is Friendly)
-            {
-                HUDManager.RefreshCharacterWindowStats(unitData.BaseStats.TotalPrimaryStats.NewReport, this as Friendly);
-            }
             FlagForRefresh();
 
             return item;
@@ -500,10 +490,6 @@ namespace Project_1.GameObjects.Entities
         {
             (Item, Item) returnable = Equipment.EquipTwoHander(aEquipment);
             unitData.BaseStats.RefreshEquipmentStats(Equipment.EquipmentStats);
-            if (this is Friendly)
-            {
-                HUDManager.RefreshCharacterWindowStats(unitData.BaseStats.TotalPrimaryStats.NewReport, this as Friendly);
-            }
             FlagForRefresh();
 
             return returnable;

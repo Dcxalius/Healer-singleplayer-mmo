@@ -9,7 +9,7 @@ namespace Project_1.GameObjects.Unit.Stats
     internal class Intellect : Stat
     {
         public double ManaBonus => Value * 15;
-        //TODO: public double CritChance => throw new NotImplementedException();
+        public double CastCritChance => 0.01f / 60 * Value; //TODO: Give melee crit from this?
 
         public Intellect(int aValue) : base(aValue)
         {

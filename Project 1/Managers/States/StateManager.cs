@@ -47,13 +47,8 @@ namespace Project_1.Managers.States
         {
             ObjectFactory.Init(aContentManager);
 
-
-
             GraphicsManager.Init();
             finalBatch = GraphicsManager.CreateSpriteBatch();
-
-
-
 
             startMenu = new StartMenu();
             game = new Game();

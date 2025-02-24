@@ -92,7 +92,7 @@ namespace Project_1.GameObjects.Unit.Resources
 
         void CalculateMaxValue(TotalPrimaryStats aStats)
         {
-            regenValue = baseRegen + aStats.Spirit;
+            regenValue = baseRegen + aStats.Spirit.Mp5Bonus;
             maxValue = BaseMaxValue + aStats.Intellect * 15;
         }
     }

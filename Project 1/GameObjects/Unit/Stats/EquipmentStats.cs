@@ -8,9 +8,12 @@ namespace Project_1.GameObjects.Unit.Stats
 {
     internal class EquipmentStats : PrimaryStats
     {
-        public EquipmentStats(int[] aStats) : base(aStats)
-        {
+        public Armor TotalArmor => armor;
+        Armor armor;
 
+        public EquipmentStats(int[] aStats, int aArmor) : base(aStats)
+        {
+            armor = new Armor(aArmor);
         }
 
         public void RemoveStats(EquipmentStats aStats)
@@ -19,6 +22,7 @@ namespace Project_1.GameObjects.Unit.Stats
             {
                 stats[i].Decrease(aStats.Stats[i]);
             }
+            armor.Decrease(aStats.armor);
         }
 
         public void AddStats(EquipmentStats aStats)
@@ -27,6 +31,7 @@ namespace Project_1.GameObjects.Unit.Stats
             {
                 stats[i].Increase(aStats.Stats[i]);
             }
+            armor.Increase(aStats.armor);
         }
     }
 }
