@@ -113,14 +113,14 @@ namespace Project_1.GameObjects.Entities
         public void RecieveDirectWalkingOrder(WorldSpace aPos)
         {
             target = null;
-            destination.OverwriteDestination(aPos);
+            Destination.OverwriteDestination(aPos);
         }
 
 
         public void AddWalkingOrder(WorldSpace aPos)
         {
             
-            destination.AddDestination(aPos);
+            Destination.AddDestination(aPos);
         }
 
         protected override bool CheckForRelation()

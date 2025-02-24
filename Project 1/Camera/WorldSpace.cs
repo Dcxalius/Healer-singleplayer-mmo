@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 using SharpDX.Direct2D1.Effects;
 using System;
 using System.Collections.Generic;
@@ -12,13 +13,19 @@ namespace Project_1.Camera
     [DebuggerStepThrough]
     internal struct WorldSpace
     {
+        [JsonProperty]
         Vector2 position;
 
+        [JsonIgnore]
         public static WorldSpace Zero { get { return new WorldSpace(); } }
 
+        [JsonIgnore]
         public WorldSpace OnlyX => new WorldSpace(position.X, 0);
+        [JsonIgnore]
         public WorldSpace OnlyY => new WorldSpace(0, position.Y);
+        [JsonIgnore]
         public float X { get { return position.X; }  set { position.X = value; } }
+        [JsonIgnore]
         public float Y { get { return position.Y; } set { position.Y = value; } }
 
         public WorldSpace()
@@ -28,6 +35,7 @@ namespace Project_1.Camera
 
         public WorldSpace(Point aPoint) : this(aPoint.ToVector2()) { }
 
+        [JsonConstructor]
         public WorldSpace(Vector2 aPosition)
         {
             position = aPosition;

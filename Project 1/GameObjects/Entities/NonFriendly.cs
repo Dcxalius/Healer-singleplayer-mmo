@@ -43,11 +43,11 @@ namespace Project_1.GameObjects.Entities
 
             aggroTable.Update();
 
-            if (!destination.HasDestination)
+            if (!Destination.HasDestination)
             {
                 WorldSpace? nextSpace = pathing.GetNextSpace;
                 if (!nextSpace.HasValue) return;
-                destination.AddDestination(nextSpace.Value);
+                Destination.AddDestination(nextSpace.Value);
             }
 
         }

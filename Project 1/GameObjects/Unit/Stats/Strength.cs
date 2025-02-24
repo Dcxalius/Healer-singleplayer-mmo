@@ -10,7 +10,7 @@ namespace Project_1.GameObjects.Unit.Stats
     internal class Strength : Stat
     {
         public double AttackPower(ClassData aClass) => throw new NotImplementedException();
-        public double BlockValue => throw new NotImplementedException();
+        //TODO: public double BlockValue => throw new NotImplementedException();
 
         public Strength(int aValue) : base(aValue)
         {

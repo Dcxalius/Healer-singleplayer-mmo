@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using Project_1.Camera;
+using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spawners;
 using Project_1.GameObjects.Unit.Resources;
 using Project_1.GameObjects.Unit.Stats;
@@ -21,31 +22,75 @@ namespace Project_1.GameObjects.Unit
         public string Name => name;
         string name;
 
+        [JsonProperty(PropertyName = "ClassName")]
+        string className => classData.Name;
+
+        [JsonIgnore]
         public ClassData ClassData => classData;
         ClassData classData;
 
+        [JsonProperty]
+        Relation.RelationToPlayer Relation => relationData.ToPlayer;
+        [JsonIgnore]
         public Relation RelationData => relationData;
         Relation relationData;
 
+        [JsonProperty]
+        int Experience => level.Experience;
+        [JsonProperty("Level")]
+        int LevelAsInt => level.CurrentLevel;
+        [JsonIgnore]
         public Level Level => level;
         Level level;
 
+        [JsonProperty]
+        float CurrentHp => baseStats.Health.CurrentHealth;
+        [JsonProperty]
+        float CurrentResource => baseStats.Resource.Value;
+
+        [JsonIgnore]
         public BaseStats BaseStats => baseStats;
         BaseStats baseStats;
 
-        
+        [JsonIgnore]
         public Health Health => baseStats.Health;
+        [JsonIgnore]
         public Resource Resource => baseStats.Resource;
 
-        public WorldSpace Position => position;
+        #region Movement
+        [JsonProperty("Destinations")]
+        public List<WorldSpace> Destinations => destination.DestinationsAsWP;
+        [JsonIgnore]
+        public Destination Destination => destination;
+        Destination destination;
+        
+        [JsonIgnore]
+        public Movement MovementData => classData.Movement;
+        public WorldSpace Position
+        {
+            get => position;
+            set => position = value;
+        }
         WorldSpace position;
 
-        public WorldSpace Momentum => momentum;
+        public WorldSpace Momentum
+        {
+            get => momentum;
+            set => momentum = value;
+        }
         WorldSpace momentum;
 
-        public WorldSpace Velocity => velocity;
-        WorldSpace velocity;
+        public WorldSpace Velocity
+        {
+            get => velocity;
+            set => velocity = value;
+        }
 
+        WorldSpace velocity;
+        #endregion
+
+        #region Attack
+        [JsonIgnore]
         public AttackData AttackData
         {
             get
@@ -57,6 +102,7 @@ namespace Project_1.GameObjects.Unit
                 return weaponAttacks;
             }
         }
+        [JsonIgnore]
         public ref TimeSpan NextAvailableMainHandAttack 
         {
             get => ref nextAvailableMainHandAttack;
@@ -64,23 +110,31 @@ namespace Project_1.GameObjects.Unit
         TimeSpan nextAvailableMainHandAttack;//TODO: Load from save
 
 
+        [JsonIgnore]
+        
         public ref TimeSpan NextAvailableOffHandAttack 
         {
             get => ref nextAvailableOffHandAttack;
         }
         TimeSpan nextAvailableOffHandAttack;//TODO: Load from save
+        #endregion
 
+        [JsonProperty("Equipment")]
+        int?[] EquipmentAsId => equipment.GetEquipementAsIds;
+
+        [JsonIgnore]
         public Equipment Equipment =>  equipment;
         Equipment equipment;
 
-        public Movement MovementData => classData.Movement;
-
+        #region gfx
+        [JsonIgnore] 
         public GfxPath GfxPath => gfxPath;
         readonly GfxPath gfxPath;
 
+        [JsonIgnore] 
         public GfxPath CorpseGfxPath => corpseGfxPath;
         readonly GfxPath corpseGfxPath;
-
+        #endregion
 
         [JsonIgnore]
         public LootTable LootTable { get => LootFactory.GetData(name); }
@@ -101,13 +155,14 @@ namespace Project_1.GameObjects.Unit
             position = aSpawn;
             velocity = WorldSpace.Zero;
             momentum = WorldSpace.Zero;
+            destination = new Destination(null);
             Assert();
         }
 
 
         [JsonConstructor]
         public UnitData(string name, string corpseGfxName, string className, Relation.RelationToPlayer? relation, int level, int experience,
-            float currentHp, float currentResource, int?[] equipment, Vector2 position, Vector2 momentum, Vector2 velocity)
+            float currentHp, float currentResource, int?[] equipment, WorldSpace position, WorldSpace momentum, WorldSpace velocity, List<WorldSpace> destinations)
         {
             this.name = name;
             Debug.Assert(relation.HasValue);
@@ -118,6 +173,7 @@ namespace Project_1.GameObjects.Unit
             this.position = new WorldSpace(position);
             this.momentum = new WorldSpace(momentum);
             this.velocity = new WorldSpace(velocity);
+            this.destination = new Destination(destinations);
             
             baseStats = new BaseStats(classData, this.level.CurrentLevel, this.equipment.EquipmentStats, currentHp, currentResource);
 

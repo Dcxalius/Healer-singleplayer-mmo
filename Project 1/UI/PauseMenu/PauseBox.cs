@@ -45,6 +45,7 @@ namespace Project_1.UI.PauseMenu
         {
             AddChild(new ResumeButton(GetStartPositionFromTop, buttonSize));
             AddChild(new OptionMenuButton(GetStartPositionFromTop, buttonSize));
+            AddChild(new SaveButton(GetStartPositionFromTop, buttonSize));
             //children.Add(new Button(GetStartPosition, buttonSize, Color.BurlyWood));
             //children.Add(new Button(GetStartPosition, buttonSize, Color.Green));
             AddChild(new ExitGameButton(GetStartPositionFromBottom, buttonSize));

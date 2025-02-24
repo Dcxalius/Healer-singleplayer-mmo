@@ -13,6 +13,23 @@ namespace Project_1.GameObjects.Entities
 {
     internal class Destination
     {
+        public List<WorldSpace> DestinationsAsWP
+        {
+            get
+            {
+                List<WorldSpace> returnable = new List<WorldSpace>();
+                if (destination.HasValue)
+                {
+                    returnable.Add(destination.Value);
+                }
+                for (int i = 0; i < paths.Count; i++)
+                {
+                    returnable.AddRange(paths[i].PointsOnPath);
+                }
+                return returnable;
+            }
+        }
+
         public bool HasDestination => CurrentPath != null;
         public WorldSpace DirectionToWalk => directionToWalk;
         public float LengthTo => lengthTo;
@@ -39,11 +56,14 @@ namespace Project_1.GameObjects.Entities
 
         List<Path> paths;
         WorldSpace? destination;
-        public Destination(Entity aOwner)
+        public Destination(List<WorldSpace> aDestinationList)
         {
             paths = new List<Path>();
-            owner = aOwner;
+            if (aDestinationList == null) return;
+            if (aDestinationList.Count != 0) paths.Add(new Path(aDestinationList));
         }
+
+        public void SetOwner(Entity aOwner) => owner = aOwner;
 
         public void Update()
         {
@@ -111,6 +131,7 @@ namespace Project_1.GameObjects.Entities
         public void OverwriteDestination(WorldSpace aDestination)
         {
             paths.Clear();
+            destination = null;
             paths.Add(TileManager.GetPath(owner.FeetPosition, aDestination, new WorldSpace(owner.FeetSize)));
         }
 

@@ -54,7 +54,8 @@ namespace Project_1.GameObjects.Entities
         protected UnitData UnitData => unitData;
         UnitData unitData;
 
-        public bool HasDestination => destination.HasDestination;
+        public bool HasDestination => unitData.Destination.HasDestination;
+        public Destination Destination => unitData.Destination;
         public Color RelationColor => unitData.RelationData.RelationColor();
         public Relation.RelationToPlayer RelationToPlayer => unitData.RelationData.ToPlayer;
         protected Relation Relation => unitData.RelationData;
@@ -90,14 +91,12 @@ namespace Project_1.GameObjects.Entities
         SelectRing selectRing;
         Shadow shadow;
 
-
-        protected Destination destination;
-
         public Entity(UnitData aUnitData) : base(new RandomAnimatedTexture(aUnitData.GfxPath, new Point(32), 0, TimeSpan.FromMilliseconds(500)), aUnitData.Position)
         {
             unitData = aUnitData;
             unitData.Equipment.SetOwner(this);
             unitData.BaseStats.SetOwner(this);
+            unitData.Destination.SetOwner(this);
             corpse = new Corpse(unitData.CorpseGfxPath, unitData.LootTable);
             bloodsplatter = new ParticleBase((1000d, 2000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[] { Color.Red }, new Point(1));
             namePlateRequiresUpdate = false;
@@ -105,7 +104,6 @@ namespace Project_1.GameObjects.Entities
             selectRing = new SelectRing();
             spellCast = new SpellCast(this);
             buffList = new BuffList();
-            destination = new Destination(this);
             aggroTablesIAmOn = new List<NonFriendly>();
 
             velocity = unitData.Velocity;
@@ -164,13 +162,17 @@ namespace Project_1.GameObjects.Entities
 
         public void Movement()
         {
-            destination.Update();
+            Destination.Update();
 
             float minAttackRange = GetMinAttackRange();
             
-            velocity += destination.GetVelocity(minAttackRange, unitData.MovementData.Speed, new WorldSpace(FeetSize));
+            velocity += Destination.GetVelocity(minAttackRange, unitData.MovementData.Speed, new WorldSpace(FeetSize));
             base.Update(); //TODO: This shouldnt be here
             CheckForCollisions();
+
+            unitData.Position = FeetPosition;
+            unitData.Momentum = momentum;
+            unitData.Velocity = velocity;
         }
 
         float GetMinAttackRange()

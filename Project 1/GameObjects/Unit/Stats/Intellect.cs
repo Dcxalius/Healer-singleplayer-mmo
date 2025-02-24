@@ -9,7 +9,7 @@ namespace Project_1.GameObjects.Unit.Stats
     internal class Intellect : Stat
     {
         public double ManaBonus => Value * 15;
-        public double CritChance => throw new NotImplementedException();
+        //TODO: public double CritChance => throw new NotImplementedException();
 
         public Intellect(int aValue) : base(aValue)
         {

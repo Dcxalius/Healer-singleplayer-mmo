@@ -8,8 +8,8 @@ namespace Project_1.GameObjects.Unit.Stats
 {
     internal class Spirit : Stat
     {
-        public double Hp5Bonus => throw new NotImplementedException();
-        public double Mp5Bonus => throw new NotImplementedException();
+        //TODO: public double Hp5Bonus => throw new NotImplementedException();
+        //TODO: public double Mp5Bonus => throw new NotImplementedException();
 
         public Spirit(int aValue) : base(aValue)
         {

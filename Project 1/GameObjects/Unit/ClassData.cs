@@ -20,6 +20,7 @@ namespace Project_1.GameObjects.Unit
             Mob
         }
 
+
         public string Name => name;
         readonly string name;
 

@@ -25,7 +25,7 @@ namespace Project_1.Items
         }
 
 
-        public int ID { get => id; /*set => id = value;*/ }
+        public int ID { get => id; }
         int id;
         static int Id { get => nextId++; }
         static int nextId = 0;

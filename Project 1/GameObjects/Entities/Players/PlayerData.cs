@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.GameObjects.Unit;
 using System;
 using System.Collections.Generic;
@@ -14,8 +15,8 @@ namespace Project_1.GameObjects.Entities.Players
         string[] party;
         public PlayerData(string name, string corpseGfxName, string className, Relation.RelationToPlayer? relation, string[] party, 
             int level, int experience, float currentHp, float currentResource, int?[] equipment, 
-            Vector2 position, Vector2 momentum, Vector2 velocity)
-            : base(name, corpseGfxName, className, relation, level, experience, currentHp, currentResource, equipment, position, momentum, velocity)
+            WorldSpace position, WorldSpace momentum, WorldSpace velocity, List<WorldSpace> destinations)
+            : base(name, corpseGfxName, className, relation, level, experience, currentHp, currentResource, equipment, position, momentum, velocity, destinations)
         {
             this.party = party;
         }

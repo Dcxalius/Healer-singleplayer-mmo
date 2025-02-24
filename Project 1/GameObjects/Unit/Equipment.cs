@@ -1,4 +1,5 @@
-﻿using Project_1.GameObjects.Entities;
+﻿using Newtonsoft.Json;
+using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Unit.Stats;
 using Project_1.Items;
 using Project_1.Items.SubTypes;
@@ -37,6 +38,25 @@ namespace Project_1.GameObjects.Unit
 
         Items.SubTypes.Equipment[] equipped;
 
+        public int?[] GetEquipementAsIds
+        {
+            get
+            {
+                int?[] returnable = new int?[(int)Slot.Count];
+                for (int i = 0; i < equipped.Length; i++)
+                {
+                    if (equipped[i] == null)
+                    {
+                        returnable[i] = null;
+                        continue;
+                    }
+                    returnable[i] = equipped[i].ID;
+                }
+                return returnable;
+            }
+        }
+
+        [JsonIgnore]
         public EquipmentStats EquipmentStats => equipmentStats;
         EquipmentStats equipmentStats;
 

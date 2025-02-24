@@ -8,6 +8,7 @@ using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,15 +25,16 @@ namespace Project_1.GameObjects
         static Dictionary<string, ClassData> allyClassData;
         static Dictionary<string, ClassData> mobClassData;
 
+        static string contentRootDirectory;
+
         public static void Init(ContentManager aC)
         {
-            //ExportData("C:\\Users\\Cassandra\\source\\repos\\Project 1\\Project 1\\Content\\UnitData.json", data);
-            ImportClassData(aC);
-            ImportMobData(aC);
-            ImportUnitData(aC);
-            ImportGuildData(aC);
+            contentRootDirectory = aC.RootDirectory;
 
-            //ExportData(aC.RootDirectory + "\\UnitData.json", unitData["Sheep"]);
+            ImportClassData();
+            ImportMobData();
+            ImportUnitData();
+            ImportGuildData();
         }
 
         public static MobData GetMobData(string aName)
@@ -73,10 +75,10 @@ namespace Project_1.GameObjects
         public static ClassData GetAllyClass(string aName) => allyClassData[aName];
         public static ClassData GetMobClass(string aName) => mobClassData[aName];
 
-        static void ImportMobData(ContentManager aContentManager)
+        static void ImportMobData()
         {
             mobData = new Dictionary<string, MobData>();
-            string path = aContentManager.RootDirectory + "\\Data\\MobData\\";
+            string path = contentRootDirectory + "\\Data\\MobData\\";
 
            
             string[] files = System.IO.Directory.GetFiles(path);
@@ -89,15 +91,15 @@ namespace Project_1.GameObjects
             }
         }
 
-        static void ImportUnitData(ContentManager aContentManager)
+        static void ImportUnitData()
         {
             unitData = new Dictionary<string, UnitData>();
 
-            string path = aContentManager.RootDirectory + "\\SaveData\\Units\\World";
+            string path = contentRootDirectory + "\\SaveData\\Units\\World";
 
             string[] folders = System.IO.Directory.GetDirectories(path);
 
-            string rawData = System.IO.File.ReadAllText(aContentManager.RootDirectory + "\\SaveData\\Units\\PlayerData.unit");
+            string rawData = System.IO.File.ReadAllText(contentRootDirectory + "\\SaveData\\Units\\PlayerData.unit");
             PlayerData playerData = JsonConvert.DeserializeObject<PlayerData>(rawData);
             unitData.Add(playerData.Name, playerData);
 
@@ -113,11 +115,11 @@ namespace Project_1.GameObjects
             }
         }
 
-        static void ImportGuildData(ContentManager aContentManager)
+        static void ImportGuildData()
         {
             guildData = new List<UnitData>();
 
-            string path = aContentManager.RootDirectory + "\\SaveData\\Units\\Guild\\";
+            string path = contentRootDirectory + "\\SaveData\\Units\\Guild\\";
 
             string[] files = System.IO.Directory.GetFiles(path);
 
@@ -130,13 +132,13 @@ namespace Project_1.GameObjects
             }
         }
         
-        static void ImportClassData(ContentManager aContentManager)
+        static void ImportClassData()
         {
             playerClassData = new Dictionary<string, ClassData>();
             allyClassData = new Dictionary<string, ClassData>();
             mobClassData = new Dictionary<string, ClassData>();
 
-            string path = aContentManager.RootDirectory + "\\Data\\Class\\";
+            string path = contentRootDirectory + "\\Data\\Class\\";
 
             string[] folders = System.IO.Directory.GetDirectories(path);
 
@@ -173,10 +175,27 @@ namespace Project_1.GameObjects
             }
         }
 
+        public static void SaveData()
+        {
+            UnitData[] dataArray = unitData.Values.ToArray();
+
+            ExportData("Units\\" + dataArray[0].Name + "Data.unit", dataArray[0]);
+            for (int i = 1; i < unitData.Count; i++)
+            {
+                //TODO: Handle Friendly/Aggresive npcs once they are implemented
+                ExportData("Units\\World\\Neutral\\" + dataArray[i].Name + ".unit", dataArray[i]);
+            }
+
+            for (int i = 0; i < guildData.Count; i++)
+            {
+                ExportData("Units\\Guild\\" + guildData[i].Name + ".unit", guildData[i]);
+            }
+        }
+
         static void ExportData(string aDestination, object aObjectToExport)
         {
             string json = JsonConvert.SerializeObject(aObjectToExport);
-            System.IO.File.WriteAllText(aDestination, json);
+            System.IO.File.WriteAllText(contentRootDirectory + "\\SaveData\\" + aDestination, json);
         }
     }
 }

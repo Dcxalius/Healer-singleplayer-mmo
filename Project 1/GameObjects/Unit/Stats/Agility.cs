@@ -3,16 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Project_1.GameObjects.Unit.Stats
 {
     internal class Agility : Stat
     {
-        public double Armor => throw new NotImplementedException();
-        public double CritChance => throw new NotImplementedException();
-        public double AttackPower(ClassData aClass ) => throw new NotImplementedException();
+        //TODO
+        //public double Armor => throw new NotImplementedException();
+        //public double CritChance => throw new NotImplementedException();
+        //public double AttackPower(ClassData aClass )
+        //{
 
-        public double Dodge => throw new NotImplementedException();
+        //}
+
+        //public double Dodge => throw new NotImplementedException();
 
         public Agility(int aValue) : base(aValue)
         {

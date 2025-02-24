@@ -24,9 +24,14 @@ namespace Project_1.Tiles
         public WorldSpace CheckLastSpace => pointsOnPath[pointsOnPath.Count - 1];
         public int Count => pointsOnPath.Count;
 
-
+        public List<WorldSpace> PointsOnPath => pointsOnPath;
         List<WorldSpace> pointsOnPath;
-        
+
+        public Path(List<WorldSpace> aPoints)
+        {
+            pointsOnPath = aPoints;
+        }
+
         public Path(List<Tile> aPath, WorldSpace aEndPosition) //TODO: Include offset
         {
             pointsOnPath = new List<WorldSpace>();
