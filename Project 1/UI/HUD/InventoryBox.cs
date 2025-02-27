@@ -36,6 +36,7 @@ namespace Project_1.UI.HUD
         {
             visibleKey = KeyBindManager.KeyListner.Inventory;
             Visible = false;
+            dragable = true;
             //inventory = ObjectManager.Player.Inventory;
             bagHolderBox = new BagHolderBox(new RelativeScreenPosition(spacing.X, aSize.Y - (itemSize.Y + spacing.Y * 3)), new RelativeScreenPosition(itemSize.X * (Inventory.bagSlots + 1) + spacing.X * (Inventory.bagSlots + 2), itemSize.Y + spacing.Y * 2));
 

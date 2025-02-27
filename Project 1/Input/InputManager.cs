@@ -70,6 +70,59 @@ namespace Project_1.Input
             }
         }
 
+        public static bool RightPress
+        {
+            get
+            {
+                if (newMouseState.RightButton == ButtonState.Pressed && oldMouseState.RightButton == ButtonState.Released)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        public static bool RightHold
+        {
+            get
+            {
+                if (newMouseState.RightButton == ButtonState.Pressed && oldMouseState.RightButton == ButtonState.Pressed)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        public static bool RightRelease
+        {
+            get
+            {
+                if (newMouseState.RightButton == ButtonState.Released && oldMouseState.RightButton == ButtonState.Pressed)
+                {
+                    return true;
+
+                }
+                return false;
+            }
+        }
+
+        public static bool IsMouseDown(ClickType aClickType)
+        {
+            switch (aClickType)
+            {
+                case ClickType.Left:
+                    return newMouseState.LeftButton == ButtonState.Pressed;
+
+                case ClickType.Middle:
+                    return newMouseState.MiddleButton == ButtonState.Pressed;
+
+                case ClickType.Right:
+                    return newMouseState.RightButton == ButtonState.Pressed;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
 
         public static Keys? GetAnyKey
         {

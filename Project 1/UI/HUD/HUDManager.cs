@@ -35,23 +35,13 @@ namespace Project_1.UI.HUD
         static Dictionary<Entity, NamePlate> namePlates = new Dictionary<Entity, NamePlate>();
         //static Dictionary<Entity, PlateBox> plateBoxes = new Dictionary<Entity, PlateBox>(); //TODO: Ponder about this
 
-        static List<UIElement> hudElements = new List<UIElement>();
+        static List<UIElement> hudElements;
 
-        static PlayerPlateBox playerPlateBox;
-        static TargetPlateBox targetPlateBox;
-        static PartyPlateBox[] partyPlateBoxes;
-        static BuffBox playerBuffBox;
-        static BuffBox targetBuffBox;
-        static BuffBox[] partyBuffBoxes = new BuffBox[4];
+       
 
         static InventoryBox inventoryBox;
         static LootBox lootBox;
         static DescriptorBox descriptorBox;
-
-        static CharacterWindow characterWindow;
-        static SpellBookWindow spellBookWindow;
-        static GuildWindow guildWindow;
-        static InspectWindow inspectWindow;
 
         static CastBar playerCastBar;
         static FirstSpellBar firstSpellBar;
@@ -66,47 +56,16 @@ namespace Project_1.UI.HUD
 
         public static void Init()
         {
-            playerPlateBox = new PlayerPlateBox(new RelativeScreenPosition(0.1f, 0.1f), new RelativeScreenPosition(0.2f, 0.1f));
-            hudElements.Add(playerPlateBox);
-            targetPlateBox = new TargetPlateBox(new RelativeScreenPosition(0.33f, 0.1f), new RelativeScreenPosition(0.2f, 0.1f));
-            hudElements.Add(targetPlateBox);
-            partyPlateBoxes = new PartyPlateBox[4];
-            for (int i = 0; i < partyPlateBoxes.Length; i++)
-            {
-                partyPlateBoxes[i] = new PartyPlateBox(i);
-            }
-            hudElements.AddRange(partyPlateBoxes);
-
-
-            playerBuffBox = new BuffBox(ObjectManager.Player, BuffBox.FillDirection.TopRightToDown, new RelativeScreenPosition(0.01f, 0.1f), new RelativeScreenPosition(0.08f, 0.1f));
-            hudElements.Add(playerBuffBox);
-            targetBuffBox = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, new RelativeScreenPosition(0.33f, 0.21f), new RelativeScreenPosition(0.2f, 0.1f));
-            hudElements.Add(targetBuffBox);
-            partyBuffBoxes = new BuffBox[4];
-            RelativeScreenPosition pBuffBoxSize = new RelativeScreenPosition(0.08f, 0.1f);
-            for (int i = 0; i < partyBuffBoxes.Length; i++)
-            {
-                partyBuffBoxes[i] = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, partyPlateBoxes[i].RelativePos - pBuffBoxSize.OnlyX, pBuffBoxSize);
-            }
-            hudElements.AddRange(partyBuffBoxes);
+            hudElements = new List<UIElement>();
+            InitPlateBoxes();
 
             lootBox = new LootBox(new RelativeScreenPosition(0.1f, 0.5f), new RelativeScreenPosition(0.4f, 0.4f));
             hudElements.Add(lootBox);
             inventoryBox = new InventoryBox(new RelativeScreenPosition(0.59f, 0.80f), new RelativeScreenPosition(0.4f));
             hudElements.Add(inventoryBox);
-            descriptorBox = new DescriptorBox();
-            hudElements.Add(descriptorBox);
 
-            Window.Init(new RelativeScreenPosition(0.05f, 0.2f), new RelativeScreenPosition(0.1f, 0f), new RelativeScreenPosition(0.2f, 0.6f));
-            characterWindow = new CharacterWindow();
-            hudElements.Add(characterWindow);
-            spellBookWindow = new SpellBookWindow();
-            hudElements.Add(spellBookWindow);
-            inspectWindow = new InspectWindow();
-            hudElements.Add(inspectWindow);
-            guildWindow = new GuildWindow();
-            hudElements.Add(guildWindow);
 
+            InitWindows();
 
 
             firstSpellBar = new FirstSpellBar(10, new RelativeScreenPosition(0.2f, 0.86f), 0.6f);
@@ -120,6 +79,68 @@ namespace Project_1.UI.HUD
             dialogueBoxes = new List<DialogueBox>();
 
         }
+
+        #region PlateBoxes 
+        static PlayerPlateBox playerPlateBox;
+        static TargetPlateBox targetPlateBox;
+        static PartyPlateBox[] partyPlateBoxes;
+        static BuffBox playerBuffBox;
+        static BuffBox targetBuffBox;
+        static BuffBox[] partyBuffBoxes;
+
+        static List<UIElement> plateBoxes;
+        static void InitPlateBoxes()
+        {
+            plateBoxes = new List<UIElement>();
+
+            playerPlateBox = new PlayerPlateBox(new RelativeScreenPosition(0.1f, 0.1f), new RelativeScreenPosition(0.2f, 0.1f));
+            plateBoxes.Add(playerPlateBox);
+            targetPlateBox = new TargetPlateBox(new RelativeScreenPosition(0.33f, 0.1f), new RelativeScreenPosition(0.2f, 0.1f));
+            plateBoxes.Add(targetPlateBox);
+            partyPlateBoxes = new PartyPlateBox[4];
+            for (int i = 0; i < partyPlateBoxes.Length; i++)
+            {
+                partyPlateBoxes[i] = new PartyPlateBox(i);
+            }
+            plateBoxes.AddRange(partyPlateBoxes);
+            descriptorBox = new DescriptorBox();
+
+
+            playerBuffBox = new BuffBox(ObjectManager.Player, BuffBox.FillDirection.TopRightToDown, new RelativeScreenPosition(0.01f, 0.1f), new RelativeScreenPosition(0.08f, 0.1f));
+            plateBoxes.Add(playerBuffBox);
+            targetBuffBox = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, new RelativeScreenPosition(0.33f, 0.21f), new RelativeScreenPosition(0.2f, 0.1f));
+            plateBoxes.Add(targetBuffBox);
+            partyBuffBoxes = new BuffBox[4];
+            RelativeScreenPosition pBuffBoxSize = new RelativeScreenPosition(0.08f, 0.1f);
+            for (int i = 0; i < partyBuffBoxes.Length; i++)
+            {
+                partyBuffBoxes[i] = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, partyPlateBoxes[i].RelativePos - pBuffBoxSize.OnlyX, pBuffBoxSize);
+            }
+            plateBoxes.AddRange(partyBuffBoxes);
+        }
+        #endregion
+
+        #region Windows
+
+        static CharacterWindow characterWindow;
+        static SpellBookWindow spellBookWindow;
+        static GuildWindow guildWindow;
+        static InspectWindow inspectWindow;
+        static void InitWindows()
+        {
+            Window.Init(new RelativeScreenPosition(0.05f, 0.2f), new RelativeScreenPosition(0.1f, 0f), new RelativeScreenPosition(0.2f, 0.6f));
+            characterWindow = new CharacterWindow();
+            hudElements.Add(characterWindow);
+            spellBookWindow = new SpellBookWindow();
+            hudElements.Add(spellBookWindow);
+            inspectWindow = new InspectWindow();
+            hudElements.Add(inspectWindow);
+            guildWindow = new GuildWindow();
+            hudElements.Add(guildWindow);
+
+        }
+        #endregion
+
         public static void Update()
         {
             foreach (KeyValuePair<Entity, NamePlate> namePlate in namePlates)
@@ -127,20 +148,40 @@ namespace Project_1.UI.HUD
                 namePlate.Value.Update(null);
             }
 
-            for (int i = 0; i < dialogueBoxes.Count; i++)
+            for (int i = 0; i < plateBoxes.Count; i++)
             {
-                dialogueBoxes[i].Update(null);
+                plateBoxes[i].Update(null);
             }
 
             for (int i = 0; i < hudElements.Count; i++)
             {
                 hudElements[i].Update(null);
             }
+
+            for (int i = 0; i < dialogueBoxes.Count; i++)
+            {
+                dialogueBoxes[i].Update(null);
+            }
         }
 
         public static void Rescale()
         {
+            foreach (KeyValuePair<Entity, NamePlate> namePlate in namePlates)
+            {
+                namePlate.Value.Rescale();
+            }
+
+            for (int i = 0; i < plateBoxes.Count; i++)
+            {
+                plateBoxes[i].Rescale();
+            }
+
             for (int i = 0; i < hudElements.Count; i++)
+            {
+                hudElements[i].Rescale();
+            }
+
+            for (int i = 0; i < dialogueBoxes.Count; i++)
             {
                 hudElements[i].Rescale();
             }
@@ -438,7 +479,18 @@ namespace Project_1.UI.HUD
 
             for (int i = hudElements.Count - 1; i >= 0; i--)
             {
-                if (hudElements[i].ClickedOn(aClickEvent)) return true;
+                if (hudElements[i].ClickedOn(aClickEvent))
+                {
+                    UIElement temp = hudElements[i];
+                    hudElements.RemoveAt(i);
+                    hudElements.Add(temp);
+                    return true;
+                }
+            }
+
+            for (int i = plateBoxes.Count - 1; i >= 0; i--)
+            {
+                if (plateBoxes[i].ClickedOn(aClickEvent)) return true;
             }
             return false;
         }
@@ -484,9 +536,14 @@ namespace Project_1.UI.HUD
                 namePlate.Value.Draw(aBatch);
             }
 
+            for (int i = 0; i < plateBoxes.Count; i++)
+            {
+                plateBoxes[i].Draw(aBatch);
+            }
+
             for (int i = 0; i < hudElements.Count; i++)
             {
-                hudElements[i].Draw(aBatch); //TODO: Add something that on clicked elements moves them to the front
+                hudElements[i].Draw(aBatch);
             }
 
             for (int i = 0; i < dialogueBoxes.Count; i++)
@@ -494,6 +551,7 @@ namespace Project_1.UI.HUD
                 dialogueBoxes[i].Draw(aBatch);
             }
 
+            descriptorBox.Draw(aBatch);
             heldItem.Draw(aBatch);
             heldSpell.Draw(aBatch);
         }

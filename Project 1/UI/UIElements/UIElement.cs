@@ -44,6 +44,8 @@ namespace Project_1.UI.UIElements
         protected bool capturesScroll;
         protected bool capturesRelease;
 
+        protected bool dragable;
+        readonly TimeSpan timeBeforeDragRegisters = TimeSpan.FromSeconds(0.2);
         #endregion
 
         #region Position
@@ -158,22 +160,24 @@ namespace Project_1.UI.UIElements
 
         public virtual void HoldUpdate()
         {
-            if (heldEvents == null)
-            {
-                return;
-            }
+            if (heldEvents == null) return;
 
             if (!heldEvents.IsStillHeld())
             {
                 if (wasHovered)
                 {
                     HoldReleaseOnMe();
+                    return;
                 }
-                else
-                {
-                    HoldReleaseAwayFromMe();
-                }
+
+                HoldReleaseAwayFromMe();
+                return;
             }
+
+            if (!dragable) return;
+            if (heldEvents.DurationHeld < timeBeforeDragRegisters.TotalSeconds) return;
+            //TODO: Add a boundscheck
+            Move(InputManager.GetMousePosRelative() - heldEvents.Offset);
         }
 
         #region Change
