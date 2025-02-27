@@ -402,6 +402,8 @@ namespace Project_1.UI.HUD
 
         public static GuildMember GetGuildMemberInspectWindowTarget() => inspectWindow.GuildMember;
 
+        public static bool PlayerCharacterPaneOpen => characterWindow.Visible;
+
         public static void ToggleInspectWindow(GuildMember aGuildMember)
         {
             if (inspectWindow.Visible == true && inspectWindow.BelongsTo(aGuildMember))

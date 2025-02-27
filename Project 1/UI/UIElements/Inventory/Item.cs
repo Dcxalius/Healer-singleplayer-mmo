@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects;
+using Project_1.GameObjects.Entities;
 using Project_1.Input;
 using Project_1.Items;
 using Project_1.Items.SubTypes;
@@ -45,7 +46,9 @@ namespace Project_1.UI.UIElements.Inventory
 
                 if (bagIndex == -3) return ObjectManager.Player.Equipment.EquipedInSlot((GameObjects.Unit.Equipment.Slot)slotIndex);
 
-                return null;
+                if (bagIndex == -4) return HUDManager.GetGuildMemberInspectWindowTarget().Equipment.EquipedInSlot((GameObjects.Unit.Equipment.Slot)slotIndex);
+
+                throw new NotImplementedException();
             }
         }
 
@@ -133,6 +136,9 @@ namespace Project_1.UI.UIElements.Inventory
 
             if (FromCharacterPane(droppedOnMe)) return;
             if (ToCharacterPane(droppedOnMe)) return;
+
+            if (FromGuildMemberCharacterPane(droppedOnMe)) return;
+            if (ToGuildMemberCharacterPane(droppedOnMe)) return;
 
             InventoryToInventory(droppedOnMe);
         }
@@ -243,19 +249,68 @@ namespace Project_1.UI.UIElements.Inventory
 
         bool ToCharacterPane(Item aItemDroppedOnMe)
         {
-            if (bagIndex != -3 && bagIndex != -4) return false;
+            if (bagIndex != -3) return false;
+            ObjectManager.Player.Inventory.SwapEquipment(aItemDroppedOnMe.Index, slotIndex, ObjectManager.Player);
+            return true;
+        }
 
-            if (bagIndex == -3)
+        bool FromGuildMemberCharacterPane(Item aItemDroppedOnMe)
+        {
+            if (aItemDroppedOnMe.bagIndex != -4) return false;
+
+            Entity openGuildPage = HUDManager.GetGuildMemberInspectWindowTarget();
+            if (bagIndex == -4)
             {
-                ObjectManager.Player.Inventory.SwapEquipment(aItemDroppedOnMe.Index, slotIndex, ObjectManager.Player);
+                Equipment thisItem = GetActualItem as Equipment;
+                Equipment droppedItem = aItemDroppedOnMe.GetActualItem as Equipment;
+
+
+                if (!GameObjects.Unit.Equipment.FitsInSlot(droppedItem.type, (GameObjects.Unit.Equipment.Slot)slotIndex)) return true;
+                if (thisItem == null)
+                {
+                    openGuildPage.EquipInParticularSlot(droppedItem, (GameObjects.Unit.Equipment.Slot)slotIndex);
+                    openGuildPage.EquipInParticularSlot(null, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
+                    return true;
+                }
+
+                if (droppedItem.type != thisItem.type) return true;
+                if (droppedItem.type >= Equipment.Type.MainHander) return true;
+                if (thisItem.type >= Equipment.Type.MainHander) return true;
+                openGuildPage.EquipInParticularSlot(droppedItem, (GameObjects.Unit.Equipment.Slot)slotIndex);
+                openGuildPage.EquipInParticularSlot(thisItem, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
+
                 return true;
             }
 
-            if (bagIndex == -4) //TODO: Break this out and expand to other scenarios
+            if (bagIndex >= 0)
             {
-                ObjectManager.Player.Inventory.SwapEquipment(aItemDroppedOnMe.Index, slotIndex, HUDManager.GetGuildMemberInspectWindowTarget());
+                Equipment thisItem = GetActualItem as Equipment;
+                Equipment droppedItem = aItemDroppedOnMe.GetActualItem as Equipment;
 
+                if (thisItem == null)
+                {
+                    ObjectManager.Player.Inventory.AddItem(droppedItem, Index);
+
+                    openGuildPage.EquipInParticularSlot(null, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
+                    return true;
+                }
+
+                if (!GameObjects.Unit.Equipment.FitsInSlot(thisItem.type, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex)) return true;
+
+                ObjectManager.Player.Inventory.AssignItem(droppedItem, Index);
+                openGuildPage.EquipInParticularSlot(thisItem, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
+
+                return true;
             }
+
+
+            return true;
+        }
+
+        bool ToGuildMemberCharacterPane(Item aItemDroppedOnMe)
+        {
+            if (bagIndex != -4) return false;
+            ObjectManager.Player.Inventory.SwapEquipment(aItemDroppedOnMe.Index, slotIndex, HUDManager.GetGuildMemberInspectWindowTarget());
             return true;
         }
 
@@ -297,22 +352,25 @@ namespace Project_1.UI.UIElements.Inventory
         {
             if (bagIndex >= 0)
             {
+                Friendly target;
+                if (HUDManager.GetGuildMemberInspectWindowTarget() == null || HUDManager.PlayerCharacterPaneOpen) target = ObjectManager.Player;
+                else target = HUDManager.GetGuildMemberInspectWindowTarget();
                 switch (ObjectManager.Player.Inventory.GetItemInSlot(Index).ItemType)
                 {
                     case ItemData.ItemType.NotSet:
                         throw new NotImplementedException();
                     case ItemData.ItemType.Container:
                         ObjectManager.Player.Inventory.EquipBag(Index);
-                        break;
+                        return;
                     case ItemData.ItemType.Trash:
-                        break;
+                        return;
                     case ItemData.ItemType.Consumable:
-                        ObjectManager.Player.Inventory.ConsumeItem(Index, ObjectManager.Player);
-                        break;
+                        ObjectManager.Player.Inventory.ConsumeItem(Index, target);
+                        return;
                     case ItemData.ItemType.Equipment:
                     case ItemData.ItemType.Weapon:
-                        ObjectManager.Player.Inventory.Equip(Index, ObjectManager.Player);
-                        break;
+                        ObjectManager.Player.Inventory.Equip(Index, target);
+                        return;
                     default:
                         throw new NotImplementedException();
                 }
@@ -322,6 +380,8 @@ namespace Project_1.UI.UIElements.Inventory
             {
                 ObjectManager.Player.Inventory.UnequipBag(slotIndex);
             }
+
+            
         }
 
         protected override void OnHover()
