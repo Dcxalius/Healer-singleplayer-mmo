@@ -1,4 +1,5 @@
-﻿using Project_1.GameObjects.Unit;
+﻿using Newtonsoft.Json;
+using Project_1.GameObjects.Unit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,9 +19,11 @@ namespace Project_1.Items.SubTypes
             Ranged
         }
 
+        [JsonIgnore]
         public Attack Attack => (itemData as WeaponData).Attack;
 
 
+        [JsonIgnore]
         public HandRequirement handRequirement;
 
         public Weapon(LootData aLoot) : base(aLoot)

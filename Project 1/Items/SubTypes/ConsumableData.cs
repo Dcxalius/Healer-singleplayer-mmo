@@ -20,8 +20,10 @@ namespace Project_1.Items.SubTypes
             Drink
         }
 
+        [JsonIgnore]
         public ConsumableType Consumable { get => type; }
         ConsumableType type;
+        [JsonIgnore]
         public float Value { get => value; }
         float value;
 

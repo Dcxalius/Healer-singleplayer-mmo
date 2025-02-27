@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json;
 using Project_1.Managers;
 using Project_1.Textures;
 using System;
@@ -15,15 +16,19 @@ namespace Project_1.Items
     internal class Item
     {
         public int ID { get => itemData.ID; }
+        [JsonIgnore]
         public int Count { get => count; set => count = value; }
-
+        [JsonIgnore]
         public int MaxStack { get => itemData.MaxStack; }
-
+        [JsonIgnore]
         public GfxPath GfxPath { get => itemData.GfxPath; }
 
+        [JsonIgnore]
         public ItemData.ItemType ItemType { get => itemData.Type; }
         
+        [JsonIgnore]
         public string Name { get => itemData.Name; }
+        [JsonIgnore]
         public string Description { get => itemData.Description; }
 
         protected ItemData itemData;

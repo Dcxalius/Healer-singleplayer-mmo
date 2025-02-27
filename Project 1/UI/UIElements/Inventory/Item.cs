@@ -251,6 +251,7 @@ namespace Project_1.UI.UIElements.Inventory
         {
             if (bagIndex != -3) return false;
             ObjectManager.Player.Inventory.SwapEquipment(aItemDroppedOnMe.Index, slotIndex, ObjectManager.Player);
+            //TODO: Handle if trying to drag inbetween sheets.
             return true;
         }
 
@@ -311,6 +312,7 @@ namespace Project_1.UI.UIElements.Inventory
         {
             if (bagIndex != -4) return false;
             ObjectManager.Player.Inventory.SwapEquipment(aItemDroppedOnMe.Index, slotIndex, HUDManager.GetGuildMemberInspectWindowTarget());
+            //TODO: Handle if trying to drag inbetween sheets.
             return true;
         }
 

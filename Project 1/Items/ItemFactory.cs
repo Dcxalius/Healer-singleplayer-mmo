@@ -41,8 +41,8 @@ namespace Project_1.Items
                     itemList.Add(data);
                 }
             }
+            itemList.Sort();
 
-           
             itemData = itemList.ToArray();
         }
 
@@ -69,6 +69,13 @@ namespace Project_1.Items
         public static bool DoesDataExist(string aName)
         {
             return itemData.Where(data => data.Name == aName).Count() > 0;
+        }
+
+        public static T GetItemData<T>(int aId) where T : ItemData
+        {
+            if (itemData[aId] is not T) throw new InvalidCastException();
+
+            return itemData[aId] as T;
         }
 
         public static ItemData GetItemData(int aId)

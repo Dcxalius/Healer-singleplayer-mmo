@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.Items
 {
-    internal class ItemData
+    internal class ItemData : IComparable<ItemData>
     {
         public enum ItemType
         {
@@ -27,8 +27,6 @@ namespace Project_1.Items
 
         public int ID { get => id; }
         int id;
-        static int Id { get => nextId++; }
-        static int nextId = 0;
         public string Name { get => name; }
         string name;
         public string Description { get => description; }
@@ -47,7 +45,7 @@ namespace Project_1.Items
         [JsonConstructor]
         public ItemData(int id, string gfxName, string name, string description, int maxStack, ItemType itemType)
         {
-            this.id = Id;
+            this.id = id;
             gfx = new GfxPath(GfxType.Item, gfxName);
             this.name = name;
             this.description = description;
@@ -62,7 +60,15 @@ namespace Project_1.Items
             Debug.Assert(name != null && description != null && maxStack > 0 && itemType != ItemType.NotSet, "Itemdata not properly set.");
         }
 
-        
+        public int CompareTo(ItemData other)
+        {
+            if (other == null) return -1;
+            if (other.id > id) return -1;
+            if (other.id < id) return 1;
+            return 0;
+        }
+
+
 
         //public void Draw(SpriteBatch aBatch, Rectangle aPos)
         //{

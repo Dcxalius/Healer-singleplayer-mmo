@@ -23,8 +23,7 @@ namespace Project_1.GameObjects.Entities.Players
     internal class Player : Friendly
     {
         public PlayerData PlayerData => UnitData as PlayerData;
-        public Inventory Inventory => inventory;
-        Inventory inventory;
+        public Inventory Inventory => PlayerData.Inventory;
 
         public SpellBook SpellBook => spellBook;
         SpellBook spellBook;
@@ -37,10 +36,9 @@ namespace Project_1.GameObjects.Entities.Players
         public bool LockedMovement => lockedMovement;
         bool lockedMovement = false;
 
-        public Player() : base(ObjectFactory.GetData("Player"))
+        public Player() : base(ObjectFactory.GetPlayerData())
         {
-            inventory = new Inventory(this);
-            HUDManager.SetInventory(inventory);
+            HUDManager.SetInventory(Inventory);
             spellBook = new SpellBook(this);
             party = new Party(this);
             guild = new Guild(this);

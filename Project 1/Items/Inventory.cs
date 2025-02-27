@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Bson;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Bson;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.Items.SubTypes;
@@ -16,19 +17,67 @@ namespace Project_1.Items
 {
     internal class Inventory
     {
-        //TODO: Move all of this into unitdata
-
         public const int bagSlots = 4;
         public const int defaultSlots = 32;
 
+        [JsonProperty("Items")]
+        public (int, int)?[][] ItemsAsID
+        {
+            get
+            {
+                (int, int)?[][] ids = new (int, int)?[items.Length][];
+
+                ids[0] = new (int, int)?[defaultSlots];
+                for (int i = 0; i < ids[0].Length; i++)
+                {
+                    if (items[0][i] == null) continue;
+                    ids[0][i] = (items[0][i].ID, items[0][i].Count);
+                }
+
+                for (int i = 1; i < ids.Length; i++)
+                {
+                    if (bags[i] == null) continue;
+
+                    ids[i] = new (int, int)?[bags[i].SlotCount];
+                    for (int j = 0; j < ids[i].Length; j++)
+                    {
+                        if (items[i][j] == null) continue;
+                        ids[i][j] = (items[i][j].ID, items[i][j].Count);
+                    }
+                }
+                return ids;
+            }
+        }
+
+        [JsonProperty("Bags")]
+        public int?[] BagsAsID
+        {
+            get
+            {
+                int?[] ids = new int?[bags.Length];
+
+                for (int i = 0; i < ids.Length; i++)
+                {
+                    if (bags[i] == null) continue;
+                    ids[i] = bags[i].ID;
+                }
+                return ids;
+            }
+        }
+
+        [JsonIgnore]
+        public Container[] Bags => bags;
+        Container[] bags;
+
+        [JsonIgnore]
+        public Item[][] Items => items;
         Item[][] items;
-        public Container[] bags;
-        public Inventory(Entity aOwner)
+        public Inventory()
         {
             bags = new Container[bagSlots + 1]; //Bag 0 is fornow always null
             items = new Item[bagSlots + 1][];
             items[0] = new Item[defaultSlots];
-            for (int i = 1; i < bagSlots; i++)
+            for (int i = 1; i < bags.Length; i++)
             {
                 if (bags[i] != null)
                 {
@@ -38,8 +87,42 @@ namespace Project_1.Items
 
             if (DebugManager.Mode(DebugMode.InvCheats))
             {
-                EquipBag( ItemFactory.CreateItem(ItemFactory.GetItemData("Small Bag") ) as Container);
+                EquipBag(ItemFactory.CreateItem(ItemFactory.GetItemData("Small Bag")) as Container);
                 items[0][22] = ItemFactory.CreateItem(ItemFactory.GetItemData("Medium Bag"));
+            }
+        }
+
+        [JsonConstructor]
+        public Inventory(int?[] bags, (int, int)?[][] items)
+        {
+            this.bags = new Container[bagSlots + 1]; //Bag 0 is fornow always null
+
+
+            for (int i = 1; i < bags.Length; i++)
+            {
+                if (bags[i] == null) continue;
+                this.bags[i] = new Container(ItemFactory.GetItemData<ContainerData>(bags[i].Value));
+            }
+
+            this.items = new Item[bagSlots + 1][];
+            this.items[0] = new Item[defaultSlots];
+            for (int i = 0; i < this.items[0].Length; i++)
+            {
+
+                if (!items[0][i].HasValue) continue;
+                this.items[0][i] = new Item(ItemFactory.GetItemData(items[0][i].Value.Item1), items[0][i].Value.Item2);
+            }
+            for (int i = 1; i < bags.Length; i++)
+            {
+                if (this.bags[i] != null)
+                {
+                    this.items[i] = new Item[this.bags[i].SlotCount];
+                    for (int j = 0; j < items[i].Length; j++)
+                    {
+                        if (!items[0][i].HasValue) continue;
+                        this.items[i][j] = new Item(ItemFactory.GetItemData(items[i][j].Value.Item1), items[i][j].Value.Item2);
+                    }
+                }
             }
         }
 

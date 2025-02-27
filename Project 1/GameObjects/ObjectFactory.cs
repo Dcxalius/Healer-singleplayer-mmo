@@ -17,6 +17,7 @@ namespace Project_1.GameObjects
     internal static class ObjectFactory
     {
         static Dictionary<string, UnitData> unitData;
+        static PlayerData playerData;
         static List<UnitData> guildData;
         static Dictionary<string, MobData> mobData;
         //static UnitData defaultData = new UnitData();
@@ -32,6 +33,7 @@ namespace Project_1.GameObjects
             contentRootDirectory = aC.RootDirectory;
 
             ImportClassData();
+            ImportPlayerData();
             ImportMobData();
             ImportUnitData();
             ImportGuildData();
@@ -60,6 +62,8 @@ namespace Project_1.GameObjects
                 throw new NotImplementedException();
             }
         }
+
+        public static PlayerData GetPlayerData() => playerData;
 
         public static List<GuildMember> GetGuildMemebers()
         {
@@ -99,20 +103,22 @@ namespace Project_1.GameObjects
 
             string[] folders = System.IO.Directory.GetDirectories(path);
 
-            string rawData = System.IO.File.ReadAllText(contentRootDirectory + "\\SaveData\\Units\\PlayerData.unit");
-            PlayerData playerData = JsonConvert.DeserializeObject<PlayerData>(rawData);
-            unitData.Add(playerData.Name, playerData);
-
             for (int i = 0; i < folders.Length; i++)
             {
                 string[] files = System.IO.Directory.GetFiles(folders[i]);
                 for (int j = 0; j < files.Length; j++)
                 {
-                    rawData = System.IO.File.ReadAllText(files[j]);
+                    string rawData = System.IO.File.ReadAllText(files[j]);
                     UnitData data = JsonConvert.DeserializeObject<UnitData>(rawData);
                     unitData.Add(data.Name, data);
                 }
             }
+        }
+
+        static void ImportPlayerData()
+        {
+            string rawData = System.IO.File.ReadAllText(contentRootDirectory + "\\SaveData\\Units\\PlayerData.unit");
+            playerData = JsonConvert.DeserializeObject<PlayerData>(rawData);
         }
 
         static void ImportGuildData()
@@ -179,8 +185,8 @@ namespace Project_1.GameObjects
         {
             UnitData[] dataArray = unitData.Values.ToArray();
 
-            ExportData("Units\\" + dataArray[0].Name + "Data.unit", dataArray[0]);
-            for (int i = 1; i < unitData.Count; i++)
+            ExportData("Units\\" + playerData.Name + "Data.unit", playerData);
+            for (int i = 0; i < unitData.Count; i++)
             {
                 //TODO: Handle Friendly/Aggresive npcs once they are implemented
                 ExportData("Units\\World\\Neutral\\" + dataArray[i].Name + ".unit", dataArray[i]);

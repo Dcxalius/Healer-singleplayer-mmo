@@ -1,4 +1,5 @@
-﻿using Project_1.GameObjects.Unit.Stats;
+﻿using Newtonsoft.Json;
+using Project_1.GameObjects.Unit.Stats;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +32,9 @@ namespace Project_1.Items.SubTypes
             Count
         }
 
+        [JsonIgnore]
         public EquipmentStats Stats => (itemData as EquipmentData).BaseStats;
+        [JsonIgnore]
         public Type type { get => (itemData as EquipmentData).Slot; }
 
 

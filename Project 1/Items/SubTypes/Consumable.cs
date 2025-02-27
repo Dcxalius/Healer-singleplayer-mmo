@@ -5,11 +5,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Project_1.Items.SubTypes
 {
     class Consumable : Item
     {
+        [JsonIgnore]
         protected ConsumableData ItemData { get => itemData as ConsumableData; }
         ConsumableData.ConsumableType ConsumableType { get => ItemData.Consumable; }
         float Value { get => ItemData.Value; }

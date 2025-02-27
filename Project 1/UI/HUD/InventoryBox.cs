@@ -73,15 +73,15 @@ namespace Project_1.UI.HUD
 
             for (int i = 1; i < bagBox.Length; i++)
             {
-                if (aInventory.bags[i] == null)
+                if (aInventory.Bags[i] == null)
                 {
                     bagBox[i] = new BagBox(aInventory, i, 0, 1, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
                     continue;
                 }
 
-                RelativeScreenPosition size = CalculateBagBoxSize(aInventory.bags[i].SlotCount, itemSize, spacing, aSize.X);
+                RelativeScreenPosition size = CalculateBagBoxSize(aInventory.Bags[i].SlotCount, itemSize, spacing, aSize.X);
 
-                bagBox[i] = new BagBox(aInventory, i, aInventory.bags[i].SlotCount, columnCount, bagPos, size);
+                bagBox[i] = new BagBox(aInventory, i, aInventory.Bags[i].SlotCount, columnCount, bagPos, size);
                 bagPos.Y += size.Y + spacing.Y;
             }
 
@@ -94,9 +94,9 @@ namespace Project_1.UI.HUD
             if (aBag == -1)
             {
                 bagHolderBox.RefreshSlot(aSlot);
-                if (aInventory.bags[aSlot] != null)
+                if (aInventory.Bags[aSlot] != null)
                 {
-                    bagBox[aSlot].RefreshBag(aInventory, aInventory.bags[aSlot].SlotCount, columnCount);
+                    bagBox[aSlot].RefreshBag(aInventory, aInventory.Bags[aSlot].SlotCount, columnCount);
                     CalculateSize(RelativePos + RelativeSize.OnlyY);
                     return;
                 }

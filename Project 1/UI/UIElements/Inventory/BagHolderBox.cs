@@ -50,7 +50,7 @@ namespace Project_1.UI.UIElements.Inventory
         public void RefreshSlot(int aSlot)
         {
 
-            bags[aSlot - 1].AssignItem(ObjectManager.Player.Inventory.bags[aSlot]);
+            bags[aSlot - 1].AssignItem(ObjectManager.Player.Inventory.Bags[aSlot]);
         }
 
         public override void Rescale()
