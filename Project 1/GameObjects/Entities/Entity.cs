@@ -111,6 +111,13 @@ namespace Project_1.GameObjects.Entities
             CreateNamePlate();
         }
 
+        public void Delete()
+        {
+            RemoveNamePlate();
+
+        }
+
+
 
         #region Update
         public override void Update()
@@ -415,9 +422,10 @@ namespace Project_1.GameObjects.Entities
             if (!(this is Friendly)) return;
             HUDManager.RefreshCharacterWindowExpBar(this as Friendly);
         }
+
+
         protected void CreateNamePlate()
         {
-
             namePlate = new NamePlate(this);
             HUDManager.AddNamePlate(this, namePlate);
 

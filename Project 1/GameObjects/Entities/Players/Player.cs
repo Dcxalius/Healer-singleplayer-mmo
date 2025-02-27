@@ -46,6 +46,7 @@ namespace Project_1.GameObjects.Entities.Players
             HUDManager.SetCharacterWindow(this);
             HUDManager.SetPlayerPlateBox(this);
         }
+
         public override void Update()
         {
             KeyboardWalk();

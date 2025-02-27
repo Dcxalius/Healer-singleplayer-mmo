@@ -9,21 +9,32 @@ using System.Text;
 using System.Threading.Tasks;
 using Project_1.Camera;
 using Project_1.Managers;
+using Newtonsoft.Json;
 
 namespace Project_1.Tiles
 {
     internal class Tile
     {
         readonly static Point tileSize = new Point(32);
+        [JsonProperty("id")]
+        public int ID => tileData.ID;
+        
+        [JsonIgnore]
         public string Name => tileData.Name;
+        [JsonIgnore]
         public WorldSpace Position { get => position; protected set => position = value; }
         WorldSpace position;
+        [JsonIgnore]
         public WorldSpace Centre { get => position + new WorldSpace(tileSize.ToVector2()) / 2; }
+        [JsonIgnore]
         public virtual Rectangle WorldRectangle { get => new Rectangle(position.ToPoint(), tileSize); }
 
+        [JsonIgnore]
         public bool Walkable => tileData.Walkable;
+        [JsonIgnore]
         public float DragCoeficient => tileData.DragCoeficient;
 
+        [JsonIgnore]
         public bool Transparent
         {
             get
@@ -40,6 +51,7 @@ namespace Project_1.Tiles
             return true;
         }
 
+        [JsonIgnore]
         public Point GridPos => tilePos;
         Point tilePos;
 

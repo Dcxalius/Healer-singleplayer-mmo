@@ -50,16 +50,33 @@ namespace Project_1.GameObjects
 
         public static void Init()
         {
-            guild.AddRange(ObjectFactory.GetGuildMemebers());
-            player = new Player();
-            player.GetPartyMembersFromGuild();
-            Camera.Camera.BindCamera(player);
+            //guild.AddRange(ObjectFactory.GetGuildMemebers());
+            //player = new Player();
+            //player.GetPartyMembersFromGuild();
+            //Camera.Camera.BindCamera(player);
 
 
             
             //entities.Add(new Walker(new WorldSpace(11*32)));//Debug
             //player.Party.AddToParty(entities[entities.Count - 1] as GuildMember); //Debug
 
+
+        }
+
+        public static void Load()
+        {
+            ObjectFactory.Load();
+            for (int i = guild.Count - 1; i >= 0; i--)
+            {
+                guild[i].Delete();
+            }
+            HUDManager.ClearParty();
+            guild.Clear();
+            guild.AddRange(ObjectFactory.GetGuildMemebers());
+            if(player != null) player.Delete();
+            player = new Player();
+            player.GetPartyMembersFromGuild();
+            Camera.Camera.BindCamera(player);
 
         }
 

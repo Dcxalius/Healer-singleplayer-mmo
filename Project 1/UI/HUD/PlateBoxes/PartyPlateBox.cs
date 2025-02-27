@@ -33,6 +33,7 @@ namespace Project_1.UI.HUD.PlateBoxes
         static RelativeScreenPosition GetPosition(int aIndex) => firstPosition + new RelativeScreenPosition(0, size.Y + spacing) * aIndex;
         public static int PartyBoxesActive => partyBoxesActive;
         static int partyBoxesActive = 0;
+        public static void ClearPartyBoxes() => partyBoxesActive = 0;
 
         public PartyPlateBox(int aIndex) : base(GetPosition(aIndex), size)
         {

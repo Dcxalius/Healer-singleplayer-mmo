@@ -39,6 +39,12 @@ namespace Project_1.GameObjects
             ImportGuildData();
         }
 
+        public static void Load()
+        {
+            ImportPlayerData();
+            ImportGuildData();
+        }
+
         public static MobData GetMobData(string aName)
         {
             if (mobData.ContainsKey(aName))
@@ -185,23 +191,17 @@ namespace Project_1.GameObjects
         {
             UnitData[] dataArray = unitData.Values.ToArray();
 
-            ExportData("Units\\" + playerData.Name + "Data.unit", playerData);
+            SaveManager.ExportData("Units\\" + playerData.Name + "Data.unit", playerData);
             for (int i = 0; i < unitData.Count; i++)
             {
                 //TODO: Handle Friendly/Aggresive npcs once they are implemented
-                ExportData("Units\\World\\Neutral\\" + dataArray[i].Name + ".unit", dataArray[i]);
+                SaveManager.ExportData("Units\\World\\Neutral\\" + dataArray[i].Name + ".unit", dataArray[i]);
             }
 
             for (int i = 0; i < guildData.Count; i++)
             {
-                ExportData("Units\\Guild\\" + guildData[i].Name + ".unit", guildData[i]);
+                SaveManager.ExportData("Units\\Guild\\" + guildData[i].Name + ".unit", guildData[i]);
             }
-        }
-
-        static void ExportData(string aDestination, object aObjectToExport)
-        {
-            string json = JsonConvert.SerializeObject(aObjectToExport);
-            System.IO.File.WriteAllText(contentRootDirectory + "\\SaveData\\" + aDestination, json);
         }
     }
 }

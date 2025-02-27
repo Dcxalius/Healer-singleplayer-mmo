@@ -7,6 +7,7 @@ using Project_1.Camera;
 using Project_1.DebugTools;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Spawners;
 using Project_1.Managers;
 using SharpDX.Direct3D9;
 using System;
@@ -34,31 +35,39 @@ namespace Project_1.Tiles
         static Tile[,] tiles;
         readonly static Point TileSize = new Point(32, 32);
         const int sizeOfSquareToCheck = 3; // this should always be odd
-        static Dictionary<string, TileData> tileData = new Dictionary<string, TileData>();
 
-        static Point debugSize = new Point(100, 100);
+        public readonly static Point debugSize = new Point(100, 100);
 
         static PathFinder pathFinder = new PathFinder();
 
-        public static void Init(ContentManager aContentManager)
+        public static int?[,] DeserializeTilesIds(string aContentRoot)
         {
-            ImportData(aContentManager.RootDirectory, aContentManager);
-            GenerateTiles(new Point(0), debugSize);
+            string path = aContentRoot + "\\SaveData\\World\\Tiles\\OpenWorld.tilemap";
+            string json = System.IO.File.ReadAllText(path);
+            int?[,] tileIds = JsonConvert.DeserializeObject<int?[,]>(json);
+
+            return tileIds;
         }
 
-
-        static void ImportData(string aPathToData, ContentManager aContentManager)
+        public static void LoadTiles(int?[,] aTilesToLoad, Point aLeftUppermostTile)
         {
-            string[] dataAsString = System.IO.File.ReadAllLines(aPathToData + "\\Data\\TileData.json");
+            tiles = new Tile[aTilesToLoad.GetLength(0), aTilesToLoad.GetLength(1)];
 
-            for (int i = 0; i < dataAsString.Length; i++)
+            for (int i = 0; i < tiles.GetLength(0); i++)
             {
-                TileData data = JsonConvert.DeserializeObject<TileData>(dataAsString[i]);
-                tileData.Add(data.Name, data);
+                for (int j = 0; j < tiles.GetLength(1); j++)
+                {
+                    if (!aTilesToLoad[i, j].HasValue) continue;
+                
+                    Point pos = new Point(aLeftUppermostTile.X + TileSize.X * i, aLeftUppermostTile.Y + TileSize.Y * j);
+
+                    tiles[i, j] = new Tile(TileFactory.GetTileData(aTilesToLoad[i, j].Value), pos, new Point(i, j));
+                }
             }
         }
 
-        static void GenerateTiles(Point aLeftUppermostTile, Point aSize)
+
+        public static void GenerateTiles(Point aLeftUppermostTile, Point aSize)
         {
             tiles = new Tile[aSize.X, aSize.Y];
 
@@ -70,7 +79,7 @@ namespace Project_1.Tiles
 
                     if (i == 0 || j == 0 || i == aSize.X-1 || j == aSize.Y-1 || (i >= 4 && i < 6 && j >= 4 && j < 6 ))
                     {
-                        tiles[i, j] = new Tile(tileData["Wall"], pos, new Point(i, j));
+                        tiles[i, j] = new Tile(TileFactory.GetTileData("Wall"), pos, new Point(i, j));
                     }
                     else
                     {
@@ -99,22 +108,19 @@ namespace Project_1.Tiles
 
                         if (RandomManager.RollDouble() < oddsOfDirt)
                         {
-                            tiles[i, j] = new Tile(tileData["Dirt"], pos, new Point(i, j));
+                            tiles[i, j] = new Tile(TileFactory.GetTileData("Dirt"), pos, new Point(i, j));
                         }
                         else
                         {
-                            tiles[i, j] = new Tile(tileData["Grass"], pos, new Point(i, j));
+                            tiles[i, j] = new Tile(TileFactory.GetTileData("Grass"), pos, new Point(i, j));
                         }
                     }
                 }
             }
         }
 
-        public static float GetDragCoeficient(WorldSpace aFeetPos)
-        {
-            return GetTileUnder(aFeetPos).DragCoeficient;
-        }
-        
+        public static float GetDragCoeficient(WorldSpace aFeetPos) => GetTileUnder(aFeetPos).DragCoeficient;
+
         public static bool CheckLineOfSight(Entity aCaster, WorldSpace aTarget)
         {
             
@@ -537,6 +543,20 @@ namespace Project_1.Tiles
             }
 
             return returnable.ToArray();
+        }
+
+        public static void SaveData()
+        {
+            int?[,] tilesAsId = new int?[tiles.GetLength(0),tiles.GetLength(1)];
+            for (int i = 0; i < tilesAsId.GetLength(0); i++)
+            {
+                for (int j = 0; j < tilesAsId.GetLength(1); j++)
+                {
+                    tilesAsId[i, j] = tiles[i, j].ID;
+                }
+            }
+
+            SaveManager.ExportData("World\\Tiles\\Tiles.tilemap", tilesAsId);
         }
 
 

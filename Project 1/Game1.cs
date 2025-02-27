@@ -41,11 +41,15 @@ namespace Project_1
             ProjectileFactory.Init(Content);
             KeyBindManager.Init(Content);
             //Camera.Init();
-            TileManager.Init(Content);
+            TileFactory.Init(Content);
             StateManager.Init(Content);
             SpawnerManager.Init(Content);
             AreaOfEffectFactory.Init(Content);
             ParticleManager.Init();
+            SaveManager.Init(Content);
+
+            //DEBUG
+            SaveManager.LoadData();
             base.Initialize();
         }
 

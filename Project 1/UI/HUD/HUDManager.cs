@@ -280,6 +280,15 @@ namespace Project_1.UI.HUD
             partyPlateBoxes[PartyPlateBox.PartyBoxesActive - 1].RemoveTarget();
         }
 
+        public static void ClearParty()
+        {
+            for (int i = 0; i < partyPlateBoxes.Length; i++)
+            {
+                partyPlateBoxes[i].RemoveTarget();
+            }
+            PartyPlateBox.ClearPartyBoxes();
+        }
+
         public static int FindGuildMemberPartyIndex(GuildMember aGuildMember)
         {
             for (int i = 0; i < partyPlateBoxes.Length; i++)

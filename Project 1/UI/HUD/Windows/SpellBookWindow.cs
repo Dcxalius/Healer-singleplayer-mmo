@@ -18,7 +18,7 @@ namespace Project_1.UI.HUD.Windows
         SpellBookSpell[] spellBookSpells;
         const int rows = 3;
         const int cols = 2;
-        public SpellBookWindow() : base(new UITexture("WhiteBackground", Color.SaddleBrown))
+        public SpellBookWindow() : base(new UITexture("WhiteBackground", Color.SaddleBrown)) //TODO: Rework, This should grab things from the spellbook instead of it being assigned to this object
         {
             visibleKey = Input.KeyBindManager.KeyListner.SpellBook;
             spellBookSpells = new SpellBookSpell[cols * rows];
