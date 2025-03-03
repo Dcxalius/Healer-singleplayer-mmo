@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Media;
+using Newtonsoft.Json;
 using Project_1.Camera;
 using Project_1.Managers;
 using Project_1.Tiles;
@@ -9,33 +10,37 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.Spawners
+namespace Project_1.GameObjects.Spawners.Pathing
 {
     internal class Bound : MobPathing
     {
         public override PathingType UnderlyingType => PathingType.Bound;
 
+        [JsonIgnore]
         public override WorldSpace? GetNextSpace
         {
             get
             {
                 StartTimer();
                 if (!TimeForMove()) return null;
-                
+
                 return NewSpawn(GetLatestSpace);
             }
         }
 
+        [JsonIgnore]
         public override WorldSpace GetLatestSpace => lastDirection;
 
         WorldSpace lastDirection;
+
         public WorldSpace BindPoint;
         WorldSpace bindPoint;
+        [JsonProperty("Leash")]
         float leash;
 
 
 
-        public Bound(WorldSpace aBindPoint , float aMaxDistanceOfLeash)
+        public Bound(WorldSpace aBindPoint, float aMaxDistanceOfLeash)
         {
             bindPoint = aBindPoint;
             leash = aMaxDistanceOfLeash;

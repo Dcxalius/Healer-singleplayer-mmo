@@ -1,4 +1,5 @@
-﻿using Project_1.Camera;
+﻿using Newtonsoft.Json;
+using Project_1.Camera;
 using Project_1.Managers;
 using Project_1.Tiles;
 using System;
@@ -8,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.Spawners
+namespace Project_1.GameObjects.Spawners.Pathing
 {
     internal class Patrol : MobPathing
     {
@@ -20,25 +21,31 @@ namespace Project_1.GameObjects.Spawners
             Bounce
         }
 
-        WorldSpace[] queue;
+        [JsonProperty("Route")]
+        WorldSpace[] route;
         int nextIndex;
+        [JsonIgnore]
         int CurrentIndex
         {
             get
             {
                 if (type == PatrolType.Circular || hasBounced == false)
                 {
-                    return (queue.Length + nextIndex - 1) % queue.Length;
+                    return (route.Length + nextIndex - 1) % route.Length;
                 }
                 return nextIndex + 1;
             }
         }
+        [JsonProperty("PatrolType")]
         PatrolType type;
+        [JsonProperty("HasBounced")]
         bool hasBounced;
 
+        [JsonIgnore]
         public override WorldSpace? GetNextSpace => GetNextInQueue();
 
-        public override WorldSpace GetLatestSpace => queue[CurrentIndex];
+        [JsonIgnore]
+        public override WorldSpace GetLatestSpace => route[CurrentIndex];
 
 
         public Patrol(WorldSpace[] aQueue, PatrolType aType, WorldSpace aUnitSize)
@@ -52,7 +59,7 @@ namespace Project_1.GameObjects.Spawners
             }
             type = aType;
             nextIndex = 1; //Make it take the closest one as first index??
-            queue = aQueue;
+            route = aQueue;
             hasBounced = false;
         }
 
@@ -64,13 +71,13 @@ namespace Project_1.GameObjects.Spawners
             switch (type)
             {
                 case PatrolType.Circular:
-                    nextWorldSpaceInQueue = queue[nextIndex];
+                    nextWorldSpaceInQueue = route[nextIndex];
                     nextIndex++;
-                    nextIndex %= queue.Length;
+                    nextIndex %= route.Length;
                     return nextWorldSpaceInQueue;
                 case PatrolType.Bounce:
-                    nextWorldSpaceInQueue = queue[nextIndex];
-                    if (nextIndex == queue.Length - 1) hasBounced = true;
+                    nextWorldSpaceInQueue = route[nextIndex];
+                    if (nextIndex == route.Length - 1) hasBounced = true;
                     if (nextIndex == 0) hasBounced = false;
                     if (!hasBounced) nextIndex++;
                     else nextIndex--;
@@ -83,11 +90,11 @@ namespace Project_1.GameObjects.Spawners
         public override WorldSpace NewSpawn(WorldSpace aSize)
         {
             Reset();
-            int currentIndex = RandomManager.RollInt(queue.Length);
+            int currentIndex = RandomManager.RollInt(route.Length);
             switch (type)
             {
                 case PatrolType.Circular:
-                    nextIndex = (currentIndex + 1) % queue.Length;
+                    nextIndex = (currentIndex + 1) % route.Length;
                     break;
                 case PatrolType.Bounce:
                     if (currentIndex == 0)
@@ -95,10 +102,10 @@ namespace Project_1.GameObjects.Spawners
                         hasBounced = false;
                         nextIndex = 1;
                     }
-                    else if (currentIndex == queue.Length - 1)
+                    else if (currentIndex == route.Length - 1)
                     {
                         hasBounced = true;
-                        nextIndex = queue.Length - 2;
+                        nextIndex = route.Length - 2;
                     }
                     else
                     {
@@ -117,7 +124,7 @@ namespace Project_1.GameObjects.Spawners
                 default:
                     break;
             }
-            WorldSpace newSpawn = TileManager.FindClosestWalkableWorldSpace(queue[currentIndex], aSize);
+            WorldSpace newSpawn = TileManager.FindClosestWalkableWorldSpace(route[currentIndex], aSize);
             return newSpawn;
         }
     }

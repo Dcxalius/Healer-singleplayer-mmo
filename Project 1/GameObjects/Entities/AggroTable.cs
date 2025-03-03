@@ -147,7 +147,7 @@ namespace Project_1.GameObjects.Entities
             aggroEntities.RemoveAt(index);
         }
 
-        public int[] CalculateAverageLevel()
+        public int[] GetLevelOfAggroTable() 
         {
             int[] returnable = new int[aggroEntities.Count];
             for (int i = 0; i < aggroEntities.Count; i++)

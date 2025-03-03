@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Spawners.Pathing;
 using Project_1.GameObjects.Unit;
 using Project_1.Input;
 using Project_1.Managers;
@@ -14,20 +16,33 @@ namespace Project_1.GameObjects.Spawners
 {
     internal class Spawner
     {
+        [JsonProperty]
+        int SpawnZoneId => spawnZoneId;
         int spawnZoneId;
+        [JsonProperty]
+        int ID => id;
         int id;
 
         NonFriendly spawn;
 
         MobData[] unitsToSpawn;
+        [JsonProperty]
+        public MobPathing Pathing => pathing;
         MobPathing pathing;
 
-
+        [JsonProperty]
+        double MinSpawnTime => minSpawnTime;
         double minSpawnTime;
+        [JsonProperty]
+        double MaxSpawnTime => maxSpawnTime;
         double maxSpawnTime;
+        [JsonProperty]
+        double NextSpawnTime => nextSpawnTime;
         double nextSpawnTime;
 
-        double lastSpawnDeathTime;
+        [JsonProperty]
+        double TimeSinceLastDeath => timeSinceLastDeath;
+        double timeSinceLastDeath;
 
         public Spawner(int aSpawnZoneId, int aId, MobPathing aPathing, double aMinSpawnTime, double aMaxSpawnTime, MobData aData, NonFriendly aUnit) : this(aSpawnZoneId, aId, aPathing, aMinSpawnTime, aMaxSpawnTime, new MobData[] { aData })
         {
@@ -40,7 +55,7 @@ namespace Project_1.GameObjects.Spawners
             spawn = aUnit;
         }
 
-        public Spawner(int aSpawnZoneId, int aId, MobPathing aPathing, double aMinSpawnTime, double aMaxSpawnTime, MobData aData) : this(aSpawnZoneId, aId, aPathing, aMinSpawnTime, aMaxSpawnTime, new MobData[] { aData }) {}
+        public Spawner(int aSpawnZoneId, int aId, MobPathing aPathing, double aMinSpawnTime, double aMaxSpawnTime, MobData aData) : this(aSpawnZoneId, aId, aPathing, aMinSpawnTime, aMaxSpawnTime, new MobData[] { aData }) { }
         public Spawner(int aSpawnZoneId, int aId, MobPathing aPathing, double aMinSpawnTime, double aMaxSpawnTime, MobData[] aData)
         {
             spawnZoneId = aSpawnZoneId;
@@ -52,8 +67,10 @@ namespace Project_1.GameObjects.Spawners
             pathing = aPathing;
 
 
-            lastSpawnDeathTime = double.NegativeInfinity;
+            timeSinceLastDeath = double.NegativeInfinity;
         }
+
+        
 
         public void Update()
         {
@@ -61,7 +78,7 @@ namespace Project_1.GameObjects.Spawners
             {
                 spawn.Update();
                 if (spawn.Alive) return;
-                lastSpawnDeathTime = TimeManager.TotalFrameTime;
+                timeSinceLastDeath = TimeManager.TotalFrameTime;
                 spawn = null;
                 return;
             }
@@ -71,19 +88,19 @@ namespace Project_1.GameObjects.Spawners
 
         void Spawn()
         {
-            if (lastSpawnDeathTime + nextSpawnTime > TimeManager.TotalFrameTime) return;
+            if (timeSinceLastDeath + nextSpawnTime > TimeManager.TotalFrameTime) return;
 
             nextSpawnTime = RandomManager.RollDouble(minSpawnTime, maxSpawnTime);
 
             if (unitsToSpawn.Length == 1)
             {
-                spawn = new NonFriendly(id, pathing, new UnitData(unitsToSpawn[0], pathing.NewSpawn(unitsToSpawn[0].Size)));
+                spawn = new NonFriendly(pathing, new SavedMobData(id, spawnZoneId, unitsToSpawn[0], pathing.NewSpawn(unitsToSpawn[0].Size)));
 
             }
             else
             {
                 MobData unitToSpawn = unitsToSpawn[RandomManager.RollInt(unitsToSpawn.Count())];
-                spawn = new NonFriendly(id, pathing, new UnitData(unitToSpawn, pathing.NewSpawn(unitToSpawn.Size)));
+                spawn = new NonFriendly(pathing, new SavedMobData(id, spawnZoneId, unitToSpawn, pathing.NewSpawn(unitToSpawn.Size)));
 
             }
         }

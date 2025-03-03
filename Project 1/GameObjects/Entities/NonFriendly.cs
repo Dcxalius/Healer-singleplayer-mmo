@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects.Spawners;
+using Project_1.GameObjects.Spawners.Pathing;
 using Project_1.GameObjects.Unit;
 using Project_1.Items;
 using Project_1.Managers;
@@ -22,17 +22,15 @@ namespace Project_1.GameObjects.Entities
             Retaliate,
             RetaliateButFleeWhenLow
         }
-        int spawnerId;
 
         public override bool InCombat => aggroTable.Count > 0;
 
         MobPathing pathing;
 
         AggroTable aggroTable;
-        public NonFriendly(int aSpawnerId, MobPathing aPathing, UnitData aUnitData) : base(aUnitData)
+        public NonFriendly(MobPathing aPathing, SavedMobData aUnitData) : base(aUnitData)
         {
             aggroTable = new AggroTable(this);
-            spawnerId = aSpawnerId;
             pathing = aPathing;
             
         }
@@ -54,9 +52,9 @@ namespace Project_1.GameObjects.Entities
         protected override void Death()
         {
 
-            int[] xdd = aggroTable.CalculateAverageLevel();
+            int[] averageLevel = aggroTable.GetLevelOfAggroTable();
 
-            int exp = UnitData.Level.ExpReward((int)Math.Round(xdd.Average()));
+            int exp = UnitData.Level.ExpReward((int)Math.Round(averageLevel.Average()));
             aggroTable.Tagger.ExpToParty(exp);
             aggroTable.ClearTable();
             base.Death();

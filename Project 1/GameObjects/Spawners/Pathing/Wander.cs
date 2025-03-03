@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 using Project_1.Camera;
 using Project_1.Managers;
 using Project_1.Tiles;
@@ -10,28 +11,31 @@ using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.Spawners
+namespace Project_1.GameObjects.Spawners.Pathing
 {
     internal class Wander : MobPathing
     {
         public override PathingType UnderlyingType => PathingType.Wander;
 
+        [JsonIgnore]
         public override WorldSpace? GetNextSpace
         {
             get
             {
                 StartTimer();
                 if (!TimeForMove()) return null;
-                
+
                 return NewSpawn(GetLatestSpace);
             }
         }
+
+        [JsonIgnore]
         public override WorldSpace GetLatestSpace => lastDirection;
 
 
         WorldSpace lastDirection;
 
-
+        [JsonProperty("Boundry")]
         Rectangle boundry;
 
         public Wander(Rectangle aBoundry)
