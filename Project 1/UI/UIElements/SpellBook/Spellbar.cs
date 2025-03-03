@@ -1,10 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
+using Project_1.GameObjects.Spells;
 using Project_1.Textures;
 using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,6 +34,28 @@ namespace Project_1.UI.UIElements.SpellBook
             AddChildren(spellButtons);
         }
 
+        public void LoadBar(Spell[] aSpells)
+        {
+            Debug.Assert(aSpells.Length == spellButtons.Length);
+            for (int i = 0; i < aSpells.Length; i++)
+            {
+                if (aSpells == null) continue;
+                spellButtons[i].AssignSpell(aSpells[i]);
+            }
+        }
+
+        public string[] SaveBar()
+        {
+            string[] returnable = new string[spellButtons.Length];
+            for (int i = 0; i < spellButtons.Length; i++)
+            {
+                Spell spell = spellButtons[i].SpellData;
+                if (spell == null) continue;
+                returnable[i] = spell.Name;
+            }
+            return returnable;
+        }
+
         static float calcOffset(float aSizeX, int aButtonCount)
         {
             return aSizeX / (aButtonCount * 10);
@@ -45,11 +69,6 @@ namespace Project_1.UI.UIElements.SpellBook
         static float calcY(float aSizeX, int aButtonCount)
         {
             return RelativeScreenPosition.GetSquareFromX(calcButtonSize(aSizeX, aButtonCount)).Y + RelativeScreenPosition.GetSquareFromX(calcOffset(aSizeX, aButtonCount)).Y * 2;
-        }
-
-        public override void Draw(SpriteBatch aBatch)
-        {
-            base.Draw(aBatch);
         }
     }
 }

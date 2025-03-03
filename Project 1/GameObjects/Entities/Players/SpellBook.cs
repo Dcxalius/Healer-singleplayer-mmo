@@ -12,16 +12,39 @@ namespace Project_1.GameObjects.Entities.Players
     {
         public Spell[] Spells { get => knownSpells.ToArray(); }
         List<Spell> knownSpells;
-        Player player;
+        Entity owner;
 
+        public string[] LearntSpells
+        {
+            get
+            {
+                string[] returnable = new string[knownSpells.Count];
+                for (int i = 0; i < returnable.Length; i++)
+                {
+                    returnable[i] = knownSpells[i].Name;
+                }
+                return returnable;
+            }
+        }
+        string[] loadedSpells;
 
-        public SpellBook(Player aPlayer)
+        public SpellBook(string[] aSpellsAlreadyLearnt)
         {
             knownSpells = new List<Spell>();
-            player = aPlayer;
-            AddSpell(new Spell("Heal", player));
-            AddSpell(new Spell("Renew", player));
+
+            loadedSpells = aSpellsAlreadyLearnt;
         }
+
+
+
+        public void Init(Entity aEntity)
+        {
+            owner = aEntity;
+
+            for (int i = 0; i < loadedSpells.Length; i++) LearnSpell(loadedSpells[i]);
+        }
+
+        public void LearnSpell(string aSpellName) => knownSpells.Add(new Spell(aSpellName, owner));
 
         public void AddSpell(Spell aSpell)
         {
@@ -29,9 +52,7 @@ namespace Project_1.GameObjects.Entities.Players
             HUDManager.AddSpellToSpellBook(aSpell);
         }
 
-        public bool HasSpell(Spell aSpell)
-        {
-            return knownSpells.Contains(aSpell);
-        }
+
+        public bool HasSpell(Spell aSpell) => knownSpells.Contains(aSpell);
     }
 }

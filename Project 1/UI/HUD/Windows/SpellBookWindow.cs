@@ -7,6 +7,7 @@ using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.SpellBook;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,6 +43,25 @@ namespace Project_1.UI.HUD.Windows
             AddChildren(spellBookSpells);
 
             //ToggleVisibilty();
+        }
+
+        public void ClearSpells()
+        {
+            for (int i = 0; i < spellBookSpells.Length; i++)
+            {
+                spellBookSpells[i].SpellData = null;
+            }
+        }
+
+        public void RefreshSpells(Spell[] aSpells)
+        {
+            Debug.Assert(aSpells.Length <= spellBookSpells.Length);
+            ClearSpells();
+            for (int i = 0; i < aSpells.Length; i++)
+            {
+
+                spellBookSpells[i].SpellData = aSpells[i];
+            }
         }
 
         public void AssignSpell(Spell aSpell)

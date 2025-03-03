@@ -438,6 +438,7 @@ namespace Project_1.UI.HUD
 
         #region Spell
         public static void AddSpellToSpellBook(Spell aSpell) => spellBookWindow.AssignSpell(aSpell);
+        public static void RefreshSpellBook(Spell[] aSpells) => spellBookWindow.RefreshSpells(aSpells);
         public static void HoldSpell(Spell aSpell, AbsoluteScreenPosition aGrabOffset) => heldSpell.HoldMe(aSpell, aGrabOffset);
         public static void ReleaseSpell() => heldSpell.ReleaseMe();
 
@@ -468,6 +469,11 @@ namespace Project_1.UI.HUD
                 }
             }
         }
+
+        public static void LoadSpellBar(Spell[] aSpells) => firstSpellBar.LoadBar(aSpells);
+        public static string[] SaveSpellBar => firstSpellBar.SaveBar();
+
+
         #endregion
 
         #region Loot

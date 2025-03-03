@@ -23,6 +23,7 @@ namespace Project_1.UI.UIElements.SpellBook
 
         KeyBindManager.KeyListner keyListner;
 
+        public Spell SpellData => spellData;
         Spell spellData;
 
         public SpellButton(KeyBindManager.KeyListner aKeyListner, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Spell aSpell = null) : base(Spell.GetGfxPath(aSpell), aPos, aSize, Color.Gray)

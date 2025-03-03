@@ -17,6 +17,8 @@ using Project_1.Items;
 using Project_1.GameObjects.Spells;
 using Project_1.Camera;
 using Project_1.UI.UIElements.Buttons;
+using System.Diagnostics;
+using Project_1.UI.UIElements.SpellBook;
 
 namespace Project_1.GameObjects.Entities.Players
 {
@@ -25,8 +27,7 @@ namespace Project_1.GameObjects.Entities.Players
         public PlayerData PlayerData => UnitData as PlayerData;
         public Inventory Inventory => PlayerData.Inventory;
 
-        public SpellBook SpellBook => spellBook;
-        SpellBook spellBook;
+        public SpellBook SpellBook => PlayerData.SpellBook;
 
         public Party Party => party;
         Party party;
@@ -39,10 +40,13 @@ namespace Project_1.GameObjects.Entities.Players
         public Player() : base(ObjectFactory.GetPlayerData())
         {
             HUDManager.SetInventory(Inventory);
-            spellBook = new SpellBook(this);
             party = new Party(this);
             guild = new Guild(this);
+            SpellBook.Init(this);
 
+            LoadSpellBar(PlayerData.SavedSpellsOnBar);
+
+            HUDManager.RefreshSpellBook(SpellBook.Spells);
             HUDManager.SetCharacterWindow(this);
             HUDManager.SetPlayerPlateBox(this);
         }
@@ -52,6 +56,28 @@ namespace Project_1.GameObjects.Entities.Players
             KeyboardWalk();
             Party.Update();
             base.Update();
+        }
+
+        void LoadSpellBar(string[] aSpellOnBar)
+        {
+            Spell[] spells = SpellBook.Spells;
+            int?[] indexOfSpellsToAdd = new int?[aSpellOnBar.Length];
+            for (int i = 0; i < aSpellOnBar.Length; i++)
+            {
+                if (aSpellOnBar[i] == null) continue;
+
+                int indexOfSpell = Array.FindIndex(spells, x => x.Name == aSpellOnBar[i]);
+                Debug.Assert(indexOfSpell >= 0);
+
+                indexOfSpellsToAdd[i] = indexOfSpell;
+            }
+            Spell[] spellsToAddToBar = new Spell[indexOfSpellsToAdd.Length];
+            for (int i = 0; i < indexOfSpellsToAdd.Length; i++)
+            {
+                if (!indexOfSpellsToAdd[i].HasValue) continue;
+                spellsToAddToBar[i] = spells[indexOfSpellsToAdd[i].Value];
+            }
+            HUDManager.LoadSpellBar(spellsToAddToBar);
         }
 
         public void GetPartyMembersFromGuild()

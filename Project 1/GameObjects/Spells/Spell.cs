@@ -31,7 +31,6 @@ namespace Project_1.GameObjects.Spells
         public bool Targetable(Relation.RelationToPlayer aTarget) => spellData.Targetable(aTarget);
         public GfxPath GfxPath { get => spellData.ButtonGfxPath; }
 
-        public Entity Owner { get => owner; }
         Entity owner;
         SpellData spellData;
         public bool OffCooldown { get => lastTimeCasted + spellData.Cooldown < TimeManager.TotalFrameTime; }
@@ -41,6 +40,7 @@ namespace Project_1.GameObjects.Spells
         public Spell(string aName, Entity aOwner) 
         {
             spellData = SpellFactory.GetSpell(aName);
+            Debug.Assert(aOwner != null);
             owner = aOwner;
             lastTimeCasted = double.NegativeInfinity;
         }
