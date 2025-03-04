@@ -33,17 +33,16 @@ namespace Project_1.GameObjects.Spawners.Pathing
 
         WorldSpace lastDirection;
 
-        public WorldSpace BindPoint;
+        public WorldSpace BindPoint => bindPoint;
         WorldSpace bindPoint;
         [JsonProperty("Leash")]
         float leash;
 
-
-
-        public Bound(WorldSpace aBindPoint, float aMaxDistanceOfLeash)
+        [JsonConstructor]
+        public Bound(WorldSpace bindPoint, float leash)
         {
-            bindPoint = aBindPoint;
-            leash = aMaxDistanceOfLeash;
+            this.bindPoint = bindPoint;
+            this.leash = leash;
         }
 
         public override WorldSpace NewSpawn(WorldSpace aSize)

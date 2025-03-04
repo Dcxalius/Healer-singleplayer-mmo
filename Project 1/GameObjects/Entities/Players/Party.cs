@@ -25,6 +25,7 @@ namespace Project_1.GameObjects.Entities.Players
         public bool IsInCommand(GuildMember aGuildMember) => commands.IndexOf(aGuildMember) >= 0;
         public bool IsInParty(GuildMember aGuildMember) => party.IndexOf(aGuildMember) >= 0;
 
+        public bool IsInCombat => party.Any(x => x.InCombat);
 
         public Party(Entity aOwner)
         {

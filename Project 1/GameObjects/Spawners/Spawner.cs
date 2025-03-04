@@ -44,15 +44,15 @@ namespace Project_1.GameObjects.Spawners
         double TimeSinceLastDeath => timeSinceLastDeath;
         double timeSinceLastDeath;
 
-        public Spawner(int aSpawnZoneId, int aId, MobPathing aPathing, double aMinSpawnTime, double aMaxSpawnTime, MobData aData, NonFriendly aUnit) : this(aSpawnZoneId, aId, aPathing, aMinSpawnTime, aMaxSpawnTime, new MobData[] { aData })
+        public Spawner(int aSpawnZoneId, int aId, MobPathing aPathing, double aMinSpawnTime, double aMaxSpawnTime, MobData aData, SavedMobData aUnit) : this(aSpawnZoneId, aId, aPathing, aMinSpawnTime, aMaxSpawnTime, new MobData[] { aData })
         {
-            spawn = aUnit;
+            spawn = new NonFriendly(aPathing, aUnit);
         }
 
 
-        public Spawner(int aSpawnZoneId, int aId, MobPathing aPathing, double aMinSpawnTime, double aMaxSpawnTime, MobData[] aData, NonFriendly aUnit) : this(aSpawnZoneId, aId, aPathing, aMinSpawnTime, aMaxSpawnTime, aData)
+        public Spawner(int aSpawnZoneId, int aId, MobPathing aPathing, double aMinSpawnTime, double aMaxSpawnTime, MobData[] aData, SavedMobData aUnit) : this(aSpawnZoneId, aId, aPathing, aMinSpawnTime, aMaxSpawnTime, aData)
         {
-            spawn = aUnit;
+            spawn = new NonFriendly(aPathing, aUnit);
         }
 
         public Spawner(int aSpawnZoneId, int aId, MobPathing aPathing, double aMinSpawnTime, double aMaxSpawnTime, MobData aData) : this(aSpawnZoneId, aId, aPathing, aMinSpawnTime, aMaxSpawnTime, new MobData[] { aData }) { }
@@ -85,6 +85,8 @@ namespace Project_1.GameObjects.Spawners
 
             Spawn();
         }
+
+        public SavedMobData GetSavedMobData() => spawn.SavedMobData;
 
         void Spawn()
         {

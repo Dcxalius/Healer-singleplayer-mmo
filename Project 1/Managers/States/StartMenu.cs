@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Input;
+using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,6 +53,16 @@ namespace Project_1.Managers.States
         public override RenderTarget2D Draw()
         {
             GraphicsManager.ClearScreen(Color.White);
+            throw new NotImplementedException();
+        }
+
+        public override void PopUp(DialogueBox aBox)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void RemovePopUp(DialogueBox aBox)
+        {
             throw new NotImplementedException();
         }
     }

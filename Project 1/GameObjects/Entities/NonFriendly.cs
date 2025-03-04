@@ -28,6 +28,9 @@ namespace Project_1.GameObjects.Entities
         MobPathing pathing;
 
         AggroTable aggroTable;
+
+        public SavedMobData SavedMobData => UnitData as SavedMobData;
+
         public NonFriendly(MobPathing aPathing, SavedMobData aUnitData) : base(aUnitData)
         {
             aggroTable = new AggroTable(this);

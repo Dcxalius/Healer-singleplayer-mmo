@@ -4,6 +4,7 @@ using Project_1.Input;
 using Project_1.UI;
 using Project_1.UI.HUD;
 using Project_1.UI.OptionMenu;
+using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,6 +62,16 @@ namespace Project_1.Managers.States
             GraphicsManager.SetRenderTarget(null);
 
             return optionDraw;
+        }
+
+        public override void PopUp(DialogueBox aBox)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void RemovePopUp(DialogueBox aBox)
+        {
+            throw new NotImplementedException();
         }
     }
 }

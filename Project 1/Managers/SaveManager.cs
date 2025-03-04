@@ -43,5 +43,11 @@ namespace Project_1.Managers
         {
             return JsonConvert.DeserializeObject<T>(aJsonString, serializerSettings);
         }
+
+        public static string TrimToNameOnly(string aFile)
+        {
+            string fileOnly = aFile.Split('\\').Last();
+            return fileOnly.Split(".")[0];
+        }
     }
 }

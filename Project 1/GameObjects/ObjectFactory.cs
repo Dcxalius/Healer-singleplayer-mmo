@@ -16,7 +16,6 @@ namespace Project_1.GameObjects
 {
     internal static class ObjectFactory
     {
-        static Dictionary<string, UnitData> unitData;
         static PlayerData playerData;
         static List<UnitData> guildData;
         static Dictionary<string, MobData> mobData;
@@ -35,7 +34,6 @@ namespace Project_1.GameObjects
             ImportClassData();
             ImportPlayerData();
             ImportMobData();
-            ImportUnitData();
             ImportGuildData();
         }
 
@@ -50,18 +48,6 @@ namespace Project_1.GameObjects
             if (mobData.ContainsKey(aName))
             {
                 return mobData[aName];
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public static UnitData GetData(string aName)
-        {
-            if (unitData.ContainsKey(aName))
-            {
-                return unitData[aName];
             }
             else
             {
@@ -101,25 +87,7 @@ namespace Project_1.GameObjects
             }
         }
 
-        static void ImportUnitData()
-        {
-            unitData = new Dictionary<string, UnitData>();
-
-            string path = contentRootDirectory + "\\SaveData\\Units\\World";
-
-            string[] folders = System.IO.Directory.GetDirectories(path);
-
-            for (int i = 0; i < folders.Length; i++)
-            {
-                string[] files = System.IO.Directory.GetFiles(folders[i]);
-                for (int j = 0; j < files.Length; j++)
-                {
-                    string rawData = System.IO.File.ReadAllText(files[j]);
-                    UnitData data = JsonConvert.DeserializeObject<UnitData>(rawData);
-                    unitData.Add(data.Name, data);
-                }
-            }
-        }
+        
 
         static void ImportPlayerData()
         {
@@ -189,14 +157,8 @@ namespace Project_1.GameObjects
 
         public static void SaveData()
         {
-            UnitData[] dataArray = unitData.Values.ToArray();
 
             SaveManager.ExportData("Units\\" + playerData.Name + "Data.unit", playerData);
-            for (int i = 0; i < unitData.Count; i++)
-            {
-                //TODO: Handle Friendly/Aggresive npcs once they are implemented
-                SaveManager.ExportData("Units\\World\\Neutral\\" + dataArray[i].Name + ".unit", dataArray[i]);
-            }
 
             for (int i = 0; i < guildData.Count; i++)
             {

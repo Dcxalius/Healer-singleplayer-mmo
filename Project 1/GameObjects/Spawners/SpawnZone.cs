@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spawners.Pathing;
+using Project_1.GameObjects.Unit;
 using Project_1.Input;
 using System;
 using System.CodeDom;
@@ -21,7 +22,7 @@ namespace Project_1.GameObjects.Spawners
         [JsonProperty]
         int id;
 
-        [JsonProperty("MobNames")]
+        [JsonProperty("MobNames", Order = 1)]
         string[] MobName
         {
             get
@@ -33,9 +34,18 @@ namespace Project_1.GameObjects.Spawners
                 }
                 return names;
             }
+            set
+            {
+                mobData = new MobData[value.Length];
+                for (int i = 0; i < value.Length; i++)
+                {
+                    mobData[i] = ObjectFactory.GetMobData(value[i]);
+
+                }
+            }
         }
 
-        [JsonProperty("Pathing", TypeNameHandling = TypeNameHandling.Auto)] //TODO: Remove all of this and rely solely on json construction of spawners, do this after different spawn times have been implemented
+        [JsonProperty("Pathing", TypeNameHandling = TypeNameHandling.Auto, Order = 2)] //TODO: Remove all of this and rely solely on json construction of spawners, do this after different spawn times have been implemented
         MobPathing[] MobPathings
         {
             get
@@ -47,7 +57,18 @@ namespace Project_1.GameObjects.Spawners
                 }
                 return returnable;
             }
+            set
+            {
+                for (int i = 0; i < unitsToFindMatchFor.Count; i++)
+                {
+                    unitsToFindMatchFor.First(x => x.SpawnerID == i);
+                    spawners.Add(new Spawner(id, i, value[i], debugMinSpawnTimer, debugMaxSpawnTimer, mobData, unitsToFindMatchFor[i]));
+
+                }
+            }
         }
+
+
 
         MobData[] mobData;
 
@@ -75,23 +96,31 @@ namespace Project_1.GameObjects.Spawners
             }
         }
 
-        public SpawnZone(int aId, string[] aMobName, MobPathing[] aPathing, NonFriendly[] aUnits)
+        //public SpawnZone(int aId, string[] aMobName, MobPathing[] aPathing, NonFriendly[] aUnits)
+        //{
+        //    id = aId;
+        //    spawners = new List<Spawner>();
+
+        //    mobData = new MobData[aMobName.Length];
+        //    for (int i = 0; i < aMobName.Length; i++)
+        //    {
+        //        mobData[i] = ObjectFactory.GetMobData(aMobName[i]);
+
+        //    }
+
+        //    Debug.Assert(aPathing.Length >= aUnits.Length);
+        //    for (int i = 0; i < aPathing.Length; i++)
+        //    {
+        //        CreateSpawner(aPathing[i], aUnits[i]);
+        //    }
+        //}
+        List<SavedMobData> unitsToFindMatchFor;
+
+        public SpawnZone(int aId, SavedMobData[] aUnits)
         {
+            unitsToFindMatchFor = aUnits.ToList();
             id = aId;
             spawners = new List<Spawner>();
-
-            mobData = new MobData[aMobName.Length];
-            for (int i = 0; i < aMobName.Length; i++)
-            {
-                mobData[i] = ObjectFactory.GetMobData(aMobName[i]);
-
-            }
-
-            Debug.Assert(aPathing.Length >= aUnits.Length);
-            for (int i = 0; i < aPathing.Length; i++)
-            {
-                CreateSpawner(aPathing[i], aUnits[i]);
-            }
         }
 
         //public void AddMobToSpawn(MobData aData) => AddMobsToSpawn(new MobData[] { aData });
@@ -101,7 +130,7 @@ namespace Project_1.GameObjects.Spawners
         //    mobData
         //}
 
-        void CreateSpawner(MobPathing aPath, NonFriendly aUnit)
+        void CreateSpawner(MobPathing aPath, SavedMobData aUnit)
         {
             Spawner s = new Spawner(id, spawners.Count, aPath, debugMinSpawnTimer, debugMaxSpawnTimer, mobData, aUnit);
             spawners.Add(s);
@@ -141,6 +170,16 @@ namespace Project_1.GameObjects.Spawners
             {
                 spawners[i].RefreshPlates();
             }
+        }
+
+        public SavedMobData[] GetSavedMobData()
+        {
+            List<SavedMobData> savedMobData = new List<SavedMobData>();
+            for (int i = 0; i < spawners.Count; i++)
+            {
+                savedMobData.Add(spawners[i].GetSavedMobData());
+            }
+            return savedMobData.ToArray();
         }
 
         internal void Draw(SpriteBatch aBatch)

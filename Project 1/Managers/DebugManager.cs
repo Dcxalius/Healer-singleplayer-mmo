@@ -93,7 +93,7 @@ namespace Project_1.Managers
         {
             if (!KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugTestGear)) return;
             RelativeScreenPosition dialogueBoxSize = new RelativeScreenPosition(0.2f);
-            DialogueBox testDialogueBox = new DialogueBox("Hello Cheater!\n\nxdd", Color.White, DialogueBox.PausesGame.Pauses, null, new UITexture(new GfxPath(GfxType.UI, "GrayBackground"), Color.White), new RelativeScreenPosition(0.5f) - dialogueBoxSize / 2, dialogueBoxSize, "Close");
+            DialogueBox testDialogueBox = new DialogueBox("Hello Cheater!\n\nxdd", Color.White, DialogueBox.LocationOfPopUp.HUDManager,DialogueBox.PausesGame.Pauses, null, new UITexture(new GfxPath(GfxType.UI, "GrayBackground"), Color.White), new RelativeScreenPosition(0.5f) - dialogueBoxSize / 2, dialogueBoxSize, "Close");
 
             HUDManager.AddDialogueBox(testDialogueBox);
             

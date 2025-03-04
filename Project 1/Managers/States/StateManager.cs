@@ -13,6 +13,7 @@ using Project_1.Particles;
 using Project_1.UI;
 using Project_1.UI.OptionMenu;
 using Project_1.UI.PauseMenu;
+using Project_1.UI.UIElements.Boxes;
 
 namespace Project_1.Managers.States
 {
@@ -64,6 +65,9 @@ namespace Project_1.Managers.States
             currentState.Update();
         }
 
+        public static void PopUp(DialogueBox aDialogueBox) => currentState.PopUp(aDialogueBox);
+        public static void RemovePopUp(DialogueBox aDialogueBox) => currentState.RemovePopUp(aDialogueBox);
+
         public static void SetState(States aState)
         {
             currentState.OnLeave();
@@ -88,6 +92,11 @@ namespace Project_1.Managers.States
                     throw new NotImplementedException();
             }
             currentState.OnEnter();
+        }
+
+        public static void RedrawGame()
+        {
+            finalGameFrame = game.Draw();
         }
 
         public static bool Click(ClickEvent aClick) => currentState.Click(aClick);

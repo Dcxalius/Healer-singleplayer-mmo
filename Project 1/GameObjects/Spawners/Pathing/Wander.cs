@@ -38,9 +38,11 @@ namespace Project_1.GameObjects.Spawners.Pathing
         [JsonProperty("Boundry")]
         Rectangle boundry;
 
-        public Wander(Rectangle aBoundry)
+
+        [JsonConstructor]
+        public Wander(Rectangle boundry)
         {
-            boundry = aBoundry;
+            this.boundry = boundry;
         }
 
         public override WorldSpace NewSpawn(WorldSpace aSize)

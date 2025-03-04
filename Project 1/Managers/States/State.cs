@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Project_1.Input;
+using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,9 @@ namespace Project_1.Managers.States
         public abstract void OnLeave();
 
         public abstract void Rescale();
+
+        public abstract void PopUp(DialogueBox aBox);
+        public abstract void RemovePopUp(DialogueBox aBox);
 
         public abstract bool Click(ClickEvent aClickEvent);
         public abstract bool Release(ReleaseEvent aReleaseEvent);

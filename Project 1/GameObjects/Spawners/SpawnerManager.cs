@@ -5,10 +5,13 @@ using Newtonsoft.Json;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spawners.Pathing;
+using Project_1.GameObjects.Unit;
 using Project_1.Input;
 using Project_1.Managers;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
@@ -18,34 +21,65 @@ namespace Project_1.GameObjects.Spawners
     {
         static List<SpawnZone> spawnZones;
 
-
+        static Dictionary<string, int> savedMobNames;
 
         public static void Init(ContentManager aContentManager)
         {
+            savedMobNames = new Dictionary<string, int>();
             spawnZones = new List<SpawnZone>();
-            ImportZones(aContentManager);
-
-            //DEBUG
-
-            //CreateNewSpawnZone(new string[] { "Sheep" });
-            //spawnZones[0].CreateSpawner(new Patrol(new WorldSpace[] { new WorldSpace(50, 50), new WorldSpace(50, 150), new WorldSpace(150, 150), new WorldSpace(150, 50) }, Patrol.PatrolType.Circular, new WorldSpace(32, 16)));
-            //spawnZones[0].CreateSpawner(new Bound(new WorldSpace(150, 150), 100));
-            //spawnZones[0].CreateSpawner(new Wander(new Rectangle(new Point(500, 200), new Point(1000, 1000))));
+            SavedMobData[] unitData = ImportUnitData(aContentManager);
+            ImportZones(aContentManager, unitData);
         }
 
-        static void ImportZones(ContentManager aContentManager)
+        static void ImportZones(ContentManager aContentManager, SavedMobData[] aUnitData)
         {
-            //string path = aContentManager.RootDirectory + "\\SaveData\\World\\SpawnZones";
+            string path = aContentManager.RootDirectory + "\\SaveData\\World\\SpawnZones";
 
-            //string[] files = System.IO.Directory.GetFiles(path);
-            //for (int i = 0; i < files.Length; i++)
-            //{
-            //    string lines = System.IO.File.ReadAllText(files[i]);
+            string[] files = System.IO.Directory.GetFiles(path);
+            SavedMobData[] x = aUnitData.Distinct(new SpawnZoneComparer()).ToArray();
+            int[] spawnZonesWithMobs = new int[x.Count()];
+            for (int i = 0; i < spawnZonesWithMobs.Length; i++)
+            {
+                spawnZonesWithMobs[i] = x[i].SpawnZoneID;
+            }
+            //TODO: Make sure files are sorted
+            for (int i = 0; i < files.Length; i++)
+            {
+                string lines = System.IO.File.ReadAllText(files[i]);
 
-            //    string rawData = lines;
-            //    spawnZones.Add(SaveManager.ImportData<SpawnZone>(rawData));
-            //}
+                string rawData = lines;
 
+                if (Array.IndexOf(spawnZonesWithMobs, int.Parse(SaveManager.TrimToNameOnly(files[i]))) == -1)
+                {
+                    spawnZones.Add(SaveManager.ImportData<SpawnZone>(rawData));
+                    continue;
+                }
+
+                spawnZones.Add(new SpawnZone(i, aUnitData.Where(x => x.SpawnZoneID == i).ToArray()));
+                JsonSerializerSettings settings = new JsonSerializerSettings() {  ObjectCreationHandling = ObjectCreationHandling.Replace, TypeNameHandling = TypeNameHandling.Auto};
+                JsonConvert.PopulateObject(rawData, spawnZones.Last(), settings);
+            }
+
+        }
+
+        class SpawnZoneComparer : IComparer<SavedMobData>, IEqualityComparer<SavedMobData>
+        {
+            public int Compare(SavedMobData x, SavedMobData y)
+            {
+                if (x.SpawnZoneID < y.SpawnZoneID) return -1;
+                if (x.SpawnZoneID > y.SpawnZoneID) return 1;
+                return 0;
+            }
+
+            public bool Equals(SavedMobData x, SavedMobData y)
+            {
+                return x.SpawnZoneID == y.SpawnZoneID;
+            }
+
+            public int GetHashCode([DisallowNull] SavedMobData obj)
+            {
+                return obj.SpawnZoneID.GetHashCode();
+            }
         }
 
         internal static void Update()
@@ -62,6 +96,48 @@ namespace Project_1.GameObjects.Spawners
             {
                 SaveManager.ExportData("World\\SpawnZones\\" + i + ".spawn", spawnZones[i]);
             }
+
+            savedMobNames.Clear();
+            for (int i = 0; i < spawnZones.Count; i++)
+            {
+                SavedMobData[] savedMobData = spawnZones[i].GetSavedMobData();
+                for (int j = 0; j < savedMobData.Length; j++)
+                {
+                    int nrOfCopies = 0;
+                    string name = savedMobData[j].Name;
+
+                    if (savedMobNames.ContainsKey(name))
+                    {
+                        nrOfCopies = savedMobNames[name]++;
+                    }
+                    else
+                    {
+                        savedMobNames.Add(name, 1);
+                    }
+                    SaveManager.ExportData("Units\\World\\Neutral\\" + name + nrOfCopies + ".unit", savedMobData[j]);
+                }
+            }
+        }
+
+        static SavedMobData[] ImportUnitData(ContentManager aContentManager)
+        {
+            List<SavedMobData> unitData = new List<SavedMobData>();
+
+            string path = aContentManager.RootDirectory + "\\SaveData\\Units\\World";
+
+            string[] folders = System.IO.Directory.GetDirectories(path);
+
+            for (int i = 0; i < folders.Length; i++)
+            {
+                string[] files = System.IO.Directory.GetFiles(folders[i]);
+                for (int j = 0; j < files.Length; j++)
+                {
+                    string rawData = System.IO.File.ReadAllText(files[j]);
+                    SavedMobData data = JsonConvert.DeserializeObject<SavedMobData>(rawData);
+                    unitData.Add(data);
+                }
+            }
+            return unitData.ToArray();
         }
 
         public static void CreateNewSpawnZone(string[] aMobNames)

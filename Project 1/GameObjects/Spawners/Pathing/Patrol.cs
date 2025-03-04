@@ -47,6 +47,15 @@ namespace Project_1.GameObjects.Spawners.Pathing
         [JsonIgnore]
         public override WorldSpace GetLatestSpace => route[CurrentIndex];
 
+        [JsonConstructor]
+        Patrol(WorldSpace[] route, int nextIndex, PatrolType type, bool hasBounced)
+        {
+            
+            this.route = route;
+            this.nextIndex = 1;
+            this.type = type;
+            this.hasBounced = hasBounced;
+        }
 
         public Patrol(WorldSpace[] aQueue, PatrolType aType, WorldSpace aUnitSize)
         {
@@ -55,7 +64,7 @@ namespace Project_1.GameObjects.Spawners.Pathing
                 Tile t = TileManager.GetTileUnder(aQueue[i]);
                 if (t.Walkable) continue;
 
-                TileManager.FindClosestWalkableWorldSpace(aQueue[i], aUnitSize);
+                aQueue[i] = TileManager.FindClosestWalkableWorldSpace(aQueue[i], aUnitSize);
             }
             type = aType;
             nextIndex = 1; //Make it take the closest one as first index??

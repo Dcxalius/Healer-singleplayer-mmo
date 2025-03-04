@@ -71,6 +71,7 @@ namespace Project_1.GameObjects
                 guild[i].Delete();
             }
             HUDManager.ClearParty();
+            entities.Clear();
             guild.Clear();
             guild.AddRange(ObjectFactory.GetGuildMemebers());
             if(player != null) player.Delete();

@@ -37,6 +37,8 @@ namespace Project_1.GameObjects.Entities.Players
         public bool LockedMovement => lockedMovement;
         bool lockedMovement = false;
 
+        public bool InCombatOrPartyInCombat => party.IsInCombat || InCombat;
+
         public Player() : base(ObjectFactory.GetPlayerData())
         {
             HUDManager.SetInventory(Inventory);
