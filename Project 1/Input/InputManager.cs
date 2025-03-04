@@ -210,12 +210,12 @@ namespace Project_1.Input
             StateManager.Scroll(scrollEvent);
         }
 
-        static bool[] CheckHoldModifiers()
+        public static bool[] CheckHoldModifiers()
         {
             bool[] heldModifiers = new bool[(int)HoldModifier.Count];
-            heldModifiers[(int)HoldModifier.Shift] = GetHold(Keys.LeftShift) || GetHold(Keys.RightShift);
+            heldModifiers[(int)HoldModifier.Ctrl] = GetHold(Keys.LeftControl) || GetHold(Keys.RightControl);
             heldModifiers[(int)HoldModifier.Alt] = GetHold(Keys.LeftAlt) || GetHold(Keys.RightAlt);
-            heldModifiers[(int)HoldModifier.Ctrl] = GetHold(Keys.LeftControl) || GetHold(Keys.RightAlt);
+            heldModifiers[(int)HoldModifier.Shift] = GetHold(Keys.LeftShift) || GetHold(Keys.RightShift);
             return heldModifiers;
         }
 

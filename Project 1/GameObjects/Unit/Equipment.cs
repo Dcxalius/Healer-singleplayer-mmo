@@ -105,7 +105,7 @@ namespace Project_1.GameObjects.Unit
             equipmentStats = new EquipmentStats(totalStats, armor);
         }
 
-        static public Slot SlotToSlot(Items.SubTypes.Equipment.Type aType) //TODO: FIX SHITE NAME
+        static public Slot EquipmentTypeToSlot(Items.SubTypes.Equipment.Type aType)
         {
             switch (aType)
             {

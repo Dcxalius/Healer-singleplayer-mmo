@@ -39,6 +39,16 @@ namespace Project_1.Input
          Keys.None, Keys.None,Keys.None, Keys.None,
          Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None};
 
+        readonly static KeySet[] xddFirstButtons = new KeySet[(int)KeyListner.Count];
+        readonly static KeySet[] xddSecondButtons = new KeySet[(int)KeyListner.Count];
+
+        readonly static KeySet[] defaultXddFirstKeys = new KeySet[(int)KeyListner.Count] //TODO: FINISH THIS
+        {
+         Keys.W, Keys.A, Keys.S, Keys.D,
+         Keys.Q, Keys.NumPad0, Keys.NumPad1, Keys.Delete, Keys.NumPad2,
+         Keys.I, Keys.T, Keys.C, Keys.G,
+         Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9, Keys.D0};
+
         static string rootDir;
 
         public static void Init(ContentManager aContentManager)
@@ -52,10 +62,10 @@ namespace Project_1.Input
         {
             try
             {
-                string dataAsString = System.IO.File.ReadAllText(rootDir + "\\Data\\Keybinds.json");
+                string dataAsString = File.ReadAllText(rootDir + "\\Data\\Keybinds.json");
 
                 Keys[] importedBinds = JsonConvert.DeserializeObject<Keys[]>(dataAsString);
-                Debug.Assert(importedBinds.Length != (int)KeyListner.Count);
+                Debug.Assert(importedBinds.Length == (int)KeyListner.Count * 2);
                 for (int i = 0; i < (int)KeyListner.Count; i++)
                 {
                     firstButtons[i] = importedBinds[i];

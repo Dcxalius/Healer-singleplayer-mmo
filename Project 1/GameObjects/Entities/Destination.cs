@@ -149,12 +149,12 @@ namespace Project_1.GameObjects.Entities
         void UpdateDirection(WorldSpace aDestination)
         {
             WorldSpace dirV = aDestination - owner.FeetPosition;
-            if (dirV.X == 0 && dirV.Y == 0)
+            if (!(dirV.X == 0 && dirV.Y == 0))
             {
-                //TODO: Bugfix, if the destination is the same as feetposition it will teleport the entity to Infinity
+                lengthTo = dirV.ToVector2().Length();
+                dirV.Normalize();
             }
-            lengthTo = dirV.ToVector2().Length();
-            dirV.Normalize();
+            
             directionToWalk = dirV;
         }
 

@@ -614,7 +614,7 @@ namespace Project_1.Items
 
             if (equipment.type <= Equipment.Type.Feet || equipment.type >= Equipment.Type.MainHander)
             {
-                if (GameObjects.Unit.Equipment.SlotToSlot(equipment.type) != (GameObjects.Unit.Equipment.Slot)aEquipmentSlot) return;
+                if (GameObjects.Unit.Equipment.EquipmentTypeToSlot(equipment.type) != (GameObjects.Unit.Equipment.Slot)aEquipmentSlot) return;
                 Equip(aIndex, aFriendly);
                 return;
             }

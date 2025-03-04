@@ -375,43 +375,74 @@ namespace Project_1.GameObjects.Entities
             return true;
         }
 
-        public virtual void TakeDamage(Entity aAttacker, float aDamageTaken)
-        {
-            float damageAfterArmor = (1f - unitData.BaseStats.TotalArmor.GetGetReductionPercentage(aAttacker.CurrentLevel)) * aDamageTaken; //TODO: Check if this gives right values
-            unitData.Health.CurrentHealth -= damageAfterArmor;
-            WorldSpace dirOfFlyingStuff = (FeetPosition - aAttacker.FeetPosition);
-            dirOfFlyingStuff.Normalize();
-            FloatingText floatingText = new FloatingText(damageAfterArmor.ToString(), Color.Red, FeetPosition, dirOfFlyingStuff); //TODO: Change to handle attacker and this being in the same place
-            ObjectManager.SpawnFloatingText(floatingText);
-
-
-            ParticleMovement bloodMovement = new ParticleMovement(dirOfFlyingStuff, WorldSpace.Zero, 0.9f);
-            //DebugManager.Print(GetType(), ((aDamageTaken / MaxHealth) * 100).ToString());
-            ParticleManager.SpawnParticle(bloodsplatter, WorldRectangle, this, bloodMovement, (int)Math.Max(1, (aDamageTaken / MaxHealth) * 100));
-            FlagForRefresh(); //TODO: Check death here?
-        }
-
         public virtual bool TakeHealing(Entity aHealer, float aHealingTaken)
         {
-            float value = aHealingTaken;
-
             if (FullHealth) return false;
+
+            float value = CalculateHealing(aHealingTaken);
+            for (int i = 0; i < aggroTablesIAmOn.Count; i++)
+            {
+                aggroTablesIAmOn[i].AddToAggroTable(aHealer, value);
+            }
+
+            WorldSpace dir = GetDirOfFloatingText(aHealer.FeetPosition);
+            
+            SpawnFlyingText(aHealingTaken, dir, Color.White);//TODO: Change color to green once text border has been implemented
+            FlagForRefresh();
+            return true;
+        }
+
+        float CalculateHealing(float aHealingTaken)
+        {
+            float value = aHealingTaken;
             if (CurrentHealth + value > MaxHealth) value = MaxHealth - CurrentHealth;
 
             int beforeHealingTaken = (int)Math.Round(unitData.Health.CurrentHealth);
             unitData.Health.CurrentHealth += value;
             int afterHealingTaken = (int)Math.Round(unitData.Health.CurrentHealth);
-            WorldSpace ws = (FeetPosition - aHealer.FeetPosition);
-            ws.Normalize();
-            FloatingText floatingText = new FloatingText((beforeHealingTaken - afterHealingTaken).ToString(), Color.White, FeetPosition, ws); //TODO: Change color to green once text border has been implemented ALSO Change to handle attacker and this being in the same place
-            ObjectManager.SpawnFloatingText(floatingText);
-            for (int i = 0; i < aggroTablesIAmOn.Count; i++)
-            {
-                aggroTablesIAmOn[i].AddToAggroTable(aHealer, value);
-            }
-            FlagForRefresh();
-            return true;
+
+            return beforeHealingTaken - afterHealingTaken;
         }
+
+        public virtual void TakeDamage(Entity aAttacker, float aDamageTaken)
+        {
+            float damageTaken = CalculateDamage(aAttacker, aDamageTaken);
+            WorldSpace dir = GetDirOfFloatingText(aAttacker.FeetPosition);
+            SpawnFlyingText(damageTaken, dir, Color.Red);
+
+            ParticleMovement bloodMovement = new ParticleMovement(dir, WorldSpace.Zero, 0.9f);
+            ParticleManager.SpawnParticle(bloodsplatter, WorldRectangle, this, bloodMovement, (int)Math.Max(1, (damageTaken / MaxHealth) * 100));
+            FlagForRefresh(); //TODO: Check death here?
+        }
+
+        void SpawnFlyingText(float aHealthChangeValue, WorldSpace aDirOfFlyingStuff, Color aTextColor)
+        {
+            FloatingText floatingText = new FloatingText(aHealthChangeValue.ToString(), aTextColor, FeetPosition, aDirOfFlyingStuff);
+            ObjectManager.SpawnFloatingText(floatingText);
+
+        }
+
+        float CalculateDamage(Entity aAttacker, float aDamageTaken)
+        {
+            float damageAfterArmor = (1f - unitData.BaseStats.TotalArmor.GetGetReductionPercentage(aAttacker.CurrentLevel)) * aDamageTaken; //TODO: Check if this gives right values
+            float healthBeforeHit = unitData.Health.CurrentHealth;
+            unitData.Health.CurrentHealth -= damageAfterArmor;
+            float healthAfterHit = unitData.Health.CurrentHealth;
+            float damageVisiblyTaken = MathF.Round(healthBeforeHit - healthAfterHit, 1);
+            return damageVisiblyTaken;
+        }
+
+        WorldSpace GetDirOfFloatingText(WorldSpace aFeetPosOfTriggerer)
+        {
+            WorldSpace dirOfFlyingStuff = (FeetPosition - aFeetPosOfTriggerer);
+            if (dirOfFlyingStuff == WorldSpace.Zero)
+            {
+                dirOfFlyingStuff.Y = 1;
+            }
+            return dirOfFlyingStuff;
+        }
+
+        
 
         public abstract void ExpToParty(int aExpAmount);
 
