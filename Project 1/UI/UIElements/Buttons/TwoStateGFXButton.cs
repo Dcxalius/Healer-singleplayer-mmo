@@ -48,9 +48,9 @@ namespace Project_1.UI.UIElements.Buttons
             secondStateActions = aSecondActions;
         }
 
-        public override void Update(in UIElement aParent)
+        public override void Update()
         {
-            base.Update(aParent);
+            base.Update();
 
             gfxRectangle = ConstructGfxRect();
         }

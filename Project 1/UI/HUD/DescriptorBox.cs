@@ -72,9 +72,9 @@ namespace Project_1.UI.HUD
             return;
         }
 
-        public override void Update(in UIElement aParent)
+        public override void Update()
         {
-            base.Update(aParent);
+            base.Update();
 
         }
 

@@ -41,13 +41,6 @@ namespace Project_1.UI.HUD.PlateBoxes
             AddSegmentsToChildren();
         }
 
-        public override void Update(in UIElement aParent)
-        {
-            base.Update(aParent);
-
-            //if (ObjectManager.Player.Target == null) { return; }
-            //if (ObjectManager.Player.Target.CurrentHealth <= 0) { SetEntity(); }
-        }
 
         public override void Refresh(Entity aEntity)
         {

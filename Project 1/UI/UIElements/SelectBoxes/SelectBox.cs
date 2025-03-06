@@ -33,15 +33,15 @@ namespace Project_1.UI.UIElements.SelectBoxes
             selectedValue = aStartDisplayValue;
         }
 
-        public override void Update(in UIElement aParent)
+        public override void Update()
         {
-            base.Update(aParent);
+            base.Update();
 
-            displayValue.Update(this);
+            displayValue.Update();
 
             foreach (var value in values)
             {
-                value.Update(this);
+                value.Update();
             }
         }
 

@@ -31,9 +31,9 @@ namespace Project_1.UI.UIElements.Bars
             remainingCast = new Text("Gloryse", Color.Wheat);
         }
 
-        public override void Update(in UIElement aParent)
+        public override void Update()
         {
-            base.Update(aParent);
+            base.Update();
         }
 
         public void CancelCast()

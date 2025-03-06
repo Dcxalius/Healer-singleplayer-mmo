@@ -23,9 +23,9 @@ namespace Project_1.UI.UIElements
             
         }
 
-        public override void Update(in UIElement aParent)
+        public override void Update()
         {
-            base.Update(aParent);
+            base.Update();
 
             xdd.Value = Math.Round(Duration / 1000, 1).ToString();
         }

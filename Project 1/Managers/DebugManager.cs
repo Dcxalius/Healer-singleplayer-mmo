@@ -53,7 +53,7 @@ namespace Project_1.Managers
             modes[(int)DebugMode.TileCoords] = false;
             modes[(int)DebugMode.InvCheats] = true;
             modes[(int)DebugMode.Teleport] = true;
-            modes[(int)DebugMode.InstantlyLoadSave1] = false;
+            modes[(int)DebugMode.InstantlyLoadSave1] = true;
             modes[(int)DebugMode.Console] = false;
 
             if (modes[(int)DebugMode.Console]) AllocConsole();

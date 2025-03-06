@@ -145,22 +145,22 @@ namespace Project_1.UI.HUD
         {
             foreach (KeyValuePair<Entity, NamePlate> namePlate in namePlates)
             {
-                namePlate.Value.Update(null);
+                namePlate.Value.Update();
             }
 
             for (int i = 0; i < plateBoxes.Count; i++)
             {
-                plateBoxes[i].Update(null);
+                plateBoxes[i].Update();
             }
 
             for (int i = 0; i < hudElements.Count; i++)
             {
-                hudElements[i].Update(null);
+                hudElements[i].Update();
             }
 
             for (int i = 0; i < dialogueBoxes.Count; i++)
             {
-                dialogueBoxes[i].Update(null);
+                dialogueBoxes[i].Update();
             }
         }
 

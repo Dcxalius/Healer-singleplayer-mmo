@@ -42,9 +42,9 @@ namespace Project_1.UI.UIElements.SpellBook
             gfx = new UITexture(Spell.GetGfxPath(aSpell), Color.White);
         }
 
-        public override void Update(in UIElement aParent)
+        public override void Update()
         {
-            base.Update(aParent);
+            base.Update();
 
             if (spellData == null) return;
 

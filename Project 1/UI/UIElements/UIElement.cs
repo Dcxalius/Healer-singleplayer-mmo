@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms.Design;
 using System.Xml.Serialization;
 
 namespace Project_1.UI.UIElements
@@ -52,22 +53,22 @@ namespace Project_1.UI.UIElements
         public RelativeScreenPosition RelativePos => relativePos;
         public RelativeScreenPosition RelativeSize => relativeSize;
 
-        public RelativeScreenPosition RelativePositionOnScreen => relativePos + parentPos.ToRelativeScreenPosition();
+        public RelativeScreenPosition RelativePositionOnScreen => relativePos + ParentPos.ToRelativeScreenPosition();
 
         public Rectangle AbsolutePos
         {
             get
             {
                 Rectangle tempRec = Rectangle.Empty;
-                tempRec.Location = absolutePos.ToPoint();
+                tempRec.Location = pos.Location + ParentPos;
                 tempRec.Size = Size.ToPoint();
                 return tempRec;
             }
         }
 
-        public AbsoluteScreenPosition Location => absolutePos;
+        public AbsoluteScreenPosition Location => AbsolutePosition;
 
-        AbsoluteScreenPosition absolutePos;
+        AbsoluteScreenPosition AbsolutePosition => new AbsoluteScreenPosition(pos.Location) + ParentPos;
         
         RelativeScreenPosition relativePos; //TODO: Change this so 1, 1 refers to parents bottom right instead of screen bottom right + parent top left
         RelativeScreenPosition relativeSize; 
@@ -86,13 +87,16 @@ namespace Project_1.UI.UIElements
 
 
         #region Parentage
-        protected AbsoluteScreenPosition parentPos;
+        protected UIElement parent;
+        protected AbsoluteScreenPosition ParentPos => parent == null ? AbsoluteScreenPosition.Zero : parent.AbsolutePosition;
+
         List<UIElement> children = new List<UIElement>();
         protected int ChildCount => children.Count;
 
         protected void KillAllChildren() => children.Clear();
         protected void KillChild(int aIndex) => children.RemoveAt(aIndex);
         protected UIElement GetChild(int aIndex) => children[aIndex];
+        protected void SetParent(UIElement aParent) => parent = aParent;
 
         #endregion
 
@@ -105,29 +109,19 @@ namespace Project_1.UI.UIElements
             relativeSize = aSize;
 
             pos = RelativeScreenPosition.TransformToAbsoluteRect(aPos, aSize);
-            absolutePos = new AbsoluteScreenPosition(pos.Location);
             capturesClick = true;
             capturesScroll = false;
             capturesRelease = true;
         }
 
-        public virtual void Update(in UIElement aParent)
+        public virtual void Update()
         {
             HoldUpdate();
 
-            if (aParent != null) //TODO: Make this less ugly
-            {
-                parentPos = aParent.absolutePos;
-                absolutePos = aParent.absolutePos + new AbsoluteScreenPosition(pos.Location);
-            }
-            else
-            {
-                absolutePos = new AbsoluteScreenPosition(pos.Location);
-            }
             foreach (UIElement child in children)
             {
                
-                child.Update(this);
+                child.Update();
             }
 
 
@@ -139,6 +133,7 @@ namespace Project_1.UI.UIElements
         protected void AddChild(UIElement aUIElement)
         {
             aUIElement.Visible = Visible;
+            aUIElement.parent = this;
             children.Add(aUIElement);
         }
 
@@ -146,6 +141,7 @@ namespace Project_1.UI.UIElements
         {
             for (int i = 0; i < aUIElement.Length; i++)
             {
+                aUIElement[i].parent = this;
                 AddChild(aUIElement[i]);
             }
         }
@@ -154,6 +150,7 @@ namespace Project_1.UI.UIElements
         {
             for (int i = 0; i < aUIElement.Count; i++)
             {
+                aUIElement[i].parent = this;
                 AddChild(aUIElement[i]);
             }
         }
@@ -198,7 +195,6 @@ namespace Project_1.UI.UIElements
         public virtual void Rescale()
         {
             pos = RelativeScreenPosition.TransformToAbsoluteRect(relativePos, relativeSize);
-            absolutePos = parentPos + new AbsoluteScreenPosition(pos.Location);
 
             for (int i = 0; i < children.Count; i++)
             {
@@ -211,11 +207,6 @@ namespace Project_1.UI.UIElements
             if (aNewPos.X == float.NaN || aNewPos.Y == float.NaN) throw new ArgumentException("Invalid move.");
             relativePos = aNewPos;
             pos.Location = TransformFromRelativeToPoint(aNewPos);
-            absolutePos = new AbsoluteScreenPosition(pos.Location) + parentPos;
-            for (int i = 0; i < children.Count; i++)
-            {
-                children[i].parentPos = absolutePos;//TODO: Expand on this
-            }
         }
 
         public void Resize(RelativeScreenPosition aSize)

@@ -27,6 +27,7 @@ namespace Project_1.Managers.States
             PausedGame,
             PauseMenu,
             OptionMenu,
+            LoadingMenu,
             NewGame
         }
 
@@ -37,6 +38,7 @@ namespace Project_1.Managers.States
         static PausedGame pausedGame;
         static PauseMenu pauseMenu;
         static OptionMenu optionMenu;
+        static LoadingMenu loadingMenu;
 
         static SpriteBatch finalBatch;
 
@@ -60,6 +62,7 @@ namespace Project_1.Managers.States
             pausedGame = new PausedGame();
             pauseMenu = new PauseMenu();
             optionMenu = new OptionMenu();
+            loadingMenu = new LoadingMenu();
 
 
 
@@ -94,6 +97,9 @@ namespace Project_1.Managers.States
                     break;
                 case States.PausedGame:
                     currentState = pausedGame;
+                    break;
+                case States.LoadingMenu:
+                    currentState = loadingMenu;
                     break;
                 default:
                     throw new NotImplementedException();

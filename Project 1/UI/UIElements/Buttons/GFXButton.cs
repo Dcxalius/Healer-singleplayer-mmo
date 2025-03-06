@@ -31,9 +31,9 @@ namespace Project_1.UI.UIElements.Buttons
             gfxOnButton = new UITexture(aPath, Color.White);
         }
 
-        public override void Update(in UIElement aParent)
+        public override void Update()
         {
-            base.Update(aParent);
+            base.Update();
 
             gfxRectangle = ConstructGfxRect();
 

@@ -24,7 +24,7 @@ namespace Project_1.Managers.States
 
         public override void Update()
         {
-            mainMenu.Update(null);
+            mainMenu.Update();
         }
 
         public override void Rescale()
@@ -59,10 +59,10 @@ namespace Project_1.Managers.States
         public override RenderTarget2D Draw()
         {
             PrepRender(Color.White);
-            spriteBatch.Begin();
+
             mainMenu.Draw(spriteBatch);
-            spriteBatch.End();
-            GraphicsManager.SetRenderTarget(null);
+
+            CleanRender();
 
             return renderTarget;
         }

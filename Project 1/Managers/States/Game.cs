@@ -72,17 +72,12 @@ namespace Project_1.Managers.States
         public override RenderTarget2D Draw()
         {
             UIDraw();
-            GraphicsManager.SetRenderTarget(renderTarget);
-            spriteBatch.Begin(SpriteSortMode.FrontToBack);
-            GraphicsManager.ClearScreen(Color.White);
-
+            PrepRender(Color.White);
 
             DrawList(spriteBatch);
             spriteBatch.Draw(uITarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
 
-
-            spriteBatch.End();
-            GraphicsManager.SetRenderTarget(null);
+            CleanRender();
             return renderTarget;
         }
 

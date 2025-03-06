@@ -91,12 +91,12 @@ namespace Project_1.UI.OptionMenu
         {
             for (int i = 0; i < optionScreenPermanents.Count; i++)
             {
-                optionScreenPermanents[i].Update(null);
+                optionScreenPermanents[i].Update();
             }
 
             for (int i = 0; i < optionElements[(int)currentScreen].Count ; i++)
             {
-                optionElements[(int)currentScreen][i].Update(null);
+                optionElements[(int)currentScreen][i].Update();
             }
         }
 

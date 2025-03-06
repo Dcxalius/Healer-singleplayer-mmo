@@ -107,9 +107,9 @@ namespace Project_1.UI.HUD
             AddChildren(loot);
         }
 
-        public override void Update(in UIElement aParent)
+        public override void Update()
         {
-            base.Update(aParent);
+            base.Update();
 
             CheckIfShouldClose();
         }

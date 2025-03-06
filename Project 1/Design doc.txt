@@ -30,34 +30,11 @@ Controls
 	The player can press {tab} to cycle through targets based on distance from player character
 		also {ALT + Tab} to cycle through friendly targets
 
-	The player can change the game through an options menu
-		Gameplay
-			Autosave
-			[Configure an auto sell, if upgrade is gotten]
-
-		Audio
-		Video
-			Screen resolution
-			Fullscreen
-			[Particle amount]
-				[Can set to a range from 0% to 200%]
-
-		Keybindings
-			The player can through this menu change all of the keybinds
-
-		UI
-			The player can change their UI settings
-			Incease/Decrease the size of all UI elements
-			Increse/Decrease the size of individual UI Elements
-			Change the positioning of most UI Elements
-			Enable/Disable certain UI Elements
-				Target of target
-				Floating names
-				Floating healthbars
+	The player can select their party members through {f1-f5}
+		In raid these can be set to prio targets
 
 	The player can save their game
 		The player can later load this save
-		[Decide when/where/how you can save]
 
 	The plater can talk to NPC and sell/buy, accept quests
 		Quests will have a questie/cata style map bubble that will guide you to where you need to go next for the quest.
@@ -68,6 +45,10 @@ Controls
 
 	The player can press {T} to open their spellbook and from there drag the spells to a spellbar slot to cast it
 		[Make it castable from book] 
+
+	[Hunters book]
+		Tracks what mobs drop what and how often
+			[Keeps track of what exacly has dropped until either all normal loot has been found or a certain number of kills]
 
 	[The player can press {} to see a list of notable npc and their [[assumed]] location]
 
@@ -129,16 +110,16 @@ World
  	Religion
  		12 gods
  			Creation
- 			Isolation/Self
+ 			Isolation/Self focus
  			Community
- 			Youth/Freshness/Growth
+ 			Youth/Freshness/Growth Spring
  			[Construction]
  			Sun/Moon/Fire
  			Ocean/Water/Life
  			Land
  			Creativity
  			Inspiration
- 			---
+ 			???
  			Envy
 
 
@@ -198,10 +179,11 @@ Character
 
 			Intellect
 				Gives 15 mana if the class has mana
-				Gives crit
+				Gives casters crit 
+				[Gives melee crit aswell?]
 			Spirit
-				Increases health regen
-				Increases mana regen
+				Increases health regen depending on class
+				Increases mana regen depending on class
 
 			Stamina
 				Gives 10 health
@@ -225,63 +207,157 @@ Character
 				School dependant
 					An item can have + holy for example
 
-		Gear
-			Weapons
-				Has an attack value range
-				Has at least one damage type
-					If it has multiple types the weapon will have one seperate range for each type
-					Physical
-					Magical
-						One for each school of magic
-				Has an attack range
-				Has an attack speed
-				Has a hands required
-					Main hand/Off hand/One hand/Two hand [yes shields are technically weapons, dont believe me? hit urself with a plank xdd]
+	Gear
+		Weapons
+			Has an attack value range
+			Has at least one damage type
+				If it has multiple types the weapon will have one seperate range for each type
+				Physical
+				Magical
+					One for each school of magic
+			Has an attack range
+			Has an attack speed
+			Has a hands required
+				Main hand/Off hand/One hand/Two hand [yes shields are technically weapons, dont believe me? hit urself with a plank xdd]
 
-				Melee
-					Strength based
-					Agility based
-				Ranged
-					Agility based
-					Int based
-						Free to cast
-						Only magic based damage
+			Melee
+				Strength based
+				Agility based
+			Ranged
+				Agility based
+				Int based
+					Free to cast
+					Only magic based damage
 
 
-			Armor
-				Head
-				Neck
-				Shoulders
-				Back
-				Chest
-				Wrist
-				Hand
-				Waist
-				Legs
-				Boots
-				2 Fingers
-				2 Trinket slots
+		Armor
+			Head
+			Neck
+			Shoulders
+			Back
+			Chest
+			Wrist
+			Hand
+			Waist
+			Legs
+			Boots
+			2 Fingers
+			2 Trinket slots
 
-				3 weapon slots, 
-					main hand
-					off hand
-					ranged weapon
-						[ammo]
-					
+			3 weapon slots, 
+				main hand
+				off hand
+				ranged weapon
+				
 
-				Armor Type
-					Cloth
-					Leather
-					Mail
-					Plate
-					Certain classes has a cap count of amount of pieces they can have
-						This cap can be 0 making them unable to equip that armor type
+			Armor Type
+				Cloth
+				Leather
+				Mail
+				Plate
+				Certain classes has a cap count of amount of pieces they can have
+					This cap can be 0 making them unable to equip that armor type
+					[Should certain pieces cost multiple of these slots? e.g 2 for chestplate and 1 for glves]
 
 			Each piece of gear has an item level and a quality
 				Roughly based on the level of the mob or similar scaling
 
 				Item levels and quality determine the amount of stats the piece of gear has to distribute among the different stats
 					Also changes the reward given by destroying an item with enchanting
+
+	Class
+		Priest
+			Cloth only
+			Strengths: 
+				Long casts
+				Cleanses
+			Weakness:
+				Quick cast expensive
+				Few hots
+			Weapons:
+				Staffs
+				Daggers
+				1h Maces
+
+		Druid
+			C/Leather only
+			Strengths:
+				Short casts
+				Lots of hots
+			Weakness:
+				Big heals expensive
+
+			Weapons:
+				Staff
+				Daggers
+				1h Maces
+				2h maces
+			
+			Gains bonus mana regen if they havent taken more than x damage for y seconds [Mana might be reverse log based]
+
+
+		Paladin
+			[3] Plate items
+			[5] Mail items
+			Strengths:
+				Medium casts
+				All rounder class, does nothing exeptional but no weakness
+			Cleanses 2
+			Weapons
+				Staves
+				1h maces
+				1h swords
+				Shield (basicly should always have a shield unless they find a giga op staff or offhand)
+
+		Monk
+			Cloth only
+			Strength:
+				Shields
+			Weakness:
+				Very timing based
+				Any heal is relative expensive
+
+		Shaman
+			[8] Mail items
+			Strength:
+				AoE healing
+				Totems
+			Weakness:
+				Expensive single target
+				Totems
+			Weapons
+				Staves
+				1h maces
+				1h swords
+				Shield (basicly should always have a shield unless they find a giga op staff or offhand)
+
+		[Vampire]
+			Clothie
+			[4 leather]
+			Debuffs enemies and thusly empowers their heals
+			Short range
+			Slow ramp
+
+		Witch
+			Clothie
+			Heals by throwing potions
+			Strenghts
+				Strong aoe heals
+				Strong debuffs
+			Weakness
+				Basicly all heals aren't castable by targeting, you have to actually throw it
+				Even single target, the single target is chosen by the closest one to the centre of the target. If noone is in circle noone gets healed
+
+		[Chronomancer]
+			biggest heals is by turning back time, reversing the damage of hits
+
+		[Necromancer]
+			Heals by the power of rotting the flesh
+			Good short duration healer
+			Healing a target to much causes debuffs to build up
+
+
+
 
 	Inventory
 		The player can manage their own inventory by pressing {I}
@@ -315,24 +391,60 @@ Guild members
 	Name
 	Class
 		Tank
-			Mitigation based tank
-				Really efficient to heal but dies to quick burst or very easily if specced to the wrong type of attack
+			Warrior ()
+				Mitigation based tank
+					Really efficient to heal but dies to quick burst or very easily if specced to the wrong type of attack
+				Plate
 
-			Health pool tank
-				Can almost never be oneshot but healing won't be as good on them as other tanks
+			Druid (Bear form)
+				Health pool tank
+					Can almost never be oneshot but healing won't be as good on them as other tanks
+				C/Leather
 
-			Evasion based tanks
-				Very luck based, but can against slow attacking bosses go several seconds without needing a single heal
+			Rogue (Swashbuckler)
+				Evasion based tanks
+					Very luck based, but can against slow attacking bosses go several seconds without needing a single heal
+				C/Leather
+				[2] mail
+
+			Mage (Frost)
+				CD based tanks
+					Wont take damage for 90% of the fight and then die in 2 hits xdd
+				Clothie
 
 		Mdps
-			Fast attacker
-			Slow hard hitting attacker
-			Dot based
+			Rogue ()
+				Fast attacker
+				C/Leather
+
+			Warrior ()
+				Slow hard hitting attacker
+				[?] Mail
+
+			Druid (Cat form)
+				Dot based
+				C/Leather
+
+			Warlock (poisoner)
+				Dot base
+				Clothie
 
 		Rpds
-			Kiting based
-			Aoe based
-			Dot based
+			Ranger (MM)
+				Kiting based
+				C/Leather
+
+			Mage (Fire)
+				Aoe based
+				Clothie
+
+			Warlock (diseaser)
+				Dot based
+				Clothie
+
+			Ranger (BM)
+				Pet based
+				C/Leather
 
 		No healers as the players character is the only healer.
 
@@ -374,6 +486,7 @@ Guild members
 
 NPC
 	The player can right click to interact with NPC in range of them
+		{E} or right click
 		If the NPC have multiple roles (eg. QG and seller the player will be brought to an intermediate screen where they can select what they want to do)
 
 	Quest givers
@@ -389,30 +502,30 @@ NPC
 
 
 Magic Schools
-	Holy - Order
-		Gives benifits to the caster if certain spells are cast in order
-			For example a spell could say "if the previous spell had a shorter cast time get this bonus"
-
-	Unholy - Chaos
-		Gives punishments to the caster if certain spells are cast to much
-
-	Fire
-		Overtime focused
-
-	Water
-		Tidal, periods of activity followed by periods of weakness that get extended by using magic
-
-	Earth
-		Direct numbers, but very bad against mobility
-
-	Air
-		CC focused, all spells have a knockback/move component
-
-	Heat
-		Ramps slowly, in short fights does almost nothing but in long enough fights will always deal the most dps by the end 
-
-	Cold
-		Very burst based magic, will if to active be locked out of casting more spells
+	[Holy - Order
+			Gives benifits to the caster if certain spells are cast in order
+				For example a spell could say "if the previous spell had a shorter cast time get this bonus"
+	
+		Unholy - Chaos
+			Gives punishments to the caster if certain spells are cast to much
+	
+		Fire
+			Overtime focused
+	
+		Water
+			Tidal, periods of activity followed by periods of weakness that get extended by using magic
+	
+		Earth
+			Direct numbers, but very bad against mobility
+	
+		Air
+			CC focused, all spells have a knockback/move component
+	
+		Heat
+			Ramps slowly, in short fights does almost nothing but in long enough fights will always deal the most dps by the end 
+	
+		Cold
+			Very burst based magic, will if to active be locked out of casting more spells]
 
 
 
@@ -594,3 +707,89 @@ Instances
 	Raid
 		3-10 bosses depening on raid size
 		Each boss should have the adds before them try to teach the mechanics but divvied up among the packs
+
+System
+	The player is faced with a start menu when they launch the game
+		The player can choose by clicking a button to either:
+			Continue their last played save
+			Create a new world and character
+			Load any save found on their pc
+			Access the option menu
+			Exit the game
+
+	The player can press escape during the game to pause the game and bring up a pause menu
+		The player can choose by clicking a button to either:
+			Resume the game (or press escape again)
+			Force a save
+			Load a save from either last save in current world or swap character and world
+			Go to the main menu
+			Exit the game
+
+	Save system
+		The game only allows for one save per character not counting backups (Every x saves triggers a backup)
+		The player can trigger a save to happen
+		The game auto saves every x seconds or when certain events happen (combat, random events, an item is bought or sold)
+
+		The player can restore to the gamestate that was previously saved or trigger a backup to roll back to.
+
+	Load system
+		The load screen is a scrollable menu with all the played characters
+		Every save has a little blurb of info, name, playtime, level, gold
+
+	Combat
+		The player can ctrl/shift left click to take control of a guildie in party.
+		The player can see their own health, resource, buffs, and any spells cast in a platebox
+			The player can see their parties values next to them
+		The player can right click to target themselves, guildmembers and NPCS
+			Having a target selected shows their health, name, resource next to their own platebox, the player can see their targets buffs in a buff box and any spell they are channeling 
+		
+
+	Options
+
+		[Profiles?]
+
+		Game
+			Behaviour of controlling the party
+			[Configure an auto sell, if upgrade is gotten]
+			Auto loot, if upgrade is gotten
+				Can be further customized if more upgrades gotten
+					Filters
+			Specific minigames (Math should work out for rewards to be 0.6 of a average run with the current equiped gear) [Upgrade]
+			Wheter rightclicking a mob will put the player into auto attack mode
+
+		Audio
+			The player can control the volume of the game through either a slider or entering a percentage
+
+		Video
+			The player can set the game to render at specific resolutions
+			The player can set the game to render to fullscreen
+			Particle effects
+				[Can set to a range from 0% to 200%]
+			[Weather effects]
+			[Vsync]
+
+		Keybindings
+			The player can through this menu change all of the keybinds
+			The player can assign spells and items to the bar allowing access to the item through hotkeys.
+			The player can toggle on "sticky" hotkeys, disallowing moving the bound keys unles they presses shift as they click on the respective button
+					The player can change any key bind to anything they want ecept escape
+
+		UI
+			The player can change their UI settings
+			Incease/Decrease the size of all UI elements
+			Increse/Decrease the size of individual UI Elements
+			Change the positioning of most UI Elements
+			Enable/Disable certain UI Elements
+				Target of target
+				Floating names
+				Floating healthbars
+				Multiple barsFloating combat text
+				Scrolling combat text
+				Help & tips
+				Crit effects
+
+
+	The player can control the camera
+		Scrooling on no ui element or elements that doesnt have a scrollable compontent will zoom out/in the camera
+
+	Pathfinding, if no straight path can be found uses a a* pathfinging algorithm 

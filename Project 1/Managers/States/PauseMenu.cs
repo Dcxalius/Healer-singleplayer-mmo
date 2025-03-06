@@ -31,12 +31,12 @@ namespace Project_1.Managers.States
 
         public override void Update()
         {
-            pauseBox.Update(null);
+            pauseBox.Update();
             if (dialogueBoxes.Count > 0)
             {
                 for (int i = 0; i < dialogueBoxes.Count; i++)
                 {
-                    dialogueBoxes[i].Update(null);
+                    dialogueBoxes[i].Update();
                 }
                 return;
             }
@@ -92,8 +92,6 @@ namespace Project_1.Managers.States
         public override RenderTarget2D Draw()
         {
             PrepRender(Color.Purple);
-            spriteBatch.Begin();
-
 
             spriteBatch.Draw(StateManager.FinalGameFrame, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f); //draw game
             pauseBackground.Draw(spriteBatch, Vector2.Zero); //draw gray screen overlay
@@ -103,8 +101,7 @@ namespace Project_1.Managers.States
                 dialogueBoxes[i].Draw(spriteBatch);
             }
 
-            spriteBatch.End();
-            GraphicsManager.SetRenderTarget(null);
+            CleanRender();
             return renderTarget;
         }
 

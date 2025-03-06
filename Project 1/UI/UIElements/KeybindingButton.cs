@@ -25,9 +25,9 @@ namespace Project_1.UI.UIElements
             keyListner = aKeyListner;
         }
 
-        public override void Update(in UIElement aParent)
+        public override void Update()
         {
-            base.Update(aParent);
+            base.Update();
 
             WaitingForPress();
         }

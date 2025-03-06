@@ -40,10 +40,18 @@ namespace Project_1.Managers.States
         public abstract bool Scroll(ScrollEvent aScrollEvent);
         public abstract RenderTarget2D Draw();
 
-        public virtual void PrepRender(Color aClearColor)
+        public virtual void PrepRender(Color aClearColor, SpriteSortMode sortMode = SpriteSortMode.Deferred, BlendState blendState = null, SamplerState samplerState = null, DepthStencilState depthStencilState = null, RasterizerState rasterizerState = null, Effect effect = null, Matrix? transformMatrix = null)
         {
             GraphicsManager.SetRenderTarget(renderTarget);
             GraphicsManager.ClearScreen(aClearColor);
+            spriteBatch.Begin(sortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, transformMatrix);
+
+        }
+
+        public virtual void CleanRender()
+        {
+            spriteBatch.End();
+            GraphicsManager.SetRenderTarget(null);
         }
 
     }

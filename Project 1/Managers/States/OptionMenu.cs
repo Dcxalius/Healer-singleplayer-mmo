@@ -49,14 +49,11 @@ namespace Project_1.Managers.States
         }
         public override RenderTarget2D Draw()
         {
-            GraphicsManager.ClearScreen(Color.Pink);
-
-            spriteBatch.Begin();
+            PrepRender(Color.Pink);
 
             OptionManager.Draw(spriteBatch);
 
-            spriteBatch.End();
-            GraphicsManager.SetRenderTarget(null);
+            CleanRender();
 
             return renderTarget;
         }

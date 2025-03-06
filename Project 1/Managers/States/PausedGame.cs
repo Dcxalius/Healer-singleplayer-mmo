@@ -34,18 +34,13 @@ namespace Project_1.Managers.States
         public override RenderTarget2D Draw()
         {
             UIDraw();
-            GraphicsManager.ClearScreen(Color.White);
-
-            spriteBatch.Begin(SpriteSortMode.FrontToBack);
+            PrepRender(Color.White, SpriteSortMode.FrontToBack);
 
             spriteBatch.Draw(StateManager.FinalGameFrame, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f); //draw game
             pauseBackground.Draw(spriteBatch, Vector2.Zero); //draw gray screen overlay
-
             spriteBatch.Draw(uITarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
 
-
-            spriteBatch.End();
-            GraphicsManager.SetRenderTarget(null);
+            CleanRender();
             return renderTarget;
         }
     }
