@@ -21,19 +21,15 @@ namespace Project_1.Managers.States
 {
     internal class Game : GameState
     {
-        SpriteBatch gameDraw;
-        RenderTarget2D gameTarget;
-
-
-
+        public override StateManager.States GetStateEnum => StateManager.States.Game;
         public Game() : base()
         {
             HUDManager.Init();
             ObjectManager.Init();
 
-            gameDraw = GraphicsManager.CreateSpriteBatch();
+            spriteBatch = GraphicsManager.CreateSpriteBatch();
 
-            gameTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
+            renderTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
         }
 
         public override void Update()
@@ -51,11 +47,10 @@ namespace Project_1.Managers.States
             ObjectManager.RefreshPlates();
             SpawnerManager.RefreshPlates();
         }
-        public override void Rescale()
-        {
-            gameTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
-            base.Rescale();
-        }
+        //public override void Rescale()
+        //{
+        //    base.Rescale();
+        //}
 
         public override bool Click(ClickEvent aClickEvent)
         {
@@ -69,7 +64,7 @@ namespace Project_1.Managers.States
 
         public override void OnLeave()
         {
-            StateManager.FinalGameFrame = gameTarget;
+            StateManager.FinalGameFrame = renderTarget;
             TimeManager.StartPause();
             HUDManager.LeavingGameState();
         }
@@ -77,18 +72,18 @@ namespace Project_1.Managers.States
         public override RenderTarget2D Draw()
         {
             UIDraw();
-            GraphicsManager.SetRenderTarget(gameTarget);
-            gameDraw.Begin(SpriteSortMode.FrontToBack);
+            GraphicsManager.SetRenderTarget(renderTarget);
+            spriteBatch.Begin(SpriteSortMode.FrontToBack);
             GraphicsManager.ClearScreen(Color.White);
 
 
-            DrawList(gameDraw);
-            gameDraw.Draw(uITarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+            DrawList(spriteBatch);
+            spriteBatch.Draw(uITarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
 
 
-            gameDraw.End();
+            spriteBatch.End();
             GraphicsManager.SetRenderTarget(null);
-            return gameTarget;
+            return renderTarget;
         }
 
         void DrawList(SpriteBatch aBatch)

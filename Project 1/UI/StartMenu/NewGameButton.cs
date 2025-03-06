@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Managers.States;
 using Project_1.UI.UIElements.Buttons;
@@ -9,21 +8,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI.PauseMenu
+namespace Project_1.UI.StartMenu
 {
-    internal class MainMenuButton : Button
+    internal class NewGameButton : Button
     {
-
-        public MainMenuButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, Color.Gray, "Main Menu")
+        public NewGameButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, Color.LightCyan, "New Game", Color.Black)
         {
 
         }
 
         public override void HoldReleaseOnMe()
         {
-            StateManager.SetState(StateManager.States.StartScreen);
-
             base.HoldReleaseOnMe();
+
+            StateManager.SetState(StateManager.States.NewGame);
         }
     }
 }

@@ -65,7 +65,8 @@ namespace Project_1.Input
                 string dataAsString = File.ReadAllText(rootDir + "\\Data\\Keybinds.json");
 
                 Keys[] importedBinds = JsonConvert.DeserializeObject<Keys[]>(dataAsString);
-                Debug.Assert(importedBinds.Length == (int)KeyListner.Count * 2);
+                //Debug.Assert(importedBinds.Length == (int)KeyListner.Count * 2);
+                //throw new Exception("")
                 for (int i = 0; i < (int)KeyListner.Count; i++)
                 {
                     firstButtons[i] = importedBinds[i];

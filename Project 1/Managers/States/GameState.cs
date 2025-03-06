@@ -5,24 +5,26 @@ using Project_1.UI.HUD;
 using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Project_1.Managers.States
 {
-    internal class GameState : State
+    internal abstract class GameState : State
     {
         protected SpriteBatch uIDraw;
         protected RenderTarget2D uITarget;
-        RasterizerState rasterizerState = new RasterizerState() { ScissorTestEnable = true };
+        RasterizerState rasterizerState;
 
 
-        public GameState()
+
+        public GameState() : base() 
         {
+            rasterizerState = new RasterizerState() { ScissorTestEnable = true };
             uIDraw = GraphicsManager.CreateSpriteBatch();
             uITarget = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
-
         }
         public override bool Click(ClickEvent aClickEvent)
         {
@@ -43,7 +45,7 @@ namespace Project_1.Managers.States
 
         public override void Rescale()
         {
-            uITarget = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
+            base.Rescale();
             HUDManager.Rescale();
 
         }
@@ -61,9 +63,9 @@ namespace Project_1.Managers.States
         protected void UIDraw()
         {
             GraphicsManager.SetRenderTarget(uITarget);
+            GraphicsManager.ClearScreen(Color.Transparent);
             uIDraw.Begin(SpriteSortMode.Immediate, null, null, null, rasterizerState);
 
-            GraphicsManager.ClearScreen(Color.Transparent);
             HUDManager.Draw(uIDraw);
             DebugManager.Draw(uIDraw);
 

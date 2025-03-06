@@ -26,6 +26,8 @@ namespace Project_1.Managers
         TileCoords,
         InvCheats,
         Teleport,
+        InstantlyLoadSave1,
+        Console,
         Count
     }
 
@@ -51,7 +53,10 @@ namespace Project_1.Managers
             modes[(int)DebugMode.TileCoords] = false;
             modes[(int)DebugMode.InvCheats] = true;
             modes[(int)DebugMode.Teleport] = true;
-            AllocConsole();
+            modes[(int)DebugMode.InstantlyLoadSave1] = false;
+            modes[(int)DebugMode.Console] = false;
+
+            if (modes[(int)DebugMode.Console]) AllocConsole();
         }
 
         public static void Update()

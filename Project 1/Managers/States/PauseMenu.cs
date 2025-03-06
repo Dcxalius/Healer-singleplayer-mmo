@@ -17,17 +17,14 @@ namespace Project_1.Managers.States
 {
     internal class PauseMenu : State
     {
-        static PauseBox pauseBox;
-        RenderTarget2D pauseTarget;
-        SpriteBatch pauseDraw;
+        public override StateManager.States GetStateEnum => StateManager.States.PauseMenu;
+        PauseBox pauseBox;
         Textures.Texture pauseBackground;
         List<DialogueBox> dialogueBoxes;
 
-        public PauseMenu()
+        public PauseMenu() : base()
         {
             dialogueBoxes = new List<DialogueBox>();
-            pauseTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
-            pauseDraw = GraphicsManager.CreateSpriteBatch();
             pauseBox = new PauseBox();
             pauseBackground = new Textures.Texture(new GfxPath(GfxType.UI, "PauseBackground"));
         }
@@ -50,8 +47,8 @@ namespace Project_1.Managers.States
         }
         public override void Rescale()
         {
-            pauseTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
             pauseBox.Rescale();
+            base.Rescale();
 
         }
 
@@ -94,22 +91,21 @@ namespace Project_1.Managers.States
 
         public override RenderTarget2D Draw()
         {
-            GraphicsManager.SetRenderTarget(pauseTarget);
-            pauseDraw.Begin();
-            GraphicsManager.ClearScreen(Color.Purple);
+            PrepRender(Color.Purple);
+            spriteBatch.Begin();
 
 
-            pauseDraw.Draw(StateManager.FinalGameFrame, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f); //draw game
-            pauseBackground.Draw(pauseDraw, Vector2.Zero); //draw gray screen overlay
-            pauseBox.Draw(pauseDraw); //draw pause menu
+            spriteBatch.Draw(StateManager.FinalGameFrame, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f); //draw game
+            pauseBackground.Draw(spriteBatch, Vector2.Zero); //draw gray screen overlay
+            pauseBox.Draw(spriteBatch); //draw pause menu
             for (int i = 0; i < dialogueBoxes.Count; i++)
             {
-                dialogueBoxes[i].Draw(pauseDraw);
+                dialogueBoxes[i].Draw(spriteBatch);
             }
 
-            pauseDraw.End();
+            spriteBatch.End();
             GraphicsManager.SetRenderTarget(null);
-            return pauseTarget;
+            return renderTarget;
         }
 
     }

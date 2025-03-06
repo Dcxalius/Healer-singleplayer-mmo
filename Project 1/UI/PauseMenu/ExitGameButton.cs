@@ -11,7 +11,7 @@ namespace Project_1.UI.PauseMenu
 {
     internal class ExitGameButton : Button
     {
-        public ExitGameButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, Color.Tan)
+        public ExitGameButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, Color.Tan) //TODO: Modernize
         {
             ButtonText = "Exit Game";
         }

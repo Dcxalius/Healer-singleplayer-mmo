@@ -22,16 +22,17 @@ namespace Project_1.Managers.States
     {
         public enum States
         {
-            StartMenu,
+            StartScreen,
             Game,
             PausedGame,
             PauseMenu,
-            OptionMenu
+            OptionMenu,
+            NewGame
         }
 
         static State currentState;
 
-        static StartMenu startMenu;
+        static StartScreen startScreen;
         static Game game;
         static PausedGame pausedGame;
         static PauseMenu pauseMenu;
@@ -44,6 +45,9 @@ namespace Project_1.Managers.States
         public static Rectangle RenderTargetPosition { set => renderTargetPosition = value; }
         static Rectangle renderTargetPosition;
 
+        public static States PreviousState => previousState;
+        static States previousState;
+
         public static void Init(ContentManager aContentManager)
         {
             ObjectFactory.Init(aContentManager);
@@ -51,13 +55,15 @@ namespace Project_1.Managers.States
             GraphicsManager.Init();
             finalBatch = GraphicsManager.CreateSpriteBatch();
 
-            startMenu = new StartMenu();
+            startScreen = new StartScreen();
             game = new Game();
             pausedGame = new PausedGame();
             pauseMenu = new PauseMenu();
             optionMenu = new OptionMenu();
 
-            currentState = game;
+
+
+            currentState = DebugManager.Mode(DebugMode.InstantlyLoadSave1) ? game : startScreen;
         }
 
         public static void Update()
@@ -71,10 +77,11 @@ namespace Project_1.Managers.States
         public static void SetState(States aState)
         {
             currentState.OnLeave();
+            previousState = currentState.GetStateEnum;
             switch (aState)
             {
-                case States.StartMenu:
-                    currentState = startMenu;
+                case States.StartScreen:
+                    currentState = startScreen;
                     break;
                 case States.Game:
                     currentState = game;
@@ -115,7 +122,7 @@ namespace Project_1.Managers.States
             game.Rescale();
             optionMenu.Rescale();
             pauseMenu.Rescale();
-            startMenu.Rescale();
+            startScreen.Rescale();
         }
         public static void Draw()
         {

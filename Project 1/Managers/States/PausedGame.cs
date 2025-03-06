@@ -14,23 +14,19 @@ namespace Project_1.Managers.States
 {
     internal class PausedGame : GameState
     {
-        RenderTarget2D pausedTarget;
-        SpriteBatch pausedGameDraw;
+        public override StateManager.States GetStateEnum => StateManager.States.PausedGame;
         Textures.Texture pauseBackground;
 
 
-
-        public PausedGame()
+        public PausedGame() : base()
         {
-            pausedGameDraw = GraphicsManager.CreateSpriteBatch();
             pauseBackground = new Textures.Texture(new GfxPath(GfxType.UI, "PauseBackground"));
-            pausedTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
 
         }
 
         public override void Rescale()
         {
-            pausedTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
+            renderTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
             base.Rescale();
         }
 
@@ -38,19 +34,19 @@ namespace Project_1.Managers.States
         public override RenderTarget2D Draw()
         {
             UIDraw();
-            GraphicsManager.SetRenderTarget(pausedTarget);
-            pausedGameDraw.Begin(SpriteSortMode.FrontToBack);
             GraphicsManager.ClearScreen(Color.White);
 
-            pausedGameDraw.Draw(StateManager.FinalGameFrame, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f); //draw game
-            pauseBackground.Draw(pausedGameDraw, Vector2.Zero); //draw gray screen overlay
+            spriteBatch.Begin(SpriteSortMode.FrontToBack);
 
-            pausedGameDraw.Draw(uITarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+            spriteBatch.Draw(StateManager.FinalGameFrame, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f); //draw game
+            pauseBackground.Draw(spriteBatch, Vector2.Zero); //draw gray screen overlay
+
+            spriteBatch.Draw(uITarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
 
 
-            pausedGameDraw.End();
+            spriteBatch.End();
             GraphicsManager.SetRenderTarget(null);
-            return pausedTarget;
+            return renderTarget;
         }
     }
 }

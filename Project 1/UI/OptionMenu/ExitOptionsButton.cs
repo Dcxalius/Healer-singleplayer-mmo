@@ -23,11 +23,7 @@ namespace Project_1.UI.OptionMenu
 
         public void AddFuncToTriggerOnExit(Action aAction)
         {
-            if (onExit.Contains(aAction))
-            {
-                return;
-            }
-            
+            if (onExit.Contains(aAction)) return;
             onExit.Add(aAction);
         }
 
@@ -43,7 +39,7 @@ namespace Project_1.UI.OptionMenu
             }
             onExit.Clear();
 
-            StateManager.SetState(StateManager.States.PauseMenu);
+            StateManager.SetState(StateManager.PreviousState);
         }
     }
 }

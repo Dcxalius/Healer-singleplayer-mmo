@@ -15,13 +15,10 @@ namespace Project_1.Managers.States
 {
     internal class OptionMenu : State
     {
-        RenderTarget2D optionDraw;
-        SpriteBatch optionBatch;
-        public OptionMenu()
+        public override StateManager.States GetStateEnum => StateManager.States.OptionMenu;
+        public OptionMenu() : base()
         {
             OptionManager.Init();
-            optionBatch = GraphicsManager.CreateSpriteBatch();
-            optionDraw = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
         }
 
         public override void Update() => OptionManager.Update();
@@ -39,7 +36,7 @@ namespace Project_1.Managers.States
 
         public override void Rescale()
         {
-            optionDraw = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
+            base.Rescale();
             OptionManager.Rescale();
         }
 
@@ -52,16 +49,16 @@ namespace Project_1.Managers.States
         }
         public override RenderTarget2D Draw()
         {
-            GraphicsManager.ClearScreen(Color.LightGray);
-            GraphicsManager.SetRenderTarget(optionDraw);
-            optionBatch.Begin();
+            GraphicsManager.ClearScreen(Color.Pink);
 
-            OptionManager.Draw(optionBatch);
+            spriteBatch.Begin();
 
-            optionBatch.End();
+            OptionManager.Draw(spriteBatch);
+
+            spriteBatch.End();
             GraphicsManager.SetRenderTarget(null);
 
-            return optionDraw;
+            return renderTarget;
         }
 
         public override void PopUp(DialogueBox aBox)
