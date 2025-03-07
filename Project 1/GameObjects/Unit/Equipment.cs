@@ -72,9 +72,8 @@ namespace Project_1.GameObjects.Unit
         public EquipmentStats EquipmentStats => equipmentStats;
         EquipmentStats equipmentStats;
 
-        public Equipment(int?[] aItemsEquiped)
+        public Equipment(int?[] aItemsEquiped) : this()
         {
-            equipped = new Items.SubTypes.Equipment[(int)Slot.Count];
             Debug.Assert(aItemsEquiped.Length == equipped.Length);
 
             for (int i = 0; i < aItemsEquiped.Length; i++)
@@ -84,6 +83,12 @@ namespace Project_1.GameObjects.Unit
                 equipped[i] = ItemFactory.CreateItem(ItemFactory.GetItemData(aItemsEquiped[i].Value), 1) as Items.SubTypes.Equipment;
             }
 
+            RefreshStatsFromEquipment();
+        }
+
+        public Equipment()
+        {
+            equipped = new Items.SubTypes.Equipment[(int)Slot.Count];
             RefreshStatsFromEquipment();
         }
 

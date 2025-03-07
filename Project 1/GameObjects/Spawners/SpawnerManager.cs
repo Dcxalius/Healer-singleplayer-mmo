@@ -123,7 +123,7 @@ namespace Project_1.GameObjects.Spawners
         {
             List<SavedMobData> unitData = new List<SavedMobData>();
 
-            string path = aContentManager.RootDirectory + "\\SaveData\\Units\\World";
+            string path = aContentManager.RootDirectory + "\\SaveData\\Units\\InWorld";
 
             string[] folders = System.IO.Directory.GetDirectories(path);
 

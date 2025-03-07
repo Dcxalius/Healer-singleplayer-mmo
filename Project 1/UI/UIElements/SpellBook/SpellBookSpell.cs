@@ -57,9 +57,9 @@ namespace Project_1.UI.UIElements.SpellBook
             }
         }
 
-        public override void HoldReleaseOnMe()
+        public override void ClickedOnAndReleasedOnMe()
         {
-            base.HoldReleaseOnMe();
+            base.ClickedOnAndReleasedOnMe();
 
             HUDManager.ReleaseSpell();
         }

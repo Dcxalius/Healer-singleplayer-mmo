@@ -53,9 +53,9 @@ namespace Project_1.UI.HUD.PlateBoxes
             levelCircle.Refresh(aEntity);
         }
 
-        public override void HoldReleaseOnMe()
+        public override void ClickedOnAndReleasedOnMe()
         {
-            base.HoldReleaseOnMe();
+            base.ClickedOnAndReleasedOnMe();
 
             ObjectManager.Player.SetTarget(ObjectManager.Player);
         }

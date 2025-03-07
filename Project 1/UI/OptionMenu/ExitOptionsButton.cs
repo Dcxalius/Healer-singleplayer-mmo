@@ -27,9 +27,9 @@ namespace Project_1.UI.OptionMenu
             onExit.Add(aAction);
         }
 
-        public override void HoldReleaseOnMe()
+        public override void ClickedOnAndReleasedOnMe()
         {
-            base.HoldReleaseOnMe();
+            base.ClickedOnAndReleasedOnMe();
          
             OptionManager.CloseAllOptionMenuStuff();
 

@@ -19,11 +19,11 @@ namespace Project_1.UI.PauseMenu
 
         }
 
-        public override void HoldReleaseOnMe()
+        public override void ClickedOnAndReleasedOnMe()
         {
             StateManager.SetState(StateManager.States.StartScreen);
 
-            base.HoldReleaseOnMe();
+            base.ClickedOnAndReleasedOnMe();
         }
     }
 }

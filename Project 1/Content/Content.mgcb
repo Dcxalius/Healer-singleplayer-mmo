@@ -665,6 +665,18 @@
 /processorParam:TextureFormat=Color
 /build:UI/Cooldown.png
 
+#begin UI/Druid.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:UI/Druid.png
+
 #begin UI/GrayBackground.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -724,6 +736,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:UI/PauseBackground.png
+
+#begin UI/Priest.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:UI/Priest.png
 
 #begin UI/Uninvite.png
 /importer:TextureImporter

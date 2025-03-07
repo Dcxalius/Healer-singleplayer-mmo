@@ -83,9 +83,9 @@ namespace Project_1.UI.HUD.PlateBoxes
             Visible = false;
         }
 
-        public override void HoldReleaseOnMe()
+        public override void ClickedOnAndReleasedOnMe()
         {
-            base.HoldReleaseOnMe();
+            base.ClickedOnAndReleasedOnMe();
 
             ObjectManager.Player.SetTarget(guildMember);
         }

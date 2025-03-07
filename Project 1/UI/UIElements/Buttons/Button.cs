@@ -63,7 +63,7 @@ namespace Project_1.UI.UIElements.Buttons
             base.ClickedOnMe(aClick);
         }
 
-        public override void HoldReleaseOnMe()
+        public override void ClickedOnAndReleasedOnMe()
         {
             pressed = false;
 
@@ -77,7 +77,7 @@ namespace Project_1.UI.UIElements.Buttons
                 }
             }
 
-            base.HoldReleaseOnMe();
+            base.ClickedOnAndReleasedOnMe();
 
         }
 

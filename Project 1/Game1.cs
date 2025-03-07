@@ -49,7 +49,7 @@ namespace Project_1
             SaveManager.Init(Content);
 
             //DEBUG
-            SaveManager.LoadData();
+            //SaveManager.LoadData();
             base.Initialize();
         }
 

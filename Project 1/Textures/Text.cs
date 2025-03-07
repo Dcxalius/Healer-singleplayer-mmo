@@ -23,12 +23,18 @@ namespace Project_1.Textures
             {
                 textToDisplay = value;
                 if (value == null) return;
-                offset = font.MeasureString(value) * Camera.Camera.Zoom; 
+                offset = font.MeasureString(value) * Camera.Camera.Zoom; //TODO: Should zoom really be here
             }
         }
 
-        public Vector2 Offset { get => offset; }
+        public virtual Color Color
+        {
+            get => color;
+            set => color = value;
+        }
 
+        public Vector2 Offset { get => offset; }
+        public Vector2 CalculatePartialOffset(int aIndexToCalculateTo) => font.MeasureString(textToDisplay.Substring(0, aIndexToCalculateTo));
         string textToDisplay;
         Vector2 offset;
         protected SpriteFont font;

@@ -67,9 +67,9 @@ namespace Project_1.UI.UIElements.SpellBook
             else gfx.Color = Color.White;
         }
 
-        public override void HoldReleaseOnMe()
+        public override void ClickedOnAndReleasedOnMe()
         {
-            base.HoldReleaseOnMe();
+            base.ClickedOnAndReleasedOnMe();
             Triggered();
         }
 

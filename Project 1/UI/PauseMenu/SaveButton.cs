@@ -21,17 +21,17 @@ namespace Project_1.UI.PauseMenu
 
         }
 
-        public override void HoldReleaseOnMe()
+        public override void ClickedOnAndReleasedOnMe()
         {
             if (ObjectManager.Player.InCombatOrPartyInCombat)
             {
                 StateManager.PopUp(new UIElements.Boxes.DialogueBox("Cannot save while in combat.", Color.Black, UIElements.Boxes.DialogueBox.LocationOfPopUp.StateManager, UIElements.Boxes.DialogueBox.PausesGame.NoPause, null, new Textures.UITexture("GrayBackground", Color.White), new RelativeScreenPosition(0.4f, 0.5f), new RelativeScreenPosition(0.2f, 0.1f), "Okay"));
-                base.HoldReleaseOnMe();
+                base.ClickedOnAndReleasedOnMe();
                 return;
             }
             SaveManager.SaveData();
 
-            base.HoldReleaseOnMe();
+            base.ClickedOnAndReleasedOnMe();
 
         }
     }

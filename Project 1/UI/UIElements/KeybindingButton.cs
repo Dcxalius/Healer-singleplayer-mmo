@@ -86,9 +86,9 @@ namespace Project_1.UI.UIElements
             waitingForPress = false;
         }
 
-        public override void HoldReleaseOnMe()
+        public override void ClickedOnAndReleasedOnMe()
         {
-            base.HoldReleaseOnMe();
+            base.ClickedOnAndReleasedOnMe();
 
             OptionManager.CloseAllOptionMenuStuff();
             ButtonText = "Waiting for key press.";

@@ -39,7 +39,7 @@ namespace Project_1.UI.UIElements.Buttons
 
         }
 
-        Rectangle ConstructGfxRect() 
+        Rectangle ConstructGfxRect() //TODO: Make this more elegant
         {
             Point pos = new Vector2(AbsolutePos.X + AbsolutePos.Size.X / 10, AbsolutePos.Y + AbsolutePos.Size.Y / 10).ToPoint();
             Point size = new Vector2(AbsolutePos.Size.X * 0.8f, AbsolutePos.Size.Y * 0.8f).ToPoint();
@@ -47,6 +47,8 @@ namespace Project_1.UI.UIElements.Buttons
             return new Rectangle(pos, size);
 
         }
+
+        
 
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)

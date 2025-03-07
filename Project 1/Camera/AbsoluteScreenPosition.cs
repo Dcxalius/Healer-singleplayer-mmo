@@ -28,6 +28,9 @@ namespace Project_1.Camera
             set => position.Y = value;
         }
 
+        public AbsoluteScreenPosition OnlyX => new AbsoluteScreenPosition(position.X, 0);
+        public AbsoluteScreenPosition OnlyY => new AbsoluteScreenPosition(0, position.Y);
+
         public AbsoluteScreenPosition()
         {
             position = Point.Zero;

@@ -32,10 +32,22 @@ namespace Project_1.UI.UIElements
         }
 
         public Vector2 UnderlyingTextOffset => underlyingText.Offset;
+        public Vector2 CalculatePartialOffset(int aIndexToCalculateTo) => underlyingText.CalculatePartialOffset(aIndexToCalculateTo);
 
         TextAllignment textAlignment;
 
-        Text underlyingText;
+        public override Color Color
+        {
+            get
+            {
+                return underlyingText.Color;
+            }
+            set
+            {
+                underlyingText.Color = value;
+            }
+        }
+        Text  underlyingText;
 
         public Label(string aText, RelativeScreenPosition aPos, RelativeScreenPosition aSize, TextAllignment aTextAlignment, Color? aColor = null, string aFontname = "Gloryse") : base(null, aPos, aSize)
         {

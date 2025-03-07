@@ -39,7 +39,12 @@ namespace Project_1.GameObjects.Entities.Players
 
         public bool InCombatOrPartyInCombat => party.IsInCombat || InCombat;
 
-        public Player() : base(ObjectFactory.GetPlayerData())
+        public Player(string aName, string aClassName) /*Change class to be a class*/ : this(new PlayerData(aName, aClassName))
+        {
+
+        }
+
+        public Player(PlayerData aPlayerData) : base(aPlayerData)
         {
             HUDManager.SetInventory(Inventory);
             party = new Party(this);

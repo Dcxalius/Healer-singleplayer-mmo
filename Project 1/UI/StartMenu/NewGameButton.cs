@@ -17,9 +17,9 @@ namespace Project_1.UI.StartMenu
 
         }
 
-        public override void HoldReleaseOnMe()
+        public override void ClickedOnAndReleasedOnMe()
         {
-            base.HoldReleaseOnMe();
+            base.ClickedOnAndReleasedOnMe();
 
             StateManager.SetState(StateManager.States.NewGame);
         }

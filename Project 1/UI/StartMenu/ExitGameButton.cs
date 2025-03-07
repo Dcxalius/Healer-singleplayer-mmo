@@ -16,11 +16,11 @@ namespace Project_1.UI.StartMenu
         }
 
 
-        public override void HoldReleaseOnMe()
+        public override void ClickedOnAndReleasedOnMe()
         {
             Game1.Instance.Exit();
 
-            base.HoldReleaseOnMe();
+            base.ClickedOnAndReleasedOnMe();
         }
     }
 }

@@ -2,9 +2,11 @@
 using Newtonsoft.Json;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Spawners;
+using Project_1.Managers.Saves;
 using Project_1.Tiles;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,23 +17,50 @@ namespace Project_1.Managers
     {
         static string contentRootDirectory;
         static JsonSerializerSettings serializerSettings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto};
+        static string saveFolder;
+        static Dictionary<string, Save> saves;
+
+        public static string CurrentSaveName => currentSave.Name;
+        static Save currentSave;
         public static void Init(ContentManager aContentManager)
         {
             contentRootDirectory = aContentManager.RootDirectory;
+            Save.Init(contentRootDirectory);
+            saveFolder = contentRootDirectory + "\\Saves";
+
+            InitSaveFolder();
+
+            saves = new Dictionary<string, Save>();
+            string[] folders = System.IO.Directory.GetDirectories(saveFolder);
+            for (int i = 0; i < folders.Length; i++)
+            {
+                string name = TrimToNameOnly(folders[i]);
+                saves.Add(name, new Save(name, true));
+            }
+
+            //DEBUG
+
         }
 
-        public static void LoadData() //TODO: Make this take an argument to allow multiple saves
+        static void CreateNewSave(string aName)
         {
-            TileManager.LoadTiles(TileManager.DeserializeTilesIds(contentRootDirectory), new Microsoft.Xna.Framework.Point(0)); //TODO: Remove hardcoded
-            ObjectManager.Load();
+            saves.Add(aName, new Save(aName, false));
         }
 
-        public static void SaveData() //TODO: Make this take an argument to allow multiple saves
+        static void InitSaveFolder()
         {
-            ObjectFactory.SaveData();
-            TileManager.SaveData();
-            SpawnerManager.SaveData();
+            if (System.IO.Directory.Exists(saveFolder)) return;
+
+            System.IO.Directory.CreateDirectory(saveFolder);
         }
+
+        public static void LoadData(string aName)
+        {
+            currentSave = saves[aName];
+            currentSave.LoadData();
+        }
+
+        public static void SaveData() => currentSave.SaveData();
 
         public static void ExportData(string aDestination, object aObjectToExport)
         {

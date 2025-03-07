@@ -169,7 +169,16 @@ namespace Project_1.GameObjects.Unit
             relationData = new Relation(relation);
             classData = new ClassData(relation.Value, className);
             this.level = new Level(level, experience);
-            this.equipment = new Equipment(equipment);
+            if (equipment != null)
+            {
+                this.equipment = new Equipment(equipment);
+
+            }
+            else
+            {
+                this.equipment = new Equipment();
+
+            }
             this.position = new WorldSpace(position);
             this.momentum = new WorldSpace(momentum);
             this.velocity = new WorldSpace(velocity);

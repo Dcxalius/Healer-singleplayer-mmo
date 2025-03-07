@@ -63,6 +63,11 @@ namespace Project_1.GameObjects
 
         }
 
+        public static void CreateNewPlayer(string aName, string aClass)
+        {
+            player = new Player(aName, aClass);
+        }
+
         public static void Load()
         {
             ObjectFactory.Load();
@@ -75,7 +80,7 @@ namespace Project_1.GameObjects
             guild.Clear();
             guild.AddRange(ObjectFactory.GetGuildMemebers());
             if(player != null) player.Delete();
-            player = new Player();
+            player = new Player(ObjectFactory.GetPlayerData());
             player.GetPartyMembersFromGuild();
             Camera.Camera.BindCamera(player);
 

@@ -6,6 +6,7 @@ using Project_1.Managers;
 using Project_1.Managers.States;
 using Project_1.UI;
 using Project_1.UI.UIElements;
+using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -32,6 +33,12 @@ namespace Project_1.Input
             Middle,
             Right
         }
+
+        public static bool WritingToLabel => inputToWriteTo != null;
+        public static InputBox InputToWriteTo { get => inputToWriteTo; set { inputToWriteTo = value; cursorPosition = inputToWriteTo.Text.Length; } }
+        static InputBox inputToWriteTo;
+        public static int CursorPosition => cursorPosition;
+        static int cursorPosition;
 
         public static bool LeftPress
         {
@@ -149,7 +156,68 @@ namespace Project_1.Input
             UpdateStates();
             UpdateScrollWheel();
             CheckButtonPress();
+            WriteToLabel();
         }
+
+        private static void WriteToLabel()
+        {
+            if (!WritingToLabel) return;
+
+            Keys[] keys = newKeyboardState.GetPressedKeys();
+            for (int i = 0; i < keys.Length; i++)
+            {
+                if (keys[i] == Keys.None) continue;
+                if (oldKeyboardState.GetPressedKeys().Contains(keys[i])) continue; //TODO: Add a condition to check if its being hold long enough and then start spamming it with increasing frequency
+                if(Remove(keys[i])) continue;
+                CursorMovement(keys[i]);
+
+                if (IllegalCharacter(keys[i])) continue; //TODO: Add more characters
+                
+                string s = keys[i].ToString();
+                
+                if (!(newKeyboardState.IsKeyDown(Keys.LeftShift) || newKeyboardState.IsKeyDown(Keys.RightShift))) s = s.ToLower();
+
+                InputToWriteTo.WriteTo(s, cursorPosition);
+                cursorPosition++;
+            }
+            
+        }
+
+        static bool Remove(Keys aPressedKey) //TODO: Change name and make less ugly
+        {
+            if (aPressedKey != Keys.Back && aPressedKey != Keys.Delete) return false;
+            bool ctrlPress = newKeyboardState.IsKeyDown(Keys.LeftControl) || newKeyboardState.IsKeyDown(Keys.RightControl);
+            if (aPressedKey == Keys.Delete)
+            {
+                InputToWriteTo.Delete(ctrlPress, cursorPosition);
+                CursorBoundsCheck();
+                return true;
+            }
+            int l = InputToWriteTo.Text.Length;
+            InputToWriteTo.Backstep(ctrlPress, cursorPosition);
+
+            if (ctrlPress) cursorPosition -= l - InputToWriteTo.Text.Length;
+            else cursorPosition--;
+            CursorBoundsCheck();
+
+            return true;
+        }
+
+        static void CursorMovement(Keys aPressedKey)
+        {
+            if (aPressedKey != Keys.Left && aPressedKey != Keys.Right) return;
+            if (aPressedKey == Keys.Left) cursorPosition--;
+            if (aPressedKey == Keys.Right) cursorPosition++;
+            CursorBoundsCheck();
+        }
+
+        static void CursorBoundsCheck()
+        {
+            if (cursorPosition < 0) cursorPosition = 0;
+            if (cursorPosition > inputToWriteTo.Text.Length) cursorPosition = inputToWriteTo.Text.Length;
+        }
+
+        static bool IllegalCharacter(Keys aPressedKey) => !(aPressedKey >= Keys.A && aPressedKey <= Keys.Z);
 
         static void UpdateStates()
         {
@@ -260,6 +328,8 @@ namespace Project_1.Input
 
         public static bool GetPress(Keys key)
         {
+            if (WritingToLabel) { return false; }
+
             if (!oldKeyboardState.IsKeyDown(key) && newKeyboardState.IsKeyDown(key))
             {
                 return true;
@@ -270,6 +340,7 @@ namespace Project_1.Input
 
         public static bool GetHold(Keys key)
         {
+            if (WritingToLabel) { return false; }
             if (oldKeyboardState.IsKeyDown(key) || newKeyboardState.IsKeyDown(key))
             {
                 return true;
@@ -280,6 +351,7 @@ namespace Project_1.Input
 
         public static bool GetRelease(Keys key)
         {
+            if (WritingToLabel) { return false; }
             if (oldKeyboardState.IsKeyDown(key) && !newKeyboardState.IsKeyDown(key))
             {
                 return true;

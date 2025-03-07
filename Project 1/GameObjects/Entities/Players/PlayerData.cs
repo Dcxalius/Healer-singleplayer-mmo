@@ -37,6 +37,7 @@ namespace Project_1.GameObjects.Entities.Players
         public string[] SavedSpellsOnBar => spellOnBar;
         string[] spellOnBar;
 
+        [JsonConstructor]
         public PlayerData(string name, string corpseGfxName, string className, Relation.RelationToPlayer? relation, string[] party, 
             int level, int experience, float currentHp, float currentResource, int?[] equipment, Inventory inventory, string[] learntSpells, string[] spellOnBar, 
             WorldSpace position, WorldSpace momentum, WorldSpace velocity, List<WorldSpace> destinations)
@@ -50,6 +51,11 @@ namespace Project_1.GameObjects.Entities.Players
             this.party = party;
         }
 
-        
+        public PlayerData(string aName, string aClassName) : this(aName, null, aClassName, Relation.RelationToPlayer.Self, new string[] { },
+            1, 0, float.MaxValue, float.MaxValue, null, null, null, null,
+            new WorldSpace(500, 500) /*TODO: Remove hardcoded*/ , new WorldSpace(0, 0), new WorldSpace(0, 0), new List<WorldSpace>() { })
+        {
+
+        }
     }
 }

@@ -41,8 +41,11 @@ namespace Project_1.UI.UIElements
         bool Hovered => AbsolutePos.Contains(InputManager.GetMousePosAbsolute().ToPoint());
         protected bool wasHovered;
 
+        public bool CapturesClick { get => capturesClick; set => capturesClick = value; }
         protected bool capturesClick;
+        public bool CapturesScroll { get => capturesScroll; set => capturesScroll = value; }
         protected bool capturesScroll;
+        public bool CapturesRelease { get => capturesRelease; set => capturesRelease = value; }
         protected bool capturesRelease;
 
         protected bool dragable;
@@ -79,7 +82,7 @@ namespace Project_1.UI.UIElements
         #region Graphics
         public UITexture Gfx => gfx;
         protected UITexture gfx;
-        public Color Color { get => gfx.Color; set => gfx.Color = value; } 
+        public virtual Color Color { get => gfx.Color; set => gfx.Color = value; } 
         #endregion
 
         public HoldEvent heldEvents;
@@ -163,7 +166,7 @@ namespace Project_1.UI.UIElements
             {
                 if (wasHovered)
                 {
-                    HoldReleaseOnMe();
+                    ClickedOnAndReleasedOnMe();
                     return;
                 }
 
@@ -282,7 +285,7 @@ namespace Project_1.UI.UIElements
             if (!visible) return;
         }
 
-        public virtual void HoldReleaseOnMe() => heldEvents = null;
+        public virtual void ClickedOnAndReleasedOnMe() => heldEvents = null;
         protected virtual void HoldReleaseAwayFromMe() => heldEvents = null;
         #endregion
 

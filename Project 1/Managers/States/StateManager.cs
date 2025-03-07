@@ -39,6 +39,7 @@ namespace Project_1.Managers.States
         static PauseMenu pauseMenu;
         static OptionMenu optionMenu;
         static LoadingMenu loadingMenu;
+        static NewGame newGame;
 
         static SpriteBatch finalBatch;
 
@@ -63,7 +64,7 @@ namespace Project_1.Managers.States
             pauseMenu = new PauseMenu();
             optionMenu = new OptionMenu();
             loadingMenu = new LoadingMenu();
-
+            newGame = new NewGame();
 
 
             currentState = DebugManager.Mode(DebugMode.InstantlyLoadSave1) ? game : startScreen;
@@ -100,6 +101,9 @@ namespace Project_1.Managers.States
                     break;
                 case States.LoadingMenu:
                     currentState = loadingMenu;
+                    break;
+                case States.NewGame:
+                    currentState = newGame;
                     break;
                 default:
                     throw new NotImplementedException();

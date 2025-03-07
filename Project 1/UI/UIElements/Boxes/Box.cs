@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.UIElements.Boxes
 {
-    internal abstract class Box : UIElement
+    internal class Box : UIElement
     {
 
         public Box(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aGfx, aPos, aSize)

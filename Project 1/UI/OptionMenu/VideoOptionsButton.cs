@@ -16,9 +16,9 @@ namespace Project_1.UI.OptionMenu
 
         }
 
-        public override void HoldReleaseOnMe()
+        public override void ClickedOnAndReleasedOnMe()
         {
-            base.HoldReleaseOnMe();
+            base.ClickedOnAndReleasedOnMe();
 
             OptionManager.SetScreen(OptionManager.OptionScreen.Video);
         }

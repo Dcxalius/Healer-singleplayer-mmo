@@ -322,7 +322,7 @@ namespace Project_1.UI.UIElements.Inventory
             return true;
         }
 
-        public override void HoldReleaseOnMe()
+        public override void ClickedOnAndReleasedOnMe()
         {
             if (isEmpty == false && !isHeld && holdable && heldEvents.ClickThatCreated == InputManager.ClickType.Right)
             {
@@ -334,7 +334,7 @@ namespace Project_1.UI.UIElements.Inventory
                 HUDManager.ReleaseItem();
             }
 
-            base.HoldReleaseOnMe();
+            base.ClickedOnAndReleasedOnMe();
         }
 
         protected override void HoldReleaseAwayFromMe()

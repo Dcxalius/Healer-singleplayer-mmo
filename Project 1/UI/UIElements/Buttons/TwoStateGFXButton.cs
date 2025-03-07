@@ -55,9 +55,9 @@ namespace Project_1.UI.UIElements.Buttons
             gfxRectangle = ConstructGfxRect();
         }
 
-        public override void HoldReleaseOnMe()
+        public override void ClickedOnAndReleasedOnMe()
         {
-            base.HoldReleaseOnMe();
+            base.ClickedOnAndReleasedOnMe();
 
             if (state == State.First) state = State.Second;
             else if (state == State.Second) state = State.First;
