@@ -746,7 +746,7 @@ System
 
 	Options
 
-		[Profiles?]
+		[Profiles]
 
 		Game
 			Behaviour of controlling the party
