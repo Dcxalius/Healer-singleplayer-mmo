@@ -545,7 +545,7 @@ namespace Project_1.Tiles
             return returnable.ToArray();
         }
 
-        public static void SaveData()
+        public static void SaveData(string aBaseFolderName)
         {
             int?[,] tilesAsId = new int?[tiles.GetLength(0),tiles.GetLength(1)];
             for (int i = 0; i < tilesAsId.GetLength(0); i++)
@@ -556,7 +556,7 @@ namespace Project_1.Tiles
                 }
             }
 
-            SaveManager.ExportData("World\\Tiles\\Tiles.tilemap", tilesAsId);
+            SaveManager.ExportData(aBaseFolderName + "\\World\\Tiles\\Tiles.tilemap", tilesAsId);
         }
 
 

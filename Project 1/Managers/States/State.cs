@@ -43,8 +43,9 @@ namespace Project_1.Managers.States
         public virtual void PrepRender(Color aClearColor, SpriteSortMode sortMode = SpriteSortMode.Deferred, BlendState blendState = null, SamplerState samplerState = null, DepthStencilState depthStencilState = null, RasterizerState rasterizerState = null, Effect effect = null, Matrix? transformMatrix = null)
         {
             GraphicsManager.SetRenderTarget(renderTarget);
+            spriteBatch.Begin(sortMode);
             GraphicsManager.ClearScreen(aClearColor);
-            spriteBatch.Begin(sortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, transformMatrix);
+            //spriteBatch.Begin(sortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, transformMatrix);
 
         }
 

@@ -72,7 +72,7 @@ namespace Project_1.Managers.States
         public override RenderTarget2D Draw()
         {
             UIDraw();
-            PrepRender(Color.White);
+            PrepRender(Color.White, SpriteSortMode.Immediate);
 
             DrawList(spriteBatch);
             spriteBatch.Draw(uITarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);

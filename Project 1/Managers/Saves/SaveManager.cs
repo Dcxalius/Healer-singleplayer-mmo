@@ -42,9 +42,12 @@ namespace Project_1.Managers
 
         }
 
-        static void CreateNewSave(string aName)
+        public static bool NameAlreadyExists(string aName) => saves.ContainsKey(aName);
+
+        public static void CreateNewSave(string aName)
         {
             saves.Add(aName, new Save(aName, false));
+            currentSave = saves[aName];
         }
 
         static void InitSaveFolder()
@@ -65,7 +68,7 @@ namespace Project_1.Managers
         public static void ExportData(string aDestination, object aObjectToExport)
         {
             string json = JsonConvert.SerializeObject(aObjectToExport, serializerSettings);
-            System.IO.File.WriteAllText(contentRootDirectory + "\\SaveData\\" + aDestination, json);
+            System.IO.File.WriteAllText(contentRootDirectory + "\\Saves\\" + aDestination, json);
         }
 
         public static T ImportData<T>(string aJsonString)

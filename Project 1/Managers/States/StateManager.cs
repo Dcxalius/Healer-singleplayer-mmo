@@ -68,6 +68,10 @@ namespace Project_1.Managers.States
 
 
             currentState = DebugManager.Mode(DebugMode.InstantlyLoadSave1) ? game : startScreen;
+            //if (currentState == startScreen) //TODO: MAKE THIS LESS ECH
+            //{
+            //    TimeManager.StartPause();
+            //}
         }
 
         public static void Update()

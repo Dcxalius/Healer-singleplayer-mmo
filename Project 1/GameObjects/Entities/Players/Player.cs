@@ -67,6 +67,7 @@ namespace Project_1.GameObjects.Entities.Players
 
         void LoadSpellBar(string[] aSpellOnBar)
         {
+            if (aSpellOnBar == null) return;
             Spell[] spells = SpellBook.Spells;
             int?[] indexOfSpellsToAdd = new int?[aSpellOnBar.Length];
             for (int i = 0; i < aSpellOnBar.Length; i++)

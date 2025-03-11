@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.UIElements.Boxes
 {
-    internal class InputBox : Box
+    internal class InputBox : Box //TODO: Bug, when unselected displays nothing
     {
         Label inputLabel;
         Label beforeWindowLabel;
-        public string Text => text;
+        public string Input => text;
         string text;
 
         Text cursor;

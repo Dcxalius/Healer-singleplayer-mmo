@@ -18,8 +18,8 @@ namespace Project_1.UI.UIElements.Buttons
 
         protected string ButtonText //TODO: Bring this out to a class called TextButton
         {
-            get => text.Value;
-            set { text.Value = value; }
+            get => label.Text;
+            set { label.Text = value; }
         }
 
         protected bool Pressed
@@ -32,7 +32,7 @@ namespace Project_1.UI.UIElements.Buttons
         UITexture pressedGfx;
         bool pressed;
 
-        Text text;
+        Label label;
 
         protected bool usesPressedGfx;
 
@@ -47,7 +47,8 @@ namespace Project_1.UI.UIElements.Buttons
         public Button(RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColor, string aText = null, Color? aTextColor = null) : base(new UITexture("WhiteBackground", aColor), aPos, aSize)
         {
             Color denullifiedTextColor = aTextColor ?? Color.White;
-            text = new Text("Gloryse", aText, denullifiedTextColor);
+            label = new Label(aText, RelativeScreenPosition.Zero, aSize, Label.TextAllignment.Centred, denullifiedTextColor);
+            AddChild(label);
             pressedGfx = new UITexture("GrayBackground", aColor);
             hoverGfx = new UITexture("ButtonHover", Color.Yellow);
             usesPressedGfx = true;
@@ -99,11 +100,11 @@ namespace Project_1.UI.UIElements.Buttons
                 pressedGfx.Draw(aBatch, AbsolutePos);
             }
 
-            if (text.Value == null)
-            {
-                return;
-            }
-            text.CentredDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Center));
+            //if (text.Value == null)
+            //{
+            //    return;
+            //}
+            //text.CentredDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Center));
 
             if (wasHovered)
             {

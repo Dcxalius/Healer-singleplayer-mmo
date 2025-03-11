@@ -15,14 +15,15 @@ namespace Project_1.Managers.Saves
         static int currentVersion = 0; //TODO: Increment this whenever major changes to the save system is implemented
         public string Name => name;
         string name;
+        string nameAsPath => contentRootDirectory + name;
 
         int version;
 
-        public string World => name + "\\World";
-        public string SpawnZones => name + "\\SpawnZones";
+        public string World => nameAsPath + "\\World";
+        public string SpawnZones => World + "\\SpawnZones";
         public string Tiles => World + "\\Tiles";
 
-        public string Units => name + "\\Units";
+        public string Units => nameAsPath + "\\Units";
         public string Guild => Units + "\\Guild";
         public string InWorld => Units + "\\InWorld";
         public string Friendly => InWorld + "\\Friendly";
@@ -30,7 +31,7 @@ namespace Project_1.Managers.Saves
 
         static string contentRootDirectory;
 
-        public static void Init(string aConentRootDirectory) => contentRootDirectory = aConentRootDirectory;
+        public static void Init(string aContentRootDirectory) => contentRootDirectory = aContentRootDirectory + "\\Saves\\";
 
         public Save(string aName, bool aExistingSave) 
         {
@@ -46,9 +47,9 @@ namespace Project_1.Managers.Saves
 
         public void SaveData()
         {
-            ObjectFactory.SaveData();
-            TileManager.SaveData();
-            SpawnerManager.SaveData();
+            ObjectFactory.SaveData(name);
+            TileManager.SaveData(name);
+            SpawnerManager.SaveData(name);
         }
 
         public void LoadData()
@@ -59,7 +60,7 @@ namespace Project_1.Managers.Saves
 
         void CreateNewSaveFolder()
         {
-            if (System.IO.Directory.Exists(name)) return;
+            if (System.IO.Directory.Exists(nameAsPath)) return;
             //TODO: Load version from file
             version = 0;
             System.IO.Directory.CreateDirectory(name);

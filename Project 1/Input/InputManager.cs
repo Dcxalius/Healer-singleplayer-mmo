@@ -35,7 +35,15 @@ namespace Project_1.Input
         }
 
         public static bool WritingToLabel => inputToWriteTo != null;
-        public static InputBox InputToWriteTo { get => inputToWriteTo; set { inputToWriteTo = value; cursorPosition = inputToWriteTo.Text.Length; } }
+        public static InputBox InputToWriteTo 
+        {
+            get => inputToWriteTo; 
+            set 
+            { 
+                inputToWriteTo = value; 
+                cursorPosition = inputToWriteTo == null ? 0 : inputToWriteTo.Input.Length; 
+            }
+        }
         static InputBox inputToWriteTo;
         public static int CursorPosition => cursorPosition;
         static int cursorPosition;
@@ -193,10 +201,10 @@ namespace Project_1.Input
                 CursorBoundsCheck();
                 return true;
             }
-            int l = InputToWriteTo.Text.Length;
+            int l = InputToWriteTo.Input.Length;
             InputToWriteTo.Backstep(ctrlPress, cursorPosition);
 
-            if (ctrlPress) cursorPosition -= l - InputToWriteTo.Text.Length;
+            if (ctrlPress) cursorPosition -= l - InputToWriteTo.Input.Length;
             else cursorPosition--;
             CursorBoundsCheck();
 
@@ -214,7 +222,7 @@ namespace Project_1.Input
         static void CursorBoundsCheck()
         {
             if (cursorPosition < 0) cursorPosition = 0;
-            if (cursorPosition > inputToWriteTo.Text.Length) cursorPosition = inputToWriteTo.Text.Length;
+            if (cursorPosition > inputToWriteTo.Input.Length) cursorPosition = inputToWriteTo.Input.Length;
         }
 
         static bool IllegalCharacter(Keys aPressedKey) => !(aPressedKey >= Keys.A && aPressedKey <= Keys.Z);
@@ -252,6 +260,8 @@ namespace Project_1.Input
         static void CreateClickEvent(InputManager.ClickType aTypeOfClick)
         {
             bool[] heldModifiers = CheckHoldModifiers();
+
+            inputToWriteTo = null;
 
             ClickEvent clickEvent = new ClickEvent(GetMousePosRelative(), aTypeOfClick, heldModifiers);
                 

@@ -30,9 +30,12 @@ namespace Project_1.GameObjects.Entities.Players
 
         public SpellBook(string[] aSpellsAlreadyLearnt)
         {
-            knownSpells = new List<Spell>();
-
             loadedSpells = aSpellsAlreadyLearnt;
+            knownSpells = new List<Spell>();
+        }
+
+        public SpellBook() : this(Array.Empty<string>())
+        {
         }
 
 

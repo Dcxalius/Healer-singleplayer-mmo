@@ -90,11 +90,11 @@ namespace Project_1.GameObjects.Spawners
             }
         }
 
-        public static void SaveData()
+        public static void SaveData(string aBaseFolderName)
         {
             for (int i = 0; i < spawnZones.Count; i++)
             {
-                SaveManager.ExportData("World\\SpawnZones\\" + i + ".spawn", spawnZones[i]);
+                SaveManager.ExportData(aBaseFolderName + "\\World\\SpawnZones\\" + i + ".spawn", spawnZones[i]);
             }
 
             savedMobNames.Clear();
@@ -114,7 +114,7 @@ namespace Project_1.GameObjects.Spawners
                     {
                         savedMobNames.Add(name, 1);
                     }
-                    SaveManager.ExportData("Units\\World\\Neutral\\" + name + nrOfCopies + ".unit", savedMobData[j]);
+                    SaveManager.ExportData(aBaseFolderName + "\\Units\\InWorld\\NonFriendly\\" + name + nrOfCopies + ".unit", savedMobData[j]);
                 }
             }
         }

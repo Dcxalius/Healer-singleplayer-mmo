@@ -14,6 +14,7 @@ using Project_1.Particles;
 using Project_1.Textures;
 using Project_1.Tiles;
 using Project_1.UI;
+using Project_1.UI.CharacterCreator;
 using Project_1.UI.OptionMenu;
 using System.Runtime.InteropServices;
 
@@ -47,6 +48,7 @@ namespace Project_1
             AreaOfEffectFactory.Init(Content);
             ParticleManager.Init();
             SaveManager.Init(Content);
+            ClassSelector.Init(Content);
 
             //DEBUG
             //SaveManager.LoadData();

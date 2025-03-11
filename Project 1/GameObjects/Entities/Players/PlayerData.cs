@@ -55,6 +55,8 @@ namespace Project_1.GameObjects.Entities.Players
             1, 0, float.MaxValue, float.MaxValue, null, null, null, null,
             new WorldSpace(500, 500) /*TODO: Remove hardcoded*/ , new WorldSpace(0, 0), new WorldSpace(0, 0), new List<WorldSpace>() { })
         {
+            inventory = new Inventory();
+            spellBook = new SpellBook();
 
         }
     }

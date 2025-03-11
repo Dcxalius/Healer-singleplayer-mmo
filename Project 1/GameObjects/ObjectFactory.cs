@@ -155,14 +155,14 @@ namespace Project_1.GameObjects
             }
         }
 
-        public static void SaveData()
+        public static void SaveData(string aBaseFolderName)
         {
 
-            SaveManager.ExportData("Units\\" + playerData.Name + "Data.unit", playerData);
+            SaveManager.ExportData(aBaseFolderName + "\\Units\\" + playerData.Name + "Data.unit", playerData);
 
             for (int i = 0; i < guildData.Count; i++)
             {
-                SaveManager.ExportData("Units\\Guild\\" + guildData[i].Name + ".unit", guildData[i]);
+                SaveManager.ExportData(aBaseFolderName + "\\Units\\Guild\\" + guildData[i].Name + ".unit", guildData[i]);
             }
         }
     }

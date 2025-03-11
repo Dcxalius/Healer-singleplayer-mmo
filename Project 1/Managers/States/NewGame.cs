@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Input;
@@ -15,7 +16,6 @@ namespace Project_1.Managers.States
     internal class NewGame : State
     {
         NewGameBox newGameBox;
-
         public NewGame() : base() 
         {
         }
@@ -28,7 +28,7 @@ namespace Project_1.Managers.States
 
         public override RenderTarget2D Draw()
         {
-            PrepRender(Color.BlanchedAlmond);
+            PrepRender(Color.BlanchedAlmond, SpriteSortMode.Immediate);
             newGameBox.Draw(spriteBatch);
             CleanRender();
             return renderTarget;
@@ -38,7 +38,7 @@ namespace Project_1.Managers.States
         {
             RelativeScreenPosition size = RelativeScreenPosition.GetSquareFromY(0.9f);
             newGameBox = new NewGameBox(new RelativeScreenPosition(0.05f), size);
-
+            TimeManager.StartPause();
         }
 
         public override void OnLeave()
