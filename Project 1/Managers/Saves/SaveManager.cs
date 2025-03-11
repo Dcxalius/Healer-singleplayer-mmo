@@ -34,18 +34,17 @@ namespace Project_1.Managers
             string[] folders = System.IO.Directory.GetDirectories(saveFolder);
             for (int i = 0; i < folders.Length; i++)
             {
-                string name = TrimToNameOnly(folders[i]);
+                string name = TrimToNameOnly(folders[i]).ToUpper();
                 saves.Add(name, new Save(name, true));
             }
 
-            //DEBUG
-
         }
 
-        public static bool NameAlreadyExists(string aName) => saves.ContainsKey(aName);
+        public static bool NameAlreadyExists(string aName) => saves.ContainsKey(aName.ToUpper());
 
         public static void CreateNewSave(string aName)
         {
+            aName = aName.ToUpper();
             saves.Add(aName, new Save(aName, false));
             currentSave = saves[aName];
         }

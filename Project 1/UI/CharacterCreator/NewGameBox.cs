@@ -22,7 +22,7 @@ namespace Project_1.UI.CharacterCreator
         {
             RelativeScreenPosition size = RelativeScreenPosition.GetSquareFromY(0.05f);
             AddChild(new LoadingMenu.ExitButton(aSize - size, size));
-            inputBox = new InputBox("Name:", Color.Black, "Input Character Name", Color.White, Color.LightGray, Color.Black, new RelativeScreenPosition(0.05f), new RelativeScreenPosition(0.25f, 0.08f));
+            inputBox = new InputBox("Name:", new InputBox.ValidInputs[] { InputBox.ValidInputs.Letters },Color.Black, "Input Character Name", Color.White, Color.LightGray, Color.Black, new RelativeScreenPosition(0.05f), new RelativeScreenPosition(0.25f, 0.08f));
             AddChild(inputBox);
             //AddChild(new GFXButton(new List<Action>() { new Action(() => className = "Priest")}, new GfxPath(GfxType.UI, "Priest"), new RelativeScreenPosition(0.4f), new AbsoluteScreenPosition(64).ToRelativeScreenPosition(), Color.AliceBlue));
             //AddChild(new GFXButton(new List<Action>() { new Action(() => className = "Druid")}, new GfxPath(GfxType.UI, "Druid"), new RelativeScreenPosition(0.5f, 0.4f), new AbsoluteScreenPosition(64).ToRelativeScreenPosition(), Color.AliceBlue));

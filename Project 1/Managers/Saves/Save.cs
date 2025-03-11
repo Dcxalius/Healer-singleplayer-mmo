@@ -15,7 +15,7 @@ namespace Project_1.Managers.Saves
         static int currentVersion = 0; //TODO: Increment this whenever major changes to the save system is implemented
         public string Name => name;
         string name;
-        string nameAsPath => contentRootDirectory + name;
+        string nameAsPath => contentRootDirectory + name.ToUpper();
 
         int version;
 
@@ -56,6 +56,7 @@ namespace Project_1.Managers.Saves
         {
             TileManager.LoadTiles(TileManager.DeserializeTilesIds(contentRootDirectory), new Microsoft.Xna.Framework.Point(0)); //TODO: Remove hardcoded
             ObjectManager.Load();
+            //TimeManager.Load(); //TODO: Implement
         }
 
         void CreateNewSaveFolder()
@@ -63,7 +64,7 @@ namespace Project_1.Managers.Saves
             if (System.IO.Directory.Exists(nameAsPath)) return;
             //TODO: Load version from file
             version = 0;
-            System.IO.Directory.CreateDirectory(name);
+            System.IO.Directory.CreateDirectory(nameAsPath);
             System.IO.Directory.CreateDirectory(World);
             System.IO.Directory.CreateDirectory(SpawnZones);
             System.IO.Directory.CreateDirectory(Tiles);

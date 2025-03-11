@@ -23,8 +23,13 @@ namespace Project_1.UI.OptionMenu
             SelectBoxValueCameraSettings[] setOfValues = SelectBoxValueCameraSettings.CreateArray(new RelativeScreenPosition(0, aSize.Y), aSize);
             displayValue = new SelectBoxValueDisplay(setOfValues[(int)Camera.Camera.CurrentCameraSetting], new UITexture("WhiteBackground", Color.White), aSize);
 
+            AddChild(displayValue);
             values = setOfValues;
-
+            AddChildren(values);
+            for (int i = 0; i < values.Length; i++)
+            {
+                values[i].Visible = false;
+            }
         }
 
         protected override void ActionWhenSelected(int aSelectedValue)

@@ -42,7 +42,12 @@ namespace Project_1.Managers
                 return timePaused.Value;
             }
         }
-        
+
+        public static void Init()
+        {
+            timePaused = new TimeSpan();
+        }
+
         public static void Update(GameTime aGameTime)
         {
             gameTime = aGameTime;
@@ -59,6 +64,12 @@ namespace Project_1.Managers
             Debug.Assert(timePaused.HasValue, "Tried to unpause unpaused game.");
             gameTime.TotalGameTime = timePaused.Value;
             timePaused = null;
+        }
+
+        public static void Load(TimeSpan aTimeToLoad)
+        {
+            timePaused = gameTime.TotalGameTime;
+
         }
     }
 }

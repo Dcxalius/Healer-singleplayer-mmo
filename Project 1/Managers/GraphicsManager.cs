@@ -22,9 +22,8 @@ using static Project_1.GameObjects.Spells.AoE.AreaOfEffectData;
 
 namespace Project_1.Managers
 {
-    //TODO: Split this into GraphicsMang and TextureMang
 
-    internal static class GraphicsManager //TODO: Split this into TextureManager and GraphicsManager
+    internal static class GraphicsManager
     {
         public enum FullscreenMode
         {
@@ -72,11 +71,7 @@ namespace Project_1.Managers
             for (int i = 0; i < scissors.Count; i++)
             {
                 r = Rectangle.Intersect(r, scissors[i].Item2);
-                //r = Rectangle.Union(aRect, scissors[i].Item2);
             }
-
-            //Debug.Assert(r == aRect);
-
             scissors.Add((aCaptor, r));
 
             graphicsDeviceManager.GraphicsDevice.ScissorRectangle = r;
@@ -84,15 +79,6 @@ namespace Project_1.Managers
 
 
             return true;
-            //if (scissorRectCaptor != null)
-            //{
-            //    return false;
-            //}
-
-            //scissorRectCaptor = aCaptor;
-            //graphicsDeviceManager.GraphicsDevice.ScissorRectangle = aRect;
-
-            //return true;
         }
 
         public static bool ReleaseScissor(object aReleaser)
@@ -110,15 +96,6 @@ namespace Project_1.Managers
 
             graphicsDeviceManager.GraphicsDevice.ScissorRectangle = scissors[scissors.Count - 1].Item2;
             return true;
-            //if (scissorRectCaptor != aReleaser ) 
-            //{
-            //    return false;
-            //}
-
-            //scissorRectCaptor = null;
-            //graphicsDeviceManager.GraphicsDevice.ScissorRectangle = unCaptueredScissorRect;
-
-            //return true;
         }
         public static SpriteBatch CreateSpriteBatch()
         {
@@ -289,12 +266,5 @@ namespace Project_1.Managers
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern int GetWindowThreadProcessId(IntPtr handle, out int processId);
-
-
-        static void ToggleFullScreen()
-        {
-
-            fullsceen = !fullsceen;
-        }
     }
 }

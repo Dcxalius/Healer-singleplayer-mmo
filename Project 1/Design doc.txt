@@ -579,18 +579,65 @@ Proffesion
 		Mini games that allows the player to do simple skill checks for a reward scaling with performance
 		Herbalism
 			Allows the player to pick up flowers / disasemble plant based enemies
+			Game
+				If you find a better mining game then make this that game but with roots instead of minerals
+					That game might thematicly work better as herb game
+				The player has a set amount of shovels trying to remove the dirt surrouding the plant roots
+				Shovels are shapes that destroy everything in that shape
+					L shape X shape etc
+				Depending on root squares not next to dirt + amount of roots not destoyed = size of reward
 
 		Mining
 			Allows the player to mine nodes around the map/in the mine
+			Game:
+				A mineral (X) is spawned in the middle of a grid
+				Underneath and besides the mineral there are chunks of stone (O)
+					These are linked together
+				Example
+				_____________________________
+				|                            |
+				|                            |
+				|                            |
+				|OOOOOOOOOOOOXXXOOOOOOOOOOOOO|
+				|OOOOOOOOOOOOOXOOOOOOOOOOOOOO|
+				|OOOOOOOOOOOOOOOOOOOOOOOOOOOO|
+				|OOOOOOOOOOOOOOOOOOOOOOOOOOOO|
+				------------------------------
+
+				At higher skillevels the player can see boardes of the chunks
+				_____________________________
+				|                            |
+				|                            |
+				|                            |
+				|OOO|OOOO|OOOOOXX|XOOO|OOO|OO|
+				|OOO|____|______X|____|OOO|__|
+				|OOO|OOOOOOOO|OOOOOOOO|OOOOOO|
+				|OOO|OOOOOOOO|OOOOOOOO|OOOOOO|
+				------------------------------
+				The goal is to make the minerals not attatched to the ground without breaking the mineral
+				Depending on speed, skill (amount of clicks away from least possible and least broken minerals possible) the player will get a reward 
 
 		Skinning
 			Allows the player to skin animals/beastial enemies
 
+			Game:
+			A corspe is displayed infront of the player
+			The player has to make an incistion, [animals, or random] has weakpoints where breaking the skin does less damage, visible with higher skill
+			After that the player has to [draw a shape] with the mouse, at highest skill the shape for max result will be shown.
+
 		Scaveging
 			Allows the player to gather cloth and other things from humanoids
+			Match 3
+			Matching will get the player the corresponding resource
+			Can only focus on getting a few types of resources, not the entire board will be clearable
+			At higher skill level the player will get tools that will allow them to focus more on reasources
+				Swap two shapes
+				Destroy a shape (wont count as matching but will cause everything about to fall down)
+				Randomize a shape
 
 		Lumbering
 			Allows the player to gather wood to turn into upgrades for their guild
+			Game: DDR?
 
 
 

@@ -26,7 +26,6 @@ namespace Project_1.GameObjects
 
         protected WorldSpace momentum = WorldSpace.Zero;
         protected WorldSpace velocity = WorldSpace.Zero;
-        //float maxSpeed;
 
 
 

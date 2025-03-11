@@ -179,11 +179,11 @@ namespace Project_1.Input
                 if(Remove(keys[i])) continue;
                 CursorMovement(keys[i]);
 
-                if (IllegalCharacter(keys[i])) continue; //TODO: Add more characters
+                if (IllegalCharacter(keys[i])) continue;
                 
-                string s = keys[i].ToString();
+                char s = keys[i].ToString()[0];
                 
-                if (!(newKeyboardState.IsKeyDown(Keys.LeftShift) || newKeyboardState.IsKeyDown(Keys.RightShift))) s = s.ToLower();
+                if (!(newKeyboardState.IsKeyDown(Keys.LeftShift) || newKeyboardState.IsKeyDown(Keys.RightShift))) s = char.ToLower(s);
 
                 InputToWriteTo.WriteTo(s, cursorPosition);
                 cursorPosition++;
@@ -225,7 +225,10 @@ namespace Project_1.Input
             if (cursorPosition > inputToWriteTo.Input.Length) cursorPosition = inputToWriteTo.Input.Length;
         }
 
-        static bool IllegalCharacter(Keys aPressedKey) => !(aPressedKey >= Keys.A && aPressedKey <= Keys.Z);
+        static bool IllegalCharacter(Keys aPressedKey)
+        {
+            return inputToWriteTo.ValidInput(aPressedKey);
+        }
 
         static void UpdateStates()
         {

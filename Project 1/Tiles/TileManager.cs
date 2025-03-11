@@ -308,34 +308,13 @@ namespace Project_1.Tiles
                 float xAtBorder = (borderInY - c) / m;
                 return new WorldSpace(xAtBorder, borderInY);
             }
-            
-
-            //if (s.X > s.Y) //TODO: Fix names
-            //{
-            //    float lengthToSide = TileSize.X / 2 * Math.Sign(s.X);
-            //    WorldSpace xdd = closestTile.Centre;
-            //    //WorldSpace xdd = closestTile.Centre - new WorldSpace(lengthToSide, lengthToSide / s.X * s.Y);
-            //    //WorldSpace xddd = xdd - new WorldSpace(aSize.X / 2 * Math.Sign(s.X), aSize.Y / 2 * Math.Sign(s.Y));
-            //    DebugManager.Print(typeof(TileManager), "X was bigger and is " + xdd);
-            //    return xdd;
-            //}
-            //else
-            //{
-            //    float lengthToSide = TileSize.Y / 2 * Math.Sign(s.Y);
-            //    WorldSpace xdd = closestTile.Centre;
-            //    //WorldSpace xdd = closestTile.Centre - new WorldSpace(lengthToSide / s.Y * s.X, lengthToSide);
-            //    //WorldSpace xddd = xdd - new WorldSpace(aSize.X / 2 * Math.Sign(s.X), aSize.Y / 2 * Math.Sign(s.Y));
-            //    DebugManager.Print(typeof(TileManager), "Y was bigger and is " + xdd);
-            //    return xdd;
-
-            //}
         }
 
         public static Tile FindClosestWalkable(WorldSpace aWorldSpace)
         {
             Tile underStart = GetTileUnder(aWorldSpace);
             if (underStart.Walkable) return underStart;
-            //DebugManager.Print(typeof(TileManager), "Started looking for better tile around " + underStart.GridPos);
+
             float x = aWorldSpace.X / TileSize.X;
             x -= (MathF.Floor(x) + 0.5f);
             float y = aWorldSpace.Y / TileSize.Y;
@@ -409,14 +388,11 @@ namespace Project_1.Tiles
                     if (t == null)
                     {
                         removables.Add(i);
-                        //DebugManager.Print(typeof(TileManager), "Remove tile at index: " + i);
                         continue;
                     }
 
-                    //DebugManager.Print(typeof(TileManager), "Check tile at: " + t.GridPos);
                     if (t.Walkable)
                     {
-                        //DebugManager.Print(typeof(TileManager), "Found tile at: " + t.GridPos);
                         return t;
                     }
                 }
@@ -507,17 +483,6 @@ namespace Project_1.Tiles
             neighbours[5] = GetTileAt(aCoord.X + 1, aCoord.Y - 1);
             neighbours[6] = GetTileAt(aCoord.X - 1, aCoord.Y + 1);
             neighbours[7] = GetTileAt(aCoord.X - 1, aCoord.Y - 1);
-            //int index = 0;
-            //for (int i = -1; i <= 1; i++)
-            //{
-            //    for (int j = -1; j <= 1; j++)
-            //    {
-            //        if (i == 0 && j == 0) continue;
-            //        neighbours[index] = GetTileAt(aCoord.X - i, aCoord.Y - j);
-
-            //        index++;
-            //    }
-            //}
             return neighbours;
         }
 
@@ -530,11 +495,8 @@ namespace Project_1.Tiles
             for (int i = 0; i < tilesAround; i++)
             {
                 Point tilePos = midTile.GridPos;
-                //DebugManager.Print(typeof(TileManager), "Sine = " + (Math.Sin((i * 2 * Math.PI / tilesAround))).ToString());
-                //DebugManager.Print(typeof(TileManager), "Tile = " + ((int)Math.Round(tilePos.X + distanceInTiles * Math.Sin((i * 2 * Math.PI / tilesAround)))).ToString());
                 
                 Tile t = Tile((int)Math.Round(tilePos.X + distanceInTiles * Math.Sin((i * 2 * Math.PI / tilesAround))), (int)Math.Floor(tilePos.Y + distanceInTiles * Math.Cos(i * 2 * Math.PI / tilesAround)));
-                //DebugManager.Print(typeof(TileManager), "Tile is at X: " + t.TilePos.X + " and Y: " + t.TilePos.Y);
 
                 if (t == null) continue;
 

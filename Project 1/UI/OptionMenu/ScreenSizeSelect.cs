@@ -20,6 +20,13 @@ namespace Project_1.UI.OptionMenu
 
             values = setOfValues;
             displayValue = new SelectBoxValueDisplay(setOfValues[(int)0], null, aSize);
+            AddChild(displayValue);
+            AddChildren(values);
+            for (int i = 0; i < values.Length; i++)
+            {
+                values[i].Visible = false;
+            }
+            
             //displayValue = new SelectBoxValueDisplay(Pos, setOfValues[(int)Camera.CurrentCameraSetting], new UITexture("WhiteBackground", Color.White), aSize);
         }
 

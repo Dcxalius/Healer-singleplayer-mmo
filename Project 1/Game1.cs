@@ -49,6 +49,7 @@ namespace Project_1
             ParticleManager.Init();
             SaveManager.Init(Content);
             ClassSelector.Init(Content);
+            TimeManager.Init();
 
             //DEBUG
             //SaveManager.LoadData();

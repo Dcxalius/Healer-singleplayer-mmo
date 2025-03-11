@@ -38,7 +38,6 @@ namespace Project_1.Managers.States
         {
             RelativeScreenPosition size = RelativeScreenPosition.GetSquareFromY(0.9f);
             newGameBox = new NewGameBox(new RelativeScreenPosition(0.05f), size);
-            TimeManager.StartPause();
         }
 
         public override void OnLeave()

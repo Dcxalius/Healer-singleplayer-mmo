@@ -67,10 +67,12 @@ namespace Project_1.Managers.States
             newGame = new NewGame();
 
 
-            currentState = DebugManager.Mode(DebugMode.InstantlyLoadSave1) ? game : startScreen;
-            //if (currentState == startScreen) //TODO: MAKE THIS LESS ECH
+            currentState = startScreen;
+
+            //if (DebugManager.Mode(DebugMode.InstantlyLoadSave1)) TODO: implement
             //{
-            //    TimeManager.StartPause();
+            //    SaveManager.LoadData();
+            //    SetState(States.Game);
             //}
         }
 

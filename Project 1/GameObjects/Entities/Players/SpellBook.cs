@@ -12,6 +12,7 @@ namespace Project_1.GameObjects.Entities.Players
     {
         public Spell[] Spells { get => knownSpells.ToArray(); }
         List<Spell> knownSpells;
+        List<Spell> learnableSpells;
         Entity owner;
 
         public string[] LearntSpells
@@ -43,7 +44,11 @@ namespace Project_1.GameObjects.Entities.Players
         public void Init(Entity aEntity)
         {
             owner = aEntity;
-
+            learnableSpells = new List<Spell>();
+            //if (owner.Class)
+            //{
+            //  Add spells from class here.
+            //}
             for (int i = 0; i < loadedSpells.Length; i++) LearnSpell(loadedSpells[i]);
         }
 

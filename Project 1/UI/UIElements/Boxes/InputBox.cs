@@ -1,19 +1,30 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Project_1.Camera;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Project_1.UI.UIElements.Boxes
 {
-    internal class InputBox : Box //TODO: Bug, when unselected displays nothing
+    internal class InputBox : Box
     {
+        public enum ValidInputs
+        {
+            Letters,
+            Digits,
+            UpperCaseLetters,
+            LowerCaseLetters,
+            Symbols
+        }
+
         Label inputLabel;
         Label beforeWindowLabel;
         public string Input => text;
@@ -21,8 +32,40 @@ namespace Project_1.UI.UIElements.Boxes
 
         Text cursor;
         Color postClickColor;
-        public InputBox(string aTextBeforeInputWindow, Color aTextBeforeColor, string aDisplayText, Color aBackgroundColor, Color aPassiveColor, Color aPostClickColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", aBackgroundColor), aPos, aSize)
+
+        ValidInputs[] validInputs;
+
+
+        public bool ValidInput(Keys aKey)
         {
+            for (int i = 0; i < validInputs.Length; i++)
+            {
+
+
+                switch (validInputs[i])
+                {
+                    case ValidInputs.Letters: //TODO: Should this be settable or should the two bellow be merged to this one
+                    case ValidInputs.UpperCaseLetters:
+                    case ValidInputs.LowerCaseLetters:
+                        if (Keys.A < aKey || Keys.Z > aKey) return false;
+                        break;
+                    case ValidInputs.Digits:
+                        if (Keys.D0 > aKey || Keys.D9 < aKey) return false;
+                        break;
+                    case ValidInputs.Symbols:
+                        throw new NotImplementedException();
+
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+            return true;
+        }
+        public InputBox(string aTextBeforeInputWindow, ValidInputs[] aSetOfValidInputs, Color aTextBeforeColor, string aDisplayText, Color aBackgroundColor, Color aPassiveColor, Color aPostClickColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", aBackgroundColor), aPos, aSize)
+        {
+            Debug.Assert(aSetOfValidInputs.Length != 0, "Made an inputbox without any legal inputs");
+            validInputs = aSetOfValidInputs;
             postClickColor = aPostClickColor;
             RelativeScreenPosition spacingSquare = RelativeScreenPosition.GetSquareFromY(0.01f);
             RelativeScreenPosition position = spacingSquare;
@@ -50,15 +93,16 @@ namespace Project_1.UI.UIElements.Boxes
         {
             inputLabel.Color = Color.Black;
             InputManager.InputToWriteTo = this;
-            inputLabel.Text = "";
+            inputLabel.Text = text;
             base.ClickedOnAndReleasedOnMe();
         }
 
-        public void WriteTo(string aString, int aIndex)
+        public void WriteTo(char aCharToWrite, int aIndex)
         {
-            if (aIndex == text.Length) text += aString;
-            else text = text.Insert(aIndex, aString);
-
+            if (validInputs.Contains(ValidInputs.LowerCaseLetters) && !validInputs.Contains(ValidInputs.UpperCaseLetters) && char.IsUpper(aCharToWrite)) aCharToWrite = char.ToLower(aCharToWrite);
+            if (validInputs.Contains(ValidInputs.UpperCaseLetters) && !validInputs.Contains(ValidInputs.LowerCaseLetters) && char.IsLower(aCharToWrite)) aCharToWrite = char.ToUpper(aCharToWrite);
+            if (aIndex == text.Length) text += aCharToWrite;
+            else text = text.Insert(aIndex, aCharToWrite.ToString());
             inputLabel.Text = text;
         }
 

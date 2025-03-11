@@ -37,12 +37,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
         {
             base.Update();
 
-            displayValue.Update();
 
-            foreach (var value in values)
-            {
-                value.Update();
-            }
         }
 
         protected override void ClickedOnMe(ClickEvent aClick)
@@ -111,28 +106,28 @@ namespace Project_1.UI.UIElements.SelectBoxes
         {
             base.Draw(aBatch);
          
-            displayValue.Draw(aBatch); 
+            //displayValue.Draw(aBatch); 
 
             if (isOpen == false)
             {
                 return;
             }
-            for (int i = 0; i < values.Length; i++)
-            {
-                values[i].Draw(aBatch);
-            }
+            //for (int i = 0; i < values.Length; i++)
+            //{
+            //    values[i].Draw(aBatch);
+            //}
         }
 
         public override void Rescale()
         {
             base.Rescale();
 
-            displayValue.Rescale();
+            //displayValue.Rescale();
 
-            for (int i = 0; i < values.Length; i++)
-            {
-                values[i].Rescale();
-            }
+            //for (int i = 0; i < values.Length; i++)
+            //{
+            //    values[i].Rescale();
+            //}
         }
     }
 }

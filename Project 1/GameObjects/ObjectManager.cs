@@ -47,6 +47,13 @@ namespace Project_1.GameObjects
                 return r;
             }
         }
+        static List<GuildMember> GuildMembersInWorld
+        {
+            get
+            {
+                return guild.Where(x => entities.Contains(x)).ToList();
+            }
+         }
 
         public static void Init()
         {
@@ -61,6 +68,20 @@ namespace Project_1.GameObjects
             //player.Party.AddToParty(entities[entities.Count - 1] as GuildMember); //Debug
 
 
+        }
+
+        public static GuildMember FriendlyTargetCycle()
+        {
+            
+            if (player.Target == null) return GetClosestGuildMember();
+            if (player.Target.GetType() != typeof(GuildMember)) return GetClosestGuildMember();
+            return entities.Where(x => x.DistanceTo(player.FeetPosition) > player.Target.DistanceTo(player.FeetPosition)).MinBy(x => x.DistanceTo(player.FeetPosition)) as GuildMember;
+
+        }
+
+        static GuildMember GetClosestGuildMember()
+        {
+            return entities.MinBy(x => x.DistanceTo(player.FeetPosition)) as GuildMember;
         }
 
         public static void CreateNewPlayer(string aName, string aClass)
