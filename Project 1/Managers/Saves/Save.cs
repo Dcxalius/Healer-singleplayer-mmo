@@ -15,7 +15,7 @@ namespace Project_1.Managers.Saves
         static int currentVersion = 0; //TODO: Increment this whenever major changes to the save system is implemented
         public string Name => name;
         string name;
-        string nameAsPath => contentRootDirectory + name.ToUpper();
+        public string nameAsPath => contentRootDirectory + name.ToUpper();
 
         int version;
 
@@ -47,16 +47,26 @@ namespace Project_1.Managers.Saves
 
         public void SaveData()
         {
-            ObjectFactory.SaveData(name);
-            TileManager.SaveData(name);
-            SpawnerManager.SaveData(name);
+            ObjectFactory.SaveData(this);
+            TileManager.SaveData(this);
+            SpawnerManager.SaveData(this);
         }
 
         public void LoadData()
         {
-            TileManager.LoadTiles(TileManager.DeserializeTilesIds(contentRootDirectory), new Microsoft.Xna.Framework.Point(0)); //TODO: Remove hardcoded
+            TileManager.LoadTiles(this); //TODO: Remove hardcoded
             ObjectManager.Load();
+            //SpawnerManager.Load(this);
             //TimeManager.Load(); //TODO: Implement
+        }
+
+        public void ClearFolder(string aPath)
+        {
+            string[] files = System.IO.Directory.GetDirectories(aPath);
+            for (int i = 0; i < files.Length; i++)
+            {
+                System.IO.Directory.Delete(files[i]);
+            }
         }
 
         void CreateNewSaveFolder()

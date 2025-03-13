@@ -1,0 +1,109 @@
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
+using Project_1.Managers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Project_1.Tiles
+{
+    internal class Chunk : IComparable<Chunk>
+    {
+        readonly Point TileSize = new Point(32);
+        public static readonly Point ChunkSize = new Point(100);
+
+        public Tile Tile((int, int) aXY) => Tile(aXY.Item1, aXY.Item2);
+        public Tile Tile(int aX, int aY) => tiles[aX, aY];
+
+
+        Tile[,] tiles;
+        public int ID => id;
+        int id;
+        public Chunk(Point aLeftUppermostTile, int aId) 
+        {
+            id = aId;
+            tiles = new Tile[ChunkSize.X, ChunkSize.Y];
+
+            for (int i = 0; i < ChunkSize.X; i++)
+            {
+                for (int j = 0; j < ChunkSize.Y; j++)
+                {
+                    Point pos = new Point(aLeftUppermostTile.X + TileSize.X * i, aLeftUppermostTile.Y + TileSize.Y * j);
+
+                    if (i == 0 || j == 0 || i == ChunkSize.X - 1 || j == ChunkSize.Y - 1 || (i >= 4 && i < 6 && j >= 4 && j < 6))
+                    {
+                        tiles[i, j] = new Tile(TileFactory.GetTileData("Wall"), pos, new Point(i, j));
+                    }
+                    else
+                    {
+                        Tile leftTile = tiles[i - 1, j];
+                        Tile upTile = tiles[i, j - 1];
+
+                        float oddsOfDirt = 0.1f;
+
+                        if (leftTile.Name == "Wall" || upTile.Name == "Wall")
+                        {
+                            oddsOfDirt++;
+                        }
+                        if (leftTile.Name == "Wall" || leftTile.Name == "Dirt")
+                        {
+                            oddsOfDirt += 0.1f;
+
+                        }
+                        if (upTile.Name == "Wall" || upTile.Name == "Dirt")
+                        {
+                            if (oddsOfDirt > 0)
+                            {
+                                oddsOfDirt += 0.3f;
+                            }
+                            oddsOfDirt += 0.2f;
+                        }
+
+                        if (RandomManager.RollDouble() < oddsOfDirt)
+                        {
+                            tiles[i, j] = new Tile(TileFactory.GetTileData("Dirt"), pos, new Point(i, j));
+                        }
+                        else
+                        {
+                            tiles[i, j] = new Tile(TileFactory.GetTileData("Grass"), pos, new Point(i, j));
+                        }
+                    }
+                }
+            }
+        }
+
+        public Chunk(int[,] aTilesToLoad, Point aLeftUppermostTile, int aId)
+        {
+            id = aId;
+            tiles = new Tile[aTilesToLoad.GetLength(0), aTilesToLoad.GetLength(1)];
+
+            for (int i = 0; i < tiles.GetLength(0); i++)
+            {
+                for (int j = 0; j < tiles.GetLength(1); j++)
+                {
+                    Point pos = new Point(aLeftUppermostTile.X + TileSize.X * i, aLeftUppermostTile.Y + TileSize.Y * j);
+
+                    tiles[i, j] = new Tile(TileFactory.GetTileData(aTilesToLoad[i, j]), pos, new Point(i, j));
+                }
+            }
+        }
+
+        public int CompareTo(Chunk other)
+        {
+            if (id < other.id) return -1;
+            if (id > other.id) return 1;
+            throw new NotImplementedException();
+        }
+
+        public void Draw(SpriteBatch aBatch)
+        {
+            foreach (var tile in tiles)
+            {
+                tile.Draw(aBatch);
+            }
+        }
+    }
+}

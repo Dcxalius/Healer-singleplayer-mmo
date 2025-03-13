@@ -21,7 +21,7 @@ namespace Project_1.Tiles
 
             ImportData(aContentManager.RootDirectory, aContentManager);
                 //DEBUG:
-            TileManager.GenerateTiles(new Point(0), TileManager.debugSize);
+            //TileManager.GenerateTiles(new Point(0), TileManager.debugSize);
 
         }
 

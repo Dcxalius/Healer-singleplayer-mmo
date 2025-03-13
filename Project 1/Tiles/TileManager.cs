@@ -9,6 +9,7 @@ using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spawners;
 using Project_1.Managers;
+using Project_1.Managers.Saves;
 using SharpDX.Direct3D9;
 using System;
 using System.Collections;
@@ -18,6 +19,7 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Xml;
 using static Project_1.GameObjects.Spells.AoE.AreaOfEffectData;
 
@@ -25,14 +27,94 @@ namespace Project_1.Tiles
 {
     internal static class TileManager
     {
-        static Tile Tile(int aX, int aY)
-        {
-            if (aX < 0 || aX >= debugSize.X || aY < 0 || aY >= debugSize.Y) return null;
+        static Tile Tile(int aChunkId, int aX, int aY) => chunks.Find(x => x.ID == aChunkId).Tile(aX, aY);
+        static List<Chunk> chunks;
 
-            return tiles[aX, aY];
+        static int GetChunkId(int aX, int aY) //TODO: Needs testing
+        {
+            if (aX == 0 && aY == 0) return 0;
+            int x = aX;
+            int y = aY;
+
+            int dirInt;
+            int max = Math.Max(Math.Abs(x), Math.Abs(y));
+            int min = Math.Min(Math.Abs(x), Math.Abs(y));
+
+            if (Math.Abs(x) >= Math.Abs(y))
+            {
+                if (x < 0) //Left
+                {
+                    dirInt = 3;
+                }
+                else //Right
+                {
+                    dirInt = 7;
+                }
+
+            }
+            else
+            {
+                if (y < 0) //Up
+                {
+                    dirInt = 1;
+                }
+                else //Down
+                {
+                    dirInt = 5;
+                }
+            }
+
+            return (dirInt * max) + TriangleNumber(max) + min; //min is wrong, min is always positive but we want the actual value
         }
 
-        static Tile[,] tiles;
+        static (int, int) GetChunkPosition(int aId)//TODO: Needs testing
+        {
+            double triangle = (Math.Sqrt(aId + 1) - 1) / 2;
+            int circle = (int)Math.Ceiling(triangle);
+            int highestNrInCircle = TriangleNumber(circle);
+            int dif = highestNrInCircle - aId;
+            if (dif == 0) return (highestNrInCircle, -highestNrInCircle);
+            
+            int sideLength = circle * 2;
+            if (dif % (sideLength) == 0)
+            {
+                if (dif / (sideLength) == 1) return (highestNrInCircle, highestNrInCircle);
+                if (dif / (sideLength) == 2) return (-highestNrInCircle, highestNrInCircle);
+                if (dif / (sideLength) == 3) return (-highestNrInCircle, -highestNrInCircle);
+                throw new Exception("ohno");
+            }
+
+            int x;
+            int y;
+
+            if (dif / (sideLength) < 1)
+            {
+                x = highestNrInCircle;
+                y = -sideLength / 2 + sideLength * dif / sideLength;
+            }
+            else if (dif / (sideLength) < 2)
+            {
+                x = sideLength / 2 - sideLength * (dif - sideLength) / sideLength;
+                y = highestNrInCircle;
+            }
+            else if (dif / sideLength < 3)
+            {
+                x = -highestNrInCircle;
+                y = sideLength / 2 - sideLength * (dif - sideLength * 2) / sideLength;
+            }
+            else if (dif / sideLength < 4)
+            {
+                x = -sideLength / 2 + sideLength * (dif - sideLength * 3) / sideLength;
+                y = -highestNrInCircle;
+            }
+            else throw new Exception("ohno");
+
+            return (x, y);
+        }
+
+        static int TriangleNumber(int aX) => (8 * ((aX * aX) - aX) / 2);
+
+
         readonly static Point TileSize = new Point(32, 32);
         const int sizeOfSquareToCheck = 3; // this should always be odd
 
@@ -40,82 +122,19 @@ namespace Project_1.Tiles
 
         static PathFinder pathFinder = new PathFinder();
 
-        public static int?[,] DeserializeTilesIds(string aContentRoot)
+        public static void LoadTiles(Save aSave)
         {
-            string path = aContentRoot + "\\SaveData\\World\\Tiles\\OpenWorld.tilemap";
-            string json = System.IO.File.ReadAllText(path);
-            int?[,] tileIds = JsonConvert.DeserializeObject<int?[,]>(json);
-
-            return tileIds;
+            
         }
 
-        public static void LoadTiles(int?[,] aTilesToLoad, Point aLeftUppermostTile)
+        public static void Load(Save aSave)
         {
-            tiles = new Tile[aTilesToLoad.GetLength(0), aTilesToLoad.GetLength(1)];
-
-            for (int i = 0; i < tiles.GetLength(0); i++)
+            string[] files = System.IO.Directory.GetFiles(aSave.Tiles);
+            for (int i = 0; i < files.Length; i++)
             {
-                for (int j = 0; j < tiles.GetLength(1); j++)
-                {
-                    if (!aTilesToLoad[i, j].HasValue) continue;
-                
-                    Point pos = new Point(aLeftUppermostTile.X + TileSize.X * i, aLeftUppermostTile.Y + TileSize.Y * j);
-
-                    tiles[i, j] = new Tile(TileFactory.GetTileData(aTilesToLoad[i, j].Value), pos, new Point(i, j));
-                }
-            }
-        }
-
-
-        public static void GenerateTiles(Point aLeftUppermostTile, Point aSize)
-        {
-            tiles = new Tile[aSize.X, aSize.Y];
-
-            for (int i = 0; i < aSize.X; i++)
-            {
-                for (int j = 0; j < aSize.Y; j++)
-                {
-                    Point pos = new Point(aLeftUppermostTile.X + TileSize.X * i, aLeftUppermostTile.Y + TileSize.Y * j);
-
-                    if (i == 0 || j == 0 || i == aSize.X-1 || j == aSize.Y-1 || (i >= 4 && i < 6 && j >= 4 && j < 6 ))
-                    {
-                        tiles[i, j] = new Tile(TileFactory.GetTileData("Wall"), pos, new Point(i, j));
-                    }
-                    else
-                    {
-                        Tile leftTile = tiles[i - 1, j];
-                        Tile upTile = tiles[i, j - 1];
-
-                        float oddsOfDirt = 0.1f;
-
-                        if (leftTile.Name == "Wall" || upTile.Name == "Wall")
-                        {
-                            oddsOfDirt++;
-                        }
-                        if (leftTile.Name == "Wall" || leftTile.Name == "Dirt")
-                        {
-                            oddsOfDirt += 0.1f;
-
-                        }
-                        if (upTile.Name == "Wall" || upTile.Name == "Dirt")
-                        {
-                            if (oddsOfDirt > 0)
-                            {
-                                oddsOfDirt += 0.3f;
-                            }
-                            oddsOfDirt += 0.2f;
-                        }
-
-                        if (RandomManager.RollDouble() < oddsOfDirt)
-                        {
-                            tiles[i, j] = new Tile(TileFactory.GetTileData("Dirt"), pos, new Point(i, j));
-                        }
-                        else
-                        {
-                            tiles[i, j] = new Tile(TileFactory.GetTileData("Grass"), pos, new Point(i, j));
-                        }
-                    }
-                }
+                string json = System.IO.File.ReadAllText(files[i]);
+                int[,] tileIds = JsonConvert.DeserializeObject<int[,]>(json);
+                Chunk c = new Chunk(tileIds, new Point(0, 0),int.Parse(SaveManager.TrimToNameOnly(files[i])));
             }
         }
 
@@ -154,11 +173,13 @@ namespace Project_1.Tiles
                 double yAtBorder = m * borderInX + c;
                 if (yAtBorder > lastTile.WorldRectangle.Top && yAtBorder < lastTile.WorldRectangle.Bottom)
                 {
-                    lastTile = tiles[lastTile.GridPos.X + (int)dirX, lastTile.GridPos.Y];
+                    lastTile = chunks[0].Tile(lastTile.GridPos.X + (int)dirX, lastTile.GridPos.Y);
+                    //lastTile = tiles[lastTile.GridPos.X + (int)dirX, lastTile.GridPos.Y];
                 }
                 else
                 {
-                    lastTile = tiles[lastTile.GridPos.X, lastTile.GridPos.Y + (int)dirY];
+                    lastTile = chunks[0].Tile(lastTile.GridPos.X, lastTile.GridPos.Y + (int)dirY);
+                    //lastTile = tiles[lastTile.GridPos.X, lastTile.GridPos.Y + (int)dirY];
                 }
 
                 if (aFalseCondition(lastTile)) return false;
@@ -272,8 +293,9 @@ namespace Project_1.Tiles
 
         public static Tile GetTileUnder(WorldSpace aWorldSpace)
         {
-            if (aWorldSpace.X < 0 || aWorldSpace.X > debugSize.X * TileSize.X || aWorldSpace.Y < 0 || aWorldSpace.Y > debugSize.Y * TileSize.Y) return null; //DEBUG
-            Tile t = tiles[(int)Math.Floor(aWorldSpace.X / TileSize.X), (int)Math.Floor(aWorldSpace.Y / TileSize.Y)];
+            if (aWorldSpace.X < 0 || aWorldSpace.X > debugSize.X * TileSize.X || aWorldSpace.Y < 0 || aWorldSpace.Y > debugSize.Y * TileSize.Y) throw new NotImplementedException(); //DEBUG
+            Tile t = chunks[0].Tile((int)Math.Floor(aWorldSpace.X / TileSize.X), (int)Math.Floor(aWorldSpace.Y / TileSize.Y));
+            //Tile t = tiles[(int)Math.Floor(aWorldSpace.X / TileSize.X), (int)Math.Floor(aWorldSpace.Y / TileSize.Y)];
             return t;
         }
 
@@ -444,7 +466,8 @@ namespace Project_1.Tiles
                 {
                     int x = aTile.GridPos.X - (int)Math.Floor(sizeOfSquareToCheck / 2m) + i;
                     int y = aTile.GridPos.Y - (int)Math.Floor(sizeOfSquareToCheck / 2m) + j;
-                    a[i, j] = tiles[x, y];
+                    a[i, j] = chunks[0].Tile(x, y);
+                    //a[i, j] = tiles[x, y];
                 }
             }
             return a;
@@ -470,7 +493,8 @@ namespace Project_1.Tiles
 
         public static Tile GetTileAt(Point aCoord) => GetTileAt(aCoord.X, aCoord.Y);
 
-        public static Tile GetTileAt(int aX, int aY) => Tile(aX, aY);
+        public static Tile GetTileAt(int aX, int aY) => Tile(0, aX, aY);
+        //public static Tile GetTileAt(int aX, int aY) => Tile(aX, aY);
 
         public static Tile[] GetNeighbours(Point aCoord)
         {
@@ -496,7 +520,7 @@ namespace Project_1.Tiles
             {
                 Point tilePos = midTile.GridPos;
                 
-                Tile t = Tile((int)Math.Round(tilePos.X + distanceInTiles * Math.Sin((i * 2 * Math.PI / tilesAround))), (int)Math.Floor(tilePos.Y + distanceInTiles * Math.Cos(i * 2 * Math.PI / tilesAround)));
+                Tile t = Tile(0, (int)Math.Round(tilePos.X + distanceInTiles * Math.Sin((i * 2 * Math.PI / tilesAround))), (int)Math.Floor(tilePos.Y + distanceInTiles * Math.Cos(i * 2 * Math.PI / tilesAround)));
 
                 if (t == null) continue;
 
@@ -507,26 +531,29 @@ namespace Project_1.Tiles
             return returnable.ToArray();
         }
 
-        public static void SaveData(string aBaseFolderName)
+        public static void SaveData(Save aSave)
         {
-            int?[,] tilesAsId = new int?[tiles.GetLength(0),tiles.GetLength(1)];
+            int?[,] tilesAsId = new int?[Chunk.ChunkSize.X, Chunk.ChunkSize.Y];
+            //int?[,] tilesAsId = new int?[tiles.GetLength(0),tiles.GetLength(1)];
             for (int i = 0; i < tilesAsId.GetLength(0); i++)
             {
                 for (int j = 0; j < tilesAsId.GetLength(1); j++)
                 {
-                    tilesAsId[i, j] = tiles[i, j].ID;
+                    tilesAsId[i, j] = chunks[0].Tile(i, j).ID;
+                    //tilesAsId[i, j] = tiles[i, j].ID;
+
                 }
             }
 
-            SaveManager.ExportData(aBaseFolderName + "\\World\\Tiles\\Tiles.tilemap", tilesAsId);
+            SaveManager.ExportData(aSave.Tiles + "\\Tiles.tilemap", tilesAsId);
         }
 
 
         public static void Draw(SpriteBatch aBatch)
         {
-            foreach (var tile in tiles)
+            foreach (var chunk in chunks)
             {
-                tile.Draw(aBatch);
+                chunk.Draw(aBatch);
             }
         }
     }

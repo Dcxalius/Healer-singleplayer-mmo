@@ -8,6 +8,7 @@ using Project_1.GameObjects.Spawners.Pathing;
 using Project_1.GameObjects.Unit;
 using Project_1.Input;
 using Project_1.Managers;
+using Project_1.Managers.Saves;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -90,11 +91,13 @@ namespace Project_1.GameObjects.Spawners
             }
         }
 
-        public static void SaveData(string aBaseFolderName)
+        public static void SaveData(Save aSave)
         {
+            aSave.ClearFolder(aSave.SpawnZones);
+            aSave.ClearFolder(aSave.NonFriendly);
             for (int i = 0; i < spawnZones.Count; i++)
             {
-                SaveManager.ExportData(aBaseFolderName + "\\World\\SpawnZones\\" + i + ".spawn", spawnZones[i]);
+                SaveManager.ExportData(aSave.SpawnZones + "\\" + i + ".spawn", spawnZones[i]);
             }
 
             savedMobNames.Clear();
@@ -114,7 +117,7 @@ namespace Project_1.GameObjects.Spawners
                     {
                         savedMobNames.Add(name, 1);
                     }
-                    SaveManager.ExportData(aBaseFolderName + "\\Units\\InWorld\\NonFriendly\\" + name + nrOfCopies + ".unit", savedMobData[j]);
+                    SaveManager.ExportData(aSave.NonFriendly + "\\" + name + nrOfCopies + ".unit", savedMobData[j]);
                 }
             }
         }

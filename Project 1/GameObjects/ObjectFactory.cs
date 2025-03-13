@@ -5,6 +5,7 @@ using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Spawners;
 using Project_1.GameObjects.Unit;
 using Project_1.Managers;
+using Project_1.Managers.Saves;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,15 +33,22 @@ namespace Project_1.GameObjects
             contentRootDirectory = aC.RootDirectory;
 
             ImportClassData();
-            ImportPlayerData();
+            //ImportPlayerData();
             ImportMobData();
-            ImportGuildData();
+            //ImportGuildData();
         }
 
         public static void Load()
         {
+            ResetUnitData();
             ImportPlayerData();
             ImportGuildData();
+        }
+
+        public static void ResetUnitData()
+        {
+            playerData = null;
+            guildData.Clear();
         }
 
         public static MobData GetMobData(string aName)
@@ -155,14 +163,16 @@ namespace Project_1.GameObjects
             }
         }
 
-        public static void SaveData(string aBaseFolderName)
+        public static void SaveData(Save aSave)
         {
 
-            SaveManager.ExportData(aBaseFolderName + "\\Units\\" + playerData.Name + "Data.unit", playerData);
+            SaveManager.ExportData(aSave.Units + "\\" + playerData.Name + "Data.unit", playerData);
+
+            aSave.ClearFolder(aSave.Guild);
 
             for (int i = 0; i < guildData.Count; i++)
             {
-                SaveManager.ExportData(aBaseFolderName + "\\Units\\Guild\\" + guildData[i].Name + ".unit", guildData[i]);
+                SaveManager.ExportData(aSave.Guild + "\\" + guildData[i].Name + ".unit", guildData[i]);
             }
         }
     }

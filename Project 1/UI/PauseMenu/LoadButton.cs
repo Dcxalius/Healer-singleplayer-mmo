@@ -20,7 +20,7 @@ namespace Project_1.UI.PauseMenu
 
         public override void ClickedOnAndReleasedOnMe()
         {
-            SaveManager.LoadData(SaveManager.CurrentSaveName);
+            SaveManager.LoadData(SaveManager.CurrentSave.Name);
             StateManager.RedrawGame();
 
             base.ClickedOnAndReleasedOnMe();

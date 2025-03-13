@@ -92,6 +92,17 @@ namespace Project_1.GameObjects
         public static void Load()
         {
             ObjectFactory.Load();
+            Reset();
+            guild.AddRange(ObjectFactory.GetGuildMemebers());
+            
+            player = new Player(ObjectFactory.GetPlayerData());
+            player.GetPartyMembersFromGuild();
+            Camera.Camera.BindCamera(player);
+
+        }
+
+        public static void Reset()
+        {
             for (int i = guild.Count - 1; i >= 0; i--)
             {
                 guild[i].Delete();
@@ -99,12 +110,7 @@ namespace Project_1.GameObjects
             HUDManager.ClearParty();
             entities.Clear();
             guild.Clear();
-            guild.AddRange(ObjectFactory.GetGuildMemebers());
-            if(player != null) player.Delete();
-            player = new Player(ObjectFactory.GetPlayerData());
-            player.GetPartyMembersFromGuild();
-            Camera.Camera.BindCamera(player);
-
+            if (player != null) player.Delete();
         }
 
         public static List<GuildMember> GetGuildMembers() => guild;

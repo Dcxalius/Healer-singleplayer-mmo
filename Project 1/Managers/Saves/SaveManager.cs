@@ -20,7 +20,7 @@ namespace Project_1.Managers
         static string saveFolder;
         static Dictionary<string, Save> saves;
 
-        public static string CurrentSaveName => currentSave.Name;
+        public static Save CurrentSave => currentSave;
         static Save currentSave;
         public static void Init(ContentManager aContentManager)
         {
