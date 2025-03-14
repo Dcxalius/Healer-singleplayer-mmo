@@ -20,6 +20,7 @@ namespace Project_1.Managers.Saves
         int version;
 
         public string World => nameAsPath + "\\World";
+        public string Corpses => World + "\\Corpses";
         public string SpawnZones => World + "\\SpawnZones";
         public string Tiles => World + "\\Tiles";
 
@@ -27,7 +28,6 @@ namespace Project_1.Managers.Saves
         public string Guild => Units + "\\Guild";
         public string InWorld => Units + "\\InWorld";
         public string Friendly => InWorld + "\\Friendly";
-        public string Corpses => InWorld + "\\Corpses";
         public string NonFriendly => InWorld + "\\NonFriendly";
 
         static string contentRootDirectory;

@@ -96,8 +96,8 @@ namespace Project_1.UI.UIElements
         List<UIElement> children = new List<UIElement>();
         protected int ChildCount => children.Count;
 
-        protected void KillAllChildren() => children.Clear();
-        protected void KillChild(int aIndex) => children.RemoveAt(aIndex);
+        protected virtual void KillAllChildren() => children.Clear();
+        protected virtual void KillChild(int aIndex) => children.RemoveAt(aIndex);
         protected UIElement GetChild(int aIndex) => children[aIndex];
         protected void SetParent(UIElement aParent) => parent = aParent;
 
@@ -133,7 +133,7 @@ namespace Project_1.UI.UIElements
             GetVisibiltyPress();
         }
 
-        protected void AddChild(UIElement aUIElement)
+        protected virtual void AddChild(UIElement aUIElement)
         {
             aUIElement.Visible = Visible;
             aUIElement.parent = this;

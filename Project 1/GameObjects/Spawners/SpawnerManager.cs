@@ -142,7 +142,6 @@ namespace Project_1.GameObjects.Spawners
 
             for (int i = 0; i < folders.Length; i++)
             {
-                if (folders[i] == aSave.Corpses) continue; //TODO: MAKE THIS NOT AS ECH
                 string[] files = System.IO.Directory.GetFiles(folders[i]);
                 for (int j = 0; j < files.Length; j++)
                 {

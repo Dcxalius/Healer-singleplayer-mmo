@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.HUD
 {
-    internal class LootBox : Box
+    internal class LootBox : Box //TODO: Make this inherit from scrollable
     {
         Corpse lootedCorpse;
         Loot[] loot;
@@ -24,7 +24,7 @@ namespace Project_1.UI.HUD
         RelativeScreenPosition lootSize = RelativeScreenPosition.GetSquareFromX(0.05f);
         RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.025f);
 
-        bool tooMuchLootForWindow = false; //TODO: Break this out to a interface
+        bool tooMuchLootForWindow = false;
         float scrollValue = 0;
         int totalLoot;
         float[] originalYPos;
