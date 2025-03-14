@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.Managers.States;
+using Project_1.Tiles;
 using Project_1.UI.UIElements.Buttons;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ namespace Project_1.UI.StartMenu
             base.ClickedOnAndReleasedOnMe();
 
             StateManager.SetState(StateManager.States.NewGame);
+            TileManager.New();
         }
     }
 }

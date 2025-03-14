@@ -21,6 +21,7 @@ using Project_1.GameObjects.Spells.Projectiles;
 using Project_1.GameObjects.Spawners;
 using System.Diagnostics;
 using Project_1.Tiles;
+using Project_1.Managers.Saves;
 
 namespace Project_1.GameObjects
 {
@@ -86,16 +87,20 @@ namespace Project_1.GameObjects
 
         public static void CreateNewPlayer(string aName, string aClass)
         {
+            Reset();
             player = new Player(aName, aClass);
+            ObjectFactory.PlayerData = player.PlayerData;
+            Camera.Camera.BindCamera(player);
         }
 
-        public static void Load()
+
+        public static void Load(Save aSave)
         {
-            ObjectFactory.Load();
+            ObjectFactory.Load(aSave);
             Reset();
             guild.AddRange(ObjectFactory.GetGuildMemebers());
             
-            player = new Player(ObjectFactory.GetPlayerData());
+            player = new Player(ObjectFactory.PlayerData);
             player.GetPartyMembersFromGuild();
             Camera.Camera.BindCamera(player);
 

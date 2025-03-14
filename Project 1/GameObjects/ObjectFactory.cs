@@ -17,6 +17,8 @@ namespace Project_1.GameObjects
 {
     internal static class ObjectFactory
     {
+        public static PlayerData PlayerData { get => playerData; set => playerData = value; }
+
         static PlayerData playerData;
         static List<UnitData> guildData;
         static Dictionary<string, MobData> mobData;
@@ -36,13 +38,14 @@ namespace Project_1.GameObjects
             //ImportPlayerData();
             ImportMobData();
             //ImportGuildData();
+            guildData = new List<UnitData>();
         }
 
-        public static void Load()
+        public static void Load(Save aSave)
         {
             ResetUnitData();
-            ImportPlayerData();
-            ImportGuildData();
+            ImportPlayerData(aSave);
+            ImportGuildData(aSave);
         }
 
         public static void ResetUnitData()
@@ -63,7 +66,6 @@ namespace Project_1.GameObjects
             }
         }
 
-        public static PlayerData GetPlayerData() => playerData;
 
         public static List<GuildMember> GetGuildMemebers()
         {
@@ -97,17 +99,17 @@ namespace Project_1.GameObjects
 
         
 
-        static void ImportPlayerData()
+        static void ImportPlayerData(Save aSave)
         {
-            string rawData = System.IO.File.ReadAllText(contentRootDirectory + "\\SaveData\\Units\\PlayerData.unit");
+            string rawData = System.IO.File.ReadAllText(aSave.Units + "\\PlayerData.unit");
             playerData = JsonConvert.DeserializeObject<PlayerData>(rawData);
         }
 
-        static void ImportGuildData()
+        static void ImportGuildData(Save aSave)
         {
             guildData = new List<UnitData>();
 
-            string path = contentRootDirectory + "\\SaveData\\Units\\Guild\\";
+            string path = aSave.Guild + "\\";
 
             string[] files = System.IO.Directory.GetFiles(path);
 
@@ -166,7 +168,7 @@ namespace Project_1.GameObjects
         public static void SaveData(Save aSave)
         {
 
-            SaveManager.ExportData(aSave.Units + "\\" + playerData.Name + "Data.unit", playerData);
+            SaveManager.ExportData(aSave.Units + "\\" + "PlayerData.unit", playerData);
 
             aSave.ClearFolder(aSave.Guild);
 

@@ -54,9 +54,9 @@ namespace Project_1.Managers.Saves
 
         public void LoadData()
         {
-            TileManager.LoadTiles(this); //TODO: Remove hardcoded
-            ObjectManager.Load();
-            //SpawnerManager.Load(this);
+            TileManager.Load(this); 
+            ObjectManager.Load(this);
+            SpawnerManager.Load(this);
             //TimeManager.Load(); //TODO: Implement
         }
 

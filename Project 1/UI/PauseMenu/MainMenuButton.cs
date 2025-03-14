@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
+using Project_1.GameObjects;
 using Project_1.Managers.States;
 using Project_1.UI.UIElements.Buttons;
 using System;
@@ -22,7 +23,7 @@ namespace Project_1.UI.PauseMenu
         public override void ClickedOnAndReleasedOnMe()
         {
             StateManager.SetState(StateManager.States.StartScreen);
-
+            ObjectManager.Reset();
             base.ClickedOnAndReleasedOnMe();
         }
     }

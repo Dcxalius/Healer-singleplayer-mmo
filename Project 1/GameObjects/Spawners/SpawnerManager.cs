@@ -24,17 +24,21 @@ namespace Project_1.GameObjects.Spawners
 
         static Dictionary<string, int> savedMobNames;
 
-        public static void Init(ContentManager aContentManager)
+        public static void Init()
         {
             savedMobNames = new Dictionary<string, int>();
             spawnZones = new List<SpawnZone>();
-            SavedMobData[] unitData = ImportUnitData(aContentManager);
-            ImportZones(aContentManager, unitData);
         }
 
-        static void ImportZones(ContentManager aContentManager, SavedMobData[] aUnitData)
+        public static void Load(Save aSave)
         {
-            string path = aContentManager.RootDirectory + "\\SaveData\\World\\SpawnZones";
+            SavedMobData[] unitData = ImportUnitData(aSave);
+            ImportZones(aSave, unitData);
+        }
+
+        static void ImportZones(Save aSave, SavedMobData[] aUnitData)
+        {
+            string path = aSave.SpawnZones;
 
             string[] files = System.IO.Directory.GetFiles(path);
             SavedMobData[] x = aUnitData.Distinct(new SpawnZoneComparer()).ToArray();
@@ -122,11 +126,11 @@ namespace Project_1.GameObjects.Spawners
             }
         }
 
-        static SavedMobData[] ImportUnitData(ContentManager aContentManager)
+        static SavedMobData[] ImportUnitData(Save aSave)
         {
             List<SavedMobData> unitData = new List<SavedMobData>();
 
-            string path = aContentManager.RootDirectory + "\\SaveData\\Units\\InWorld";
+            string path = aSave.InWorld;
 
             string[] folders = System.IO.Directory.GetDirectories(path);
 

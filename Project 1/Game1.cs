@@ -44,7 +44,7 @@ namespace Project_1
             //Camera.Init();
             TileFactory.Init(Content);
             StateManager.Init(Content);
-            SpawnerManager.Init(Content);
+            SpawnerManager.Init();
             AreaOfEffectFactory.Init(Content);
             ParticleManager.Init();
             SaveManager.Init(Content);

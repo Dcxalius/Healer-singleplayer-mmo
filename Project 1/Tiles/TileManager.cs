@@ -30,6 +30,11 @@ namespace Project_1.Tiles
         static Tile Tile(int aChunkId, int aX, int aY) => chunks.Find(x => x.ID == aChunkId).Tile(aX, aY);
         static List<Chunk> chunks;
 
+        public static void Init()
+        {
+            chunks = new List<Chunk>();
+        }
+
         static int GetChunkId(int aX, int aY) //TODO: Needs testing
         {
             if (aX == 0 && aY == 0) return 0;
@@ -67,20 +72,20 @@ namespace Project_1.Tiles
             return (dirInt * max) + TriangleNumber(max) + min; //min is wrong, min is always positive but we want the actual value
         }
 
-        static (int, int) GetChunkPosition(int aId)//TODO: Needs testing
+        public static Point GetChunkPosition(int aId)//TODO: Needs testing
         {
             double triangle = (Math.Sqrt(aId + 1) - 1) / 2;
             int circle = (int)Math.Ceiling(triangle);
             int highestNrInCircle = TriangleNumber(circle);
             int dif = highestNrInCircle - aId;
-            if (dif == 0) return (highestNrInCircle, -highestNrInCircle);
+            if (dif == 0) return new Point(highestNrInCircle, -highestNrInCircle);
             
             int sideLength = circle * 2;
             if (dif % (sideLength) == 0)
             {
-                if (dif / (sideLength) == 1) return (highestNrInCircle, highestNrInCircle);
-                if (dif / (sideLength) == 2) return (-highestNrInCircle, highestNrInCircle);
-                if (dif / (sideLength) == 3) return (-highestNrInCircle, -highestNrInCircle);
+                if (dif / (sideLength) == 1) return new Point(highestNrInCircle, highestNrInCircle);
+                if (dif / (sideLength) == 2) return new Point(-highestNrInCircle, highestNrInCircle);
+                if (dif / (sideLength) == 3) return new Point(-highestNrInCircle, -highestNrInCircle);
                 throw new Exception("ohno");
             }
 
@@ -109,7 +114,7 @@ namespace Project_1.Tiles
             }
             else throw new Exception("ohno");
 
-            return (x, y);
+            return new Point(x, y);
         }
 
         static int TriangleNumber(int aX) => (8 * ((aX * aX) - aX) / 2);
@@ -122,19 +127,25 @@ namespace Project_1.Tiles
 
         static PathFinder pathFinder = new PathFinder();
 
-        public static void LoadTiles(Save aSave)
+        public static void New()
         {
-            
+            chunks.Add(new Chunk(Point.Zero, 0));
         }
 
         public static void Load(Save aSave)
         {
+            chunks.Clear();
+
             string[] files = System.IO.Directory.GetFiles(aSave.Tiles);
             for (int i = 0; i < files.Length; i++)
             {
                 string json = System.IO.File.ReadAllText(files[i]);
-                int[,] tileIds = JsonConvert.DeserializeObject<int[,]>(json);
-                Chunk c = new Chunk(tileIds, new Point(0, 0),int.Parse(SaveManager.TrimToNameOnly(files[i])));
+                Chunk c = SaveManager.ImportData<Chunk>(json);
+                //int[,] tileIds = JsonConvert.DeserializeObject<int[,]>(json);
+                int id = int.Parse(SaveManager.TrimToNameOnly(files[i]));
+                chunks.Add(c);
+
+                
             }
         }
 
@@ -533,19 +544,14 @@ namespace Project_1.Tiles
 
         public static void SaveData(Save aSave)
         {
-            int?[,] tilesAsId = new int?[Chunk.ChunkSize.X, Chunk.ChunkSize.Y];
-            //int?[,] tilesAsId = new int?[tiles.GetLength(0),tiles.GetLength(1)];
-            for (int i = 0; i < tilesAsId.GetLength(0); i++)
-            {
-                for (int j = 0; j < tilesAsId.GetLength(1); j++)
-                {
-                    tilesAsId[i, j] = chunks[0].Tile(i, j).ID;
-                    //tilesAsId[i, j] = tiles[i, j].ID;
 
-                }
+
+            for (int i = 0; i < chunks.Count; i++)
+            {
+                SaveManager.ExportData(aSave.Tiles + "\\" + chunks[i].ID + ".tilemap", chunks[i]);
+
             }
 
-            SaveManager.ExportData(aSave.Tiles + "\\Tiles.tilemap", tilesAsId);
         }
 
 

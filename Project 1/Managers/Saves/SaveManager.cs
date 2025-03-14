@@ -67,7 +67,7 @@ namespace Project_1.Managers
         public static void ExportData(string aDestination, object aObjectToExport)
         {
             string json = JsonConvert.SerializeObject(aObjectToExport, serializerSettings);
-            System.IO.File.WriteAllText(contentRootDirectory + "\\Saves\\" + aDestination, json);
+            System.IO.File.WriteAllText(aDestination, json);
         }
 
         public static T ImportData<T>(string aJsonString)

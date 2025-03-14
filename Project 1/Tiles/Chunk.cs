@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json;
 using Project_1.Camera;
 using Project_1.Managers;
 using System;
@@ -18,8 +19,30 @@ namespace Project_1.Tiles
         public Tile Tile((int, int) aXY) => Tile(aXY.Item1, aXY.Item2);
         public Tile Tile(int aX, int aY) => tiles[aX, aY];
 
+        [JsonProperty]
+        int[,] tilesAsIDs
+        {
+            get
+            {
+                int[,] tilesAsId = new int[ChunkSize.X, ChunkSize.Y];
+                //int?[,] tilesAsId = new int?[tiles.GetLength(0),tiles.GetLength(1)];
+                for (int i = 0; i < tilesAsId.GetLength(0); i++)
+                {
+                    for (int j = 0; j < tilesAsId.GetLength(1); j++)
+                    {
+                        tilesAsId[i, j] = Tile(i, j).ID;
+                        //tilesAsId[i, j] = tiles[i, j].ID;
+
+                    }
+                }
+                return tilesAsId;
+            }
+        }
+
+
 
         Tile[,] tiles;
+        [JsonIgnore]
         public int ID => id;
         int id;
         public Chunk(Point aLeftUppermostTile, int aId) 
@@ -75,18 +98,20 @@ namespace Project_1.Tiles
             }
         }
 
-        public Chunk(int[,] aTilesToLoad, Point aLeftUppermostTile, int aId)
+        [JsonConstructor]
+        public Chunk(int[,] tilesAsIDs, int aId)
         {
             id = aId;
-            tiles = new Tile[aTilesToLoad.GetLength(0), aTilesToLoad.GetLength(1)];
+            Point tilePos = TileManager.GetChunkPosition(id);
+            tiles = new Tile[tilesAsIDs.GetLength(0), tilesAsIDs.GetLength(1)];
 
             for (int i = 0; i < tiles.GetLength(0); i++)
             {
                 for (int j = 0; j < tiles.GetLength(1); j++)
                 {
-                    Point pos = new Point(aLeftUppermostTile.X + TileSize.X * i, aLeftUppermostTile.Y + TileSize.Y * j);
+                    Point pos = new Point(tilePos.X * ChunkSize.X + TileSize.X * i, tilePos.Y * ChunkSize.Y + TileSize.Y * j);
 
-                    tiles[i, j] = new Tile(TileFactory.GetTileData(aTilesToLoad[i, j]), pos, new Point(i, j));
+                    tiles[i, j] = new Tile(TileFactory.GetTileData(tilesAsIDs[i, j]), pos, new Point(i, j));
                 }
             }
         }

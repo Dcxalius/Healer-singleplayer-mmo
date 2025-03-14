@@ -26,6 +26,7 @@ namespace Project_1.Managers.States
         {
             HUDManager.Init();
             ObjectManager.Init();
+            TileManager.Init();
 
             spriteBatch = GraphicsManager.CreateSpriteBatch();
 
