@@ -29,7 +29,7 @@ namespace Project_1.Items.SubTypes
 
 
         [JsonConstructor]
-        public ConsumableData(int id, string gfxName, string name, string description, int maxStack, ConsumableType type, float value = -1) : base(id, gfxName, name, description, maxStack, ItemType.Consumable)
+        public ConsumableData(int id, string gfxName, string name, string description, int maxStack, ConsumableType type, Item.Quality quality, float value = -1) : base(id, gfxName, name, description, maxStack, ItemType.Consumable, quality)
         {
 
             this.type = type;

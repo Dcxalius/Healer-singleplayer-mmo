@@ -61,6 +61,7 @@ namespace Project_1.GameObjects.Entities
         protected Relation Relation => unitData.RelationData;
         public string Name => unitData.Name;
         public string Class => unitData.ClassData.Name;
+        public ClassData ClassData => unitData.ClassData;
         public int CurrentLevel => unitData.Level.CurrentLevel;
         public bool Alive => unitData.Health.CurrentHealth > 0;
         public bool FullHealth => unitData.Health.MaxHealth == unitData.Health.CurrentHealth;
@@ -84,7 +85,6 @@ namespace Project_1.GameObjects.Entities
 
         float timeSinceLastAttack = 0;
 
-        protected Corpse corpse;
         ParticleBase bloodsplatter;
         bool namePlateRequiresUpdate;
 
@@ -97,7 +97,6 @@ namespace Project_1.GameObjects.Entities
             unitData.Equipment.SetOwner(this);
             unitData.BaseStats.SetOwner(this);
             unitData.Destination.SetOwner(this);
-            corpse = new Corpse(unitData.CorpseGfxPath, unitData.LootTable);
             bloodsplatter = new ParticleBase((1000d, 2000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[] { Color.Red }, new Point(1));
             namePlateRequiresUpdate = false;
             shadow = new Shadow();
@@ -155,7 +154,8 @@ namespace Project_1.GameObjects.Entities
 
             ObjectManager.RemoveEntity(this);
             RemoveNamePlate();
-            if (corpse != null) corpse.SpawnCorpe(Position);
+            Corpse c = new Corpse(unitData.CorpseGfxPath, unitData.LootTable);
+            c.SpawnCorpe(Position);
 
         }
         void TargetAliveCheck()
@@ -407,11 +407,11 @@ namespace Project_1.GameObjects.Entities
         public virtual void TakeDamage(Entity aAttacker, float aDamageTaken)
         {
             float damageTaken = CalculateDamage(aAttacker, aDamageTaken);
-            WorldSpace dir = GetDirOfFloatingText(aAttacker.FeetPosition);
+            WorldSpace dir = GetDirOfFloatingText(aAttacker.FeetPosition); //TODO: This is wrong
             SpawnFlyingText(damageTaken, dir, Color.Red);
 
             ParticleMovement bloodMovement = new ParticleMovement(dir, WorldSpace.Zero, 0.9f);
-            ParticleManager.SpawnParticle(bloodsplatter, WorldRectangle, this, bloodMovement, (int)Math.Max(1, (damageTaken / MaxHealth) * 100));
+            ParticleManager.SpawnParticle(bloodsplatter, WorldRectangle, this, bloodMovement, (int)Math.Max(1, Math.Min((damageTaken / MaxHealth) * 100, 100)));
             FlagForRefresh(); //TODO: Check death here?
         }
 

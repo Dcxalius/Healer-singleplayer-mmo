@@ -39,7 +39,13 @@ namespace Project_1.UI.UIElements.SpellBook
             Debug.Assert(aSpells.Length == spellButtons.Length);
             for (int i = 0; i < aSpells.Length; i++)
             {
-                if (aSpells == null) continue;
+                
+                //if (aSpells[i] == null)
+                //{
+                //    spellButtons[i].AssignSpell(null);
+                //    continue;
+                //}
+
                 spellButtons[i].AssignSpell(aSpells[i]);
             }
         }

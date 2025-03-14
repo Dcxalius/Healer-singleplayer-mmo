@@ -14,14 +14,14 @@ namespace Project_1.UI.UIElements
 {
     internal class KeybindingButton : Button
     {
-        bool firstButtons;
+        bool firstButton;
         KeyBindManager.KeyListner keyListner;
         
         
         bool waitingForPress = false;
         public KeybindingButton(bool aFirstButtons, KeyBindManager.KeyListner aKeyListner, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, Color.White, KeyBindManager.GetKey(aFirstButtons, aKeyListner).ToString(), Color.Black)
         {
-            firstButtons = aFirstButtons; 
+            firstButton = aFirstButtons; 
             keyListner = aKeyListner;
         }
 
@@ -45,7 +45,7 @@ namespace Project_1.UI.UIElements
         {
             if (InputManager.GetPress(Keys.Escape))
             {
-                KeyBindManager.SetKey(firstButtons, keyListner, Keys.None);
+                KeyBindManager.SetKey(firstButton, keyListner, Keys.None);
                 waitingForPress = false;
                 ButtonText = "None";
                 OptionManager.AddActionToDoAtExitOfOptionMenu(KeyBindManager.SaveBindings);
@@ -61,19 +61,19 @@ namespace Project_1.UI.UIElements
             {
                 return;
             }
-            if (newKey.Value == Keys.Escape)
+            if (newKey.Value == Keys.Escape || InputManager.IsModifier(newKey.Value))
             {
                 return;
             }
 
-            if (!KeyBindManager.CheckForNoDupeKeys(newKey.Value))
+            if (!KeyBindManager.CheckForNoDupeKeys(newKey.Value, InputManager.CheckHoldModifiers()))
             {
                 ButtonText = "Dupe key, try another key.";
                 return;
             }
 
-            ButtonText = newKey.Value.ToString();
-            KeyBindManager.SetKey(firstButtons, keyListner, newKey.Value);
+            KeyBindManager.SetKey(firstButton, keyListner, newKey.Value);
+            ButtonText = KeyBindManager.GetKey(firstButton, keyListner).ToString();
             waitingForPress = false;
 
             OptionManager.AddActionToDoAtExitOfOptionMenu(KeyBindManager.SaveBindings);
@@ -82,7 +82,7 @@ namespace Project_1.UI.UIElements
         public override void Close()
         {
             base.Close();
-            ButtonText = KeyBindManager.GetKey(firstButtons, keyListner).ToString();
+            ButtonText = KeyBindManager.GetKey(firstButton, keyListner).ToString();
             waitingForPress = false;
         }
 

@@ -61,9 +61,13 @@ namespace Project_1.GameObjects.Spawners
             {
                 for (int i = 0; i < unitsToFindMatchFor.Count; i++)
                 {
-                    unitsToFindMatchFor.First(x => x.SpawnerID == i);
-                    spawners.Add(new Spawner(id, i, value[i], debugMinSpawnTimer, debugMaxSpawnTimer, mobData, unitsToFindMatchFor[i]));
-
+                    SavedMobData savedMobData = unitsToFindMatchFor.FirstOrDefault(x => x.SpawnerID == i);
+                    if (savedMobData != null)
+                    {
+                        spawners.Add(new Spawner(id, i, value[i], debugMinSpawnTimer, debugMaxSpawnTimer, mobData, savedMobData));
+                        continue;
+                    }
+                    spawners.Add(new Spawner(id, i, value[i], debugMinSpawnTimer, debugMaxSpawnTimer, mobData));
                 }
             }
         }
@@ -142,6 +146,13 @@ namespace Project_1.GameObjects.Spawners
             spawners.Add(s);
         }
 
+        public void RemoveAllPlates()
+        {
+            for (int i = 0; i < spawners.Count; i++)
+            {
+                spawners[i].RemovePlates();
+            }
+        }
 
         public Spawner GetSpawner(int aId)
         {

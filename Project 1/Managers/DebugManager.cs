@@ -28,6 +28,7 @@ namespace Project_1.Managers
         Teleport,
         InstantlyLoadSave1,
         Console,
+        LearnKill,
         Count
     }
 
@@ -55,6 +56,8 @@ namespace Project_1.Managers
             modes[(int)DebugMode.Teleport] = true;
             modes[(int)DebugMode.InstantlyLoadSave1] = false;
             modes[(int)DebugMode.Console] = true;
+            modes[(int)DebugMode.LearnKill] = true;
+            
 
             if (modes[(int)DebugMode.Console]) AllocConsole();
         }

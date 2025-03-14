@@ -304,7 +304,7 @@ namespace Project_1.Tiles
 
         public static Tile GetTileUnder(WorldSpace aWorldSpace)
         {
-            if (aWorldSpace.X < 0 || aWorldSpace.X > debugSize.X * TileSize.X || aWorldSpace.Y < 0 || aWorldSpace.Y > debugSize.Y * TileSize.Y) throw new NotImplementedException(); //DEBUG
+            if (aWorldSpace.X < 0 || aWorldSpace.X > debugSize.X * TileSize.X || aWorldSpace.Y < 0 || aWorldSpace.Y > debugSize.Y * TileSize.Y) return null; //DEBUG
             Tile t = chunks[0].Tile((int)Math.Floor(aWorldSpace.X / TileSize.X), (int)Math.Floor(aWorldSpace.Y / TileSize.Y));
             //Tile t = tiles[(int)Math.Floor(aWorldSpace.X / TileSize.X), (int)Math.Floor(aWorldSpace.Y / TileSize.Y)];
             return t;

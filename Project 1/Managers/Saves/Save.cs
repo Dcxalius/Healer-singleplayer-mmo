@@ -27,6 +27,7 @@ namespace Project_1.Managers.Saves
         public string Guild => Units + "\\Guild";
         public string InWorld => Units + "\\InWorld";
         public string Friendly => InWorld + "\\Friendly";
+        public string Corpses => InWorld + "\\Corpses";
         public string NonFriendly => InWorld + "\\NonFriendly";
 
         static string contentRootDirectory;
@@ -48,6 +49,7 @@ namespace Project_1.Managers.Saves
         public void SaveData()
         {
             ObjectFactory.SaveData(this);
+            ObjectManager.Save(this);
             TileManager.SaveData(this);
             SpawnerManager.SaveData(this);
         }
@@ -84,6 +86,7 @@ namespace Project_1.Managers.Saves
             System.IO.Directory.CreateDirectory(InWorld);
             System.IO.Directory.CreateDirectory(Friendly);
             System.IO.Directory.CreateDirectory(NonFriendly);
+            System.IO.Directory.CreateDirectory(Corpses);
         }
 
         bool VersionCheck(int aVersion)

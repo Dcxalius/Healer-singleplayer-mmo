@@ -37,7 +37,7 @@ namespace Project_1.GameObjects.Spells
         public double RatioOfCooldownDone { get => Math.Min((TimeManager.TotalFrameTime - lastTimeCasted) / spellData.Cooldown, 1); }
         double lastTimeCasted;
 
-        public Spell(string aName, Entity aOwner) 
+        public Spell(string aName, Entity aOwner) //TODO: Ponder if owner should be passed here or only when casted
         {
             spellData = SpellFactory.GetSpell(aName);
             Debug.Assert(aOwner != null);

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 using Project_1.Camera;
 using Project_1.Input;
@@ -21,17 +22,22 @@ namespace Project_1.GameObjects.Entities
     {
         ParticleBase lootGlow;
         ParticleMovement lootGlowMovement;
+
+        [JsonProperty]
         public Item[] Drop => drop;
         LootTable loot;
         Item[] drop;
+        [JsonIgnore]
         public float LootLength => lootLength;
         float lootLength;
 
+        [JsonIgnore]
         public bool IsEmpty => drop.All(drop => drop == null);
+        [JsonIgnore]
         public bool Despawned => isDespawning && timeDespawnStart + despawnTime < TimeManager.TotalFrameTime;
 
-        const double hardDecayTime = 10000;
-        const double softDecayTime = 20000;
+        const double hardDecayTime = 30000;
+        const double softDecayTime = 60000;
 
         const double despawnTime = 1000;
 
@@ -40,13 +46,32 @@ namespace Project_1.GameObjects.Entities
         bool isDespawning;
         double timeDespawnStart;
 
-        public Corpse(GfxPath aPath, LootTable aLoot) : base(new Textures.Texture(aPath), WorldSpace.Zero)
+
+        [JsonProperty]
+        string CorpseName => corpseName;
+        string corpseName;
+
+        [JsonProperty]
+        WorldSpace Pos => Position;
+
+        public Corpse(GfxPath aPath, LootTable aLoot) : this(aPath, WorldSpace.Zero)
         {
             loot = aLoot;
+        }
+
+        [JsonConstructor] //TODO: Make this take timers for despawnlogic
+        Corpse(string corpseName, Item[] drop, WorldSpace pos) : this(new GfxPath(GfxType.Corpse, corpseName), pos)
+        {
+            this.drop = drop;
+        }
+
+        Corpse(GfxPath aPath, WorldSpace aPosition) : base(new Textures.Texture(aPath), aPosition)
+        {
+            corpseName = aPath.Name;
+
             lootLength = WorldRectangle.Size.ToVector2().Length();
-            lootGlow = new ParticleBase((1000d, 1000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[]{ Color.Yellow }, new Point(1));
+            lootGlow = new ParticleBase((1000d, 1000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[] { Color.Yellow }, new Point(1));
             lootGlowMovement = new ParticleMovement(new WorldSpace(0, -1), WorldSpace.Zero, 0.95f);
-            drop = new Item[0];
             isDespawning = false;
         }
 

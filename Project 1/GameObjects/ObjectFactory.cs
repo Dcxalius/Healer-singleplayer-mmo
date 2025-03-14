@@ -56,6 +56,7 @@ namespace Project_1.GameObjects
 
         public static MobData GetMobData(string aName)
         {
+            aName = aName.ToUpper();
             if (mobData.ContainsKey(aName))
             {
                 return mobData[aName];
@@ -92,7 +93,7 @@ namespace Project_1.GameObjects
             {
                 string rawData = System.IO.File.ReadAllText(files[i]);
                 MobData data = JsonConvert.DeserializeObject<MobData>(rawData);
-                mobData.Add(data.Name, data);
+                mobData.Add(data.Name.ToUpper(), data);
                 
             }
         }

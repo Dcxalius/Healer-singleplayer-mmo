@@ -1,4 +1,6 @@
 ﻿using Project_1.GameObjects.Spells;
+using Project_1.GameObjects.Unit;
+using Project_1.Managers;
 using Project_1.UI.HUD;
 using System;
 using System.Collections.Generic;
@@ -45,14 +47,42 @@ namespace Project_1.GameObjects.Entities.Players
         {
             owner = aEntity;
             learnableSpells = new List<Spell>();
-            //if (owner.Class)
-            //{
-            //  Add spells from class here.
-            //}
-            for (int i = 0; i < loadedSpells.Length; i++) LearnSpell(loadedSpells[i]);
+            string[] learnables = aEntity.ClassData.LearnableSpells;
+            for (int i = 0; i < learnables.Length; i++)
+            {
+                learnableSpells.Add(new Spell(learnables[i], owner));
+            }
+
+            string[] levelOneSpells = aEntity.ClassData.LevelOneSpells;
+
+            for (int i = 0; i < levelOneSpells.Length; i++)
+            {
+                AddSpell(new Spell(levelOneSpells[i], owner));
+            }
+
+            for (int i = 0; i < loadedSpells.Length; i++)
+            {
+                if (levelOneSpells.Contains(loadedSpells[i])) continue;
+                LearnSpell(loadedSpells[i]);
+            }
+
+            if (DebugManager.Mode(DebugMode.LearnKill))
+            {
+                AddSpell(new Spell("Kill", owner));
+            }
         }
 
-        public void LearnSpell(string aSpellName) => knownSpells.Add(new Spell(aSpellName, owner));
+        public void LearnSpell(string aSpellName)
+        {
+            Spell s = learnableSpells.Find(x => x.Name == aSpellName);
+            if (s == null)
+            {
+                DebugManager.Print(GetType(), "Tried to learn spell named " + aSpellName + " but it was null.");
+                return;
+            }
+
+            AddSpell(s);
+        }
 
         public void AddSpell(Spell aSpell)
         {

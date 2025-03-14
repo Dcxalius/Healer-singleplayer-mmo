@@ -1,13 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
-using Project_1.Camera;
+using Project_1.GameObjects.Spawners;
+using Project_1.GameObjects.Spawners.Pathing;
 using Project_1.Managers;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project_1.Tiles
 {
@@ -96,6 +93,14 @@ namespace Project_1.Tiles
                     }
                 }
             }
+            SpawnerManager.CreateNewSpawnZone(new string[] { "sheep" });
+            for (int i = 0; i < 10; i++)
+            {
+                Point size = new Point(10 + RandomManager.RollInt(500), 10 + RandomManager.RollInt(500));
+                Rectangle r = new Rectangle(new Point(RandomManager.RollInt(size.X), RandomManager.RollInt(size.Y)), size);
+                SpawnerManager.CreateNewSpawner(0, new Wander(r));
+
+            } 
         }
 
         [JsonConstructor]

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -33,6 +34,8 @@ namespace Project_1.Input
             Middle,
             Right
         }
+
+        public static bool IsModifier(Keys aKey) => aKey == Keys.LeftShift || aKey == Keys.RightShift || aKey == Keys.LeftAlt || aKey == Keys.RightAlt || aKey == Keys.LeftControl || aKey == Keys.RightControl;
 
         public static bool WritingToLabel => inputToWriteTo != null;
         public static InputBox InputToWriteTo 

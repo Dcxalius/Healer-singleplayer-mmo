@@ -70,7 +70,10 @@ namespace Project_1.GameObjects.Spawners
             timeSinceLastDeath = double.NegativeInfinity;
         }
 
-        
+        public void RemovePlates()
+        {
+            if (spawn != null) spawn.Delete();
+        }
 
         public void Update()
         {
@@ -86,7 +89,11 @@ namespace Project_1.GameObjects.Spawners
             Spawn();
         }
 
-        public SavedMobData GetSavedMobData() => spawn.SavedMobData;
+        public SavedMobData GetSavedMobData()
+        {
+            if (spawn == null) return null;
+            return spawn.SavedMobData;
+        }
 
         void Spawn()
         {

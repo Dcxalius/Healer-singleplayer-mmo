@@ -25,27 +25,19 @@ namespace Project_1.Input
             Count
         }
 
-        static Keys[] firstButtons = new Keys[(int)KeyListner.Count];
-        static Keys[] secondButtons = new Keys[(int)KeyListner.Count];
+        static KeySet[] firstButtons = new KeySet[(int)KeyListner.Count];
+        static KeySet[] secondButtons = new KeySet[(int)KeyListner.Count];
 
-        readonly static Keys[] defaultFirstKeys = new Keys[(int)KeyListner.Count] //TODO: Make this have a variable per entry for modkeys
-        {Keys.W, Keys.A, Keys.S, Keys.D, 
-         Keys.Q, Keys.NumPad0, Keys.NumPad1, Keys.Delete, Keys.NumPad2,
-         Keys.I, Keys.T, Keys.C, Keys.G,
-         Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9, Keys.D0};
-        readonly static Keys[] defaultSecondKeys = new Keys[(int)KeyListner.Count] 
+        readonly static KeySet[] defaultSecondKeys = new KeySet[(int)KeyListner.Count] 
         {Keys.Up, Keys.Left, Keys.Down, Keys.Right, 
          Keys.None, Keys.None, Keys.None, Keys.None, Keys.None,
          Keys.None, Keys.None,Keys.None, Keys.None,
          Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None};
 
-        readonly static KeySet[] xddFirstButtons = new KeySet[(int)KeyListner.Count];
-        readonly static KeySet[] xddSecondButtons = new KeySet[(int)KeyListner.Count];
-
-        readonly static KeySet[] defaultXddFirstKeys = new KeySet[(int)KeyListner.Count] //TODO: FINISH THIS
+        readonly static KeySet[] defaultFirstKeys = new KeySet[(int)KeyListner.Count]
         {
          Keys.W, Keys.A, Keys.S, Keys.D,
-         Keys.Q, Keys.NumPad0, Keys.NumPad1, Keys.Delete, Keys.NumPad2,
+         Keys.Q, Keys.NumPad0, Keys.NumPad1, Keys.Delete, new KeySet(Keys.NumPad2, Keys.LeftShift),
          Keys.I, Keys.T, Keys.C, Keys.G,
          Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9, Keys.D0};
 
@@ -64,7 +56,7 @@ namespace Project_1.Input
             {
                 string dataAsString = File.ReadAllText(rootDir + "\\Data\\Keybinds.json");
 
-                Keys[] importedBinds = JsonConvert.DeserializeObject<Keys[]>(dataAsString);
+                KeySet[] importedBinds = JsonConvert.DeserializeObject<KeySet[]>(dataAsString);
                 //Debug.Assert(importedBinds.Length == (int)KeyListner.Count * 2);
                 //throw new Exception("")
                 for (int i = 0; i < (int)KeyListner.Count; i++)
@@ -93,80 +85,61 @@ namespace Project_1.Input
         public static void SaveBindings()
         {
             ExportData(rootDir + "\\Data\\Keybinds.json", firstButtons.Concat(secondButtons));
-
         }
 
         static void ExportData(string aDestination, object aObjectToExport)
         {
             string json = JsonConvert.SerializeObject(aObjectToExport, Formatting.None, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Include });
-            System.IO.File.WriteAllText(aDestination, json);
+            File.WriteAllText(aDestination, json);
         }
 
         static void DefaultKeys()
         {
-            for (int i = 0; i < firstButtons.Length; i++)
-            {
-                firstButtons[i] = defaultFirstKeys[i];
-                secondButtons[i] = defaultSecondKeys[i];
-            }
+            firstButtons = defaultFirstKeys;
+            secondButtons = defaultSecondKeys;
         }
 
-        public static Keys? GetKey(bool aFirstButton, KeyListner aListner)
+        public static KeySet GetKey(bool aFirstButton, KeyListner aListner)
         {
-            if (aFirstButton)
-            {
-                return firstButtons[(int)aListner];
-            }
+            if (aFirstButton) return firstButtons[(int)aListner];
             return secondButtons[(int)aListner];
         }
 
-        public static bool GetPress(KeyListner aListner)
-        {
-            return InputManager.GetPress(firstButtons[(int)aListner]) || InputManager.GetPress(secondButtons[(int)aListner]);
-        }
+        public static bool GetPress(KeyListner aListner) => firstButtons[(int)aListner].GetPress || secondButtons[(int)aListner].GetPress;
 
-        public static bool GetHold(KeyListner aListner)
-        {
-            return InputManager.GetHold(firstButtons[(int)aListner]) || InputManager.GetHold(secondButtons[(int)aListner]);
-        }
+        public static bool GetHold(KeyListner aListner) => firstButtons[(int)aListner].GetHold || secondButtons[(int)aListner].GetHold;
 
-        public static bool SetKey(bool aFirstButton, KeyListner aListner, Keys aKey)
+        public static void SetKey(bool aFirstButton, KeyListner aListner, Keys aKey)
         {
             if (aFirstButton)
             {
-                firstButtons[(int)aListner] = aKey;
-                return true;
+                firstButtons[(int)aListner] = new KeySet(aKey, InputManager.CheckHoldModifiers());
             }
             else
             {
-                secondButtons[(int)aListner] = aKey;
-                return true;
+                secondButtons[(int)aListner] = new KeySet(aKey, InputManager.CheckHoldModifiers());
             }
         }
 
-        public static bool CheckForNoDupeKeys(Keys aKey)
+        public static bool CheckForNoDupeKeys(Keys aKey, bool[] aModifier)
         {
+            KeySet keySet = new KeySet(aKey, aModifier);
             for (int i = 0; i < firstButtons.Length; i++)
             {
-                if (firstButtons[i] == aKey)
+                if (firstButtons[i].Equals(keySet))
                 {
                     return false;
                 }
             }
             for (int j = 0; j < secondButtons.Length; j++)
             {
-                if (secondButtons[j] == aKey)
+                if (secondButtons[j].Equals(keySet))
                 {
                     return false;
                 }
             }
 
             return true;
-        }
-
-        public static void Update()
-        {
-
         }
     }
 }

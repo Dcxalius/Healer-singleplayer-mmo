@@ -31,7 +31,7 @@ namespace Project_1.Items.SubTypes
         public Equipment.Type Slot { get => slot; } //TODO: Find better name
         Equipment.Type slot;
 
-        public EquipmentData(int id, string gfxName, string name, string description, Equipment.Type slot, ItemType itemType, int armor, int[] baseStats) : base(id, gfxName, name, description, 1, itemType)
+        public EquipmentData(int id, string gfxName, string name, string description, Equipment.Type slot, ItemType itemType, int armor, int[] baseStats, Item.Quality quality) : base(id, gfxName, name, description, 1, itemType, quality)
         {
             this.slot = slot;
             //this.baseStats = new EquipmentStats(baseStats);
@@ -41,6 +41,6 @@ namespace Project_1.Items.SubTypes
         }
 
         [JsonConstructor]
-        public EquipmentData(int id, string gfxName, string name, string description, Equipment.Type slot, int armor, int[] baseStats) : this(id, gfxName, name, description, slot, ItemType.Equipment, armor, baseStats) { }
+        public EquipmentData(int id, string gfxName, string name, string description, Equipment.Type slot, int armor, int[] baseStats, Item.Quality quality) : this(id, gfxName, name, description, slot, ItemType.Equipment, armor, baseStats, quality) { }
     }
 }

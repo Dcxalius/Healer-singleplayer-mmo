@@ -14,7 +14,7 @@ namespace Project_1.Items.SubTypes
         Attack attack;
 
 
-        public WeaponData(int id, string gfxName, string name, string description, Equipment.Type slot, int armor, int[] baseStats, int minAttackDamage, int maxAttackDamage, float attackSpeed) : base(id, gfxName, name, description, slot, ItemType.Weapon, armor, baseStats)
+        public WeaponData(int id, string gfxName, string name, string description, Equipment.Type slot, int armor, int[] baseStats, int minAttackDamage, int maxAttackDamage, float attackSpeed, Item.Quality quality) : base(id, gfxName, name, description, slot, ItemType.Weapon, armor, baseStats, quality)
         {
             attack = new Attack(minAttackDamage, maxAttackDamage, attackSpeed);
         }

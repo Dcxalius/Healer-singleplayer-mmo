@@ -22,8 +22,16 @@ namespace Project_1.GameObjects.Spells
         {
             get
             {
-                if (minValue == maxValue) return minValue;
-                return RandomManager.RollInt(minValue, maxValue);
+                if (minValue == maxValue) return Math.Abs(minValue);
+                if (type == Type.Heal)
+                {
+                    return RandomManager.RollInt(minValue, maxValue);
+                }
+                if (type == Type.Attack)
+                {
+                    return RandomManager.RollInt(Math.Abs(minValue), Math.Abs(maxValue));
+                }
+                throw new NotImplementedException();
             }
         }
 

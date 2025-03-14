@@ -32,6 +32,11 @@ namespace Project_1.GameObjects.Spawners
 
         public static void Load(Save aSave)
         {
+            for (int i = 0; i < spawnZones.Count; i++)
+            {
+                spawnZones[i].RemoveAllPlates();
+            }
+            spawnZones.Clear();
             SavedMobData[] unitData = ImportUnitData(aSave);
             ImportZones(aSave, unitData);
         }
@@ -110,9 +115,10 @@ namespace Project_1.GameObjects.Spawners
                 SavedMobData[] savedMobData = spawnZones[i].GetSavedMobData();
                 for (int j = 0; j < savedMobData.Length; j++)
                 {
-                    int nrOfCopies = 0;
-                    string name = savedMobData[j].Name;
+                    if (savedMobData[j] == null) continue;
 
+                    string name = savedMobData[j].Name;
+                    int nrOfCopies = 0;
                     if (savedMobNames.ContainsKey(name))
                     {
                         nrOfCopies = savedMobNames[name]++;
@@ -136,6 +142,7 @@ namespace Project_1.GameObjects.Spawners
 
             for (int i = 0; i < folders.Length; i++)
             {
+                if (folders[i] == aSave.Corpses) continue; //TODO: MAKE THIS NOT AS ECH
                 string[] files = System.IO.Directory.GetFiles(folders[i]);
                 for (int j = 0; j < files.Length; j++)
                 {
@@ -152,6 +159,8 @@ namespace Project_1.GameObjects.Spawners
             SpawnZone spawnZone = new SpawnZone(spawnZones.Count, aMobNames);
             spawnZones.Add(spawnZone);
         }
+
+        public static void CreateNewSpawner(int aId, MobPathing aPathing) => spawnZones[aId].CreateSpawner(aPathing);
 
         public static Spawner GetSpawner(int aZoneId, int aSpawnerId)
         {

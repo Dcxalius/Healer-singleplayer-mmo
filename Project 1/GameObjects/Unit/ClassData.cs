@@ -70,8 +70,14 @@ namespace Project_1.GameObjects.Unit
         public float MeleeCritScaling => meleeCritScaling;
         float meleeCritScaling;
 
+        public string[] LearnableSpells => learnableSpells;
+        string[] learnableSpells;
+
+        public string[] LevelOneSpells => levelOneSpells;
+        string[] levelOneSpells;
+
         [JsonConstructor]
-        public ClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float baseHpPer5, 
+        public ClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float baseHpPer5, string[] learnableSpells, string[] levelOneSpells, 
             float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed, MeleeAttackPowerBonus meleeAttackPowerBonus, float dodgeScaling, float meleeCritScaling)
         {
             this.name = name;
@@ -81,6 +87,8 @@ namespace Project_1.GameObjects.Unit
             this.baseHp = baseHp;
             this.perLevelHp = perLevelHp;
             this.baseHpPer5 = baseHpPer5;
+            this.learnableSpells = learnableSpells;
+            this.levelOneSpells = levelOneSpells;
             this.fistMinAttackDamage = fistMinAttackDamage;
             this.fistMaxAttackDamage = fistMaxAttackDamage;
             this.fistAttackSpeed = fistAttackSpeed;

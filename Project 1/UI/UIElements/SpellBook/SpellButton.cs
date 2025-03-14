@@ -30,8 +30,6 @@ namespace Project_1.UI.UIElements.SpellBook
         {
             keyListner = aKeyListner;
             onCooldownGfx = new CooldownTexture();
-            //emptyBorder = new Border(Vector2.Zero, aSize);
-            //gfx = new UITexture(Spell img);
         }
 
 
@@ -39,7 +37,12 @@ namespace Project_1.UI.UIElements.SpellBook
         public void AssignSpell(Spell aSpell)
         {
             spellData = aSpell;
-            gfx = new UITexture(Spell.GetGfxPath(aSpell), Color.White);
+            gfxOnButton = new UITexture(Spell.GetGfxPath(aSpell), Color.White);
+            if (aSpell == null) gfx.Color = Color.Gray;
+
+
+            //else gfx = new UITexture()
+
         }
 
         public override void Update()

@@ -93,6 +93,13 @@ namespace Project_1.GameObjects
             Camera.Camera.BindCamera(player);
         }
 
+        internal static void Save(Save save)
+        {
+            for (int i = 0; i < corpses.Count; i++)
+            {
+                SaveManager.ExportData(save.Corpses + "\\" + i + ".corpse", corpses[i]);
+            } 
+        }
 
         public static void Load(Save aSave)
         {
@@ -104,6 +111,13 @@ namespace Project_1.GameObjects
             player.GetPartyMembersFromGuild();
             Camera.Camera.BindCamera(player);
 
+            string[] files = System.IO.Directory.GetFiles(aSave.Corpses);
+            for (int i = 0; i < files.Length; i++)
+            {
+                string json = System.IO.File.ReadAllText(files[i]);
+                Corpse c = SaveManager.ImportData<Corpse>(json);
+                corpses.Add(c);
+            }
         }
 
         public static void Reset()
@@ -115,6 +129,7 @@ namespace Project_1.GameObjects
             HUDManager.ClearParty();
             entities.Clear();
             guild.Clear();
+            corpses.Clear();
             if (player != null) player.Delete();
         }
 
@@ -284,5 +299,6 @@ namespace Project_1.GameObjects
             }
 
         }
+
     }
 }

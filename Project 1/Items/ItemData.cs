@@ -38,12 +38,14 @@ namespace Project_1.Items
         public GfxPath GfxPath { get => gfx; }
         GfxPath gfx;
 
+        public Item.Quality Quality => quality;
+        Item.Quality quality;
 
         public ItemType Type { get => itemType; }
         ItemType itemType;
 
         [JsonConstructor]
-        public ItemData(int id, string gfxName, string name, string description, int maxStack, ItemType itemType)
+        public ItemData(int id, string gfxName, string name, string description, int maxStack, ItemType itemType, Item.Quality quality)
         {
             this.id = id;
             gfx = new GfxPath(GfxType.Item, gfxName);
@@ -51,6 +53,7 @@ namespace Project_1.Items
             this.description = description;
             this.maxStack = maxStack;
             this.itemType = itemType;
+            this.quality = quality;
 
             Assert();
         }
@@ -67,12 +70,5 @@ namespace Project_1.Items
             if (other.id < id) return 1;
             return 0;
         }
-
-
-
-        //public void Draw(SpriteBatch aBatch, Rectangle aPos)
-        //{
-        //    gfx.Draw(aBatch, aPos);
-        //}
     }
 }

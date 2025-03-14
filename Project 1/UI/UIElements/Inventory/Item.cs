@@ -81,8 +81,10 @@ namespace Project_1.UI.UIElements.Inventory
                 RemoveItem();
                 return;
             }
+
             gfxOnButton = new UITexture(aItem.GfxPath, Color.White);
             isEmpty = false;
+            Color = aItem.ItemQualityColor;
             if (aItem.MaxStack == 1) return;
             itemCount.Value = aItem.Count.ToString();
         }
@@ -92,6 +94,7 @@ namespace Project_1.UI.UIElements.Inventory
             gfxOnButton = null;
             isEmpty = true;
             itemCount.Value = null;
+            Color = Color.DarkGray;
         }
 
         public void HoldMe()
