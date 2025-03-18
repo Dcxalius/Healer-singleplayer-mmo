@@ -20,19 +20,21 @@ namespace Project_1.UI.HUD
     {
         Corpse lootedCorpse;
         Loot[] loot;
+        ScrollableBox scrollableComponent;
 
         RelativeScreenPosition lootSize = RelativeScreenPosition.GetSquareFromX(0.05f);
         RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.025f);
 
-        bool tooMuchLootForWindow = false;
-        float scrollValue = 0;
         int totalLoot;
         float[] originalYPos;
 
         public LootBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", Color.NavajoWhite), aPos, aSize)
         {
             ToggleVisibilty();
-            capturesScroll = true;
+            RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.025f);
+            scrollableComponent = new ScrollableBox(new UITexture("WhiteBackground", Color.White), Color.Yellow, spacing, aSize - spacing - spacing);
+            //capturesScroll = true;
+            AddChild(scrollableComponent);
         }
 
         public Items.Item GetItem(int aIndex)
@@ -91,20 +93,7 @@ namespace Project_1.UI.HUD
                 pos.Y += spacing.Y;
             }
 
-            if (RelativeSize.Y < pos.Y - lootSize.Y - spacing.Y)
-            {
-                tooMuchLootForWindow = true;
-                scrollValue = 0;
-                totalLoot = loots.Length;
-            }
-            else
-            {
-                tooMuchLootForWindow = false;
-                scrollValue = 0;
-                totalLoot = 0;
-            }
-
-            AddChildren(loot);
+            scrollableComponent.AddScrollableElements(loot);
         }
 
         public override void Update()
@@ -114,62 +103,37 @@ namespace Project_1.UI.HUD
             CheckIfShouldClose();
         }
 
-
-        void UpdateLootPosition()
-        {
-            for (int i = 0; i < ChildCount; i++)
-            {
-                if (!loot.Contains(GetChild(i))) continue;
-
-                GetChild(i).Move(new RelativeScreenPosition(GetChild(i).RelativePos.X, originalYPos[i] - scrollValue));
-            }
-        }
-
-        protected override void ScrolledOnMe(ScrollEvent aScrollEvent)
-        {
-            base.ScrolledOnMe(aScrollEvent);
-
-            if (!tooMuchLootForWindow) return;
-
-            //float lastScrollValue = scrollValue;
-            scrollValue += (aScrollEvent.DirectionAndSteps * 0.01f);
-
-            CapScroll();
-            UpdateLootPosition();
-
-
-        }
-
-        void CapScroll()
-        {
-            if (scrollValue <= 0)
-            {
-                scrollValue = 0;
-                return;
-            }
-
-            if (scrollValue > originalYPos.Last() + lootSize.Y + spacing.Y - RelativeSize.Y)
-            {
-                scrollValue = originalYPos.Last() + lootSize.Y + spacing.Y - RelativeSize.Y;
-            }
-        }
-
         void CheckIfShouldClose()
         {
             if (lootedCorpse == null) return;
+            
+            if (CheckIfCorpseDespawned()) return;
+
+            if (CheckIfOutOfRange()) return;
+
+            CheckIfLootedAll();
+        }
+
+        bool CheckIfCorpseDespawned()
+        {
             if (lootedCorpse.Despawned)
             {
                 StopLoot();
-                return;
+                return true;
             }
+            return false;
+        }
 
+        bool CheckIfOutOfRange()
+        {
             if (lootedCorpse.Centre.DistanceTo(ObjectManager.Player.FeetPosition) > lootedCorpse.LootLength)
             {
                 StopLoot();
-                return;
+                return true;
             }
-            CheckIfLootedAll();
+            return false;
         }
+
         void CheckIfLootedAll()
         {
             if (lootedCorpse.IsEmpty)
@@ -189,6 +153,7 @@ namespace Project_1.UI.HUD
             //children.RemoveAll(child => loot.Contains(child));
             loot = null;
             lootedCorpse = null;
+            scrollableComponent.RemoveAllScrollableElements();
         }
     }
 }

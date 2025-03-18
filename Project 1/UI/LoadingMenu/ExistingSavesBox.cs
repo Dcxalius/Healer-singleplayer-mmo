@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.LoadingMenu
 {
-    internal class ExistingSavesBox : Box, ScrollableBox
+    internal class ExistingSavesBox : Box
     {
         public ExistingSavesBox(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aGfx, aPos, aSize)
         {
-            SCroll
+            
         }
 
         public List<UIElement> Children => throw new NotImplementedException();

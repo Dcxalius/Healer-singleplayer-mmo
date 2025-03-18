@@ -98,7 +98,9 @@ namespace Project_1.UI.UIElements
 
         protected virtual void KillAllChildren() => children.Clear();
         protected virtual void KillChild(int aIndex) => children.RemoveAt(aIndex);
+        protected virtual void KillChild(UIElement aChild) => children.Remove(aChild);
         protected UIElement GetChild(int aIndex) => children[aIndex];
+        protected int GetChildID(UIElement aChild) => children.IndexOf(aChild);
         protected void SetParent(UIElement aParent) => parent = aParent;
 
         #endregion
