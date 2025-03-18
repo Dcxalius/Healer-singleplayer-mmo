@@ -13,14 +13,14 @@ namespace Project_1.UI.UIElements.Boxes
 {
     internal class ScrollBar : UIElement
     {
-        ScrollPlimp scrollBlimp;
+        ScrollPlimp scrollPlimp;
         float RelativeSpacing => spacing * RelativeSize.Y;
         const float spacing = 0.0234375f; //(Length of the head part)/(Length of entire bar)
         
         public ScrollBar(Color aColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("ScrollBar", aColor), aPos, aSize)
         {
-            scrollBlimp = new ScrollPlimp(aColor, RelativeScreenPosition.Zero, new RelativeScreenPosition(aSize.X, aSize.Y / 32)); //32 is from (graphical size of bar)/(graphical side of blimp)
-            AddChild(scrollBlimp);
+            scrollPlimp = new ScrollPlimp(aColor, RelativeScreenPosition.Zero, new RelativeScreenPosition(aSize.X, aSize.Y / 32)); //32 is from (graphical size of bar)/(graphical side of blimp)
+            AddChild(scrollPlimp);
             SetValue(0);
             capturesClick = true;
         }
@@ -30,20 +30,24 @@ namespace Project_1.UI.UIElements.Boxes
             if (aValue < 0) aValue = 0;
             if (aValue > 1) aValue = 1;
 
-            float total = RelativeSize.Y - RelativeSpacing - RelativeSpacing - scrollBlimp.RelativeSize.Y;
-            scrollBlimp.SetPosOnBar(RelativeSpacing + total * aValue);
+            float total = RelativeSize.Y - RelativeSpacing - RelativeSpacing - scrollPlimp.RelativeSize.Y;
+            scrollPlimp.SetPosOnBar(RelativeSpacing + total * aValue);
         }
 
         public void GetValueFromMouse()
         {
-            (parent as ScrollableBox).SetValue((InputManager.GetMousePosAbsolute().Y - AbsolutePos.Y) / (float)AbsolutePos.Size.Y);
+            float top = (InputManager.GetMousePosAbsolute().Y - AbsolutePos.Y - spacing * AbsolutePos.Size.Y);
+            float bottom = AbsolutePos.Size.Y - (spacing * AbsolutePos.Size.Y) * 2;
+            (parent as ScrollableBox).SetValue(top   / bottom);
 
         }
 
         protected override void ClickedOnMe(ClickEvent aClick)
         {
             base.ClickedOnMe(aClick);
-            (parent as ScrollableBox).SetValue((aClick.AbsolutePos.Y - AbsolutePos.Y) / (float)AbsolutePos.Size.Y );
+            float top = (InputManager.GetMousePosAbsolute().Y - AbsolutePos.Y - spacing * AbsolutePos.Size.Y);
+            float bottom = AbsolutePos.Size.Y - (spacing * AbsolutePos.Size.Y) * 2;
+            (parent as ScrollableBox).SetValue(top / bottom);
         }
     }
 }

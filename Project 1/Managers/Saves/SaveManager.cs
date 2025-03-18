@@ -18,6 +18,7 @@ namespace Project_1.Managers
         static string contentRootDirectory;
         static JsonSerializerSettings serializerSettings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto};
         static string saveFolder;
+        public static Save[] Saves => saves.Values.ToArray();
         static Dictionary<string, Save> saves;
 
         public static Save CurrentSave => currentSave;

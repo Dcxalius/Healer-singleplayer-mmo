@@ -214,7 +214,7 @@ namespace Project_1.UI.UIElements
             pos.Location = TransformFromRelativeToPoint(aNewPos);
         }
 
-        public void Resize(RelativeScreenPosition aSize)
+        public virtual void Resize(RelativeScreenPosition aSize)
         {
             relativeSize = aSize;
             pos.Size = TransformFromRelativeToPoint(aSize);

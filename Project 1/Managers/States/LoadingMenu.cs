@@ -14,9 +14,13 @@ namespace Project_1.Managers.States
     internal class LoadingMenu : State
     {
         LoadingBox loadingBox;
+        private RasterizerState rasterizerState;
+
         public LoadingMenu() : base()
         {
             loadingBox = new LoadingBox(new Camera.RelativeScreenPosition(0.05f, 0.05f), new Camera.RelativeScreenPosition(0.9f, 0.9f));
+            rasterizerState = new RasterizerState() { ScissorTestEnable = true };
+
         }
 
         public override StateManager.States GetStateEnum => StateManager.States.LoadingMenu;
@@ -27,7 +31,7 @@ namespace Project_1.Managers.States
 
         public override RenderTarget2D Draw()
         {
-            PrepRender(Color.Lime);
+            PrepRender(Color.Lime, SpriteSortMode.Immediate, null, null, null, rasterizerState);
             loadingBox.Draw(spriteBatch);
 
             CleanRender();
@@ -36,12 +40,12 @@ namespace Project_1.Managers.States
 
         public override void OnEnter()
         {
-            //TODO: Load files
+            loadingBox.Setup(SaveManager.Saves);
         }
 
         public override void OnLeave()
         {
-            //TODO: Unload files
+            loadingBox.Reset(); 
         }
 
         #region NYI

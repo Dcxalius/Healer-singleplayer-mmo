@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Project_1.Managers.Saves
 {
@@ -32,6 +33,10 @@ namespace Project_1.Managers.Saves
 
         static string contentRootDirectory;
 
+        string SaveDetailsPath => nameAsPath + "\\Save.Details";
+        public SaveDetails SaveDetails => saveDetails;
+        SaveDetails saveDetails;
+
         public static void Init(string aContentRootDirectory) => contentRootDirectory = aContentRootDirectory + "\\Saves\\";
 
         public Save(string aName, bool aExistingSave) 
@@ -39,15 +44,27 @@ namespace Project_1.Managers.Saves
             name = aName;
             if (aExistingSave)
             {
-                version = 0;
+                version = 0; //TODO: Implement this system
+                string file = System.IO.File.ReadAllText(SaveDetailsPath);
+                saveDetails = SaveManager.ImportData<SaveDetails>(file);
                 return;
             }
 
             CreateNewSaveFolder();
         }
 
+        void SaveSaveDetails()
+        {
+            string name = ObjectManager.Player.Name;
+            string className = ObjectManager.Player.ClassData.Name;
+            int level = ObjectManager.Player.Level.CurrentLevel;
+            saveDetails = new SaveDetails(name, className, level);
+            SaveManager.ExportData(SaveDetailsPath, saveDetails);
+        }
+
         public void SaveData()
         {
+            SaveSaveDetails();
             ObjectFactory.SaveData(this);
             ObjectManager.Save(this);
             TileManager.SaveData(this);

@@ -17,7 +17,16 @@ namespace Project_1.UI.UIElements.Boxes
         ScrollBar scrollBar;
         public int ScrollableElementsCount => scrollableElements.Count;
         List<UIElement> scrollableElements;
-        protected bool TooMuchForWindow => originalYPos.Last() + GetChild(ChildCount - 1).RelativeSize.Y + Spacing.Y > RelativeSize.Y;
+        protected bool TooMuchForWindow
+        {
+            get
+            {
+                //TODO: Hide plimp if this returns false;
+                if (scrollableElements.Count == 0) return false; 
+                return originalYPos.Last() + elementSize.Y + Spacing.Y > RelativeSize.Y;
+            }
+        }
+
         float scrollValue;
         List<float> originalYPos;
         protected RelativeScreenPosition Spacing

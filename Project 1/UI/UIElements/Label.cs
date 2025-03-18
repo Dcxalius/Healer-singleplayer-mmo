@@ -49,9 +49,9 @@ namespace Project_1.UI.UIElements
         }
         Text  underlyingText;
 
-        public Label(string aText, RelativeScreenPosition aPos, RelativeScreenPosition aSize, TextAllignment aTextAlignment, Color? aColor = null, string aFontname = "Gloryse") : base(null, aPos, aSize)
+        public Label(string aText, RelativeScreenPosition aPos, RelativeScreenPosition aSize, TextAllignment aTextAlignment, Color? aTextColor = null, string aFontname = "Gloryse") : base(null, aPos, aSize)
         {
-            underlyingText = aColor.HasValue ? new Text(aFontname, aText, aColor.Value) : new Text(aFontname, aText);
+            underlyingText = aTextColor.HasValue ? new Text(aFontname, aText, aTextColor.Value) : new Text(aFontname, aText);
             textAlignment = aTextAlignment;
             capturesClick = false;
             capturesRelease = false;

@@ -15,7 +15,6 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
-using static Project_1.GameObjects.Spells.AoE.AreaOfEffectData;
 
 namespace Project_1.Managers.States
 {

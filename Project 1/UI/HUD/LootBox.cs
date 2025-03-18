@@ -25,8 +25,6 @@ namespace Project_1.UI.HUD
         RelativeScreenPosition lootSize = RelativeScreenPosition.GetSquareFromX(0.05f);
         RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.025f);
 
-        int totalLoot;
-        float[] originalYPos;
 
         public LootBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", Color.NavajoWhite), aPos, aSize)
         {
@@ -72,25 +70,18 @@ namespace Project_1.UI.HUD
         {
             Items.Item[] loots = lootedCorpse.Drop;
             loot = new Loot[loots.Length];
-            originalYPos = new float[loot.Length];
 
-            RelativeScreenPosition pos = RelativeScreenPosition.Zero;
-            pos.X = spacing.X;
-            pos.Y = spacing.Y;
             for (int i = 0; i < loot.Length; i++)
             {
                 if (loots[i] != null)
                 {
-                    loot[i] = new Loot(i, loots[i], loots[i].GfxPath, pos, lootSize);
+                    loot[i] = new Loot(i, loots[i], loots[i].GfxPath, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
 
                 }
                 else
                 {
-                    loot[i] = new Loot(i, null, new GfxPath(GfxType.Debug, null), pos, RelativeScreenPosition.Zero);
+                    loot[i] = new Loot(i, null, new GfxPath(GfxType.Debug, null), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
                 }
-                originalYPos[i] = pos.Y;
-                pos.Y += lootSize.Y;
-                pos.Y += spacing.Y;
             }
 
             scrollableComponent.AddScrollableElements(loot);
