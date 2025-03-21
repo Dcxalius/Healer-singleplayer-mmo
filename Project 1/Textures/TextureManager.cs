@@ -15,7 +15,6 @@ using System.Xml.Serialization;
 
 namespace Project_1.Textures
 {
-    [DebuggerStepThrough]
     internal static class TextureManager
     {
 
@@ -59,7 +58,7 @@ namespace Project_1.Textures
         {
             texturesDict = new Dictionary<string, Texture2D>[(int)GfxType.Count];
 
-            string root = contentManager.RootDirectory + "\\";
+            string root = contentManager.RootDirectory + "\\Graphics\\";
             string debug = "Textures loaded: ";
 
             for (int i = 0; i < texturesDict.Length; i++)
@@ -73,7 +72,7 @@ namespace Project_1.Textures
                 for (int j = 0; j < dir.Length; j++)
                 {
                     string filePath = TrimContentFolderAndImageFileExtention(dir[j]); 
-                    string textureName = filePath.Split('\\')[1]; //Folder name\\ImageName is expected string so 1 here
+                    string textureName = filePath.Split('\\').Last();
 
                     texturesDict[i].Add(textureName, contentManager.Load<Texture2D>(filePath));
                     debug += textureName + ", ";
@@ -88,7 +87,7 @@ namespace Project_1.Textures
                     for (int k = 0; k < filesInFolders.Length; k++)
                     {
                         string filePath = TrimContentFolderAndImageFileExtention(filesInFolders[k]);
-                        string textureName = filePath.Split('\\')[2]; //Since we are 2 folders deep the 2 instead of 1
+                        string textureName = filePath.Split('\\').Last();
 
                         texturesDict[i].Add(textureName, contentManager.Load<Texture2D>(filePath));
                         debug += textureName + ", ";

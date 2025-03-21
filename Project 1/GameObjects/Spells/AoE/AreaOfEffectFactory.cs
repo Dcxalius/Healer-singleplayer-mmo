@@ -17,15 +17,15 @@ namespace Project_1.GameObjects.Spells.AoE
 
         public static void Init(ContentManager aContentManager)
         {
-            string path = aContentManager.RootDirectory + "\\AreaOfEffects\\";
-            string[] files = Directory.GetFiles(path);
+            //string path = aContentManager.RootDirectory + "\\AreaOfEffects\\";
+            //string[] files = Directory.GetFiles(path);
 
-            for (int i = 0; i < files.Length; i++)
-            {
-                string rawData = File.ReadAllText(files[i]);
-                AreaOfEffectData data = JsonConvert.DeserializeObject<AreaOfEffectData>(rawData);
-                AoEData.Add(files[i], data);
-            }
+            //for (int i = 0; i < files.Length; i++)
+            //{
+            //    string rawData = File.ReadAllText(files[i]);
+            //    AreaOfEffectData data = JsonConvert.DeserializeObject<AreaOfEffectData>(rawData);
+            //    AoEData.Add(files[i], data);
+            //}
         }
 
     }

@@ -18,8 +18,8 @@ namespace Project_1.Managers
         static string contentRootDirectory;
         static JsonSerializerSettings serializerSettings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto};
         static string saveFolder;
-        public static Save[] Saves => saves.Values.ToArray();
-        static Dictionary<string, Save> saves;
+        public static Save[] Saves => saves.ToArray();
+        static List<Save> saves;
 
         public static Save CurrentSave => currentSave;
         static Save currentSave;
@@ -31,23 +31,24 @@ namespace Project_1.Managers
 
             InitSaveFolder();
 
-            saves = new Dictionary<string, Save>();
+            saves = new List<Save>();
             string[] folders = System.IO.Directory.GetDirectories(saveFolder);
             for (int i = 0; i < folders.Length; i++)
             {
                 string name = TrimToNameOnly(folders[i]).ToUpper();
-                saves.Add(name, new Save(name, true));
+                saves.Add(new Save(name, true));
             }
-
+            saves.Sort();
         }
 
-        public static bool NameAlreadyExists(string aName) => saves.ContainsKey(aName.ToUpper());
+        public static bool NameAlreadyExists(string aName) => saves.Find(x => x.Name == aName.ToUpper()) != null;
 
         public static void CreateNewSave(string aName)
         {
             aName = aName.ToUpper();
-            saves.Add(aName, new Save(aName, false));
-            currentSave = saves[aName];
+            saves.Add(new Save(aName, false));
+            currentSave = saves.Last();
+            saves.Sort();
         }
 
         static void InitSaveFolder()
@@ -57,7 +58,7 @@ namespace Project_1.Managers
             System.IO.Directory.CreateDirectory(saveFolder);
         }
 
-        public static void LoadData(string aName) => LoadData(saves[aName]);
+        //public static void LoadData(string aName) => LoadData(saves[aName]);
 
         public static void LoadData(Save aSave)
         {

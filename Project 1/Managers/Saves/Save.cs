@@ -13,7 +13,7 @@ using Project_1.GameObjects.Unit;
 
 namespace Project_1.Managers.Saves
 {
-    internal class Save
+    internal class Save : IComparable<Save>
     {
         static int currentVersion = 0; //TODO: Increment this whenever major changes to the save system is implemented
         public string Name => name;
@@ -127,5 +127,11 @@ namespace Project_1.Managers.Saves
             return false;
         }
 
+        public int CompareTo(Save other)
+        {
+            if (saveDetails.TimeInfo > other.saveDetails.TimeInfo) return -1; 
+            if (saveDetails.TimeInfo < other.saveDetails.TimeInfo) return 1;
+            return 0;
+        }
     }
 }
