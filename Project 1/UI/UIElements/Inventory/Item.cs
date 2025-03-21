@@ -52,7 +52,7 @@ namespace Project_1.UI.UIElements.Inventory
             }
         }
 
-        public Item(int aBagIndex, int aSlotIndex, bool aHoldable, GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPath, aPos, aSize, Color.DarkGray) //TODO: Change this so a nulled path isn't required
+        public Item(int aBagIndex, int aSlotIndex, bool aHoldable, Color aBackgroundColor, GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPath, aPos, aSize, aBackgroundColor) //TODO: Change this so a nulled path isn't required
         {
             bagIndex = aBagIndex;
             slotIndex = aSlotIndex;

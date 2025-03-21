@@ -48,6 +48,10 @@ namespace Project_1.UI.UIElements
         public bool CapturesRelease { get => capturesRelease; set => capturesRelease = value; }
         protected bool capturesRelease;
 
+        public bool AlwaysOnScreen => alwaysOnScreen;
+        protected bool alwaysOnScreen;
+        readonly Point alwaysOnScreenAmount = new Point(10, 10);
+
         protected bool dragable;
         readonly TimeSpan timeBeforeDragRegisters = TimeSpan.FromSeconds(0.2);
 
@@ -86,9 +90,6 @@ namespace Project_1.UI.UIElements
         protected UITexture gfx;
         public virtual Color Color { get => gfx.Color; set => gfx.Color = value; } 
         #endregion
-
-
-
 
         #region Parentage
         protected UIElement parent;
@@ -143,6 +144,7 @@ namespace Project_1.UI.UIElements
             capturesClick = true;
             capturesScroll = false;
             capturesRelease = true;
+            alwaysOnScreen = false;
         }
 
         #region Update
@@ -213,8 +215,65 @@ namespace Project_1.UI.UIElements
         public void Move(RelativeScreenPosition aNewPos)
         {
             if (aNewPos.X == float.NaN || aNewPos.Y == float.NaN) throw new ArgumentException("Invalid move.");
-            relativePos = aNewPos;
             pos.Location = aNewPos.ToAbsoluteScreenPos();
+            relativePos = aNewPos;
+            MoveBoundsCheck();
+        }
+
+        void MoveBoundsCheck()
+        {
+            if (!alwaysOnScreen) return;
+
+            Rectangle overlap = Rectangle.Intersect(Camera.Camera.ScreenRectangle, pos);
+
+            bool xOutOfBounds = false;
+            bool yOutOfBounds = false;
+            if (overlap.Size.X < alwaysOnScreenAmount.X)
+            {
+                if (pos.Location.X < Size.X - alwaysOnScreenAmount.X || pos.Location.X > Camera.Camera.ScreenRectangle.Width - alwaysOnScreenAmount.X)
+                {
+                    xOutOfBounds = true;
+                }
+            }
+            if (overlap.Size.Y < alwaysOnScreenAmount.Y)
+            {
+                if (pos.Location.Y < Size.Y - alwaysOnScreenAmount.Y || pos.Location.Y > Camera.Camera.ScreenRectangle.Height - alwaysOnScreenAmount.Y)
+                {
+                    yOutOfBounds = true;
+                }
+            }
+
+            if (!xOutOfBounds && !yOutOfBounds) return;
+
+            Point xdd = pos.Location;
+
+            if (xOutOfBounds)
+            {
+                if (pos.Location.X < 0)
+                {
+                    xdd.X = alwaysOnScreenAmount.X - pos.Width;
+                }
+                else
+                {
+                    xdd.X = Camera.Camera.ScreenRectangle.Width - alwaysOnScreenAmount.X;
+                }
+            }
+
+            if (yOutOfBounds)
+            {
+                if (pos.Location.Y < 0)
+                {
+                    xdd.Y = alwaysOnScreenAmount.Y - pos.Height;
+                }
+                else
+                {
+                    xdd.Y = Camera.Camera.ScreenRectangle.Height - alwaysOnScreenAmount.Y;
+                }
+            }
+
+
+            pos.Location = xdd;
+            relativePos = new AbsoluteScreenPosition(pos.Location).ToRelativeScreenPosition();
         }
 
         public virtual void Resize(RelativeScreenPosition aSize)

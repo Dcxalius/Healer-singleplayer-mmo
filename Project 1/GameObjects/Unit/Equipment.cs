@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Unit.Classes;
 using Project_1.GameObjects.Unit.Stats;
 using Project_1.Items;
 using Project_1.Items.SubTypes;
 using Project_1.UI.HUD;
+using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -34,7 +36,11 @@ namespace Project_1.GameObjects.Unit
             Count
         }
 
+        public static int MainSlotCount => (int)Slot.Feet - 1; //Normally this should be +1 but neck and back shouldnt count so - 2
+
         Entity owner;
+        int[] gearAllowed;
+        int[] gearTypeEquiped;
 
         Items.SubTypes.Equipment[] equipped;
 
@@ -72,7 +78,18 @@ namespace Project_1.GameObjects.Unit
         public EquipmentStats EquipmentStats => equipmentStats;
         EquipmentStats equipmentStats;
 
-        public Equipment(int?[] aItemsEquiped) : this()
+
+        public Equipment(int[] aGearAllowed)
+        {
+            equipped = new Items.SubTypes.Equipment[(int)Slot.Count];
+            gearAllowed = aGearAllowed;
+            gearTypeEquiped = new int[(int)Items.SubTypes.Equipment.GearType.Count];
+            RefreshStatsFromEquipment();
+        }
+
+        public Equipment() : this(new int[4] { int.MaxValue, int.MaxValue, int.MaxValue, int.MaxValue }) { }
+
+        public Equipment(int[] aGearAllowed, int?[] aItemsEquiped) : this(aGearAllowed)
         {
             Debug.Assert(aItemsEquiped.Length == equipped.Length);
 
@@ -80,19 +97,27 @@ namespace Project_1.GameObjects.Unit
             {
                 if (!aItemsEquiped[i].HasValue) continue;
 
-                equipped[i] = ItemFactory.CreateItem(ItemFactory.GetItemData(aItemsEquiped[i].Value), 1) as Items.SubTypes.Equipment;
+                Items.SubTypes.Equipment equipment = ItemFactory.CreateItem(ItemFactory.GetItemData(aItemsEquiped[i].Value), 1) as Items.SubTypes.Equipment;
+                equipped[i] = equipment;
+
+                Items.SubTypes.Equipment.GearType type = equipment.EquipmentData.Material;
+
+                Debug.Assert(type != Items.SubTypes.Equipment.GearType.Count);
+                if (type == Items.SubTypes.Equipment.GearType.Cloth || type == Items.SubTypes.Equipment.GearType.None) continue;
+                
+                gearTypeEquiped[(int)type]++;
             }
 
             RefreshStatsFromEquipment();
         }
 
-        public Equipment()
-        {
-            equipped = new Items.SubTypes.Equipment[(int)Slot.Count];
-            RefreshStatsFromEquipment();
-        }
+        public Equipment(int?[] aItemsEquiped) : this(new int[4] { int.MaxValue, int.MaxValue, int.MaxValue, int.MaxValue }, aItemsEquiped) { }
 
-        public void SetOwner(Entity aOwner) => owner = aOwner;
+        public void SetOwner(Entity aOwner)
+        {
+            owner = aOwner;
+            HUDManager.RefreshAllCharacterWindowSlots(this, owner as Friendly);
+        }
 
         void RefreshStatsFromEquipment()
         {
@@ -251,13 +276,13 @@ namespace Project_1.GameObjects.Unit
                     throw new NotImplementedException();
 
                 case Items.SubTypes.Equipment.Type.OneHander:
-                    return EqiupAndSwapWeapon(aEquipment, Slot.MainHand);
+                    return EquipAndSwapWeapon(aEquipment, Slot.MainHand);
 
                 case Items.SubTypes.Equipment.Type.MainHander:
-                    return EqiupAndSwapWeapon(aEquipment, Slot.MainHand);
+                    return EquipAndSwapWeapon(aEquipment, Slot.MainHand);
 
                 case Items.SubTypes.Equipment.Type.OffHander:
-                    return EqiupAndSwapWeapon(aEquipment, Slot.OffHand);
+                    return EquipAndSwapWeapon(aEquipment, Slot.OffHand);
 
                 case Items.SubTypes.Equipment.Type.Ranged:
                     return SwapItem(aEquipment, Slot.Ranged);
@@ -267,8 +292,10 @@ namespace Project_1.GameObjects.Unit
             }
         }
 
-        Item EqiupAndSwapWeapon(Items.SubTypes.Equipment aEquipment, Slot aSlot) //TODO: Find better name
+        Item EquipAndSwapWeapon(Items.SubTypes.Equipment aEquipment, Slot aSlot) //TODO: Find better name
         {
+            if (UnableToDualWield(aEquipment, aSlot)) return aEquipment;
+
             Item returnable = EquipAndSwapWeaponWithTwoHander(aEquipment, aSlot);
 
             if (returnable != null) return returnable;
@@ -296,6 +323,7 @@ namespace Project_1.GameObjects.Unit
 
         public (Item, Item) EquipTwoHander(Items.SubTypes.Equipment aEquipment)
         {
+            if (aEquipment.type != Items.SubTypes.Equipment.Type.TwoHander) return (null, null);
             Item oh = RemoveItem(Slot.OffHand);
             Item mh = SwapItem(aEquipment, Slot.MainHand);
 
@@ -306,6 +334,7 @@ namespace Project_1.GameObjects.Unit
 
         Item CheckDoubleSlot(Items.SubTypes.Equipment aEquipment, Slot aSlot, Slot aSlot2)
         {
+
             Item first = equipped[(int)aSlot];
             Item second = equipped[(int)aSlot2];
             if (first == null)
@@ -315,6 +344,11 @@ namespace Project_1.GameObjects.Unit
             }
             if (second == null)
             {
+                if (UnableToDualWield(aEquipment, aSlot2))
+                {
+                    return SwapItem(aEquipment, aSlot);
+                }
+
                 EquipItem(aEquipment, aSlot2);
                 return null;
             }
@@ -325,8 +359,18 @@ namespace Project_1.GameObjects.Unit
 
         Item SwapItem(Items.SubTypes.Equipment aEquipment, Slot aSlot)
         {
+            if (!GearTypeCheck(aEquipment)) return aEquipment;
+            if (UnableToDualWield(aEquipment, aSlot)) return aEquipment;
             Items.SubTypes.Equipment previouslyEquiped = equipped[(int)aSlot];
-            if (previouslyEquiped != null) equipmentStats.RemoveStats(previouslyEquiped.Stats);
+
+            if (previouslyEquiped != null)
+            {
+                Items.SubTypes.Equipment.GearType material = aEquipment.EquipmentData.Material;
+
+                if (material != Items.SubTypes.Equipment.GearType.None && material != Items.SubTypes.Equipment.GearType.Cloth) gearTypeEquiped[(int)material]--;
+                
+                equipmentStats.RemoveStats(previouslyEquiped.Stats);
+            }
 
             equipped[(int)aSlot] = aEquipment;
             equipmentStats.AddStats(aEquipment.Stats);
@@ -338,16 +382,43 @@ namespace Project_1.GameObjects.Unit
         void EquipItem(Items.SubTypes.Equipment aEquipment, Slot aSlot)
         {
             Debug.Assert(equipped[(int)aSlot] == null);
+
+            //if (GearTypeCheck(aEquipment)) return; //I think this is only called when an equipment has type none anyways
             equipped[(int)aSlot] = aEquipment;
             equipmentStats.AddStats(aEquipment.Stats);
             HUDManager.RefreshCharacterWindowSlot(aSlot, this, owner as Friendly); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
         }
 
+        bool UnableToDualWield(Items.SubTypes.Equipment aEquipment, Slot aSlot)
+        {
+            if (aSlot != Slot.OffHand) return false;
+            if (aEquipment.EquipmentData.Slot != Items.SubTypes.Equipment.Type.OneHander && aEquipment.EquipmentData.Slot != Items.SubTypes.Equipment.Type.OffHander) return false;
+            if ((aEquipment as Weapon).WeaponData.WeaponType == Weapon.WeaponType.Holdable) return false;
+            if (owner.ClassData.CanDualWield) return false;
+            return true;
+        }
+
+        bool GearTypeCheck(Items.SubTypes.Equipment aEquipment)
+        {
+            int material = (int)aEquipment.EquipmentData.Material;
+
+            if (material == (int)Items.SubTypes.Equipment.GearType.None || material == (int)Items.SubTypes.Equipment.GearType.Cloth) return true;
+            
+            if (gearAllowed[material] <= gearTypeEquiped[material]) return false; //TODO: Print an error message
+
+            gearTypeEquiped[material]++;
+
+            return true;
+        }
+
         Item RemoveItem(Slot aSlot)
         {
+
             Items.SubTypes.Equipment item = equipped[(int)aSlot];
             if (item == null) return null;
             equipped[(int)aSlot] = null;
+            
+
             equipmentStats.RemoveStats(item.Stats);
             HUDManager.RefreshCharacterWindowSlot(aSlot, this, owner as Friendly);
             return item;

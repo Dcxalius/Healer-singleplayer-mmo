@@ -370,8 +370,17 @@ namespace Project_1.UI.HUD
         public static void SetCharacterWindow(Player aPlayer) => characterWindow.SetData(aPlayer);
         public static void ToggleCharacterWindow() => characterWindow.ToggleVisibilty();
 
+        public static void RefreshAllCharacterWindowSlots(Equipment aEquipment, Friendly aFriendly)
+        {
+            for (int i = 0; i < (int)Equipment.Slot.Count; i++)
+            {
+                RefreshCharacterWindowSlot((Equipment.Slot)i, aEquipment, aFriendly);
+            }
+        }
+
         public static void RefreshCharacterWindowSlot(Equipment.Slot aSlot, Equipment aEquipment, Friendly aFriendly)
         {
+            if (aFriendly == null) return;
             if (aFriendly.RelationToPlayer == Relation.RelationToPlayer.Self)
             {
                 characterWindow.SetSlot(aSlot, aEquipment);
@@ -385,6 +394,8 @@ namespace Project_1.UI.HUD
 
         public static void RefreshCharacterWindowStats(PairReport aReport, Friendly aFriendly)
         {
+            if (aFriendly == null) return;
+
             if (aFriendly.RelationToPlayer == Relation.RelationToPlayer.Self)
             {
                 characterWindow.SetReportBox(aReport);

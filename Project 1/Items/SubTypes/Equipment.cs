@@ -32,11 +32,24 @@ namespace Project_1.Items.SubTypes
             Count
         }
 
+        public enum GearType
+        {
+            Cloth,
+            Leather,
+            Mail,
+            Plate,
+            Count,
+            None
+        }
         [JsonIgnore]
-        public EquipmentStats Stats => (itemData as EquipmentData).BaseStats;
-        [JsonIgnore]
-        public Type type { get => (itemData as EquipmentData).Slot; }
+        public EquipmentData EquipmentData => itemData as EquipmentData;
 
+        [JsonIgnore]
+        public EquipmentStats Stats => EquipmentData.BaseStats;
+        [JsonIgnore]
+        public Type type { get => EquipmentData.Slot; }
+        [JsonIgnore]
+        public GearType Material => EquipmentData.Material;
 
         public Equipment(LootData aLoot) : base(aLoot)
         {

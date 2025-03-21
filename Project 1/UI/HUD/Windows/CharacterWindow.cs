@@ -78,7 +78,7 @@ namespace Project_1.UI.HUD.Windows
         {
             for (int i = (int)aStart; i <= (int)aEnd; i++)
             {
-                equiped[i] = new Item(BagIndexForItem, i, true, new GfxPath(GfxType.Item, null), aStartPos + aChangeInPos * (i - (int)aStart), itemSize);
+                equiped[i] = new Item(BagIndexForItem, i, true, Color.DarkGray, new GfxPath(GfxType.Item, null), aStartPos + aChangeInPos * (i - (int)aStart), itemSize);
             }
         }
 

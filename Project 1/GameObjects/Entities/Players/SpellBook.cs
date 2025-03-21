@@ -45,15 +45,18 @@ namespace Project_1.GameObjects.Entities.Players
 
         public void Init(Entity aEntity)
         {
-            owner = aEntity;
+            if (aEntity.RelationToPlayer != Relation.RelationToPlayer.Self) return;
+            owner = aEntity as Friendly;
+            aEntity = aEntity as Friendly;
             learnableSpells = new List<Spell>();
-            string[] learnables = aEntity.ClassData.LearnableSpells;
+            Friendly f = owner as Friendly;
+            string[] learnables = f.ClassData.LearnableSpells;
             for (int i = 0; i < learnables.Length; i++)
             {
                 learnableSpells.Add(new Spell(learnables[i], owner));
             }
 
-            string[] levelOneSpells = aEntity.ClassData.LevelOneSpells;
+            string[] levelOneSpells = f.ClassData.LevelOneSpells;
 
             for (int i = 0; i < levelOneSpells.Length; i++)
             {

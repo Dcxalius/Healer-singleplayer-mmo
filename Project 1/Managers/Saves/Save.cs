@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Project_1.Camera;
+using Project_1.GameObjects.Unit;
 
 namespace Project_1.Managers.Saves
 {
@@ -34,7 +35,7 @@ namespace Project_1.Managers.Saves
 
         static string contentRootDirectory;
 
-        public string CameraSettings => nameAsPath + "\\Camera.settings";
+        public string CameraSettings => nameAsPath + "\\Camera.pos";
         string SaveDetailsPath => nameAsPath + "\\Save.Details";
         public SaveDetails SaveDetails => saveDetails;
         SaveDetails saveDetails;
@@ -51,8 +52,15 @@ namespace Project_1.Managers.Saves
                 saveDetails = SaveManager.ImportData<SaveDetails>(file);
                 return;
             }
+            else
+            {
+                CreateNewSaveFolder();
 
-            CreateNewSaveFolder();
+                SaveData();
+                //saveDetails = new SaveDetails(name, "className", 0);
+                //SaveManager.ExportData(SaveDetailsPath, saveDetails);
+                //Camera.Camera.Save(this);
+            }
         }
 
         void SaveSaveDetails()

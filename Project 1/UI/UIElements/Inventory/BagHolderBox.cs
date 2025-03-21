@@ -22,7 +22,7 @@ namespace Project_1.UI.UIElements.Inventory
 
         public BagHolderBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.White), aPos, aSize)
         {
-            defaultBag = new Item(-1, 0, false, new GfxPath(GfxType.Item, "DefaultBag"), InventoryBox.spacing, InventoryBox.itemSize);
+            defaultBag = new Item(-1, 0, false, Color.White, new GfxPath(GfxType.Item, "DefaultBag"), InventoryBox.spacing, InventoryBox.itemSize);
             AddChild(defaultBag);
         }
 
@@ -36,11 +36,11 @@ namespace Project_1.UI.UIElements.Inventory
 
                 if (aBags[i] == null)
                 {
-                    bags[i - 1] = new Item(-1, i, true, new GfxPath(GfxType.Item, null), pos, size);
+                    bags[i - 1] = new Item(-1, i, true, Color.DarkGray, new GfxPath(GfxType.Item, null), pos, size);
                 }
                 else
                 {
-                    bags[i - 1] = new Item(-1, i, true, aBags[i].GfxPath, pos , size);
+                    bags[i - 1] = new Item(-1, i, true, aBags[i].ItemQualityColor, aBags[i].GfxPath, pos , size);
                 }
             }
 

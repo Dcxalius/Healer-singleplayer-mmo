@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Project_1.GameObjects.Unit.Resources;
 using Project_1.GameObjects.Unit.Stats;
+using Project_1.Items.SubTypes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,9 +9,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.Unit
+namespace Project_1.GameObjects.Unit.Classes
 {
-    internal struct ClassData
+    internal class ClassData
     {
         public enum Type
         {
@@ -26,6 +27,13 @@ namespace Project_1.GameObjects.Unit
             Strength,
             Agility
         }
+
+        
+
+        public bool WeaponUsuable(Weapon.WeaponType aType) => WeaponsAllowed.HasFlag(aType);
+
+        public Weapon.WeaponType WeaponsAllowed => weaponsAllowed;
+        Weapon.WeaponType weaponsAllowed;
 
 
         public string Name => name;
@@ -70,15 +78,14 @@ namespace Project_1.GameObjects.Unit
         public float MeleeCritScaling => meleeCritScaling;
         float meleeCritScaling;
 
-        public string[] LearnableSpells => learnableSpells;
-        string[] learnableSpells;
+        public bool CanDualWield => canDualWield;
+        bool canDualWield;
 
-        public string[] LevelOneSpells => levelOneSpells;
-        string[] levelOneSpells;
 
         [JsonConstructor]
-        public ClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float baseHpPer5, string[] learnableSpells, string[] levelOneSpells, 
-            float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed, MeleeAttackPowerBonus meleeAttackPowerBonus, float dodgeScaling, float meleeCritScaling)
+        public ClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float baseHpPer5,
+            float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed, MeleeAttackPowerBonus meleeAttackPowerBonus, float dodgeScaling, float meleeCritScaling,
+            Weapon.WeaponType weaponsAllowed, bool canDualWield)
         {
             this.name = name;
             this.resource = resource;
@@ -87,8 +94,6 @@ namespace Project_1.GameObjects.Unit
             this.baseHp = baseHp;
             this.perLevelHp = perLevelHp;
             this.baseHpPer5 = baseHpPer5;
-            this.learnableSpells = learnableSpells;
-            this.levelOneSpells = levelOneSpells;
             this.fistMinAttackDamage = fistMinAttackDamage;
             this.fistMaxAttackDamage = fistMaxAttackDamage;
             this.fistAttackSpeed = fistAttackSpeed;
@@ -96,29 +101,13 @@ namespace Project_1.GameObjects.Unit
             movementData = new Movement(speed, maxSpeed);
             this.dodgeScaling = dodgeScaling == 0 ? 0.01f / 20f : dodgeScaling;
             this.meleeCritScaling = meleeCritScaling == 0 ? 0.01f / 20f : meleeCritScaling;
-            Assert();
+            this.weaponsAllowed = weaponsAllowed;
+            this.canDualWield = canDualWield;
         }
 
-        public ClassData(Relation.RelationToPlayer aRelation, string aClassName)
-        {
-            switch (aRelation)
-            {
-                case Relation.RelationToPlayer.Self:
-                    this = ObjectFactory.GetPlayerClass(aClassName);
-                    break;
-                case Relation.RelationToPlayer.Friendly:
-                    this = ObjectFactory.GetAllyClass(aClassName);
-                    break;
-                case Relation.RelationToPlayer.Neutral:
-                case Relation.RelationToPlayer.Hostile:
-                    this = ObjectFactory.GetMobClass(aClassName);
-                    break;
-                default:
-                    throw new Exception("Incorrect relation.");
-            }
-        }
+       
 
-        void Assert()
+        protected virtual void Assert()
         {
             Debug.Assert(name != null && baseHp > 0 && perLevelHp > 0 && baseStats != null && perLevelStats != null && baseHpPer5 > 0 && fistMinAttackDamage > 0 && fistAttackSpeed > 0);
         }

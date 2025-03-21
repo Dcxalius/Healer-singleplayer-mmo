@@ -46,9 +46,10 @@ namespace Project_1.UI.HUD
             float sizeY = name.RelativeSize.Y + barSize.Y;
             if (textOffset.X < barOffset.X)
             {
-                offset.X = -barOffset.X;
-                name.Move(new RelativeScreenPosition(barSize.X / 2 - textOffset.X / 2, 0));
                 Resize(new RelativeScreenPosition(barSize.X , sizeY));
+                offset.X = -barOffset.X;
+                //name.Move(new RelativeScreenPosition(barSize.X / 2 - textOffset.X / 2, 0));
+                name.Move(new AbsoluteScreenPosition((int)(barOffset.X - textOffset.X), name.AbsolutePos.Y).ToRelativeScreenPosition());
             }
             else
             {

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Project_1.Camera;
 using Project_1.GameObjects.Unit;
+using Project_1.GameObjects.Unit.Classes;
 using Project_1.Managers;
 using Project_1.Textures;
 using System;
@@ -50,7 +51,7 @@ namespace Project_1.GameObjects.Spawners
         {
             this.name = name;
             relationData = new Relation(relation);
-            classData = new ClassData(relationData.ToPlayer, className);
+            classData = ObjectFactory.GetMobClass(className);
             this.maxLevel = maxLevel;
             this.minLevel = minLevel;
             this.equipment = new Equipment(equipment);

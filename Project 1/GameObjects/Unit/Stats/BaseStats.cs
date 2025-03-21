@@ -1,4 +1,5 @@
 ﻿using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Unit.Classes;
 using Project_1.GameObjects.Unit.Resources;
 using Project_1.UI.HUD;
 using System;
@@ -36,7 +37,7 @@ namespace Project_1.GameObjects.Unit.Stats
             get
             {
                 PairReport report = TotalPrimaryStats.NewReport;
-                report.AddLine("Armor", baseArmor);
+                report.AddLine("Armor", TotalArmor);
                 return report;
             }
         }
@@ -47,9 +48,10 @@ namespace Project_1.GameObjects.Unit.Stats
         public BaseStats(ClassData aClassData, int aLevel, EquipmentStats aEquipmentStats, float aCurrentHealth = float.MaxValue, float aCurrentResource = float.MaxValue)
         {
             basePrimaryStats = new BasePrimaryStats(aClassData.BaseStats, aClassData.PerLevelStats, aLevel);
-            totalPrimaryStats = new TotalPrimaryStats(basePrimaryStats, aEquipmentStats);
+            baseArmor = new Armor(aEquipmentStats.TotalArmor);
             health = new Health(aClassData, basePrimaryStats, aLevel, aCurrentHealth);
             classData = aClassData;
+            totalPrimaryStats = new TotalPrimaryStats(basePrimaryStats, aEquipmentStats);
             switch (aClassData.Resource)
             {
                 case Resource.ResourceType.Mana:
@@ -73,10 +75,14 @@ namespace Project_1.GameObjects.Unit.Stats
 
             fistAttack = new AttackData(AttackData.AttackStyle.OneHander, new Attack(aClassData.FistMinAttackDamage, aClassData.FistMaxAttackDamage, aClassData.FistAttackSpeed), null);
             fistAttack.AttackPower = GetAttackPower(aClassData);
-            baseArmor = new Armor(0);
+
         }
 
-        public void SetOwner(Entity aEntity) => owner = aEntity;
+        public void SetOwner(Entity aEntity)
+        {
+            owner = aEntity;
+            HUDManager.RefreshCharacterWindowStats(StatReport, owner as Friendly);
+        }
 
         public bool CheckIfResourceRegened()
         {

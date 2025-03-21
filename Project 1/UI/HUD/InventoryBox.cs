@@ -50,6 +50,8 @@ namespace Project_1.UI.HUD
             }
             AddChild(bagHolderBox);
             AddChildren(bagBox);
+
+            alwaysOnScreen = true;
         }
 
         public void SetInventory(Inventory aInventory)

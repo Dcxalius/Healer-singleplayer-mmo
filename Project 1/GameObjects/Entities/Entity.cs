@@ -28,6 +28,7 @@ using Project_1.Items;
 using Project_1.UI.UIElements.Guild;
 using System.Security.Cryptography;
 using System.Drawing.Printing;
+using Project_1.GameObjects.Unit.Classes;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -61,7 +62,7 @@ namespace Project_1.GameObjects.Entities
         protected Relation Relation => unitData.RelationData;
         public string Name => unitData.Name;
         public string Class => unitData.ClassData.Name;
-        public ClassData ClassData => unitData.ClassData;
+        public virtual ClassData ClassData => unitData.ClassData;
         public int CurrentLevel => unitData.Level.CurrentLevel;
         public bool Alive => unitData.Health.CurrentHealth > 0;
         public bool FullHealth => unitData.Health.MaxHealth == unitData.Health.CurrentHealth;

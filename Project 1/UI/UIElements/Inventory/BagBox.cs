@@ -50,11 +50,11 @@ namespace Project_1.UI.UIElements.Inventory
 
                 if (items[i] != null)
                 {
-                    slots[i] = new Item(bagNr, i, true, items[i].GfxPath, pos, size);
+                    slots[i] = new Item(bagNr, i, true, items[i].ItemQualityColor, items[i].GfxPath, pos, size);
                 }
                 else
                 {
-                    slots[i] = new Item(bagNr, i, true, new GfxPath(GfxType.Item, null), pos, size);
+                    slots[i] = new Item(bagNr, i, true, Color.DarkGray, new GfxPath(GfxType.Item, null), pos, size);
                 }
             }
 

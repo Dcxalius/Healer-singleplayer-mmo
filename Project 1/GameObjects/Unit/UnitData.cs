@@ -3,9 +3,11 @@ using Newtonsoft.Json;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spawners;
+using Project_1.GameObjects.Unit.Classes;
 using Project_1.GameObjects.Unit.Resources;
 using Project_1.GameObjects.Unit.Stats;
 using Project_1.Items;
+using Project_1.Items.SubTypes;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -167,18 +169,9 @@ namespace Project_1.GameObjects.Unit
             this.name = name;
             Debug.Assert(relation.HasValue);
             relationData = new Relation(relation);
-            classData = new ClassData(relation.Value, className);
+            SetClassData(relation.Value, className);
             this.level = new Level(level, experience);
-            if (equipment != null)
-            {
-                this.equipment = new Equipment(equipment);
-
-            }
-            else
-            {
-                this.equipment = new Equipment();
-
-            }
+            SetEquipment(equipment);
             this.position = new WorldSpace(position);
             this.momentum = new WorldSpace(momentum);
             this.velocity = new WorldSpace(velocity);
@@ -202,6 +195,35 @@ namespace Project_1.GameObjects.Unit
             Assert();
         }
 
+        void SetEquipment(int?[] aEquipment)
+        {
+            if (aEquipment == null)
+            {
+                if (relationData.ToPlayer == Unit.Relation.RelationToPlayer.Self || relationData.ToPlayer == Unit.Relation.RelationToPlayer.Friendly)
+                {
+                    equipment = new Equipment((classData as FriendlyClassData).GearAllowed);
+                }
+                else equipment = new Equipment();
+                return;
+            }
+            
+            if (relationData.ToPlayer == Unit.Relation.RelationToPlayer.Self || relationData.ToPlayer == Unit.Relation.RelationToPlayer.Friendly)
+            {
+                equipment = new Equipment((classData as FriendlyClassData).GearAllowed, aEquipment);
+            }
+            else equipment = new Equipment(aEquipment);
+        }
+
+        public void SetClassData(Relation.RelationToPlayer aRelation, string aClassName)
+        {
+            classData = aRelation switch
+            {
+                Unit.Relation.RelationToPlayer.Self => ObjectFactory.GetPlayerClass(aClassName),
+                Unit.Relation.RelationToPlayer.Friendly => ObjectFactory.GetAllyClass(aClassName),
+                Unit.Relation.RelationToPlayer.Neutral or Unit.Relation.RelationToPlayer.Hostile => ObjectFactory.GetMobClass(aClassName),
+                _ => throw new Exception("Incorrect relation."),
+            };
+        }
         void Assert()
         {
 

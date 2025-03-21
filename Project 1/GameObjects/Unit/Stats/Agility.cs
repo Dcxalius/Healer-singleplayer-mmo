@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Project_1.GameObjects.Unit.Classes;
 
 namespace Project_1.GameObjects.Unit.Stats
 {

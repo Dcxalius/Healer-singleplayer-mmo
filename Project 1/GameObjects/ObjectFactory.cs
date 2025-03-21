@@ -4,6 +4,7 @@ using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Spawners;
 using Project_1.GameObjects.Unit;
+using Project_1.GameObjects.Unit.Classes;
 using Project_1.Managers;
 using Project_1.Managers.Saves;
 using System;
@@ -24,9 +25,9 @@ namespace Project_1.GameObjects
         static Dictionary<string, MobData> mobData;
         //static UnitData defaultData = new UnitData();
 
-        static Dictionary<string, ClassData> playerClassData;
-        static Dictionary<string, ClassData> allyClassData;
-        static Dictionary<string, ClassData> mobClassData;
+        static Dictionary<string, FriendlyClassData> playerClassData;
+        static Dictionary<string, FriendlyClassData> allyClassData;
+        static Dictionary<string, MobClassData> mobClassData;
 
         static string contentRootDirectory;
 
@@ -125,9 +126,9 @@ namespace Project_1.GameObjects
         
         static void ImportClassData()
         {
-            playerClassData = new Dictionary<string, ClassData>();
-            allyClassData = new Dictionary<string, ClassData>();
-            mobClassData = new Dictionary<string, ClassData>();
+            playerClassData = new Dictionary<string, FriendlyClassData>();
+            allyClassData = new Dictionary<string, FriendlyClassData>();
+            mobClassData = new Dictionary<string, MobClassData>();
 
             string path = contentRootDirectory + "\\Data\\Class\\";
 
@@ -140,26 +141,34 @@ namespace Project_1.GameObjects
                 for (int j = 0; j < files.Length; j++)
                 {
                     string rawData = System.IO.File.ReadAllText(files[j]);
-                    ClassData data = JsonConvert.DeserializeObject<ClassData>(rawData);
-                    AddToClassData(data, Enum.Parse<ClassData.Type>(type));
+                    AddToClassData(rawData, Enum.Parse<ClassData.Type>(type));
                 }
             }
 
 
         }
 
-        static void AddToClassData(ClassData aData, ClassData.Type aType)
+        static void AddToClassData(string aRawData, ClassData.Type aType)
         {
             switch (aType)
             {
                 case ClassData.Type.Player:
-                    playerClassData.Add(aData.Name, aData);
+                    {
+                        FriendlyClassData data = JsonConvert.DeserializeObject<FriendlyClassData>(aRawData);
+                        playerClassData.Add(data.Name, data);
+                    }
                     break;
                 case ClassData.Type.Ally:
-                    allyClassData.Add(aData.Name, aData);
+                    {
+                        FriendlyClassData data = JsonConvert.DeserializeObject<FriendlyClassData>(aRawData);
+                        allyClassData.Add(data.Name, data);
+                    }
                     break;
                 case ClassData.Type.Mob:
-                    mobClassData.Add(aData.Name, aData);
+                    {
+                        MobClassData data = JsonConvert.DeserializeObject<MobClassData>(aRawData);
+                        mobClassData.Add(data.Name, data);
+                    }
                     break;
                 default:
                     throw new Exception("Error");

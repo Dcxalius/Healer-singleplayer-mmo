@@ -17,10 +17,11 @@ namespace Project_1.UI.UIElements.Inventory
     {
         Items.Item item;
 
-        public Loot(int aSlotIndex, Items.Item aItem, GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(-2, aSlotIndex, true, aPath, aPos, aSize)
+        public Loot(int aSlotIndex, Items.Item aItem, GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(-2, aSlotIndex, true, Color.Pink, aPath, aPos, aSize)
         {
             if (aItem == null) return;
             item = aItem;
+            Color = aItem.ItemQualityColor;
             if (aItem.MaxStack == 1) return;
             itemCount.Value = aItem.Count.ToString();
         }

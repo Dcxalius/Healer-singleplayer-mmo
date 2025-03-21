@@ -104,7 +104,8 @@ namespace Project_1.Items
             {
 
                 if (!items[0][i].HasValue) continue;
-                this.items[0][i] = new Item(ItemFactory.GetItemData(items[0][i].Value.Item1), items[0][i].Value.Item2);
+                this.items[0][i] = ItemFactory.CreateItem(ItemFactory.GetItemData(items[0][i].Value.Item1), items[0][i].Value.Item2);
+
             }
             for (int i = 1; i < bags.Length; i++)
             {
@@ -114,7 +115,7 @@ namespace Project_1.Items
                     for (int j = 0; j < items[i].Length; j++)
                     {
                         if (!items[0][i].HasValue) continue;
-                        this.items[i][j] = new Item(ItemFactory.GetItemData(items[i][j].Value.Item1), items[i][j].Value.Item2);
+                        this.items[0][i] = ItemFactory.CreateItem(ItemFactory.GetItemData(items[i][j].Value.Item1), items[i][j].Value.Item2);
                     }
                 }
             }
@@ -578,6 +579,8 @@ namespace Project_1.Items
             if (!(item.ItemType == ItemData.ItemType.Equipment || item.ItemType == ItemData.ItemType.Weapon)) return;
 
             Equipment equipment = item as Equipment;
+            
+            if (item.ItemType == ItemData.ItemType.Weapon && !aFriendly.ClassData.WeaponsAllowed.HasFlag((equipment as Weapon).WeaponData.WeaponType)) return;
             GameObjects.Unit.Equipment wearing = aFriendly.Equipment;
 
             if (equipment.type == Equipment.Type.TwoHander) 
@@ -585,11 +588,13 @@ namespace Project_1.Items
                 if (OpenSlots() < 1 && wearing.EquipedInSlot(GameObjects.Unit.Equipment.Slot.MainHand) != null && wearing.EquipedInSlot(GameObjects.Unit.Equipment.Slot.OffHand) != null) return;
 
                 (Item, Item) equipedInSlots = aFriendly.EquipTwoHander(equipment);
+
                 AssignItem(equipedInSlots.Item1, aIndex);
                 if (equipedInSlots.Item2 == null) return;
                 AddItem(equipedInSlots.Item2);
                 return;
             }
+
 
             Item equipedInSlot = aFriendly.Equip(equipment);
             AssignItem(equipedInSlot, aIndex);
@@ -603,9 +608,10 @@ namespace Project_1.Items
             if (!(item.ItemType == ItemData.ItemType.Equipment || item.ItemType == ItemData.ItemType.Weapon)) return;
 
             Equipment equipment = item as Equipment;
+            if (item.ItemType == ItemData.ItemType.Weapon && !aFriendly.ClassData.WeaponsAllowed.HasFlag((equipment as Weapon).WeaponData.WeaponType)) return;
             GameObjects.Unit.Equipment wearing = aFriendly.Equipment;
 
-            if(equipment.type == Equipment.Type.TwoHander)
+            if (equipment.type == Equipment.Type.TwoHander)
             {
                 if (!(GameObjects.Unit.Equipment.Slot.MainHand == (GameObjects.Unit.Equipment.Slot)aEquipmentSlot || GameObjects.Unit.Equipment.Slot.OffHand == (GameObjects.Unit.Equipment.Slot)aEquipmentSlot)) return;
                 Equip(aIndex, aFriendly);

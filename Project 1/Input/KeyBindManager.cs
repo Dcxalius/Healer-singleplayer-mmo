@@ -37,7 +37,7 @@ namespace Project_1.Input
         readonly static KeySet[] defaultFirstKeys = new KeySet[(int)KeyListner.Count]
         {
          Keys.W, Keys.A, Keys.S, Keys.D,
-         Keys.Q, Keys.NumPad0, Keys.NumPad1, Keys.Delete, new KeySet(Keys.NumPad2, Keys.LeftShift),
+         Keys.Q, Keys.NumPad0, Keys.NumPad1, Keys.Delete, new KeySet(Keys.C, Keys.LeftShift),
          Keys.I, Keys.T, Keys.C, Keys.G,
          Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9, Keys.D0};
 
