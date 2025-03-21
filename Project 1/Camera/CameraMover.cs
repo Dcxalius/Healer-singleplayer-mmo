@@ -14,19 +14,26 @@ namespace Project_1.Camera
 {
     internal class CameraMover
     {
+        public WorldSpace CentreInWorldSpace { get => centreInWorldSpace; set => centreInWorldSpace = value; }
+        WorldSpace centreInWorldSpace = new WorldSpace(100, 100);
 
 
         float cameraMoveBorderSize = 0.1f;
         WorldSpace velocity = WorldSpace.Zero;
         WorldSpace momentum = WorldSpace.Zero;
         int baseSpeed = 100;
-        Vector2 drag = new Vector2(0.9f, 0.9f);
-
-
+        readonly Vector2 drag;
 
         MovingObject boundObject;
-        public Rectangle bindingRectangle = new Rectangle(new Point(0), new Point(ScreenSize.X / 4 * 3, ScreenSize.Y / 4 * 3));
-        public float maxCircleCameraMove = ScreenSize.Y / 3;
+        public Rectangle bindingRectangle;
+        public float maxCircleCameraMove;
+
+        public CameraMover()
+        {
+            drag = new Vector2(0.9f, 0.9f);
+            bindingRectangle = new Rectangle(new Point(0), new Point(ScreenSize.X / 4 * 3, ScreenSize.Y / 4 * 3));
+            maxCircleCameraMove = ScreenSize.Y / 3;
+        }
 
 
         void ApplyMouseVelocity()
@@ -328,6 +335,11 @@ namespace Project_1.Camera
 
         void ApplyMovementToCamera()
         {
+            if (velocity.X == float.NaN || velocity.Y == float.NaN)
+            {
+                Debug.Assert(false);
+                velocity = WorldSpace.Zero; //TODO: Track down this bug
+            }
             momentum += velocity;
 
             velocity = WorldSpace.Zero;

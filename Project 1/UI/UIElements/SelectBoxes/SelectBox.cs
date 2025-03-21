@@ -58,7 +58,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
         void SetNewValue(Point aP)
         {
-            int tempSelectedValue = aP.Y / TransformFromRelativeToPoint(defaultSize).Y;
+            int tempSelectedValue = aP.Y / defaultSize.ToAbsoluteScreenPos().Y;
             //DebugManager.Print(GetType(), "New selectedValue is: " + tempSelectedValue);
 
             if (tempSelectedValue == 0 || tempSelectedValue == selectedValue + 1)

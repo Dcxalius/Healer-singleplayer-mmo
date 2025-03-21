@@ -30,6 +30,7 @@ namespace Project_1.Managers.Saves
             level = aLevel;
             timeInfo = DateTime.Now;
         }
+
         [JsonConstructor]
         public SaveDetails(string name, string className, int level, DateTime timeInfo) : this(name, className, level)
         {

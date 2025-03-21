@@ -50,6 +50,8 @@ namespace Project_1.UI.UIElements
 
         protected bool dragable;
         readonly TimeSpan timeBeforeDragRegisters = TimeSpan.FromSeconds(0.2);
+
+        public HoldEvent heldEvents;
         #endregion
 
         #region Position
@@ -85,7 +87,6 @@ namespace Project_1.UI.UIElements
         public virtual Color Color { get => gfx.Color; set => gfx.Color = value; } 
         #endregion
 
-        public HoldEvent heldEvents;
 
 
 
@@ -102,38 +103,6 @@ namespace Project_1.UI.UIElements
         protected UIElement GetChild(int aIndex) => children[aIndex];
         protected int GetChildID(UIElement aChild) => children.IndexOf(aChild);
         protected void SetParent(UIElement aParent) => parent = aParent;
-
-        #endregion
-
-        protected UIElement(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) //aPos and aSize should be between 0 and 1
-        {
-            visible = true;
-            gfx = aGfx;
-
-            relativePos = aPos;
-            relativeSize = aSize;
-
-            pos = RelativeScreenPosition.TransformToAbsoluteRect(aPos, aSize);
-            capturesClick = true;
-            capturesScroll = false;
-            capturesRelease = true;
-        }
-
-        public virtual void Update()
-        {
-            HoldUpdate();
-
-            foreach (UIElement child in children)
-            {
-               
-                child.Update();
-            }
-
-
-
-            HoverUpdate();
-            GetVisibiltyPress();
-        }
 
         protected virtual void AddChild(UIElement aUIElement)
         {
@@ -160,7 +129,40 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        public virtual void HoldUpdate()
+        #endregion
+
+        protected UIElement(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) //aPos and aSize should be between 0 and 1
+        {
+            visible = true;
+            gfx = aGfx;
+
+            relativePos = aPos;
+            relativeSize = aSize;
+
+            pos = RelativeScreenPosition.TransformToAbsoluteRect(aPos, aSize);
+            capturesClick = true;
+            capturesScroll = false;
+            capturesRelease = true;
+        }
+
+        #region Update
+        public virtual void Update()
+        {
+            HoldUpdate();
+            UpdateChildren();
+            HoverUpdate();
+            GetVisibiltyPress();
+        }
+
+        void UpdateChildren()
+        {
+            for (int i = 0; i < children.Count; i++)
+            {
+                children[i].Update();
+            }
+        }
+
+        protected virtual void HoldUpdate()
         {
             if (heldEvents == null) return;
 
@@ -181,7 +183,8 @@ namespace Project_1.UI.UIElements
             //TODO: Add a boundscheck
             Move(InputManager.GetMousePosRelative() - heldEvents.Offset);
         }
-
+        #endregion
+ 
         #region Change
         void GetVisibiltyPress()
         {
@@ -211,13 +214,13 @@ namespace Project_1.UI.UIElements
         {
             if (aNewPos.X == float.NaN || aNewPos.Y == float.NaN) throw new ArgumentException("Invalid move.");
             relativePos = aNewPos;
-            pos.Location = TransformFromRelativeToPoint(aNewPos);
+            pos.Location = aNewPos.ToAbsoluteScreenPos();
         }
 
         public virtual void Resize(RelativeScreenPosition aSize)
         {
             relativeSize = aSize;
-            pos.Size = TransformFromRelativeToPoint(aSize);
+            pos.Size = aSize.ToAbsoluteScreenPos();
         }
 
         public virtual void Close()
@@ -239,11 +242,11 @@ namespace Project_1.UI.UIElements
 
         #endregion
 
-        static protected Point TransformFromRelativeToPoint(Vector2 aValue) //TODO: ????
-        { 
-            Point size = new Point((int)(Camera.Camera.ScreenSize.X * aValue.X), (int)(Camera.Camera.ScreenSize.Y * aValue.Y));
-            return size;
-        }
+        //static protected Point TransformFromRelativeToPoint(Vector2 aValue) //TODO: ????
+        //{ 
+        //    Point size = new Point((int)(Camera.Camera.ScreenSize.X * aValue.X), (int)(Camera.Camera.ScreenSize.Y * aValue.Y));
+        //    return size;
+        //}
 
 
         #region Release

@@ -57,9 +57,11 @@ namespace Project_1.Managers
             System.IO.Directory.CreateDirectory(saveFolder);
         }
 
-        public static void LoadData(string aName)
+        public static void LoadData(string aName) => LoadData(saves[aName]);
+
+        public static void LoadData(Save aSave)
         {
-            currentSave = saves[aName];
+            currentSave = aSave;
             currentSave.LoadData();
         }
 

@@ -41,7 +41,7 @@ namespace Project_1
             SpellFactory.Init(Content);
             ProjectileFactory.Init(Content);
             KeyBindManager.Init(Content);
-            //Camera.Init();
+            Camera.Camera.Init();
             TileFactory.Init(Content);
             StateManager.Init(Content);
             SpawnerManager.Init();

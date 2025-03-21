@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
+using Project_1.Managers;
 using Project_1.Managers.Saves;
 using Project_1.Managers.States;
 using Project_1.Textures;
@@ -41,7 +42,7 @@ namespace Project_1.UI.LoadingMenu
 
         void LoadSave()
         {
-            save.LoadData();
+            SaveManager.LoadData(save);
             StateManager.SetState(StateManager.States.Game);
         }
 

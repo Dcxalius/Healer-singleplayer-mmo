@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Project_1.Camera;
 
 namespace Project_1.Managers.Saves
 {
@@ -33,6 +34,7 @@ namespace Project_1.Managers.Saves
 
         static string contentRootDirectory;
 
+        public string CameraSettings => nameAsPath + "\\Camera.settings";
         string SaveDetailsPath => nameAsPath + "\\Save.Details";
         public SaveDetails SaveDetails => saveDetails;
         SaveDetails saveDetails;
@@ -65,6 +67,7 @@ namespace Project_1.Managers.Saves
         public void SaveData()
         {
             SaveSaveDetails();
+            Camera.Camera.Save(this);
             ObjectFactory.SaveData(this);
             ObjectManager.Save(this);
             TileManager.SaveData(this);
@@ -73,6 +76,8 @@ namespace Project_1.Managers.Saves
 
         public void LoadData()
         {
+
+            Camera.Camera.Load(this);
             TileManager.Load(this); 
             ObjectManager.Load(this);
             SpawnerManager.Load(this);
