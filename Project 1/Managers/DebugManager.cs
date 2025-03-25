@@ -26,7 +26,7 @@ namespace Project_1.Managers
         TileCoords,
         InvCheats,
         Teleport,
-        InstantlyLoadSave1,
+        InstantlyContinue,
         Console,
         LearnKill,
         Count
@@ -54,7 +54,7 @@ namespace Project_1.Managers
             modes[(int)DebugMode.TileCoords] = false;
             modes[(int)DebugMode.InvCheats] = true;
             modes[(int)DebugMode.Teleport] = true;
-            modes[(int)DebugMode.InstantlyLoadSave1] = false;
+            modes[(int)DebugMode.InstantlyContinue] = true;
             modes[(int)DebugMode.Console] = true;
             modes[(int)DebugMode.LearnKill] = true;
             

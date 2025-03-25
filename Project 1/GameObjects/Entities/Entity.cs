@@ -408,7 +408,7 @@ namespace Project_1.GameObjects.Entities
         public virtual void TakeDamage(Entity aAttacker, float aDamageTaken)
         {
             float damageTaken = CalculateDamage(aAttacker, aDamageTaken);
-            WorldSpace dir = GetDirOfFloatingText(aAttacker.FeetPosition); //TODO: This is wrong
+            WorldSpace dir = GetDirOfFloatingText(aAttacker.FeetPosition);
             SpawnFlyingText(damageTaken, dir, Color.Red);
 
             ParticleMovement bloodMovement = new ParticleMovement(dir, WorldSpace.Zero, 0.9f);
@@ -440,6 +440,7 @@ namespace Project_1.GameObjects.Entities
             {
                 dirOfFlyingStuff.Y = 1;
             }
+            dirOfFlyingStuff.Normalize();
             return dirOfFlyingStuff;
         }
 

@@ -37,6 +37,7 @@ namespace Project_1.UI.HUD.PlateBoxes
             leftVerticalSegments = new PlateBoxSegment[] { };
             rightVerticalSegments = new PlateBoxSegment[] { };
             horizontalSegments = new PlateBoxSegment[] { nameSegment, healthSegment, resourceSegment };
+            Visible = false;
 
             AddSegmentsToChildren();
         }
@@ -60,6 +61,7 @@ namespace Project_1.UI.HUD.PlateBoxes
             if (targetEntity == null)
             {
                 nameSegment.Name = null;
+                Visible = false;
                 return;
             }
 
@@ -67,6 +69,7 @@ namespace Project_1.UI.HUD.PlateBoxes
             healthSegment.SetTarget(targetEntity);
             levelCircle.Refresh(targetEntity);
             resourceSegment.SetTarget(targetEntity);
+            Visible = true;
         }
 
 

@@ -52,7 +52,12 @@ namespace Project_1
             TimeManager.Init();
 
             //DEBUG
-            //SaveManager.LoadData();
+            
+            if(DebugManager.Mode(DebugMode.InstantlyContinue))
+            {
+                SaveManager.ContinueLastSave();
+                StateManager.SetState(StateManager.States.Game);
+            }
             base.Initialize();
         }
 

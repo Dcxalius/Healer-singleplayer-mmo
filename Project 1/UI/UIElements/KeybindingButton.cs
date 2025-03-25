@@ -14,14 +14,14 @@ namespace Project_1.UI.UIElements
 {
     internal class KeybindingButton : Button
     {
-        bool firstButton;
+        bool buttonLevel;
         KeyBindManager.KeyListner keyListner;
         
         
         bool waitingForPress = false;
-        public KeybindingButton(bool aFirstButtons, KeyBindManager.KeyListner aKeyListner, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, Color.White, KeyBindManager.GetKey(aFirstButtons, aKeyListner).ToString(), Color.Black)
+        public KeybindingButton(bool aButtonLevel, KeyBindManager.KeyListner aKeyListner, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, Color.White, KeyBindManager.GetKey(aButtonLevel, aKeyListner).ToString(), Color.Black)
         {
-            firstButton = aFirstButtons; 
+            buttonLevel = aButtonLevel; 
             keyListner = aKeyListner;
         }
 
@@ -45,7 +45,7 @@ namespace Project_1.UI.UIElements
         {
             if (InputManager.GetPress(Keys.Escape))
             {
-                KeyBindManager.SetKey(firstButton, keyListner, Keys.None);
+                KeyBindManager.SetKey(buttonLevel, keyListner, Keys.None);
                 waitingForPress = false;
                 ButtonText = "None";
                 OptionManager.AddActionToDoAtExitOfOptionMenu(KeyBindManager.SaveBindings);
@@ -72,8 +72,8 @@ namespace Project_1.UI.UIElements
                 return;
             }
 
-            KeyBindManager.SetKey(firstButton, keyListner, newKey.Value);
-            ButtonText = KeyBindManager.GetKey(firstButton, keyListner).ToString();
+            KeyBindManager.SetKey(buttonLevel, keyListner, newKey.Value);
+            ButtonText = KeyBindManager.GetKey(buttonLevel, keyListner).ToString();
             waitingForPress = false;
 
             OptionManager.AddActionToDoAtExitOfOptionMenu(KeyBindManager.SaveBindings);
@@ -82,7 +82,7 @@ namespace Project_1.UI.UIElements
         public override void Close()
         {
             base.Close();
-            ButtonText = KeyBindManager.GetKey(firstButton, keyListner).ToString();
+            ButtonText = KeyBindManager.GetKey(buttonLevel, keyListner).ToString();
             waitingForPress = false;
         }
 

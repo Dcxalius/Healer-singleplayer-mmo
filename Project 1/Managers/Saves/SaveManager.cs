@@ -21,6 +21,7 @@ namespace Project_1.Managers
         public static Save[] Saves => saves.ToArray();
         static List<Save> saves;
 
+
         public static Save CurrentSave => currentSave;
         static Save currentSave;
         public static void Init(ContentManager aContentManager)
@@ -59,6 +60,9 @@ namespace Project_1.Managers
         }
 
         //public static void LoadData(string aName) => LoadData(saves[aName]);
+
+        public static void ContinueLastSave() => LoadData(saves.First());
+
 
         public static void LoadData(Save aSave)
         {

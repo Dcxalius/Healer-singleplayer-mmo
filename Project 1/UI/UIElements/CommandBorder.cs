@@ -13,9 +13,7 @@ namespace Project_1.UI.UIElements
 {
     internal class CommandBorder : UIElement
     {
-        public new bool Visible { get => visible; set => visible = value; }
-
-        bool visible = true;
+        
         public CommandBorder(Color aColor, RelativeScreenPosition aPos, RelativeScreenPosition aSizeOfBoxToBorder) : base(null, aPos, aSizeOfBoxToBorder)
         //public Border(Color aColor, Vector2 aPos, Vector2 aSize) : base(new UITexture("GrayWhiteBorder", aColor), aPos, aSize)
         {

@@ -93,22 +93,25 @@ namespace Project_1.UI.HUD
 
         public void RefreshSlot(int aBag, int aSlot, Inventory aInventory)
         {
-            if (aBag == -1)
+            if (aBag >= 0)
             {
-                bagHolderBox.RefreshSlot(aSlot);
-                if (aInventory.Bags[aSlot] != null)
-                {
-                    bagBox[aSlot].RefreshBag(aInventory, aInventory.Bags[aSlot].SlotCount, columnCount);
-                    CalculateSize(RelativePos + RelativeSize.OnlyY);
-                    return;
-                }
-                bagBox[aSlot].RefreshBag(aInventory, 0, 1);
-
-                CalculateSize(RelativePos + RelativeSize.OnlyY);
-
+                bagBox[aBag].RefreshSlot(aSlot);
                 return;
             }
-            bagBox[aBag].RefreshSlot(aSlot);
+            
+            bagHolderBox.RefreshSlot(aSlot);
+            if (aInventory.Bags[aSlot] != null)
+            {
+                bagBox[aSlot].RefreshBag(aInventory, aInventory.Bags[aSlot].SlotCount, columnCount);
+                CalculateSize(RelativePos + RelativeSize.OnlyY);
+                return;
+            }
+            bagBox[aSlot].RefreshBag(aInventory, 0, 1);
+
+            CalculateSize(RelativePos + RelativeSize.OnlyY);
+
+            return;
+            
         }
 
         void CalculateSize(RelativeScreenPosition aPos) //TODO: Find better name
@@ -132,7 +135,7 @@ namespace Project_1.UI.HUD
 
             Resize(resize);
             bagHolderBox.Move(new RelativeScreenPosition(spacing.X, RelativeSize.Y - (itemSize.Y + spacing.Y * 3)));
-            Move(new RelativeScreenPosition(RelativePos.X, aPos.Y - resize.Y));
+            Move(new RelativeScreenPosition(RelativePos.X, aPos.Y));
 
         }
 
