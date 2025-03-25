@@ -22,21 +22,29 @@ namespace Project_1.Managers.Saves
 
         [JsonProperty]
         public DateTime TimeInfo => timeInfo;
-        DateTime timeInfo; 
-        public SaveDetails(string aName, string aClassName, int aLevel)
+        DateTime timeInfo;
+
+        [JsonProperty]
+        public TimeSpan TimeInSave => timeInSave;
+        TimeSpan timeInSave;
+
+        public SaveDetails(string aName, string aClassName, int aLevel, TimeSpan aTimeInSave)
         {
             name = aName;
             className = aClassName;
             level = aLevel;
+            timeInSave = aTimeInSave;
             timeInfo = DateTime.Now;
         }
 
         [JsonConstructor]
-        public SaveDetails(string name, string className, int level, DateTime timeInfo) : this(name, className, level)
+        public SaveDetails(string name, string className, int level, DateTime timeInfo, TimeSpan timeInSave) : this(name, className, level, timeInSave)
         {
             this.timeInfo = timeInfo;
+            this.timeInSave = timeInSave;
         }
 
+        [JsonIgnore]
         public string Stringify
         {
             get
@@ -45,6 +53,7 @@ namespace Project_1.Managers.Saves
                 s += "Name: " + name + "\n";
                 s += "Class: " + className + "\n";
                 s += "Level: " + level.ToString() + "\n";
+                s += "Time Played: " + timeInSave.ToString(@"dd\.hh\:mm\:ss") + "\n";
                 s += "Last Time Saved: " + timeInfo.ToString() + "\n";
                 return s;
             }

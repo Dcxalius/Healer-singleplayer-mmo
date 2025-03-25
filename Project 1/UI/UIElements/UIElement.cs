@@ -52,6 +52,9 @@ namespace Project_1.UI.UIElements
         protected bool alwaysOnScreen;
         readonly Point alwaysOnScreenAmount = new Point(10, 10);
 
+        public bool AlwaysFullyOnScreen => alwaysFullyOnScreen;
+        protected bool alwaysFullyOnScreen;
+
         protected bool dragable;
         readonly TimeSpan timeBeforeDragRegisters = TimeSpan.FromSeconds(0.2);
 
@@ -145,6 +148,7 @@ namespace Project_1.UI.UIElements
             capturesScroll = false;
             capturesRelease = true;
             alwaysOnScreen = false;
+            alwaysFullyOnScreen = false;
         }
 
         #region Update
@@ -222,40 +226,63 @@ namespace Project_1.UI.UIElements
 
         void MoveBoundsCheck()
         {
+            AlwaysOnScreenCheck();
+            AlwaysFullyOnScreenCheck();
+        }
+
+        void AlwaysOnScreenCheck()
+        {
             if (!alwaysOnScreen) return;
 
             Rectangle overlap = Rectangle.Intersect(Camera.Camera.ScreenRectangle, pos);
 
-            bool xOutOfBounds = false;
-            bool yOutOfBounds = false;
-            if (overlap.Size.X < alwaysOnScreenAmount.X)
-            {
-                if (pos.Location.X < Size.X - alwaysOnScreenAmount.X || pos.Location.X > Camera.Camera.ScreenRectangle.Width - alwaysOnScreenAmount.X)
-                {
-                    xOutOfBounds = true;
-                }
-            }
-            if (overlap.Size.Y < alwaysOnScreenAmount.Y)
-            {
-                if (pos.Location.Y < Size.Y - alwaysOnScreenAmount.Y || pos.Location.Y > Camera.Camera.ScreenRectangle.Height - alwaysOnScreenAmount.Y)
-                {
-                    yOutOfBounds = true;
-                }
-            }
+            if (overlap == pos) return;
+
+            (bool, bool) outOfBounds = OutOfBoundsCheck(overlap.Size, alwaysOnScreenAmount);
+            bool xOutOfBounds = outOfBounds.Item1;
+            bool yOutOfBounds = outOfBounds.Item2;
 
             if (!xOutOfBounds && !yOutOfBounds) return;
 
-            Point xdd = pos.Location;
+
+            pos.Location = GetNewMove(xOutOfBounds, yOutOfBounds, alwaysOnScreenAmount);
+
+
+            relativePos = new AbsoluteScreenPosition(pos.Location).ToRelativeScreenPosition();
+        }
+
+        void AlwaysFullyOnScreenCheck()
+        {
+            if (!alwaysFullyOnScreen) return;
+
+            Rectangle overlap = Rectangle.Intersect(Camera.Camera.ScreenRectangle, pos);
+
+            if (overlap == pos) return;
+
+            (bool, bool) outOfBounds = OutOfBoundsCheck(overlap.Size, Size);
+            bool xOutOfBounds = outOfBounds.Item1;
+            bool yOutOfBounds = outOfBounds.Item2;
+
+            if (!xOutOfBounds && !yOutOfBounds) return;
+
+
+            pos.Location = GetNewMove(xOutOfBounds, yOutOfBounds, Size);
+            relativePos = new AbsoluteScreenPosition(pos.Location).ToRelativeScreenPosition();
+        }
+
+        Point GetNewMove(bool xOutOfBounds, bool yOutOfBounds, Point alwaysOnScreenAmount)
+        {
+            Point returnable = pos.Location;
 
             if (xOutOfBounds)
             {
                 if (pos.Location.X < 0)
                 {
-                    xdd.X = alwaysOnScreenAmount.X - pos.Width;
+                    returnable.X = alwaysOnScreenAmount.X - pos.Width;
                 }
                 else
                 {
-                    xdd.X = Camera.Camera.ScreenRectangle.Width - alwaysOnScreenAmount.X;
+                    returnable.X = Camera.Camera.ScreenRectangle.Width - alwaysOnScreenAmount.X;
                 }
             }
 
@@ -263,17 +290,36 @@ namespace Project_1.UI.UIElements
             {
                 if (pos.Location.Y < 0)
                 {
-                    xdd.Y = alwaysOnScreenAmount.Y - pos.Height;
+                    returnable.Y = alwaysOnScreenAmount.Y - pos.Height;
                 }
                 else
                 {
-                    xdd.Y = Camera.Camera.ScreenRectangle.Height - alwaysOnScreenAmount.Y;
+                    returnable.Y = Camera.Camera.ScreenRectangle.Height - alwaysOnScreenAmount.Y;
                 }
             }
 
+            return returnable;
+        }
 
-            pos.Location = xdd;
-            relativePos = new AbsoluteScreenPosition(pos.Location).ToRelativeScreenPosition();
+        (bool, bool) OutOfBoundsCheck(Point aOverlapSize, Point aOnScreenAmount)
+        {
+            bool xOutOfBounds = false;
+            bool yOutOfBounds = false;
+            if (aOverlapSize.X < aOnScreenAmount.X)
+            {
+                if (pos.Location.X < Size.X - aOnScreenAmount.X || pos.Location.X > Camera.Camera.ScreenRectangle.Width - aOnScreenAmount.X)
+                {
+                    xOutOfBounds = true;
+                }
+            }
+            if (aOverlapSize.Y < aOnScreenAmount.Y)
+            {
+                if (pos.Location.Y < Size.Y - aOnScreenAmount.Y || pos.Location.Y > Camera.Camera.ScreenRectangle.Height - aOnScreenAmount.Y)
+                {
+                    yOutOfBounds = true;
+                }
+            }
+            return (xOutOfBounds, yOutOfBounds);
         }
 
         public virtual void Resize(RelativeScreenPosition aSize)

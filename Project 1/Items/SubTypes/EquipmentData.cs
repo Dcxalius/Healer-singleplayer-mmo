@@ -13,7 +13,8 @@ namespace Project_1.Items.SubTypes
 {
     internal class EquipmentData : ItemData
     {
-        PairReport StatReport
+        [JsonIgnore]
+        public PairReport StatReport
         {
             get
             {

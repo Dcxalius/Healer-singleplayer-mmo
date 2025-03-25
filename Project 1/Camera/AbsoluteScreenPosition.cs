@@ -31,24 +31,12 @@ namespace Project_1.Camera
         public AbsoluteScreenPosition OnlyX => new AbsoluteScreenPosition(position.X, 0);
         public AbsoluteScreenPosition OnlyY => new AbsoluteScreenPosition(0, position.Y);
 
-        public AbsoluteScreenPosition()
-        {
-            position = Point.Zero;
-        }
-
+        public AbsoluteScreenPosition() : this(Point.Zero) { }
+        public AbsoluteScreenPosition(int aX) : this(new Point(aX)) { }
+        public AbsoluteScreenPosition(int aX, int aY) : this(new Point(aX, aY)) { }
         public AbsoluteScreenPosition(Point aPosition)
         {
             position = aPosition;
-        }
-
-        public AbsoluteScreenPosition(int aX)
-        {
-            position = new Point(aX);
-        }
-
-        public AbsoluteScreenPosition(int aX, int aY)
-        {
-            position = new Point(aX, aY);
         }
 
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SharpDX.Direct3D11;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
@@ -24,6 +25,7 @@ namespace Project_1.GameObjects.Unit.Stats
         {
             for (int i = 0; i < (int)PrimaryStat.Count; i++)
             {
+                if (stats[i] == 0) continue;
                 report.AddLine(stats[i].GetType().Name.ToString(), stats[i].Value);
             }
 

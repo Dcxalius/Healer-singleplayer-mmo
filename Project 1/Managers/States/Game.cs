@@ -60,12 +60,12 @@ namespace Project_1.Managers.States
         }
 
 
-        public override void OnEnter() => TimeManager.StopPause();
+        public override void OnEnter() => TimeManager.StopPause(this);
 
         public override void OnLeave()
         {
             StateManager.FinalGameFrame = renderTarget;
-            TimeManager.StartPause();
+            TimeManager.StartPause(this);
             HUDManager.LeavingGameState();
         }
 

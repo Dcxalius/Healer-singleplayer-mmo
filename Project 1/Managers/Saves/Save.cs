@@ -68,7 +68,8 @@ namespace Project_1.Managers.Saves
             string name = ObjectManager.Player.Name;
             string className = ObjectManager.Player.ClassData.Name;
             int level = ObjectManager.Player.Level.CurrentLevel;
-            saveDetails = new SaveDetails(name, className, level);
+            TimeSpan timeSpan = TimeManager.TotalFrameTimeAsTimeSpan;
+            saveDetails = new SaveDetails(name, className, level, timeSpan);
             SaveManager.ExportData(SaveDetailsPath, saveDetails);
         }
 
@@ -80,6 +81,7 @@ namespace Project_1.Managers.Saves
             ObjectManager.Save(this);
             TileManager.SaveData(this);
             SpawnerManager.SaveData(this);
+            //TimeManager.Save(this); //Done through savedetails atm
         }
 
         public void LoadData()
@@ -89,7 +91,7 @@ namespace Project_1.Managers.Saves
             TileManager.Load(this); 
             ObjectManager.Load(this);
             SpawnerManager.Load(this);
-            //TimeManager.Load(); //TODO: Implement
+            TimeManager.Load(this);
         }
 
         public void ClearFolder(string aPath)

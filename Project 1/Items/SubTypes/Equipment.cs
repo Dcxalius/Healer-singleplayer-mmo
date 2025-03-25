@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Unit.Stats;
 using System;
 using System.Collections.Generic;
@@ -50,6 +51,8 @@ namespace Project_1.Items.SubTypes
         public Type type { get => EquipmentData.Slot; }
         [JsonIgnore]
         public GearType Material => EquipmentData.Material;
+        [JsonIgnore]
+        public PairReport StatReport => EquipmentData.StatReport;
 
         public Equipment(LootData aLoot) : base(aLoot)
         {

@@ -22,7 +22,12 @@ namespace Project_1.Textures
             set
             {
                 textToDisplay = value;
-                if (value == null) return;
+                if (value == null)
+                {
+                    offset = Vector2.Zero;
+                    return;
+                }
+
                 offset = font.MeasureString(value) * Camera.Camera.Zoom; //TODO: Should zoom really be here
             }
         }

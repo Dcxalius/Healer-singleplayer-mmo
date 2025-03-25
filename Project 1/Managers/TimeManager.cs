@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Managers.Saves;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,66 +11,46 @@ namespace Project_1.Managers
 {
     internal static class TimeManager
     {
-        static GameTime gameTime;
+        static GameTime instanceTime;
+        static GameTime playTime;
         static TimeSpan? timePaused;
-        public static double SecondsSinceLastFrame
-        {
-            get => gameTime.ElapsedGameTime.TotalSeconds;
-        }
+        static List<Object> pausers;
 
+        public static double SecondsSinceLastFrame => instanceTime.ElapsedGameTime.TotalSeconds;
+
+        public static double TotalFrameTime => playTime.TotalGameTime.TotalMilliseconds;
+
+        public static TimeSpan TotalFrameTimeAsTimeSpan => playTime.TotalGameTime;
         
-        public static double TotalFrameTime
-        {
-            get
-            {
-                if (!timePaused.HasValue)
-                {
-                    return gameTime.TotalGameTime.TotalMilliseconds;
-                }
-                return timePaused.Value.TotalMilliseconds;
-            }
-
-        }
-
-        public static TimeSpan TotalFrameTimeAsTimeSpan
-        {
-            get
-            {
-                if (!timePaused.HasValue)
-                {
-                    return gameTime.TotalGameTime;
-                }
-                return timePaused.Value;
-            }
-        }
+        public static bool Paused => pausers.Count > 0;
 
         public static void Init()
         {
-            timePaused = new TimeSpan();
+            playTime = new GameTime();
+            pausers = new List<object>();
         }
 
         public static void Update(GameTime aGameTime)
         {
-            gameTime = aGameTime;
+            instanceTime = aGameTime;
+            if (!Paused)
+            {
+                playTime.TotalGameTime += aGameTime.ElapsedGameTime;
+            }
         }
 
-        public static void StartPause()
-        {
-            Debug.Assert(!timePaused.HasValue, "Tried to pause paused game.");
-            timePaused = gameTime.TotalGameTime;
-        }
+        public static void StartPause(Object aPauser) => pausers.Add(aPauser);
 
-        public static void StopPause()
-        {
-            Debug.Assert(timePaused.HasValue, "Tried to unpause unpaused game.");
-            gameTime.TotalGameTime = timePaused.Value;
-            timePaused = null;
-        }
+        public static void StopPause(Object aPauser) => pausers.Remove(aPauser);
 
-        public static void Load(TimeSpan aTimeToLoad)
-        {
-            timePaused = gameTime.TotalGameTime;
+        //public static void Save(Save aSave)
+        //{
+        //    SaveManager.ExportData()
+        //}
 
+        public static void Load(Save aSave)
+        {
+            playTime.TotalGameTime = aSave.SaveDetails.TimeInSave;
         }
     }
 }
