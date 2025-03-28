@@ -106,18 +106,11 @@ namespace Project_1.UI.HUD
 
         void DrawText(SpriteBatch aBatch)
         {
-
-            //AbsoluteScreenPosition offsetName = new AbsoluteScreenPosition(0, (int)(descriptedName.Offset.Y / 2f));
-            //AbsoluteScreenPosition pos = ((AbsoluteScreenPosition)AbsolutePos.Location + spacing + offsetName);
             AbsoluteScreenPosition pos = ((AbsoluteScreenPosition)AbsolutePos.Location + spacing.ToAbsoluteScreenPos());
-            //AbsoluteScreenPosition offsetDesc = new AbsoluteScreenPosition(0, (int)(description.Offset.Y / 2));
             descriptedName.TopLeftDraw(aBatch, pos);
             pos = pos + spacing.ToAbsoluteScreenPos().OnlyY + new AbsoluteScreenPosition(0, (int)descriptedName.Offset.Y);
-            //pos = pos + offsetDesc + spacing.OnlyY * (1 + descriptedName.NameLines);
             description.TopLeftDraw(aBatch, pos);
-
             pos = pos + spacing.ToAbsoluteScreenPos().OnlyY + new AbsoluteScreenPosition(0, (int)description.Offset.Y);
-
             statSheet.TopLeftDraw(aBatch, pos);
 
         }

@@ -33,6 +33,7 @@ namespace Project_1.UI.HUD
             scrollableComponent = new ScrollableBox(new UITexture("WhiteBackground", Color.White), Color.Yellow, spacing, aSize - spacing - spacing);
             //capturesScroll = true;
             AddChild(scrollableComponent);
+            dragable = true;
         }
 
         public Items.Item GetItem(int aIndex)
@@ -75,12 +76,12 @@ namespace Project_1.UI.HUD
             {
                 if (loots[i] != null)
                 {
-                    loot[i] = new Loot(i, loots[i], loots[i].GfxPath, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
+                    loot[i] = new Loot(i, loots[i], loots[i].GfxPath);
 
                 }
                 else
                 {
-                    loot[i] = new Loot(i, null, new GfxPath(GfxType.Debug, null), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
+                    loot[i] = new Loot(i, null, new GfxPath(GfxType.Debug, null));
                 }
             }
 

@@ -321,6 +321,7 @@ namespace Project_1.Items
             Item item = HUDManager.GetLootItem(aLootIndex);
             for (int i = 0; i < items.Length; i++)
             {
+                if (items[i] == null) continue;
                 for (int j = 0; j < items[i].Length; j++)
                 {
                     if (items[i][j] == null)

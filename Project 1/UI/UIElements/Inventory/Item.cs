@@ -31,6 +31,11 @@ namespace Project_1.UI.UIElements.Inventory
         public int bagIndex; //BagIndex 0 and above is the inventory slots, -1 is for the slots for the bags themselves, -2 is for lootwindow, -3 is for equipped
         public int slotIndex;
 
+        public string ItemCount
+        {
+            get => itemCount.Value;
+            set => itemCount.Value = value;
+        }
         protected Text itemCount;
 
 
@@ -384,9 +389,14 @@ namespace Project_1.UI.UIElements.Inventory
             if (bagIndex == -1)
             {
                 ObjectManager.Player.Inventory.UnequipBag(slotIndex);
+                return;
             }
 
-            
+            if (bagIndex == -2)
+            {
+                ObjectManager.Player.Inventory.LootItem(slotIndex);
+                return;
+            }
         }
 
         protected override void OnHover()

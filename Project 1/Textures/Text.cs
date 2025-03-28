@@ -28,7 +28,7 @@ namespace Project_1.Textures
                     return;
                 }
 
-                offset = font.MeasureString(value) * Camera.Camera.Zoom; //TODO: Should zoom really be here
+                offset = font.MeasureString(value);
             }
         }
 

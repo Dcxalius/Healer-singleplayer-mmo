@@ -103,12 +103,12 @@ namespace Project_1.UI.HUD
             if (aInventory.Bags[aSlot] != null)
             {
                 bagBox[aSlot].RefreshBag(aInventory, aInventory.Bags[aSlot].SlotCount, columnCount);
-                CalculateSize(RelativePos + RelativeSize.OnlyY);
+                CalculateSize(RelativePos);
                 return;
             }
             bagBox[aSlot].RefreshBag(aInventory, 0, 1);
 
-            CalculateSize(RelativePos + RelativeSize.OnlyY);
+            CalculateSize(RelativePos);
 
             return;
             
@@ -139,7 +139,7 @@ namespace Project_1.UI.HUD
 
         }
 
-        RelativeScreenPosition CalculateBagBoxSize(int aSlotCount, RelativeScreenPosition aItemSize, RelativeScreenPosition aSpacing, float aWidthOfInventory)
+        static RelativeScreenPosition CalculateBagBoxSize(int aSlotCount, RelativeScreenPosition aItemSize, RelativeScreenPosition aSpacing, float aWidthOfInventory)
         {
             RelativeScreenPosition size = new RelativeScreenPosition();
 
@@ -149,19 +149,8 @@ namespace Project_1.UI.HUD
             return size;
         }
 
-        int CalculateColumns(int aSlotCount, float aItemSizeX, float aSpacingX, float aWidthOfInventory)
-        {
-            //float xdd = (aItemSizeX + aSpacingX) * aSlotCount + aSpacingX;
-
-            float xdd = aItemSizeX + aSpacingX + aSpacingX / aSlotCount;
-
-            return (int)Math.Floor(aWidthOfInventory/xdd);
-        }
-
-        int CalculateRows(int aSlotCount, float aItemSizeX, float aSpacingX, float aWidthOfInventory)
-        {
-            return (int)Math.Ceiling((aSpacingX + (aItemSizeX + aSpacingX) * aSlotCount) / aWidthOfInventory);
-        }
+        static int CalculateColumns(int aSlotCount, float aItemSizeX, float aSpacingX, float aWidthOfInventory) => (int)Math.Floor(aWidthOfInventory / (aItemSizeX + aSpacingX + aSpacingX / aSlotCount));
+        static int CalculateRows(int aSlotCount, float aItemSizeX, float aSpacingX, float aWidthOfInventory) => (int)Math.Ceiling((aSpacingX + (aItemSizeX + aSpacingX) * aSlotCount) / aWidthOfInventory);
 
 
         public override void Rescale()
@@ -170,11 +159,6 @@ namespace Project_1.UI.HUD
             itemSize = RelativeScreenPosition.GetSquareFromX(itemSizeX);
             spacing = RelativeScreenPosition.GetSquareFromX(spacingX);
             base.Rescale();
-        }
-
-        public override void Draw(SpriteBatch aBatch)
-        {
-            base.Draw(aBatch);
         }
     }
 }
