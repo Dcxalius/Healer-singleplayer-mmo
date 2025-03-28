@@ -65,8 +65,20 @@ namespace Project_1.Managers.States
         public override void OnLeave()
         {
             StateManager.FinalGameFrame = renderTarget;
+            
+
             TimeManager.StartPause(this);
             HUDManager.LeavingGameState();
+        }
+
+        public RenderTarget2D CleanGameDraw()
+        {            
+            PrepRender(Color.White, SpriteSortMode.Immediate);
+
+            DrawList(spriteBatch);
+
+            CleanRender();
+            return renderTarget;
         }
 
         public override RenderTarget2D Draw()

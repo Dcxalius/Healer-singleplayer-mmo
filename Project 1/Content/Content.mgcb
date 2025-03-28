@@ -764,6 +764,18 @@
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/LevelCircle.png
 
+#begin Graphics/UI/MovableHUD.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Graphics/UI/MovableHUD.png
+
 #begin Graphics/UI/PauseBackground.png
 /importer:TextureImporter
 /processor:TextureProcessor

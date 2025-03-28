@@ -53,6 +53,7 @@ namespace Project_1.Textures
         public Text(string aFontName, string aTextToStart, Color aColor)
         {
             font = TextureManager.GetFont(aFontName);
+            Debug.Assert(font != null, "Font not found");
             scale = Camera.Camera.Zoom;
             Value = aTextToStart;
             color = aColor;

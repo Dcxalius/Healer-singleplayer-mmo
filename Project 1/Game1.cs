@@ -51,14 +51,14 @@ namespace Project_1
         void ManagerInit()
         {
             DebugManager.Init();
+            SaveManager.Init(Content);
             RandomManager.Init();
             TextureManager.Init(Content);
             KeyBindManager.Init(Content);
-            StateManager.Init(Content);
             SpawnerManager.Init();
             ParticleManager.Init();
-            SaveManager.Init(Content);
             TimeManager.Init();
+            StateManager.Init(Content);
         }
 
         void FactoryInit()

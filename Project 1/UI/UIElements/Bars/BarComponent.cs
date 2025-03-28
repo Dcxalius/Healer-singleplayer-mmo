@@ -15,7 +15,7 @@ namespace Project_1.UI.UIElements.Bars
 
         public BarComponent(BarTexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aGfx, aPos, aSize)
         {
-
+            capturesClick = false;
         }
 
         

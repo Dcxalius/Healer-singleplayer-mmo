@@ -33,7 +33,8 @@ namespace Project_1.UI.HUD
             scrollableComponent = new ScrollableBox(new UITexture("WhiteBackground", Color.White), Color.Yellow, spacing, aSize - spacing - spacing);
             //capturesScroll = true;
             AddChild(scrollableComponent);
-            dragable = true;
+            Dragable = true;
+            hudMoveable = false;
         }
 
         public Items.Item GetItem(int aIndex)

@@ -36,6 +36,8 @@ namespace Project_1.UI.UIElements
         public Window(UITexture aGfx) : base(aGfx, RelativeScreenPosition.Zero, size)
         {
             Visible = false;
+            hudMoveable = false;
+
         }
 
         public override void ToggleVisibilty()

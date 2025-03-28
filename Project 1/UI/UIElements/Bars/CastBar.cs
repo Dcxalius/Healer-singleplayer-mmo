@@ -31,11 +31,6 @@ namespace Project_1.UI.UIElements.Bars
             remainingCast = new Text("Gloryse", Color.Wheat);
         }
 
-        public override void Update()
-        {
-            base.Update();
-        }
-
         public void CancelCast()
         {
             castSpell = null; //TODO: Do something fancy

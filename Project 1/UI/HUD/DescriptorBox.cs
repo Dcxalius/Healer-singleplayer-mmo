@@ -40,7 +40,7 @@ namespace Project_1.UI.HUD
             statSheet = new DescriptorText(maxX, "Gloryse", Color.White);
 
             Visible = false;
-            alwaysFullyOnScreen = true;
+            AlwaysFullyOnScreen = true;
         }
 
         public void SetToItem(Item aItem)

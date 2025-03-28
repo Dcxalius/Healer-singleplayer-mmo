@@ -35,7 +35,7 @@ namespace Project_1.UI.HUD.PlateBoxes
         static int partyBoxesActive = 0;
         public static void ClearPartyBoxes() => partyBoxesActive = 0;
 
-        public PartyPlateBox(int aIndex) : base(GetPosition(aIndex), size)
+        public PartyPlateBox(RelativeScreenPosition aPos, int aIndex) : base(aPos, size)
         {
             name = new PlateBoxNameSegment(null, Color.White, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(size.X, size.Y / 2));
             health = new PlateBoxHealthSegment(new RelativeScreenPosition(0, size.Y / 2), new RelativeScreenPosition(size.X, size.Y / 4));
@@ -97,6 +97,12 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         protected override void ClickedOnMe(ClickEvent aClick)
         {
+            if (hudMoving)
+            {
+                base.ClickedOnMe(aClick);
+                return;
+            }
+
             guildMember.Command(aClick);
 
             base.ClickedOnMe(aClick);

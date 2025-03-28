@@ -39,18 +39,15 @@ namespace Project_1.UI.UIElements.Boxes
 
         Label textToDisplay;
 
-        public DialogueBox(string aMessage, Color aMessageColor, LocationOfPopUp aLocation, PausesGame aPauses, Action aAction, UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, string aButtonText = null) 
+        public DialogueBox(string aMessage, Color aMessageColor, LocationOfPopUp aLocation, PausesGame aPauses, List<Action> aAction, UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, string aButtonText = null) 
             : this(aMessage, aMessageColor, aLocation, aPauses, aAction, aGfx, aPos, aSize, DefaultButtonPos(aSize), defaultButtonSize, defaultButtonColor, aButtonText, defaultButtonTextColor) { }
 
-        public DialogueBox(string aMessage, Color aMessageColor, LocationOfPopUp aLocation, PausesGame aPauses, Action aAction, UITexture aGfx, 
+        public DialogueBox(string aMessage, Color aMessageColor, LocationOfPopUp aLocation, PausesGame aPauses, List<Action> aAction, UITexture aGfx, 
             RelativeScreenPosition aPos, RelativeScreenPosition aSize, 
             RelativeScreenPosition aButtonPos, RelativeScreenPosition aButtonSize, Color aButtonColor, string aButtonText = null, Color? aButtonTextColor = null)
                 : base(
-                    new Button[] { new Button(aPauses == PausesGame.Pauses ? new List<Action> { aAction } : new List<Action> { aAction }, 
-                    aButtonPos, aButtonSize, aButtonColor, aButtonText, aButtonTextColor)}, aGfx, aPos, aSize)
+                    new Button[] { new Button(aAction, aButtonPos, aButtonSize, aButtonColor, aButtonText, aButtonTextColor)}, aPauses, aGfx, aPos, aSize)
         {
-            if (aPauses == PausesGame.Pauses) TimeManager.StartPause(this);
-            buttons.First().AddAction(new Action(() => TimeManager.StopPause(this)));
             switch (aLocation)
             {
                 case LocationOfPopUp.HUDManager:
@@ -63,7 +60,7 @@ namespace Project_1.UI.UIElements.Boxes
                     throw new NotImplementedException();
             }
 
-            
+
             textToDisplay = new Label(aMessage, defaultEdgeSpacing, aSize - defaultEdgeSpacing * 2, Label.TextAllignment.TopCentre, aMessageColor);
             AddChild(textToDisplay);
         }

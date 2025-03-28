@@ -24,7 +24,7 @@ namespace Project_1.Managers.States
         {
             StartScreen,
             Game,
-            PausedGame,
+            MoveHUD,
             PauseMenu,
             OptionMenu,
             LoadingMenu,
@@ -35,7 +35,7 @@ namespace Project_1.Managers.States
 
         static StartScreen startScreen;
         static Game game;
-        static PausedGame pausedGame;
+        static MoveHUD moveHUD;
         static PauseMenu pauseMenu;
         static OptionMenu optionMenu;
         static LoadingMenu loadingMenu;
@@ -43,6 +43,7 @@ namespace Project_1.Managers.States
 
         static SpriteBatch finalBatch;
 
+        public static RenderTarget2D CleanGameTarget => game.CleanGameDraw();
         public static RenderTarget2D FinalGameFrame { get => finalGameFrame; set => finalGameFrame = value; }
         static RenderTarget2D finalGameFrame;
         public static Rectangle RenderTargetPosition { set => renderTargetPosition = value; }
@@ -60,7 +61,7 @@ namespace Project_1.Managers.States
 
             startScreen = new StartScreen();
             game = new Game();
-            pausedGame = new PausedGame();
+            moveHUD = new MoveHUD();
             pauseMenu = new PauseMenu();
             optionMenu = new OptionMenu();
             loadingMenu = new LoadingMenu();
@@ -102,8 +103,8 @@ namespace Project_1.Managers.States
                 case States.OptionMenu:
                     currentState = optionMenu;
                     break;
-                case States.PausedGame:
-                    currentState = pausedGame;
+                case States.MoveHUD:
+                    currentState = moveHUD;
                     break;
                 case States.LoadingMenu:
                     currentState = loadingMenu;
@@ -121,6 +122,7 @@ namespace Project_1.Managers.States
         {
             finalGameFrame = game.Draw();
         }
+
 
         public static bool Click(ClickEvent aClick) => currentState.Click(aClick);
         public static bool Release(ReleaseEvent aRelease) => currentState.Release(aRelease);

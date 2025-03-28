@@ -12,7 +12,7 @@ namespace Project_1.Input
     {
         double heldSince;
         
-        public double DurationHeld => TimeManager.TotalFrameTime - heldSince;
+        public double DurationHeld => TimeManager.InstanceTotalFrameTime - heldSince;
         double durationHeld;
         public InputManager.ClickType ClickThatCreated { get => clickEventThatTriggered.ButtonPressed; }
         public Camera.RelativeScreenPosition Offset => offset;
@@ -22,9 +22,9 @@ namespace Project_1.Input
         UIElement creatorOfEvent;
 
 
-        public HoldEvent(double aStartTime, ClickEvent aClickEvent, UIElement aOwner)
+        public HoldEvent(ClickEvent aClickEvent, UIElement aOwner)
         {
-            heldSince = aStartTime;
+            heldSince = TimeManager.InstanceTotalFrameTime;
             clickEventThatTriggered = aClickEvent;
             creatorOfEvent = aOwner;
             offset = clickEventThatTriggered.RelativePos - creatorOfEvent.RelativePositionOnScreen;

@@ -23,7 +23,9 @@ using Project_1.UI.UIElements.SpellBook;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using Item = Project_1.UI.UIElements.Inventory.Item;
@@ -53,9 +55,12 @@ namespace Project_1.UI.HUD
 
         static List<DialogueBox> dialogueBoxes;
 
+        static List<(string, RelativeScreenPosition)> LoadedSettings;
 
         public static void Init()
         {
+            SetSettings();
+
             hudElements = new List<UIElement>();
             InitPlateBoxes();
 
@@ -64,13 +69,15 @@ namespace Project_1.UI.HUD
             inventoryBox = new InventoryBox(new RelativeScreenPosition(0.59f, 0.60f), new RelativeScreenPosition(0.4f));
             hudElements.Add(inventoryBox);
 
+            descriptorBox = new DescriptorBox(); //Shouldnt be in elements for now
 
             InitWindows();
 
-
-            firstSpellBar = new FirstSpellBar(10, new RelativeScreenPosition(0.2f, 0.86f), 0.6f);
+            var loaded = LoadedSettings.Find(x => x.Item1 == typeof(FirstSpellBar).Name);
+            firstSpellBar = new FirstSpellBar(10, loaded.Item2, 0.6f);
             hudElements.Add(firstSpellBar);
-            playerCastBar = new CastBar(new RelativeScreenPosition(0.1f, 0.203f), new RelativeScreenPosition(0.2f, 0.015f));
+            loaded = LoadedSettings.Find(x => x.Item1 == typeof(CastBar).Name);
+            playerCastBar = new CastBar(loaded.Item2, new RelativeScreenPosition(0.2f, 0.015f));
             hudElements.Add(playerCastBar);
 
             heldItem = new HeldItem();
@@ -80,66 +87,19 @@ namespace Project_1.UI.HUD
 
         }
 
-        #region PlateBoxes 
-        static PlayerPlateBox playerPlateBox;
-        static TargetPlateBox targetPlateBox;
-        static PartyPlateBox[] partyPlateBoxes;
-        static BuffBox playerBuffBox;
-        static BuffBox targetBuffBox;
-        static BuffBox[] partyBuffBoxes;
-
-        static List<UIElement> plateBoxes;
-        static void InitPlateBoxes()
+        static void SetSettings()
         {
-            plateBoxes = new List<UIElement>();
-
-            playerPlateBox = new PlayerPlateBox(new RelativeScreenPosition(0.1f, 0.1f), new RelativeScreenPosition(0.2f, 0.1f));
-            plateBoxes.Add(playerPlateBox);
-            targetPlateBox = new TargetPlateBox(new RelativeScreenPosition(0.33f, 0.1f), new RelativeScreenPosition(0.2f, 0.1f));
-            plateBoxes.Add(targetPlateBox);
-            partyPlateBoxes = new PartyPlateBox[4];
-            for (int i = 0; i < partyPlateBoxes.Length; i++)
+            if (File.Exists(SaveManager.HudSettings))
             {
-                partyPlateBoxes[i] = new PartyPlateBox(i);
+                string json = File.ReadAllText(SaveManager.HudSettings);
+                LoadedSettings = SaveManager.ImportData<List<(string, RelativeScreenPosition)>>(json);
             }
-            plateBoxes.AddRange(partyPlateBoxes);
-            descriptorBox = new DescriptorBox();
-
-
-            playerBuffBox = new BuffBox(ObjectManager.Player, BuffBox.FillDirection.TopRightToDown, new RelativeScreenPosition(0.01f, 0.1f), new RelativeScreenPosition(0.08f, 0.1f));
-            plateBoxes.Add(playerBuffBox);
-            targetBuffBox = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, new RelativeScreenPosition(0.33f, 0.21f), new RelativeScreenPosition(0.2f, 0.1f));
-            plateBoxes.Add(targetBuffBox);
-            partyBuffBoxes = new BuffBox[4];
-            RelativeScreenPosition pBuffBoxSize = new RelativeScreenPosition(0.08f, 0.1f);
-            for (int i = 0; i < partyBuffBoxes.Length; i++)
+            else
             {
-                partyBuffBoxes[i] = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, partyPlateBoxes[i].RelativePos - pBuffBoxSize.OnlyX, pBuffBoxSize);
+                string json = File.ReadAllText(SaveManager.DefaultHudSettings);
+                LoadedSettings = SaveManager.ImportData<List<(string, RelativeScreenPosition)>>(json);
             }
-            plateBoxes.AddRange(partyBuffBoxes);
         }
-        #endregion
-
-        #region Windows
-
-        static CharacterWindow characterWindow;
-        static SpellBookWindow spellBookWindow;
-        static GuildWindow guildWindow;
-        static InspectWindow inspectWindow;
-        static void InitWindows()
-        {
-            Window.Init(new RelativeScreenPosition(0.05f, 0.2f), new RelativeScreenPosition(0.1f, 0f), new RelativeScreenPosition(0.2f, 0.6f));
-            characterWindow = new CharacterWindow();
-            hudElements.Add(characterWindow);
-            spellBookWindow = new SpellBookWindow();
-            hudElements.Add(spellBookWindow);
-            inspectWindow = new InspectWindow();
-            hudElements.Add(inspectWindow);
-            guildWindow = new GuildWindow();
-            hudElements.Add(guildWindow);
-
-        }
-        #endregion
 
         public static void Update()
         {
@@ -187,10 +147,175 @@ namespace Project_1.UI.HUD
             }
         }
 
+        #region HUDMoving
+        public static void DisableHUDMoveable() => SetHUDMoveable(false);
+
+        public static void SetHUDMoveable(bool aSet)
+        {
+            for (int i = 0; i < plateBoxes.Count; i++)
+            {
+                plateBoxes[i].HUDMoveable(aSet);
+            }
+
+            for (int i = 0; i < hudElements.Count; i++)
+            {
+                hudElements[i].HUDMoveable(aSet);
+            }
+
+            for (int i = 0; i < dialogueBoxes.Count; i++)
+            {
+                dialogueBoxes[i].HUDMoveable(aSet);
+            }
+        }
+
+        public static void ResetHUDMoveable()
+        {
+            for (int i = 0; i < plateBoxes.Count; i++)
+            {
+                plateBoxes[i].ResetHUDMoveable();
+            }
+
+            for (int i = 0; i < hudElements.Count; i++)
+            {
+                hudElements[i].ResetHUDMoveable();
+            }
+
+            for (int i = 0; i < dialogueBoxes.Count; i++)
+            {
+                dialogueBoxes[i].ResetHUDMoveable();
+            }
+        }
+
+        public static void HUDMoveableDraw(SpriteBatch aBatch)
+        {
+            for (int i = 0; i < plateBoxes.Count; i++)
+            {
+                plateBoxes[i].HUDMovableDraw(aBatch);
+            }
+
+            for (int i = 0; i < hudElements.Count; i++)
+            {
+                hudElements[i].HUDMovableDraw(aBatch);
+            }
+
+            for (int i = 0; i < dialogueBoxes.Count; i++)
+            {
+                dialogueBoxes[i].HUDMovableDraw(aBatch);
+            }
+        }
+
+        public static void HUDMovableUpdate()
+        {
+            for (int i = 0; i < plateBoxes.Count; i++)
+            {
+                plateBoxes[i].Update();
+            }
+
+            for (int i = 0; i < hudElements.Count; i++)
+            {
+                hudElements[i].Update();
+            }
+
+            for (int i = 0; i < dialogueBoxes.Count; i++)
+            {
+                dialogueBoxes[i].Update();
+            }
+        }
+
+
+        public static void Save()
+        {
+            List<(string, RelativeScreenPosition)> saveables = new List<(string, RelativeScreenPosition)>();
+            for (int i = 0; i < plateBoxes.Count; i++)
+            {
+                if (!plateBoxes[i].HudMoveable) continue;
+                saveables.Add(plateBoxes[i].Save);
+            }
+
+            for (int i = 0; i < hudElements.Count; i++)
+            {
+                if (!hudElements[i].HudMoveable) continue;
+                saveables.Add(hudElements[i].Save);
+            }
+
+            for (int i = 0; i < dialogueBoxes.Count; i++)
+            {
+                if (!dialogueBoxes[i].HudMoveable) continue;
+                saveables.Add(dialogueBoxes[i].Save);
+            }
+
+            SaveManager.ExportData(SaveManager.HudSettings, saveables);
+        }
+        #endregion
+
+        #region PlateBoxes 
+        static PlayerPlateBox playerPlateBox;
+        static TargetPlateBox targetPlateBox;
+        static PartyPlateBox[] partyPlateBoxes;
+        static BuffBox playerBuffBox;
+        static BuffBox targetBuffBox;
+        static BuffBox[] partyBuffBoxes;
+
+        static List<UIElement> plateBoxes;
+        static void InitPlateBoxes()
+        {
+            plateBoxes = new List<UIElement>();
+
+            playerPlateBox = new PlayerPlateBox(LoadedSettings.Find(x => x.Item1 == typeof(PlayerPlateBox).Name).Item2, new RelativeScreenPosition(0.2f, 0.1f));
+            plateBoxes.Add(playerPlateBox);
+            targetPlateBox = new TargetPlateBox(LoadedSettings.Find(x => x.Item1 == typeof(TargetPlateBox).Name).Item2, new RelativeScreenPosition(0.2f, 0.1f));
+            plateBoxes.Add(targetPlateBox);
+            partyPlateBoxes = new PartyPlateBox[4];
+            var loadedPos = LoadedSettings.Where(x => x.Item1 == typeof(PartyPlateBox).Name).ToArray();
+            for (int i = 0; i < partyPlateBoxes.Length; i++)
+            {
+
+                partyPlateBoxes[i] = new PartyPlateBox(loadedPos[i].Item2, i);
+            }
+            plateBoxes.AddRange(partyPlateBoxes);
+
+            loadedPos = LoadedSettings.Where(x => x.Item1 == typeof(BuffBox).Name).ToArray();
+            playerBuffBox = new BuffBox(ObjectManager.Player, BuffBox.FillDirection.TopRightToDown, loadedPos[0].Item2, new RelativeScreenPosition(0.08f, 0.1f));
+            plateBoxes.Add(playerBuffBox);
+            targetBuffBox = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, loadedPos[1].Item2, new RelativeScreenPosition(0.2f, 0.1f));
+            plateBoxes.Add(targetBuffBox);
+            partyBuffBoxes = new BuffBox[4];
+            RelativeScreenPosition pBuffBoxSize = new RelativeScreenPosition(0.08f, 0.1f);
+            for (int i = 0; i < partyBuffBoxes.Length; i++)
+            {
+
+                partyBuffBoxes[i] = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, loadedPos[2 + i].Item2, pBuffBoxSize);
+            }
+            plateBoxes.AddRange(partyBuffBoxes);
+        }
+        #endregion
+
+        #region Windows
+
+        static CharacterWindow characterWindow;
+        static SpellBookWindow spellBookWindow;
+        static GuildWindow guildWindow;
+        static InspectWindow inspectWindow;
+        static void InitWindows()
+        {
+            Window.Init(new RelativeScreenPosition(0.05f, 0.2f), new RelativeScreenPosition(0.1f, 0f), new RelativeScreenPosition(0.2f, 0.6f));
+            characterWindow = new CharacterWindow();
+            hudElements.Add(characterWindow);
+            spellBookWindow = new SpellBookWindow();
+            hudElements.Add(spellBookWindow);
+            inspectWindow = new InspectWindow();
+            hudElements.Add(inspectWindow);
+            guildWindow = new GuildWindow();
+            hudElements.Add(guildWindow);
+
+        }
+        #endregion
+
+        #region Dialogue
         public static void AddDialogueBox(DialogueBox aDialogueBox) => dialogueBoxes.Add(aDialogueBox);
 
         public static void RemoveDialogueBox(DialogueBox aDialogueBox) => dialogueBoxes.Remove(aDialogueBox);
-
+        #endregion
 
         #region Plate
         public static void AddNamePlate(Entity aEntity, NamePlate aNamePlate) => namePlates.Add(aEntity, aNamePlate);
@@ -354,8 +479,6 @@ namespace Project_1.UI.HUD
 
 
         #endregion
-
-
 
         #region Inventory
         public static void SetInventory(Inventory aInventory) => inventoryBox.SetInventory(aInventory);

@@ -48,14 +48,45 @@ namespace Project_1.UI.UIElements
         public bool CapturesRelease { get => capturesRelease; set => capturesRelease = value; }
         protected bool capturesRelease;
 
-        public bool AlwaysOnScreen => alwaysOnScreen;
+        public bool AlwaysOnScreen
+        {
+            get => alwaysOnScreen;
+            set
+            {
+                alwaysOnScreen = value;
+                alwaysFullyOnScreen = !value;
+            }
+        }
+
         protected bool alwaysOnScreen;
         readonly Point alwaysOnScreenAmount = new Point(10, 10);
 
-        public bool AlwaysFullyOnScreen => alwaysFullyOnScreen;
-        protected bool alwaysFullyOnScreen;
+        public bool AlwaysFullyOnScreen //TOOD: Change to enum?
+        {
+            get => alwaysFullyOnScreen;
+            protected set
+            {
+                alwaysFullyOnScreen = value;
+                alwaysOnScreen = !value;
+            }
+        }
 
-        protected bool dragable;
+        bool alwaysFullyOnScreen;
+
+        public bool Dragable
+        {
+            get => dragable;
+            protected set => dragable = value;
+        }
+        bool dragable;
+
+        RelativeScreenPosition oldPosition;
+        protected bool hudMoving;
+        public bool HudMoveable => hudMoveable;
+        protected bool hudMoveable;
+        static UITexture movableGFX => new UITexture("MovableHUD", Color.White);
+        Text nameText;
+
         readonly TimeSpan timeBeforeDragRegisters = TimeSpan.FromSeconds(0.2);
 
         public HoldEvent heldEvents;
@@ -135,6 +166,8 @@ namespace Project_1.UI.UIElements
 
         #endregion
 
+        public (string, RelativeScreenPosition) Save => (GetType().Name, RelativePos);
+
         protected UIElement(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) //aPos and aSize should be between 0 and 1
         {
             visible = true;
@@ -144,12 +177,18 @@ namespace Project_1.UI.UIElements
             relativeSize = aSize;
 
             pos = RelativeScreenPosition.TransformToAbsoluteRect(aPos, aSize);
+            nameText = new Text("Gloryse", GetType().Name);
+
+
             capturesClick = true;
             capturesScroll = false;
             capturesRelease = true;
             alwaysOnScreen = false;
-            alwaysFullyOnScreen = false;
+            alwaysFullyOnScreen = true;
+            hudMoveable = true;
         }
+
+
 
         #region Update
         public virtual void Update()
@@ -158,6 +197,12 @@ namespace Project_1.UI.UIElements
             UpdateChildren();
             HoverUpdate();
             GetVisibiltyPress();
+        }
+
+        public void HUDMovableUpdate()
+        {
+            if (!hudMoveable) return;
+            HoldUpdate();
         }
 
         void UpdateChildren()
@@ -184,9 +229,9 @@ namespace Project_1.UI.UIElements
                 return;
             }
 
-            if (!dragable) return;
+            if (!Dragable && !hudMoving) return;
             if (heldEvents.DurationHeld < timeBeforeDragRegisters.TotalSeconds) return;
-            //TODO: Add a boundscheck
+            
             Move(InputManager.GetMousePosRelative() - heldEvents.Offset);
         }
         #endregion
@@ -201,10 +246,22 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        public virtual void ToggleVisibilty()
+        public void HUDMoveable(bool aSet)
         {
-            Visible = !visible;
+            hudMoving = aSet;
+            if (hudMoving)
+            {
+                oldPosition = RelativePos;
+            }
         }
+
+        public void ResetHUDMoveable()
+        {
+            hudMoving = false;
+            Move(oldPosition);
+        }
+
+        public virtual void ToggleVisibilty() => Visible = !visible;
 
         public virtual void Rescale()
         {
@@ -214,6 +271,8 @@ namespace Project_1.UI.UIElements
             {
                 children[i].Rescale();
             }
+
+            nameText.Rescale();
         }
 
         public void Move(RelativeScreenPosition aNewPos)
@@ -347,13 +406,6 @@ namespace Project_1.UI.UIElements
 
         #endregion
 
-        //static protected Point TransformFromRelativeToPoint(Vector2 aValue) //TODO: ????
-        //{ 
-        //    Point size = new Point((int)(Camera.Camera.ScreenSize.X * aValue.X), (int)(Camera.Camera.ScreenSize.Y * aValue.Y));
-        //    return size;
-        //}
-
-
         #region Release
         public virtual bool ReleasedOn(ReleaseEvent aRelease)
         {
@@ -431,7 +483,7 @@ namespace Project_1.UI.UIElements
         #region Click
         public virtual bool ClickedOn(ClickEvent aClick)
         {
-            if (!visible) return false;
+            if (!visible && !(hudMoveable && hudMoving)) return false;
 
             if (!AbsolutePos.Contains(aClick.AbsolutePos)) return false;
 
@@ -444,7 +496,7 @@ namespace Project_1.UI.UIElements
 
         protected virtual bool ClickedOnChildren(ClickEvent aClick)
         {
-            if (!visible) return false;
+            if (!visible || (hudMoveable && hudMoving)) return false;
 
             for (int i = 0; i < children.Count; i++)
             {
@@ -464,8 +516,8 @@ namespace Project_1.UI.UIElements
 
         protected virtual void ClickedOnMe(ClickEvent aClick)
         {
-            if (!visible) return;
-            heldEvents = new HoldEvent(TimeManager.TotalFrameTime, aClick, this);
+            if (!visible && !(hudMoveable && hudMoving)) return;
+            heldEvents = new HoldEvent(aClick, this);
 
             //DebugManager.Print(GetType(), "Clicked on " + pos);
         }
@@ -508,6 +560,20 @@ namespace Project_1.UI.UIElements
             
         }
         #endregion
+
+        public void HUDMovableDraw(SpriteBatch aBatch)
+        {
+            if (!hudMoveable) return;
+
+            if (gfx != null)
+            {
+                gfx.Draw(aBatch, AbsolutePos);
+            }
+
+            movableGFX.Draw(aBatch, AbsolutePos);
+            nameText.CentredDraw(aBatch, AbsolutePosition + Size / 2 - new AbsoluteScreenPosition(nameText.Offset.ToPoint()) / 2);
+
+        }
 
         public virtual void Draw(SpriteBatch aBatch)
         {

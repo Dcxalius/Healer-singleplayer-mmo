@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,13 +12,18 @@ namespace Project_1.Camera
     [DebuggerStepThrough]
     internal struct RelativeScreenPosition
     {
+        [JsonProperty]
         Vector2 position;
 
         public static RelativeScreenPosition Zero { get { return new RelativeScreenPosition(); } }
 
+        [JsonIgnore]
         public RelativeScreenPosition OnlyX => new RelativeScreenPosition(position.X, 0);
+        [JsonIgnore]
         public RelativeScreenPosition OnlyY => new RelativeScreenPosition(0, position.Y);
+        [JsonIgnore]
         public float X { get { return position.X; } set => position.X = value; }
+        [JsonIgnore]
         public float Y { get { return position.Y; } set => position.Y = value; }
 
         public RelativeScreenPosition()

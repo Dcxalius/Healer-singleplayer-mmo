@@ -4,6 +4,7 @@ using Project_1.GameObjects;
 using Project_1.GameObjects.Spawners;
 using Project_1.Managers.Saves;
 using Project_1.Tiles;
+using Project_1.UI.HUD;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,6 +19,10 @@ namespace Project_1.Managers
         static string contentRootDirectory;
         static JsonSerializerSettings serializerSettings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto};
         static string saveFolder;
+        public static string Settings => contentRootDirectory + "\\Settings";
+        public static string HudSettings => Settings + "\\Hud.set";
+        public static string DefaultSettings => Settings + "\\Default";
+        public static string DefaultHudSettings => DefaultSettings + "\\Hud.def";
         public static Save[] Saves => saves.ToArray();
         static List<Save> saves;
 
@@ -41,6 +46,21 @@ namespace Project_1.Managers
             }
             saves.Sort();
         }
+
+        //public string LoadEntireFile(string aPath)
+        //{
+        //    try
+        //    {
+        //        System.IO.File.ReadAllText(aPath);
+        //    }
+        //    catch (Exception)
+        //    {
+                
+
+        //        throw;
+        //    }
+        //}
+
 
         public static bool NameAlreadyExists(string aName) => saves.Find(x => x.Name == aName.ToUpper()) != null;
 
@@ -69,6 +89,8 @@ namespace Project_1.Managers
             currentSave = aSave;
             currentSave.LoadData();
         }
+
+        public static void SaveHUD() => HUDManager.Save();
 
         public static void SaveData() => currentSave.SaveData();
 

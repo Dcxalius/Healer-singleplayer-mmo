@@ -14,7 +14,11 @@ namespace Project_1.Tiles
         public static readonly Point ChunkSize = new Point(100);
 
         public Tile Tile((int, int) aXY) => Tile(aXY.Item1, aXY.Item2);
-        public Tile Tile(int aX, int aY) => tiles[aX, aY];
+        public Tile Tile(int aX, int aY)
+        {
+            if (aX < 0 || aX > ChunkSize.X || aY < 0 || aY > ChunkSize.Y) return null;
+            return tiles[aX, aY];
+        }
 
         [JsonProperty]
         int[,] tilesAsIDs
