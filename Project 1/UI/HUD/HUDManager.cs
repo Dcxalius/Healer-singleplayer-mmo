@@ -147,64 +147,64 @@ namespace Project_1.UI.HUD
             }
         }
 
-        #region HUDMoving
-        public static void DisableHUDMoveable() => SetHUDMoveable(false);
+        #region HudChanging
+        public static void DisableHudMoveable() => SetHudMoveable(false);
 
-        public static void SetHUDMoveable(bool aSet)
+        public static void SetHudMoveable(bool aSet)
         {
             for (int i = 0; i < plateBoxes.Count; i++)
             {
-                plateBoxes[i].HUDMoveable(aSet);
+                plateBoxes[i].SetHudMoveable(aSet);
             }
 
             for (int i = 0; i < hudElements.Count; i++)
             {
-                hudElements[i].HUDMoveable(aSet);
+                hudElements[i].SetHudMoveable(aSet);
             }
 
             for (int i = 0; i < dialogueBoxes.Count; i++)
             {
-                dialogueBoxes[i].HUDMoveable(aSet);
+                dialogueBoxes[i].SetHudMoveable(aSet);
             }
         }
 
-        public static void ResetHUDMoveable()
+        public static void ResetHudMoveable()
         {
             for (int i = 0; i < plateBoxes.Count; i++)
             {
-                plateBoxes[i].ResetHUDMoveable();
+                plateBoxes[i].ResetHudMoveable();
             }
 
             for (int i = 0; i < hudElements.Count; i++)
             {
-                hudElements[i].ResetHUDMoveable();
+                hudElements[i].ResetHudMoveable();
             }
 
             for (int i = 0; i < dialogueBoxes.Count; i++)
             {
-                dialogueBoxes[i].ResetHUDMoveable();
+                dialogueBoxes[i].ResetHudMoveable();
             }
         }
 
-        public static void HUDMoveableDraw(SpriteBatch aBatch)
+        public static void HudMoveableDraw(SpriteBatch aBatch)
         {
             for (int i = 0; i < plateBoxes.Count; i++)
             {
-                plateBoxes[i].HUDMovableDraw(aBatch);
+                plateBoxes[i].HudMovableDraw(aBatch);
             }
 
             for (int i = 0; i < hudElements.Count; i++)
             {
-                hudElements[i].HUDMovableDraw(aBatch);
+                hudElements[i].HudMovableDraw(aBatch);
             }
 
             for (int i = 0; i < dialogueBoxes.Count; i++)
             {
-                dialogueBoxes[i].HUDMovableDraw(aBatch);
+                dialogueBoxes[i].HudMovableDraw(aBatch);
             }
         }
 
-        public static void HUDMovableUpdate()
+        public static void HudMovableUpdate()
         {
             for (int i = 0; i < plateBoxes.Count; i++)
             {
@@ -222,6 +222,15 @@ namespace Project_1.UI.HUD
             }
         }
 
+        public static void ChangeSizes()
+        {
+
+        }
+
+        public static void DisableSizeChanges()
+        {
+
+        }
 
         public static void Save()
         {

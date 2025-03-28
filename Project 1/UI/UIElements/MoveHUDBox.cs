@@ -22,16 +22,17 @@ namespace Project_1.UI.UIElements
         static RelativeScreenPosition aButtonPos => size.OnlyY + new RelativeScreenPosition(spacing.X, -spacing.Y) - buttonSize.OnlyY;
         static RelativeScreenPosition bButtonPos => size - spacing - buttonSize;
 
-        public MoveHUDBox() : base("aMessage", Color.White, LocationOfPopUp.StateManager, PausesGame.NoPause, new List<Action> { HUDManager.DisableHUDMoveable, SaveManager.SaveHUD }, new List<Action> { HUDManager.ResetHUDMoveable },
+        CheckBox sizeChangeCheckBox;
+
+        public MoveHUDBox() : base("aMessage", Color.White, LocationOfPopUp.StateManager, PausesGame.NoPause, new List<Action> { HUDManager.DisableHudMoveable, SaveManager.SaveHUD }, new List<Action> { HUDManager.ResetHudMoveable },
             new UITexture("WhiteBackground", Color.Black), pos, size, aButtonPos, bButtonPos, buttonSize, Color.Gray, "Confirm", "Reset", Color.White)
         {
             Dragable = true;
-            for (int i = 0; i < buttons.Count; i++)
-            {
-                buttons[i].AddAction(
-                    () => 
-                    StateManager.SetState(StateManager.States.PauseMenu));
-            }
+            for (int i = 0; i < buttons.Count; i++) buttons[i].AddAction(() => StateManager.SetState(StateManager.States.PauseMenu)); //TODO: Formalize this
+
+            sizeChangeCheckBox = new CheckBox(false, HUDManager.ChangeSizes, HUDManager.DisableSizeChanges, spacing, RelativeScreenPosition.GetSquareFromX(0.01f)); //TODO: Continue implementation
+
+            AddChild(sizeChangeCheckBox);
         }
     }
 }

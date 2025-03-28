@@ -31,7 +31,7 @@ namespace Project_1.Managers.States
 
         public override void OnEnter()
         {
-            HUDManager.SetHUDMoveable(true);
+            HUDManager.SetHudMoveable(true);
             cleanGame = StateManager.CleanGameTarget;
         }
 
@@ -43,7 +43,7 @@ namespace Project_1.Managers.States
         public override void Update()
         {
             MoveHUDBox.Update();
-            HUDManager.HUDMovableUpdate();
+            HUDManager.HudMovableUpdate();
 
         }
 
@@ -85,7 +85,7 @@ namespace Project_1.Managers.States
 
             spriteBatch.Draw(cleanGame, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f); //draw game
             pauseBackground.Draw(spriteBatch, Vector2.Zero); //draw gray screen overlay
-            HUDManager.HUDMoveableDraw(spriteBatch);
+            HUDManager.HudMoveableDraw(spriteBatch);
             MoveHUDBox.Draw(spriteBatch);
 
             CleanRender();

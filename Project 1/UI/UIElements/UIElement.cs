@@ -54,7 +54,10 @@ namespace Project_1.UI.UIElements
             set
             {
                 alwaysOnScreen = value;
-                alwaysFullyOnScreen = !value;
+                if (value)
+                {
+                    alwaysFullyOnScreen = !value;
+                }
             }
         }
 
@@ -67,7 +70,11 @@ namespace Project_1.UI.UIElements
             protected set
             {
                 alwaysFullyOnScreen = value;
-                alwaysOnScreen = !value;
+
+                if (value)
+                {
+                    alwaysOnScreen = !value;
+                }
             }
         }
 
@@ -184,7 +191,7 @@ namespace Project_1.UI.UIElements
             capturesScroll = false;
             capturesRelease = true;
             alwaysOnScreen = false;
-            alwaysFullyOnScreen = true;
+            alwaysFullyOnScreen = false;
             hudMoveable = true;
         }
 
@@ -246,7 +253,7 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        public void HUDMoveable(bool aSet)
+        public void SetHudMoveable(bool aSet)
         {
             hudMoving = aSet;
             if (hudMoving)
@@ -255,7 +262,7 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        public void ResetHUDMoveable()
+        public void ResetHudMoveable()
         {
             hudMoving = false;
             Move(oldPosition);
@@ -561,7 +568,7 @@ namespace Project_1.UI.UIElements
         }
         #endregion
 
-        public void HUDMovableDraw(SpriteBatch aBatch)
+        public void HudMovableDraw(SpriteBatch aBatch)
         {
             if (!hudMoveable) return;
 
