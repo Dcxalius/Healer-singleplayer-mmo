@@ -33,23 +33,10 @@ namespace Project_1
 
         protected override void Initialize() //TODO: Split all Inits so that all calls that are independant are called first and only after that the dependant ones are called
         {
-            DebugManager.Init();
-            RandomManager.Init();
-            ItemFactory.Init(Content);
-            LootFactory.Init(Content);
-            TextureManager.Init(Content);
-            SpellFactory.Init(Content);
-            ProjectileFactory.Init(Content);
-            KeyBindManager.Init(Content);
             Camera.Camera.Init();
-            TileFactory.Init(Content);
-            StateManager.Init(Content);
-            SpawnerManager.Init();
-            AreaOfEffectFactory.Init(Content);
-            ParticleManager.Init();
-            SaveManager.Init(Content);
+            ManagerInit();
+            FactoryInit();
             ClassSelector.Init(Content);
-            TimeManager.Init();
 
             //DEBUG
             
@@ -59,6 +46,28 @@ namespace Project_1
                 StateManager.SetState(StateManager.States.Game);
             }
             base.Initialize();
+        }
+
+        void ManagerInit()
+        {
+            DebugManager.Init();
+            RandomManager.Init();
+            TextureManager.Init(Content);
+            KeyBindManager.Init(Content);
+            StateManager.Init(Content);
+            SpawnerManager.Init();
+            ParticleManager.Init();
+            SaveManager.Init(Content);
+            TimeManager.Init();
+        }
+
+        void FactoryInit()
+        {
+            SpellFactory.Init(Content);
+            ItemFactory.Init(Content);
+            TileFactory.Init(Content);
+            ProjectileFactory.Init(Content);
+            AreaOfEffectFactory.Init(Content);
         }
 
         protected override void LoadContent()

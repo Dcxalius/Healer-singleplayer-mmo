@@ -75,7 +75,7 @@ namespace Project_1.UI.UIElements
 
         public override void Draw(SpriteBatch aBatch)
         {
-            if (!visible) return;
+            if (!Visible) return;
             base.Draw(aBatch);
         }
     }

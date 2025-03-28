@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -42,8 +43,9 @@ namespace Project_1.Items
                 }
             }
             itemList.Sort();
-
             itemData = itemList.ToArray();
+
+            LootFactory.Init(aContentManager);
         }
 
         static ItemData CreateData(string aRawData, string aFolder)
