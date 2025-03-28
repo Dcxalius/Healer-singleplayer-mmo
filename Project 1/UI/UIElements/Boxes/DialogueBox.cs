@@ -10,6 +10,7 @@ using Project_1.Managers.States;
 using Project_1.UI.HUD;
 using Project_1.UI.UIElements.Buttons;
 using System.Diagnostics.CodeAnalysis;
+using Project_1.Managers;
 
 namespace Project_1.UI.UIElements.Boxes
 {
@@ -33,7 +34,7 @@ namespace Project_1.UI.UIElements.Boxes
             StateManager
         }
 
-        static Action unPauseGame => new Action(() => StateManager.SetState(StateManager.States.Game)); //TODO: Make this keep track of how many things are pausing the game and subtract them by one and only unpause when its 0
+        Action unPauseGame => new Action(() => TimeManager.StopPause(this));
 
 
         Label textToDisplay;
@@ -45,17 +46,18 @@ namespace Project_1.UI.UIElements.Boxes
             RelativeScreenPosition aPos, RelativeScreenPosition aSize, 
             RelativeScreenPosition aButtonPos, RelativeScreenPosition aButtonSize, Color aButtonColor, string aButtonText = null, Color? aButtonTextColor = null)
                 : base(
-                    new Button[] { new Button(aPauses == PausesGame.Pauses ? new List<Action> { unPauseGame, aAction } : new List<Action> { aAction }, 
+                    new Button[] { new Button(aPauses == PausesGame.Pauses ? new List<Action> { aAction } : new List<Action> { aAction }, 
                     aButtonPos, aButtonSize, aButtonColor, aButtonText, aButtonTextColor)}, aGfx, aPos, aSize)
         {
-            if (aPauses == PausesGame.Pauses) StateManager.SetState(StateManager.States.PausedGame);
+            if (aPauses == PausesGame.Pauses) TimeManager.StartPause(this);
+            buttons.First().AddAction(new Action(() => TimeManager.StopPause(this)));
             switch (aLocation)
             {
                 case LocationOfPopUp.HUDManager:
-                    buttons[0].AddAction(new Action(() => HUDManager.RemoveDialogueBox(this)));
+                    buttons.First().AddAction(new Action(() => HUDManager.RemoveDialogueBox(this)));
                     break;
                 case LocationOfPopUp.StateManager:
-                    buttons[0].AddAction(new Action(() => StateManager.RemovePopUp(this)));
+                    buttons.First().AddAction(new Action(() => StateManager.RemovePopUp(this)));
                     break;
                 default:
                     throw new NotImplementedException();
