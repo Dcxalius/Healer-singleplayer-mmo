@@ -33,7 +33,16 @@ namespace Project_1.UI.UIElements.PlateBoxes
 
         public abstract void Refresh(Entity aEntity);
 
-        
+        public override void Resize(AbsoluteScreenPosition aSize) => Resize(aSize.ToRelativeScreenPosition());
+
+        public override void Resize(RelativeScreenPosition aSize)
+        {
+            RelativeScreenPosition childRatio = aSize / RelativeSize;
+            base.Resize(aSize);
+            Action<UIElement> action = (child) => child.Resize(child.RelativeSize * childRatio);
+            ForAllChildren(action);
+        }
+
 
         protected void AddSegmentsToChildren()
         {

@@ -728,6 +728,18 @@
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/Cooldown.png
 
+#begin Graphics/UI/DownArrow.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Graphics/UI/DownArrow.png
+
 #begin Graphics/UI/Druid.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -775,6 +787,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/Invite.png
+
+#begin Graphics/UI/LeftArrow.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Graphics/UI/LeftArrow.png
 
 #begin Graphics/UI/LevelCircle.png
 /importer:TextureImporter
@@ -824,6 +848,18 @@
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/Priest.png
 
+#begin Graphics/UI/RightArrow.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Graphics/UI/RightArrow.png
+
 #begin Graphics/UI/ScrollBar.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -859,6 +895,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/Uninvite.png
+
+#begin Graphics/UI/UpArrow.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Graphics/UI/UpArrow.png
 
 #begin Graphics/UI/WhiteBackground.png
 /importer:TextureImporter

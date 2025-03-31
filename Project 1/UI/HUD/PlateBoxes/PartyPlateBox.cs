@@ -26,21 +26,18 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         CommandBorder border;
 
-        static RelativeScreenPosition firstPosition = new RelativeScreenPosition(0.1f, 0.24f); //Check values
-        static RelativeScreenPosition size = new RelativeScreenPosition(0.2f, 0.1f);
         static float spacing = 0.05f;
 
-        static RelativeScreenPosition GetPosition(int aIndex) => firstPosition + new RelativeScreenPosition(0, size.Y + spacing) * aIndex;
         public static int PartyBoxesActive => partyBoxesActive;
         static int partyBoxesActive = 0;
         public static void ClearPartyBoxes() => partyBoxesActive = 0;
 
-        public PartyPlateBox(RelativeScreenPosition aPos, int aIndex) : base(aPos, size)
+        public PartyPlateBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize, int aIndex) : base(aPos, aSize)
         {
-            name = new PlateBoxNameSegment(null, Color.White, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(size.X, size.Y / 2));
-            health = new PlateBoxHealthSegment(new RelativeScreenPosition(0, size.Y / 2), new RelativeScreenPosition(size.X, size.Y / 4));
+            name = new PlateBoxNameSegment(null, Color.White, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(aSize.X, aSize.Y / 2));
+            health = new PlateBoxHealthSegment(new RelativeScreenPosition(0, aSize.Y / 2), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
 
-            resource = new PlateBoxResourceSegment(new RelativeScreenPosition(0, size.Y / 4 * 3), new RelativeScreenPosition(size.X, size.Y / 4));
+            resource = new PlateBoxResourceSegment(new RelativeScreenPosition(0, aSize.Y / 4 * 3), new RelativeScreenPosition(aSize.X, aSize.Y / 4));
 
             //health = new PlateBoxHealthSegment(walker, new Vector2(0, 0), new Vector2(aSize.X, aSize.Y / 2));
 
@@ -51,7 +48,7 @@ namespace Project_1.UI.HUD.PlateBoxes
 
             AddSegmentsToChildren();
 
-            border = new CommandBorder(Color.YellowGreen, RelativeScreenPosition.Zero, size);
+            border = new CommandBorder(Color.YellowGreen, RelativeScreenPosition.Zero, aSize);
             AddChild(border);
             VisibleBorder = false;
             Visible = false;

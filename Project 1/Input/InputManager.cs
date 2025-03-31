@@ -179,16 +179,22 @@ namespace Project_1.Input
             {
                 if (keys[i] == Keys.None) continue;
                 if (oldKeyboardState.GetPressedKeys().Contains(keys[i])) continue; //TODO: Add a condition to check if its being hold long enough and then start spamming it with increasing frequency
-                if(Remove(keys[i])) continue;
+                if (Remove(keys[i])) continue;
+                if (keys[i] == Keys.Enter)
+                {
+                    InputToWriteTo.Enter();
+                    InputToWriteTo = null;
+                    return;
+                }
                 CursorMovement(keys[i]);
 
-                if (IllegalCharacter(keys[i])) continue;
+                if (!IllegalCharacter(keys[i])) continue;
                 
-                char s = keys[i].ToString()[0];
+                char s = keys[i].ToString().Last();
                 
                 if (!(newKeyboardState.IsKeyDown(Keys.LeftShift) || newKeyboardState.IsKeyDown(Keys.RightShift))) s = char.ToLower(s);
 
-                InputToWriteTo.WriteTo(s, cursorPosition);
+                if (!InputToWriteTo.WriteTo(s, cursorPosition)) continue;
                 cursorPosition++;
             }
             
@@ -228,10 +234,7 @@ namespace Project_1.Input
             if (cursorPosition > inputToWriteTo.Input.Length) cursorPosition = inputToWriteTo.Input.Length;
         }
 
-        static bool IllegalCharacter(Keys aPressedKey)
-        {
-            return inputToWriteTo.ValidInput(aPressedKey);
-        }
+        static bool IllegalCharacter(Keys aPressedKey) => inputToWriteTo.ValidInput(aPressedKey);
 
         static void UpdateStates()
         {

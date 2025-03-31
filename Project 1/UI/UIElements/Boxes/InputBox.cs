@@ -27,13 +27,24 @@ namespace Project_1.UI.UIElements.Boxes
 
         Label inputLabel;
         Label beforeWindowLabel;
-        public string Input => text;
+        public string Input
+        {
+            get => text;
+            set
+            {
+                inputLabel.Text = value;
+                text = value;
+            }
+        }
+
         string text;
 
         Text cursor;
         Color postClickColor;
 
         ValidInputs[] validInputs;
+
+        List<Action> enterActions;
 
 
         public bool ValidInput(Keys aKey)
@@ -47,10 +58,10 @@ namespace Project_1.UI.UIElements.Boxes
                     case ValidInputs.Letters: //TODO: Should this be settable or should the two bellow be merged to this one
                     case ValidInputs.UpperCaseLetters:
                     case ValidInputs.LowerCaseLetters:
-                        if (Keys.A < aKey || Keys.Z > aKey) return false;
+                        if (aKey < Keys.A || aKey > Keys.Z) return false;
                         break;
                     case ValidInputs.Digits:
-                        if (Keys.D0 > aKey || Keys.D9 < aKey) return false;
+                        if (aKey < Keys.D0 || aKey > Keys.D9) return false;
                         break;
                     case ValidInputs.Symbols:
                         throw new NotImplementedException();
@@ -62,7 +73,9 @@ namespace Project_1.UI.UIElements.Boxes
             }
             return true;
         }
-        public InputBox(string aTextBeforeInputWindow, ValidInputs[] aSetOfValidInputs, Color aTextBeforeColor, string aDisplayText, Color aBackgroundColor, Color aPassiveColor, Color aPostClickColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", aBackgroundColor), aPos, aSize)
+
+        //TODO: Change names v (they are a bit messy)
+        public InputBox(string aTextBeforeInputWindow, ValidInputs[] aSetOfValidInputs, Color aTextBeforeColor, string aDisplayText, Color aBackgroundColor, bool aNoYSpacing, Color aPassiveColor, Color aPostClickColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", aBackgroundColor), aPos, aSize)
         {
             Debug.Assert(aSetOfValidInputs.Length != 0, "Made an inputbox without any legal inputs");
             validInputs = aSetOfValidInputs;
@@ -75,8 +88,11 @@ namespace Project_1.UI.UIElements.Boxes
             beforeWindowLabel = new Label(aTextBeforeInputWindow, position, size.OnlyY + textSize.OnlyX, Label.TextAllignment.CentreLeft, aTextBeforeColor);
             AddChild(beforeWindowLabel);
 
-
-            Box textBackgroundBox = new Box(new UITexture("WhiteBackground", aBackgroundColor), position + beforeWindowLabel.RelativeSize.OnlyX + position.OnlyX, size - beforeWindowLabel.RelativeSize.OnlyX - position.OnlyX);
+            RelativeScreenPosition bgPos = spacingSquare;
+            RelativeScreenPosition bgSize = size;
+            if (aNoYSpacing) bgPos = spacingSquare.OnlyX;
+            if (aNoYSpacing) bgSize = aSize - spacingSquare.OnlyX * 2;
+            Box textBackgroundBox = new Box(new UITexture("WhiteBackground", aBackgroundColor), bgPos + beforeWindowLabel.RelativeSize.OnlyX + position.OnlyX, bgSize - beforeWindowLabel.RelativeSize.OnlyX - position.OnlyX);
             textBackgroundBox.CapturesClick = false;
             AddChild(textBackgroundBox);
 
@@ -86,24 +102,29 @@ namespace Project_1.UI.UIElements.Boxes
 
             cursor = new Textures.Text("Gloryse", "|", aPostClickColor);
             text = "";
+
+            enterActions = new List<Action>();
         }
 
 
         public override void ClickedOnAndReleasedOnMe()
         {
-            inputLabel.Color = Color.Black;
+            inputLabel.Color = postClickColor;
             InputManager.InputToWriteTo = this;
             inputLabel.Text = text;
             base.ClickedOnAndReleasedOnMe();
         }
 
-        public void WriteTo(char aCharToWrite, int aIndex)
+        public bool WriteTo(char aCharToWrite, int aIndex)
         {
             if (validInputs.Contains(ValidInputs.LowerCaseLetters) && !validInputs.Contains(ValidInputs.UpperCaseLetters) && char.IsUpper(aCharToWrite)) aCharToWrite = char.ToLower(aCharToWrite);
             if (validInputs.Contains(ValidInputs.UpperCaseLetters) && !validInputs.Contains(ValidInputs.LowerCaseLetters) && char.IsLower(aCharToWrite)) aCharToWrite = char.ToUpper(aCharToWrite);
+            float x = Text.CalculateOffset(text + aCharToWrite, TextureManager.GetFont("Gloryse")).X;
+            if (x > inputLabel.Size.X) return false;
             if (aIndex == text.Length) text += aCharToWrite;
             else text = text.Insert(aIndex, aCharToWrite.ToString());
             inputLabel.Text = text;
+            return true;
         }
 
         public void Backstep(bool aControlHeld, int aIndex)
@@ -125,6 +146,24 @@ namespace Project_1.UI.UIElements.Boxes
 
         }
 
+        public void SetEnter(List<Action> aSetOfActions)
+        {
+            enterActions = aSetOfActions;
+        }
+
+        public void AddToEnter(Action aAction) => enterActions.Add(aAction);
+        public void AddToEnter(List<Action> aSetOfActions) => enterActions.AddRange(aSetOfActions);
+
+        public void Enter()
+        {
+            if (enterActions.Count == 0) return;
+
+            for (int i = 0; i < enterActions.Count; i++)
+            {
+                enterActions[i].Invoke();
+            }
+        }
+
         public void Delete(bool aControlHeld, int aIndex)
         {
             if (aIndex == text.Length) return;
@@ -143,7 +182,7 @@ namespace Project_1.UI.UIElements.Boxes
             inputLabel.Text = text;
         }
 
-        public AbsoluteScreenPosition WhereToDrawCursor(int aCursorPosition)
+        AbsoluteScreenPosition WhereToDrawCursor(int aCursorPosition)
         {
             return new AbsoluteScreenPosition(inputLabel.CalculatePartialOffset(aCursorPosition).ToPoint()).OnlyX + inputLabel.Location + inputLabel.Size.OnlyY / 2;
         }
@@ -153,7 +192,7 @@ namespace Project_1.UI.UIElements.Boxes
             base.Draw(aBatch);
 
             if (InputManager.InputToWriteTo != this) return;
-            if (TimeManager.TotalFrameTimeAsTimeSpan.TotalMilliseconds % 750 < 250) return;
+            if (TimeManager.InstanceTotalFrameTimeAsTimeSpan.TotalMilliseconds % 750 < 250) return;
             
             cursor.CentredDraw(aBatch, WhereToDrawCursor(InputManager.CursorPosition));
             

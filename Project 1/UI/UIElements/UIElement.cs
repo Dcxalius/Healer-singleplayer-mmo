@@ -1,9 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Microsoft.Win32.SafeHandles;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
+using Project_1.UI.HUD;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -88,9 +90,9 @@ namespace Project_1.UI.UIElements
         bool dragable;
 
         RelativeScreenPosition oldPosition;
-        protected bool hudMoving;
+        protected bool hudMoving; //Todo: Change name on these, this means the hud is in movable state, maybe even move this out
         public bool HudMoveable => hudMoveable;
-        protected bool hudMoveable;
+        protected bool hudMoveable; //Todo: Change name on these, this means the element is movable
         static UITexture movableGFX => new UITexture("MovableHUD", Color.White);
         Text nameText;
 
@@ -145,6 +147,13 @@ namespace Project_1.UI.UIElements
         protected UIElement GetChild(int aIndex) => children[aIndex];
         protected int GetChildID(UIElement aChild) => children.IndexOf(aChild);
         protected void SetParent(UIElement aParent) => parent = aParent;
+        protected void ForAllChildren(Action<UIElement> aAction)
+        {
+            for (int i = 0; i < children.Count; i++)
+            {
+                aAction(children[i]);
+            }
+        }
 
         protected virtual void AddChild(UIElement aUIElement)
         {
@@ -173,10 +182,13 @@ namespace Project_1.UI.UIElements
 
         #endregion
 
-        public (string, RelativeScreenPosition) Save => (GetType().Name, RelativePos);
+        public (string, RelativeScreenPosition, RelativeScreenPosition) Save => (GetType().Name, RelativePos, RelativeSize);
 
         protected UIElement(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) //aPos and aSize should be between 0 and 1
         {
+            //TODO: Make it so aPos and aSize is parent relative
+            //If no parent 0 0 should refer to top left of game screen and 1 1 should refer to bottom right of game screen
+            //If parent 0 0 should refer to top left of parent and 1 1 should refer to bottom right of game screen
             visible = true;
             gfx = aGfx;
 
@@ -394,6 +406,12 @@ namespace Project_1.UI.UIElements
             pos.Size = aSize.ToAbsoluteScreenPos();
         }
 
+        public virtual void Resize(AbsoluteScreenPosition aSize)
+        {
+            relativeSize = aSize.ToRelativeScreenPosition();
+            pos.Size = aSize;
+        }
+
         public virtual void Close()
         {
             for (int i = 0; i < children.Count; i++)
@@ -454,14 +472,20 @@ namespace Project_1.UI.UIElements
             if (!visible) return;
         }
 
-        public virtual void ClickedOnAndReleasedOnMe() => heldEvents = null;
+        public virtual void ClickedOnAndReleasedOnMe()
+        {
+            heldEvents = null;
+            if (parent != null || !hudMoveable || !hudMoving) return;
+            HUDManager.SetSizeChanger(this);
+        }
+
         protected virtual void HoldReleaseAwayFromMe() => heldEvents = null;
         #endregion
 
         #region Hover
         void HoverUpdate()
         {
-            if (!visible) return;
+            if (!visible && (!hudMoveable && !hudMoving)) return;
 
             if (!wasHovered && Hovered)
             {

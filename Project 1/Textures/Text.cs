@@ -40,6 +40,8 @@ namespace Project_1.Textures
 
         public Vector2 Offset { get => offset; }
         public Vector2 CalculatePartialOffset(int aIndexToCalculateTo) => font.MeasureString(textToDisplay.Substring(0, aIndexToCalculateTo));
+        static public Vector2 CalculateOffset(string aString, SpriteFont aFont) => aFont.MeasureString(aString);
+
         string textToDisplay;
         Vector2 offset;
         protected SpriteFont font;

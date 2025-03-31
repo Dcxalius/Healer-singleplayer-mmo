@@ -24,6 +24,8 @@ namespace Project_1.UI.UIElements.PlateBoxes
             AddChild(healthBar);
         }
 
+        
+
 
         public override void Refresh(Entity aEntity)
         {
