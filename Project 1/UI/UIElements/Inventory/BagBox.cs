@@ -39,7 +39,12 @@ namespace Project_1.UI.UIElements.Inventory
             Items.Item[] items = aInventory.GetItemsInBox(bagNr);
 
             float rowCount = (float)Math.Ceiling(aSlotCount / (double)aColumnCount);
-            Resize(new RelativeScreenPosition(aColumnCount * InventoryBox.itemSize.X + aColumnCount * InventoryBox.spacing.X + InventoryBox.spacing.X, rowCount * InventoryBox.itemSize.Y + rowCount * InventoryBox.spacing.Y + InventoryBox.spacing.Y));
+
+            RelativeScreenPosition newSize = new RelativeScreenPosition();
+            newSize.X = aColumnCount * InventoryBox.itemSize.X + aColumnCount * InventoryBox.spacing.X + InventoryBox.spacing.X;
+            newSize.Y = rowCount * InventoryBox.itemSize.Y + (rowCount + 1) * InventoryBox.spacing.Y;
+
+            Resize(newSize);
 
             for (int i = 0; i < slots.Length; i++)
             {
@@ -61,7 +66,10 @@ namespace Project_1.UI.UIElements.Inventory
             AddChildren(slots);
         }
 
-        
+        public override void Resize(RelativeScreenPosition aSize)
+        {
+            base.Resize(aSize);
+        }
 
         void MakeZero()
         {

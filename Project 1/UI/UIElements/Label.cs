@@ -70,15 +70,15 @@ namespace Project_1.UI.UIElements
             switch (textAlignment)
             {
                 case TextAllignment.CentreLeft:
-                    underlyingText.CentreLeftDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Location + new Vector2(0, AbsolutePos.Size.Y / 2).ToPoint()));
+                    underlyingText.CentreLeftDraw(aBatch, Location + Size.OnlyY / 2);
                     break;
 
                 case TextAllignment.CentreRight:
-                    underlyingText.CentreRightDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Location + new Vector2(AbsolutePos.Size.X, AbsolutePos.Size.Y / 2).ToPoint()));
+                    underlyingText.CentreRightDraw(aBatch, Location + new AbsoluteScreenPosition(Size.X, Size.Y / 2));
                     break;
 
                 case TextAllignment.Centred:
-                    underlyingText.CentredDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Location + new Vector2(AbsolutePos.Size.X / 2, AbsolutePos.Size.Y / 2).ToPoint()));
+                    underlyingText.CentredDraw(aBatch, Location + Size / 2);
                     break;
 
                 case TextAllignment.TopLeft:

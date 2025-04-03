@@ -23,12 +23,12 @@ namespace Project_1.UI.UIElements.PlateBoxes
 
         protected LevelCircle levelCircle;
 
-        readonly RelativeScreenPosition levelCircleSize = RelativeScreenPosition.GetSquareFromX(0.015f);
+       
         public PlateBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", Color.White), aPos, aSize)
         {
-
+            RelativeScreenPosition levelCircleSize = RelativeScreenPosition.GetSquareFromX(0.05f, Size);
             //TODO: Make sure the segmentsizes add up to aSize
-            levelCircle = new LevelCircle(new RelativeScreenPosition(aSize.X - levelCircleSize.X, 0), levelCircleSize);
+            levelCircle = new LevelCircle(new RelativeScreenPosition(1 - levelCircleSize.X, 0), levelCircleSize);
         }
 
         public abstract void Refresh(Entity aEntity);

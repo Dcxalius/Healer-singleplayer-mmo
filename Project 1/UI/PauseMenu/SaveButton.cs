@@ -16,7 +16,7 @@ namespace Project_1.UI.PauseMenu
 {
     internal class SaveButton : Button
     {
-        public SaveButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, Color.AliceBlue, "Save")
+        public SaveButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, Color.AliceBlue, "Save", Color.Black)
         {
 
         }

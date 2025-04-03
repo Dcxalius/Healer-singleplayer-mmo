@@ -15,7 +15,8 @@ namespace Project_1.Camera
         [JsonProperty]
         Vector2 position;
 
-        public static RelativeScreenPosition Zero { get { return new RelativeScreenPosition(); } }
+        public static RelativeScreenPosition Zero => new RelativeScreenPosition();
+        public static RelativeScreenPosition One => new RelativeScreenPosition(1);
 
         [JsonIgnore]
         public RelativeScreenPosition OnlyX => new RelativeScreenPosition(position.X, 0);
@@ -47,11 +48,25 @@ namespace Project_1.Camera
             position = new Vector2(aX, aY);
         }
 
+        static public RelativeScreenPosition GetSquareFromX(float aSizeInX, AbsoluteScreenPosition aParentSize)
+        {
+            float a = aParentSize.X * aSizeInX;
+            float b = a / aParentSize.Y;
+            return new(aSizeInX, b);
+        }
+
         static public RelativeScreenPosition GetSquareFromX(float aSizeInX)
         {
             float a = Camera.ScreenRectangle.Size.X * aSizeInX;
             float b = a / Camera.ScreenRectangle.Size.Y;
             return new(aSizeInX, b);
+        }
+
+        static public RelativeScreenPosition GetSquareFromY(float aSizeInY, AbsoluteScreenPosition aParentSize)
+        {
+            float a = aParentSize.Y * aSizeInY;
+            float b = a / aParentSize.X;
+            return new(b, aSizeInY);
         }
 
         static public RelativeScreenPosition GetSquareFromY(float aSizeInY)

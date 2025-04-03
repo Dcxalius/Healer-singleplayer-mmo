@@ -19,7 +19,7 @@ namespace Project_1.UI.UIElements.Inventory
         Item item;
         Label itemName;
 
-        static RelativeScreenPosition Spacing => RelativeScreenPosition.GetSquareFromX(0.005f);
+        RelativeScreenPosition Spacing => RelativeScreenPosition.GetSquareFromX(0.005f, Size);
 
         public Loot(int aSlotIndex, Items.Item aItem, GfxPath aPath) : base(new UITexture("GrayBackground", Color.AliceBlue), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
         {
@@ -39,10 +39,10 @@ namespace Project_1.UI.UIElements.Inventory
             if (item == null) return;
 
             item.Move(Spacing);
-            RelativeScreenPosition itemSize = RelativeScreenPosition.GetSquareFromY(aSize.Y - Spacing.Y * 2);
+            RelativeScreenPosition itemSize = RelativeScreenPosition.GetSquareFromY(1f - Spacing.Y * 2, aSize.ToAbsoluteScreenPos());
             item.Resize(itemSize);
             itemName.Move(itemSize.OnlyX + Spacing + Spacing.OnlyX);
-            itemName.Resize(aSize - itemSize.OnlyX - Spacing * 2);
+            itemName.Resize(RelativeScreenPosition.One - itemSize.OnlyX - Spacing * 2);
 
             
         }

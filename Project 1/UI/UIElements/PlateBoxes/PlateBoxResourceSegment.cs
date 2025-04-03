@@ -17,7 +17,7 @@ namespace Project_1.UI.UIElements.PlateBoxes
         static Color backgroundColor = new Color(255, 211, 211, 120);
         public PlateBoxResourceSegment(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, aPos, aSize)
         {
-            resourceBar = new ResourceBar(new BarTexture(BarTexture.FillingDirection.Right, Color.White), new UITexture("WhiteBackground", backgroundColor), RelativeScreenPosition.Zero, aSize);
+            resourceBar = new ResourceBar(new BarTexture(BarTexture.FillingDirection.Right, Color.White), new UITexture("WhiteBackground", backgroundColor), RelativeScreenPosition.Zero, RelativeScreenPosition.One);
             
             AddChild(resourceBar);
         }

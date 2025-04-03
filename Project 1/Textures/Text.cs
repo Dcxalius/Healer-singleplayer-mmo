@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 
 namespace Project_1.Textures
 {
-    [DebuggerStepThrough]
     internal class Text
     {
         public virtual string Value

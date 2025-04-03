@@ -19,17 +19,17 @@ namespace Project_1.UI.UIElements.SpellBook
         Border border;
         public SpellBar(UITexture aGfx, int aButtonCount, RelativeScreenPosition aPos, float aSizeX) : base(aGfx, aPos, new RelativeScreenPosition(aSizeX, calcY(aSizeX, aButtonCount)))
         {
-            Vector2 offset = RelativeScreenPosition.GetSquareFromX(calcOffset(aSizeX, aButtonCount));
-            float buttonSize = calcButtonSize(aSizeX, aButtonCount);
+            Vector2 offset = RelativeScreenPosition.GetSquareFromX(calcOffset(1, aButtonCount), Size);
+            float buttonSize = calcButtonSize(1, aButtonCount);
             //border = new Border(Vector2.Zero, new Vector2(aSizeX, calcY(aSizeX, aButtonCount)));
-            border = new Border(RelativeScreenPosition.Zero, RelativeSize);
+            border = new Border(RelativeScreenPosition.Zero, RelativeScreenPosition.One);
             AddChild(border);
             //Vector2 size = new Vector2(aSize.Y - 0.05f);
             spellButtons = new SpellButton[aButtonCount];
 
             for (int i = 0; i < spellButtons.Length; i++)
             {
-                spellButtons[i] = new SpellButton(Input.KeyBindManager.KeyListner.SpellBar1Spell1 + i, new RelativeScreenPosition(offset.X + (offset.X + buttonSize) * i, offset.Y), RelativeScreenPosition.GetSquareFromX(buttonSize));
+                spellButtons[i] = new SpellButton(Input.KeyBindManager.KeyListner.SpellBar1Spell1 + i, new RelativeScreenPosition(offset.X + (offset.X + buttonSize) * i, offset.Y), RelativeScreenPosition.GetSquareFromX(buttonSize, Size));
             }
             AddChildren(spellButtons);
         }

@@ -103,7 +103,9 @@ namespace Project_1.UI.UIElements
 
         #region Position
         public RelativeScreenPosition RelativePos => relativePos;
+        RelativeScreenPosition relativePos; //TODO: Change this so 1, 1 refers to parents bottom right instead of screen bottom right + parent top left
         public RelativeScreenPosition RelativeSize => relativeSize;
+        RelativeScreenPosition relativeSize;
 
         public RelativeScreenPosition RelativePositionOnScreen => relativePos + ParentPos.ToRelativeScreenPosition();
 
@@ -112,20 +114,14 @@ namespace Project_1.UI.UIElements
             get
             {
                 Rectangle tempRec = Rectangle.Empty;
-                tempRec.Location = pos.Location + ParentPos;
-                tempRec.Size = Size.ToPoint();
+                tempRec.Location = Location;
+                tempRec.Size = Size;
                 return tempRec;
             }
         }
 
-        public AbsoluteScreenPosition Location => AbsolutePosition;
-
-        AbsoluteScreenPosition AbsolutePosition => new AbsoluteScreenPosition(pos.Location) + ParentPos;
-        
-        RelativeScreenPosition relativePos; //TODO: Change this so 1, 1 refers to parents bottom right instead of screen bottom right + parent top left
-        RelativeScreenPosition relativeSize; 
-        public AbsoluteScreenPosition Size => new AbsoluteScreenPosition(pos.Size);
-        Rectangle pos;
+        public AbsoluteScreenPosition Location => (ParentPos) + (RelativePos * ParentRelativeSize).ToAbsoluteScreenPos();
+        public AbsoluteScreenPosition Size => (RelativeSize * ParentRelativeSize).ToAbsoluteScreenPos(); //TODO: This is wrong, it needs to include grandparents
         #endregion
 
         #region Graphics
@@ -136,7 +132,10 @@ namespace Project_1.UI.UIElements
 
         #region Parentage
         protected UIElement parent;
-        protected AbsoluteScreenPosition ParentPos => parent == null ? AbsoluteScreenPosition.Zero : parent.AbsolutePosition;
+        protected AbsoluteScreenPosition ParentPos => parent == null ? AbsoluteScreenPosition.Zero : parent.Location;
+        protected RelativeScreenPosition ParentRelativePos => parent == null ? RelativeScreenPosition.Zero : parent.RelativePos;
+        protected AbsoluteScreenPosition ParentSize => parent == null ? new AbsoluteScreenPosition(1) : parent.Size;
+        protected RelativeScreenPosition ParentRelativeSize => parent == null ? new RelativeScreenPosition(1) : parent.Size.ToRelativeScreenPosition();
 
         List<UIElement> children = new List<UIElement>();
         protected int ChildCount => children.Count;
@@ -146,7 +145,6 @@ namespace Project_1.UI.UIElements
         protected virtual void KillChild(UIElement aChild) => children.Remove(aChild);
         protected UIElement GetChild(int aIndex) => children[aIndex];
         protected int GetChildID(UIElement aChild) => children.IndexOf(aChild);
-        protected void SetParent(UIElement aParent) => parent = aParent;
         protected void ForAllChildren(Action<UIElement> aAction)
         {
             for (int i = 0; i < children.Count; i++)
@@ -195,7 +193,6 @@ namespace Project_1.UI.UIElements
             relativePos = aPos;
             relativeSize = aSize;
 
-            pos = RelativeScreenPosition.TransformToAbsoluteRect(aPos, aSize);
             nameText = new Text("Gloryse", GetType().Name);
 
 
@@ -206,6 +203,8 @@ namespace Project_1.UI.UIElements
             alwaysFullyOnScreen = false;
             hudMoveable = true;
         }
+
+
 
 
 
@@ -284,7 +283,7 @@ namespace Project_1.UI.UIElements
 
         public virtual void Rescale()
         {
-            pos = RelativeScreenPosition.TransformToAbsoluteRect(relativePos, relativeSize);
+            //pos = RelativeScreenPosition.TransformToAbsoluteRect(relativePos, relativeSize);
 
             for (int i = 0; i < children.Count; i++)
             {
@@ -297,7 +296,6 @@ namespace Project_1.UI.UIElements
         public void Move(RelativeScreenPosition aNewPos)
         {
             if (aNewPos.X == float.NaN || aNewPos.Y == float.NaN) throw new ArgumentException("Invalid move.");
-            pos.Location = aNewPos.ToAbsoluteScreenPos();
             relativePos = aNewPos;
             MoveBoundsCheck();
         }
@@ -312,9 +310,9 @@ namespace Project_1.UI.UIElements
         {
             if (!alwaysOnScreen) return;
 
-            Rectangle overlap = Rectangle.Intersect(Camera.Camera.ScreenRectangle, pos);
+            Rectangle overlap = Rectangle.Intersect(Camera.Camera.ScreenRectangle, AbsolutePos);
 
-            if (overlap == pos) return;
+            if (overlap == AbsolutePos) return;
 
             (bool, bool) outOfBounds = OutOfBoundsCheck(overlap.Size, alwaysOnScreenAmount);
             bool xOutOfBounds = outOfBounds.Item1;
@@ -323,19 +321,16 @@ namespace Project_1.UI.UIElements
             if (!xOutOfBounds && !yOutOfBounds) return;
 
 
-            pos.Location = GetNewMove(xOutOfBounds, yOutOfBounds, alwaysOnScreenAmount);
-
-
-            relativePos = new AbsoluteScreenPosition(pos.Location).ToRelativeScreenPosition();
+            relativePos = new AbsoluteScreenPosition( GetNewMove(xOutOfBounds, yOutOfBounds, alwaysOnScreenAmount)).ToRelativeScreenPosition();
         }
 
         void AlwaysFullyOnScreenCheck()
         {
             if (!alwaysFullyOnScreen) return;
 
-            Rectangle overlap = Rectangle.Intersect(Camera.Camera.ScreenRectangle, pos);
+            Rectangle overlap = Rectangle.Intersect(Camera.Camera.ScreenRectangle, AbsolutePos);
 
-            if (overlap == pos) return;
+            if (overlap == AbsolutePos) return;
 
             (bool, bool) outOfBounds = OutOfBoundsCheck(overlap.Size, Size);
             bool xOutOfBounds = outOfBounds.Item1;
@@ -344,19 +339,20 @@ namespace Project_1.UI.UIElements
             if (!xOutOfBounds && !yOutOfBounds) return;
 
 
-            pos.Location = GetNewMove(xOutOfBounds, yOutOfBounds, Size);
-            relativePos = new AbsoluteScreenPosition(pos.Location).ToRelativeScreenPosition();
+            relativePos = new AbsoluteScreenPosition(GetNewMove(xOutOfBounds, yOutOfBounds, Size)).ToRelativeScreenPosition();
+
+            //relativePos = new AbsoluteScreenPosition(Location).ToRelativeScreenPosition();
         }
 
         Point GetNewMove(bool xOutOfBounds, bool yOutOfBounds, Point alwaysOnScreenAmount)
         {
-            Point returnable = pos.Location;
+            Point returnable = Location;
 
             if (xOutOfBounds)
             {
-                if (pos.Location.X < 0)
+                if (Location.X < 0)
                 {
-                    returnable.X = alwaysOnScreenAmount.X - pos.Width;
+                    returnable.X = alwaysOnScreenAmount.X - Size.X;
                 }
                 else
                 {
@@ -366,9 +362,9 @@ namespace Project_1.UI.UIElements
 
             if (yOutOfBounds)
             {
-                if (pos.Location.Y < 0)
+                if (Location.Y < 0)
                 {
-                    returnable.Y = alwaysOnScreenAmount.Y - pos.Height;
+                    returnable.Y = alwaysOnScreenAmount.Y - Size.Y;
                 }
                 else
                 {
@@ -385,14 +381,14 @@ namespace Project_1.UI.UIElements
             bool yOutOfBounds = false;
             if (aOverlapSize.X < aOnScreenAmount.X)
             {
-                if (pos.Location.X < Size.X - aOnScreenAmount.X || pos.Location.X > Camera.Camera.ScreenRectangle.Width - aOnScreenAmount.X)
+                if (Location.X < Size.X - aOnScreenAmount.X || Location.X > Camera.Camera.ScreenRectangle.Width - aOnScreenAmount.X)
                 {
                     xOutOfBounds = true;
                 }
             }
             if (aOverlapSize.Y < aOnScreenAmount.Y)
             {
-                if (pos.Location.Y < Size.Y - aOnScreenAmount.Y || pos.Location.Y > Camera.Camera.ScreenRectangle.Height - aOnScreenAmount.Y)
+                if (Location.Y < Size.Y - aOnScreenAmount.Y || Location.Y > Camera.Camera.ScreenRectangle.Height - aOnScreenAmount.Y)
                 {
                     yOutOfBounds = true;
                 }
@@ -400,17 +396,9 @@ namespace Project_1.UI.UIElements
             return (xOutOfBounds, yOutOfBounds);
         }
 
-        public virtual void Resize(RelativeScreenPosition aSize)
-        {
-            relativeSize = aSize;
-            pos.Size = aSize.ToAbsoluteScreenPos();
-        }
+        public virtual void Resize(RelativeScreenPosition aSize) => relativeSize = aSize;
 
-        public virtual void Resize(AbsoluteScreenPosition aSize)
-        {
-            relativeSize = aSize.ToRelativeScreenPosition();
-            pos.Size = aSize;
-        }
+        public virtual void Resize(AbsoluteScreenPosition aSize) => relativeSize = aSize.ToRelativeScreenPosition();
 
         public virtual void Close()
         {
@@ -602,7 +590,7 @@ namespace Project_1.UI.UIElements
             }
 
             movableGFX.Draw(aBatch, AbsolutePos);
-            nameText.CentredDraw(aBatch, AbsolutePosition + Size / 2 - new AbsoluteScreenPosition(nameText.Offset.ToPoint()) / 2);
+            nameText.CentredDraw(aBatch, Location + Size / 2 - new AbsoluteScreenPosition(nameText.Offset.ToPoint()) / 2);
 
         }
 

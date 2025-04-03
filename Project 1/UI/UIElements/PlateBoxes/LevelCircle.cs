@@ -17,7 +17,7 @@ namespace Project_1.UI.UIElements.PlateBoxes
 
         public LevelCircle(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("LevelCircle", Color.White), aPos, aSize)
         {
-            numberLabel = new Label("1", RelativeScreenPosition.Zero, aSize, Label.TextAllignment.Centred);
+            numberLabel = new Label("1", RelativeScreenPosition.Zero, RelativeScreenPosition.One, Label.TextAllignment.Centred, Color.Pink);
             capturesClick = false;
 
             AddChild(numberLabel);
@@ -26,6 +26,16 @@ namespace Project_1.UI.UIElements.PlateBoxes
         public void Refresh(Entity aEntity)
         {
             numberLabel.Text = aEntity.CurrentLevel.ToString();
+        }
+
+        public override void Resize(AbsoluteScreenPosition aSize)
+        {
+            Resize(aSize.ToRelativeScreenPosition());
+        }
+
+        public override void Resize(RelativeScreenPosition aSize)
+        {
+            base.Resize(aSize);
         }
 
         public override void Draw(SpriteBatch aBatch)

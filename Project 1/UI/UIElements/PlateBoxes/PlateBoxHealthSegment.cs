@@ -19,7 +19,7 @@ namespace Project_1.UI.UIElements.PlateBoxes
 
         public PlateBoxHealthSegment(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, aPos, aSize)
         {
-            healthBar = new ResourceBar(new BarTexture(BarTexture.FillingDirection.Right, Color.Red), new UITexture("WhiteBackground", backgroundColor), RelativeScreenPosition.Zero, aSize);
+            healthBar = new ResourceBar(new BarTexture(BarTexture.FillingDirection.Right, Color.Red), new UITexture("WhiteBackground", backgroundColor), RelativeScreenPosition.Zero, RelativeScreenPosition.One);
             
             AddChild(healthBar);
         }

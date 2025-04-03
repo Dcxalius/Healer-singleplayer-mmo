@@ -80,12 +80,13 @@ namespace Project_1.UI.UIElements.Boxes
             Debug.Assert(aSetOfValidInputs.Length != 0, "Made an inputbox without any legal inputs");
             validInputs = aSetOfValidInputs;
             postClickColor = aPostClickColor;
-            RelativeScreenPosition spacingSquare = RelativeScreenPosition.GetSquareFromY(0.01f);
+            RelativeScreenPosition spacingSquare = RelativeScreenPosition.GetSquareFromY(0.01f, Size);
             RelativeScreenPosition position = spacingSquare;
-            RelativeScreenPosition size = aSize - spacingSquare * 2;
+            RelativeScreenPosition size = RelativeScreenPosition.One - spacingSquare * 2;
 
-            RelativeScreenPosition textSize = new AbsoluteScreenPosition(TextureManager.GetFont("Gloryse").MeasureString(aTextBeforeInputWindow).ToPoint()).ToRelativeScreenPosition();
-            beforeWindowLabel = new Label(aTextBeforeInputWindow, position, size.OnlyY + textSize.OnlyX, Label.TextAllignment.CentreLeft, aTextBeforeColor);
+            AbsoluteScreenPosition textSize = new AbsoluteScreenPosition(TextureManager.GetFont("Gloryse").MeasureString(aTextBeforeInputWindow).ToPoint());
+            RelativeScreenPosition xdd = new RelativeScreenPosition((float)textSize.X / (float)Size.X, textSize.Y / (float)Size.Y);
+            beforeWindowLabel = new Label(aTextBeforeInputWindow, position, size.OnlyY + xdd.OnlyX, Label.TextAllignment.CentreLeft, aTextBeforeColor);
             AddChild(beforeWindowLabel);
 
             RelativeScreenPosition bgPos = spacingSquare;

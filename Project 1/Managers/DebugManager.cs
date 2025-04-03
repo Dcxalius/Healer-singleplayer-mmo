@@ -54,8 +54,8 @@ namespace Project_1.Managers
             modes[(int)DebugMode.TileCoords] = false;
             modes[(int)DebugMode.InvCheats] = true;
             modes[(int)DebugMode.Teleport] = true;
-            modes[(int)DebugMode.InstantlyContinue] = true;
-            modes[(int)DebugMode.Console] = true;
+            modes[(int)DebugMode.InstantlyContinue] = false;
+            modes[(int)DebugMode.Console] = false;
             modes[(int)DebugMode.LearnKill] = true;
             
 

@@ -19,7 +19,7 @@ namespace Project_1.UI.UIElements.Boxes
         
         public ScrollBar(Color aColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("ScrollBar", aColor), aPos, aSize)
         {
-            scrollPlimp = new ScrollPlimp(aColor, RelativeScreenPosition.Zero, new RelativeScreenPosition(aSize.X, aSize.Y / 32)); //32 is from (graphical size of bar)/(graphical side of blimp)
+            scrollPlimp = new ScrollPlimp(aColor, RelativeScreenPosition.Zero, new RelativeScreenPosition(1, 1f / 32f)); //32 is from (graphical size of bar)/(graphical side of blimp)
             AddChild(scrollPlimp);
             SetValue(0);
             capturesClick = true;
@@ -30,7 +30,7 @@ namespace Project_1.UI.UIElements.Boxes
             if (aValue < 0) aValue = 0;
             if (aValue > 1) aValue = 1;
 
-            float total = RelativeSize.Y - RelativeSpacing - RelativeSpacing - scrollPlimp.RelativeSize.Y;
+            float total = 1f - RelativeSpacing - RelativeSpacing - scrollPlimp.RelativeSize.Y;
             scrollPlimp.SetPosOnBar(RelativeSpacing + total * aValue);
         }
 

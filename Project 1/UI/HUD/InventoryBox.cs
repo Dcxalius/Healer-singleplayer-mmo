@@ -28,22 +28,25 @@ namespace Project_1.UI.HUD
         const float itemSizeX = 0.02f;
         const float spacingX = 0.005f;
 
-        public static RelativeScreenPosition itemSize = RelativeScreenPosition.GetSquareFromX(itemSizeX);
-        public static RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(spacingX);
+        public static RelativeScreenPosition itemSize;
+        public static RelativeScreenPosition spacing;
 
         int columnCount;
         public InventoryBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground",new Color(80, 80, 80, 80)), aPos, aSize) //this will scale down size to closest fit
         {
+            itemSize = RelativeScreenPosition.GetSquareFromX(itemSizeX, Size);
+            spacing = RelativeScreenPosition.GetSquareFromX(spacingX, Size);
+
             visibleKey = KeyBindManager.KeyListner.Inventory;
             Visible = false;
             Dragable = true;
             //inventory = ObjectManager.Player.Inventory;
-            bagHolderBox = new BagHolderBox(new RelativeScreenPosition(spacing.X, aSize.Y - (itemSize.Y + spacing.Y * 3)), new RelativeScreenPosition(itemSize.X * (Inventory.bagSlots + 1) + spacing.X * (Inventory.bagSlots + 2), itemSize.Y + spacing.Y * 2));
+            bagHolderBox = new BagHolderBox(new RelativeScreenPosition(spacing.X, 1f - (itemSize.Y + spacing.Y * 3)), new RelativeScreenPosition(itemSize.X * (Inventory.bagSlots + 1) + spacing.X * (Inventory.bagSlots + 2), itemSize.Y + spacing.Y * 2));
 
             columnCount = CalculateColumns(Inventory.defaultSlots, itemSize.X, spacing.X, aSize.X);
             bagBox = new BagBox[Inventory.bagSlots + 1];
 
-            bagBox[0] = new BagBox(null, 0, 0, columnCount, spacing, CalculateBagBoxSize(Inventory.defaultSlots, itemSize, spacing, aSize.X));
+            bagBox[0] = new BagBox(null, 0, 0, columnCount, spacing, CalculateBagBoxSize(Inventory.defaultSlots, itemSize, spacing, aSize.Y));
             for (int i = 1; i < bagBox.Length; i++)
             {
                 bagBox[i] = new BagBox(null, i, 0, 1, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
@@ -69,8 +72,8 @@ namespace Project_1.UI.HUD
             AddChild(bagHolderBox);
             RelativeScreenPosition bagPos = RelativeScreenPosition.Zero;
             bagPos.X = spacing.X;
-            bagPos.Y = CalculateBagBoxSize(Inventory.defaultSlots, itemSize, spacing, aSize.X).Y;
-            bagBox[0] = new BagBox(aInventory, 0, Inventory.defaultSlots, columnCount, spacing, CalculateBagBoxSize(Inventory.defaultSlots, itemSize, spacing, aSize.X));
+            bagPos.Y = CalculateBagBoxSize(Inventory.defaultSlots, itemSize, spacing, aSize.Y).Y;
+            bagBox[0] = new BagBox(aInventory, 0, Inventory.defaultSlots, columnCount, spacing, CalculateBagBoxSize(Inventory.defaultSlots, itemSize, spacing, aSize.Y));
             bagPos.Y += spacing.Y;
             bagPos.Y += spacing.Y;
 
@@ -82,7 +85,7 @@ namespace Project_1.UI.HUD
                     continue;
                 }
 
-                RelativeScreenPosition size = CalculateBagBoxSize(aInventory.Bags[i].SlotCount, itemSize, spacing, aSize.X);
+                RelativeScreenPosition size = CalculateBagBoxSize(aInventory.Bags[i].SlotCount, itemSize, spacing, aSize.Y);
 
                 bagBox[i] = new BagBox(aInventory, i, aInventory.Bags[i].SlotCount, columnCount, bagPos, size);
                 bagPos.Y += size.Y + spacing.Y;
@@ -135,7 +138,7 @@ namespace Project_1.UI.HUD
             resize.Y = bagHolderBox.RelativeSize.Y + spacing.Y + bagY;
 
             Resize(resize);
-            bagHolderBox.Move(new RelativeScreenPosition(spacing.X, RelativeSize.Y - (itemSize.Y + spacing.Y * 3)));
+            bagHolderBox.Move(new RelativeScreenPosition(spacing.X, 1f - (itemSize.Y + spacing.Y * 3)));
             Move(new RelativeScreenPosition(RelativePos.X, aPos.Y));
 
         }
@@ -144,21 +147,23 @@ namespace Project_1.UI.HUD
         {
             RelativeScreenPosition size = new RelativeScreenPosition();
 
-            size.X = CalculateColumns(aSlotCount, aItemSize.X, aSpacing.X, aWidthOfInventory) * (aItemSize.X + aSpacing.X) + aSpacing.X;
-            size.Y = (CalculateRows(aSlotCount, aItemSize.X, aSpacing.X, aWidthOfInventory) * (aItemSize.Y + aSpacing.Y)) + aSpacing.Y;
+            int columns = CalculateColumns(aSlotCount, aItemSize.X, aSpacing.X, aWidthOfInventory);
+            size.X = columns * (aItemSize.X + aSpacing.X) + aSpacing.X;
+            int rows = CalculateRows(aSlotCount, aItemSize.X, aSpacing.X, aWidthOfInventory);
+            size.Y = rows * (aItemSize.Y + aSpacing.Y) + aSpacing.Y;
 
             return size;
         }
 
-        static int CalculateColumns(int aSlotCount, float aItemSizeX, float aSpacingX, float aWidthOfInventory) => (int)Math.Floor(aWidthOfInventory / (aItemSizeX + aSpacingX + aSpacingX / aSlotCount));
+        static int CalculateColumns(int aSlotCount, float aItemSizeX, float aSpacingX, float aWidthOfInventory) => (int)Math.Floor(aWidthOfInventory / (aItemSizeX + aSpacingX + aSpacingX / aSlotCount)); //TODO: This has to be wrong
         static int CalculateRows(int aSlotCount, float aItemSizeX, float aSpacingX, float aWidthOfInventory) => (int)Math.Ceiling((aSpacingX + (aItemSizeX + aSpacingX) * aSlotCount) / aWidthOfInventory);
 
 
         public override void Rescale()
         {
 
-            itemSize = RelativeScreenPosition.GetSquareFromX(itemSizeX);
-            spacing = RelativeScreenPosition.GetSquareFromX(spacingX);
+            spacing = RelativeScreenPosition.GetSquareFromX(spacingX, Size);
+            itemSize = RelativeScreenPosition.GetSquareFromX(itemSizeX, Size);
             base.Rescale();
         }
     }

@@ -24,7 +24,7 @@ namespace Project_1.UI.PauseMenu
         {
             AddChild(new ResumeButton(GetStartPositionFromTop, ButtonSize));
             AddChild(new OptionMenuButton(GetStartPositionFromTop, ButtonSize));
-            AddChild(new Button(new List<Action>() { new Action(() => StateManager.SetState(StateManager.States.MoveHUD)) }, GetStartPositionFromTop, ButtonSize, Color.White));
+            AddChild(new Button(new List<Action>() { new Action(() => StateManager.SetState(StateManager.States.MoveHUD)) }, GetStartPositionFromTop, ButtonSize, Color.WhiteSmoke, "Move HUD", Color.Black));
             
             AddChild(new SaveButton(GetStartPositionFromTop, ButtonSize));
             AddChild(new LoadButton(GetStartPositionFromTop, ButtonSize));

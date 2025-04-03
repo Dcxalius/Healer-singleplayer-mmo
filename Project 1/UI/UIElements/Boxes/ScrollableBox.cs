@@ -42,7 +42,7 @@ namespace Project_1.UI.UIElements.Boxes
             set => scrollSpeed = value;
         }
         float scrollSpeed = 0.1f;
-        float MaxScroll => originalYPos.Last() + scrollableElements[(scrollableElements.Count - 1)].RelativeSize.Y + Spacing.Y - RelativeSize.Y;
+        float MaxScroll => originalYPos.Last() + scrollableElements.Last().RelativeSize.Y + Spacing.Y - 1f;
         public RelativeScreenPosition ElementSize
         {
             get => elementSize;
@@ -61,20 +61,20 @@ namespace Project_1.UI.UIElements.Boxes
         RelativeScreenPosition elementSize;
 
 
-        public ScrollableBox(UITexture aGfx, Color aBarColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aGfx, aPos, aSize)
+        public ScrollableBox(float visibleElements, UITexture aGfx, Color aBarColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aGfx, aPos, aSize)
         {
             scrollableElements = new List<UIElement>();
 
-            RelativeScreenPosition barSpacing = RelativeScreenPosition.GetSquareFromX(0.005f);
-            RelativeScreenPosition sizeOfScrollBar = new RelativeScreenPosition(0.01f, aSize.Y - barSpacing.Y - barSpacing.Y);
-            scrollBar = new ScrollBar(aBarColor, new RelativeScreenPosition(aSize.X - sizeOfScrollBar.X - barSpacing.X, barSpacing.Y), sizeOfScrollBar);
+            RelativeScreenPosition barSpacing = RelativeScreenPosition.GetSquareFromX(0.005f, Size);
+            RelativeScreenPosition sizeOfScrollBar = new RelativeScreenPosition(0.03f, 1f - barSpacing.Y - barSpacing.Y);
+            scrollBar = new ScrollBar(aBarColor, new RelativeScreenPosition(1f - sizeOfScrollBar.X - barSpacing.X, barSpacing.Y), sizeOfScrollBar);
             originalYPos = new List<float>();
             AddChild(scrollBar);
 
-            spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
+            spacing = RelativeScreenPosition.GetSquareFromX(0.005f, Size);
             capturesScroll = true;
 
-            elementSize = new RelativeScreenPosition(aSize.X - spacing.X - spacing.X - sizeOfScrollBar.X - barSpacing.X, (aSize.Y - spacing.Y) / 3);
+            elementSize = new RelativeScreenPosition(1f - spacing.X - spacing.X - sizeOfScrollBar.X - barSpacing.X, (1f - spacing.Y) / visibleElements);
         }
 
         public void SetValue(float aValue)
@@ -120,7 +120,7 @@ namespace Project_1.UI.UIElements.Boxes
         public void AddScrollableElement(UIElement aUIElement)
         {
             aUIElement.Resize(elementSize);
-            aUIElement.Move(new RelativeScreenPosition(spacing.X, spacing.Y + (elementSize.Y + spacing.Y) * ScrollableElementsCount));
+            aUIElement.Move(new RelativeScreenPosition(spacing.X, elementSize.Y * ScrollableElementsCount + spacing.Y * (ScrollableElementsCount + 1)));
             scrollableElements.Add(aUIElement);
             originalYPos.Add(aUIElement.RelativePos.Y);
             AddChild(aUIElement);

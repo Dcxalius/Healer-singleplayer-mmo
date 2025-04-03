@@ -21,7 +21,7 @@ namespace Project_1.UI.LoadingMenu
 
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
             RelativeScreenPosition size = new RelativeScreenPosition(aSize.X / 2 - spacing.X - spacing.X, aSize.Y - spacing.Y - spacing.Y);
-            savesToLoadFrom = new ScrollableBox(new UITexture("WhiteBackground", Color.AntiqueWhite), Color.AliceBlue, spacing, size);
+            savesToLoadFrom = new ScrollableBox(3f, new UITexture("WhiteBackground", Color.AntiqueWhite), Color.AliceBlue, spacing, size);
             AddChild(savesToLoadFrom);
             ExistingSave.callAtClick = SetSave;
 

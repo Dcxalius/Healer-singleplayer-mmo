@@ -22,15 +22,14 @@ namespace Project_1.UI.HUD
         Loot[] loot;
         ScrollableBox scrollableComponent;
 
-        RelativeScreenPosition lootSize = RelativeScreenPosition.GetSquareFromX(0.05f);
         RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.025f);
 
 
         public LootBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", Color.NavajoWhite), aPos, aSize)
         {
             ToggleVisibilty();
-            RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.025f);
-            scrollableComponent = new ScrollableBox(new UITexture("WhiteBackground", Color.White), Color.Yellow, spacing, aSize - spacing - spacing);
+            RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.025f, Size);
+            scrollableComponent = new ScrollableBox(3f, new UITexture("WhiteBackground", Color.White), Color.Yellow, spacing, RelativeScreenPosition.One - spacing - spacing);
             //capturesScroll = true;
             AddChild(scrollableComponent);
             Dragable = true;
