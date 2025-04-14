@@ -28,14 +28,15 @@ namespace Project_1.UI.CharacterCreator
         }
 
         const float lines = 2;
+        const float rows = 1;
 
         public ClassSelector(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.DarkKhaki), aPos, aSize)
         {
-            RelativeScreenPosition size = new RelativeScreenPosition(aSize.X / (classNames.Length / lines), aSize.Y / lines);
+            RelativeScreenPosition size = new RelativeScreenPosition(1 / lines, 1 / rows);
             for (int i = 0; i < classNames.Length; i++)
             {
                 DebugManager.Print(GetType(), "i == " + i + "  formula == " + i % (classNames.Length / lines));
-                AddChild(new ClassSelectButton(classNames[i], new RelativeScreenPosition(size.X * (i % (classNames.Length / lines)), size.Y * MathF.Floor(i / (classNames.Length / lines))), size));
+                AddChild(new ClassSelectButton(classNames[i], new RelativeScreenPosition(size.X * (i % (classNames.Length)), size.Y * MathF.Floor(i / (classNames.Length))), size));
             }
         }
     }

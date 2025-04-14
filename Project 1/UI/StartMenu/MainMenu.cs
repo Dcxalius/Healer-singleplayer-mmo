@@ -15,7 +15,7 @@ namespace Project_1.UI.StartMenu
     {
 
         static RelativeScreenPosition mainSize = new RelativeScreenPosition(0.2f, 0.5f);
-        static UITexture staticGfx = new UITexture("WhiteBackground", Color.DarkGray);
+        //static UITexture staticGfx = new UITexture("WhiteBackground", Color.DarkGray);
 
         static RelativeScreenPosition mainPos = new RelativeScreenPosition(0.5f - (mainSize.X / 2), 0.5f - mainSize.Y / 2);
 

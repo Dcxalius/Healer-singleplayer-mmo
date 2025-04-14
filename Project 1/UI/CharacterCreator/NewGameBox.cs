@@ -20,14 +20,15 @@ namespace Project_1.UI.CharacterCreator
         FinalizeCharacterButton finalizeCharacterButton;
         public NewGameBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", Color.AliceBlue), aPos, aSize)
         {
-            RelativeScreenPosition size = RelativeScreenPosition.GetSquareFromY(0.05f);
-            AddChild(new LoadingMenu.ExitButton(aSize - size, size));
-            inputBox = new InputBox("Name:", new InputBox.ValidInputs[] { InputBox.ValidInputs.Letters },Color.Black, "Input Character Name", Color.White, false, Color.LightGray, Color.Black, new RelativeScreenPosition(0.05f), new RelativeScreenPosition(0.25f, 0.08f));
+            RelativeScreenPosition size = RelativeScreenPosition.GetSquareFromY(0.05f, Size);
+            AddChild(new LoadingMenu.ExitButton(RelativeScreenPosition.One - size, size));
+            inputBox = new InputBox("Name:", Size, new InputBox.ValidInputs[] { InputBox.ValidInputs.Letters },Color.Black, "Input Character Name", Color.White, true, Color.LightGray, Color.Black, new RelativeScreenPosition(0.05f), new RelativeScreenPosition(0.5f, 0.08f));
             AddChild(inputBox);
             //AddChild(new GFXButton(new List<Action>() { new Action(() => className = "Priest")}, new GfxPath(GfxType.UI, "Priest"), new RelativeScreenPosition(0.4f), new AbsoluteScreenPosition(64).ToRelativeScreenPosition(), Color.AliceBlue));
             //AddChild(new GFXButton(new List<Action>() { new Action(() => className = "Druid")}, new GfxPath(GfxType.UI, "Druid"), new RelativeScreenPosition(0.5f, 0.4f), new AbsoluteScreenPosition(64).ToRelativeScreenPosition(), Color.AliceBlue));
-            AddChild(new ClassSelector(new RelativeScreenPosition(0.2f, 0.3f), new RelativeScreenPosition(0.2f)));
-            finalizeCharacterButton = new FinalizeCharacterButton(new List<Action>() { new Action(CreateNewCharacter) }, new RelativeScreenPosition(0.5f, 0.4f), new RelativeScreenPosition(0.15f, 0.05f));
+            AddChild(new ClassSelector(new RelativeScreenPosition(0.4f, 0.3f), new RelativeScreenPosition(0.2f)));
+            RelativeScreenPosition finalButtonSize = new RelativeScreenPosition(0.3f, 0.05f);
+            finalizeCharacterButton = new FinalizeCharacterButton(new List<Action>() { new Action(CreateNewCharacter) }, new RelativeScreenPosition(0.5f - finalButtonSize.X / 2, 0.95f - finalButtonSize.Y), finalButtonSize);
             AddChild(finalizeCharacterButton);
             finalizeCharacterButton.Visible = false;
         }

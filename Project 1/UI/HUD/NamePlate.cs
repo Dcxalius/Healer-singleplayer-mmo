@@ -34,15 +34,15 @@ namespace Project_1.UI.HUD
             SetTarget(aEntity);
         }
 
-        public void SetTarget(Entity aEntity)
+        public void SetTarget(Entity aEntity) //TODO: Rewrite
         {
             name.Text = aEntity.Name;
             healthBar.Value = aEntity.CurrentHealth / aEntity.MaxHealth;
             AbsoluteScreenPosition barOffset = AbsoluteScreenPosition.FromRelativeScreenPosition(barSize) / 2;
             Vector2 textOffset = name.UnderlyingTextOffset / 2;
-            name.Resize(new AbsoluteScreenPosition(name.UnderlyingTextOffset.ToPoint()).ToRelativeScreenPosition());
-            healthBar.Move(name.RelativeSize.OnlyY);
-            //healthBar.Move(RelativeScreenPosition.Zero);
+            name.Resize(new AbsoluteScreenPosition(name.UnderlyingTextOffset.ToPoint()).ToRelativeScreenPosition(Size));
+            //healthBar.Move(name.RelativeSize.OnlyY);
+            healthBar.Move(RelativeScreenPosition.Zero);
             float sizeY = name.RelativeSize.Y + barSize.Y;
             if (textOffset.X < barOffset.X)
             {

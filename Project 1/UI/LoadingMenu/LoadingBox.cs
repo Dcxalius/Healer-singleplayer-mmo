@@ -19,18 +19,18 @@ namespace Project_1.UI.LoadingMenu
         public LoadingBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", Color.Orange), aPos, aSize)
         {
 
-            RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
-            RelativeScreenPosition size = new RelativeScreenPosition(aSize.X / 2 - spacing.X - spacing.X, aSize.Y - spacing.Y - spacing.Y);
+            RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f, Size);
+            RelativeScreenPosition size = new RelativeScreenPosition(1f / 2f - spacing.X - spacing.X, 1 - spacing.Y - spacing.Y);
             savesToLoadFrom = new ScrollableBox(3f, new UITexture("WhiteBackground", Color.AntiqueWhite), Color.AliceBlue, spacing, size);
             AddChild(savesToLoadFrom);
             ExistingSave.callAtClick = SetSave;
 
-            saveDetails = new SaveDetails(new RelativeScreenPosition(size.X + spacing.X + spacing.X + spacing.X, spacing.Y), size);
+            saveDetails = new SaveDetails(new RelativeScreenPosition(size.X + spacing.X * 3, spacing.Y), size);
             AddChild(saveDetails);
 
 
-            RelativeScreenPosition square = RelativeScreenPosition.GetSquareFromY(0.05f);
-            AddChild(new ExitButton(aSize - square - spacing, square));
+            RelativeScreenPosition square = RelativeScreenPosition.GetSquareFromY(0.07f, Size);
+            AddChild(new ExitButton(RelativeScreenPosition.One - square - spacing, square));
         }
 
         public void Setup(Save[] aSaves)

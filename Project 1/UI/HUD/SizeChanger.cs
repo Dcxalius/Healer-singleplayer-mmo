@@ -75,8 +75,8 @@ namespace Project_1.UI.HUD
 
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
             RelativeScreenPosition inputSize = new RelativeScreenPosition(RelativeSize.X - spacing.X * 2, RelativeSize.Y / 12);
-            directionBoxX = new InputBox("X", new InputBox.ValidInputs[] { InputBox.ValidInputs.Digits }, Color.Black, "", Color.White, true, Color.Black, Color.Black, RelativeSize - inputSize - inputSize.OnlyY - spacing - spacing.OnlyY, inputSize);
-            directionBoxY = new InputBox("Y", new InputBox.ValidInputs[] { InputBox.ValidInputs.Digits }, Color.Black, "", Color.White, true, Color.Black, Color.Black, RelativeSize - inputSize - spacing, inputSize);
+            directionBoxX = new InputBox("X", Size, new InputBox.ValidInputs[] { InputBox.ValidInputs.Digits }, Color.Black, "", Color.White, false, Color.Black, Color.Black, RelativeSize - inputSize - inputSize.OnlyY - spacing - spacing.OnlyY, inputSize);
+            directionBoxY = new InputBox("Y", Size, new InputBox.ValidInputs[] { InputBox.ValidInputs.Digits }, Color.Black, "", Color.White, false, Color.Black, Color.Black, RelativeSize - inputSize - spacing, inputSize);
 
             AddChild(directionBoxX);
             AddChild(directionBoxY);

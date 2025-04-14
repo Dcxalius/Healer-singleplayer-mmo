@@ -28,18 +28,18 @@ namespace Project_1.UI.HUD.Windows
 
         protected virtual int BagIndexForItem => -3;
 
-        static RelativeScreenPosition itemSize = RelativeScreenPosition.GetSquareFromY(0.05f);
-        static RelativeScreenPosition itemSpacing = RelativeScreenPosition.GetSquareFromY(0.003f);
+        static RelativeScreenPosition itemSize = RelativeScreenPosition.GetSquareFromY(0.05f, WindowSize.ToAbsoluteScreenPos());
+        static RelativeScreenPosition itemSpacing = RelativeScreenPosition.GetSquareFromY(0.003f, WindowSize.ToAbsoluteScreenPos());
         static RelativeScreenPosition leftSideTop = itemSpacing;
-        static RelativeScreenPosition bottomSideLeft = new RelativeScreenPosition(WindowSize.X / 2 - itemSize.X * 1.5f - itemSpacing.X, (itemSize.Y + itemSpacing.Y) * (int)Equipment.Slot.Hands + itemSpacing.Y);
-        static RelativeScreenPosition rightSideTop = new RelativeScreenPosition(WindowSize.X - itemSpacing.X - itemSize.X, itemSpacing.Y);
+        static RelativeScreenPosition bottomSideLeft = new RelativeScreenPosition(1 / 2f - itemSize.X * 1.5f - itemSpacing.X, (itemSize.Y + itemSpacing.Y) * (int)Equipment.Slot.Hands + itemSpacing.Y);
+        static RelativeScreenPosition rightSideTop = new RelativeScreenPosition(1f - itemSpacing.X - itemSize.X, itemSpacing.Y);
 
-        static RelativeScreenPosition expBarSize = new RelativeScreenPosition(WindowSize.X, 0.05f);
-        static RelativeScreenPosition expBarPos = new RelativeScreenPosition(0, WindowSize.Y - expBarSize.Y);
+        static RelativeScreenPosition expBarSize = new RelativeScreenPosition(1f, 0.05f);
+        static RelativeScreenPosition expBarPos = new RelativeScreenPosition(0, 1f - expBarSize.Y);
 
         public CharacterWindow() : base(new UITexture("WhiteBackground", Color.Turquoise))
         {
-            nameLabel = new Label(null, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(WindowSize.X, itemSize.Y), Label.TextAllignment.TopCentre, Color.Black);
+            nameLabel = new Label(null, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(1, itemSize.Y), Label.TextAllignment.TopCentre, Color.Black);
 
             visibleKey = Input.KeyBindManager.KeyListner.Character;
             equiped = new Item[(int)Equipment.Slot.Count];
@@ -52,7 +52,7 @@ namespace Project_1.UI.HUD.Windows
 
             RelativeScreenPosition topPart = new RelativeScreenPosition(0, yChange.Y * ((int)Equipment.Slot.Hands + 1));
             RelativeScreenPosition textBoxPos = topPart + itemSpacing;
-            RelativeScreenPosition textBoxSize = new RelativeScreenPosition(WindowSize.X - itemSpacing.X * 2, WindowSize.Y - topPart.Y - itemSpacing.Y * 2) / 2;
+            RelativeScreenPosition textBoxSize = new RelativeScreenPosition(1 - itemSpacing.X * 2, 1 - topPart.Y - itemSpacing.Y * 2) / 2;
 
             nrStatReport = new Label(null, textBoxPos, textBoxSize - new RelativeScreenPosition(itemSpacing.X, 0), Label.TextAllignment.TopRight, Color.Black);
             stringStatReport = new Label(null, textBoxPos + new RelativeScreenPosition(textBoxSize.X, 0f) + new RelativeScreenPosition(itemSpacing.X, 0), textBoxSize - new RelativeScreenPosition(itemSpacing.X, 0), Label.TextAllignment.TopLeft, Color.Black);

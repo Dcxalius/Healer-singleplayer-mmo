@@ -75,25 +75,31 @@ namespace Project_1.UI.UIElements.Boxes
         }
 
         //TODO: Change names v (they are a bit messy)
-        public InputBox(string aTextBeforeInputWindow, ValidInputs[] aSetOfValidInputs, Color aTextBeforeColor, string aDisplayText, Color aBackgroundColor, bool aNoYSpacing, Color aPassiveColor, Color aPostClickColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", aBackgroundColor), aPos, aSize)
+        public InputBox(string aTextBeforeInputWindow, AbsoluteScreenPosition aThisIsUglyAFButItWorksForNow, ValidInputs[] aSetOfValidInputs, Color aTextBeforeColor, string aDisplayText, Color aBackgroundColor, bool aYSpacing, Color aPassiveColor, Color aPostClickColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", aBackgroundColor), aPos, aSize)
         {
             Debug.Assert(aSetOfValidInputs.Length != 0, "Made an inputbox without any legal inputs");
             validInputs = aSetOfValidInputs;
             postClickColor = aPostClickColor;
-            RelativeScreenPosition spacingSquare = RelativeScreenPosition.GetSquareFromY(0.01f, Size);
+            RelativeScreenPosition spacingSquare = RelativeScreenPosition.GetSquareFromY(0.05f, Size);
             RelativeScreenPosition position = spacingSquare;
             RelativeScreenPosition size = RelativeScreenPosition.One - spacingSquare * 2;
 
+            //AbsoluteScreenPosition textSize = new AbsoluteScreenPosition(TextureManager.GetFont("Gloryse").MeasureString(aTextBeforeInputWindow).ToPoint());
             AbsoluteScreenPosition textSize = new AbsoluteScreenPosition(TextureManager.GetFont("Gloryse").MeasureString(aTextBeforeInputWindow).ToPoint());
-            RelativeScreenPosition xdd = new RelativeScreenPosition((float)textSize.X / (float)Size.X, textSize.Y / (float)Size.Y);
-            beforeWindowLabel = new Label(aTextBeforeInputWindow, position, size.OnlyY + xdd.OnlyX, Label.TextAllignment.CentreLeft, aTextBeforeColor);
+            DebugManager.Print(GetType(), "textSize = " + textSize);
+            
+            RelativeScreenPosition textSizeRelative = textSize.ToRelativeScreenPosition(new AbsoluteScreenPosition((int)(aThisIsUglyAFButItWorksForNow.X * aSize.X), (int)(aThisIsUglyAFButItWorksForNow.Y * aSize.Y))); //TODO: This has wrong size due to size being unset when objects is created
+            //beforeWindowLabel = new Label(aTextBeforeInputWindow, position, textSizeRelative, Label.TextAllignment.CentreLeft, aTextBeforeColor);
+            //beforeWindowLabel = new Label(aTextBeforeInputWindow, position, textSizeRelative.OnlyX + spacingSquare.OnlyX * 2 + size.OnlyY - spacingSquare.OnlyY * 2, Label.TextAllignment.CentreLeft, aTextBeforeColor);
+            beforeWindowLabel = new Label(aTextBeforeInputWindow, position, size.OnlyY + textSizeRelative.OnlyX + spacingSquare.OnlyX * 2, Label.TextAllignment.CentreLeft, aTextBeforeColor);
+            DebugManager.Print(GetType(), "after = " + beforeWindowLabel.UnderlyingTextOffset.ToString());
             AddChild(beforeWindowLabel);
 
-            RelativeScreenPosition bgPos = spacingSquare;
+            RelativeScreenPosition bgPos = RelativeScreenPosition.Zero;
             RelativeScreenPosition bgSize = size;
-            if (aNoYSpacing) bgPos = spacingSquare.OnlyX;
-            if (aNoYSpacing) bgSize = aSize - spacingSquare.OnlyX * 2;
-            Box textBackgroundBox = new Box(new UITexture("WhiteBackground", aBackgroundColor), bgPos + beforeWindowLabel.RelativeSize.OnlyX + position.OnlyX, bgSize - beforeWindowLabel.RelativeSize.OnlyX - position.OnlyX);
+            if (aYSpacing) bgPos = spacingSquare;
+            if (aYSpacing) bgSize = RelativeScreenPosition.One - spacingSquare.OnlyX * 2 - spacingSquare.OnlyY * 2;
+            Box textBackgroundBox = new Box(new UITexture("WhiteBackground", aBackgroundColor), bgPos + beforeWindowLabel.RelativeSize.OnlyX + spacingSquare.OnlyX, bgSize - beforeWindowLabel.RelativeSize.OnlyX - position.OnlyX);
             textBackgroundBox.CapturesClick = false;
             AddChild(textBackgroundBox);
 

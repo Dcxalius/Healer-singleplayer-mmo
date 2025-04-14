@@ -28,9 +28,9 @@ namespace Project_1.UI.LoadingMenu
         public SaveDetails(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.Beige), aPos, aSize)
         {
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
-            RelativeScreenPosition imgSize = new RelativeScreenPosition(aSize.X - spacing.X - spacing.X, aSize.Y / 3 - spacing.Y - spacing.Y);
+            RelativeScreenPosition imgSize = new RelativeScreenPosition(1 - spacing.X - spacing.X, 1 / 3f - spacing.Y - spacing.Y);
 
-            imagePlaceHolder = new Box(new UITexture("GrayBackground", Color.Gray), spacing, imgSize);
+            imagePlaceHolder = new Box(new UITexture("GrayBackground", Color.Gray), spacing, imgSize); //TODO: Also make this use a default visual
             AddChild(imagePlaceHolder);
             textDetails = new Label(null, imgSize.OnlyY + spacing, imgSize, Label.TextAllignment.TopLeft, Color.Black);
             AddChild(textDetails);

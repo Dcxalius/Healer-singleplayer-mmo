@@ -23,9 +23,9 @@ namespace Project_1.UI.HUD.Windows
         {
             visibleKey = Input.KeyBindManager.KeyListner.SpellBook;
             spellBookSpells = new SpellBookSpell[cols * rows];
-            RelativeScreenPosition startPos = RelativeScreenPosition.GetSquareFromX(0.01f);
-            RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
-            RelativeScreenPosition size = RelativeScreenPosition.GetSquareFromX(0.015f);
+            RelativeScreenPosition startPos = RelativeScreenPosition.GetSquareFromX(0.01f, Size);
+            RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.01f, Size);
+            RelativeScreenPosition size = RelativeScreenPosition.GetSquareFromX(0.15f, Size);
 
             //Spell[] spells = ObjectManager.Player.SpellBook.Spells;
 

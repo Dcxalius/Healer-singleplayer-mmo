@@ -41,11 +41,12 @@ namespace Project_1.Camera
 
 
 
-        static public AbsoluteScreenPosition FromRelativeScreenPosition(RelativeScreenPosition aRelativePosition)
+        static public AbsoluteScreenPosition FromRelativeScreenPosition(RelativeScreenPosition aRelativePosition, AbsoluteScreenPosition? aContext = null) //TODO: Make this take in scope
         {
-            AbsoluteScreenPosition pos = new AbsoluteScreenPosition((int)(Camera.ScreenRectangle.Width * aRelativePosition.X), (int)(Camera.ScreenRectangle.Height * aRelativePosition.Y));
+            if (!aContext.HasValue) return new AbsoluteScreenPosition((int)(Camera.ScreenRectangle.Width * aRelativePosition.X), (int)(Camera.ScreenRectangle.Height * aRelativePosition.Y));
+            return new AbsoluteScreenPosition((int)(aContext.Value.X * aRelativePosition.X), (int)(aContext.Value.Y * aRelativePosition.Y));
+
             //DebugManager.Print(typeof(Camera), "Abs pos = " + pos + ", and relative pos = " + aPos);
-            return pos;
         }
 
         static public RelativeScreenPosition ToRelativeScreenPos(AbsoluteScreenPosition aAbsoluteScreenPosition)
@@ -53,9 +54,19 @@ namespace Project_1.Camera
             return RelativeScreenPosition.FromAbsoluteScreenPosition(aAbsoluteScreenPosition);
         }
 
+        static public RelativeScreenPosition ToRelativeScreenPos(AbsoluteScreenPosition aAbsoluteScreenPosition, AbsoluteScreenPosition aContext)
+        {
+            return RelativeScreenPosition.FromAbsoluteScreenPosition(aAbsoluteScreenPosition, aContext);
+        }
+
         public RelativeScreenPosition ToRelativeScreenPosition()
         {
             return ToRelativeScreenPos(this);
+        }
+
+        public RelativeScreenPosition ToRelativeScreenPosition(AbsoluteScreenPosition aContext)
+        {
+            return ToRelativeScreenPos(this, aContext);
         }
 
         public static implicit operator Point(AbsoluteScreenPosition absP) => absP.position;
@@ -128,6 +139,11 @@ namespace Project_1.Camera
         public Vector2 ToVector2()
         {
             return position.ToVector2();
+        }
+
+        public override string ToString()
+        {
+            return position.ToString();
         }
     }
 }

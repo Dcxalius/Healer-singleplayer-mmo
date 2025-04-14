@@ -121,7 +121,7 @@ namespace Project_1.UI.UIElements
         }
 
         public AbsoluteScreenPosition Location => (ParentPos) + (RelativePos * ParentRelativeSize).ToAbsoluteScreenPos();
-        public AbsoluteScreenPosition Size => (RelativeSize * ParentRelativeSize).ToAbsoluteScreenPos(); //TODO: This is wrong, it needs to include grandparents
+        public AbsoluteScreenPosition Size => (RelativeSize * ParentRelativeSize).ToAbsoluteScreenPos();
         #endregion
 
         #region Graphics
@@ -134,8 +134,9 @@ namespace Project_1.UI.UIElements
         protected UIElement parent;
         protected AbsoluteScreenPosition ParentPos => parent == null ? AbsoluteScreenPosition.Zero : parent.Location;
         protected RelativeScreenPosition ParentRelativePos => parent == null ? RelativeScreenPosition.Zero : parent.RelativePos;
-        protected AbsoluteScreenPosition ParentSize => parent == null ? new AbsoluteScreenPosition(1) : parent.Size;
-        protected RelativeScreenPosition ParentRelativeSize => parent == null ? new RelativeScreenPosition(1) : parent.Size.ToRelativeScreenPosition();
+        protected AbsoluteScreenPosition ParentSize => parent == null ? Camera.Camera.ScreenSize : parent.Size;
+        protected RelativeScreenPosition ParentRelativeSize => parent == null ? new RelativeScreenPosition(1) : parent.RelativeSize * parent.ParentRelativeSize;
+        //protected RelativeScreenPosition ParentRelativeSize => parent == null ? new RelativeScreenPosition(1) : parent.Size.ToRelativeScreenPosition(parent.ParentSize);
 
         List<UIElement> children = new List<UIElement>();
         protected int ChildCount => children.Count;
@@ -398,7 +399,7 @@ namespace Project_1.UI.UIElements
 
         public virtual void Resize(RelativeScreenPosition aSize) => relativeSize = aSize;
 
-        public virtual void Resize(AbsoluteScreenPosition aSize) => relativeSize = aSize.ToRelativeScreenPosition();
+        public virtual void Resize(AbsoluteScreenPosition aSize) => relativeSize = aSize.ToRelativeScreenPosition(); //TODO: ??????
 
         public virtual void Close()
         {
