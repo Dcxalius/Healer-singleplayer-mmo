@@ -103,7 +103,7 @@ namespace Project_1.UI.UIElements
 
         #region Position
         public RelativeScreenPosition RelativePos => relativePos;
-        RelativeScreenPosition relativePos; //TODO: Change this so 1, 1 refers to parents bottom right instead of screen bottom right + parent top left
+        RelativeScreenPosition relativePos;
         public RelativeScreenPosition RelativeSize => relativeSize;
         RelativeScreenPosition relativeSize;
 
@@ -296,7 +296,7 @@ namespace Project_1.UI.UIElements
 
         public void Move(RelativeScreenPosition aNewPos)
         {
-            if (aNewPos.X == float.NaN || aNewPos.Y == float.NaN) throw new ArgumentException("Invalid move.");
+            aNewPos.Assert();
             relativePos = aNewPos;
             MoveBoundsCheck();
         }
@@ -397,9 +397,13 @@ namespace Project_1.UI.UIElements
             return (xOutOfBounds, yOutOfBounds);
         }
 
-        public virtual void Resize(RelativeScreenPosition aSize) => relativeSize = aSize;
+        public virtual void Resize(RelativeScreenPosition aSize)
+        {
+           aSize.Assert();
+            relativeSize = aSize;
+        }
 
-        public virtual void Resize(AbsoluteScreenPosition aSize) => relativeSize = aSize.ToRelativeScreenPosition(); //TODO: ??????
+        //public virtual void Resize(AbsoluteScreenPosition aSize) => relativeSize = aSize.ToRelativeScreenPosition(); //TODO: ??????
 
         public virtual void Close()
         {

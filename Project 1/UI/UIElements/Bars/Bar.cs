@@ -26,7 +26,7 @@ namespace Project_1.UI.UIElements.Bars
 
         public Bar(BarTexture aBarGfx, UITexture aBackgroundGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aBackgroundGfx, aPos, aSize)
         {
-            barComponent = new BarComponent(aBarGfx, RelativeScreenPosition.Zero, aSize);
+            barComponent = new BarComponent(aBarGfx, RelativeScreenPosition.Zero, RelativeScreenPosition.One);
             AddChild(barComponent);
         }
         public override void Draw(SpriteBatch aBatch)

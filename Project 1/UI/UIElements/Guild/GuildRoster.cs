@@ -34,7 +34,7 @@ namespace Project_1.UI.UIElements.Guild
         public GuildRoster(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.AliceBlue), aPos, aSize)
         {
             guildMembers = new List<GuildMemberListing>();
-            size = new RelativeScreenPosition(aSize.X - spacing.X * 2, 0.05f);
+            size = new RelativeScreenPosition(1 - spacing.X * 2, 0.05f);
             changeInY = new RelativeScreenPosition(0, size.Y + spacing.Y);
         }
 

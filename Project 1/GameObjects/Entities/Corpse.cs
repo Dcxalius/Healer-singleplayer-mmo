@@ -18,21 +18,21 @@ using System.Threading.Tasks;
 
 namespace Project_1.GameObjects.Entities
 {
-    internal class Corpse : GameObject
+    internal class Corpse : WorldObject
     {
         ParticleBase lootGlow;
         ParticleMovement lootGlowMovement;
 
         [JsonProperty]
-        public Item[] Drop => drop;
+        public LootDrop Drop => drop;
         LootTable loot;
-        Item[] drop;
+        LootDrop drop;
         [JsonIgnore]
         public float LootLength => lootLength;
         float lootLength;
 
         [JsonIgnore]
-        public bool IsEmpty => drop.All(drop => drop == null);
+        public bool IsEmpty => drop.IsEmpty;
         [JsonIgnore]
         public bool Despawned => isDespawning && timeDespawnStart + despawnTime < TimeManager.TotalFrameTime;
 
@@ -46,6 +46,7 @@ namespace Project_1.GameObjects.Entities
         bool isDespawning;
         double timeDespawnStart;
 
+        public override float MaxSpeed => 0;
 
         [JsonProperty]
         string CorpseName => corpseName;
@@ -60,7 +61,7 @@ namespace Project_1.GameObjects.Entities
         }
 
         [JsonConstructor] //TODO: Make this take timers for despawnlogic
-        Corpse(string corpseName, Item[] drop, WorldSpace pos) : this(new GfxPath(GfxType.Corpse, corpseName), pos)
+        Corpse(string corpseName, LootDrop drop, WorldSpace pos) : this(new GfxPath(GfxType.Corpse, corpseName), pos)
         {
             this.drop = drop;
         }
@@ -79,7 +80,7 @@ namespace Project_1.GameObjects.Entities
         {
             if (loot!= null)
             {
-                drop = loot.GenerateDrop();
+                drop = loot.GenerateDrop(this);
             }
             Position = aPos;
             ObjectManager.AddCorpse(this);
@@ -92,9 +93,9 @@ namespace Project_1.GameObjects.Entities
             if (aClickEvent.ButtonPressed != InputManager.ClickType.Right) return false;
             if (!Camera.Camera.WorldRectToScreenRect(WorldRectangle).Contains(aClickEvent.AbsolutePos.ToPoint())) return false;
             if (ObjectManager.Player.FeetPosition.DistanceTo(Centre) > lootLength) return false;
-            if (drop.All(drop => drop == null)) return false;
+            if (drop.IsEmpty) return false;
 
-            HUDManager.Loot(this);
+            HUDManager.Loot(drop);
 
             return true;
         }

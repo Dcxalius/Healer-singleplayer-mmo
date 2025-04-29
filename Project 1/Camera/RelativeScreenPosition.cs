@@ -95,6 +95,7 @@ namespace Project_1.Camera
         static public AbsoluteScreenPosition ToAbsoluteScreenPosition(RelativeScreenPosition aRelativeScreenPos, AbsoluteScreenPosition aContext) => AbsoluteScreenPosition.FromRelativeScreenPosition(aRelativeScreenPos, aContext);
 
         public AbsoluteScreenPosition ToAbsoluteScreenPos() => ToAbsoluteScreenPosition(this);
+        public AbsoluteScreenPosition ToAbsoluteScreenPos(AbsoluteScreenPosition aContext) => ToAbsoluteScreenPosition(this, aContext);
 
         public static implicit operator Vector2(RelativeScreenPosition rs) => rs.position;
         public static explicit operator RelativeScreenPosition(Vector2 v) => new RelativeScreenPosition(v);
@@ -128,5 +129,15 @@ namespace Project_1.Camera
         public Vector2 ToVector2() => position;
 
         public override string ToString() => position.ToString();
+
+        public void Assert()
+        {
+            float x;
+            float y;
+            position.Deconstruct(out x, out y);
+            if (float.IsNaN(x) || float.IsNaN(y)) throw new Exception("Not a number set as relative");
+            if (float.IsInfinity(x) || float.IsInfinity(y)) throw new Exception("Not a number set as relative");
+            
+        }
     }
 }

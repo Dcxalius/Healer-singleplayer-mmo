@@ -12,13 +12,13 @@ namespace Project_1.UI.UIElements
     {
         Label description;
 
-        static RelativeScreenPosition CalculateSize(RelativeScreenPosition aSize) => RelativeScreenPosition.GetSquareFromY(aSize.Y); 
+        static RelativeScreenPosition CalculateSize(RelativeScreenPosition aSize) => RelativeScreenPosition.GetSquareFromY(aSize.Y); //TODO: ???????????
 
         public DescriptCheckBox(string aDescription, Color aTextColor, bool aStartState, Action aTickedAction, Action aUntickedAction, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : this(aDescription, aTextColor, aStartState, new List<Action> { aTickedAction }, new List<Action> { aUntickedAction }, aPos, aSize) { }
 
         public DescriptCheckBox(string aDescription, Color aTextColor, bool aStartState, List<Action> aTickedActions, List<Action> aUntickedActions, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aStartState, aTickedActions, aUntickedActions, aPos, CalculateSize(aSize))
         {
-            RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
+            RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f, Size);
             description = new Label(aDescription, CalculateSize(aSize).OnlyX + spacing.OnlyX, aSize - CalculateSize(aSize).OnlyX - spacing.OnlyX, Label.TextAllignment.CentreLeft, aTextColor);
             capturesClick = false;
             AddChild(description);

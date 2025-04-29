@@ -46,15 +46,15 @@ namespace Project_1.UI.UIElements.Guild
         {
             friendly = aFriendly;
 
-            buttonSize = RelativeScreenPosition.GetSquareFromY(aSize.Y - spacing.Y - spacing.Y);
-            buttonPos = new RelativeScreenPosition(aSize.X, spacing.Y);
+            buttonSize = RelativeScreenPosition.GetSquareFromY(1 - spacing.Y - spacing.Y);
+            buttonPos = new RelativeScreenPosition(1, spacing.Y);
             changeInY = new RelativeScreenPosition(-buttonSize.X - spacing.X, 0);
             
             openInspectWindow = new OpenInspectWindow(friendly, GetButtonPos, buttonSize);
             openInventory = new OpenInventory(GetButtonPos, buttonSize);
 
             float labelPosX = (buttonPos.X - spacing.X - spacing.X) / 3;
-            RelativeScreenPosition labelSize = new RelativeScreenPosition(labelPosX, aSize.Y);
+            RelativeScreenPosition labelSize = new RelativeScreenPosition(labelPosX, 1);
 
             name = new Label(aFriendly.Name, new RelativeScreenPosition(spacing.X, 0), labelSize, Label.TextAllignment.CentreLeft);
             level = new Label(aFriendly.CurrentLevel.ToString(), new RelativeScreenPosition(spacing.X + labelPosX, 0), labelSize, Label.TextAllignment.Centred);

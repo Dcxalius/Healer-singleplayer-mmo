@@ -4,7 +4,6 @@ using Project_1.Camera;
 using Project_1.Input;
 using Project_1.Textures;
 using Project_1.UI.HUD;
-using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;

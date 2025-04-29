@@ -67,7 +67,6 @@ namespace Project_1.GameObjects
 
         public void Teleport(WorldSpace aNewPos) => FeetPosition = aNewPos;
 
-        public virtual bool Click(ClickEvent aClickEvent) => false;
 
         public void AddEffect(VisualEffect aEffect)
         {

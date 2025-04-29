@@ -18,48 +18,54 @@ namespace Project_1.UI.HUD
     internal class NamePlate : Box
     {
         Bar healthBar;
+        public string Name => name.Text;
         Label name;
         static Color backgroundColor = new Color(120, 50, 50, 80);
-        RelativeScreenPosition barSize = new RelativeScreenPosition(0.02f, 0.006f);
+        RelativeScreenPosition barSize = new RelativeScreenPosition(1f, 0.2f);
+        //RelativeScreenPosition barSize = new RelativeScreenPosition(0.02f, 0.006f);
         WorldSpace offset;
 
-        public NamePlate(Entity aEntity) : base(null, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
+        static Color ColorTransform(Entity aE)
+        {
+            float transp = 120f / 255f;
+
+            byte r = (byte)((transp * aE.RelationColor.R / 255f) * 255);
+            byte g = (byte)((transp * aE.RelationColor.G / 255f) * 255);
+            byte b = (byte)((transp * aE.RelationColor.B / 255f) * 255);
+            byte a = (byte)((transp * aE.RelationColor.A / 255f) * 255);
+
+            return new Color(r, g, b, a);
+        }
+
+        public NamePlate(Entity aEntity) : base(new UITexture("GrayBackground", ColorTransform(aEntity)), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
         {
             name = new Label(aEntity.Name, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopCentre);
-            healthBar = new Bar(new BarTexture(BarTexture.FillingDirection.Right, Color.Red), new UITexture("WhiteBackground", backgroundColor), new AbsoluteScreenPosition(0, (int)name.UnderlyingTextOffset.Y).ToRelativeScreenPosition(), barSize);
+            healthBar = new Bar(new BarTexture(BarTexture.FillingDirection.Right, Color.Red), new UITexture("WhiteBackground", backgroundColor), RelativeScreenPosition.Zero, barSize);
             
+
             AddChild(name);
             AddChild(healthBar);
 
             SetTarget(aEntity);
         }
 
-        public void SetTarget(Entity aEntity) //TODO: Rewrite
+        void SetTarget(Entity aEntity) //TODO: Add a minimum size for bar and a maximum size of name.
         {
             name.Text = aEntity.Name;
             healthBar.Value = aEntity.CurrentHealth / aEntity.MaxHealth;
-            AbsoluteScreenPosition barOffset = AbsoluteScreenPosition.FromRelativeScreenPosition(barSize) / 2;
-            Vector2 textOffset = name.UnderlyingTextOffset / 2;
-            name.Resize(new AbsoluteScreenPosition(name.UnderlyingTextOffset.ToPoint()).ToRelativeScreenPosition(Size));
-            //healthBar.Move(name.RelativeSize.OnlyY);
-            healthBar.Move(RelativeScreenPosition.Zero);
-            float sizeY = name.RelativeSize.Y + barSize.Y;
-            if (textOffset.X < barOffset.X)
-            {
-                Resize(new RelativeScreenPosition(barSize.X , sizeY));
-                offset.X = -barOffset.X;
-                //name.Move(new RelativeScreenPosition(barSize.X / 2 - textOffset.X / 2, 0));
-                name.Move(new AbsoluteScreenPosition((int)(barOffset.X - textOffset.X), name.AbsolutePos.Y).ToRelativeScreenPosition());
-            }
-            else
-            {
-                Resize(new RelativeScreenPosition(name.RelativeSize.X, sizeY));
-                offset.X = -textOffset.X;
-                healthBar.Move(new AbsoluteScreenPosition((int)(textOffset.X - barOffset.X), healthBar.AbsolutePos.Y).ToRelativeScreenPosition());
-            }
 
-            offset.Y = - aEntity.Size.Y;
-            Move((aEntity.FeetPosition + offset).ToAbsoltueScreenPosition().ToRelativeScreenPosition() - RelativeSize.OnlyY);
+            AbsoluteScreenPosition textOffset = new AbsoluteScreenPosition((int)name.UnderlyingTextOffset.X, (int)name.UnderlyingTextOffset.Y);
+
+
+            healthBar.Resize(barSize);
+
+            Resize((textOffset.OnlyX + textOffset.OnlyY * (1 + barSize.Y)).ToRelativeScreenPosition());
+
+            name.Resize(textOffset.ToRelativeScreenPosition(Size));     
+
+            Reposition(aEntity);
+
+            healthBar.Move(RelativeScreenPosition.One.OnlyY - healthBar.RelativeSize.OnlyY);
         }
 
         public void Refresh(Entity aEntity)
@@ -69,7 +75,9 @@ namespace Project_1.UI.HUD
 
         public void Reposition(Entity aEntity)
         {
-            Move((aEntity.FeetPosition + offset).ToAbsoltueScreenPosition().ToRelativeScreenPosition() - RelativeSize.OnlyY);
+            //Move((aEntity.FeetPosition + offset).ToAbsoltueScreenPosition().ToRelativeScreenPosition() - RelativeSize.OnlyY);
+            Move((aEntity.FeetPosition.ToAbsoltueScreenPosition() - new AbsoluteScreenPosition(Size.X / 2, aEntity.WorldRectangle.Size.Y * 2)).ToRelativeScreenPosition() - RelativeSize.OnlyY);
+
         }
     }
 }

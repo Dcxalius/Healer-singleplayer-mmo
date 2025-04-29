@@ -1,4 +1,5 @@
-﻿using Project_1.Managers;
+﻿using Project_1.GameObjects;
+using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,7 +31,7 @@ namespace Project_1.Items
             maxDrops = aMaxDrops;
         }
 
-        public Item[] GenerateDrop()
+        public LootDrop GenerateDrop(WorldObject aObject)
         {
             List<Item> returnable = new List<Item>();
 
@@ -42,7 +43,7 @@ namespace Project_1.Items
                 returnable.Add(drop);
             }
 
-            return returnable.ToArray();
+            return new LootDrop(returnable.ToArray(), aObject);
         }
 
         Item FindItemToCreate(ref int[] aDropCount)

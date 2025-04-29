@@ -53,17 +53,17 @@ namespace Project_1.UI.HUD
 
         public SizeChanger() : base(new UITexture("GrayBackground", Color.Gray), RelativeScreenPosition.Zero, new RelativeScreenPosition(0.2f, 0.2f))
         {
-            RelativeScreenPosition labelSpacing = new RelativeScreenPosition(0.025f, 0.025f);
+            RelativeScreenPosition labelSpacing = new RelativeScreenPosition(0.025f);
 
-            name = new Label("", labelSpacing, RelativeSize - labelSpacing * 2, Label.TextAllignment.TopCentre, Color.White);
+            name = new Label("", labelSpacing, RelativeScreenPosition.One - labelSpacing * 2, Label.TextAllignment.TopCentre, Color.White);
             AddChild(name);
 
             directionButtons = new GFXButton[(int)Cardinals.Count];
 
-            RelativeScreenPosition buttonSize = RelativeScreenPosition.GetSquareFromX(0.015f);
+            RelativeScreenPosition buttonSize = RelativeScreenPosition.GetSquareFromX(0.08f, Size);
             
 
-            RelativeScreenPosition pos = RelativeSize / 2 - buttonSize / 2;
+            RelativeScreenPosition pos = RelativeScreenPosition.One / 2 - buttonSize / 2;
 
             directionButtons[0] = new GFXButton(new List<Action> { NudgeValues(Cardinals.Up) }, new GfxPath(GfxType.UI, "UpArrow"), pos, buttonSize, Color.White);
             directionButtons[1] = new GFXButton(new List<Action> { NudgeValues(Cardinals.Down) }, new GfxPath(GfxType.UI, "DownArrow"), pos + buttonSize.OnlyY, buttonSize, Color.White);
@@ -73,10 +73,10 @@ namespace Project_1.UI.HUD
 
             AddChildren(directionButtons);
 
-            RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
-            RelativeScreenPosition inputSize = new RelativeScreenPosition(RelativeSize.X - spacing.X * 2, RelativeSize.Y / 12);
-            directionBoxX = new InputBox("X", Size, new InputBox.ValidInputs[] { InputBox.ValidInputs.Digits }, Color.Black, "", Color.White, false, Color.Black, Color.Black, RelativeSize - inputSize - inputSize.OnlyY - spacing - spacing.OnlyY, inputSize);
-            directionBoxY = new InputBox("Y", Size, new InputBox.ValidInputs[] { InputBox.ValidInputs.Digits }, Color.Black, "", Color.White, false, Color.Black, Color.Black, RelativeSize - inputSize - spacing, inputSize);
+            RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f, Size);
+            RelativeScreenPosition inputSize = new RelativeScreenPosition(1 - spacing.X * 2, 1 / 12f);
+            directionBoxX = new InputBox("X", Size, new InputBox.ValidInputs[] { InputBox.ValidInputs.Digits }, Color.Black, "", Color.White, false, Color.Black, Color.Black, RelativeScreenPosition.One - inputSize - inputSize.OnlyY - spacing - spacing.OnlyY, inputSize);
+            directionBoxY = new InputBox("Y", Size, new InputBox.ValidInputs[] { InputBox.ValidInputs.Digits }, Color.Black, "", Color.White, false, Color.Black, Color.Black, RelativeScreenPosition.One - inputSize - spacing, inputSize);
 
             AddChild(directionBoxX);
             AddChild(directionBoxY);
@@ -106,7 +106,7 @@ namespace Project_1.UI.HUD
             int x = int.Parse(directionBoxX.Input);
             int y = int.Parse(directionBoxY.Input);
 
-            target.Resize(new AbsoluteScreenPosition(x, y));
+            target.Resize(new AbsoluteScreenPosition(x, y).ToRelativeScreenPosition());
         }
 
         Action NudgeValues(Cardinals aCardinal)
@@ -133,7 +133,7 @@ namespace Project_1.UI.HUD
 
             return new Action(() =>
             {
-                target.Resize(target.Size + sizeChange);
+                target.Resize((target.Size + sizeChange).ToRelativeScreenPosition());
                 Move(target.RelativePos - RelativeSize);
             });
         }

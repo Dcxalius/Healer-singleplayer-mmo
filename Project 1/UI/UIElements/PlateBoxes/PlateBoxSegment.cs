@@ -23,12 +23,12 @@ namespace Project_1.UI.UIElements.PlateBoxes
             capturesClick = false;
         }
 
-        public override void Resize(AbsoluteScreenPosition aSize)
-        {
-            base.Resize(aSize);
+        //public override void Resize(AbsoluteScreenPosition aSize)
+        //{
+        //    base.Resize(aSize);
 
-            ForAllChildren((child) => child.Resize(aSize));
-        }
+        //    ForAllChildren((child) => child.Resize(aSize));
+        //}
 
         public override void Resize(RelativeScreenPosition aSize)
         { 

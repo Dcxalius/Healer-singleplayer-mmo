@@ -35,7 +35,6 @@ namespace Project_1.UI.HUD
     internal static class HUDManager
     {
         static Dictionary<Entity, NamePlate> namePlates = new Dictionary<Entity, NamePlate>();
-        //static Dictionary<Entity, PlateBox> plateBoxes = new Dictionary<Entity, PlateBox>(); //TODO: Ponder about this
 
         static List<UIElement> hudElements;
 
@@ -107,11 +106,7 @@ namespace Project_1.UI.HUD
 
         public static void Update()
         {
-            foreach (KeyValuePair<Entity, NamePlate> namePlate in namePlates)
-            {
-                namePlate.Value.Update();
-            }
-
+            UpdateNamePlates();
             for (int i = 0; i < plateBoxes.Count; i++)
             {
                 plateBoxes[i].Update();
@@ -126,6 +121,75 @@ namespace Project_1.UI.HUD
             {
                 dialogueBoxes[i].Update();
             }
+        }
+
+        static void UpdateNamePlates()
+        {
+
+            foreach (KeyValuePair<Entity, NamePlate> namePlate in namePlates)
+            {
+                namePlate.Value.Update();
+            }
+
+            int maxPasses = 50;
+            int passes = 0;
+            List<Rectangle> collisonRects = new List<Rectangle>();
+            do
+            {
+                passes++;
+                List<NamePlate> namePlates = new List<NamePlate>();
+                foreach (KeyValuePair<Entity, NamePlate> namePlate in HUDManager.namePlates)
+                {
+                    namePlates.Add(namePlate.Value);
+                }
+
+
+                List<(int, int)> collisionIndexes = new List<(int, int)>();
+                collisonRects.Clear();
+
+                for (int i = 0; i < namePlates.Count; i++)
+                {
+                    for (int j = 0; j < namePlates.Count; j++)
+                    {
+                        if (i == j) continue;
+                        if (collisionIndexes.Contains((j, i))) continue;
+
+                        Rectangle r = Rectangle.Intersect(namePlates[i].AbsolutePos, namePlates[j].AbsolutePos);
+
+                        if (r.Size.X != 0 && r.Size.Y != 0)
+                        {
+                            collisionIndexes.Add((i, j));
+                            collisonRects.Add(r);
+                        }
+                    }
+                }
+
+                for (int i = 0; i < collisonRects.Count; i++)
+                {
+                    UpdateSingleNamePlate(namePlates[collisionIndexes[i].Item1], collisonRects[i].Center, collisonRects[i].Size);
+                    UpdateSingleNamePlate(namePlates[collisionIndexes[i].Item2], collisonRects[i].Center, collisonRects[i].Size);
+                }
+            }
+            while (collisonRects.Count > 0 && passes < maxPasses);
+
+            //DebugManager.Print(typeof(HUDManager), "Passes of nameplatedupdate was: " + passes);
+        }
+
+        static void UpdateSingleNamePlate(NamePlate aNamePlate, Point aCentre, Point aSize)
+        {
+            Vector2 dir = (aNamePlate.AbsolutePos.Center - aCentre).ToVector2();
+            dir.Normalize();
+
+            if (float.IsNaN(dir.X) || float.IsNaN(dir.Y)) dir = Vector2.Zero;
+            
+            //DebugManager.Print(typeof(HUDManager), "Nameplate of " + aNamePlate.Name + " was at " + aNamePlate.RelativePos);
+
+            aNamePlate.Move(aNamePlate.RelativePos + (new AbsoluteScreenPosition((aSize.ToVector2() * (dir / 2)).ToPoint()) + new AbsoluteScreenPosition(1 * Math.Sign(dir.X), 1 * Math.Sign(dir.Y))).ToRelativeScreenPosition());
+            
+            //DebugManager.Print(typeof(HUDManager), "Nameplate of " + aNamePlate.Name + " is now at " + aNamePlate.RelativePos);
+
+            if (aNamePlate.RelativePos.X == -1431655) throw new Exception();
+
         }
 
         public static void Rescale()
@@ -632,7 +696,7 @@ namespace Project_1.UI.HUD
         #region Loot
         public static Items.Item GetLootItem(int aSlotInLoot) => lootBox.GetItem(aSlotInLoot);
         public static void ReduceLootItem(int aSlotInLoot, int aCount) => lootBox.ReduceItem(aSlotInLoot, aCount);
-        public static void Loot(Corpse aCorpse) => lootBox.Loot(aCorpse);
+        public static void Loot(LootDrop aDrop) => lootBox.Loot(aDrop);
 
         public static void HoldItem(Item aItem, AbsoluteScreenPosition aGrabOffset) => heldItem.HoldItem(aItem, aGrabOffset);
         public static void ReleaseItem() => heldItem.ReleaseMe();

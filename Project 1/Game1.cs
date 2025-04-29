@@ -59,6 +59,8 @@ namespace Project_1
             ParticleManager.Init();
             TimeManager.Init();
             StateManager.Init(Content);
+            //InputManager.Init(ref IsActive);
+            
         }
 
         void FactoryInit()

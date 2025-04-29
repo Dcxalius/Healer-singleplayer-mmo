@@ -28,10 +28,10 @@ namespace Project_1.UI.UIElements.PlateBoxes
             numberLabel.Text = aEntity.CurrentLevel.ToString();
         }
 
-        public override void Resize(AbsoluteScreenPosition aSize)
-        {
-            Resize(aSize.ToRelativeScreenPosition());
-        }
+        //public override void Resize(AbsoluteScreenPosition aSize)
+        //{
+        //    Resize(aSize.ToRelativeScreenPosition());
+        //}
 
         public override void Resize(RelativeScreenPosition aSize)
         {

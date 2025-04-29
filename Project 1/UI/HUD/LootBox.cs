@@ -3,6 +3,7 @@ using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.Input;
+using Project_1.Items;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
@@ -16,9 +17,9 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.HUD
 {
-    internal class LootBox : Box //TODO: Make this inherit from scrollable
+    internal class LootBox : Box
     {
-        Corpse lootedCorpse;
+        LootDrop lootedDrop;
         Loot[] loot;
         ScrollableBox scrollableComponent;
 
@@ -38,38 +39,38 @@ namespace Project_1.UI.HUD
 
         public Items.Item GetItem(int aIndex)
         {
-            return lootedCorpse.Drop[aIndex];
+            return lootedDrop.Drop[aIndex];
         }
 
         public void ReduceItem(int aIndex, int aCount)
         {
-            int newCount = lootedCorpse.Drop[aIndex].Count - aCount;
+            int newCount = lootedDrop.Drop[aIndex].Count - aCount;
             Debug.Assert(newCount >= 0, "Tried to reduce items by more then it had.");
             if (newCount == 0)
             {
-                lootedCorpse.Drop[aIndex] = null;
+                lootedDrop.Drop[aIndex] = null;
                 loot[aIndex].Hide();
                 return;
             }
-            lootedCorpse.Drop[aIndex].Count -= aCount; //TODO: Make this not remove directly from property
+            lootedDrop.Drop[aIndex].Count -= aCount; //TODO: Make this not remove directly from property
         }
 
-        public void Loot(Corpse aCorpse)
+        public void Loot(LootDrop aDrop)
         {
-            if (aCorpse.IsEmpty)
+            if (aDrop.IsEmpty)
             {
                 return;
             }
 
             ClearLoot();
-            ToggleVisibilty();
-            lootedCorpse = aCorpse;
+            lootedDrop = aDrop;
+            Visible = true;
             CreateLoot();
         }
 
         void CreateLoot()
         {
-            Items.Item[] loots = lootedCorpse.Drop;
+            Items.Item[] loots = lootedDrop.Drop;
             loot = new Loot[loots.Length];
 
             for (int i = 0; i < loot.Length; i++)
@@ -97,7 +98,7 @@ namespace Project_1.UI.HUD
 
         void CheckIfShouldClose()
         {
-            if (lootedCorpse == null) return;
+            if (lootedDrop == null) return;
             
             if (CheckIfCorpseDespawned()) return;
 
@@ -108,7 +109,7 @@ namespace Project_1.UI.HUD
 
         bool CheckIfCorpseDespawned()
         {
-            if (lootedCorpse.Despawned)
+            if (lootedDrop.Despawned)
             {
                 StopLoot();
                 return true;
@@ -118,7 +119,7 @@ namespace Project_1.UI.HUD
 
         bool CheckIfOutOfRange()
         {
-            if (lootedCorpse.Centre.DistanceTo(ObjectManager.Player.FeetPosition) > lootedCorpse.LootLength)
+            if (!lootedDrop.InDistance)
             {
                 StopLoot();
                 return true;
@@ -128,7 +129,7 @@ namespace Project_1.UI.HUD
 
         void CheckIfLootedAll()
         {
-            if (lootedCorpse.IsEmpty)
+            if (lootedDrop.IsEmpty)
             {
                 StopLoot();
             }
@@ -136,7 +137,7 @@ namespace Project_1.UI.HUD
 
         public void StopLoot()
         {
-            ToggleVisibilty();
+            Visible = false;
             ClearLoot();
         }
 
@@ -144,7 +145,7 @@ namespace Project_1.UI.HUD
         {
             //children.RemoveAll(child => loot.Contains(child));
             loot = null;
-            lootedCorpse = null;
+            lootedDrop = null;
             scrollableComponent.RemoveAllScrollableElements();
         }
     }

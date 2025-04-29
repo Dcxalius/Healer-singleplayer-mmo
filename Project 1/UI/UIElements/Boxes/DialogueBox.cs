@@ -61,7 +61,7 @@ namespace Project_1.UI.UIElements.Boxes
             }
 
 
-            textToDisplay = new Label(aMessage, defaultEdgeSpacing, aSize - defaultEdgeSpacing * 2, Label.TextAllignment.TopCentre, aMessageColor);
+            textToDisplay = new Label(aMessage, defaultEdgeSpacing, RelativeScreenPosition.One - defaultEdgeSpacing * 2, Label.TextAllignment.TopCentre, aMessageColor);
             AddChild(textToDisplay);
         }
     }

@@ -162,6 +162,14 @@ namespace Project_1.Input
         static MouseState newMouseState;
         static MouseState oldMouseState;
 
+        static bool isFocused;
+
+        public static void Init(ref bool aIsFocused)
+        {
+            isFocused = aIsFocused;
+            //TODO: Find a way to make the game ignore presses/keys is the window is not in focus
+        }
+
         public static void Update()
         {
             UpdateStates();

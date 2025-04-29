@@ -14,25 +14,15 @@ using Project_1.Tiles;
 using Project_1.UI.HUD;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 using Project_1.Textures.AnimatedTextures;
 using static Project_1.GameObjects.Unit.Equipment;
 using System.Diagnostics;
 using Project_1.Items;
-using Project_1.UI.UIElements.Guild;
-using System.Security.Cryptography;
-using System.Drawing.Printing;
 using Project_1.GameObjects.Unit.Classes;
 
 namespace Project_1.GameObjects.Entities
 {
-    internal abstract class Entity : MovingObject
+    internal abstract class Entity : WorldObject
     {
         public bool Selected => ObjectManager.Player.Target == this;
         public virtual Entity Target { get => target; }
@@ -490,10 +480,7 @@ namespace Project_1.GameObjects.Entities
         {
             if (Camera.Camera.WorldRectToScreenRect(WorldRectangle).Contains(aClickEvent.AbsolutePos.ToPoint()))
             {
-                if (aClickEvent.NoModifiers())
-                {
-                    ObjectManager.Player.SetTarget(this);
-                }
+                
                 ClickedOn(aClickEvent);
 
                 return true;
@@ -503,6 +490,11 @@ namespace Project_1.GameObjects.Entities
 
         protected virtual void ClickedOn(ClickEvent aClickEvent)
         {
+            if (aClickEvent.NoModifiers())
+            {
+                ObjectManager.Player.SetTarget(this);
+            }
+
             if (aClickEvent.NoModifiers() && aClickEvent.ButtonPressed == InputManager.ClickType.Right)
             {
                 ObjectManager.Player.Party.IssueTargetOrder(this);
