@@ -12,14 +12,14 @@ namespace Project_1.UI.UIElements
     {
         Label description;
 
-        static RelativeScreenPosition CalculateSize(RelativeScreenPosition aSize) => RelativeScreenPosition.GetSquareFromY(aSize.Y); //TODO: ???????????
+        static RelativeScreenPosition CalculateSize(float aSizeY, AbsoluteScreenPosition aParentSize) => RelativeScreenPosition.GetSquareFromY(aSizeY, aParentSize);
 
-        public DescriptCheckBox(string aDescription, Color aTextColor, bool aStartState, Action aTickedAction, Action aUntickedAction, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : this(aDescription, aTextColor, aStartState, new List<Action> { aTickedAction }, new List<Action> { aUntickedAction }, aPos, aSize) { }
+        public DescriptCheckBox(string aDescription, Color aTextColor, bool aStartState, Action aTickedAction, Action aUntickedAction, RelativeScreenPosition aPos, RelativeScreenPosition aSize, AbsoluteScreenPosition aParentSize) : this(aDescription, aTextColor, aStartState, new List<Action> { aTickedAction }, new List<Action> { aUntickedAction }, aPos, aSize, aParentSize) { }
 
-        public DescriptCheckBox(string aDescription, Color aTextColor, bool aStartState, List<Action> aTickedActions, List<Action> aUntickedActions, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aStartState, aTickedActions, aUntickedActions, aPos, CalculateSize(aSize))
+        public DescriptCheckBox(string aDescription, Color aTextColor, bool aStartState, List<Action> aTickedActions, List<Action> aUntickedActions, RelativeScreenPosition aPos, RelativeScreenPosition aSize, AbsoluteScreenPosition aParentSize) : base(aStartState, aTickedActions, aUntickedActions, aPos, CalculateSize(aSize.Y, aParentSize))
         {
-            RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f, Size);
-            description = new Label(aDescription, CalculateSize(aSize).OnlyX + spacing.OnlyX, aSize - CalculateSize(aSize).OnlyX - spacing.OnlyX, Label.TextAllignment.CentreLeft, aTextColor);
+            RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.05f, Size);
+            description = new Label(aDescription, RelativeScreenPosition.One.OnlyX + spacing.OnlyX, RelativeScreenPosition.One - CalculateSize(aSize.Y, aParentSize).OnlyX - spacing.OnlyX, Label.TextAllignment.CentreLeft, aTextColor);
             capturesClick = false;
             AddChild(description);
         }

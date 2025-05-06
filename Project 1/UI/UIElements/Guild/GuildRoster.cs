@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.UIElements.Guild
 {
-    internal class GuildRoster : Box
+    internal class GuildRoster : ScrollableBox
     {
         public enum SortBy
         {
@@ -24,18 +24,15 @@ namespace Project_1.UI.UIElements.Guild
         }
         static public SortBy[] sortOrder = new SortBy[(int)SortBy.Count] { SortBy.Name, SortBy.Class, SortBy.Level };
 
-        RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
-        RelativeScreenPosition firstPosition = RelativeScreenPosition.GetSquareFromX(0.005f);
         RelativeScreenPosition size;
-        RelativeScreenPosition changeInY;
         
 
         List<GuildMemberListing> guildMembers;
-        public GuildRoster(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.AliceBlue), aPos, aSize)
+        public GuildRoster(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(10, new UITexture("WhiteBackground", Color.AliceBlue), Color.DarkSeaGreen, aPos, aSize)
         {
+            RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f, Size);
             guildMembers = new List<GuildMemberListing>();
             size = new RelativeScreenPosition(1 - spacing.X * 2, 0.05f);
-            changeInY = new RelativeScreenPosition(0, size.Y + spacing.Y);
         }
 
         public void SetGuildMemberInviteStatus(List<string> aName, List<TwoStateGFXButton.State> aState)
@@ -63,7 +60,8 @@ namespace Project_1.UI.UIElements.Guild
 
             for (int i = 0; i < aData.Length; i++)
             {
-                guildMembers.Add(new GuildMemberListing(aData[i], firstPosition + changeInY * i, size));
+                AddScrollableElement(new GuildMemberListing(aData[i], ElementSize.ToAbsoluteScreenPos(Size)));
+                //guildMembers.Add(new GuildMemberListing(aData[i], firstPosition + changeInY * i, size));
             }
             Sort();
             AddChildren(guildMembers);
@@ -71,9 +69,11 @@ namespace Project_1.UI.UIElements.Guild
 
         public void AddMember(Friendly aData)
         {
-            guildMembers.Add(new GuildMemberListing(aData, firstPosition, size));
-            AddChild(guildMembers.Last());
-            Sort();
+            AddScrollableElement(new GuildMemberListing(aData, ElementSize.ToAbsoluteScreenPos(Size)));
+
+            //guildMembers.Add(new GuildMemberListing(aData, firstPosition, size));
+            //AddChild(guildMembers.Last());
+            //Sort();
         }
 
         public void RemoveMember()
@@ -84,10 +84,10 @@ namespace Project_1.UI.UIElements.Guild
         public void Sort()
         {
             guildMembers.Sort();
-            for (int i = 0; i < guildMembers.Count; i++)
-            {
-                guildMembers[i].Move(firstPosition + changeInY * i);
-            }
+            //for (int i = 0; i < guildMembers.Count; i++)
+            //{
+            //    guildMembers[i].Move(firstPosition + changeInY * i);
+            //}
         }
     }
 }

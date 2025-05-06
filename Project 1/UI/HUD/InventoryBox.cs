@@ -25,17 +25,19 @@ namespace Project_1.UI.HUD
         BagHolderBox bagHolderBox;
         BagBox[] bagBox;
 
-        const float itemSizeX = 0.02f;
-        const float spacingX = 0.005f;
+        const float itemSizeX = 0.05f;
+        const float spacingX = 0.01f;
 
         public static RelativeScreenPosition itemSize;
         public static RelativeScreenPosition spacing;
 
         int columnCount;
+
+        // xdd i hate programing xdd 
         public InventoryBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground",new Color(80, 80, 80, 80)), aPos, aSize) //this will scale down size to closest fit
         {
-            itemSize = RelativeScreenPosition.GetSquareFromX(itemSizeX, Size);
-            spacing = RelativeScreenPosition.GetSquareFromX(spacingX, Size);
+            itemSize = RelativeScreenPosition.GetSquareFromX(itemSizeX);
+            spacing = RelativeScreenPosition.GetSquareFromX(spacingX);
 
             visibleKey = KeyBindManager.KeyListner.Inventory;
             Visible = false;

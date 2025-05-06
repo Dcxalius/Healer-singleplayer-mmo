@@ -28,11 +28,11 @@ namespace Project_1.UI.HUD.Windows
 
         protected virtual int BagIndexForItem => -3;
 
-        static RelativeScreenPosition itemSize = RelativeScreenPosition.GetSquareFromY(0.05f, WindowSize.ToAbsoluteScreenPos());
-        static RelativeScreenPosition itemSpacing = RelativeScreenPosition.GetSquareFromY(0.003f, WindowSize.ToAbsoluteScreenPos());
+        static RelativeScreenPosition itemSize = RelativeScreenPosition.GetSquareFromY(0.09f, WindowSize.ToAbsoluteScreenPos());
+        static RelativeScreenPosition itemSpacing = RelativeScreenPosition.GetSquareFromY(0.01f, WindowSize.ToAbsoluteScreenPos());
         static RelativeScreenPosition leftSideTop = itemSpacing;
-        static RelativeScreenPosition bottomSideLeft = new RelativeScreenPosition(1 / 2f - itemSize.X * 1.5f - itemSpacing.X, (itemSize.Y + itemSpacing.Y) * (int)Equipment.Slot.Hands + itemSpacing.Y);
         static RelativeScreenPosition rightSideTop = new RelativeScreenPosition(1f - itemSpacing.X - itemSize.X, itemSpacing.Y);
+        static RelativeScreenPosition bottomSideLeft = new RelativeScreenPosition(1 / 2f - itemSize.X * 1.5f - itemSpacing.X, (itemSize.Y + itemSpacing.Y) * (int)Equipment.Slot.Hands + itemSpacing.Y);
 
         static RelativeScreenPosition expBarSize = new RelativeScreenPosition(1f, 0.05f);
         static RelativeScreenPosition expBarPos = new RelativeScreenPosition(0, 1f - expBarSize.Y);
@@ -78,7 +78,7 @@ namespace Project_1.UI.HUD.Windows
         {
             for (int i = (int)aStart; i <= (int)aEnd; i++)
             {
-                equiped[i] = new Item(BagIndexForItem, i, true, Color.DarkGray, new GfxPath(GfxType.Item, null), aStartPos + aChangeInPos * (i - (int)aStart), itemSize);
+                equiped[i] = new Item(BagIndexForItem, i, true, Color.Teal, new GfxPath(GfxType.Item, null), aStartPos + aChangeInPos * (i - (int)aStart), itemSize);
             }
         }
 

@@ -42,11 +42,12 @@ namespace Project_1.UI.UIElements.Guild
         }
 
 
-        public GuildMemberListing(Friendly aFriendly, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.Pink), aPos, aSize) //TODO: Make this sortable
+        public GuildMemberListing(Friendly aFriendly, AbsoluteScreenPosition aSizeForButtonScaling) : base(new UITexture("WhiteBackground", Color.Pink), RelativeScreenPosition.One, RelativeScreenPosition.One) //TODO: Make this sortable
         {
             friendly = aFriendly;
 
-            buttonSize = RelativeScreenPosition.GetSquareFromY(1 - spacing.Y - spacing.Y);
+            spacing = RelativeScreenPosition.GetSquareFromX(0.005f, aSizeForButtonScaling);
+            buttonSize = RelativeScreenPosition.GetSquareFromY(1 - spacing.Y * 2, aSizeForButtonScaling);
             buttonPos = new RelativeScreenPosition(1, spacing.Y);
             changeInY = new RelativeScreenPosition(-buttonSize.X - spacing.X, 0);
             

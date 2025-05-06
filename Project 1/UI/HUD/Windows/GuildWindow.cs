@@ -31,7 +31,8 @@ namespace Project_1.UI.HUD.Windows
         }
         public GuildWindow() : base(new UITexture("WhiteBackground", Color.SaddleBrown))
         {
-            roster = new GuildRoster(RelativeScreenPosition.Zero, new RelativeScreenPosition(1, 0.17f));
+            RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.03f, Size);
+            roster = new GuildRoster(spacing, new RelativeScreenPosition(1, 0.8f) - spacing * 2);
             visibleKey = Input.KeyBindManager.KeyListner.GuildRoster;
 
             AddChild(roster);
