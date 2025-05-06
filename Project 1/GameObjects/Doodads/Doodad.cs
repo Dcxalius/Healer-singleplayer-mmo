@@ -11,7 +11,7 @@ namespace Project_1.GameObjects.Doodads
 {
     internal class Doodad : WorldObject
     {
-        float maximumClickDistance = 5;
+        float maximumClickDistance = 500;
 
         public Doodad(Texture aTexture, WorldSpace aStartingPos) : base(aTexture, aStartingPos)
         {

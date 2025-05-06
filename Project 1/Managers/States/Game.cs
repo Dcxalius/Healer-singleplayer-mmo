@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects;
+using Project_1.GameObjects.Doodads;
 using Project_1.GameObjects.Spawners;
 using Project_1.Input;
 using Project_1.Particles;
@@ -25,6 +26,7 @@ namespace Project_1.Managers.States
         {
             HUDManager.Init();
             ObjectManager.Init();
+            DoodadManager.Init();
             TileManager.Init();
 
             spriteBatch = GraphicsManager.CreateSpriteBatch();
@@ -40,6 +42,7 @@ namespace Project_1.Managers.States
             }
             Camera.Camera.Update();
             ObjectManager.Update();
+            DoodadManager.Update();
             SpawnerManager.Update();
             ParticleManager.Update();
             base.Update();
@@ -55,8 +58,9 @@ namespace Project_1.Managers.States
         public override bool Click(ClickEvent aClickEvent)
         {
             if (base.Click(aClickEvent)) return true;
-
-            return ObjectManager.Click(aClickEvent);
+            if (ObjectManager.Click(aClickEvent)) return true;
+            if (DoodadManager.Click(aClickEvent)) return true;
+            return ObjectManager.ClickGround(aClickEvent);
         }
 
 
@@ -97,6 +101,7 @@ namespace Project_1.Managers.States
         {
 
             TileManager.Draw(aBatch);
+            DoodadManager.Draw(aBatch);
             ObjectManager.Draw(aBatch);
             SpawnerManager.Draw(aBatch);
             ParticleManager.Draw(aBatch);

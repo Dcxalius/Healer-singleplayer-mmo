@@ -84,6 +84,8 @@ namespace Project_1.GameObjects
             {
                 effects[i].Draw(aBatch, Position, FeetPosition.Y + 0.01f);
             }
+
+            //TODO: change name of effects to ground effects and move them here
         }
     }
 }

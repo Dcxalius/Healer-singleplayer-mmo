@@ -124,7 +124,10 @@ namespace Project_1.Items
                     return new Item(aLoot);
                 case ItemData.ItemType.Consumable:
                     return new Consumable(aLoot);
-
+                case ItemData.ItemType.Weapon:
+                    return new Weapon(aLoot);
+                case ItemData.ItemType.Equipment:
+                    return new Equipment(aLoot);
                 default:
                     throw new NotImplementedException();
             }

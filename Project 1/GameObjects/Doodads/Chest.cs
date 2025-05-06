@@ -15,7 +15,8 @@ namespace Project_1.GameObjects.Doodads
     internal class Chest : Doodad
     {
         static LootTable t = LootFactory.GetData("Chest");
-        public Chest(Texture aTexture, WorldSpace aStartingPos) : base(new Texture(new GfxPath(GfxType.Object, "Chest")), aStartingPos)
+        LootDrop lootDrop;
+        public Chest(WorldSpace aStartingPos) : base(new Texture(new GfxPath(GfxType.Object, "Chest")), aStartingPos)
         {
             
         }
@@ -24,7 +25,9 @@ namespace Project_1.GameObjects.Doodads
         {
             base.ClickedOn(aEvent);
 
-            HUDManager.Loot(t.GenerateDrop(this));
+            if (lootDrop == null) lootDrop = t.GenerateDrop(this);
+
+            HUDManager.Loot(lootDrop);
         }
     }
 }

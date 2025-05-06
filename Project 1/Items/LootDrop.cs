@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.Items
 {
-    internal class LootDrop
+    internal class LootDrop //TODO: Better name?
     {
         public Item[] Drop => drop;
         Item[] drop;

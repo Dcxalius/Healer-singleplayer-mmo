@@ -245,10 +245,14 @@ namespace Project_1.GameObjects
                 if (corpses[i].Click(aClickEvent)) return true; 
             }
 
+            return false;
+        }
 
+        public static bool ClickGround(ClickEvent aClickEvent)
+        {
             if (LeftClickedGround(aClickEvent)) return true;
             if (RightClickGround(aClickEvent)) return true;
-
+            //if (MiddleClickGround(aClickEvent)) return true;
             return false;
         }
 
