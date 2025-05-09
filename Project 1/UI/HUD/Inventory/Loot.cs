@@ -5,6 +5,7 @@ using Project_1.Input;
 using Project_1.Items;
 using Project_1.Textures;
 using Project_1.UI.HUD;
+using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI.UIElements.Inventory
+namespace Project_1.UI.HUD.Inventory
 {
     internal class Loot : Box
     {
@@ -44,7 +45,7 @@ namespace Project_1.UI.UIElements.Inventory
             itemName.Move(itemSize.OnlyX + Spacing + Spacing.OnlyX);
             itemName.Resize(RelativeScreenPosition.One - itemSize.OnlyX - Spacing * 2);
 
-            
+
         }
 
         public void Hide()

@@ -40,7 +40,7 @@ namespace Project_1.Camera
 
 
 
-        static public AbsoluteScreenPosition FromRelativeScreenPosition(RelativeScreenPosition aRelativePosition, AbsoluteScreenPosition? aContext = null) //TODO: Make this take in scope
+        static public AbsoluteScreenPosition FromRelativeScreenPosition(RelativeScreenPosition aRelativePosition, AbsoluteScreenPosition? aContext = null)
         {
             if (!aContext.HasValue) return new AbsoluteScreenPosition((int)(Camera.ScreenRectangle.Width * aRelativePosition.X), (int)(Camera.ScreenRectangle.Height * aRelativePosition.Y));
             return new AbsoluteScreenPosition((int)(aContext.Value.X * aRelativePosition.X), (int)(aContext.Value.Y * aRelativePosition.Y));

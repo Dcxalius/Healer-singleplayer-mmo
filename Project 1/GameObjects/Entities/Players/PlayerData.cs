@@ -5,7 +5,6 @@ using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Unit;
 using Project_1.Items;
 using Project_1.UI.HUD;
-using Project_1.UI.UIElements.SpellBook;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,7 +30,7 @@ namespace Project_1.GameObjects.Entities.Players
         SpellBook spellBook;
 
         [JsonProperty("SpellOnBar")]
-        string[] spellsOnBar => HUDManager.SaveSpellBar;
+        string[] SpellsOnBar => HUDManager.SaveSpellBar;
 
         [JsonIgnore]
         public string[] SavedSpellsOnBar => spellOnBar;

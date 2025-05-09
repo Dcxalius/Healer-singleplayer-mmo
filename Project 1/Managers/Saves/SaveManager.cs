@@ -21,8 +21,11 @@ namespace Project_1.Managers
         static string saveFolder;
         public static string Settings => contentRootDirectory + "\\Settings";
         public static string HudSettings => Settings + "\\Hud.set";
+        public static string CameraSettings => Settings + "\\Camera.set";
+
         public static string DefaultSettings => Settings + "\\Default";
         public static string DefaultHudSettings => DefaultSettings + "\\Hud.def";
+        public static string DefaultCameraSettings => DefaultSettings + "\\Camera.def";
         public static Save[] Saves => saves.ToArray();
         static List<Save> saves;
 

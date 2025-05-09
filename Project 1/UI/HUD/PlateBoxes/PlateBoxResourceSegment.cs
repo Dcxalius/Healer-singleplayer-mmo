@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI.UIElements.PlateBoxes
+namespace Project_1.UI.HUD.PlateBoxes
 {
     internal class PlateBoxResourceSegment : PlateBoxSegment
     {
@@ -18,7 +18,7 @@ namespace Project_1.UI.UIElements.PlateBoxes
         public PlateBoxResourceSegment(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, aPos, aSize)
         {
             resourceBar = new ResourceBar(new BarTexture(BarTexture.FillingDirection.Right, Color.White), new UITexture("WhiteBackground", backgroundColor), RelativeScreenPosition.Zero, RelativeScreenPosition.One);
-            
+
             AddChild(resourceBar);
         }
 

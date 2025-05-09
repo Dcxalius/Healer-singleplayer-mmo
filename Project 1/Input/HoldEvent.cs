@@ -13,7 +13,6 @@ namespace Project_1.Input
         double heldSince;
         
         public double DurationHeld => TimeManager.InstanceTotalFrameTime - heldSince;
-        double durationHeld;
         public InputManager.ClickType ClickThatCreated { get => clickEventThatTriggered.ButtonPressed; }
         public Camera.RelativeScreenPosition Offset => offset;
         Camera.RelativeScreenPosition offset;

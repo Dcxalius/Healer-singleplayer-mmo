@@ -18,7 +18,6 @@ using Project_1.GameObjects.Spells;
 using Project_1.Camera;
 using Project_1.UI.UIElements.Buttons;
 using System.Diagnostics;
-using Project_1.UI.UIElements.SpellBook;
 
 namespace Project_1.GameObjects.Entities.Players
 {

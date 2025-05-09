@@ -14,7 +14,7 @@ using Project_1.GameObjects.Entities.Players;
 using Project_1.Camera;
 using Project_1.UI.UIElements.Buttons;
 
-namespace Project_1.UI.UIElements.SpellBook
+namespace Project_1.UI.HUD.SpellBook
 {
     internal class SpellButton : GFXButton
     {

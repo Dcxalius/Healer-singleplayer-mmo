@@ -17,11 +17,14 @@ namespace Project_1.GameObjects.Entities.GroundEffect
         {
         }
 
-        public void Draw(SpriteBatch aBatch, Entity aOwner)
+        public override void Draw(SpriteBatch aBatch, WorldObject aOwner)
         {
-            if (aOwner.Selected == true)
+            if (aOwner is not Entity) return;
+
+            Entity entityOwner = aOwner as Entity;
+            if (entityOwner.Selected == true)
             {
-                Draw(aBatch, aOwner.FeetPosition, aOwner.RelationColor, 1);
+                Draw(aBatch, entityOwner.ScreenRect, entityOwner.RelationColor, entityOwner.FeetPosition.Y - 1);
             }
         }
     }

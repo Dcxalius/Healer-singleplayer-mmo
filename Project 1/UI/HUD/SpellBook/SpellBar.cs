@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects.Spells;
 using Project_1.Textures;
+using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI.UIElements.SpellBook
+namespace Project_1.UI.HUD.SpellBook
 {
     internal class SpellBar : Box
     {
@@ -39,7 +40,7 @@ namespace Project_1.UI.UIElements.SpellBook
             Debug.Assert(aSpells.Length == spellButtons.Length);
             for (int i = 0; i < aSpells.Length; i++)
             {
-                
+
                 //if (aSpells[i] == null)
                 //{
                 //    spellButtons[i].AssignSpell(null);

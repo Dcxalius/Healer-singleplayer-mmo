@@ -610,7 +610,7 @@ namespace Project_1.Items
 
             Equipment equipment = item as Equipment;
             if (item.ItemType == ItemData.ItemType.Weapon && !aFriendly.ClassData.WeaponsAllowed.HasFlag((equipment as Weapon).WeaponData.WeaponType)) return;
-            GameObjects.Unit.Equipment wearing = aFriendly.Equipment;
+           
 
             if (equipment.type == Equipment.Type.TwoHander)
             {

@@ -6,7 +6,6 @@ using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.Input;
 using Project_1.Textures;
-using Project_1.UI.UIElements.PlateBoxes;
 using System;
 using System.Collections.Generic;
 using System.Linq;

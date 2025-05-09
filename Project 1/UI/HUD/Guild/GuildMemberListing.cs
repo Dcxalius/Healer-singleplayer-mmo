@@ -3,6 +3,7 @@ using Project_1.Camera;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.Textures;
+using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
 using Project_1.UI.UIElements.Buttons;
 using SharpDX.XAudio2;
@@ -15,7 +16,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms.Design.Behavior;
 
-namespace Project_1.UI.UIElements.Guild
+namespace Project_1.UI.HUD.Guild
 {
     internal class GuildMemberListing : Box, IComparable //TODO: Should this be button?
     {
@@ -50,7 +51,7 @@ namespace Project_1.UI.UIElements.Guild
             buttonSize = RelativeScreenPosition.GetSquareFromY(1 - spacing.Y * 2, aSizeForButtonScaling);
             buttonPos = new RelativeScreenPosition(1, spacing.Y);
             changeInY = new RelativeScreenPosition(-buttonSize.X - spacing.X, 0);
-            
+
             openInspectWindow = new OpenInspectWindow(friendly, GetButtonPos, buttonSize);
             openInventory = new OpenInventory(GetButtonPos, buttonSize);
 
@@ -79,7 +80,7 @@ namespace Project_1.UI.UIElements.Guild
             invite.state = aState;
         }
 
-        public void RefreshData(GameObjects.Entities.GuildMember.GuildMemberData aGuildMember)
+        public void RefreshData(GuildMember.GuildMemberData aGuildMember)
         {
             name.Text = aGuildMember.Name;
             level.Text = aGuildMember.Level;

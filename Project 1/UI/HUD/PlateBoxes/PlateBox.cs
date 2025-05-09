@@ -5,6 +5,7 @@ using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Unit;
 using Project_1.Textures;
+using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI.UIElements.PlateBoxes
+namespace Project_1.UI.HUD.PlateBoxes
 {
     internal abstract class PlateBox : Box
     {
@@ -23,7 +24,7 @@ namespace Project_1.UI.UIElements.PlateBoxes
 
         protected LevelCircle levelCircle;
 
-       
+
         public PlateBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", Color.White), aPos, aSize)
         {
             RelativeScreenPosition levelCircleSize = RelativeScreenPosition.GetSquareFromX(0.05f, Size);

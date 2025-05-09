@@ -338,7 +338,7 @@ namespace Project_1.Camera
             if (velocity.X == float.NaN || velocity.Y == float.NaN)
             {
                 Debug.Assert(false);
-                velocity = WorldSpace.Zero; //TODO: Track down this bug
+                velocity = WorldSpace.Zero;
             }
             momentum += velocity;
 

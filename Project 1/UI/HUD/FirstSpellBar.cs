@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.Textures;
-using Project_1.UI.UIElements.SpellBook;
+using Project_1.UI.HUD.SpellBook;
 using System;
 using System.Collections.Generic;
 using System.Linq;

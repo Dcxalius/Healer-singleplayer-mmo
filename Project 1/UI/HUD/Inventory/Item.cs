@@ -18,7 +18,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI.UIElements.Inventory
+namespace Project_1.UI.HUD.Inventory
 {
     internal class Item : GFXButton
     {
@@ -39,14 +39,14 @@ namespace Project_1.UI.UIElements.Inventory
         protected Text itemCount;
 
 
-        public Items.Item GetActualItem 
+        public Items.Item GetActualItem
         {
             get
             {
                 if (bagIndex >= 0) return ObjectManager.Player.Inventory.GetItemInSlot(Index);
-                
+
                 if (bagIndex == -1) return ObjectManager.Player.Inventory.GetBag(slotIndex);
-                
+
                 if (bagIndex == -2) return HUDManager.GetLootItem(slotIndex);
 
                 if (bagIndex == -3) return ObjectManager.Player.Equipment.EquipedInSlot((GameObjects.Unit.Equipment.Slot)slotIndex);
@@ -121,7 +121,7 @@ namespace Project_1.UI.UIElements.Inventory
             Color = Color.DarkGray;
         }
 
-        
+
 
         public override void ReleaseOnMe(ReleaseEvent aRelease)
         {
@@ -206,7 +206,7 @@ namespace Project_1.UI.UIElements.Inventory
         bool FromCharacterPane(Item aItemDroppedOnMe)
         {
             if (aItemDroppedOnMe.bagIndex != -3) return false;
-            
+
             if (bagIndex == -3)
             {
                 Equipment thisItem = GetActualItem as Equipment;
@@ -249,7 +249,7 @@ namespace Project_1.UI.UIElements.Inventory
 
                 return true;
             }
-            
+
 
             return true; //TODO: If dropped on gear for the same slot it should equip it if dropped on anything else it should dequip it
 
@@ -435,8 +435,7 @@ namespace Project_1.UI.UIElements.Inventory
         {
 
             base.Draw(aBatch);
-            itemCount.CentreRightDraw(aBatch, new AbsoluteScreenPosition((AbsolutePos.Location + AbsolutePos.Size)) - new AbsoluteScreenPosition(0, (int)itemCount.Offset.Y / 2));
-            itemCount.CentreLeftDraw(aBatch, RelativePos.ToAbsoluteScreenPos());
+            itemCount.CentreRightDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Location + AbsolutePos.Size) - new AbsoluteScreenPosition(0, (int)itemCount.Offset.Y / 2));
         }
     }
 }

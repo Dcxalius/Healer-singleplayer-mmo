@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI.UIElements.Guild
+namespace Project_1.UI.HUD.Guild
 {
     internal class GuildRoster : ScrollableBox
     {
@@ -25,7 +25,7 @@ namespace Project_1.UI.UIElements.Guild
         static public SortBy[] sortOrder = new SortBy[(int)SortBy.Count] { SortBy.Name, SortBy.Class, SortBy.Level };
 
         RelativeScreenPosition size;
-        
+
 
         List<GuildMemberListing> guildMembers;
         public GuildRoster(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(10, new UITexture("WhiteBackground", Color.AliceBlue), Color.DarkSeaGreen, aPos, aSize)

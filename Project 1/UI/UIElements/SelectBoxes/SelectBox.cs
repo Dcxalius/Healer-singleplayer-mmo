@@ -18,7 +18,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
     internal abstract class SelectBox : Box
     {
         bool isOpen;
-        //TODO: float openMaxSize;
+
         protected SelectBoxValue[] values;
         int selectedValue;
         protected SelectBoxValueDisplay displayValue;

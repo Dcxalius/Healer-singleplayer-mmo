@@ -1,4 +1,5 @@
 ﻿using Project_1.Camera;
+using Project_1.GameObjects.Entities.GroundEffect;
 using Project_1.Input;
 using Project_1.Textures;
 using System;
@@ -15,7 +16,9 @@ namespace Project_1.GameObjects.Doodads
 
         public Doodad(Texture aTexture, WorldSpace aStartingPos) : base(aTexture, aStartingPos)
         {
+            groundEffects.Add(new Shadow());
         }
+
 
         public override float MaxSpeed => 0;
 

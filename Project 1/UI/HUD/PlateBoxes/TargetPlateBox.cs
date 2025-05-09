@@ -8,7 +8,6 @@ using Project_1.GameObjects.Unit;
 using Project_1.Input;
 using Project_1.Managers.States;
 using Project_1.UI.UIElements;
-using Project_1.UI.UIElements.PlateBoxes;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI.UIElements.Inventory
+namespace Project_1.UI.HUD.Inventory
 {
     internal class HeldItem
     {
@@ -43,7 +43,7 @@ namespace Project_1.UI.UIElements.Inventory
                 return;
             }
 
-            Rectangle pos = new Rectangle((InputManager.GetMousePosAbsolute() - grabOffset), size);
+            Rectangle pos = new Rectangle(InputManager.GetMousePosAbsolute() - grabOffset, size);
             Color transparent = new Color(80, 80, 80, 80);
             heldItem.Gfx.Draw(aBatch, pos, transparent);
             heldItem.GfxOnButton.Draw(aBatch, pos, transparent);

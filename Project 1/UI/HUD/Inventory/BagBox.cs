@@ -10,7 +10,7 @@ using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;
 
-namespace Project_1.UI.UIElements.Inventory
+namespace Project_1.UI.HUD.Inventory
 {
     internal class BagBox : Box
     {
@@ -18,7 +18,7 @@ namespace Project_1.UI.UIElements.Inventory
         Item[] slots;
         int columnCount;
         int bagNr;
-        
+
 
         public BagBox(Items.Inventory aInventory, int aBagNr, int aSlotCount, int aColumnCount, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.Beige), aPos, aSize)
         {
@@ -30,9 +30,10 @@ namespace Project_1.UI.UIElements.Inventory
         {
             if (aSlotCount == 0)
             {
-                MakeZero();
+                Empty();
                 return;
             }
+
             slots = new Item[aSlotCount];
 
             columnCount = aColumnCount;
@@ -41,17 +42,22 @@ namespace Project_1.UI.UIElements.Inventory
             float rowCount = (float)Math.Ceiling(aSlotCount / (double)aColumnCount);
 
             RelativeScreenPosition newSize = new RelativeScreenPosition();
-            newSize.X = aColumnCount * InventoryBox.itemSize.X + aColumnCount * InventoryBox.spacing.X + InventoryBox.spacing.X;
-            newSize.Y = rowCount * InventoryBox.itemSize.Y + (rowCount + 1) * InventoryBox.spacing.Y;
+
+            RelativeScreenPosition itemSize = InventoryBox.itemSize.ToRelativeScreenPosition();
+            newSize.X = aColumnCount * itemSize.X + aColumnCount * InventoryBox.spacing.X + InventoryBox.spacing.X;
+            newSize.Y = rowCount * itemSize.Y + (rowCount + 1) * InventoryBox.spacing.Y;
 
             Resize(newSize);
+            RelativeScreenPosition fml = InventoryBox.spacing.ToAbsoluteScreenPos().ToRelativeScreenPosition(Size);
 
+            itemSize = itemSize.ToAbsoluteScreenPos().ToRelativeScreenPosition(Size);
+            //itemSize = InventoryBox.xdd(Size);
             for (int i = 0; i < slots.Length; i++)
             {
-                float x = ((i % columnCount) * ((InventoryBox.itemSize.X + InventoryBox.spacing.X)) + InventoryBox.spacing.X);
-                float y = InventoryBox.spacing.Y + (InventoryBox.itemSize.Y + InventoryBox.spacing.Y) * (float)Math.Floor((double)i / columnCount);
+                float x = i % columnCount * (itemSize.X + fml.X) + fml.X;
+                float y = fml.Y + (itemSize.Y + fml.Y) * (float)Math.Floor((double)i / columnCount);
                 RelativeScreenPosition pos = new RelativeScreenPosition(x, y);
-                RelativeScreenPosition size = InventoryBox.itemSize;
+                RelativeScreenPosition size = InventoryBox.xdd(Size);
 
                 if (items[i] != null)
                 {
@@ -71,7 +77,7 @@ namespace Project_1.UI.UIElements.Inventory
             base.Resize(aSize);
         }
 
-        void MakeZero()
+        void Empty()
         {
             KillAllChildren();
             Resize(RelativeScreenPosition.Zero);

@@ -17,7 +17,7 @@ namespace Project_1.GameObjects.Entities.GroundEffect
         {
         }
 
-        public void Draw(SpriteBatch aBatch, Entity aOwner)
+        public override void Draw(SpriteBatch aBatch, WorldObject aOwner)
         {
             Color shadowColor = Color.Black;
             if (aOwner.GetType() == typeof(GuildMember))
@@ -28,7 +28,7 @@ namespace Project_1.GameObjects.Entities.GroundEffect
                 }
             }
 
-            Draw(aBatch, aOwner.FeetPosition, shadowColor, 2);
+            Draw(aBatch, aOwner.ScreenRect, shadowColor, aOwner.FeetPosition.Y - 2);
 
         }
     }

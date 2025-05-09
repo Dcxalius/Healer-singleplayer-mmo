@@ -10,16 +10,14 @@ using Project_1.Input;
 using Project_1.Items;
 using Project_1.Managers;
 using Project_1.Textures;
+using Project_1.UI.HUD.Inventory;
 using Project_1.UI.HUD.PlateBoxes;
+using Project_1.UI.HUD.SpellBook;
 using Project_1.UI.HUD.Windows;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Bars;
 using Project_1.UI.UIElements.Boxes;
 using Project_1.UI.UIElements.Buttons;
-using Project_1.UI.UIElements.Guild;
-using Project_1.UI.UIElements.Inventory;
-using Project_1.UI.UIElements.PlateBoxes;
-using Project_1.UI.UIElements.SpellBook;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,7 +26,7 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
-using Item = Project_1.UI.UIElements.Inventory.Item;
+using Item = Project_1.UI.HUD.Inventory.Item;
 
 namespace Project_1.UI.HUD
 {
@@ -58,9 +56,12 @@ namespace Project_1.UI.HUD
 
         static List<(string, RelativeScreenPosition, RelativeScreenPosition)> LoadedSettings;
 
+        public static bool HudMoving => hudMoving;
+        static bool hudMoving;
         public static void Init()
         {
-            SetSettings();
+            hudMoving = false;
+            ImportSettings();
 
             hudElements = new List<UIElement>();
             InitPlateBoxes();
@@ -90,7 +91,7 @@ namespace Project_1.UI.HUD
 
         }
 
-        static void SetSettings()
+        static void ImportSettings()
         {
             if (File.Exists(SaveManager.HudSettings))
             {
@@ -564,9 +565,9 @@ namespace Project_1.UI.HUD
         #endregion
 
         #region Inventory
-        public static void SetInventory(Inventory aInventory) => inventoryBox.SetInventory(aInventory);
-        public static void RefreshInventorySlot(int aBag, int aSlot, Inventory aInventory) => inventoryBox.RefreshSlot(aBag, aSlot, aInventory);
-        public static void RefreshInventorySlot((int, int) aBagAndSlot, Inventory aInventory) => RefreshInventorySlot(aBagAndSlot.Item1, aBagAndSlot.Item2, aInventory);
+        public static void SetInventory(Items.Inventory aInventory) => inventoryBox.SetInventory(aInventory);
+        public static void RefreshInventorySlot(int aBag, int aSlot, Items.Inventory aInventory) => inventoryBox.RefreshSlot(aBag, aSlot, aInventory);
+        public static void RefreshInventorySlot((int, int) aBagAndSlot, Items.Inventory aInventory) => RefreshInventorySlot(aBagAndSlot.Item1, aBagAndSlot.Item2, aInventory);
 
         public static void SetDescriptorBox(Item aItem) => descriptorBox.SetToItem(aItem);
 

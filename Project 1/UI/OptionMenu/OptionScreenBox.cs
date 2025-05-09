@@ -18,7 +18,7 @@ namespace Project_1.UI.OptionMenu
 
         public OptionScreenBox(int aCountOfButtons, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, aPos, aSize)
         {
-            RelativeScreenPosition buttonSize = new RelativeScreenPosition(aSize.X / aCountOfButtons, aSize.Y);
+            RelativeScreenPosition buttonSize = new RelativeScreenPosition(1f / aCountOfButtons, 1);
             videoOptionsButton = new VideoOptionsButton(new RelativeScreenPosition(0), buttonSize);
             keybindingsOptionButton = new KeybindingsOptionButton(new RelativeScreenPosition(buttonSize.X, 0), buttonSize);
 

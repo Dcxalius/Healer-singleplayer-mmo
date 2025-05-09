@@ -33,7 +33,6 @@ namespace Project_1
 
         protected override void Initialize() //TODO: Split all Inits so that all calls that are independant are called first and only after that the dependant ones are called
         {
-            Camera.Camera.Init();
             ManagerInit();
             FactoryInit();
             ClassSelector.Init(Content);
@@ -52,6 +51,7 @@ namespace Project_1
         {
             DebugManager.Init();
             SaveManager.Init(Content);
+            Camera.Camera.Init();
             RandomManager.Init();
             TextureManager.Init(Content);
             KeyBindManager.Init(Content);
@@ -59,8 +59,10 @@ namespace Project_1
             ParticleManager.Init();
             TimeManager.Init();
             StateManager.Init(Content);
+
+
             //InputManager.Init(ref IsActive);
-            
+
         }
 
         void FactoryInit()

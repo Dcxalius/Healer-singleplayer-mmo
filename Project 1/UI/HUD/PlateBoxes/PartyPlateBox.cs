@@ -4,7 +4,6 @@ using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.Input;
 using Project_1.UI.UIElements;
-using Project_1.UI.UIElements.PlateBoxes;
 using System;
 using System.Collections.Generic;
 using System.Linq;

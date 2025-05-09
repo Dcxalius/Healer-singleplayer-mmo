@@ -54,7 +54,7 @@ namespace Project_1.Camera
             WorldSpace topLeft = Camera.CentreInWorldSpace * Camera.Scale - new WorldSpace(Camera.ScreenSize.ToVector2() / 2);
 
             //return new AbsoluteScreenPosition((int)Math.Round(this.X * Camera.Scale - topLeft.X, MidpointRounding.ToPositiveInfinity), (int)Math.Round(this.Y * Camera.Scale - topLeft.Y, MidpointRounding.ToPositiveInfinity));
-            return new AbsoluteScreenPosition((int)Math.Floor(this.X * Camera.Scale - topLeft.X), (int)Math.Floor(this.Y * Camera.Scale - topLeft.Y)); //TODO: Find out wtf is wrong with this.
+            return new AbsoluteScreenPosition((int)Math.Floor(this.X * Camera.Scale - topLeft.X), (int)Math.Floor(this.Y * Camera.Scale - topLeft.Y));
         }
         public static WorldSpace FromRelativeScreenSpace(RelativeScreenPosition aScreenSpace)
         {

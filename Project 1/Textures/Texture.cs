@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 
 namespace Project_1.Textures
 {
-    [DebuggerStepThrough]
     internal class Texture
     {
         protected Texture2D gfx;
@@ -78,7 +77,7 @@ namespace Project_1.Textures
 
         public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, float aFeetPosY) => Draw(aBatch, aPos, color, offset, aFeetPosY);
 
-        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, Color aColor, float aFeetPosY) => Draw(aBatch, aPos, aColor, offset, aFeetPosY);
+        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, Color aColor, float aFeetPosY) => Draw(aBatch, aPos, aColor, offset, aFeetPosY); //TODO: Remove these?
 
         public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, Color aColor, Vector2 aOffset, float aFeetPosY)
         {
@@ -104,5 +103,14 @@ namespace Project_1.Textures
             }
         }
 
+        public virtual void Draw(SpriteBatch aBatch, Rectangle aPos, Color aColor, Vector2 aOffset, float aFeetPosY)
+        {
+            if (gfx == null) return;
+
+            //if (Camera.Camera.MomAmIInFrame(aPos * Camera.Camera.Scale)) TODO: Make this check if its in frame.
+            {
+                aBatch.Draw(gfx, aPos, visible, aColor, rotation, aOffset, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y)); 
+            }
+        }
     }
 }

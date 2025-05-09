@@ -4,14 +4,13 @@ using Project_1.Camera;
 using Project_1.GameObjects.Spells;
 using Project_1.Input;
 using Project_1.Textures;
-using Project_1.UI.UIElements.Inventory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI.UIElements.SpellBook
+namespace Project_1.UI.HUD.SpellBook
 {
     internal class HeldSpell
     {
@@ -46,6 +45,6 @@ namespace Project_1.UI.UIElements.SpellBook
             Color transparent = new Color(80, 80, 80, 80);
             gfx.Draw(aBatch, pos, transparent);
         }
-            
+
     }
 }

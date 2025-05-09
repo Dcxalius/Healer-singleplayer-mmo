@@ -185,9 +185,6 @@ namespace Project_1.UI.UIElements
 
         protected UIElement(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) //aPos and aSize should be between 0 and 1
         {
-            //TODO: Make it so aPos and aSize is parent relative
-            //If no parent 0 0 should refer to top left of game screen and 1 1 should refer to bottom right of game screen
-            //If parent 0 0 should refer to top left of parent and 1 1 should refer to bottom right of game screen
             visible = true;
             gfx = aGfx;
 
@@ -589,13 +586,10 @@ namespace Project_1.UI.UIElements
         {
             if (!hudMoveable) return;
 
-            if (gfx != null)
-            {
-                gfx.Draw(aBatch, AbsolutePos);
-            }
+            if (gfx != null) gfx.Draw(aBatch, AbsolutePos);
 
             movableGFX.Draw(aBatch, AbsolutePos);
-            nameText.CentredDraw(aBatch, Location + Size / 2 - new AbsoluteScreenPosition(nameText.Offset.ToPoint()) / 2);
+            nameText.CentredDraw(aBatch, Location + Size / 2);
 
         }
 

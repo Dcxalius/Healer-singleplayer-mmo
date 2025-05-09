@@ -31,7 +31,7 @@ namespace Project_1.Managers.States
         }
         public override bool Scroll(ScrollEvent aScrollEvent)
         {
-            throw new NotImplementedException();
+            return OptionManager.Scroll(aScrollEvent);
         }
 
         public override void Rescale()
@@ -49,7 +49,7 @@ namespace Project_1.Managers.States
         }
         public override RenderTarget2D Draw()
         {
-            PrepRender(Color.Pink);
+            PrepRender(Color.Pink, sortMode: SpriteSortMode.Immediate, rasterizerState: new RasterizerState() { ScissorTestEnable = true });
 
             OptionManager.Draw(spriteBatch);
 

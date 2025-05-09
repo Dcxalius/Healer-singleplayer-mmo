@@ -55,27 +55,11 @@ namespace Project_1.UI.OptionMenu
             };
         }
 
-        static RelativeScreenPosition keybindingStartPos = new RelativeScreenPosition(0.2f, 0.1f);
-        static RelativeScreenPosition keybindingSize = new RelativeScreenPosition(0.5f, 0.05f);
-        static RelativeScreenPosition keybindingSpacing = new RelativeScreenPosition(0, 0.01f);
-        static RelativeScreenPosition GetKeybindingPos
-        {
-            get
-            {
-                RelativeScreenPosition r = keybindingStartPos;
-                keybindingStartPos.Y += keybindingSize.Y + keybindingSpacing.Y;
-
-                return r;
-            }
-        }
 
         static void InitKeybindings()
         {
             optionElements[(int)OptionScreen.Keybindings] = new List<UIElement>();
-            for (int i = 0; i < (int)KeyBindManager.KeyListner.Count; i++)
-            {
-                optionElements[(int)OptionScreen.Keybindings].Add(new KeybindingObject((KeyBindManager.KeyListner)i, GetKeybindingPos, keybindingSize));
-            }
+            optionElements[(int)OptionScreen.Keybindings].Add(new KeybindingsList(new RelativeScreenPosition(0.3f, 0.1f), new RelativeScreenPosition(0.4f, 0.8f)));
 
         }
 
@@ -100,18 +84,19 @@ namespace Project_1.UI.OptionMenu
             }
         }
 
-        public static void Draw(SpriteBatch aBatch)
+        internal static bool Scroll(ScrollEvent aScrollEvent)
         {
-            for (int i = 0; i < optionScreenPermanents.Count; i++)
-            {
-                optionScreenPermanents[i].Draw(aBatch);
-            }
-
             for (int i = 0; i < optionElements[(int)currentScreen].Count; i++)
             {
-                optionElements[(int)currentScreen][i].Draw(aBatch);
+                bool clickedOn = optionElements[(int)currentScreen][i].ScrolledOn(aScrollEvent);
+                if (clickedOn == true)
+                {
+                    return true;
+                }
             }
+            return false;
         }
+
 
 
         public static void CloseAllOptionMenuStuff()
@@ -138,11 +123,7 @@ namespace Project_1.UI.OptionMenu
 
             for (int i = 0; i < optionElements[(int)currentScreen].Count; i++)
             {
-                bool clickedOn = optionElements[(int)currentScreen][i].ClickedOn(aClickEvent);
-                if (clickedOn == true)
-                {
-                    return true;
-                }
+                if (optionElements[(int)currentScreen][i].ClickedOn(aClickEvent)) return true;
             }
             return false;
         }
@@ -160,6 +141,21 @@ namespace Project_1.UI.OptionMenu
                 {
                     optionElements[i][j].Rescale();
                 }
+            }
+        }
+
+
+
+        public static void Draw(SpriteBatch aBatch)
+        {
+            for (int i = 0; i < optionScreenPermanents.Count; i++)
+            {
+                optionScreenPermanents[i].Draw(aBatch);
+            }
+
+            for (int i = 0; i < optionElements[(int)currentScreen].Count; i++)
+            {
+                optionElements[(int)currentScreen][i].Draw(aBatch);
             }
         }
     }

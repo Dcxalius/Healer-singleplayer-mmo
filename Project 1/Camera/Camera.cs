@@ -12,8 +12,10 @@ using Project_1.UI;
 using Project_1.UI.HUD;
 using Project_1.UI.OptionMenu;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Security.Permissions;
 using System.Windows.Forms;
@@ -61,7 +63,7 @@ namespace Project_1.Camera
 
         public static void Init()
         {
-            cameraSettings = CameraSettings.RectangleSoftBound; //TODO: Get this from settings
+            ImportSettings();
             cameraMover = new CameraMover();
         }
 
@@ -70,14 +72,33 @@ namespace Project_1.Camera
             cameraMover.Move();
         }
 
-        public static void Save(Save aSave)
+        static void ImportSettings()
         {
-            SaveManager.ExportData(aSave.CameraSettings, cameraMover.CentreInWorldSpace);
+            if (File.Exists(SaveManager.CameraSettings))
+            {
+                string json = File.ReadAllText(SaveManager.CameraSettings);
+                cameraSettings = SaveManager.ImportData<CameraSettings>(json);
+            }
+            else
+            {
+                string json = File.ReadAllText(SaveManager.DefaultCameraSettings);
+                cameraSettings = SaveManager.ImportData<CameraSettings>(json);
+            }
         }
 
-        public static void Load(Save aSave)
+        static void ExportSettings() //TODO: Call this somewhere
         {
-            string json = System.IO.File.ReadAllText(aSave.CameraSettings);
+            SaveManager.ExportData(SaveManager.CameraSettings, cameraSettings);
+        }
+
+        public static void SavePosition(Save aSave)
+        {
+            SaveManager.ExportData(aSave.CameraPosition, cameraMover.CentreInWorldSpace);
+        }
+
+        public static void LoadPosition(Save aSave)
+        {
+            string json = File.ReadAllText(aSave.CameraPosition);
             WorldSpace ws = SaveManager.ImportData<WorldSpace>(json);
             cameraMover.CentreInWorldSpace = ws;
             //TODO: Ponder if the bound object should also be saved
@@ -138,7 +159,6 @@ namespace Project_1.Camera
             cameraMover.bindingRectangle = new Rectangle(new Point(0), new Point(screenRectangleSize.X / 4 * 3, screenRectangleSize.Y / 4 * 3));
             cameraMover.maxCircleCameraMove = screenRectangleSize.Y / 3;
 
-            Init();
 
         }
 

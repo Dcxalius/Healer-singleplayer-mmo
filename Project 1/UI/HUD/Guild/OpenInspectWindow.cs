@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI.UIElements.Guild
+namespace Project_1.UI.HUD.Guild
 {
     internal class OpenInspectWindow : GFXButton
     {
@@ -30,6 +30,6 @@ namespace Project_1.UI.UIElements.Guild
 
         }
 
-        
+
     }
 }

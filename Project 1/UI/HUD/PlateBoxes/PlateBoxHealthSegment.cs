@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI.UIElements.PlateBoxes
+namespace Project_1.UI.HUD.PlateBoxes
 {
     internal class PlateBoxHealthSegment : PlateBoxSegment
     {
@@ -20,11 +20,11 @@ namespace Project_1.UI.UIElements.PlateBoxes
         public PlateBoxHealthSegment(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, aPos, aSize)
         {
             healthBar = new ResourceBar(new BarTexture(BarTexture.FillingDirection.Right, Color.Red), new UITexture("WhiteBackground", backgroundColor), RelativeScreenPosition.Zero, RelativeScreenPosition.One);
-            
+
             AddChild(healthBar);
         }
 
-        
+
 
 
         public override void Refresh(Entity aEntity)

@@ -14,7 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI.UIElements.Guild
+namespace Project_1.UI.HUD.Guild
 {
     internal class InviteButton : TwoStateGFXButton
     {
@@ -22,7 +22,7 @@ namespace Project_1.UI.UIElements.Guild
         public InviteButton(Friendly aFriendly, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new List<Action>() { }, new GfxPath(GfxType.UI, "Invite"), new List<Action>() { }, new GfxPath(GfxType.UI, "Uninvite"), aPos, aSize, Color.White)
         {
             if (aFriendly.GetType() != typeof(GuildMember)) return;
-            
+
             guildMember = aFriendly as GuildMember;
             AddAction(new Action(() => Invite()), State.First);
             AddAction(new Action(() => Kick()), State.Second);

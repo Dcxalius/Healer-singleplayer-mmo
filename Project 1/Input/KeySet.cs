@@ -94,5 +94,21 @@ namespace Project_1.Input
         }
 
         public static implicit operator KeySet(Keys aKey) { return new KeySet(aKey); }
+
+        public override string ToString()
+        {
+            if (Modifiers.Length == 0)
+            {
+                return Key.ToString();
+            }
+
+            string s = "";
+            for (int i = 0; i < Modifiers.Length; i++)
+            {
+                s += Modifiers[i].ToString() + " + ";
+            }
+            s += Key.ToString();
+            return s;
+        }
     }
 }

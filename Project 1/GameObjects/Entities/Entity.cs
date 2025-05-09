@@ -19,6 +19,7 @@ using static Project_1.GameObjects.Unit.Equipment;
 using System.Diagnostics;
 using Project_1.Items;
 using Project_1.GameObjects.Unit.Classes;
+using System.Threading.Tasks.Dataflow;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -79,9 +80,6 @@ namespace Project_1.GameObjects.Entities
         ParticleBase bloodsplatter;
         bool namePlateRequiresUpdate;
 
-        SelectRing selectRing;
-        Shadow shadow;
-
         public Entity(UnitData aUnitData) : base(new RandomAnimatedTexture(aUnitData.GfxPath, new Point(32), 0, TimeSpan.FromMilliseconds(500)), aUnitData.Position)
         {
             unitData = aUnitData;
@@ -90,14 +88,16 @@ namespace Project_1.GameObjects.Entities
             unitData.Destination.SetOwner(this);
             bloodsplatter = new ParticleBase((1000d, 2000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[] { Color.Red }, new Point(1));
             namePlateRequiresUpdate = false;
-            shadow = new Shadow();
-            selectRing = new SelectRing();
+            
             spellCast = new SpellCast(this);
             buffList = new BuffList();
             aggroTablesIAmOn = new List<NonFriendly>();
 
             velocity = unitData.Velocity;
             momentum = UnitData.Momentum;
+
+            groundEffects.Add(new Shadow());
+            groundEffects.Add(new SelectRing());
             CreateNamePlate();
         }
 
@@ -529,14 +529,5 @@ namespace Project_1.GameObjects.Entities
         }
 
         #endregion
-
-        
-
-        public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)
-        {
-            shadow.Draw(aBatch, this);
-            selectRing.Draw(aBatch, this);
-            base.Draw(aBatch);
-        }
     }
 }

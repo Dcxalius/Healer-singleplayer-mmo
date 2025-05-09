@@ -51,8 +51,6 @@ namespace Project_1.UI.UIElements.Boxes
         {
             for (int i = 0; i < validInputs.Length; i++)
             {
-
-
                 switch (validInputs[i])
                 {
                     case ValidInputs.Letters: //TODO: Should this be settable or should the two bellow be merged to this one
@@ -65,8 +63,6 @@ namespace Project_1.UI.UIElements.Boxes
                         break;
                     case ValidInputs.Symbols:
                         throw new NotImplementedException();
-
-                        break;
                     default:
                         throw new NotImplementedException();
                 }
@@ -145,7 +141,7 @@ namespace Project_1.UI.UIElements.Boxes
                 return;
             }
             int index = text.LastIndexOf(' ');
-            if (index != -1) text.Remove(index, aIndex - index);
+            if (index != -1) text = text.Remove(index, aIndex - index);
             else text = text.Remove(0, aIndex);
            
 
@@ -182,7 +178,7 @@ namespace Project_1.UI.UIElements.Boxes
                 return;
             }
             int index = text.LastIndexOf(' ', aIndex);
-            if (index != -1) text.Remove(index, aIndex - index);
+            if (index != -1) text = text.Remove(index, aIndex - index);
             else text = "";
 
 

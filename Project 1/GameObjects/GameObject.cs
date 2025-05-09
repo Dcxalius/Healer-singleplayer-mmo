@@ -21,6 +21,7 @@ namespace Project_1.GameObjects
         public WorldSpace FeetPosition { get => Position + new WorldSpace(size.X / 2, size.Y); set => Position = value - new WorldSpace(size.X / 2, size.Y); }
         public virtual WorldSpace FeetSize { get => new WorldSpace(Size); } //TODO: ??
         public virtual Rectangle WorldRectangle { get => new Rectangle(position.ToPoint(), size); }
+        public virtual Rectangle ScreenRect { get => new Rectangle(position.ToAbsoltueScreenPosition().ToPoint(), (size.ToVector2() * Camera.Camera.Scale).ToPoint()); }
         public float DistanceTo(WorldSpace aPoint) => FeetPosition.DistanceTo(aPoint);
         
         protected Textures.Texture gfx;
@@ -84,8 +85,6 @@ namespace Project_1.GameObjects
             {
                 effects[i].Draw(aBatch, Position, FeetPosition.Y + 0.01f);
             }
-
-            //TODO: change name of effects to ground effects and move them here
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Project_1.Input;
 using Project_1.UI.HUD;
-using Project_1.UI.UIElements.PlateBoxes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
