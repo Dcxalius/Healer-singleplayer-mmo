@@ -19,42 +19,49 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Security.Permissions;
 using System.Windows.Forms;
+using static Project_1.Camera.CameraSettings;
 
 namespace Project_1.Camera
 {
 
     internal static class Camera
     {
-        public enum CameraSettings
+
+        public static Rectangle ScreenRectangle { get => new Rectangle(Point.Zero, WindowSize.ToPoint()); }
+
+        public static CameraSettings.Follow CurrentCameraSetting
         {
-            Free,
-            CircleSoftBound,
-            RectangleSoftBound,
-            Hardbound,
-            Count
+            get => cameraSettings.FollowSetting;
+            set
+            {
+                //TODO: CameraStyleSelect.instance.SetValueFromOutside((int)aCameraSettings);
+                cameraSettings.FollowSetting = value;
+            }
         }
 
-        public static Rectangle ScreenRectangle { get => new Rectangle(Point.Zero, ScreenSize.ToPoint()); }
 
-        public static AbsoluteScreenPosition ScreenSize { get => screenRectangleSize; }
+        public static Rectangle WorldRectangle { get => new Rectangle(cameraMover.CentreInWorldSpace.ToPoint() - (CentrePointInScreenSpace / Scale).ToPoint(), (WindowSize / Scale).ToPoint()); }
 
-        public static CameraSettings CurrentCameraSetting { get => cameraSettings; }
-
-        public static Rectangle WorldRectangle { get => new Rectangle(cameraMover.CentreInWorldSpace.ToPoint() - (CentrePointInScreenSpace / Scale).ToPoint(), (ScreenSize / Scale).ToPoint()); }
-
-        public static AbsoluteScreenPosition CentrePointInScreenSpace { get => screenRectangleSize / 2; }
+        public static AbsoluteScreenPosition CentrePointInScreenSpace { get => WindowSize / 2; }
 
         public readonly static Point devScreenBorder = new Point(1500, 900);
-        static AbsoluteScreenPosition screenRectangleSize;
-
+        public static AbsoluteScreenPosition WindowSize
+        {
+            get => new AbsoluteScreenPosition(cameraSettings.WindowSize);
+            set => cameraSettings.WindowSize = new AbsoluteScreenPosition(value);
+        }
+        public static Point WindowSizeAsPoint
+        {
+            get => cameraSettings.WindowSize;
+            set => cameraSettings.WindowSize = value;
+        }
 
         static float scale = 1f;
         static float minScale = 0.7f;
         static float maxScale = 1.4f;
 
+
         static CameraSettings cameraSettings;
-
-
 
         static CameraMover cameraMover;
 
@@ -65,6 +72,7 @@ namespace Project_1.Camera
         {
             ImportSettings();
             cameraMover = new CameraMover();
+            cameraSettings.SetCamera();
         }
 
         public static void Update()
@@ -86,7 +94,7 @@ namespace Project_1.Camera
             }
         }
 
-        static void ExportSettings() //TODO: Call this somewhere
+        public static void ExportSettings() //TODO: Call this somewhere
         {
             SaveManager.ExportData(SaveManager.CameraSettings, cameraSettings);
         }
@@ -122,7 +130,7 @@ namespace Project_1.Camera
             scale -= 0.05f * aScrollEvent.Steps;
 
             DebugManager.Print(typeof(Camera), "Scale is now " + scale);
-            cameraMover.bindingRectangle.Size = new Point((int)(screenRectangleSize.X / 4 * 3 * Zoom), (int)(screenRectangleSize.Y / 4 * 3 * Zoom));
+            cameraMover.bindingRectangle.Size = new Point((int)(WindowSize.X / 4 * 3 * Zoom), (int)(WindowSize.Y / 4 * 3 * Zoom));
         }
 
         static void ZoomOut(ScrollEvent aScrollEvent)
@@ -132,7 +140,7 @@ namespace Project_1.Camera
             scale += 0.05f * aScrollEvent.Steps;
             DebugManager.Print(typeof(Camera), "Scale is now " + scale);
 
-            cameraMover.bindingRectangle.Size = new Point((int)(screenRectangleSize.X / 4 * 3 * Zoom), (int)(screenRectangleSize.Y / 4 * 3 * Zoom));
+            cameraMover.bindingRectangle.Size = new Point((int)(WindowSize.X / 4 * 3 * Zoom), (int)(WindowSize.Y / 4 * 3 * Zoom));
         }
         #endregion
 
@@ -141,23 +149,15 @@ namespace Project_1.Camera
             cameraMover.BindCamera(aBinder);
         }
 
-        public static void SetCamera(CameraSettings aCameraSettings)
-        {
-            CameraStyleSelect.instance.SetValueFromOutside((int)aCameraSettings);
-            cameraSettings = aCameraSettings;
-        }
-
         public static void SetWindowSize(AbsoluteScreenPosition aSize)
         {
-            screenRectangleSize = aSize;
-
             float x = devScreenBorder.X / aSize.X;
             float y = devScreenBorder.Y / aSize.Y;
             scale = Math.Max(x, y);
             minScale = scale - 0.3f;
             maxScale = scale + 0.4f;
-            cameraMover.bindingRectangle = new Rectangle(new Point(0), new Point(screenRectangleSize.X / 4 * 3, screenRectangleSize.Y / 4 * 3));
-            cameraMover.maxCircleCameraMove = screenRectangleSize.Y / 3;
+            cameraMover.bindingRectangle = new Rectangle(new Point(0), new Point(aSize.X / 4 * 3, aSize.Y / 4 * 3));
+            cameraMover.maxCircleCameraMove = aSize.Y / 3;
 
 
         }
@@ -165,7 +165,7 @@ namespace Project_1.Camera
 
         public static Rectangle WorldRectToScreenRect(Rectangle aWorldPos)
         {
-            Point topLeft = (cameraMover.CentreInWorldSpace * scale - screenRectangleSize.ToVector2() / 2).ToPoint();
+            Point topLeft = (cameraMover.CentreInWorldSpace * scale - WindowSize.ToVector2() / 2).ToPoint();
             Rectangle cameraPos = new Rectangle((aWorldPos.Location.ToVector2() * scale).ToPoint() - topLeft, (aWorldPos.Size.ToVector2() * scale).ToPoint());
             return cameraPos;
         }

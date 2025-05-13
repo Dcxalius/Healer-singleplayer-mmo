@@ -16,7 +16,7 @@ namespace Project_1.UI.UIElements.Buttons
     internal class Button : UIElement
     {
 
-        protected string ButtonText //TODO: Bring this out to a class called TextButton
+        public string ButtonText //TODO: Bring this out to a class called TextButton
         {
             get => label.Text;
             set { label.Text = value; }

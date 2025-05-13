@@ -13,9 +13,9 @@ namespace Project_1.UI.UIElements.SelectBoxes
 {
     internal class SelectBoxValueDisplay : SelectBoxValue
     {
-        public SelectBoxValueDisplay(SelectBoxValue aTypeToCopy, UITexture aGfx, RelativeScreenPosition aSize) : base(aTypeToCopy.Type, aGfx, aTypeToCopy.DisplayText, RelativeScreenPosition.Zero, aSize)
+        public SelectBoxValueDisplay(SelectBoxValue aTypeToCopy, UITexture aGfx, SelectBox aParent) : base(aTypeToCopy.Type, aGfx, aTypeToCopy.DisplayText, RelativeScreenPosition.Zero, RelativeScreenPosition.One, aParent)
         {
-
+            capturesClick = false;
         }
 
         public void SetToNewValue(SelectBoxValue aValueToCopy)
@@ -28,6 +28,10 @@ namespace Project_1.UI.UIElements.SelectBoxes
         {
             base.Rescale();
             
+        }
+
+        public override void ClickedOnAndReleasedOnMe()
+        {
         }
 
     }

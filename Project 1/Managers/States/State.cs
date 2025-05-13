@@ -20,7 +20,7 @@ namespace Project_1.Managers.States
         protected State()
         {
             spriteBatch = GraphicsManager.CreateSpriteBatch();
-            renderTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
+            renderTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
         }
 
         public abstract void Update();
@@ -29,7 +29,7 @@ namespace Project_1.Managers.States
 
         public virtual void Rescale()
         {
-            renderTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
+            renderTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
         }
 
         public abstract void PopUp(DialogueBox aBox);

@@ -25,15 +25,16 @@ namespace Project_1.UI.UIElements.SelectBoxes
         public SelectBoxValueTypes Type { get => type; }
 
 
-
+        protected SelectBox selectBoxParent;
         //public 
 
         protected Text text;
 
         SelectBoxValueTypes type;
 
-        protected SelectBoxValue(SelectBoxValueTypes aType, UITexture aGfx, string aStartText, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aGfx, aPos, aSize)
+        protected SelectBoxValue(SelectBoxValueTypes aType, UITexture aGfx, string aStartText, RelativeScreenPosition aPos, RelativeScreenPosition aSize, SelectBox aParent) : base(aGfx, aPos, aSize)
         {
+            selectBoxParent = aParent;
             type = aType;
             text = new Text("Gloryse", aStartText, Color.Teal);
         }
@@ -44,6 +45,15 @@ namespace Project_1.UI.UIElements.SelectBoxes
             
             text.Rescale();
         }
+
+        
+        public override void ClickedOnAndReleasedOnMe()
+        {
+            base.ClickedOnAndReleasedOnMe();
+
+            selectBoxParent.Close(this);
+        }
+
 
         public override void Draw(SpriteBatch aBatch)
         {

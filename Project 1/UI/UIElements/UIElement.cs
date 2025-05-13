@@ -134,7 +134,7 @@ namespace Project_1.UI.UIElements
         protected UIElement parent;
         protected AbsoluteScreenPosition ParentPos => parent == null ? AbsoluteScreenPosition.Zero : parent.Location;
         protected RelativeScreenPosition ParentRelativePos => parent == null ? RelativeScreenPosition.Zero : parent.RelativePos;
-        protected AbsoluteScreenPosition ParentSize => parent == null ? Camera.Camera.ScreenSize : parent.Size;
+        protected AbsoluteScreenPosition ParentSize => parent == null ? Camera.Camera.WindowSize : parent.Size;
         protected RelativeScreenPosition ParentRelativeSize => parent == null ? new RelativeScreenPosition(1) : parent.RelativeSize * parent.ParentRelativeSize;
         //protected RelativeScreenPosition ParentRelativeSize => parent == null ? new RelativeScreenPosition(1) : parent.Size.ToRelativeScreenPosition(parent.ParentSize);
 

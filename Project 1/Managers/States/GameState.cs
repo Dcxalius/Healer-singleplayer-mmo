@@ -24,7 +24,7 @@ namespace Project_1.Managers.States
         {
             rasterizerState = new RasterizerState() { ScissorTestEnable = true };
             uIDraw = GraphicsManager.CreateSpriteBatch();
-            uITarget = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
+            uITarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
         }
         public override bool Click(ClickEvent aClickEvent)
         {

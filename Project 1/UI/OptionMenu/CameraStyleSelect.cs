@@ -14,29 +14,24 @@ namespace Project_1.UI.OptionMenu
 {
     internal class CameraStyleSelect : SelectBox
     {
-        public static CameraStyleSelect instance;
 
         public CameraStyleSelect(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.White), (int)Camera.Camera.CurrentCameraSetting, aPos, aSize)
         {
-            instance = this;
 
-            SelectBoxValueCameraSettings[] setOfValues = SelectBoxValueCameraSettings.CreateArray(new RelativeScreenPosition(0, aSize.Y), aSize);
-            displayValue = new SelectBoxValueDisplay(setOfValues[(int)Camera.Camera.CurrentCameraSetting], new UITexture("WhiteBackground", Color.White), aSize);
+            SelectBoxValueCameraSettings[] setOfValues = SelectBoxValueCameraSettings.CreateArray(new RelativeScreenPosition(0, aSize.Y), aSize, this);
+            displayValue = new SelectBoxValueDisplay(setOfValues[(int)Camera.Camera.CurrentCameraSetting], new UITexture("WhiteBackground", Color.White), this);
 
             AddChild(displayValue);
             values = setOfValues;
-            AddChildren(values);
-            for (int i = 0; i < values.Length; i++)
-            {
-                values[i].Visible = false;
-            }
+
+            allValues.AddScrollableElements(values);
         }
 
         protected override void ActionWhenSelected(int aSelectedValue)
         {
             base.ActionWhenSelected(aSelectedValue);
 
-            Camera.Camera.SetCamera(((SelectBoxValueCameraSettings)values[aSelectedValue]).CameraSetting);
+            Camera.Camera.CurrentCameraSetting = ((SelectBoxValueCameraSettings)values[aSelectedValue]).CameraSetting;
         }
 
         public void SetValueFromOutside(int aSelectedValue) //TODO: Bring this up? Add checks or something??

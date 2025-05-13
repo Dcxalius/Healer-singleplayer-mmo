@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.GameObjects.Spawners;
 using Project_1.Input;
 using Project_1.Managers.States;
@@ -53,7 +54,7 @@ namespace Project_1.Managers
         {
 
             scissors = new List<(object, Rectangle)>();
-            SetWindowSize(Camera.Camera.devScreenBorder, fullsceen, borderlessFullscreen);
+            //SetWindowSize(Camera.Camera.devScreenBorder, );
 
         }
 
@@ -154,14 +155,14 @@ namespace Project_1.Managers
             graphicsDeviceManager.GraphicsDevice.Clear(aColor);
         }
 
-        public static void SetWindowSize(Point aSize, bool aFullscreen, bool aBorderless)
+        public static void SetWindowSize(Point aSize, CameraSettings.Fullscreen aFullscreen)
         {
             if (!AllowedSize(aSize))
             {
                 return;
             }
 
-            if (aFullscreen)
+            if (aFullscreen <= (CameraSettings.Fullscreen)1)
             {
                 graphicsDeviceManager.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
                 graphicsDeviceManager.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
@@ -174,8 +175,23 @@ namespace Project_1.Managers
                 StateManager.RenderTargetPosition = new Rectangle(0, 0, aSize.X, aSize.Y);
             }
 
-            graphicsDeviceManager.IsFullScreen = aFullscreen;
-            graphicsDeviceManager.HardwareModeSwitch = aBorderless && aFullscreen;
+            switch (aFullscreen)
+            {
+                case CameraSettings.Fullscreen.Fullscreen:
+                    graphicsDeviceManager.IsFullScreen = true;
+                    graphicsDeviceManager.HardwareModeSwitch = false;
+                    break;
+                case CameraSettings.Fullscreen.Borderless:
+                    graphicsDeviceManager.IsFullScreen = true;
+                    graphicsDeviceManager.HardwareModeSwitch = true;
+                    break;
+                case CameraSettings.Fullscreen.Windowed:
+                    graphicsDeviceManager.HardwareModeSwitch = false;
+                    graphicsDeviceManager.IsFullScreen = false;
+                    break;
+                default:
+                    break;
+            }
             graphicsDeviceManager.ApplyChanges();
 
             //Add check here to see if display area is correct and if it isn't change aSize

@@ -20,17 +20,25 @@ namespace Project_1.UI.UIElements.SelectBoxes
         bool isOpen;
 
         protected SelectBoxValue[] values;
-        int selectedValue;
+        protected int selectedValue;
         protected SelectBoxValueDisplay displayValue;
+
+        protected ScrollableBox allValues;
 
         RelativeScreenPosition defaultPos;
         RelativeScreenPosition defaultSize;
+
+        const float sizeMulti = 5;
 
         public SelectBox(UITexture aGfx, int aStartDisplayValue, RelativeScreenPosition aPos, RelativeScreenPosition aCollapsedSize) : base(aGfx, aPos, aCollapsedSize)
         {
             defaultPos = aPos;
             defaultSize = aCollapsedSize;
             selectedValue = aStartDisplayValue;
+
+            allValues = new ScrollableBox(5, UITexture.Null, Color.AliceBlue, new RelativeScreenPosition(ScrollableBox.WidthOfBar + ScrollableBox.WidthOfSpacing * 2, 1 / sizeMulti), new RelativeScreenPosition(1 - ScrollableBox.WidthOfBar - ScrollableBox.WidthOfSpacing * 3, 1 - 1 / sizeMulti));
+            AddChild(allValues);
+            allValues.Visible = false;
         }
 
         public override void Update()
@@ -48,7 +56,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
             if (isOpen == true)
             {
-                Close(aClick);
+                //Close();
             }
             else
             {
@@ -56,22 +64,15 @@ namespace Project_1.UI.UIElements.SelectBoxes
             }
         }
 
-        void SetNewValue(Point aP)
+        void SetNewValue(int aIndex)
         {
-            int tempSelectedValue = aP.Y / defaultSize.ToAbsoluteScreenPos().Y;
-            //DebugManager.Print(GetType(), "New selectedValue is: " + tempSelectedValue);
+            if (aIndex == selectedValue) return;
 
-            if (tempSelectedValue == 0 || tempSelectedValue == selectedValue + 1)
-            {
-                return;
-            }
-
-            ActionWhenSelected(tempSelectedValue - 1);
+            ActionWhenSelected(aIndex);
         }
 
         protected virtual void ActionWhenSelected(int aSelectedValue)
         {
-
             selectedValue = aSelectedValue;
             displayValue.SetToNewValue(values[aSelectedValue]);
         }
@@ -80,16 +81,22 @@ namespace Project_1.UI.UIElements.SelectBoxes
         {
             isOpen = false;
 
+            displayValue.Resize(RelativeScreenPosition.One);
+
+            allValues.Visible = false;
             Resize(defaultSize);
         }
 
-        void Close(ClickEvent aClick)
+        public void ClickedOnSelectBoxValue(SelectBoxValue aVal)
+        {
+            //displayValue
+        }
+
+        public void Close(SelectBoxValue aVal)
         {
             Close();
 
-            Point target = aClick.RelativePos.ToAbsoluteScreenPos() - AbsolutePos.Location;
-
-            SetNewValue(target);
+            SetNewValue(Array.IndexOf(values, aVal));
         }
 
         void Open()
@@ -98,8 +105,9 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
             isOpen = true;
 
-            Resize(new RelativeScreenPosition(Size.X, defaultSize.Y * (values.Length + 1)));
-
+            displayValue.Resize(new RelativeScreenPosition(1, 1 / (sizeMulti)));
+            Resize(new RelativeScreenPosition(RelativeSize.X, defaultSize.Y * sizeMulti));
+            allValues.Visible = true;
         }
 
         public override void Draw(SpriteBatch aBatch)

@@ -13,30 +13,34 @@ namespace Project_1.UI.OptionMenu
 {
     internal class ScreenSizeSelect : SelectBox
     {
-        static readonly string[] screenRezes = new string[] { "1500, 900", "1200, 900", "900, 1100", "100, 100"}; //make this pull this data from file
+        static readonly string[] screenRezes = new string[] { "1500, 900", "1200, 900", "900, 1100", "100, 100"}; //TODO: Make this pull this data from file
         public ScreenSizeSelect(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.White), 0, aPos, aSize)
         {
-            SelectBoxValueScreenRez[] setOfValues = SelectBoxValueScreenRez.CreateArray(screenRezes, new RelativeScreenPosition(0, aSize.Y), aSize);
+            SelectBoxValueScreenRez[] setOfValues = SelectBoxValueScreenRez.CreateArray(screenRezes, new RelativeScreenPosition(0, aSize.Y), aSize, this);
+            displayValue = new SelectBoxValueDisplay(setOfValues[0], new UITexture("WhiteBackground", Color.WhiteSmoke), this);
 
-            values = setOfValues;
-            displayValue = new SelectBoxValueDisplay(setOfValues[(int)0], null, aSize);
             AddChild(displayValue);
-            AddChildren(values);
-            for (int i = 0; i < values.Length; i++)
-            {
-                values[i].Visible = false;
-            }
+            values = setOfValues;
+
+            allValues.AddScrollableElements(values);
+
             
             //displayValue = new SelectBoxValueDisplay(Pos, setOfValues[(int)Camera.CurrentCameraSetting], new UITexture("WhiteBackground", Color.White), aSize);
         }
 
         protected override void ActionWhenSelected(int aSelectedValue)
         {
+            int prevVal = selectedValue;
+            
+
             base.ActionWhenSelected(aSelectedValue);
 
             Point p = ((SelectBoxValueScreenRez)values[aSelectedValue]).ScreenSize;
 
-            GraphicsManager.SetWindowSize(p, false, false);
+            
+            OptionManager.AddActionToDoAtExitOfOptionMenu(() => base.ActionWhenSelected(prevVal), () => Camera.Camera.WindowSizeAsPoint = p);
+            
+            //GraphicsManager.SetWindowSize(p, false, false);
         }
     }
 }

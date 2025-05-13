@@ -31,14 +31,14 @@ namespace Project_1.Camera
         public CameraMover()
         {
             drag = new Vector2(0.9f, 0.9f);
-            bindingRectangle = new Rectangle(new Point(0), new Point(ScreenSize.X / 4 * 3, ScreenSize.Y / 4 * 3));
-            maxCircleCameraMove = ScreenSize.Y / 3;
+            bindingRectangle = new Rectangle(new Point(0), new Point(WindowSize.X / 4 * 3, WindowSize.Y / 4 * 3));
+            maxCircleCameraMove = WindowSize.Y / 3;
         }
 
 
         void ApplyMouseVelocity()
         {
-            if (CurrentCameraSetting == CameraSettings.Hardbound)
+            if (CurrentCameraSetting == CameraSettings.Follow.Hardbound)
             {
                 return;
             }
@@ -96,16 +96,16 @@ namespace Project_1.Camera
         {
             switch (CurrentCameraSetting)
             {
-                case CameraSettings.Free:
+                case CameraSettings.Follow.Free:
                     MoveFree();
                     break;
-                case CameraSettings.CircleSoftBound:
+                case CameraSettings.Follow.CircleSoftBound:
                     MoveCircleSoftBound();
                     break;
-                case CameraSettings.RectangleSoftBound:
+                case CameraSettings.Follow.RectangleSoftBound:
                     MoveRectangleSoftBound();
                     break;
-                case CameraSettings.Hardbound:
+                case CameraSettings.Follow.Hardbound:
                     MoveHardBound();
                     break;
                 default:
@@ -126,7 +126,7 @@ namespace Project_1.Camera
             {
                 if (boundObject == null)
                 {
-                    SetCamera(CameraSettings.Free);
+                    CurrentCameraSetting = (CameraSettings.Follow.Free);
                     return;
                 }
                 CentreInWorldSpace = boundObject.FeetPosition;
@@ -137,7 +137,7 @@ namespace Project_1.Camera
         {
             if (boundObject == null)
             {
-                SetCamera(CameraSettings.Free);
+                CurrentCameraSetting = (CameraSettings.Follow.Free);
 
                 return;
             }
@@ -291,7 +291,7 @@ namespace Project_1.Camera
         {
             if (boundObject == null)
             {
-                SetCamera(CameraSettings.Free);
+                CurrentCameraSetting = (CameraSettings.Follow.Free);
                 return;
             }
 
@@ -308,7 +308,7 @@ namespace Project_1.Camera
         {
             if (boundObject == null)
             {
-                SetCamera(CameraSettings.Free);
+                CurrentCameraSetting = (CameraSettings.Follow.Free);
                 return;
             }
 

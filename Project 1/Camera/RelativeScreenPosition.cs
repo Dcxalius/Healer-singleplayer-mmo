@@ -78,8 +78,8 @@ namespace Project_1.Camera
 
         static public Rectangle TransformToAbsoluteRect(RelativeScreenPosition aPos, RelativeScreenPosition aSize)
         {
-            Point pos = new Point((int)(Camera.ScreenSize.X * aPos.X), (int)(Camera.ScreenSize.Y * aPos.Y));
-            Point size = new Point((int)(Camera.ScreenSize.X * aSize.X), (int)(Camera.ScreenSize.Y * aSize.Y));
+            Point pos = new Point((int)(Camera.WindowSize.X * aPos.X), (int)(Camera.WindowSize.Y * aPos.Y));
+            Point size = new Point((int)(Camera.WindowSize.X * aSize.X), (int)(Camera.WindowSize.Y * aSize.Y));
             return new Rectangle(pos, size);
         }
 

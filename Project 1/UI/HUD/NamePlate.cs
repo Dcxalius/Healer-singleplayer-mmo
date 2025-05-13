@@ -68,6 +68,18 @@ namespace Project_1.UI.HUD
             healthBar.Move(RelativeScreenPosition.One.OnlyY - healthBar.RelativeSize.OnlyY);
         }
 
+        public override void Rescale()
+        {
+            healthBar.Resize(barSize);
+            AbsoluteScreenPosition textOffset = new AbsoluteScreenPosition((int)name.UnderlyingTextOffset.X, (int)name.UnderlyingTextOffset.Y);
+
+            Resize((textOffset.OnlyX + textOffset.OnlyY * (1 + barSize.Y)).ToRelativeScreenPosition());
+
+            name.Resize(textOffset.ToRelativeScreenPosition(Size));
+
+            healthBar.Move(RelativeScreenPosition.One.OnlyY - healthBar.RelativeSize.OnlyY);
+        }
+
         public void Refresh(Entity aEntity)
         {
             healthBar.Value = aEntity.CurrentHealth / aEntity.MaxHealth;

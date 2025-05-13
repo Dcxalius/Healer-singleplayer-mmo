@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Input;
 using Project_1.UI.UIElements;
+using Project_1.UI.UIElements.Buttons;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,15 +21,37 @@ namespace Project_1.UI.OptionMenu
             Keybindings,
             Count
         }
+        public static bool ChangesMade
+        {
+            set
+            {
+                if (changesMade == false && value == true)
+                {
+                    exitOptionsButton.ButtonText = "Revert";
+                    saveChangesButton.Visible = true;
+                }
+                if (changesMade == true && value == false)
+                {
+                    exitOptionsButton.ButtonText = "Close";
+                    saveChangesButton.Visible = false;
+
+                }
+                changesMade = value;
+            }
+        }
+        static bool changesMade;
+
         static List<UIElement>[] optionElements = new List<UIElement>[(int)OptionScreen.Count];
         static List<UIElement> optionScreenPermanents = new List<UIElement>();
 
         static OptionScreen currentScreen = OptionScreen.Video;
 
         static ExitOptionsButton exitOptionsButton;
+        static Button saveChangesButton;
 
         public static void Init()
         {
+            changesMade = false;
             InitPermanents();
             InitVideo();
             InitKeybindings();
@@ -38,20 +61,28 @@ namespace Project_1.UI.OptionMenu
         {
             optionScreenPermanents.Add(new OptionScreenBox((int)OptionScreen.Count, new RelativeScreenPosition(0), new RelativeScreenPosition(0.3f,0.04f)));
             exitOptionsButton = new ExitOptionsButton();
+            saveChangesButton = new Button(new RelativeScreenPosition(0.81f, 0.9f), new RelativeScreenPosition(0.08f, 0.05f), Color.Beige, "Save Changes", Color.Black);
+            saveChangesButton.Visible = false;
+
             optionScreenPermanents.Add(exitOptionsButton);
+            optionScreenPermanents.Add(saveChangesButton);
         }
         
-        public static void AddActionToDoAtExitOfOptionMenu(Action aAction)
+        public static void AddActionToDoAtExitOfOptionMenu(Action aReverseAction, Action aAction)
         {
-            exitOptionsButton.AddFuncToTriggerOnExit(aAction);
+            ChangesMade = true;
+            exitOptionsButton.AddFuncToTriggerOnExit(aReverseAction);
+            saveChangesButton.AddAction(aAction);
         }
+
+
 
         static void InitVideo()
         {
             optionElements[(int)OptionScreen.Video] = new List<UIElement>
             {
-                new CameraStyleSelect(new RelativeScreenPosition(0.1f, 0.22f), new RelativeScreenPosition(0.3f, 0.1f)),
                 new ScreenSizeSelect(new RelativeScreenPosition(0.1f, 0.1f), new RelativeScreenPosition(0.3f, 0.1f)),
+                new CameraStyleSelect(new RelativeScreenPosition(0.1f, 0.22f), new RelativeScreenPosition(0.3f, 0.1f)),
             };
         }
 
@@ -153,7 +184,7 @@ namespace Project_1.UI.OptionMenu
                 optionScreenPermanents[i].Draw(aBatch);
             }
 
-            for (int i = 0; i < optionElements[(int)currentScreen].Count; i++)
+            for (int i = optionElements[(int)currentScreen].Count - 1; i >= 0; i--)
             {
                 optionElements[(int)currentScreen][i].Draw(aBatch);
             }

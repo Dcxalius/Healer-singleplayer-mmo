@@ -31,7 +31,7 @@ namespace Project_1.Managers.States
 
             spriteBatch = GraphicsManager.CreateSpriteBatch();
 
-            renderTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.ScreenSize);
+            renderTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
         }
 
         public override void Update()

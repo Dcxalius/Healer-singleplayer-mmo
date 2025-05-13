@@ -45,12 +45,20 @@ namespace Project_1.UI.UIElements
         {
             if (InputManager.GetPress(Keys.Escape))
             {
-                KeyBindManager.SetKey(buttonLevel, keyListner, Keys.None);
+                KeySet keySet = KeyBindManager.GetKey(buttonLevel, keyListner);
+
                 waitingForPress = false;
                 ButtonText = "None";
-                OptionManager.AddActionToDoAtExitOfOptionMenu(KeyBindManager.SaveBindings);
+                //OptionManager.AddActionToDoAtExitOfOptionMenu(xdd(buttonLevel, keyListner, keySet.Key), xdd(buttonLevel, keyListner, Keys.None));
 
             }
+        }
+
+        void xdd(bool buttonLevel, KeyBindManager.KeyListner aListner, Keys aKey)
+        {
+            KeyBindManager.SaveBindings();
+            KeyBindManager.SetKey(buttonLevel, keyListner, Keys.None);
+
         }
 
         void SetKey()
@@ -76,7 +84,7 @@ namespace Project_1.UI.UIElements
             ButtonText = KeyBindManager.GetKey(buttonLevel, keyListner).ToString();
             waitingForPress = false;
 
-            OptionManager.AddActionToDoAtExitOfOptionMenu(KeyBindManager.SaveBindings);
+            //OptionManager.AddActionToDoAtExitOfOptionMenu(KeyBindManager.SaveBindings);
         }
 
         public override void Close()

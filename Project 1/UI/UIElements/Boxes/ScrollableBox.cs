@@ -8,11 +8,14 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Project_1.UI.UIElements.Boxes
 {
     internal class ScrollableBox : Box
     {
+
+        //TODO: Figure out a way to elegantly handle there not being enough items to scroll
         ScrollBar scrollBar;
         public int ScrollableElementsCount => scrollableElements.Count;
         List<UIElement> scrollableElements;
@@ -58,19 +61,20 @@ namespace Project_1.UI.UIElements.Boxes
         }
 
         RelativeScreenPosition elementSize;
-
+        public const float WidthOfBar = 0.03f;
+        public const float WidthOfSpacing = 0.005f;
 
         public ScrollableBox(float visibleElements, UITexture aGfx, Color aBarColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aGfx, aPos, aSize)
         {
             scrollableElements = new List<UIElement>();
 
-            RelativeScreenPosition barSpacing = RelativeScreenPosition.GetSquareFromX(0.005f, Size);
-            RelativeScreenPosition sizeOfScrollBar = new RelativeScreenPosition(0.03f, 1f - barSpacing.Y - barSpacing.Y);
+            RelativeScreenPosition barSpacing = RelativeScreenPosition.GetSquareFromX(WidthOfSpacing, Size);
+            RelativeScreenPosition sizeOfScrollBar = new RelativeScreenPosition(WidthOfBar, 1f - barSpacing.Y - barSpacing.Y);
             scrollBar = new ScrollBar(aBarColor, new RelativeScreenPosition(1f - sizeOfScrollBar.X - barSpacing.X, barSpacing.Y), sizeOfScrollBar);
             originalYPos = new List<float>();
             AddChild(scrollBar);
 
-            spacing = RelativeScreenPosition.GetSquareFromX(0.005f, Size);
+            spacing = RelativeScreenPosition.GetSquareFromX(WidthOfSpacing, Size);
             capturesScroll = true;
 
             elementSize = new RelativeScreenPosition(1f - spacing.X - spacing.X - sizeOfScrollBar.X - barSpacing.X, (1f - spacing.Y) / visibleElements);

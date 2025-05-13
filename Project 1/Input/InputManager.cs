@@ -323,7 +323,7 @@ namespace Project_1.Input
         public static RelativeScreenPosition GetMousePosRelative()
         {
             Point mousePoint = GetMousePosAbsolute();
-            Point screenSize = Camera.Camera.ScreenSize.ToPoint();
+            Point screenSize = Camera.Camera.WindowSize.ToPoint();
 
             RelativeScreenPosition mouseVector = new RelativeScreenPosition(mousePoint.X / (float)screenSize.X, mousePoint.Y / (float)screenSize.Y);
 

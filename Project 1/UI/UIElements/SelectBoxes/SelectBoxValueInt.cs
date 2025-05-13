@@ -12,7 +12,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
     {
         //int value;
 
-        public SelectBoxValueInt(string aStartValue, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(SelectBoxValueTypes.Int, null, aStartValue, aPos, aSize)
+        public SelectBoxValueInt(string aStartValue, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(SelectBoxValueTypes.Int, null, aStartValue, aPos, aSize,null)
         {
         }
     }
