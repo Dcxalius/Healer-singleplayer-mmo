@@ -8,6 +8,7 @@ using SharpDX.MediaFoundation;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -109,7 +110,7 @@ namespace Project_1.Textures
 
             //if (Camera.Camera.MomAmIInFrame(aPos * Camera.Camera.Scale)) TODO: Make this check if its in frame.
             {
-                aBatch.Draw(gfx, aPos, visible, aColor, rotation, aOffset, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y)); 
+                aBatch.Draw(gfx, aPos, visible, aColor, rotation, aOffset, flip, (aFeetPosY - Camera.Camera.WorldRectangle.Top) / (Camera.Camera.WorldRectangle.Bottom + size.Y - Camera.Camera.WorldRectangle.Top)); 
             }
         }
     }

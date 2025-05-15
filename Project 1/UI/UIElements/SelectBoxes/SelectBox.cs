@@ -17,6 +17,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
 {
     internal abstract class SelectBox : Box
     {
+        //TODO: Add a check to see if this should open up or down
         bool isOpen;
 
         protected SelectBoxValue[] values;
@@ -30,7 +31,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
         const float sizeMulti = 5;
 
-        public SelectBox(UITexture aGfx, int aStartDisplayValue, RelativeScreenPosition aPos, RelativeScreenPosition aCollapsedSize) : base(aGfx, aPos, aCollapsedSize)
+        public SelectBox(UITexture aGfx, int aStartDisplayValue, RelativeScreenPosition aPos, RelativeScreenPosition aCollapsedSize) : base(aGfx, aPos, aCollapsedSize) 
         {
             defaultPos = aPos;
             defaultSize = aCollapsedSize;
@@ -56,7 +57,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
             if (isOpen == true)
             {
-                //Close();
+                Close();
             }
             else
             {

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.UIElements.SelectBoxes
 {
-    internal class SelectBoxValueScreenRez : SelectBoxValue
+    internal class SelectBoxValueScreenRez : SelectBoxValueOption
     {
         //TODO: Redraw gramescreen for pause menu if thie is changed.
         //TODO: Add custom size
@@ -19,7 +19,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
         Point screenSize;
 
-        SelectBoxValueScreenRez(string aRez, RelativeScreenPosition aPos, RelativeScreenPosition aSize, SelectBox aParent) : base(SelectBoxValueTypes.ScreenRez, null, aRez, aPos, aSize, aParent)
+        SelectBoxValueScreenRez(string aRez, SelectBox aParent) : base(aRez, aParent)
         {
 
             string[] split = aRez.Split(',');
@@ -32,14 +32,12 @@ namespace Project_1.UI.UIElements.SelectBoxes
             Debug.Assert(successL && successW);
         }
 
-        public static SelectBoxValueScreenRez[] CreateArray(string[] aListToCreate, RelativeScreenPosition aStartPos, RelativeScreenPosition aSize, SelectBox aParent)
+        public static SelectBoxValueScreenRez[] CreateArray(string[] aListToCreate, SelectBox aParent)
         {
             SelectBoxValueScreenRez[] returnable = new SelectBoxValueScreenRez[aListToCreate.Length];
-            RelativeScreenPosition pos = aStartPos;
             for (int i = 0; i < aListToCreate.Length; i++)
             {
-                returnable[i] = new SelectBoxValueScreenRez(aListToCreate[i], pos, aSize, aParent);
-                pos.Y += aSize.Y;
+                returnable[i] = new SelectBoxValueScreenRez(aListToCreate[i], aParent);
             }
             return returnable;
         }

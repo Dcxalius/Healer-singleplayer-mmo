@@ -13,18 +13,18 @@ namespace Project_1.UI.OptionMenu
 {
     internal class ScreenSizeSelect : SelectBox
     {
-        static readonly string[] screenRezes = new string[] { "1500, 900", "1200, 900", "900, 1100", "100, 100"}; //TODO: Make this pull this data from file
+        static readonly string[] screenRezes = new string[] { "1500, 900", "1200, 900", "900, 1100", "100, 100", "5000, 5000", "1337, 420"}; //TODO: Make this pull this data from file
         public ScreenSizeSelect(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.White), 0, aPos, aSize)
         {
-            SelectBoxValueScreenRez[] setOfValues = SelectBoxValueScreenRez.CreateArray(screenRezes, new RelativeScreenPosition(0, aSize.Y), aSize, this);
-            displayValue = new SelectBoxValueDisplay(setOfValues[0], new UITexture("WhiteBackground", Color.WhiteSmoke), this);
-
-            AddChild(displayValue);
+            SelectBoxValueScreenRez[] setOfValues = SelectBoxValueScreenRez.CreateArray(screenRezes, this);
+            
             values = setOfValues;
 
             allValues.AddScrollableElements(values);
 
-            
+            displayValue = new SelectBoxValueDisplay(RelativeScreenPosition.Zero, RelativeScreenPosition.One, setOfValues[0], this);
+
+            AddChild(displayValue);
             //displayValue = new SelectBoxValueDisplay(Pos, setOfValues[(int)Camera.CurrentCameraSetting], new UITexture("WhiteBackground", Color.White), aSize);
         }
 

@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Project_1.Input
 {
@@ -28,18 +29,18 @@ namespace Project_1.Input
         static KeySet[] firstButtons = new KeySet[(int)KeyListner.Count];
         static KeySet[] secondButtons = new KeySet[(int)KeyListner.Count];
 
-        readonly static KeySet[] defaultSecondKeys = new KeySet[(int)KeyListner.Count] 
-        {Keys.Up, Keys.Left, Keys.Down, Keys.Right, 
-         Keys.None, Keys.None, Keys.None, Keys.None, Keys.None,
-         Keys.None, Keys.None,Keys.None, Keys.None,
-         Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None};
+        //readonly static KeySet[] defaultSecondKeys = new KeySet[(int)KeyListner.Count] 
+        //{Keys.Up, Keys.Left, Keys.Down, Keys.Right, 
+        // Keys.None, Keys.None, Keys.None, Keys.None, Keys.None,
+        // Keys.None, Keys.None,Keys.None, Keys.None,
+        // Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None, Keys.None};
 
-        readonly static KeySet[] defaultFirstKeys = new KeySet[(int)KeyListner.Count]
-        {
-         Keys.W, Keys.A, Keys.S, Keys.D,
-         Keys.Q, Keys.NumPad0, Keys.NumPad1, Keys.Delete, new KeySet(Keys.C, Keys.LeftShift),
-         Keys.I, Keys.T, Keys.C, Keys.G,
-         Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9, Keys.D0};
+        //readonly static KeySet[] defaultFirstKeys = new KeySet[(int)KeyListner.Count]
+        //{
+        // Keys.W, Keys.A, Keys.S, Keys.D,
+        // Keys.Q, Keys.NumPad0, Keys.NumPad1, Keys.Delete, new KeySet(Keys.C, Keys.LeftShift),
+        // Keys.I, Keys.T, Keys.C, Keys.G,
+        // Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9, Keys.D0};
 
         static string rootDir;
 
@@ -54,17 +55,17 @@ namespace Project_1.Input
         {
             try
             {
-                string dataAsString = File.ReadAllText(rootDir + "\\Data\\Keybinds.json");
+                string dataAsString = File.ReadAllText(SaveManager.KeyBindSettings);
 
-                KeySet[] importedBinds = JsonConvert.DeserializeObject<KeySet[]>(dataAsString);
-                //Debug.Assert(importedBinds.Length == (int)KeyListner.Count * 2);
-                //throw new Exception("")
+                KeySet[] importedBinds = SaveManager.ImportData<KeySet[]>(dataAsString);
+
                 for (int i = 0; i < (int)KeyListner.Count; i++)
                 {
                     firstButtons[i] = importedBinds[i];
                     secondButtons[i] = importedBinds[i + (int)KeyListner.Count];
                 }
 
+                GetBindings(SaveManager.KeyBindSettings);
             }
             catch (Exception exception)
             {
@@ -74,29 +75,35 @@ namespace Project_1.Input
                 }
 
                 DebugManager.Print(typeof(KeyBindManager), "Error Importing Bindings from file.");
-                Debug.Assert(defaultFirstKeys.Length == (int)KeyListner.Count && defaultSecondKeys.Length == (int)KeyListner.Count, "Default Key has wrong count");
+                //Debug.Assert(defaultFirstKeys.Length == (int)KeyListner.Count && defaultSecondKeys.Length == (int)KeyListner.Count, "Default Key has wrong count");
 
-                
-                DefaultKeys();
+                GetBindings(SaveManager.DefaultKeyBindSettings);
             }
 
         }
 
+        static void GetBindings(string aKeyBindSetting)
+        {
+            string dataAsString = File.ReadAllText(aKeyBindSetting);
+
+            KeySet[] importedBinds = SaveManager.ImportData<KeySet[]>(dataAsString);
+
+            for (int i = 0; i < (int)KeyListner.Count; i++)
+            {
+                firstButtons[i] = importedBinds[i];
+                secondButtons[i] = importedBinds[i + (int)KeyListner.Count];
+            }
+        }
+
         public static void SaveBindings()
         {
-            ExportData(rootDir + "\\Data\\Keybinds.json", firstButtons.Concat(secondButtons));
+            ExportData(SaveManager.KeyBindSettings, firstButtons.Concat(secondButtons));
         }
 
         static void ExportData(string aDestination, object aObjectToExport)
         {
             string json = JsonConvert.SerializeObject(aObjectToExport, Formatting.None, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Include });
             File.WriteAllText(aDestination, json);
-        }
-
-        static void DefaultKeys()
-        {
-            firstButtons = defaultFirstKeys;
-            secondButtons = defaultSecondKeys;
         }
 
         public static KeySet GetKey(bool aFirstButton, KeyListner aListner)
@@ -109,31 +116,30 @@ namespace Project_1.Input
 
         public static bool GetHold(KeyListner aListner) => firstButtons[(int)aListner].GetHold || secondButtons[(int)aListner].GetHold;
 
-        public static void SetKey(bool aFirstButton, KeyListner aListner, Keys aKey)
+        public static void SetKey(bool aFirstButton, KeyListner aListner, KeySet aKey)
         {
             if (aFirstButton)
             {
-                firstButtons[(int)aListner] = new KeySet(aKey, InputManager.CheckHoldModifiers());
+                firstButtons[(int)aListner] = aKey;
             }
             else
             {
-                secondButtons[(int)aListner] = new KeySet(aKey, InputManager.CheckHoldModifiers());
+                secondButtons[(int)aListner] = aKey;
             }
         }
 
-        public static bool CheckForNoDupeKeys(Keys aKey, bool[] aModifier)
+        public static bool CheckForNoDupeKeys(KeySet aKeySet)
         {
-            KeySet keySet = new KeySet(aKey, aModifier);
             for (int i = 0; i < firstButtons.Length; i++)
             {
-                if (firstButtons[i].Equals(keySet))
+                if (firstButtons[i].Equals(aKeySet))
                 {
                     return false;
                 }
             }
             for (int j = 0; j < secondButtons.Length; j++)
             {
-                if (secondButtons[j].Equals(keySet))
+                if (secondButtons[j].Equals(aKeySet))
                 {
                     return false;
                 }

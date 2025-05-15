@@ -22,10 +22,14 @@ namespace Project_1.Managers
         public static string Settings => contentRootDirectory + "\\Settings";
         public static string HudSettings => Settings + "\\Hud.set";
         public static string CameraSettings => Settings + "\\Camera.set";
+        public static string KeyBindSettings => Settings + "\\KeyBind.set";
+
+
 
         public static string DefaultSettings => Settings + "\\Default";
         public static string DefaultHudSettings => DefaultSettings + "\\Hud.def";
         public static string DefaultCameraSettings => DefaultSettings + "\\Camera.def";
+        public static string DefaultKeyBindSettings => DefaultSettings + "\\KeyBind.def";
         public static Save[] Saves => saves.ToArray();
         static List<Save> saves;
 

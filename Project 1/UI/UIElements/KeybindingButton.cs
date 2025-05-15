@@ -37,7 +37,7 @@ namespace Project_1.UI.UIElements
             if (waitingForPress == true)
             {
                 CheckForEscape();
-                SetKey();
+                ActualKey();
             }
         }
 
@@ -49,19 +49,20 @@ namespace Project_1.UI.UIElements
 
                 waitingForPress = false;
                 ButtonText = "None";
-                //OptionManager.AddActionToDoAtExitOfOptionMenu(xdd(buttonLevel, keyListner, keySet.Key), xdd(buttonLevel, keyListner, Keys.None));
+                OptionManager.AddActionToDoAtExitOfOptionMenu(() => SetKey(buttonLevel, keyListner, keySet), () => SetKey(buttonLevel, keyListner, Keys.None));
+                OptionManager.AddFinalActions(KeyBindManager.SaveBindings);
 
             }
         }
 
-        void xdd(bool buttonLevel, KeyBindManager.KeyListner aListner, Keys aKey)
+        void SetKey(bool aButtonLevel, KeyBindManager.KeyListner aListner, KeySet aKey)
         {
-            KeyBindManager.SaveBindings();
-            KeyBindManager.SetKey(buttonLevel, keyListner, Keys.None);
+            KeyBindManager.SetKey(aButtonLevel, aListner, aKey);
 
+            ButtonText = KeyBindManager.GetKey(buttonLevel, keyListner).ToString();
         }
 
-        void SetKey()
+        void ActualKey()
         {
             Keys? newKey = InputManager.GetAnyKey;
 
@@ -74,17 +75,21 @@ namespace Project_1.UI.UIElements
                 return;
             }
 
-            if (!KeyBindManager.CheckForNoDupeKeys(newKey.Value, InputManager.CheckHoldModifiers()))
+            KeySet keySet = new KeySet(newKey.Value, InputManager.CheckHoldModifiers());
+
+            if (!KeyBindManager.CheckForNoDupeKeys(keySet))
             {
                 ButtonText = "Dupe key, try another key.";
                 return;
             }
 
-            KeyBindManager.SetKey(buttonLevel, keyListner, newKey.Value);
+            KeySet oldKeySet = KeyBindManager.GetKey(buttonLevel, keyListner);
+            KeyBindManager.SetKey(buttonLevel, keyListner, keySet);
             ButtonText = KeyBindManager.GetKey(buttonLevel, keyListner).ToString();
             waitingForPress = false;
 
-            //OptionManager.AddActionToDoAtExitOfOptionMenu(KeyBindManager.SaveBindings);
+            OptionManager.AddActionToDoAtExitOfOptionMenu(() => SetKey(buttonLevel, keyListner, oldKeySet), () => SetKey(buttonLevel, keyListner, keySet));
+            OptionManager.AddFinalActions(KeyBindManager.SaveBindings);
         }
 
         public override void Close()

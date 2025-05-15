@@ -19,7 +19,6 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Security.Permissions;
 using System.Windows.Forms;
-using static Project_1.Camera.CameraSettings;
 
 namespace Project_1.Camera
 {
@@ -39,6 +38,7 @@ namespace Project_1.Camera
             }
         }
 
+        public static CameraSettings.Fullscreen FullScreen => cameraSettings.xddFullscreen;
 
         public static Rectangle WorldRectangle { get => new Rectangle(cameraMover.CentreInWorldSpace.ToPoint() - (CentrePointInScreenSpace / Scale).ToPoint(), (WindowSize / Scale).ToPoint()); }
 
@@ -80,6 +80,7 @@ namespace Project_1.Camera
             cameraMover.Move();
         }
 
+        #region Save/Load
         static void ImportSettings()
         {
             if (File.Exists(SaveManager.CameraSettings))
@@ -111,6 +112,7 @@ namespace Project_1.Camera
             cameraMover.CentreInWorldSpace = ws;
             //TODO: Ponder if the bound object should also be saved
         }
+        #endregion
 
         #region Zoom
         public static float Scale { get => scale; }

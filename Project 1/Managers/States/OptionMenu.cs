@@ -46,6 +46,7 @@ namespace Project_1.Managers.States
 
         public override void OnLeave()
         {
+            OptionManager.ClearButtons();
         }
         public override RenderTarget2D Draw()
         {

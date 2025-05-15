@@ -15,7 +15,7 @@ namespace Project_1.UI.OptionMenu
     {
         List<Action> onExit;
 
-        public ExitOptionsButton() : base(new RelativeScreenPosition(0.9f), new RelativeScreenPosition(0.08f, 0.05f), Color.Beige, "Close", Color.Black)
+        public ExitOptionsButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColor, Color aTextColor) : base(new RelativeScreenPosition(0.9f), new RelativeScreenPosition(0.08f, 0.05f), Color.Beige, "Close", Color.Black)
         {
             onExit = new List<Action>();
 
@@ -35,13 +35,18 @@ namespace Project_1.UI.OptionMenu
 
             OptionManager.ChangesMade = false;
 
-            for (int i = 0; i < onExit.Count; i++)
+            for (int i = onExit.Count - 1; i >= 0; i--)
             {
                 onExit[i].Invoke();
             }
             onExit.Clear();
 
             StateManager.SetState(StateManager.PreviousState);
+        }
+
+        public void ClearActions()
+        {
+            onExit.Clear();
         }
     }
 }

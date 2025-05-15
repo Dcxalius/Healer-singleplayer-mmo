@@ -13,7 +13,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
 {
     internal class SelectBoxValueDisplay : SelectBoxValue
     {
-        public SelectBoxValueDisplay(SelectBoxValue aTypeToCopy, UITexture aGfx, SelectBox aParent) : base(aTypeToCopy.Type, aGfx, aTypeToCopy.DisplayText, RelativeScreenPosition.Zero, RelativeScreenPosition.One, aParent)
+        public SelectBoxValueDisplay(RelativeScreenPosition aPos, RelativeScreenPosition aSize, SelectBoxValue aTypeToCopy, SelectBox aParent) : base(new UITexture("WhiteBackground", Color.WhiteSmoke), aPos, aSize, aTypeToCopy.DisplayText, aParent)
         {
             capturesClick = false;
         }

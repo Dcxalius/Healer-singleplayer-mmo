@@ -13,16 +13,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
 {
     internal abstract class SelectBoxValue : UIElement
     {
-        public enum SelectBoxValueTypes
-        {
-            Int,
-            String,
-            CameraSetting,
-            ScreenRez
-        }
-
-        public string DisplayText { get => text.Value; }
-        public SelectBoxValueTypes Type { get => type; }
+        public string DisplayText { get => text.Value; set => text.Value = value; }
 
 
         protected SelectBox selectBoxParent;
@@ -30,12 +21,9 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
         protected Text text;
 
-        SelectBoxValueTypes type;
-
-        protected SelectBoxValue(SelectBoxValueTypes aType, UITexture aGfx, string aStartText, RelativeScreenPosition aPos, RelativeScreenPosition aSize, SelectBox aParent) : base(aGfx, aPos, aSize)
+        protected SelectBoxValue(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, string aStartText, SelectBox aParent) : base(aGfx, aPos, aSize)
         {
             selectBoxParent = aParent;
-            type = aType;
             text = new Text("Gloryse", aStartText, Color.Teal);
         }
 

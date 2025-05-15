@@ -47,7 +47,7 @@ namespace Project_1.UI.OptionMenu
         static OptionScreen currentScreen = OptionScreen.Video;
 
         static ExitOptionsButton exitOptionsButton;
-        static Button saveChangesButton;
+        static SaveChangesButton saveChangesButton;
 
         public static void Init()
         {
@@ -60,9 +60,13 @@ namespace Project_1.UI.OptionMenu
         static void InitPermanents()
         {
             optionScreenPermanents.Add(new OptionScreenBox((int)OptionScreen.Count, new RelativeScreenPosition(0), new RelativeScreenPosition(0.3f,0.04f)));
-            exitOptionsButton = new ExitOptionsButton();
-            saveChangesButton = new Button(new RelativeScreenPosition(0.81f, 0.9f), new RelativeScreenPosition(0.08f, 0.05f), Color.Beige, "Save Changes", Color.Black);
-            saveChangesButton.Visible = false;
+
+            RelativeScreenPosition buttonSize = new RelativeScreenPosition(0.08f, 0.05f);
+            RelativeScreenPosition buttonPos = new RelativeScreenPosition(0.9f);
+
+            exitOptionsButton = new ExitOptionsButton(buttonPos, buttonSize, Color.Beige, Color.Black);
+            saveChangesButton = new SaveChangesButton(buttonPos - buttonSize.OnlyX, buttonSize, Color.Beige, Color.Black);
+            
 
             optionScreenPermanents.Add(exitOptionsButton);
             optionScreenPermanents.Add(saveChangesButton);
@@ -75,7 +79,18 @@ namespace Project_1.UI.OptionMenu
             saveChangesButton.AddAction(aAction);
         }
 
+        public static void AddFinalActions(Action aAction)
+        {
+            saveChangesButton.AddFinalActions(aAction);
+        }
 
+        public static void ClearButtons()
+        {
+            saveChangesButton.Visible = false;
+            ChangesMade = false;
+            exitOptionsButton.ClearActions();
+            saveChangesButton.ClearActions();
+        }
 
         static void InitVideo()
         {

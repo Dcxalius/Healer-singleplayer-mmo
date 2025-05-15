@@ -18,20 +18,24 @@ namespace Project_1.UI.OptionMenu
         public CameraStyleSelect(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.White), (int)Camera.Camera.CurrentCameraSetting, aPos, aSize)
         {
 
-            SelectBoxValueCameraSettings[] setOfValues = SelectBoxValueCameraSettings.CreateArray(new RelativeScreenPosition(0, aSize.Y), aSize, this);
-            displayValue = new SelectBoxValueDisplay(setOfValues[(int)Camera.Camera.CurrentCameraSetting], new UITexture("WhiteBackground", Color.White), this);
-
-            AddChild(displayValue);
+            SelectBoxValueCameraSettings[] setOfValues = SelectBoxValueCameraSettings.CreateArray(this);
+            
             values = setOfValues;
 
             allValues.AddScrollableElements(values);
+
+            displayValue = new SelectBoxValueDisplay(RelativeScreenPosition.Zero, RelativeScreenPosition.One, setOfValues[(int)Camera.Camera.CurrentCameraSetting], this);
+
+            AddChild(displayValue);
         }
 
         protected override void ActionWhenSelected(int aSelectedValue)
         {
             base.ActionWhenSelected(aSelectedValue);
-
+            CameraSettings.Follow oldSetting = Camera.Camera.CurrentCameraSetting;
             Camera.Camera.CurrentCameraSetting = ((SelectBoxValueCameraSettings)values[aSelectedValue]).CameraSetting;
+
+            OptionManager.AddActionToDoAtExitOfOptionMenu(() => Camera.Camera.CurrentCameraSetting = oldSetting, () => Camera.Camera.ExportSettings());
         }
 
         public void SetValueFromOutside(int aSelectedValue) //TODO: Bring this up? Add checks or something??

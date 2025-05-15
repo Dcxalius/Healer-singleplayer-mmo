@@ -43,7 +43,7 @@ namespace Project_1.Managers.States
         public override bool Release(ReleaseEvent aReleaseEvent) => HUDManager.Release(aReleaseEvent);
 
 
-        public override void Rescale()
+        public override void Rescale() //TODO: This is wrong, this should rescale everything
         {
             base.Rescale();
             HUDManager.Rescale();

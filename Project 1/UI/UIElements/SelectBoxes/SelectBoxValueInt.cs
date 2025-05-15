@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.UIElements.SelectBoxes
 {
-    internal class SelectBoxValueInt : SelectBoxValue
+    internal class SelectBoxValueInt : SelectBoxValueOption
     {
         //int value;
 
-        public SelectBoxValueInt(string aStartValue, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(SelectBoxValueTypes.Int, null, aStartValue, aPos, aSize,null)
+        public SelectBoxValueInt(string aStartValue, SelectBox aParent) : base(aStartValue, aParent)
         {
         }
     }

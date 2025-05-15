@@ -68,8 +68,11 @@ namespace Project_1.Input
             }
         }
 
+        [JsonIgnore]
         public bool GetPress => CheckKey(new Func<Keys, bool>(InputManager.GetPress));
+        [JsonIgnore]
         public bool GetHold => CheckKey(new Func<Keys, bool>(InputManager.GetHold));
+        [JsonIgnore]
         public bool GetRelease => CheckKey(new Func<Keys, bool>(InputManager.GetRelease));
 
         bool CheckKey(Func<Keys, bool> a)

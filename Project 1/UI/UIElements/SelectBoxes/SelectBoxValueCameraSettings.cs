@@ -9,24 +9,22 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.UIElements.SelectBoxes
 {
-    internal class SelectBoxValueCameraSettings : SelectBoxValue
+    internal class SelectBoxValueCameraSettings : SelectBoxValueOption
     {
         public CameraSettings.Follow CameraSetting { get => cameraSetting; }
 
         CameraSettings.Follow cameraSetting;
-        public SelectBoxValueCameraSettings(CameraSettings.Follow aCameraSetting, RelativeScreenPosition aPos, RelativeScreenPosition aSize, SelectBox aParent) : base(SelectBoxValueTypes.CameraSetting, null, aCameraSetting.ToString(), aPos, aSize, aParent)
+        public SelectBoxValueCameraSettings(CameraSettings.Follow aCameraSetting, SelectBox aParent) : base(aCameraSetting.ToString(), aParent)
         {
             cameraSetting = aCameraSetting;
         }
 
-        public static SelectBoxValueCameraSettings[] CreateArray(RelativeScreenPosition aStartPos, RelativeScreenPosition aSize, SelectBox aParent)
+        public static SelectBoxValueCameraSettings[] CreateArray(SelectBox aParent)
         {
             SelectBoxValueCameraSettings[] returnable = new SelectBoxValueCameraSettings[(int)CameraSettings.Follow.Count];
-            RelativeScreenPosition pos = aStartPos;
             for (int i = 0; i < (int)CameraSettings.Follow.Count; i++)
             {
-                returnable[i] = new SelectBoxValueCameraSettings(((CameraSettings.Follow)i), pos, aSize, aParent);
-                pos.Y += aSize.Y;
+                returnable[i] = new SelectBoxValueCameraSettings(((CameraSettings.Follow)i), aParent);
             }
             return returnable;
         }
