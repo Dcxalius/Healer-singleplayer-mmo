@@ -38,7 +38,11 @@ namespace Project_1.Camera
             }
         }
 
-        public static CameraSettings.Fullscreen FullScreen => cameraSettings.xddFullscreen;
+        public static CameraSettings.Fullscreen FullScreen
+        {
+            get => cameraSettings.xddFullscreen;
+            set => cameraSettings.xddFullscreen = value;
+        }
 
         public static Rectangle WorldRectangle { get => new Rectangle(cameraMover.CentreInWorldSpace.ToPoint() - (CentrePointInScreenSpace / Scale).ToPoint(), (WindowSize / Scale).ToPoint()); }
 

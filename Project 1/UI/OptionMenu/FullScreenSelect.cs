@@ -1,8 +1,10 @@
-﻿using Project_1.Camera;
+﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.Textures;
 using Project_1.UI.UIElements.SelectBoxes;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,17 +13,26 @@ namespace Project_1.UI.OptionMenu
 {
     internal class FullScreenSelect : SelectBox
     {
-        public FullScreenSelect(UITexture aGfx, int aStartDisplayValue, RelativeScreenPosition aPos, RelativeScreenPosition aCollapsedSize) : base(aGfx, (int)Camera.Camera.FullScreen, aPos, aCollapsedSize)
+        public FullScreenSelect(RelativeScreenPosition aPos, RelativeScreenPosition aCollapsedSize) : base(new UITexture("WhiteBackground", Color.White), (int)Camera.Camera.FullScreen, aPos, aCollapsedSize)
         {
-            SelectBoxValueStrings[] setOfValues = SelectBoxValueStrings.CreateArray(screenRezes, this);
-
-            values = setOfValues;
+            values = SelectBoxValueOption.CreateArray(this, Enum.GetNames(typeof(CameraSettings.Fullscreen)));
 
             allValues.AddScrollableElements(values);
 
-            displayValue = new SelectBoxValueDisplay(RelativeScreenPosition.Zero, RelativeScreenPosition.One, setOfValues[0], this);
+            displayValue = new SelectBoxValueDisplay(RelativeScreenPosition.Zero, RelativeScreenPosition.One, Camera.Camera.FullScreen.ToString(), this);
 
             AddChild(displayValue);
+        }
+
+        protected override void ActionWhenSelected(int aSelectedValue)
+        {
+            base.ActionWhenSelected(aSelectedValue);
+
+            CameraSettings.Fullscreen oldFullscreen = Camera.Camera.FullScreen;
+
+            Camera.Camera.FullScreen = Enum.Parse<CameraSettings.Fullscreen>(values[aSelectedValue].DisplayText);
+
+            OptionManager.AddActionToDoAtExitOfOptionMenu(() => Camera.Camera.FullScreen = oldFullscreen, Camera.Camera.ExportSettings);
         }
     }
 }

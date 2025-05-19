@@ -74,6 +74,7 @@ namespace Project_1.UI.OptionMenu
         
         public static void AddActionToDoAtExitOfOptionMenu(Action aReverseAction, Action aAction)
         {
+            //TODO: Right now this holds because the first changes you make gets called last, this is pretty ugly however so a better system should be developed
             ChangesMade = true;
             exitOptionsButton.AddFuncToTriggerOnExit(aReverseAction);
             saveChangesButton.AddAction(aAction);
@@ -98,6 +99,7 @@ namespace Project_1.UI.OptionMenu
             {
                 new ScreenSizeSelect(new RelativeScreenPosition(0.1f, 0.1f), new RelativeScreenPosition(0.3f, 0.1f)),
                 new CameraStyleSelect(new RelativeScreenPosition(0.1f, 0.22f), new RelativeScreenPosition(0.3f, 0.1f)),
+                new FullScreenSelect(new RelativeScreenPosition(0.1f, 0.34f), new RelativeScreenPosition(0.3f, 0.1f))
             };
         }
 

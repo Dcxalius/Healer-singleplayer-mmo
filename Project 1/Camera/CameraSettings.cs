@@ -16,8 +16,7 @@ namespace Project_1.Camera
             Free,
             CircleSoftBound,
             RectangleSoftBound,
-            Hardbound,
-            Count
+            Hardbound
         }
 
         public enum Fullscreen

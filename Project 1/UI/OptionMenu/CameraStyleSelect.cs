@@ -17,14 +17,11 @@ namespace Project_1.UI.OptionMenu
 
         public CameraStyleSelect(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.White), (int)Camera.Camera.CurrentCameraSetting, aPos, aSize)
         {
-
-            SelectBoxValueCameraSettings[] setOfValues = SelectBoxValueCameraSettings.CreateArray(this);
-            
-            values = setOfValues;
+            values = SelectBoxValueOption.CreateArray(this, Enum.GetNames(typeof(CameraSettings.Follow)));
 
             allValues.AddScrollableElements(values);
 
-            displayValue = new SelectBoxValueDisplay(RelativeScreenPosition.Zero, RelativeScreenPosition.One, setOfValues[(int)Camera.Camera.CurrentCameraSetting], this);
+            displayValue = new SelectBoxValueDisplay(RelativeScreenPosition.Zero, RelativeScreenPosition.One, values[(int)Camera.Camera.CurrentCameraSetting].DisplayText, this);
 
             AddChild(displayValue);
         }
@@ -33,7 +30,7 @@ namespace Project_1.UI.OptionMenu
         {
             base.ActionWhenSelected(aSelectedValue);
             CameraSettings.Follow oldSetting = Camera.Camera.CurrentCameraSetting;
-            Camera.Camera.CurrentCameraSetting = ((SelectBoxValueCameraSettings)values[aSelectedValue]).CameraSetting;
+            Camera.Camera.CurrentCameraSetting = Enum.Parse<CameraSettings.Follow>(values[aSelectedValue].DisplayText);
 
             OptionManager.AddActionToDoAtExitOfOptionMenu(() => Camera.Camera.CurrentCameraSetting = oldSetting, () => Camera.Camera.ExportSettings());
         }

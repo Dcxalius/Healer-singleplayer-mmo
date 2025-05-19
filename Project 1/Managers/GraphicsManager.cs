@@ -155,7 +155,7 @@ namespace Project_1.Managers
             graphicsDeviceManager.GraphicsDevice.Clear(aColor);
         }
 
-        public static void SetWindowSize(Point aSize, CameraSettings.Fullscreen aFullscreen)
+        public static void SetWindowSize(Point aSize, CameraSettings.Fullscreen aFullscreen) //TODO: Figure out whats wrong with fullscreen.
         {
             if (!AllowedSize(aSize))
             {
