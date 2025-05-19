@@ -20,7 +20,7 @@ namespace Project_1.UI.LoadingMenu
         Save save;
         Label textDetails;
         //TODO: Image from last gameframe
-        Box imagePlaceHolder;
+        RuntimeImage imagePlaceHolder;
 
         Button loadButton;
 
@@ -30,7 +30,7 @@ namespace Project_1.UI.LoadingMenu
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
             RelativeScreenPosition imgSize = new RelativeScreenPosition(1 - spacing.X - spacing.X, 1 / 3f - spacing.Y - spacing.Y);
 
-            imagePlaceHolder = new Box(new UITexture("GrayBackground", Color.Gray), spacing, imgSize); //TODO: Also make this use a default visual
+            imagePlaceHolder = new RuntimeImage(spacing, imgSize); 
             AddChild(imagePlaceHolder);
             textDetails = new Label(null, imgSize.OnlyY + spacing, imgSize, Label.TextAllignment.TopLeft, Color.Black);
             AddChild(textDetails);
@@ -50,6 +50,7 @@ namespace Project_1.UI.LoadingMenu
         {
             save = aSave;
             textDetails.Text = save.SaveDetails.Stringify;
+            imagePlaceHolder.SetImage(aSave.ImagePath);
             AddChild(loadButton);
         }
 
@@ -57,6 +58,7 @@ namespace Project_1.UI.LoadingMenu
         {
             save = null;
             textDetails.Text = null;
+            imagePlaceHolder.Clear();
             KillChild(loadButton);
         }
     }

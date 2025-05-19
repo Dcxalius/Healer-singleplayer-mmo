@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Project_1.Camera;
 using Project_1.GameObjects.Unit;
+using Project_1.Managers.States;
+using System.IO;
 
 namespace Project_1.Managers.Saves
 {
@@ -37,6 +39,7 @@ namespace Project_1.Managers.Saves
 
         public string CameraPosition => nameAsPath + "\\Camera.pos";
         string SaveDetailsPath => nameAsPath + "\\Save.Details";
+        public string ImagePath => nameAsPath + "\\SaveImage.png";
         public SaveDetails SaveDetails => saveDetails;
         SaveDetails saveDetails;
 
@@ -48,7 +51,7 @@ namespace Project_1.Managers.Saves
             if (aExistingSave)
             {
                 version = 0; //TODO: Implement this system
-                string file = System.IO.File.ReadAllText(SaveDetailsPath);
+                string file = File.ReadAllText(SaveDetailsPath);
                 saveDetails = SaveManager.ImportData<SaveDetails>(file);
                 return;
             }
@@ -71,6 +74,11 @@ namespace Project_1.Managers.Saves
             TimeSpan timeSpan = TimeManager.TotalFrameTimeAsTimeSpan;
             saveDetails = new SaveDetails(name, className, level, timeSpan);
             SaveManager.ExportData(SaveDetailsPath, saveDetails);
+
+            AbsoluteScreenPosition windowSize = Camera.Camera.WindowSize;
+            Stream imageStream = File.Create(ImagePath);
+            StateManager.FinalGameFrame.SaveAsPng(imageStream, windowSize.X, windowSize.Y);
+            imageStream.Close();
         }
 
         public void SaveData()

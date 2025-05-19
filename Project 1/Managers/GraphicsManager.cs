@@ -58,11 +58,6 @@ namespace Project_1.Managers
 
         }
 
-        [DebuggerStepThrough]
-        public static Texture2D CreateNewTexture(Point aSize)
-        {
-            return new Texture2D(graphicsDeviceManager.GraphicsDevice, aSize.X, aSize.Y);
-        }
 
         public static bool CaptureScissor(object aCaptor, Rectangle aRect)
         {
@@ -98,20 +93,13 @@ namespace Project_1.Managers
             graphicsDeviceManager.GraphicsDevice.ScissorRectangle = scissors[scissors.Count - 1].Item2;
             return true;
         }
-        public static SpriteBatch CreateSpriteBatch()
-        {
-            return new SpriteBatch(graphicsDeviceManager.GraphicsDevice);
-        }
 
-        public static RenderTarget2D CreateRenderTarget(Point aSize)
-        {
-            return new RenderTarget2D(graphicsDeviceManager.GraphicsDevice, aSize.X, aSize.Y);
-        }
 
-        public static void SetRenderTarget(RenderTarget2D aRenderTarget)
-        {
-            graphicsDeviceManager.GraphicsDevice.SetRenderTarget(aRenderTarget);
-        }
+        public static Texture2D CreateNewTexture(Point aSize) => new Texture2D(graphicsDeviceManager.GraphicsDevice, aSize.X, aSize.Y);
+        public static SpriteBatch CreateSpriteBatch() => new SpriteBatch(graphicsDeviceManager.GraphicsDevice);
+        public static RenderTarget2D CreateRenderTarget(Point aSize) => new RenderTarget2D(graphicsDeviceManager.GraphicsDevice, aSize.X, aSize.Y);
+        public static Texture2D CreateTextureFromFile(string aPath) => Texture2D.FromFile(graphicsDeviceManager.GraphicsDevice, aPath);
+        public static void SetRenderTarget(RenderTarget2D aRenderTarget) => graphicsDeviceManager.GraphicsDevice.SetRenderTarget(aRenderTarget);
 
         public static void SetManager(Microsoft.Xna.Framework.Game aGame)
         {
@@ -142,7 +130,7 @@ namespace Project_1.Managers
             windowBounds.Size = gameWindow.ClientBounds.Size + windowBounds.Location;
             //DebugManager.Print(typeof(GraphicsManager), InputManager.GetMousePosAbsolute().ToString());
             //rect.Location += 
-            if (ApplicationIsActivated())
+            if (ApplicationIsActivated()) //TODO: Add an option for this
             {
                 ClipCursor(ref windowBounds);
 
