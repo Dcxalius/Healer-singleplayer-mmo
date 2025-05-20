@@ -477,19 +477,8 @@ namespace Project_1.GameObjects.Entities
         #endregion
 
         #region Click
-        public override bool Click(ClickEvent aClickEvent)
-        {
-            if (Camera.Camera.WorldRectToScreenRect(WorldRectangle).Contains(aClickEvent.AbsolutePos.ToPoint()))
-            {
-                
-                ClickedOn(aClickEvent);
-
-                return true;
-            }
-            return false;
-        }
-
-        protected virtual void ClickedOn(ClickEvent aClickEvent)
+       
+        protected override void ClickedOn(ClickEvent aClickEvent)
         {
             if (aClickEvent.NoModifiers())
             {

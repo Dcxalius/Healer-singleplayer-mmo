@@ -23,6 +23,8 @@ using Project_1.Managers.Saves;
 using Project_1.GameObjects.FloatingTexts;
 using Project_1.GameObjects.Entities.Corspes;
 using Project_1.GameObjects.Entities.Projectiles;
+using Project_1.GameObjects.Entities.Npcs;
+using Project_1.GameObjects.Unit;
 
 namespace Project_1.GameObjects
 {
@@ -31,8 +33,13 @@ namespace Project_1.GameObjects
         public const float DistanceOfCircleAroundPlayer = 700;
         public static Player Player { get => player; }
 
-        public static List<Entity> entities = new List<Entity>();
-        public static List<GuildMember> guild = new List<GuildMember>();
+        public static List<Entity> entities;
+        public static List<GuildMember> guild;
+        public static List<Npc> npcs;
+
+        public static List<GuildMember> GetGuildMembers() => guild;
+        static GuildMember GetClosestGuildMember() => entities.MinBy(x => x.DistanceTo(player.FeetPosition)) as GuildMember;
+        static GuildMember[] GuildMembersInWorld => guild.Where(x => entities.Contains(x)).ToArray();
 
         static Player player = null;
 
@@ -41,45 +48,41 @@ namespace Project_1.GameObjects
             get
             {
                 var r = entities.Union(guild).ToList();
+                r.AddRange(npcs);
                 r.Add(player);
                 return r;
             }
         }
-        static List<GuildMember> GuildMembersInWorld
-        {
-            get
-            {
-                return guild.Where(x => entities.Contains(x)).ToList();
-            }
-         }
 
         public static void Init()
         {
-            //guild.AddRange(ObjectFactory.GetGuildMemebers());
-            //player = new Player();
-            //player.GetPartyMembersFromGuild();
-            //Camera.Camera.BindCamera(player);
-
-
-            
-            //entities.Add(new Walker(new WorldSpace(11*32)));//Debug
-            //player.Party.AddToParty(entities[entities.Count - 1] as GuildMember); //Debug
-
-
+            entities = new List<Entity>();
+            guild = new List<GuildMember>();
+            npcs = new List<Npc>();
         }
 
-        public static GuildMember FriendlyTargetCycle()
+        public static void Update()
         {
-            
-            if (player.Target == null) return GetClosestGuildMember();
-            if (player.Target.GetType() != typeof(GuildMember)) return GetClosestGuildMember();
-            return entities.Where(x => x.DistanceTo(player.FeetPosition) > player.Target.DistanceTo(player.FeetPosition)).MinBy(x => x.DistanceTo(player.FeetPosition)) as GuildMember;
+            for (int i = All.Count - 1; i >= 0; i--)
+            {
+                All[i].Update();
+            }
 
+            if (TimeManager.TotalFrameTime % 2000 < 1) //TODO: This can cause issues at lower framerate
+            {
+                for (int i = 0; i < All.Count; i++)
+                {
+                    All[i].ServerTick();
+                }
+            }
         }
 
-        static GuildMember GetClosestGuildMember()
+        public static void RefreshPlates()
         {
-            return entities.MinBy(x => x.DistanceTo(player.FeetPosition)) as GuildMember;
+            for (int i = 0; i < All.Count; i++)
+            {
+                All[i].RefreshPlates();
+            }
         }
 
         public static void CreateNewPlayer(string aName, string aClass)
@@ -89,6 +92,9 @@ namespace Project_1.GameObjects
             ObjectFactory.PlayerData = player.PlayerData;
             Camera.Camera.BindCamera(player);
         }
+        public static void RemoveEntity(Entity aObject) => entities.Remove(aObject);
+
+        
 
         
 
@@ -101,8 +107,15 @@ namespace Project_1.GameObjects
             player = new Player(ObjectFactory.PlayerData);
             player.GetPartyMembersFromGuild();
             Camera.Camera.BindCamera(player);
+            npcs.AddRange(ObjectFactory.CreateNpcs());
 
-            
+        }
+
+        public static void CreateNewGuildMember()
+        {
+            ObjectFactory.AddGuildMember("xdddd", "Rogue");
+            guild = ObjectFactory.GetGuildMemebers();
+            HUDManager.AddGuildMember(guild.Last());
         }
 
         public static void Reset()
@@ -114,12 +127,21 @@ namespace Project_1.GameObjects
             HUDManager.ClearParty();
             entities.Clear();
             guild.Clear();
+            npcs.Clear();
             CorpseManager.Reset();
             FloatingTextManager.Reset();
             if (player != null) player.Delete();
         }
 
-        public static List<GuildMember> GetGuildMembers() => guild;
+        #region Party/Guild
+        public static GuildMember FriendlyTargetCycle()
+        {
+
+            if (player.Target == null) return GetClosestGuildMember();
+            if (player.Target.GetType() != typeof(GuildMember)) return GetClosestGuildMember();
+            return entities.Where(x => x.DistanceTo(player.FeetPosition) > player.Target.DistanceTo(player.FeetPosition)).MinBy(x => x.DistanceTo(player.FeetPosition)) as GuildMember;
+
+        }
 
         public static bool SpawnGuildMemberToParty(GuildMember aMember, WorldSpace? aPosition)
         {
@@ -159,36 +181,9 @@ namespace Project_1.GameObjects
             //tile = tiles[tiles.Length - 1];
             return tile.Position;
         }
+        #endregion
 
-        public static void RemoveEntity(Entity aObject) => entities.Remove(aObject);
-
-        public static void Update()
-        {
-            for (int i = All.Count - 1; i >= 0; i--)
-            {
-                All[i].Update();
-            }
-
-            if (TimeManager.TotalFrameTime % 2000 < 1)
-            {
-                for (int i = 0; i < All.Count; i++)
-                {
-                    All[i].ServerTick();
-                }
-            }
-
-            
-        }
-
-        public static void RefreshPlates()
-        {
-            for (int i = 0; i < All.Count; i++)
-            {
-                All[i].RefreshPlates();
-            }
-        }
-
-
+        #region Click
         public static bool Click(ClickEvent aClickEvent)
         {
             if (player.Click(aClickEvent)) return true;
@@ -198,7 +193,10 @@ namespace Project_1.GameObjects
                 if (entities[i].Click(aClickEvent)) return true;
             }
 
-            if (SpawnerManager.Click(aClickEvent)) return true; 
+            for (int i = 0; i < npcs.Count; i++)
+            {
+                if (npcs[i].Click(aClickEvent)) return true;
+            }
 
             return false;
         }
@@ -234,12 +232,19 @@ namespace Project_1.GameObjects
             player.Party.IssueMoveOrder(aClickEvent);
             return true;
         }
+        #endregion
 
         public static void Draw(SpriteBatch aSpriteBatch)
         {
-            for (int i = 0; i < All.Count; i++)
+            player.Draw(aSpriteBatch);
+            for (int i = 0; i < entities.Count; i++)
             {
-                All[i].Draw(aSpriteBatch);
+                entities[i].Draw(aSpriteBatch);
+            }
+
+            for (int i = 0; i < npcs.Count; i++)
+            {
+                npcs[i].Draw(aSpriteBatch);
             }
         }
     }

@@ -69,6 +69,7 @@ namespace Project_1.Managers.States
         {
             if (base.Click(aClickEvent)) return true;
             if (ObjectManager.Click(aClickEvent)) return true;
+            if (SpawnerManager.Click(aClickEvent)) return true;
             if (CorpseManager.Click(aClickEvent)) return true;
             if (DoodadManager.Click(aClickEvent)) return true;
             return ObjectManager.ClickGround(aClickEvent);

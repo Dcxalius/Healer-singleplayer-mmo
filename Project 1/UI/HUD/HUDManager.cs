@@ -14,6 +14,7 @@ using Project_1.UI.HUD.Inventory;
 using Project_1.UI.HUD.PlateBoxes;
 using Project_1.UI.HUD.SpellBook;
 using Project_1.UI.HUD.Windows;
+using Project_1.UI.HUD.Windows.Gossip;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Bars;
 using Project_1.UI.UIElements.Boxes;
@@ -380,18 +381,39 @@ namespace Project_1.UI.HUD
         static SpellBookWindow spellBookWindow;
         static GuildWindow guildWindow;
         static InspectWindow inspectWindow;
+        static GossipWindow gossipWindow;
         static void InitWindows()
         {
             Window.Init(new RelativeScreenPosition(0.05f, 0.2f), new RelativeScreenPosition(0.1f, 0f), new RelativeScreenPosition(0.2f, 0.6f));
+
             characterWindow = new CharacterWindow();
             hudElements.Add(characterWindow);
+
             spellBookWindow = new SpellBookWindow();
             hudElements.Add(spellBookWindow);
+
             inspectWindow = new InspectWindow();
             hudElements.Add(inspectWindow);
+
             guildWindow = new GuildWindow();
             hudElements.Add(guildWindow);
 
+            gossipWindow = new GossipWindow();
+            hudElements.Add(gossipWindow);
+
+        }
+
+        public static void OpenGossipWindow(string aIntro, GossipOption[] aGossipOption)
+        {
+            gossipWindow.OpenWindow();
+            gossipWindow.ResetOptions();
+            gossipWindow.SetIntro(aIntro);
+            gossipWindow.AddOptions(aGossipOption);
+        }
+
+        public static void CloseGossipWindow()
+        {
+            gossipWindow.CloseWindow();
         }
         #endregion
 

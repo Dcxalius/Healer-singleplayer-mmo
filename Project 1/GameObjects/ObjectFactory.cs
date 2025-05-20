@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Newtonsoft.Json;
+using Project_1.Camera;
 using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Entities.Npcs;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Spawners;
 using Project_1.GameObjects.Unit;
@@ -22,6 +24,7 @@ namespace Project_1.GameObjects
 
         static PlayerData playerData;
         static List<UnitData> guildData;
+        static List<UnitData> npcData;
         static Dictionary<string, MobData> mobData;
         //static UnitData defaultData = new UnitData();
 
@@ -36,10 +39,15 @@ namespace Project_1.GameObjects
             contentRootDirectory = aC.RootDirectory;
 
             ImportClassData();
-            //ImportPlayerData();
             ImportMobData();
-            //ImportGuildData();
-            guildData = new List<UnitData>();
+            ImportNpcData();
+        }
+
+        public static void AddGuildMember(string aName, string aClassName)
+        {
+            UnitData xdd = new UnitData(aName, "", aClassName, Relation.RelationToPlayer.Friendly, 1, 0, float.MaxValue, float.MaxValue, null, WorldSpace.Zero, WorldSpace.Zero, WorldSpace.Zero, null);
+
+            guildData.Add(xdd);
         }
 
         public static void Load(Save aSave)
@@ -52,7 +60,7 @@ namespace Project_1.GameObjects
         public static void ResetUnitData()
         {
             playerData = null;
-            guildData.Clear();
+            guildData?.Clear();
         }
 
         public static MobData GetMobData(string aName)
@@ -82,6 +90,15 @@ namespace Project_1.GameObjects
         public static ClassData GetPlayerClass(string aName) => playerClassData[aName];
         public static ClassData GetAllyClass(string aName) => allyClassData[aName];
         public static ClassData GetMobClass(string aName) => mobClassData[aName];
+        public static Npc[] CreateNpcs()
+        {
+            Npc[] returnable = new Npc[npcData.Count];
+            for (int i = 0; i < npcData.Count; i++)
+            {
+                returnable[i] = new Npc(npcData[i]);
+            }
+            return returnable.ToArray();
+        }
 
         static void ImportMobData()
         {
@@ -99,7 +116,21 @@ namespace Project_1.GameObjects
             }
         }
 
-        
+        static void ImportNpcData()
+        {
+            npcData = new List<UnitData>();
+            string path = contentRootDirectory + "\\Data\\NpcData\\";
+
+
+            string[] files = System.IO.Directory.GetFiles(path);
+            for (int i = 0; i < files.Length; i++)
+            {
+                string rawData = System.IO.File.ReadAllText(files[i]);
+                NpcData data = JsonConvert.DeserializeObject<NpcData>(rawData);
+                npcData.Add(data);
+
+            }
+        }
 
         static void ImportPlayerData(Save aSave)
         {

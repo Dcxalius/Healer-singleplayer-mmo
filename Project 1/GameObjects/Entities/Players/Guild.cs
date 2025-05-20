@@ -19,8 +19,8 @@ namespace Project_1.GameObjects.Entities.Players
             owner = aOwner;
             guildMembers = new List<Friendly>();
             guildMembers.Add(aOwner);
-
             guildMembers.AddRange(ObjectManager.GetGuildMembers());
+
             SetRosterWindow();
         }
 

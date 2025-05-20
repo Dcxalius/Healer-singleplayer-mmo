@@ -40,6 +40,20 @@ namespace Project_1.UI.UIElements
 
         }
 
+        public void OpenWindow()
+        {
+            if (nrOfBookletsOpen >= maxNrOfOpenWindows) return;
+
+            if (!Visible) OpenBooklet();
+            Visible = true;
+        }
+
+        public void CloseWindow()
+        {
+            if (Visible) CloseBooklet();
+            Visible = false;
+        }
+
         public override void ToggleVisibilty()
         {
             if (nrOfBookletsOpen >= maxNrOfOpenWindows && !Visible) return;

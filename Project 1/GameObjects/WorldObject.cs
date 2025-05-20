@@ -32,12 +32,12 @@ namespace Project_1.GameObjects
             {
                 ClickedOn(aClickEvent);
 
-                return true;
+                return capturesClick;
             }
-            return capturesClick;
+            return false;
         }
 
-        public virtual void ClickedOn(ClickEvent aEvent) { }
+        protected virtual void ClickedOn(ClickEvent aEvent) { }
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)
         {
