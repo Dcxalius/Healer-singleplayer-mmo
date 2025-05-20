@@ -74,7 +74,9 @@ namespace Project_1.Textures
 
         public virtual void Update() {}
 
-        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos) => Draw(aBatch, aPos, color, offset, Camera.Camera.WorldRectangle.Bottom);
+        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos) => Draw(aBatch, aPos, color, offset, Camera.Camera.WorldRectangle.Top);
+
+        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, Color aColor) => Draw(aBatch, aPos, aColor, offset, Camera.Camera.WorldRectangle.Top);
 
         public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, float aFeetPosY) => Draw(aBatch, aPos, color, offset, aFeetPosY);
 
@@ -88,7 +90,7 @@ namespace Project_1.Textures
             {
                 //aBatch.Draw(gfx, aPos, visible, aColor, rotation, offset, Camera.Camera.Scale, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
                 //aBatch.Draw(gfx, new Rectangle(aPos.ToPoint(),ScaledSize), visible, aColor, rotation, offset, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
-                aBatch.Draw(gfx, new Rectangle(new Point((int)Math.Round(aPos.X), (int)Math.Round(aPos.Y)), ScaledSize), visible, aColor, rotation, aOffset, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
+                aBatch.Draw(gfx, new Rectangle(new Point((int)Math.Round(aPos.X), (int)Math.Round(aPos.Y)), ScaledSize), visible, aColor, rotation, aOffset, flip, (aFeetPosY - Camera.Camera.WorldRectangle.Top) / (Camera.Camera.WorldRectangle.Bottom - Camera.Camera.WorldRectangle.Top));
             }
         }
 
@@ -100,7 +102,7 @@ namespace Project_1.Textures
 
             if (Camera.Camera.MomAmIInFrame(new Rectangle(aPos, (size.ToVector2() * Camera.Camera.Scale).ToPoint())))
             {
-                aBatch.Draw(gfx, new Rectangle(aPos, ScaledSize), visible, aColor, rotation, aOffset, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
+                aBatch.Draw(gfx, new Rectangle(aPos, ScaledSize), visible, aColor, rotation, aOffset, flip, (aFeetPosY - Camera.Camera.WorldRectangle.Top) / (Camera.Camera.WorldRectangle.Bottom - Camera.Camera.WorldRectangle.Top));
             }
         }
 
@@ -110,7 +112,7 @@ namespace Project_1.Textures
 
             //if (Camera.Camera.MomAmIInFrame(aPos * Camera.Camera.Scale)) TODO: Make this check if its in frame.
             {
-                aBatch.Draw(gfx, aPos, visible, aColor, rotation, aOffset, flip, (aFeetPosY - Camera.Camera.WorldRectangle.Top) / (Camera.Camera.WorldRectangle.Bottom + size.Y - Camera.Camera.WorldRectangle.Top)); 
+                aBatch.Draw(gfx, aPos, visible, aColor, rotation, aOffset, flip, (aFeetPosY - Camera.Camera.WorldRectangle.Top) / (Camera.Camera.WorldRectangle.Bottom - Camera.Camera.WorldRectangle.Top)); 
             }
         }
     }

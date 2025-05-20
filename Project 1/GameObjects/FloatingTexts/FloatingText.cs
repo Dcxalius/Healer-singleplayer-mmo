@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects
+namespace Project_1.GameObjects.FloatingTexts
 {
     internal class FloatingText
     {
@@ -57,7 +57,7 @@ namespace Project_1.GameObjects
             spriteBatch.Begin(SpriteSortMode.Deferred);
             //spriteBatch.Begin(samplerState : SamplerState.PointClamp, effect : TextureManager.textOutline);
             text.CentreLeftDraw(spriteBatch, new AbsoluteScreenPosition(0, textSize.Y / 2));
-            
+
             spriteBatch.End();
             GraphicsManager.SetRenderTarget(null);
             //Stream stream = File.OpenWrite("xdd.png");
@@ -69,7 +69,7 @@ namespace Project_1.GameObjects
         {
             if (spawnTime + duration <= TimeManager.TotalFrameTime)
             {
-                ObjectManager.DoWhatLeaguePlayersTellMe(this);
+                FloatingTextManager.DoWhatLeaguePlayersTellMe(this);
             }
 
             momentum *= 0.99f;

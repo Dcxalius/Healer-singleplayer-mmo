@@ -16,11 +16,13 @@ using Project_1.Managers;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.Camera;
-using Project_1.GameObjects.Spells.Projectiles;
 using Project_1.GameObjects.Spawners;
 using System.Diagnostics;
 using Project_1.Tiles;
 using Project_1.Managers.Saves;
+using Project_1.GameObjects.FloatingTexts;
+using Project_1.GameObjects.Entities.Corspes;
+using Project_1.GameObjects.Entities.Projectiles;
 
 namespace Project_1.GameObjects
 {
@@ -31,12 +33,8 @@ namespace Project_1.GameObjects
 
         public static List<Entity> entities = new List<Entity>();
         public static List<GuildMember> guild = new List<GuildMember>();
-        public static List<Corpse> corpses = new List<Corpse>();
-        public static List<Projectile> projectiles = new List<Projectile>();
 
         static Player player = null;
-
-        static List<FloatingText> floatingTexts = new List<FloatingText>();
 
         static List<Entity> All
         {
@@ -92,13 +90,7 @@ namespace Project_1.GameObjects
             Camera.Camera.BindCamera(player);
         }
 
-        internal static void Save(Save save)
-        {
-            for (int i = 0; i < corpses.Count; i++)
-            {
-                SaveManager.ExportData(save.Corpses + "\\" + i + ".corpse", corpses[i]);
-            } 
-        }
+        
 
         public static void Load(Save aSave)
         {
@@ -110,13 +102,7 @@ namespace Project_1.GameObjects
             player.GetPartyMembersFromGuild();
             Camera.Camera.BindCamera(player);
 
-            string[] files = System.IO.Directory.GetFiles(aSave.Corpses);
-            for (int i = 0; i < files.Length; i++)
-            {
-                string json = System.IO.File.ReadAllText(files[i]);
-                Corpse c = SaveManager.ImportData<Corpse>(json);
-                corpses.Add(c);
-            }
+            
         }
 
         public static void Reset()
@@ -128,7 +114,8 @@ namespace Project_1.GameObjects
             HUDManager.ClearParty();
             entities.Clear();
             guild.Clear();
-            corpses.Clear();
+            CorpseManager.Reset();
+            FloatingTextManager.Reset();
             if (player != null) player.Delete();
         }
 
@@ -173,41 +160,15 @@ namespace Project_1.GameObjects
             return tile.Position;
         }
 
-        public static void DoWhatLeaguePlayersTellMe(FloatingText aText) => floatingTexts.Remove(aText);
-
-        public static void AddProjectile(Projectile aProjectile) => projectiles.Add(aProjectile);
-
-        public static void AddCorpse(Corpse aCorpse) => corpses.Add(aCorpse);
-
-        public static void DespawnCorpse(Corpse aCorpse) => corpses.Remove(aCorpse);
-
         public static void RemoveEntity(Entity aObject) => entities.Remove(aObject);
-
-        public static void SpawnFloatingText(FloatingText aFloatingText) => floatingTexts.Add(aFloatingText);
 
         public static void Update()
         {
-            for (int i = projectiles.Count - 1; i >= 0; i--)
-            {
-                projectiles[i].Update();
-                if (projectiles[i].IsFinished)
-                {
-                    projectiles.RemoveAt(i);
-                }
-            }
-
             for (int i = All.Count - 1; i >= 0; i--)
             {
                 All[i].Update();
             }
-            for (int i = corpses.Count - 1; i >= 0; i--)
-            {
-                corpses[i].Update();
-            }
-            for (int i = 0; i < floatingTexts.Count; i++)
-            {
-                floatingTexts[i].Update();
-            }
+
             if (TimeManager.TotalFrameTime % 2000 < 1)
             {
                 for (int i = 0; i < All.Count; i++)
@@ -238,11 +199,6 @@ namespace Project_1.GameObjects
             }
 
             if (SpawnerManager.Click(aClickEvent)) return true; 
-
-            for (int i = 0; i < corpses.Count; i++)
-            {
-                if (corpses[i].Click(aClickEvent)) return true; 
-            }
 
             return false;
         }
@@ -281,27 +237,10 @@ namespace Project_1.GameObjects
 
         public static void Draw(SpriteBatch aSpriteBatch)
         {
-            for (int i = 0; i < corpses.Count; i++)
+            for (int i = 0; i < All.Count; i++)
             {
-                corpses[i].Draw(aSpriteBatch);
+                All[i].Draw(aSpriteBatch);
             }
-            player.Draw(aSpriteBatch);
-            for (int i = 0; i < entities.Count; i++)
-            {
-                entities[i].Draw(aSpriteBatch);
-            }
-
-            for (int i = 0; i < projectiles.Count; i++)
-            {
-                projectiles[i].Draw(aSpriteBatch);
-            }
-
-            for (int i = 0; i < floatingTexts.Count; i++)
-            {
-                floatingTexts[i].Draw(aSpriteBatch);
-            }
-
         }
-
     }
 }

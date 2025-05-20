@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.Spells.Projectiles
+namespace Project_1.GameObjects.Entities.Projectiles
 {
     internal struct ProjectileData
     {
@@ -35,8 +35,8 @@ namespace Project_1.GameObjects.Spells.Projectiles
             this.maxSpeed = maxSpeed;
             //spell = SpellFactory.GetSpell(name);
             gfxPath = new GfxPath(GfxType.Object, name);
-            this.size = new Point(sizeX, sizeY);
-            
+            size = new Point(sizeX, sizeY);
+
 
 
             Assert();

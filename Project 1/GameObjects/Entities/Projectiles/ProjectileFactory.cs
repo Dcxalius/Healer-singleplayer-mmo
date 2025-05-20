@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Spells;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace Project_1.GameObjects.Spells.Projectiles
+namespace Project_1.GameObjects.Entities.Projectiles
 {
     internal static class ProjectileFactory
     {

@@ -20,6 +20,8 @@ using System.Diagnostics;
 using Project_1.Items;
 using Project_1.GameObjects.Unit.Classes;
 using System.Threading.Tasks.Dataflow;
+using Project_1.GameObjects.FloatingTexts;
+using Project_1.GameObjects.Entities.Corspes;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -145,8 +147,7 @@ namespace Project_1.GameObjects.Entities
 
             ObjectManager.RemoveEntity(this);
             RemoveNamePlate();
-            Corpse c = new Corpse(unitData.CorpseGfxPath, unitData.LootTable);
-            c.SpawnCorpe(Position);
+            Corpse c = new Corpse(unitData.CorpseGfxPath, unitData.LootTable, FeetPosition);
 
         }
         void TargetAliveCheck()
@@ -409,7 +410,7 @@ namespace Project_1.GameObjects.Entities
         void SpawnFlyingText(float aHealthChangeValue, WorldSpace aDirOfFlyingStuff, Color aTextColor)
         {
             FloatingText floatingText = new FloatingText(aHealthChangeValue.ToString(), aTextColor, FeetPosition, aDirOfFlyingStuff);
-            ObjectManager.SpawnFloatingText(floatingText);
+            FloatingTextManager.AddFloatingText(floatingText);
 
         }
 

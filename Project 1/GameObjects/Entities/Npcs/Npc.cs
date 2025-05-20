@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.Entities
+namespace Project_1.GameObjects.Entities.Npcs
 {
-    internal class Npc : Entity
+    internal class Npc : Friendly
     {
 
         public Npc(UnitData aUnitData) : base(aUnitData)

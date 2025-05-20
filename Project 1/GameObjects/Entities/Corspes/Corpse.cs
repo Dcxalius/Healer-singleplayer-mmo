@@ -16,12 +16,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.Entities
+namespace Project_1.GameObjects.Entities.Corspes
 {
     internal class Corpse : WorldObject
     {
-        ParticleBase lootGlow;
-        ParticleMovement lootGlowMovement;
+        static ParticleBase lootGlow;
+        static ParticleMovement lootGlowMovement;
 
         [JsonProperty]
         public LootDrop Drop => drop;
@@ -32,7 +32,15 @@ namespace Project_1.GameObjects.Entities
         float lootLength;
 
         [JsonIgnore]
-        public bool IsEmpty => drop.IsEmpty;
+        public bool IsEmpty
+        {
+            get
+            {
+                if (drop == null) return true;
+                return drop.IsEmpty;
+            }
+        }
+
         [JsonIgnore]
         public bool Despawned => isDespawning && timeDespawnStart + despawnTime < TimeManager.TotalFrameTime;
 
@@ -55,9 +63,19 @@ namespace Project_1.GameObjects.Entities
         [JsonProperty]
         WorldSpace Pos => Position;
 
-        public Corpse(GfxPath aPath, LootTable aLoot) : this(aPath, WorldSpace.Zero)
+        public static void Init()
         {
-            loot = aLoot;
+
+            lootGlow = new ParticleBase((1000d, 1000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[] { Color.Yellow }, new Point(1));
+            lootGlowMovement = new ParticleMovement(new WorldSpace(0, -1), WorldSpace.Zero, 0.95f);
+        }
+
+        public Corpse(GfxPath aPath, LootTable aLoot, WorldSpace aPos) : this(aPath, aPos)
+        {
+            if (aLoot != null)
+            {
+                drop = aLoot.GenerateDrop(this);
+            }
         }
 
         [JsonConstructor] //TODO: Make this take timers for despawnlogic
@@ -70,22 +88,14 @@ namespace Project_1.GameObjects.Entities
         {
             corpseName = aPath.Name;
 
-            lootLength = WorldRectangle.Size.ToVector2().Length();
-            lootGlow = new ParticleBase((1000d, 1000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[] { Color.Yellow }, new Point(1));
-            lootGlowMovement = new ParticleMovement(new WorldSpace(0, -1), WorldSpace.Zero, 0.95f);
-            isDespawning = false;
-        }
+            lootLength = WorldRectangle.Size.ToVector2().Length(); //TODO: Should this be rect size / 2 + const from player?
 
-        public void SpawnCorpe(WorldSpace aPos)
-        {
-            if (loot!= null)
-            {
-                drop = loot.GenerateDrop(this);
-            }
-            Position = aPos;
-            ObjectManager.AddCorpse(this);
+            isDespawning = false;
 
             timeDied = TimeManager.TotalFrameTime;
+
+            CorpseManager.AddCorpse(this);
+
         }
 
         public override bool Click(ClickEvent aClickEvent)
@@ -121,7 +131,7 @@ namespace Project_1.GameObjects.Entities
             if (!isDespawning) return;
             if (!Despawned) return;
 
-            ObjectManager.DespawnCorpse(this);
+            CorpseManager.RemoveCorpse(this);
         }
 
         void DespawnWithoutLootInside()
@@ -144,7 +154,7 @@ namespace Project_1.GameObjects.Entities
 
         void StartDespawn()
         {
-            isDespawning = true; 
+            isDespawning = true;
             timeDespawnStart = TimeManager.TotalFrameTime;
         }
 
@@ -154,7 +164,7 @@ namespace Project_1.GameObjects.Entities
             //gfx.Draw(aBatch, Camera.Camera.WorldPosToCameraSpace(Position), Position.Y);
             if (isDespawning)
             {
-                gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2(), Color.White * (float)(1 - ((TimeManager.TotalFrameTime - timeDespawnStart) / despawnTime)), FeetPosition.Y);
+                gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2(), Color.White * (float)(1 - (TimeManager.TotalFrameTime - timeDespawnStart) / despawnTime), FeetPosition.Y);
                 return;
             }
             gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2(), FeetPosition.Y);

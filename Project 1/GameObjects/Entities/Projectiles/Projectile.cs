@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.Spells.Projectiles
+namespace Project_1.GameObjects.Entities.Projectiles
 {
     internal class Projectile : MovingObject
     {
@@ -38,7 +38,8 @@ namespace Project_1.GameObjects.Spells.Projectiles
             gfx.Rotation = (float)Math.Atan2(dir.Y, dir.X);
             Size = projectileData.Size;
             gfx.Offset = Size.ToVector2() / 2;
-            //Debug.Assert(projectileData != null);
+
+            ProjectileManager.AddProjectile(this);
         }
 
         public override void Update()

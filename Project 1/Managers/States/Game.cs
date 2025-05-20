@@ -3,6 +3,9 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Doodads;
+using Project_1.GameObjects.Entities.Corspes;
+using Project_1.GameObjects.Entities.Projectiles;
+using Project_1.GameObjects.FloatingTexts;
 using Project_1.GameObjects.Spawners;
 using Project_1.Input;
 using Project_1.Particles;
@@ -26,6 +29,9 @@ namespace Project_1.Managers.States
         {
             HUDManager.Init();
             ObjectManager.Init();
+            ProjectileManager.Init();
+            FloatingTextManager.Init();
+            CorpseManager.Init();
             DoodadManager.Init();
             TileManager.Init();
 
@@ -39,11 +45,15 @@ namespace Project_1.Managers.States
             if (InputManager.GetPress(Microsoft.Xna.Framework.Input.Keys.Escape))
             {
                 StateManager.SetState(StateManager.States.PauseMenu);
+                return;
             }
             Camera.Camera.Update();
             ObjectManager.Update();
+            FloatingTextManager.Update();
+            CorpseManager.Update();
             DoodadManager.Update();
             SpawnerManager.Update();
+            ProjectileManager.Update();
             ParticleManager.Update();
             base.Update();
 
@@ -59,6 +69,7 @@ namespace Project_1.Managers.States
         {
             if (base.Click(aClickEvent)) return true;
             if (ObjectManager.Click(aClickEvent)) return true;
+            if (CorpseManager.Click(aClickEvent)) return true;
             if (DoodadManager.Click(aClickEvent)) return true;
             return ObjectManager.ClickGround(aClickEvent);
         }
@@ -88,7 +99,7 @@ namespace Project_1.Managers.States
         public override RenderTarget2D Draw()
         {
             UIDraw();
-            PrepRender(Color.White, SpriteSortMode.Immediate);
+            PrepRender(Color.White, SpriteSortMode.FrontToBack);
 
             DrawList(spriteBatch);
             spriteBatch.Draw(uITarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
@@ -99,12 +110,16 @@ namespace Project_1.Managers.States
 
         void DrawList(SpriteBatch aBatch)
         {
-
             TileManager.Draw(aBatch);
-            DoodadManager.Draw(aBatch);
+
+            ProjectileManager.Draw(aBatch);
             ObjectManager.Draw(aBatch);
+            DoodadManager.Draw(aBatch);
+            CorpseManager.Draw(aBatch);
             SpawnerManager.Draw(aBatch);
+
             ParticleManager.Draw(aBatch);
+            FloatingTextManager.Draw(aBatch);
         }
 
         

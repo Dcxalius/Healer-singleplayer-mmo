@@ -12,6 +12,7 @@ using Project_1.Camera;
 using Project_1.GameObjects.Unit;
 using Project_1.Managers.States;
 using System.IO;
+using Project_1.GameObjects.Entities.Corspes;
 
 namespace Project_1.Managers.Saves
 {
@@ -86,7 +87,7 @@ namespace Project_1.Managers.Saves
             SaveSaveDetails();
             Camera.Camera.SavePosition(this);
             ObjectFactory.SaveData(this);
-            ObjectManager.Save(this);
+            CorpseManager.Save(this);
             TileManager.SaveData(this);
             SpawnerManager.SaveData(this);
             //TimeManager.Save(this); //Done through savedetails atm
@@ -98,6 +99,7 @@ namespace Project_1.Managers.Saves
             Camera.Camera.LoadPosition(this);
             TileManager.Load(this); 
             ObjectManager.Load(this);
+            CorpseManager.Load(this);
             SpawnerManager.Load(this);
             TimeManager.Load(this);
         }
