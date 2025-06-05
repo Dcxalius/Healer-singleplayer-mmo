@@ -18,19 +18,22 @@ using System.Threading.Tasks;
 
 namespace Project_1.GameObjects
 {
-    internal static class ObjectFactory
+    internal static class ObjectFactory  //TODO: Split this in two, one to handle static data like classes and one to handle dynamic data
     {
         public static PlayerData PlayerData { get => playerData; set => playerData = value; }
 
         static PlayerData playerData;
         static List<UnitData> guildData;
         static List<UnitData> npcData;
+
         static Dictionary<string, MobData> mobData;
         //static UnitData defaultData = new UnitData();
 
         static Dictionary<string, FriendlyClassData> playerClassData;
         static Dictionary<string, FriendlyClassData> allyClassData;
         static Dictionary<string, MobClassData> mobClassData;
+
+        static Dictionary<string, GossipData> gossipData;
 
         static string contentRootDirectory;
 
@@ -41,6 +44,7 @@ namespace Project_1.GameObjects
             ImportClassData();
             ImportMobData();
             ImportNpcData();
+            ImportGossipData();
         }
 
         public static void AddGuildMember(string aName, string aClassName)
@@ -90,6 +94,7 @@ namespace Project_1.GameObjects
         public static ClassData GetPlayerClass(string aName) => playerClassData[aName];
         public static ClassData GetAllyClass(string aName) => allyClassData[aName];
         public static ClassData GetMobClass(string aName) => mobClassData[aName];
+        public static GossipData GetGossip(string aName) => gossipData[aName];
         public static Npc[] CreateNpcs()
         {
             Npc[] returnable = new Npc[npcData.Count];
@@ -99,6 +104,23 @@ namespace Project_1.GameObjects
             }
             return returnable.ToArray();
         }
+
+        static void ImportGossipData()
+        {
+            gossipData = new Dictionary<string, GossipData>();
+            string path = contentRootDirectory + "\\Data\\NpcData\\Gossip\\";
+
+            string[] files = System.IO.Directory.GetFiles(path);
+            for (int i = 0; i < files.Length; i++)
+            {
+                string rawData = System.IO.File.ReadAllText(files[i]);
+                
+                GossipData data = JsonConvert.DeserializeObject<GossipData>(rawData);
+                gossipData.Add(SaveManager.TrimToNameOnly(files[i]), data);
+
+            }
+        }
+
 
         static void ImportMobData()
         {

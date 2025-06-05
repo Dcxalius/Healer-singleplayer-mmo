@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Entities.Npcs;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Unit;
@@ -400,20 +401,27 @@ namespace Project_1.UI.HUD
 
             gossipWindow = new GossipWindow();
             hudElements.Add(gossipWindow);
+            ChatGossipOption.SetGossipWindow = gossipWindow.GetSet();
 
         }
 
-        public static void OpenGossipWindow(string aIntro, GossipOption[] aGossipOption)
+        public static void OpenGossipWindow(ChatGossipOption aIntro, Npc aNpc)
         {
             gossipWindow.OpenWindow();
             gossipWindow.ResetOptions();
-            gossipWindow.SetIntro(aIntro);
-            gossipWindow.AddOptions(aGossipOption);
+            gossipWindow.Set(aIntro, aNpc);
+            //gossipWindow.SetIntro(aIntro);
+            //gossipWindow.AddOptions(aGossipOption);
         }
 
         public static void CloseGossipWindow()
         {
             gossipWindow.CloseWindow();
+        }
+
+        public static Action<ChatGossipOption> GetGossipSetAction()
+        {
+            return gossipWindow.GetSet();
         }
         #endregion
 

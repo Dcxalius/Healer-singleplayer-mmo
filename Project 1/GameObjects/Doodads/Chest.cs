@@ -20,7 +20,7 @@ namespace Project_1.GameObjects.Doodads
             
         }
 
-        public override void ClickedOn(ClickEvent aEvent)
+        protected override void ClickedOn(ClickEvent aEvent)
         {
             base.ClickedOn(aEvent);
 

@@ -14,9 +14,7 @@ namespace Project_1.UI.HUD.Windows.Gossip
 {
     internal class GossipOption : Button
     {
-        //Label text;
-
-        public GossipOption(string aDescriptor) : base(RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Color.Lime, aDescriptor)
+        public GossipOption(string aDescriptor) : base(RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Color.DarkGreen, aDescriptor)
         {
             //text = new Label(aDescriptor, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.Centred, Color.Black);
             //AddChild(text);

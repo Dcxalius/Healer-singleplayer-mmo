@@ -101,6 +101,8 @@ namespace Project_1.GameObjects.Entities
             groundEffects.Add(new Shadow());
             groundEffects.Add(new SelectRing());
             CreateNamePlate();
+
+            CapturesClick = true;
         }
 
         public void Delete()
