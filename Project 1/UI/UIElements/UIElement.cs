@@ -298,6 +298,13 @@ namespace Project_1.UI.UIElements
             MoveBoundsCheck();
         }
 
+        public void Bump(AbsoluteScreenPosition aAmount)
+        {
+            RelativeScreenPosition a = aAmount.ToRelativeScreenPosition();
+            Move(RelativePos + a);
+
+        }
+
         void MoveBoundsCheck()
         {
             AlwaysOnScreenCheck();

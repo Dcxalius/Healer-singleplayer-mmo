@@ -30,6 +30,7 @@ namespace Project_1.Textures
                 offset = font.MeasureString(value);
             }
         }
+        string textToDisplay;
 
         public virtual Color Color
         {
@@ -38,11 +39,15 @@ namespace Project_1.Textures
         }
 
         public Vector2 Offset { get => offset; }
-        public Vector2 CalculatePartialOffset(int aIndexToCalculateTo) => font.MeasureString(textToDisplay.Substring(0, aIndexToCalculateTo));
-        static public Vector2 CalculateOffset(string aString, SpriteFont aFont) => aFont.MeasureString(aString);
-
-        string textToDisplay;
         Vector2 offset;
+        public Vector2 CalculatePartialOffset(int aIndexToCalculateTo) => CalculatePartialOffset(0, aIndexToCalculateTo);
+        public Vector2 CalculatePartialOffset(int aStartIndex, int aIndexToCalculateTo) => font.MeasureString(textToDisplay.Substring(aStartIndex, aIndexToCalculateTo));
+        static public Vector2 CalculateOffset(string aString, SpriteFont aFont) => aFont.MeasureString(aString);
+        static public Vector2 CalculatePartialOffset(string aString, SpriteFont aFont, int aIndexToCalculateTo) => CalculatePartialOffset(aString, aFont, 0, aIndexToCalculateTo);
+        static public Vector2 CalculatePartialOffset(string aString, SpriteFont aFont, int aStartIndex, int aIndexToCalculateTo) => CalculateOffset(aString.Substring(aStartIndex, aIndexToCalculateTo), aFont);
+
+
+        public SpriteFont Font => font;
         protected SpriteFont font;
         Color color;
         float scale;

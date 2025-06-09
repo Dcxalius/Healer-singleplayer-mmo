@@ -24,7 +24,7 @@ namespace Project_1.UI.HUD.Windows.Gossip
         public GossipWindow() : base(new UITexture("WhiteBackground", Color.AntiqueWhite))
         {
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.05f, Size);
-            RelativeScreenPosition introSize = new RelativeScreenPosition(1 - spacing.X * 2, 0.4f);
+            RelativeScreenPosition introSize = new RelativeScreenPosition((1 - spacing.X * 2), 0.4f);
             introduction = new Label("", spacing, introSize, Label.TextAllignment.TopLeft, Color.Black);
             AddChild(introduction);
             options = new ScrollableBox(10, UITexture.Null, Color.AliceBlue, introSize.OnlyY + spacing, RelativeScreenPosition.One - spacing - introSize.OnlyY);
@@ -59,7 +59,7 @@ namespace Project_1.UI.HUD.Windows.Gossip
         {
             Debug.Assert(npcTalkingTo != null);
             ResetOptions();
-            introduction.Text = aOption.IntroText; //TODO: Implement text wrapping
+            introduction.Text = aOption.IntroText;
             AddOptions(aOption.GossipOptions);
         }
 
