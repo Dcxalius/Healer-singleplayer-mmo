@@ -11,7 +11,7 @@ using Project_1.Input;
 using Project_1.Particles;
 using Project_1.Tiles;
 using Project_1.UI;
-using Project_1.UI.HUD;
+using Project_1.UI.HUD.Managers;
 using Project_1.UI.PauseMenu;
 using System;
 using System.Collections.Generic;

@@ -107,6 +107,7 @@ namespace Project_1.UI.HUD
             int y = int.Parse(directionBoxY.Input);
 
             target.Resize(new AbsoluteScreenPosition(x, y).ToRelativeScreenPosition());
+            target.Rescale();
         }
 
         Action NudgeValues(Cardinals aCardinal)
@@ -116,16 +117,16 @@ namespace Project_1.UI.HUD
             switch (aCardinal)
             {
                 case Cardinals.Up:
-                    sizeChange = new AbsoluteScreenPosition(0, -1);
+                    sizeChange = AbsoluteScreenPosition.UpCardinal;
                     break;
                 case Cardinals.Down:
-                    sizeChange = new AbsoluteScreenPosition(0, 1);
+                    sizeChange = AbsoluteScreenPosition.DownCardinal;
                     break;
                 case Cardinals.Left:
-                    sizeChange = new AbsoluteScreenPosition(-1, 0);
+                    sizeChange = AbsoluteScreenPosition.LeftCardinal;
                     break;
                 case Cardinals.Right:
-                    sizeChange = new AbsoluteScreenPosition(1, 0);
+                    sizeChange = AbsoluteScreenPosition.RightCardinal;
                     break;
                 default:
                     throw new NotImplementedException();
@@ -134,6 +135,7 @@ namespace Project_1.UI.HUD
             return new Action(() =>
             {
                 target.Resize((target.Size + sizeChange).ToRelativeScreenPosition());
+                target.Rescale();
                 Move(target.RelativePos - RelativeSize);
             });
         }

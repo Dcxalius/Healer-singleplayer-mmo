@@ -1,11 +1,11 @@
-﻿using Project_1.UI.HUD;
-using Project_1.UI;
+﻿using Project_1.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using Project_1.UI.HUD.Managers;
 
 namespace Project_1.GameObjects.Entities.Players
 {
@@ -39,7 +39,7 @@ namespace Project_1.GameObjects.Entities.Players
             {
                 data[i] = guildMembers[i].CreateGuildMemberData();
             }
-            HUDManager.SetGuildMembers(guildMembers.ToArray());
+            HUDManager.windowHandler.SetGuildMembers(guildMembers.ToArray());
         }
     }
 }

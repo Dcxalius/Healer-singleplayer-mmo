@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.UI.HUD;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
@@ -13,6 +14,12 @@ namespace Project_1.Camera
     [DebuggerStepThrough]
     internal struct AbsoluteScreenPosition
     {
+        public static AbsoluteScreenPosition UpCardinal => new AbsoluteScreenPosition(0, -1);
+        public static AbsoluteScreenPosition DownCardinal => new AbsoluteScreenPosition(0, 1);
+        public static AbsoluteScreenPosition LeftCardinal => new AbsoluteScreenPosition(-1, 0);
+        public static AbsoluteScreenPosition RightCardinal => new AbsoluteScreenPosition(0, 1);
+
+
         Point position;
         public static AbsoluteScreenPosition Zero { get { return new AbsoluteScreenPosition(); } }
 

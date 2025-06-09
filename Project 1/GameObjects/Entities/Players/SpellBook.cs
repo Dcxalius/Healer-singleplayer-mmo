@@ -1,7 +1,7 @@
 ﻿using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Unit;
 using Project_1.Managers;
-using Project_1.UI.HUD;
+using Project_1.UI.HUD.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -90,7 +90,7 @@ namespace Project_1.GameObjects.Entities.Players
         public void AddSpell(Spell aSpell)
         {
             knownSpells.Add(aSpell);
-            HUDManager.AddSpellToSpellBook(aSpell);
+            HUDManager.windowHandler.AddSpellToSpellBook(aSpell);
         }
 
 

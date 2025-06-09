@@ -3,6 +3,7 @@ using Project_1.Camera;
 using Project_1.Managers;
 using Project_1.Managers.States;
 using Project_1.Textures;
+using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
 using System;

@@ -9,7 +9,7 @@ using Project_1.Items;
 using Project_1.Items.SubTypes;
 using Project_1.Managers;
 using Project_1.Textures;
-using Project_1.UI.HUD;
+using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements.Buttons;
 using System;
 using System.Collections.Generic;
@@ -51,7 +51,7 @@ namespace Project_1.UI.HUD.Inventory
 
                 if (bagIndex == -3) return ObjectManager.Player.Equipment.EquipedInSlot((GameObjects.Unit.Equipment.Slot)slotIndex);
 
-                if (bagIndex == -4) return HUDManager.GetGuildMemberInspectWindowTarget().Equipment.EquipedInSlot((GameObjects.Unit.Equipment.Slot)slotIndex);
+                if (bagIndex == -4) return HUDManager.windowHandler.GetGuildMemberInspectWindowTarget().Equipment.EquipedInSlot((GameObjects.Unit.Equipment.Slot)slotIndex);
 
                 throw new NotImplementedException();
             }
@@ -267,7 +267,7 @@ namespace Project_1.UI.HUD.Inventory
         {
             if (aItemDroppedOnMe.bagIndex != -4) return false;
 
-            Entity openGuildPage = HUDManager.GetGuildMemberInspectWindowTarget();
+            Entity openGuildPage = HUDManager.windowHandler.GetGuildMemberInspectWindowTarget();
             if (bagIndex == -4)
             {
                 Equipment thisItem = GetActualItem as Equipment;
@@ -319,7 +319,7 @@ namespace Project_1.UI.HUD.Inventory
         bool ToGuildMemberCharacterPane(Item aItemDroppedOnMe)
         {
             if (bagIndex != -4) return false;
-            ObjectManager.Player.Inventory.SwapEquipment(aItemDroppedOnMe.Index, slotIndex, HUDManager.GetGuildMemberInspectWindowTarget());
+            ObjectManager.Player.Inventory.SwapEquipment(aItemDroppedOnMe.Index, slotIndex, HUDManager.windowHandler.GetGuildMemberInspectWindowTarget());
             //TODO: Handle if trying to drag inbetween sheets.
             return true;
         }
@@ -363,8 +363,8 @@ namespace Project_1.UI.HUD.Inventory
             if (bagIndex >= 0)
             {
                 Friendly target;
-                if (HUDManager.GetGuildMemberInspectWindowTarget() == null || HUDManager.PlayerCharacterPaneOpen) target = ObjectManager.Player;
-                else target = HUDManager.GetGuildMemberInspectWindowTarget();
+                if (HUDManager.windowHandler.GetGuildMemberInspectWindowTarget() == null || HUDManager.windowHandler.PlayerCharacterPaneOpen) target = ObjectManager.Player;
+                else target = HUDManager.windowHandler.GetGuildMemberInspectWindowTarget();
                 switch (ObjectManager.Player.Inventory.GetItemInSlot(Index).ItemType)
                 {
                     case ItemData.ItemType.NotSet:

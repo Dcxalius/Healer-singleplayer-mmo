@@ -2,7 +2,7 @@
 using Project_1.Input;
 using Project_1.Items;
 using Project_1.Textures;
-using Project_1.UI.HUD;
+using Project_1.UI.HUD.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;

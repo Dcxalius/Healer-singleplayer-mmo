@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Input;
-using Project_1.UI.HUD;
+using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;

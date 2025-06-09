@@ -4,7 +4,7 @@ using Project_1.GameObjects;
 using Project_1.GameObjects.Spawners;
 using Project_1.Managers.Saves;
 using Project_1.Tiles;
-using Project_1.UI.HUD;
+using Project_1.UI.HUD.Managers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

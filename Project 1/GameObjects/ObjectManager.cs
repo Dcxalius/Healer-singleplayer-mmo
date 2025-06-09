@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Project_1.Input;
-using Project_1.UI.HUD;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +24,7 @@ using Project_1.GameObjects.Entities.Corspes;
 using Project_1.GameObjects.Entities.Projectiles;
 using Project_1.GameObjects.Entities.Npcs;
 using Project_1.GameObjects.Unit;
+using Project_1.UI.HUD.Managers;
 
 namespace Project_1.GameObjects
 {
@@ -115,7 +115,7 @@ namespace Project_1.GameObjects
         {
             ObjectFactory.AddGuildMember("xdddd", "Rogue");
             guild = ObjectFactory.GetGuildMemebers();
-            HUDManager.AddGuildMember(guild.Last());
+            HUDManager.windowHandler.AddGuildMember(guild.Last());
         }
 
         public static void Reset()
@@ -124,7 +124,7 @@ namespace Project_1.GameObjects
             {
                 guild[i].Delete();
             }
-            HUDManager.ClearParty();
+            HUDManager.plateBoxHandler.ClearParty();
             entities.Clear();
             guild.Clear();
             npcs.Clear();

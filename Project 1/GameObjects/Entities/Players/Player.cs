@@ -11,13 +11,13 @@ using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.Input;
 using Project_1.Tiles;
-using Project_1.UI.HUD;
 using Project_1.Textures.AnimatedTextures;
 using Project_1.Items;
 using Project_1.GameObjects.Spells;
 using Project_1.Camera;
 using Project_1.UI.UIElements.Buttons;
 using System.Diagnostics;
+using Project_1.UI.HUD.Managers;
 
 namespace Project_1.GameObjects.Entities.Players
 {
@@ -52,9 +52,9 @@ namespace Project_1.GameObjects.Entities.Players
 
             LoadSpellBar(PlayerData.SavedSpellsOnBar);
 
-            HUDManager.RefreshSpellBook(SpellBook.Spells);
-            HUDManager.SetCharacterWindow(this);
-            HUDManager.SetPlayerPlateBox(this);
+            HUDManager.windowHandler.RefreshSpellBook(SpellBook.Spells);
+            HUDManager.windowHandler.SetCharacterWindow(this);
+            HUDManager.plateBoxHandler.SetPlayerPlateBox(this);
         }
 
         public override void Update()
@@ -97,7 +97,7 @@ namespace Project_1.GameObjects.Entities.Players
             }
 
 
-            HUDManager.SetGuildMemberInviteStatus(partyMembers.ToList(), Enumerable.Repeat(TwoStateGFXButton.State.Second, partyMembers.Length).ToList());
+            HUDManager.windowHandler.SetGuildMemberInviteStatus(partyMembers.ToList(), Enumerable.Repeat(TwoStateGFXButton.State.Second, partyMembers.Length).ToList());
         }
 
         void KeyboardWalk()

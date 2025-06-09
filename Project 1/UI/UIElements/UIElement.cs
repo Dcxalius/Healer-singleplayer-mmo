@@ -5,7 +5,7 @@ using Project_1.Camera;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
-using Project_1.UI.HUD;
+using Project_1.UI.HUD.Managers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -403,7 +403,7 @@ namespace Project_1.UI.UIElements
 
         public virtual void Resize(RelativeScreenPosition aSize)
         {
-           aSize.Assert();
+            aSize.Assert();
             relativeSize = aSize;
         }
 

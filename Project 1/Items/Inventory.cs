@@ -4,7 +4,7 @@ using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.Items.SubTypes;
 using Project_1.Managers;
-using Project_1.UI.HUD;
+using Project_1.UI.HUD.Managers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

@@ -1,7 +1,7 @@
 ﻿using Project_1.Camera;
 using Project_1.GameObjects.Unit;
 using Project_1.Input;
-using Project_1.UI.HUD;
+using Project_1.UI.HUD.Managers;
 using Project_1.UI.HUD.Windows.Gossip;
 using System;
 using System.Collections.Generic;
@@ -29,7 +29,7 @@ namespace Project_1.GameObjects.Entities.Npcs
 
             if (!InConversationRange(ObjectManager.Player.FeetPosition)) return;
 
-            HUDManager.OpenGossipWindow(gossip.Start, this);
+            HUDManager.windowHandler.OpenGossipWindow(gossip.Start, this);
         }
 
         public override void ExpToParty(int aExpAmount)

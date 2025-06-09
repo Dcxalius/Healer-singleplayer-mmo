@@ -2,7 +2,7 @@
 using Project_1.GameObjects.Spells;
 using Project_1.Managers;
 using Project_1.Tiles;
-using Project_1.UI.HUD;
+using Project_1.UI.HUD.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,7 +1,7 @@
 ﻿using Project_1.Camera;
 using Project_1.GameObjects.Unit;
 using Project_1.Input;
-using Project_1.UI.HUD;
+using Project_1.UI.HUD.Managers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -50,7 +50,7 @@ namespace Project_1.GameObjects.Entities.Players
 
         public void ClearCommand()
         {
-            HUDManager.RemoveWalkersFromControl(commands.ToArray());
+            HUDManager.plateBoxHandler.RemoveWalkerFromControl(commands.ToArray());
             commands.Clear();
         }
 
@@ -58,7 +58,7 @@ namespace Project_1.GameObjects.Entities.Players
         {
             if (commands.Contains(aGuildMember)) { return; }
 
-            HUDManager.AddWalkerToControl(aGuildMember);
+            HUDManager.plateBoxHandler.AddGuildMemberToControl(aGuildMember);
             commands.Add(aGuildMember);
         }
 
@@ -73,7 +73,7 @@ namespace Project_1.GameObjects.Entities.Players
         {
             if (!commands.Contains(aGuildMember)) { return; }
 
-            HUDManager.RemoveWalkersFromControl(new GuildMember[] { aGuildMember });
+            HUDManager.plateBoxHandler.RemoveWalkerFromControl(new GuildMember[] { aGuildMember });
             commands.Remove(aGuildMember);
         }
 
@@ -84,7 +84,7 @@ namespace Project_1.GameObjects.Entities.Players
             party.Add(aGuildMember);
             aGuildMember.AddedToParty();
 
-            HUDManager.AddGuildMemberToParty(party[party.Count - 1]);
+            HUDManager.plateBoxHandler.AddGuildMemberToParty(party[party.Count - 1]);
             return true;
         }
 
@@ -94,7 +94,7 @@ namespace Project_1.GameObjects.Entities.Players
             Debug.Assert(aGuildMember != null);
             Debug.Assert(IsInParty(aGuildMember));
 
-            HUDManager.RemoveGuildMemberFromParty(aGuildMember);
+            HUDManager.plateBoxHandler.RemoveGuildMemberFromParty(aGuildMember);
             party.Remove(aGuildMember);
             aGuildMember.RemovedFromParty();
             return true;

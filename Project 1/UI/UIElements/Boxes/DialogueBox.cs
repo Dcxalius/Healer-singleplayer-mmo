@@ -7,10 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Project_1.Managers.States;
-using Project_1.UI.HUD;
 using Project_1.UI.UIElements.Buttons;
 using System.Diagnostics.CodeAnalysis;
 using Project_1.Managers;
+using Project_1.UI.HUD.Managers;
 
 namespace Project_1.UI.UIElements.Boxes
 {

@@ -3,7 +3,7 @@ using Project_1.Camera;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.Textures;
-using Project_1.UI.HUD;
+using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements.Buttons;
 using System;
 using System.Collections.Generic;
@@ -19,10 +19,10 @@ namespace Project_1.UI.HUD.Guild
         {
             if (aFriendly.RelationToPlayer == GameObjects.Unit.Relation.RelationToPlayer.Self)
             {
-                HUDManager.ToggleCharacterWindow();
+                HUDManager.windowHandler.ToggleCharacterWindow();
                 return;
             }
-            HUDManager.ToggleInspectWindow(aFriendly as GuildMember);
+            HUDManager.windowHandler.ToggleInspectWindow(aFriendly as GuildMember);
         }
 
         public OpenInspectWindow(Friendly aFriendly, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new List<Action>() { new Action(() => OpenWindow(aFriendly)) }, new GfxPath(GfxType.Item, "TestDagger"), aPos, aSize, Color.White)

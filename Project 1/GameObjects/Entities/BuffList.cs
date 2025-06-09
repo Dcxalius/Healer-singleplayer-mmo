@@ -1,5 +1,5 @@
 ﻿using Project_1.GameObjects.Spells.Buff;
-using Project_1.UI.HUD;
+using Project_1.UI.HUD.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +42,7 @@ namespace Project_1.GameObjects.Entities
             }
 
             buffs.Add(aBuff);
-            HUDManager.AddBuff(buffs.Last(), aOwner);
+            HUDManager.plateBoxHandler.AddBuff(buffs.Last(), aOwner);
         }
 
         public List<Buff> GetAllBuffs()

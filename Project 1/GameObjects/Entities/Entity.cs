@@ -22,6 +22,7 @@ using Project_1.GameObjects.Unit.Classes;
 using System.Threading.Tasks.Dataflow;
 using Project_1.GameObjects.FloatingTexts;
 using Project_1.GameObjects.Entities.Corspes;
+using Project_1.UI.HUD.Managers;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -292,20 +293,18 @@ namespace Project_1.GameObjects.Entities
         }
         #endregion
 
-        #region Target
+
         public void SetTarget(Entity aEntity)
         {
             target = aEntity;
-            HUDManager.SetNewTarget(this, target);
+            HUDManager.plateBoxHandler.SetNewTarget(this, target);
         }
 
         public void RemoveTarget()
         {
             target = null;
-            HUDManager.SetNewTarget(this, null);
+            HUDManager.plateBoxHandler.SetNewTarget(this, null);
         }
-
-        #endregion
 
         #region Spells
         public bool OffGlobalCooldown => spellCast.OffGlobalCooldown;
@@ -446,21 +445,21 @@ namespace Project_1.GameObjects.Entities
             unitData.GainExp(aExpAmount);
 
             if (!(this is Friendly)) return;
-            HUDManager.RefreshCharacterWindowExpBar(this as Friendly);
+            HUDManager.windowHandler.RefreshCharacterWindowExpBar(this as Friendly);
         }
 
 
         protected void CreateNamePlate()
         {
             namePlate = new NamePlate(this);
-            HUDManager.AddNamePlate(this, namePlate);
+            HUDManager.namePlateHandler.AddNamePlate(this, namePlate);
 
         }
 
         protected void RemoveNamePlate()
         {
             namePlate = null;
-            HUDManager.RemoveNamePlate(this);
+            HUDManager.namePlateHandler.RemoveNamePlate(this);
         }
 
         protected void FlagForRefresh() => namePlateRequiresUpdate = true;
@@ -468,7 +467,7 @@ namespace Project_1.GameObjects.Entities
         public virtual void RefreshPlates()
         {
             if (!namePlateRequiresUpdate) return;
-            HUDManager.RefreshPlates(this);
+            HUDManager.plateBoxHandler.RefreshPlates(this);
         }
 
         protected virtual void MoveNamePlate()

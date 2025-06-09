@@ -1,7 +1,7 @@
 ﻿using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Unit.Classes;
 using Project_1.GameObjects.Unit.Resources;
-using Project_1.UI.HUD;
+using Project_1.UI.HUD.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -81,7 +81,7 @@ namespace Project_1.GameObjects.Unit.Stats
         public void SetOwner(Entity aEntity)
         {
             owner = aEntity;
-            HUDManager.RefreshCharacterWindowStats(StatReport, owner as Friendly);
+            HUDManager.windowHandler.RefreshCharacterWindowStats(StatReport, owner as Friendly);
         }
 
         public bool CheckIfResourceRegened()
@@ -110,7 +110,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
 
             if (!(owner is Friendly)) return;
-            HUDManager.RefreshCharacterWindowStats(StatReport, owner as Friendly);
+            HUDManager.windowHandler.RefreshCharacterWindowStats(StatReport, owner as Friendly);
         }
 
         public void RefreshEquipmentStats(EquipmentStats aEquipmentStats)
