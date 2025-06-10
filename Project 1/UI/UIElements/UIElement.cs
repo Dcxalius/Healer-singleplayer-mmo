@@ -407,7 +407,7 @@ namespace Project_1.UI.UIElements
             relativeSize = aSize;
         }
 
-        //public virtual void Resize(AbsoluteScreenPosition aSize) => relativeSize = aSize.ToRelativeScreenPosition(); //TODO: ??????
+        public virtual void Resize(AbsoluteScreenPosition aSize) => Resize(aSize.ToRelativeScreenPosition(ParentSize));
 
         public virtual void Close()
         {

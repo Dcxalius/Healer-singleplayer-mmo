@@ -22,17 +22,17 @@ namespace Project_1.UI.HUD.Inventory
 
         public BagHolderBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.White), aPos, aSize)
         {
-            defaultBag = new Item(-1, 0, false, Color.White, new GfxPath(GfxType.Item, "DefaultBag"), InventoryBox.spacing, InventoryBox.itemSize.ToRelativeScreenPosition());
+            defaultBag = new Item(-1, 0, false, Color.White, new GfxPath(GfxType.Item, "DefaultBag"), InventoryBox.BagBoxSpacing.ToAbsoluteScreenPos(InventoryBox.BagBoxSize.ToAbsoluteScreenPos(ParentSize)).ToRelativeScreenPosition(Size), InventoryBox.ItemSize.ToAbsoluteScreenPos(InventoryBox.BagBoxSize.ToAbsoluteScreenPos(ParentSize)).ToRelativeScreenPosition(Size));
             AddChild(defaultBag);
         }
 
-        public void SetBags(Container[] aBags)
+        public void SetBags(Container[] aBags, AbsoluteScreenPosition aItemSize, AbsoluteScreenPosition aSpacingSize)
         {
             bags = new Item[aBags.Length - 1];
             for (int i = 1; i < aBags.Length; i++)
             {
-                RelativeScreenPosition pos = new RelativeScreenPosition(i * (InventoryBox.itemSize.X + InventoryBox.spacing.X) + InventoryBox.spacing.X, InventoryBox.spacing.Y);
-                RelativeScreenPosition size = InventoryBox.itemSize.ToRelativeScreenPosition();
+                RelativeScreenPosition pos = new RelativeScreenPosition(i * (aItemSize.ToRelativeScreenPosition(Size).X + aSpacingSize.ToRelativeScreenPosition(Size).X) + aSpacingSize.ToRelativeScreenPosition(Size).X, aSpacingSize.ToRelativeScreenPosition(Size).Y);
+                RelativeScreenPosition size = aItemSize.ToRelativeScreenPosition(Size);
 
                 if (aBags[i] == null)
                 {

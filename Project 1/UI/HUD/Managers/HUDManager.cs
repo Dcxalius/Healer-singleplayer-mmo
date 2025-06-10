@@ -75,7 +75,7 @@ namespace Project_1.UI.HUD.Managers
 
             lootBox = new LootBox(new RelativeScreenPosition(0.1f, 0.5f), new RelativeScreenPosition(0.4f, 0.4f));
             hudElements.Add(lootBox);
-            inventoryBox = new InventoryBox(new RelativeScreenPosition(0.59f, 0.60f), new RelativeScreenPosition(0.4f));
+            inventoryBox = new InventoryBox(new RelativeScreenPosition(0.59f, 0.60f), new RelativeScreenPosition(0.4f), 16);
             hudElements.Add(inventoryBox);
 
             descriptorBox = new DescriptorBox(); //Shouldnt be in elements for now

@@ -35,6 +35,7 @@ namespace Project_1.UI.UIElements
 
         public string TextWidthFixer(string s)
         {
+            if (s == null) return null;
             if (Textures.Text.CalculateOffset(s, underlyingText.Font).X <= Size.X || Textures.Text.CalculateOffset(s, underlyingText.Font).X == 0 || Size.X == 0) return s;
 
             

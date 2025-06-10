@@ -17,7 +17,7 @@ namespace Project_1.Items
 {
     internal class Inventory
     {
-        public const int bagSlots = 4;
+        public const int bagSlots = 5;
         public const int defaultSlots = 32;
 
         [JsonProperty("Items")]
@@ -74,8 +74,8 @@ namespace Project_1.Items
         Item[][] items;
         public Inventory()
         {
-            bags = new Container[bagSlots + 1]; //Bag 0 is fornow always null
-            items = new Item[bagSlots + 1][];
+            bags = new Container[bagSlots]; //Bag 0 is fornow always null
+            items = new Item[bagSlots][];
             items[0] = new Item[defaultSlots];
             for (int i = 1; i < bags.Length; i++)
             {
@@ -89,7 +89,7 @@ namespace Project_1.Items
         [JsonConstructor]
         public Inventory(int?[] bags, (int, int)?[][] items)
         {
-            this.bags = new Container[bagSlots + 1]; //Bag 0 is fornow always null
+            this.bags = new Container[bagSlots]; //Bag 0 is fornow always null
 
 
             for (int i = 1; i < bags.Length; i++)
@@ -98,7 +98,7 @@ namespace Project_1.Items
                 this.bags[i] = new Container(ItemFactory.GetItemData<ContainerData>(bags[i].Value));
             }
 
-            this.items = new Item[bagSlots + 1][];
+            this.items = new Item[bagSlots][];
             this.items[0] = new Item[defaultSlots];
             for (int i = 0; i < this.items[0].Length; i++)
             {
@@ -114,8 +114,8 @@ namespace Project_1.Items
                     this.items[i] = new Item[this.bags[i].SlotCount];
                     for (int j = 0; j < items[i].Length; j++)
                     {
-                        if (!items[0][i].HasValue) continue;
-                        this.items[0][i] = ItemFactory.CreateItem(ItemFactory.GetItemData(items[i][j].Value.Item1), items[i][j].Value.Item2);
+                        if (!items[i][j].HasValue) continue;
+                        this.items[i][j] = ItemFactory.CreateItem(ItemFactory.GetItemData(items[i][j].Value.Item1), items[i][j].Value.Item2);
                     }
                 }
             }

@@ -4,11 +4,13 @@ using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.Items;
+using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.UI.HUD;
 using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 
 namespace Project_1.UI.HUD.Inventory
 {
@@ -16,14 +18,12 @@ namespace Project_1.UI.HUD.Inventory
     {
         public int SlotCount { get => slots.Length; }
         Item[] slots;
-        int columnCount;
         int bagNr;
 
 
-        public BagBox(Items.Inventory aInventory, int aBagNr, int aSlotCount, int aColumnCount, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.Beige), aPos, aSize)
+        public BagBox(int aBagNr, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.Beige), aPos, aSize)
         {
             bagNr = aBagNr;
-            GetBagContent(aInventory, aSlotCount, aColumnCount);
         }
 
         void GetBagContent(Items.Inventory aInventory, int aSlotCount, int aColumnCount)
@@ -35,49 +35,53 @@ namespace Project_1.UI.HUD.Inventory
             }
 
             slots = new Item[aSlotCount];
-
-            columnCount = aColumnCount;
             Items.Item[] items = aInventory.GetItemsInBox(bagNr);
 
-            float rowCount = (float)Math.Ceiling(aSlotCount / (double)aColumnCount);
+            float rowCount = MathF.Ceiling(aSlotCount / (float)aColumnCount);
 
-            RelativeScreenPosition newSize = new RelativeScreenPosition();
+            //DebugManager.Print(GetType(), "spacing: " + InventoryBox.bagBoxSpacing + "   | itemSize: " + itemSize);
+            //DebugManager.Print(GetType(), "spacing: " + InventoryBox.bagBoxSpacing.ToAbsoluteScreenPos(Size) + "   | itemSize: " + itemSize.ToAbsoluteScreenPos(Size));
 
-            RelativeScreenPosition itemSize = InventoryBox.itemSize.ToRelativeScreenPosition();
-            newSize.X = aColumnCount * itemSize.X + aColumnCount * InventoryBox.spacing.X + InventoryBox.spacing.X;
-            newSize.Y = rowCount * itemSize.Y + (rowCount + 1) * InventoryBox.spacing.Y;
+            AbsoluteScreenPosition absItem = InventoryBox.ItemSize.ToAbsoluteScreenPos(Size);
+            AbsoluteScreenPosition absSpacing = InventoryBox.BagBoxSpacing.ToAbsoluteScreenPos(Size);
 
-            Resize(newSize);
-            RelativeScreenPosition fml = InventoryBox.spacing.ToAbsoluteScreenPos().ToRelativeScreenPosition(Size);
+            AbsoluteScreenPosition r = absItem * rowCount + absSpacing * (rowCount + 1);
+            RelativeScreenPosition r2 = RelativeSize;
+            if (aSlotCount < aColumnCount)
+            {
+                AbsoluteScreenPosition xdd = absItem * aSlotCount + absSpacing * (aSlotCount + 1);
+                r2.X = xdd.ToRelativeScreenPosition(ParentSize).X; 
+                aColumnCount = aSlotCount;
+            }
+            r2.Y = r.ToRelativeScreenPosition(ParentSize).Y;
+            Resize(r2);
+            RelativeScreenPosition itemSize = absItem.ToRelativeScreenPosition(Size);
+            RelativeScreenPosition spacing = absSpacing.ToRelativeScreenPosition(Size);
 
-            itemSize = itemSize.ToAbsoluteScreenPos().ToRelativeScreenPosition(Size);
-            //itemSize = InventoryBox.xdd(Size);
             for (int i = 0; i < slots.Length; i++)
             {
-                float x = i % columnCount * (itemSize.X + fml.X) + fml.X;
-                float y = fml.Y + (itemSize.Y + fml.Y) * (float)Math.Floor((double)i / columnCount);
-                RelativeScreenPosition pos = new RelativeScreenPosition(x, y);
-                RelativeScreenPosition size = InventoryBox.xdd(Size);
+               // float x = spacing.X + i % aColumnCount * (itemSize.X + spacing.X);
+                float x = spacing.X + (i % aColumnCount) * ((1 - spacing.X) / (float)aColumnCount);
 
+                float y = spacing.Y + (itemSize.Y + spacing.Y) * (float)Math.Floor((double)i / aColumnCount);
+                RelativeScreenPosition pos = new RelativeScreenPosition(x, y);
+                DebugManager.Print(GetType(), pos.ToAbsoluteScreenPos(Size).ToString());
                 if (items[i] != null)
                 {
-                    slots[i] = new Item(bagNr, i, true, items[i].ItemQualityColor, items[i].GfxPath, pos, size);
+                    slots[i] = new Item(bagNr, i, true, items[i].ItemQualityColor, items[i].GfxPath, pos, itemSize);
+                    
                 }
                 else
                 {
-                    slots[i] = new Item(bagNr, i, true, Color.DarkGray, new GfxPath(GfxType.Item, null), pos, size);
+                    slots[i] = new Item(bagNr, i, true, Color.DarkGray, new GfxPath(GfxType.Item, null), pos, itemSize);
+                    //DebugManager.Print(GetType(), slots[i].Size.ToString() );
                 }
             }
 
             AddChildren(slots);
         }
 
-        public override void Resize(RelativeScreenPosition aSize)
-        {
-            base.Resize(aSize);
-        }
-
-        void Empty()
+        public void Empty()
         {
             KillAllChildren();
             Resize(RelativeScreenPosition.Zero);
