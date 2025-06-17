@@ -382,8 +382,9 @@ namespace Project_1.Items
         public bool AddItem(Item aItem)
         {
             int count = aItem.Count;
-            for (int i = 0; i < items.Length; i++)
+            for (int i = 0; i < items.Length; i++) //TODO: Break this out to a method
             {
+                if (aItem.MaxStack == 1) break;
                 if (items[i] == null) continue;
                 for (int j = 0; j < items[i].Length; j++)
                 {

@@ -19,6 +19,8 @@ using System.Xml.Serialization;
 
 namespace Project_1.UI.UIElements
 {
+
+    [DebuggerStepThrough]
     internal abstract class UIElement
     {
         #region Interactibility
