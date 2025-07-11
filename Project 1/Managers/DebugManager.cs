@@ -8,9 +8,11 @@ using Project_1.Items;
 using Project_1.Textures;
 using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements.Boxes;
+using SharpDX.Direct3D11;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -32,10 +34,13 @@ namespace Project_1.Managers
         Count
     }
 
-    [DebuggerStepThrough]
     internal static class DebugManager
     {
         static List<DebugShape> debugShapes = new List<DebugShape>();
+        static List<string> printLog = new List<string>();
+        static int printLogCount = 0;
+        static StreamWriter logger;
+
 
         public static bool Mode(DebugMode aMode) => modes[(int)aMode];
         static readonly bool[] modes = new bool[(int)DebugMode.Count];
@@ -45,8 +50,7 @@ namespace Project_1.Managers
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool AllocConsole();
 
-
-        public static void Init()
+        static DebugManager()
         {
             modes[(int)DebugMode.DebugShapes] = true;
             modes[(int)DebugMode.FalseRandom] = false;
@@ -57,9 +61,13 @@ namespace Project_1.Managers
             modes[(int)DebugMode.InstantlyContinue] = true;
             modes[(int)DebugMode.Console] = true;
             modes[(int)DebugMode.LearnKill] = true;
-            
 
-            if (modes[(int)DebugMode.Console]) AllocConsole();
+
+            if (modes[(int)DebugMode.Console])
+            {
+                AllocConsole();
+                //logger = new StreamWriter(Console.OpenStandardOutput());
+            }
         }
 
         public static void Update()
@@ -76,12 +84,28 @@ namespace Project_1.Managers
             debugShapes.Add(aShape);
         }
 
-        public static void Print(Type test, string aMsg)
+
+        public static void Print(Type aType, object aObject) => Print(aType, aObject.ToString());
+
+        public static void Print(Type aType, string aMsg)
         {
             if (!modes[(int)DebugMode.Print]) return;
 
-            Console.WriteLine(test.ToString() + ": " + aMsg);
+            //logger.WriteLine(aType.ToString() + ": " + aMsg);
+            //if (printLog.Count <= printLogCount)
+            //{
+            //    printLog.Add(aType.ToString() + ": " + aMsg);
+            //}
+            //else
+            //{
+            //    printLog[printLogCount] = aType.ToString() + ": " + aMsg;
+            //}
+            //printLogCount++;
+            Console.WriteLine(aType.ToString() + ": " + aMsg);
+            //Console.Out.WriteLineAsync(aType.ToString() + ": " + aMsg);
+            
         }
+
 
         static void ClearDebugShapes()
         {

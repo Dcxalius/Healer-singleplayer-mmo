@@ -14,10 +14,10 @@ namespace Project_1.GameObjects.Entities.Corspes
     internal static class CorpseManager
     {
         static List<Corpse> corpses;
-        public static void Init()
+
+        static CorpseManager()
         {
             corpses = new List<Corpse>();
-            Corpse.Init();
         }
 
         public static void AddCorpse(Corpse aCorpse) => corpses.Add(aCorpse);

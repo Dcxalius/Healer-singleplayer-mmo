@@ -72,7 +72,7 @@ namespace Project_1.UI.HUD
         {
             Items.Item[] loots = lootedDrop.Drop;
             loot = new Loot[loots.Length];
-
+            List<int> indexToHide = new List<int>(); //TODO: Make this not hideous
             for (int i = 0; i < loot.Length; i++)
             {
                 if (loots[i] != null)
@@ -83,10 +83,16 @@ namespace Project_1.UI.HUD
                 else
                 {
                     loot[i] = new Loot(i, null, new GfxPath(GfxType.Debug, null));
+                    indexToHide.Add(i);
                 }
             }
 
             scrollableComponent.AddScrollableElements(loot);
+            for (int i = 0; i < indexToHide.Count; i++)
+            {
+                loot[indexToHide[i]].Visible = false;
+            }
+            scrollableComponent.SetScrollValue(0f);
         }
 
         public override void Update()

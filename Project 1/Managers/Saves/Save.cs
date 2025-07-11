@@ -36,15 +36,13 @@ namespace Project_1.Managers.Saves
         public string Friendly => InWorld + "\\Friendly";
         public string NonFriendly => InWorld + "\\NonFriendly";
 
-        static string contentRootDirectory;
+        static string contentRootDirectory => Game1.ContentManager.RootDirectory + "\\Saves\\";
 
         public string CameraPosition => nameAsPath + "\\Camera.pos";
         string SaveDetailsPath => nameAsPath + "\\Save.Details";
         public string ImagePath => nameAsPath + "\\SaveImage.png";
         public SaveDetails SaveDetails => saveDetails;
         SaveDetails saveDetails;
-
-        public static void Init(string aContentRootDirectory) => contentRootDirectory = aContentRootDirectory + "\\Saves\\";
 
         public Save(string aName, bool aExistingSave) 
         {

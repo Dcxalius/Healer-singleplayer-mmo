@@ -27,14 +27,6 @@ namespace Project_1.Managers.States
         public override StateManager.States GetStateEnum => StateManager.States.Game;
         public Game() : base()
         {
-            HUDManager.Init();
-            ObjectManager.Init();
-            ProjectileManager.Init();
-            FloatingTextManager.Init();
-            CorpseManager.Init();
-            DoodadManager.Init();
-            TileManager.Init();
-
             spriteBatch = GraphicsManager.CreateSpriteBatch();
 
             renderTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);

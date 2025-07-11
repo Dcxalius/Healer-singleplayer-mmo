@@ -16,9 +16,9 @@ namespace Project_1.UI.UIElements.Boxes
 {
     internal class DialogueBox : ButtonBox
     {
-        static RelativeScreenPosition DefaultButtonPos(RelativeScreenPosition aSize) => aSize - defaultButtonSize - defaultEdgeSpacing;
-        static RelativeScreenPosition defaultButtonSize = new RelativeScreenPosition(0.05f, 0.03f);
+        static RelativeScreenPosition defaultButtonSize = new RelativeScreenPosition(0.25f, 0.15f);
         static RelativeScreenPosition defaultEdgeSpacing = new RelativeScreenPosition(0.025f, 0.025f);
+        static RelativeScreenPosition DefaultButtonPos = RelativeScreenPosition.One - defaultButtonSize - defaultEdgeSpacing;
         static Color defaultButtonColor = Color.LightGray;
         static Color defaultButtonTextColor = Color.Black;
 
@@ -40,7 +40,7 @@ namespace Project_1.UI.UIElements.Boxes
         Label textToDisplay;
 
         public DialogueBox(string aMessage, Color aMessageColor, LocationOfPopUp aLocation, PausesGame aPauses, List<Action> aAction, UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, string aButtonText = null) 
-            : this(aMessage, aMessageColor, aLocation, aPauses, aAction, aGfx, aPos, aSize, DefaultButtonPos(aSize), defaultButtonSize, defaultButtonColor, aButtonText, defaultButtonTextColor) { }
+            : this(aMessage, aMessageColor, aLocation, aPauses, aAction, aGfx, aPos, aSize, DefaultButtonPos, defaultButtonSize, defaultButtonColor, aButtonText, defaultButtonTextColor) { }
 
         public DialogueBox(string aMessage, Color aMessageColor, LocationOfPopUp aLocation, PausesGame aPauses, List<Action> aAction, UITexture aGfx, 
             RelativeScreenPosition aPos, RelativeScreenPosition aSize, 

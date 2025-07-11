@@ -2,6 +2,7 @@
 using System.Linq;
 using Project_1.Input;
 using Project_1.Camera;
+using Project_1.Managers;
 namespace Project_1.Input
 {
     internal class ClickEvent : Modifiable
@@ -24,6 +25,7 @@ namespace Project_1.Input
         public ClickEvent(RelativeScreenPosition aClickPos, InputManager.ClickType aButtonPressed, bool[] aModifiers)
         {
             clickPos = aClickPos;
+            DebugManager.Print(GetType(), "Click: " + clickPos);
 
             buttonPressed = aButtonPressed;
             modifierHeld = aModifiers;

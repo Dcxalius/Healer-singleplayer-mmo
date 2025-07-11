@@ -11,11 +11,12 @@ namespace Project_1.GameObjects.Doodads
     internal static class DoodadManager
     {
         static List<Doodad> doodads;
-        public static void Init()
+        static DoodadManager()
         {
+
             doodads = new List<Doodad>();
 
-            doodads.Add(new Chest(new Camera.WorldSpace(600, 600)));
+            doodads.Add(new Chest(new Camera.WorldSpace(600, 600))); //DEBUG
         }
 
 

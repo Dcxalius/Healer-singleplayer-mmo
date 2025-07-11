@@ -44,10 +44,9 @@ namespace Project_1.Input
 
         static string rootDir;
 
-        public static void Init(ContentManager aContentManager)
+        static KeyBindManager()
         {
-            
-            rootDir = aContentManager.RootDirectory;
+            rootDir = Game1.ContentManager.RootDirectory;
             ImportBindings();
         }
 

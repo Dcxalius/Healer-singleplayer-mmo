@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Project_1.GameObjects.Spells;
 using Project_1.Items.SubTypes;
+using SharpDX.MediaFoundation.DirectX;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,12 +24,12 @@ namespace Project_1.Items
         //static int Id { get => nextId++; }
         //static int nextId = 0;
 
-        public static void Init(ContentManager aContentManager)
+        static ItemFactory()
         {
             //itemData = new Dictionary<int, ItemData>();
             List<ItemData> itemList = new List<ItemData>();
 
-            string path = aContentManager.RootDirectory + "\\Data\\Items\\";
+            string path = Game1.ContentManager.RootDirectory + "\\Data\\Items\\";
             string[] folders = Directory.GetDirectories(path);
             for (int i = 0; i < folders.Length; i++)
             {
@@ -44,8 +45,6 @@ namespace Project_1.Items
             }
             itemList.Sort();
             itemData = itemList.ToArray();
-
-            LootFactory.Init(aContentManager);
         }
 
         static ItemData CreateData(string aRawData, string aFolder)
@@ -111,6 +110,7 @@ namespace Project_1.Items
             }
         }
 
+        public static Item CreateItem(int aId, int aCount = 1) => CreateItem(GetItemData(aId), aCount);
 
         public static Item CreateItem(LootData aLoot)
         {

@@ -87,7 +87,7 @@ namespace Project_1.UI.HUD.Inventory
                 return;
             }
 
-            gfxOnButton = new UITexture(aItem.GfxPath, Color.White);
+            imageOnButton.SetImage(aItem.GfxPath);
             isEmpty = false;
             Color = aItem.ItemQualityColor;
             if (aItem.MaxStack == 1) return;
@@ -96,7 +96,7 @@ namespace Project_1.UI.HUD.Inventory
 
         public void RemoveItem()
         {
-            gfxOnButton = null;
+            imageOnButton.ClearImage();
             isEmpty = true;
             itemCount.Value = null;
             Color = Color.DarkGray;
@@ -118,7 +118,13 @@ namespace Project_1.UI.HUD.Inventory
 
             isHeld = false;
             Pressed = false;
-            Color = Color.DarkGray;
+            Items.Item item = GetActualItem;
+            if(item == null)
+            {
+                Color = Color.DarkGray;
+                return;
+            }
+            Color = GetActualItem.ItemQualityColor;
         }
 
 

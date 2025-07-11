@@ -13,7 +13,7 @@ namespace Project_1.Items.SubTypes
         public int SlotCount { get => slotCount; }
         int slotCount;
         [JsonConstructor]
-        public ContainerData(int id, string gfxName, string name, string description, int slotCount, Item.Quality quality) : base(id, gfxName, name, description, 1, ItemType.Container, quality)
+        public ContainerData(int id, string gfxName, string name, string description, int slotCount, int cost, Item.Quality quality) : base(id, gfxName, name, description, 1, ItemType.Container, quality, cost)
         {
             this.slotCount = slotCount;
             Assert();

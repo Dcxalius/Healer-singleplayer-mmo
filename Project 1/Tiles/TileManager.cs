@@ -30,7 +30,7 @@ namespace Project_1.Tiles
         static Tile Tile(int aChunkId, int aX, int aY) => chunks.Find(x => x.ID == aChunkId).Tile(aX, aY);
         static List<Chunk> chunks;
 
-        public static void Init()
+        static TileManager()
         {
             chunks = new List<Chunk>();
         }

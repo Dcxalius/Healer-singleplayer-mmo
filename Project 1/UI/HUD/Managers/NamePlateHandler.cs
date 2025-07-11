@@ -77,7 +77,7 @@ namespace Project_1.UI.HUD.Managers
         {
             Vector2 dir = (aNamePlate.AbsolutePos.Center - aRect.Center).ToVector2();
             dir.Normalize();
-            //Debug.Assert(!float.IsNaN(dir.X) && !float.IsNaN(dir.Y));
+
             if (float.IsNaN(dir.X) || float.IsNaN(dir.Y)) dir = Vector2.Zero;
 
             //DebugManager.Print(typeof(HUDManager), "Nameplate of " + aNamePlate.Name + " was at " + aNamePlate.RelativePos);
@@ -89,7 +89,6 @@ namespace Project_1.UI.HUD.Managers
 
         public void Rescale()
         {
-
             foreach (KeyValuePair<Entity, NamePlate> namePlate in namePlates)
             {
                 namePlate.Value.Rescale();

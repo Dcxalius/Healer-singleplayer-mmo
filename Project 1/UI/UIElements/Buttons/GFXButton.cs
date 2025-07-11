@@ -14,59 +14,34 @@ namespace Project_1.UI.UIElements.Buttons
 {
     internal class GFXButton : Button
     {
-        public UITexture GfxOnButton { get => gfxOnButton; }
+        public UITexture GfxOnButton { get => imageOnButton.Gfx; }
 
-        protected UITexture gfxOnButton;
         Rectangle gfxRectangle;
-
+        protected Image imageOnButton;
 
 
         public GFXButton(GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColorOfBorder) : base(aPos, aSize, aColorOfBorder)
         {
-            gfxOnButton = new UITexture(aPath, Color.White);
+            imageOnButton = new Image(new UITexture(aPath, Color.White), new RelativeScreenPosition(0.1f), new RelativeScreenPosition(0.8f));
+            AddChild(imageOnButton);
         }
 
         public GFXButton(List<Action> aActions, GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColor, string aText = null, Color? aTextColor = null) : base(aActions, aPos, aSize, aColor, aText, aTextColor)
         {
-            gfxOnButton = new UITexture(aPath, Color.White);
+            imageOnButton = new Image(new UITexture(aPath, Color.White), new RelativeScreenPosition(0.1f), new RelativeScreenPosition(0.8f));
+            AddChild(imageOnButton);
         }
-
-        public override void Update()
+        protected override void ClickedOnMe(ClickEvent aClick)
         {
-            base.Update();
+            base.ClickedOnMe(aClick);
 
-            gfxRectangle = ConstructGfxRect();
-
+            imageOnButton.Color = Color.Gray;
         }
-
-        Rectangle ConstructGfxRect() //TODO: Make this more elegant
+        protected override void Released()
         {
-            Point pos = new Vector2(AbsolutePos.X + AbsolutePos.Size.X / 10, AbsolutePos.Y + AbsolutePos.Size.Y / 10).ToPoint();
-            Point size = new Vector2(AbsolutePos.Size.X * 0.8f, AbsolutePos.Size.Y * 0.8f).ToPoint();
+            base.Released();
 
-            return new Rectangle(pos, size);
-
+            imageOnButton.Color = Color.White;
         }
-
-        
-
-
-        public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)
-        {
-            base.Draw(aBatch);
-
-            if (gfxOnButton == null) return;
-
-            if (!Pressed)
-            {
-                gfxOnButton.Draw(aBatch, gfxRectangle);
-            }
-            else
-            {
-                gfxOnButton.Draw(aBatch, gfxRectangle, Color.DarkGray);
-
-            }
-        }
-
     }
 }

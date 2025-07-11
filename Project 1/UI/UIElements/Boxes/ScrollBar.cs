@@ -25,6 +25,11 @@ namespace Project_1.UI.UIElements.Boxes
             capturesClick = true;
         }
 
+        public void SetScrollPlimpSize(float aSize)
+        {
+            scrollPlimp.Resize(new RelativeScreenPosition(scrollPlimp.RelativeSize.X, aSize - spacing * 2));
+        }
+
         public void SetValue(float aValue)
         {
             if (aValue < 0) aValue = 0;
@@ -38,7 +43,7 @@ namespace Project_1.UI.UIElements.Boxes
         {
             float top = (InputManager.GetMousePosAbsolute().Y - AbsolutePos.Y - spacing * AbsolutePos.Size.Y);
             float bottom = AbsolutePos.Size.Y - (spacing * AbsolutePos.Size.Y) * 2;
-            (parent as ScrollableBox).SetValue(top   / bottom);
+            (parent as ScrollableBox).SetScrollValue(top   / bottom);
 
         }
 
@@ -47,7 +52,7 @@ namespace Project_1.UI.UIElements.Boxes
             base.ClickedOnMe(aClick);
             float top = (InputManager.GetMousePosAbsolute().Y - AbsolutePos.Y - spacing * AbsolutePos.Size.Y);
             float bottom = AbsolutePos.Size.Y - (spacing * AbsolutePos.Size.Y) * 2;
-            (parent as ScrollableBox).SetValue(top / bottom);
+            (parent as ScrollableBox).SetScrollValue(top / bottom);
         }
     }
 }

@@ -60,23 +60,23 @@ namespace Project_1.GameObjects.Entities.Npcs
             gossipOptions = new GossipOption[aOptions.Length];
             for (int i = 0; i < aOptions.Length; i++)
             {
-                GossipOption go;
+                GossipOption gossipOption;
 
                 switch (aOptions[i][(int)optionsContext.Type])
                 {
                     case "C":
                         //Chat
-                        go = new ChatGossipOption(aOptions[i][(int)optionsContext.GossipHeader], aOptions[i][(int)optionsContext.Data]);
+                        gossipOption = new ChatGossipOption(aOptions[i][(int)optionsContext.GossipHeader], aOptions[i][(int)optionsContext.Data]);
                         break;
                     case "S":
                         //Shop
-                        go = new ShopGossipOption(aOptions[i][(int)optionsContext.GossipHeader], aOptions[i][(int)optionsContext.Data]);
+                        gossipOption = new ShopGossipOption(aOptions[i][(int)optionsContext.GossipHeader], aOptions[i][(int)optionsContext.Data]);
                         break;
                     default:
                         throw new NotImplementedException();
                 }
 
-                gossipOptions[i] = go;
+                gossipOptions[i] = gossipOption;
             }
         }
 

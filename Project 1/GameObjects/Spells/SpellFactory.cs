@@ -21,17 +21,16 @@ namespace Project_1.GameObjects.Spells
         static Instant[] instantData;
         static OverTime[] overTimeData;
 
-        public static void Init(ContentManager aContentManager)
+        static SpellFactory()
         {
-            InitEffectData(aContentManager);
-            InitSpellData(aContentManager);
-
+            InitEffectData();
+            InitSpellData();
         }
 
-        static void InitSpellData(ContentManager aContentManager)
+        static void InitSpellData()
         {
             spellData = new Dictionary<string, SpellData>();
-            string path = aContentManager.RootDirectory + "\\Data\\Spells\\";
+            string path = Game1.ContentManager.RootDirectory + "\\Data\\Spells\\";
             string[] files = Directory.GetFiles(path);
 
             for (int i = 0; i < files.Length; i++)
@@ -42,21 +41,21 @@ namespace Project_1.GameObjects.Spells
             }
         }
 
-        static void InitEffectData(ContentManager aContentManager)
+        static void InitEffectData()
         {
             
             //string[] folders = Directory.GetDirectories(path);
             
-            InitInstant(aContentManager);
-            InitOverTime(aContentManager);
+            InitInstant();
+            InitOverTime();
 
         }
 
-        static void InitInstant(ContentManager aContentManager) //TODO: Ugly AF so find a better way
+        static void InitInstant() //TODO: Ugly AF so find a better way
         {
             List<Instant> effects = new List<Instant>();
 
-            string pathInstant = aContentManager.RootDirectory + "\\Data\\Effects\\Instant";
+            string pathInstant = Game1.ContentManager.RootDirectory + "\\Data\\Effects\\Instant";
             string[] files = Directory.GetFiles(pathInstant);
             for (int j = 0; j < files.Length; j++)
             {
@@ -74,10 +73,10 @@ namespace Project_1.GameObjects.Spells
         }
 
 
-        static void InitOverTime(ContentManager aContentManager)
+        static void InitOverTime()
         {
             List<OverTime> effects = new List<OverTime>();
-            string pathOverTime = aContentManager.RootDirectory + "\\Data\\Effects\\OverTime";
+            string pathOverTime = Game1.ContentManager.RootDirectory + "\\Data\\Effects\\OverTime";
             string[] files = Directory.GetFiles(pathOverTime);
             
             for (int j = 0; j < files.Length; j++)

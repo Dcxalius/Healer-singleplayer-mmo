@@ -60,20 +60,25 @@ namespace Project_1.UI.HUD
                 return;
             }
 
+            SetToItem(item, aItem.RelativePositionOnScreen);
+        }
+
+        public void SetToItem(Items.Item aItem, RelativeScreenPosition aPos)
+        {
             Visible = true;
-            descriptedName.Value = item.Name;
-            description.Value = item.Description;
+            descriptedName.Value = aItem.Name;
+            description.Value = aItem.Description;
             int spacingNeeded = 3;
-            if (item.ItemType == Items.ItemData.ItemType.Equipment || item.ItemType == Items.ItemData.ItemType.Weapon)
+            if (aItem.ItemType == Items.ItemData.ItemType.Equipment || aItem.ItemType == Items.ItemData.ItemType.Weapon)
             {
-                statSheet.Value = (item as Equipment).StatReport.Value;
+                statSheet.Value = (aItem as Equipment).StatReport.Value;
                 spacingNeeded += 1;
             }
             else { statSheet.Value = null; }
             int y = (int)(descriptedName.Offset.Y + description.Offset.Y + statSheet.Offset.Y);
             int x = (int)Math.Max(descriptedName.Offset.X, Math.Max(description.Offset.X, statSheet.Offset.X));
             Resize(new AbsoluteScreenPosition(x, y).ToRelativeScreenPosition() + spacing.OnlyX * 2 + spacing.OnlyY * spacingNeeded);
-            Move(aItem.RelativePositionOnScreen - spacingFromItem - RelativeSize);
+            Move(aPos - spacingFromItem - RelativeSize);
         }
 
         void ResetDescriptor()

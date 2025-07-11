@@ -14,10 +14,11 @@ namespace Project_1.Particles
     internal static class ParticleManager
     {
         static List<Particle> particles;
-        
-        public static void Init()
+
+        static ParticleManager()
         {
             particles = new List<Particle>();
+
         }
 
         public static void SpawnParticle(ParticleBase aParticle, WorldSpace aWorldPos, GameObject aParent, ParticleMovement aParticleMovement)

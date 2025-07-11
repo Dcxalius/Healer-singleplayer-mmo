@@ -37,7 +37,7 @@ namespace Project_1.UI.HUD.SpellBook
         public void AssignSpell(Spell aSpell)
         {
             spellData = aSpell;
-            gfxOnButton = new UITexture(Spell.GetGfxPath(aSpell), Color.White);
+            imageOnButton.SetImage(Spell.GetGfxPath(aSpell));
             if (aSpell == null) gfx.Color = Color.Gray;
 
 

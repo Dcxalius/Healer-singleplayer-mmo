@@ -36,10 +36,11 @@ namespace Project_1.Managers
 
         public static Save CurrentSave => currentSave;
         static Save currentSave;
-        public static void Init(ContentManager aContentManager)
+
+        static SaveManager()
         {
-            contentRootDirectory = aContentManager.RootDirectory;
-            Save.Init(contentRootDirectory);
+            contentRootDirectory = Game1.ContentManager.RootDirectory;
+
             saveFolder = contentRootDirectory + "\\Saves";
 
             InitSaveFolder();

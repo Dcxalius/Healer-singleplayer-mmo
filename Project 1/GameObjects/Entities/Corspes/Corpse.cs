@@ -63,9 +63,8 @@ namespace Project_1.GameObjects.Entities.Corspes
         [JsonProperty]
         WorldSpace Pos => Position;
 
-        public static void Init()
+        static Corpse()
         {
-
             lootGlow = new ParticleBase((1000d, 1000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[] { Color.Yellow }, new Point(1));
             lootGlowMovement = new ParticleMovement(new WorldSpace(0, -1), WorldSpace.Zero, 0.95f);
         }

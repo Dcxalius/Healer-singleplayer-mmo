@@ -107,12 +107,12 @@ namespace Project_1.UI.HUD.Guild
                     return string.Compare(name.Text, aComparedTo.name.Text);
                 case GuildRoster.SortBy.Level:
                     int actualLevel = int.Parse(level.Text);
-                    int comaredToLevel = int.Parse(aComparedTo.level.Text);
-                    if (actualLevel > comaredToLevel)
+                    int comparedToLevel = int.Parse(aComparedTo.level.Text);
+                    if (actualLevel > comparedToLevel)
                     {
                         return -1;
                     }
-                    else if (actualLevel < comaredToLevel)
+                    else if (actualLevel < comparedToLevel)
                     {
                         return 1;
                     }

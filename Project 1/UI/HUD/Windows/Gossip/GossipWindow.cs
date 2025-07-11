@@ -4,6 +4,7 @@ using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Npcs;
 using Project_1.Textures;
+using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
 using System;
@@ -63,6 +64,17 @@ namespace Project_1.UI.HUD.Windows.Gossip
             AddOptions(aOption.GossipOptions);
         }
 
+        public Action<ShopGossipOption> GetClose()
+        {
+            return CloseAndOpenShop;
+        }
+
+        void CloseAndOpenShop(ShopGossipOption aSO)
+        {
+            CloseWindow();
+            HUDManager.windowHandler.OpenShopWindow(aSO, npcTalkingTo);
+            
+        }
 
         public void SetIntro(string aIntro) => introduction.Text = aIntro;
 

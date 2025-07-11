@@ -38,10 +38,10 @@ namespace Project_1.Camera
             }
         }
 
-        public static CameraSettings.Fullscreen FullScreen
+        public static CameraSettings.WindowType FullScreen
         {
-            get => cameraSettings.xddFullscreen;
-            set => cameraSettings.xddFullscreen = value;
+            get => cameraSettings.Fullscreen;
+            set => cameraSettings.Fullscreen = value;
         }
 
         public static Rectangle WorldRectangle { get => new Rectangle(cameraMover.CentreInWorldSpace.ToPoint() - (CentrePointInScreenSpace / Scale).ToPoint(), (WindowSize / Scale).ToPoint()); }
@@ -70,9 +70,7 @@ namespace Project_1.Camera
         static CameraMover cameraMover;
 
 
-
-
-        public static void Init()
+        static Camera()
         {
             ImportSettings();
             cameraMover = new CameraMover();
@@ -99,7 +97,7 @@ namespace Project_1.Camera
             }
         }
 
-        public static void ExportSettings() //TODO: Call this somewhere
+        public static void ExportSettings()
         {
             SaveManager.ExportData(SaveManager.CameraSettings, cameraSettings);
         }

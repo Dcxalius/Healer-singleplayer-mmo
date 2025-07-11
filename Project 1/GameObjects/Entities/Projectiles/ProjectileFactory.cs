@@ -17,10 +17,10 @@ namespace Project_1.GameObjects.Entities.Projectiles
     {
         static Dictionary<string, ProjectileData> projectiles;
 
-        public static void Init(ContentManager aContentManager)
+        static ProjectileFactory()
         {
             projectiles = new Dictionary<string, ProjectileData>();
-            string path = aContentManager.RootDirectory + "\\Data\\Projectiles\\";
+            string path = Game1.ContentManager.RootDirectory + "\\Data\\Projectiles\\";
             string[] files = Directory.GetFiles(path);
 
             for (int i = 0; i < files.Length; i++)

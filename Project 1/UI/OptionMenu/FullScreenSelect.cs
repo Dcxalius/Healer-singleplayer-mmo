@@ -15,7 +15,7 @@ namespace Project_1.UI.OptionMenu
     {
         public FullScreenSelect(RelativeScreenPosition aPos, RelativeScreenPosition aCollapsedSize) : base(new UITexture("WhiteBackground", Color.White), (int)Camera.Camera.FullScreen, aPos, aCollapsedSize)
         {
-            values = SelectBoxValueOption.CreateArray(this, Enum.GetNames(typeof(CameraSettings.Fullscreen)));
+            values = SelectBoxValueOption.CreateArray(this, Enum.GetNames(typeof(CameraSettings.WindowType)));
 
             allValues.AddScrollableElements(values);
 
@@ -28,9 +28,9 @@ namespace Project_1.UI.OptionMenu
         {
             base.ActionWhenSelected(aSelectedValue);
 
-            CameraSettings.Fullscreen oldFullscreen = Camera.Camera.FullScreen;
+            CameraSettings.WindowType oldFullscreen = Camera.Camera.FullScreen;
 
-            Camera.Camera.FullScreen = Enum.Parse<CameraSettings.Fullscreen>(values[aSelectedValue].DisplayText);
+            Camera.Camera.FullScreen = Enum.Parse<CameraSettings.WindowType>(values[aSelectedValue].DisplayText);
 
             OptionManager.AddActionToDoAtExitOfOptionMenu(() => Camera.Camera.FullScreen = oldFullscreen, Camera.Camera.ExportSettings);
         }

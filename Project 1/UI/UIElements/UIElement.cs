@@ -43,7 +43,7 @@ namespace Project_1.UI.UIElements
         protected KeyBindManager.KeyListner? visibleKey;
 
         bool Hovered => AbsolutePos.Contains(InputManager.GetMousePosAbsolute().ToPoint());
-        protected bool wasHovered;
+        protected bool isHovered;
 
         public bool CapturesClick { get => capturesClick; set => capturesClick = value; }
         protected bool capturesClick;
@@ -109,7 +109,7 @@ namespace Project_1.UI.UIElements
         public RelativeScreenPosition RelativeSize => relativeSize;
         RelativeScreenPosition relativeSize;
 
-        public RelativeScreenPosition RelativePositionOnScreen => relativePos + ParentPos.ToRelativeScreenPosition();
+        public RelativeScreenPosition RelativePositionOnScreen => Location.ToRelativeScreenPosition();
 
         public Rectangle AbsolutePos
         {
@@ -237,7 +237,8 @@ namespace Project_1.UI.UIElements
 
             if (!heldEvents.IsStillHeld())
             {
-                if (wasHovered)
+                Released();
+                if (isHovered)
                 {
                     ClickedOnAndReleasedOnMe();
                     return;
@@ -251,6 +252,11 @@ namespace Project_1.UI.UIElements
             if (heldEvents.DurationHeld < timeBeforeDragRegisters.TotalSeconds) return;
             
             Move(InputManager.GetMousePosRelative() - heldEvents.Offset);
+        }
+
+        protected virtual void Released()
+        {
+
         }
         #endregion
  
@@ -485,17 +491,18 @@ namespace Project_1.UI.UIElements
         void HoverUpdate()
         {
             if (!visible && (!hudMoveable && !hudMoving)) return;
-
-            if (!wasHovered && Hovered)
+            if (!isHovered && Hovered)
             {
-                wasHovered = true;
+                isHovered = true;
                 OnHover();
+                return;
             }
 
-            if (wasHovered && !Hovered)
+            if (isHovered && !Hovered)
             {
-                wasHovered = false;
+                isHovered = false;
                 OnDeHover();
+                return;
             }
         }
 

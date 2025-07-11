@@ -27,7 +27,7 @@ namespace Project_1.Managers
         
         public static bool Paused => pausers.Count > 0;
 
-        public static void Init()
+        static TimeManager()
         {
             playTime = new GameTime();
             pausers = new List<object>();

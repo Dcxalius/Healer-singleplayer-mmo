@@ -11,7 +11,7 @@ namespace Project_1.GameObjects.Entities.Projectiles
     {
         static List<Projectile> projectiles;
 
-        public static void Init()
+        static ProjectileManager()
         {
             projectiles = new List<Projectile>();
         }

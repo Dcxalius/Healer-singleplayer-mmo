@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Input;
 using Project_1.Camera;
 using Project_1.GameObjects;
+using Project_1.GameObjects.Spawners.Pathing;
 using Project_1.Managers;
 using Project_1.Managers.States;
 using Project_1.UI;
@@ -327,7 +328,9 @@ namespace Project_1.Input
 
             RelativeScreenPosition mouseVector = new RelativeScreenPosition(mousePoint.X / (float)screenSize.X, mousePoint.Y / (float)screenSize.Y);
 
-            
+            //DebugManager.Print(typeof(InputManager), Camera.Camera.ScreenRectangle.ToString());
+            //DebugManager.Print(typeof(InputManager), mousePoint.ToString());
+
 
             return mouseVector;
         }
@@ -335,9 +338,10 @@ namespace Project_1.Input
         static AbsoluteScreenPosition BoundsCheckOnMouse(AbsoluteScreenPosition aMousePos)
         {
             Rectangle bounds = Camera.Camera.ScreenRectangle;
+
             if (!bounds.Contains(aMousePos.ToPoint()))
             {
-                return new AbsoluteScreenPosition(-1);
+                return new AbsoluteScreenPosition(int.MinValue);
             }
             return aMousePos;
         }

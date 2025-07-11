@@ -1,33 +1,16 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
-using Project_1.GameObjects;
-using Project_1.GameObjects.Entities;
-using Project_1.GameObjects.Entities.Npcs;
-using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Spells;
-using Project_1.GameObjects.Unit;
 using Project_1.Input;
 using Project_1.Items;
 using Project_1.Managers;
-using Project_1.Textures;
 using Project_1.UI.HUD.Inventory;
-using Project_1.UI.HUD.PlateBoxes;
 using Project_1.UI.HUD.SpellBook;
-using Project_1.UI.HUD.Windows;
-using Project_1.UI.HUD.Windows.Gossip;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Bars;
 using Project_1.UI.UIElements.Boxes;
-using Project_1.UI.UIElements.Buttons;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using Item = Project_1.UI.HUD.Inventory.Item;
 
 namespace Project_1.UI.HUD.Managers
@@ -37,6 +20,8 @@ namespace Project_1.UI.HUD.Managers
         public static PlateBoxHandler plateBoxHandler;
         public static NamePlateHandler namePlateHandler;
         public static WindowHandler windowHandler;
+        public static HudChanger hudChanger;
+
         static List<UIElement> hudElements;
 
 
@@ -61,11 +46,12 @@ namespace Project_1.UI.HUD.Managers
 
         public static bool HudMoving => hudMoving;
         static bool hudMoving;
-        public static void Init()
+        static HUDManager()
         {
             plateBoxHandler = new PlateBoxHandler();
             namePlateHandler = new NamePlateHandler();
             windowHandler = new WindowHandler();
+            hudChanger = new HudChanger();
 
             hudMoving = false;
             ImportSettings();
@@ -95,7 +81,6 @@ namespace Project_1.UI.HUD.Managers
             heldSpell = new HeldSpell();
 
             dialogueBoxes = new List<DialogueBox>();
-
         }
 
         static void ImportSettings()
@@ -262,6 +247,7 @@ namespace Project_1.UI.HUD.Managers
         public static void RefreshInventorySlot((int, int) aBagAndSlot, Items.Inventory aInventory) => RefreshInventorySlot(aBagAndSlot.Item1, aBagAndSlot.Item2, aInventory);
 
         public static void SetDescriptorBox(Item aItem) => descriptorBox.SetToItem(aItem);
+        public static void SetDescriptorBox(Items.Item aItem, RelativeScreenPosition aPos) => descriptorBox.SetToItem(aItem, aPos);
 
         #endregion
 

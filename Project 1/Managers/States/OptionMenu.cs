@@ -18,7 +18,7 @@ namespace Project_1.Managers.States
         public override StateManager.States GetStateEnum => StateManager.States.OptionMenu;
         public OptionMenu() : base()
         {
-            OptionManager.Init();
+
         }
 
         public override void Update() => OptionManager.Update();

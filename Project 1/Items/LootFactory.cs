@@ -17,10 +17,10 @@ namespace Project_1.Items
     {
         static Dictionary<string, LootTable> lootData;
 
-        public static void Init(ContentManager aContentManager)
+        static LootFactory()
         {
             lootData = new Dictionary<string, LootTable>();
-            ImportData(aContentManager);
+            ImportData(Game1.ContentManager);
         }
 
         static void ImportData(ContentManager aContentManager)

@@ -115,5 +115,21 @@ namespace Project_1.Textures
                 aBatch.Draw(gfx, aPos, visible, aColor, rotation, aOffset, flip, (aFeetPosY - Camera.Camera.WorldRectangle.Top) / (Camera.Camera.WorldRectangle.Bottom - Camera.Camera.WorldRectangle.Top)); 
             }
         }
+
+        public void ChangeGfx(GfxPath aPath)
+        {
+            if (aPath != null) 
+            {
+                if (aPath.Name != null)
+                {
+                    gfx = TextureManager.GetTexture(aPath);
+                    return;
+                }
+            }
+            
+
+            gfx = null;
+
+        }
     }
 }

@@ -52,11 +52,8 @@ namespace Project_1.Managers.States
         public static States PreviousState => previousState;
         static States previousState;
 
-        public static void Init(ContentManager aContentManager)
+        static StateManager()
         {
-            ObjectFactory.Init(aContentManager);
-
-            GraphicsManager.Init();
             finalBatch = GraphicsManager.CreateSpriteBatch();
 
             startScreen = new StartScreen();

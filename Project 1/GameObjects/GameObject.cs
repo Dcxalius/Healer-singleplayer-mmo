@@ -23,6 +23,7 @@ namespace Project_1.GameObjects
         public virtual Rectangle WorldRectangle { get => new Rectangle(position.ToPoint(), size); }
         public virtual Rectangle ScreenRect { get => new Rectangle(position.ToAbsoltueScreenPosition().ToPoint(), (size.ToVector2() * Camera.Camera.Scale).ToPoint()); }
         public float DistanceTo(WorldSpace aPoint) => FeetPosition.DistanceTo(aPoint);
+        public float DistanceTo(GameObject aGameObject) => FeetPosition.DistanceTo(aGameObject.FeetPosition);
         
         protected Textures.Texture gfx;
 

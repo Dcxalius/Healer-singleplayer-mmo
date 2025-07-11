@@ -10,9 +10,10 @@ namespace Project_1.Managers
     internal static class RandomManager
     {
         static Random random;
-        public static void Init()
+
+        static RandomManager()
         {
-            if (DebugManager.Mode(DebugMode.FalseRandom)) 
+            if (DebugManager.Mode(DebugMode.FalseRandom))
             {
                 random = new Random(1);
                 return;

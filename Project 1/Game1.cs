@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Project_1.GameObjects;
@@ -23,19 +24,18 @@ namespace Project_1
     public class Game1 : Microsoft.Xna.Framework.Game
     {
         public static Microsoft.Xna.Framework.Game Instance { get; private set; }
+        public static ContentManager ContentManager { get; private set; }
         public Game1()
         {
             GraphicsManager.SetManager(this);
             Content.RootDirectory = "Content";
+            ContentManager = Content;
             IsMouseVisible = true;
             Instance = this;
         }
 
         protected override void Initialize() //TODO: Split all Inits so that all calls that are independant are called first and only after that the dependant ones are called
         {
-            ManagerInit();
-            FactoryInit();
-            ClassSelector.Init(Content);
 
             //DEBUG
             
@@ -45,33 +45,6 @@ namespace Project_1
                 StateManager.SetState(StateManager.States.Game);
             }
             base.Initialize();
-        }
-
-        void ManagerInit()
-        {
-            DebugManager.Init();
-            SaveManager.Init(Content);
-            Camera.Camera.Init();
-            RandomManager.Init();
-            TextureManager.Init(Content);
-            KeyBindManager.Init(Content);
-            SpawnerManager.Init();
-            ParticleManager.Init();
-            TimeManager.Init();
-            StateManager.Init(Content);
-
-
-            //InputManager.Init(ref IsActive);
-
-        }
-
-        void FactoryInit()
-        {
-            SpellFactory.Init(Content);
-            ItemFactory.Init(Content);
-            TileFactory.Init(Content);
-            ProjectileFactory.Init(Content);
-            AreaOfEffectFactory.Init(Content);
         }
 
         protected override void LoadContent()

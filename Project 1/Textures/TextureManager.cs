@@ -25,12 +25,12 @@ namespace Project_1.Textures
 
         public static Effect textOutline;
 
-        public static void Init(ContentManager aContentManager)
+        static TextureManager()
         {
-            contentManager = aContentManager;
+            contentManager = Game1.ContentManager;
             InitArrays();
             InitFonts();
-            textOutline = aContentManager.Load<Effect>("TextOutline");
+            textOutline = contentManager.Load<Effect>("TextOutline");
             //textOutline.Parameters["texelSize"].SetValue()
         }
 

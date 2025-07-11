@@ -25,27 +25,30 @@ namespace Project_1.Items
         }
 
 
-        public int ID { get => id; }
+        public int ID => id;
         int id;
-        public string Name { get => name; }
+        public string Name => name;
         string name;
-        public string Description { get => description; }
+        public string Description => description;
         string description;
 
-        public int MaxStack { get => maxStack; }
+        public int MaxStack => maxStack;
         int maxStack;
 
-        public GfxPath GfxPath { get => gfx; }
+        public GfxPath GfxPath => gfx;
         GfxPath gfx;
 
         public Item.Quality Quality => quality;
         Item.Quality quality;
 
-        public ItemType Type { get => itemType; }
+        public ItemType Type => itemType;
         ItemType itemType;
 
+        public int Cost => cost;
+        int cost;
+
         [JsonConstructor]
-        public ItemData(int id, string gfxName, string name, string description, int maxStack, ItemType itemType, Item.Quality quality)
+        public ItemData(int id, string gfxName, string name, string description, int maxStack, ItemType itemType, Item.Quality quality, int cost)
         {
             this.id = id;
             gfx = new GfxPath(GfxType.Item, gfxName);
@@ -54,7 +57,7 @@ namespace Project_1.Items
             this.maxStack = maxStack;
             this.itemType = itemType;
             this.quality = quality;
-
+            this.cost = cost;
             Assert();
         }
 

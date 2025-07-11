@@ -19,7 +19,7 @@ namespace Project_1.Camera
             Hardbound
         }
 
-        public enum Fullscreen
+        public enum WindowType
         {
             Fullscreen,
             Borderless,
@@ -45,7 +45,7 @@ namespace Project_1.Camera
         }
         Point windowSize;
 
-        public Fullscreen xddFullscreen //TODO: Fix name
+        public WindowType Fullscreen
         {
             get => fullscreen;
             set
@@ -54,10 +54,10 @@ namespace Project_1.Camera
                 GraphicsManager.SetWindowSize(windowSize, fullscreen);
             }
         }
-        Fullscreen fullscreen;
+        WindowType fullscreen;
 
         [JsonConstructor]
-        public CameraSettings(Follow followSetting, Point windowSize, Fullscreen xddFullscreen)
+        public CameraSettings(Follow followSetting, Point windowSize, WindowType xddFullscreen)
         {
             follow = followSetting;
             this.windowSize = windowSize;

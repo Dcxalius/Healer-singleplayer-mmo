@@ -35,12 +35,9 @@ namespace Project_1.GameObjects
 
         static Dictionary<string, GossipData> gossipData;
 
-        static string contentRootDirectory;
-
-        public static void Init(ContentManager aC)
+        
+        static ObjectFactory()
         {
-            contentRootDirectory = aC.RootDirectory;
-
             ImportClassData();
             ImportMobData();
             ImportNpcData();
@@ -108,7 +105,7 @@ namespace Project_1.GameObjects
         static void ImportGossipData()
         {
             gossipData = new Dictionary<string, GossipData>();
-            string path = contentRootDirectory + "\\Data\\NpcData\\Gossip\\";
+            string path = Game1.ContentManager.RootDirectory + "\\Data\\NpcData\\Gossip\\";
 
             string[] files = System.IO.Directory.GetFiles(path);
             for (int i = 0; i < files.Length; i++)
@@ -125,7 +122,7 @@ namespace Project_1.GameObjects
         static void ImportMobData()
         {
             mobData = new Dictionary<string, MobData>();
-            string path = contentRootDirectory + "\\Data\\MobData\\";
+            string path = Game1.ContentManager.RootDirectory + "\\Data\\MobData\\";
 
            
             string[] files = System.IO.Directory.GetFiles(path);
@@ -141,7 +138,7 @@ namespace Project_1.GameObjects
         static void ImportNpcData()
         {
             npcData = new List<UnitData>();
-            string path = contentRootDirectory + "\\Data\\NpcData\\";
+            string path = Game1.ContentManager.RootDirectory + "\\Data\\NpcData\\";
 
 
             string[] files = System.IO.Directory.GetFiles(path);
@@ -183,7 +180,7 @@ namespace Project_1.GameObjects
             allyClassData = new Dictionary<string, FriendlyClassData>();
             mobClassData = new Dictionary<string, MobClassData>();
 
-            string path = contentRootDirectory + "\\Data\\Class\\";
+            string path = Game1.ContentManager.RootDirectory + "\\Data\\Class\\";
 
             string[] folders = System.IO.Directory.GetDirectories(path);
 

@@ -54,7 +54,7 @@ namespace Project_1.GameObjects
             }
         }
 
-        public static void Init()
+        static ObjectManager()
         {
             entities = new List<Entity>();
             guild = new List<GuildMember>();

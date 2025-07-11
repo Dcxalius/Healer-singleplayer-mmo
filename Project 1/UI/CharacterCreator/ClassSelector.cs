@@ -17,14 +17,16 @@ namespace Project_1.UI.CharacterCreator
     {
 
         static string[] classNames;
-        public static void Init(ContentManager aContentManager)
+
+        static ClassSelector()
         {
-            string root = aContentManager.RootDirectory;
+            string root = Game1.ContentManager.RootDirectory;
             classNames = System.IO.Directory.GetFiles(root + "\\Data\\Class\\Player");
             for (int i = 0; i < classNames.Length; i++)
             {
                 classNames[i] = SaveManager.TrimToNameOnly(classNames[i]);
             }
+
         }
 
         const float lines = 2;

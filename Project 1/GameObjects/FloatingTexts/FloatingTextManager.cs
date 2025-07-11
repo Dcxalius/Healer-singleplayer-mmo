@@ -11,7 +11,7 @@ namespace Project_1.GameObjects.FloatingTexts
     internal static class FloatingTextManager
     {
         static List<FloatingText> floatingTexts;
-        public static void Init()
+        static FloatingTextManager()
         {
             floatingTexts = new List<FloatingText>();
         }

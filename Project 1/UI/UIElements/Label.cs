@@ -41,10 +41,13 @@ namespace Project_1.UI.UIElements
             
             int lastNewlineIndex = s.LastIndexOf('\n');
             float ratioOfSizes = Size.X / Textures.Text.CalculateOffset(s.Substring(lastNewlineIndex + 1), underlyingText.Font).X;
-            if (ratioOfSizes > 1) return s;
-
-            int spaceIndex = s.IndexOf(' ', (int)((s.Length - lastNewlineIndex + 1) * ratioOfSizes) + lastNewlineIndex + 1);
+            int len = (int)((s.Length - lastNewlineIndex + 1) * ratioOfSizes) + lastNewlineIndex + 1;
+            if (ratioOfSizes > 1 || len >= s.Length) return s;
             
+            int spaceIndex = s.IndexOf(' ', len);
+
+            if (spaceIndex == -1) return s; //TODO: Think more about this
+
             spaceIndex = TextWidthLineLengthCheck(s, lastNewlineIndex, spaceIndex);
 
             s = s.Remove(spaceIndex, 1);

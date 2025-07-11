@@ -106,7 +106,7 @@ namespace Project_1.UI.UIElements.Buttons
             //}
             //text.CentredDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Center));
 
-            if (wasHovered)
+            if (isHovered)
             {
                 //hoverGfx.Draw(aBatch, AbsolutePos);
             }

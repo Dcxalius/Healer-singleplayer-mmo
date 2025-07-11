@@ -16,22 +16,21 @@ namespace Project_1.Tiles
     {
         static TileData[] tileData;
 
-        public static void Init(ContentManager aContentManager)
+        static TileFactory()
         {
 
-            ImportData(aContentManager.RootDirectory, aContentManager);
-                //DEBUG:
+            ImportData();
+            //DEBUG:
             //TileManager.GenerateTiles(new Point(0), TileManager.debugSize);
-
         }
 
         public static TileData GetTileData(int aid) => tileData[aid];
         public static TileData GetTileData(string aName) => tileData.Where(tile =>  tile.Name == aName).First();
 
-        static void ImportData(string aPathToData, ContentManager aContentManager)
+        static void ImportData()
         {
             List<TileData> tiles = new List<TileData>();
-            string[] dataAsString = System.IO.File.ReadAllLines(aPathToData + "\\Data\\TileData.json");
+            string[] dataAsString = System.IO.File.ReadAllLines(Game1.ContentManager.RootDirectory + "\\Data\\TileData.json");
 
             for (int i = 0; i < dataAsString.Length; i++)
             {

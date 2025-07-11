@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.UI.UIElements
+namespace Project_1.UI.HUD.Windows
 {
     internal class Window : Box
     {
@@ -25,12 +25,13 @@ namespace Project_1.UI.UIElements
 
         static public void Init(RelativeScreenPosition aFurthestLeftWindow, RelativeScreenPosition aSpacing, RelativeScreenPosition aSize)
         {
+            //TODO: Add a button to close window
             nrOfBookletsOpen = 0;
             furthestLeftWindow = aFurthestLeftWindow;
             spacing = aSpacing;
             size = aSize;
 
-            maxNrOfOpenWindows = 1 + (int)((1 - (furthestLeftWindow.X + size.X))/ (spacing.X + size.X));
+            maxNrOfOpenWindows = 1 + (int)((1 - (furthestLeftWindow.X + size.X)) / (spacing.X + size.X));
             openWindows = new List<Window>();
         }
         public Window(UITexture aGfx) : base(aGfx, RelativeScreenPosition.Zero, size)
@@ -57,7 +58,7 @@ namespace Project_1.UI.UIElements
         public override void ToggleVisibilty()
         {
             if (nrOfBookletsOpen >= maxNrOfOpenWindows && !Visible) return;
-            
+
             if (!Visible) OpenBooklet();
             if (Visible) CloseBooklet();
 

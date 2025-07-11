@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.Input;
+using Project_1.Managers;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -14,8 +15,6 @@ namespace Project_1.UI.UIElements.Boxes
 {
     internal class ScrollableBox : Box
     {
-
-        //TODO: Figure out a way to elegantly handle there not being enough items to scroll
         ScrollBar scrollBar;
         public int ScrollableElementsCount => scrollableElements.Count;
         List<UIElement> scrollableElements;
@@ -80,7 +79,7 @@ namespace Project_1.UI.UIElements.Boxes
             elementSize = new RelativeScreenPosition(1f - spacing.X - spacing.X - sizeOfScrollBar.X - barSpacing.X, (1f - spacing.Y) / visibleElements);
         }
 
-        public void SetValue(float aValue)
+        public void SetScrollValue(float aValue)
         {
             scrollBar.SetValue(aValue);
             scrollValue = MaxScroll * aValue;
@@ -127,6 +126,9 @@ namespace Project_1.UI.UIElements.Boxes
             scrollableElements.Add(aUIElement);
             originalYPos.Add(aUIElement.RelativePos.Y);
             AddChild(aUIElement);
+
+            if (!TooMuchForWindow) scrollBar.SetScrollPlimpSize(1f);
+            else scrollBar.SetScrollPlimpSize((elementSize.Y + spacing.Y) / (originalYPos.Last() + scrollableElements.Last().RelativeSize.Y + Spacing.Y));
         }
 
         public void AddScrollableElements(List<UIElement> aList)

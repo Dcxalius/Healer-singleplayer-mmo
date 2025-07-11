@@ -35,13 +35,14 @@ namespace Project_1.Managers
 
         static GraphicsDeviceManager graphicsDeviceManager;
         static GraphicsAdapter graphicsAdapter;
+        public static GameWindow GameWindow => gameWindow;
         static GameWindow gameWindow;
 
         //--- Window stuff
         readonly static Point windowsTitleBarStuff = new Point(128, 32); //128 is a guesstimation of the minimum width, 32 is the required height based on https://learn.microsoft.com/en-us/windows/apps/design/basics/titlebar-design
         static Rectangle windowBounds;
         static readonly Point offset = new Point(8, 31); //I dont know why this is neccessary, well y is just the titlebar height but why does x have to 8????
-        static readonly Point fullscreenOffset = new Point(8, 0); //I dont know why this is neccessary, well y is just the titlebar height but why does x have to 8????
+        static readonly Point fullscreenOffset = new Point(0, 0);
 
         static bool fullsceen = false;
         static bool borderlessFullscreen = false;
@@ -49,13 +50,10 @@ namespace Project_1.Managers
         static Rectangle unCaptueredScissorRect;
         static object scissorRectCaptor = null;
         static List<(object, Rectangle)> scissors;
-
-        public static void Init()
+        static GraphicsManager()
         {
-
             scissors = new List<(object, Rectangle)>();
             //SetWindowSize(Camera.Camera.devScreenBorder, );
-
         }
 
 
@@ -143,18 +141,18 @@ namespace Project_1.Managers
             graphicsDeviceManager.GraphicsDevice.Clear(aColor);
         }
 
-        public static void SetWindowSize(Point aSize, CameraSettings.Fullscreen aFullscreen) //TODO: Figure out whats wrong with fullscreen.
+        public static void SetWindowSize(Point aSize, CameraSettings.WindowType aFullscreen) //TODO: Figure out whats wrong with fullscreen.
         {
             if (!AllowedSize(aSize))
             {
                 return;
             }
 
-            if (aFullscreen <= (CameraSettings.Fullscreen)1)
+            if (aFullscreen <= CameraSettings.WindowType.Borderless)
             {
                 graphicsDeviceManager.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
                 graphicsDeviceManager.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-                StateManager.RenderTargetPosition = GetRenderTargetDestination(Camera.Camera.devScreenBorder, graphicsDeviceManager.PreferredBackBufferWidth, graphicsDeviceManager.PreferredBackBufferHeight);
+                StateManager.RenderTargetPosition = GetRenderTargetDestination(Camera.Camera.ScreenRectangle.Size, graphicsDeviceManager.PreferredBackBufferWidth, graphicsDeviceManager.PreferredBackBufferHeight);
             }
             else
             {
@@ -165,15 +163,15 @@ namespace Project_1.Managers
 
             switch (aFullscreen)
             {
-                case CameraSettings.Fullscreen.Fullscreen:
+                case CameraSettings.WindowType.Fullscreen:
                     graphicsDeviceManager.IsFullScreen = true;
                     graphicsDeviceManager.HardwareModeSwitch = false;
                     break;
-                case CameraSettings.Fullscreen.Borderless:
+                case CameraSettings.WindowType.Borderless:
                     graphicsDeviceManager.IsFullScreen = true;
                     graphicsDeviceManager.HardwareModeSwitch = true;
                     break;
-                case CameraSettings.Fullscreen.Windowed:
+                case CameraSettings.WindowType.Windowed:
                     graphicsDeviceManager.HardwareModeSwitch = false;
                     graphicsDeviceManager.IsFullScreen = false;
                     break;
@@ -251,15 +249,14 @@ namespace Project_1.Managers
         /// from https://stackoverflow.com/questions/7162834/determine-if-current-application-is-activated-has-focus
         public static bool ApplicationIsActivated()
         {
-            var activatedHandle = GetForegroundWindow();
+            IntPtr activatedHandle = GetForegroundWindow();
             if (activatedHandle == IntPtr.Zero)
             {
                 return false;       // No window is currently activated
             }
 
-            var procId = Process.GetCurrentProcess().Id;
-            int activeProcId;
-            GetWindowThreadProcessId(activatedHandle, out activeProcId);
+            int procId = Process.GetCurrentProcess().Id;
+            _ = GetWindowThreadProcessId(activatedHandle, out int activeProcId);
 
             return activeProcId == procId;
         }

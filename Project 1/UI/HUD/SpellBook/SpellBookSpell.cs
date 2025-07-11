@@ -27,8 +27,8 @@ namespace Project_1.UI.HUD.SpellBook
             set
             {
                 spellData = value;
-                if (value != null) gfxOnButton = new UITexture(spellData.GfxPath, Color.White);
-                else gfxOnButton = null;
+                if (value != null) imageOnButton.SetImage(spellData.GfxPath);
+                else imageOnButton.ClearImage();
             }
         }
         Spell spellData;

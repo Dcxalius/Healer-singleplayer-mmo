@@ -24,10 +24,11 @@ namespace Project_1.GameObjects.Spawners
 
         static Dictionary<string, int> savedMobNames;
 
-        public static void Init()
+        static SpawnerManager()
         {
             savedMobNames = new Dictionary<string, int>();
             spawnZones = new List<SpawnZone>();
+
         }
 
         public static void Load(Save aSave)

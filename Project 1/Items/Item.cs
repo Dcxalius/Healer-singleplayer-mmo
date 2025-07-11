@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using Project_1.Managers;
@@ -25,20 +26,22 @@ namespace Project_1.Items
             Legendary
         }
 
-        public int ID { get => itemData.ID; }
+        public int ID => itemData.ID;
         public int Count { get => count; set => count = value; }
         [JsonIgnore]
-        public int MaxStack { get => itemData.MaxStack; }
+        public int MaxStack => itemData.MaxStack;
         [JsonIgnore]
-        public GfxPath GfxPath { get => itemData.GfxPath; }
+        public GfxPath GfxPath => itemData.GfxPath;
 
         [JsonIgnore]
-        public ItemData.ItemType ItemType { get => itemData.Type; }
-        
+        public ItemData.ItemType ItemType => itemData.Type;
+
         [JsonIgnore]
-        public string Name { get => itemData.Name; }
+        public string Name => itemData.Name;
         [JsonIgnore]
-        public string Description { get => itemData.Description; }
+        public string Description => itemData.Description;
+        [JsonIgnore]
+        public int Cost => itemData.Cost;
         [JsonIgnore]
         public Color ItemQualityColor
         {

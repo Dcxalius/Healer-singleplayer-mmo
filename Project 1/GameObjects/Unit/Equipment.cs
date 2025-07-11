@@ -424,7 +424,7 @@ namespace Project_1.GameObjects.Unit
             return item;
         }
 
-        public AttackData GetWeaponAttacks() //TODO: Change this so it changes Attackstyle when a weapon is equiped
+        public AttackData GetWeaponAttacks()
         {
             Attack mh = null;
             

@@ -23,6 +23,7 @@ namespace Project_1.UI.HUD.Managers
         static GuildWindow guildWindow;
         static InspectWindow inspectWindow;
         static GossipWindow gossipWindow;
+        static ShopWindow shopWindow;
         public void InitWindows(ref List<UIElement> aHudElements)
         {
             Window.Init(new RelativeScreenPosition(0.05f, 0.2f), new RelativeScreenPosition(0.1f, 0f), new RelativeScreenPosition(0.2f, 0.6f));
@@ -42,7 +43,17 @@ namespace Project_1.UI.HUD.Managers
             gossipWindow = new GossipWindow();
             aHudElements.Add(gossipWindow);
             ChatGossipOption.SetGossipWindow = gossipWindow.GetSet();
+            ShopGossipOption.CloseGossipWindowAndOpenShop = gossipWindow.GetClose();
 
+            shopWindow = new ShopWindow();
+            aHudElements.Add(shopWindow);
+
+        }
+
+        public void OpenShopWindow(ShopGossipOption aShop, Npc aNpc)
+        {
+            shopWindow.OpenWindow();
+            shopWindow.OpenShop(aShop, aNpc);
         }
 
         public void OpenGossipWindow(ChatGossipOption aIntro, Npc aNpc)
@@ -57,11 +68,6 @@ namespace Project_1.UI.HUD.Managers
         public void CloseGossipWindow()
         {
             gossipWindow.CloseWindow();
-        }
-
-        public Action<ChatGossipOption> GetGossipSetAction()
-        {
-            return gossipWindow.GetSet();
         }
 
         public void AddGuildMember(Friendly aData)

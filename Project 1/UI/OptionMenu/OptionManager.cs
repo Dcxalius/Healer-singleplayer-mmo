@@ -49,7 +49,7 @@ namespace Project_1.UI.OptionMenu
         static ExitOptionsButton exitOptionsButton;
         static SaveChangesButton saveChangesButton;
 
-        public static void Init()
+        static OptionManager()
         {
             changesMade = false;
             InitPermanents();
