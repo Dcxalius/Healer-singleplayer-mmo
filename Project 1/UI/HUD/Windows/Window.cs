@@ -1,7 +1,9 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Textures;
 using Project_1.UI.UIElements.Boxes;
+using Project_1.UI.UIElements.Buttons;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,9 +25,10 @@ namespace Project_1.UI.HUD.Windows
         static RelativeScreenPosition GetNextOpenPosition => furthestLeftWindow + (spacing + new RelativeScreenPosition(size.X, 0)) * nrOfBookletsOpen;
         static List<Window> openWindows;
 
+        public static bool IsWindowOpen(string aWindowName) => openWindows != null && openWindows.Any(window => window.GetType().Name == aWindowName);
+
         static public void Init(RelativeScreenPosition aFurthestLeftWindow, RelativeScreenPosition aSpacing, RelativeScreenPosition aSize)
         {
-            //TODO: Add a button to close window
             nrOfBookletsOpen = 0;
             furthestLeftWindow = aFurthestLeftWindow;
             spacing = aSpacing;
@@ -39,6 +42,9 @@ namespace Project_1.UI.HUD.Windows
             Visible = false;
             hudMoveable = false;
 
+            RelativeScreenPosition buttonSize = RelativeScreenPosition.GetSquareFromX(0.05f, size.ToAbsoluteScreenPos());
+            GFXButton gFXButton = new GFXButton(new List<Action>() { new Action(CloseWindow) }, new GfxPath(GfxType.UI, "XButton"), RelativeScreenPosition.One.OnlyX + new RelativeScreenPosition(-buttonSize.X, 0), buttonSize, Color.White);
+            AddChild(gFXButton);
         }
 
         public void OpenWindow()

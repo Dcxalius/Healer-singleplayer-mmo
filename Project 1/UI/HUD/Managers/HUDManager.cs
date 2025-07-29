@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects.Spells;
 using Project_1.Input;
@@ -20,18 +21,18 @@ namespace Project_1.UI.HUD.Managers
         public static PlateBoxHandler plateBoxHandler;
         public static NamePlateHandler namePlateHandler;
         public static WindowHandler windowHandler;
-        public static HudChanger hudChanger;
+        //public static HudChanger hudChanger;
 
         static List<UIElement> hudElements;
 
-
+        
 
         static InventoryBox inventoryBox;
         static LootBox lootBox;
         static DescriptorBox descriptorBox;
 
         static CastBar playerCastBar;
-        static FirstSpellBar firstSpellBar;
+        static SpellBar firstSpellBar;
 
 
 
@@ -51,7 +52,7 @@ namespace Project_1.UI.HUD.Managers
             plateBoxHandler = new PlateBoxHandler();
             namePlateHandler = new NamePlateHandler();
             windowHandler = new WindowHandler();
-            hudChanger = new HudChanger();
+            //hudChanger = new HudChanger();
 
             hudMoving = false;
             ImportSettings();
@@ -70,8 +71,8 @@ namespace Project_1.UI.HUD.Managers
 
             windowHandler.InitWindows(ref hudElements);
 
-            var loaded = LoadedSettings.Find(x => x.Item1 == typeof(FirstSpellBar).Name);
-            firstSpellBar = new FirstSpellBar(10, loaded.Item2, loaded.Item3.X);
+            var loaded = LoadedSettings.Find(x => x.Item1 == typeof(SpellBar).Name);
+            firstSpellBar = new SpellBar(Color.White, 10, loaded.Item2, loaded.Item3.X);
             hudElements.Add(firstSpellBar);
             loaded = LoadedSettings.Find(x => x.Item1 == typeof(CastBar).Name);
             playerCastBar = new CastBar(loaded.Item2, loaded.Item3);
@@ -249,6 +250,7 @@ namespace Project_1.UI.HUD.Managers
         public static void SetDescriptorBox(Item aItem) => descriptorBox.SetToItem(aItem);
         public static void SetDescriptorBox(Items.Item aItem, RelativeScreenPosition aPos) => descriptorBox.SetToItem(aItem, aPos);
 
+        public static void RefreshGold(int aGoldAmount) => inventoryBox.RefreshGold(aGoldAmount);
         #endregion
 
         

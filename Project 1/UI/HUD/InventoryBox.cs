@@ -8,14 +8,9 @@ using Project_1.Items;
 using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.UI.HUD.Inventory;
+using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Project_1.GameObjects.Unit.Equipment;
 
 namespace Project_1.UI.HUD
 {
@@ -26,6 +21,8 @@ namespace Project_1.UI.HUD
 
         BagHolderBox bagHolderBox;
         BagBox[] bagBox;
+        Label gold;
+        Image goldImage;
 
         const float itemSizeX = 0.06f;
         const float spacingX = 0.01f;
@@ -51,6 +48,10 @@ namespace Project_1.UI.HUD
 
         int columnCount;
 
+        static InventoryBox()
+        {
+        }
+
         public InventoryBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize, int aColumnCount) : base(new UITexture("WhiteBackground",new Color(80, 80, 80, 80)), aPos, new RelativeScreenPosition(0.3f, 0.4f))
         {
             InitUIElement(aColumnCount);
@@ -68,8 +69,9 @@ namespace Project_1.UI.HUD
             hudMoveable = false;
         }
 
-        void InitStatics()
+        void InitStatics() //TODO: Make this indepentet and called in the static constructor
         {
+
             bagBoxSize = new RelativeScreenPosition(1 - spacing.X * 2, 0.3f);
             itemSizeInBagSpace = RelativeScreenPosition.GetSquareFromX((1 - (columnCount + 1) * spacing.X) / (float)columnCount, bagBoxSize.ToAbsoluteScreenPos(Size));
             absItemSize = itemSizeInBagSpace.ToAbsoluteScreenPos(bagBoxSize.ToAbsoluteScreenPos(Size));
@@ -95,6 +97,15 @@ namespace Project_1.UI.HUD
             }
 
             AddChildren(bagBox);
+
+            RelativeScreenPosition imgSize = RelativeScreenPosition.GetSquareFromY(bagHolderBox.RelativeSize.Y / 2, Size);
+            goldImage = new Image(new UITexture("Gold", Color.White), RelativeScreenPosition.One - imgSize - bagBoxSpacingInInventoryScope.OnlyX, imgSize);
+
+            RelativeScreenPosition goldSize = new RelativeScreenPosition(1 - imgSize.X - bagBoxSpacingInInventoryScope.X * 2, bhSize.Y);
+            gold = new Label("0", RelativeScreenPosition.Zero + RelativeScreenPosition.One.OnlyY - goldSize.OnlyY - bagBoxSpacingInInventoryScope.OnlyY, goldSize, Label.TextAllignment.CentreRight);
+
+            AddChild(gold);
+            AddChild(goldImage);
         }
 
         public override void Resize(RelativeScreenPosition aSize)
@@ -134,6 +145,8 @@ namespace Project_1.UI.HUD
                 newBagPos.Y += bagBox[i].RelativeSize.Y + absBagBoxSpacing.ToRelativeScreenPosition().Y;
             }
         }
+
+        public void RefreshGold(int aGoldAmount) => gold.Text = aGoldAmount.ToString();
 
         public void RefreshSlot(int aBag, int aSlot, Items.Inventory aInventory)
         {
@@ -205,6 +218,15 @@ namespace Project_1.UI.HUD
                 bagBox[i].Resize(oldPosAndSize[i].Item2.ToRelativeScreenPosition(Size));
 
             }
+
+            goldImage.Resize(RelativeScreenPosition.GetSquareFromY(bagHolderBox.RelativeSize.Y / 2, Size));
+            //goldImage.Move(RelativeScreenPosition.One - goldImage.RelativeSize - outerSpacingInScreenSpace.OnlyX);
+            goldImage.Move(RelativeScreenPosition.One - bagHolderBox.RelativeSize.OnlyY / 2 - goldImage.RelativeSize.OnlyY / 2 - goldImage.RelativeSize.OnlyX - outerSpacingInScreenSpace.OnlyX);
+            //
+
+
+            gold.Resize(new RelativeScreenPosition(1 - goldImage.RelativeSize.X - outerSpacingInScreenSpace.X * 2, bagHolderBox.RelativeSize.Y));
+            gold.Move(new RelativeScreenPosition(RelativeScreenPosition.Zero + RelativeScreenPosition.One.OnlyY - gold.RelativeSize.OnlyY - outerSpacingInScreenSpace.OnlyY));
         }
 
         public override void Rescale()

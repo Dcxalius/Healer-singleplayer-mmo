@@ -25,7 +25,7 @@ namespace Project_1.Textures
         {
             if (!File.Exists(aPath))
             {
-                //TODO: FNF gfx
+                //TODO: File not found gfx
                 return;
             }
             gfx = GraphicsManager.CreateTextureFromFile(aPath);

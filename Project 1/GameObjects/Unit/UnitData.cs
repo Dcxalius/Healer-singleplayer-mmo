@@ -141,6 +141,7 @@ namespace Project_1.GameObjects.Unit
         [JsonIgnore]
         public LootTable LootTable { get => LootFactory.GetData(name); }
 
+        
         public UnitData(MobData aData, WorldSpace aSpawn)
         {
             name = aData.Name;

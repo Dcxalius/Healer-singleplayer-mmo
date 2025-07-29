@@ -34,7 +34,7 @@ namespace Project_1
             Instance = this;
         }
 
-        protected override void Initialize() //TODO: Split all Inits so that all calls that are independant are called first and only after that the dependant ones are called
+        protected override void Initialize()
         {
 
             //DEBUG

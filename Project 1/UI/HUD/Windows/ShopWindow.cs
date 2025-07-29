@@ -22,11 +22,11 @@ namespace Project_1.UI.HUD.Windows
         int[] itemIDsInShop;
         public ShopWindow() : base(new UITexture("WhiteBackground", Color.Lime))
         {
+            RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.05f, Size);
             itemsForSale = new ItemForSale[10];
             for (int i = 0; i < itemsForSale.Length; i++)
             {
-                DebugManager.Print(GetType(), new RelativeScreenPosition(ItemForSale.size.X * (i % 2) + 0.1f, ItemForSale.size.Y * MathF.Floor(i / 2)));
-                itemsForSale[i] = new ItemForSale(new RelativeScreenPosition(ItemForSale.size.X * (i % 2) + 0.1f, ItemForSale.size.Y * MathF.Floor(i / 2)));
+                itemsForSale[i] = new ItemForSale(new RelativeScreenPosition((ItemForSale.size.X + spacing.X) * (i % 2) + spacing.X * (i % 2 + 1), (ItemForSale.size.Y + spacing.Y) * MathF.Floor(i / 2) + spacing.Y * (MathF.Floor(1 / 2) + 1)));
             }
             AddChildren(itemsForSale);
 

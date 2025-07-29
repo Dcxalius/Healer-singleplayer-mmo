@@ -1,4 +1,5 @@
-﻿using Project_1.Camera;
+﻿using Newtonsoft.Json.Bson;
+using Project_1.Camera;
 using Project_1.GameObjects.Unit;
 using Project_1.Input;
 using Project_1.UI.HUD.Managers;
@@ -15,7 +16,7 @@ namespace Project_1.GameObjects.Entities.Players
     {
         public const int maxPartySize = 4;
 
-        Entity owner;
+        Player owner;
         List<GuildMember> commands = new List<GuildMember>();
 
         public int PartyCount => party.Count;
@@ -27,7 +28,7 @@ namespace Project_1.GameObjects.Entities.Players
 
         public bool IsInCombat => party.Any(x => x.InCombat);
 
-        public Party(Entity aOwner)
+        public Party(Player aOwner)
         {
             owner = aOwner;
         }
@@ -137,8 +138,6 @@ namespace Project_1.GameObjects.Entities.Players
             DivideExpAmongParty(aExpAmount);
         }
 
-
-
         public void DivideExpAmongParty(int aExpAmount)
         {
             int dividedExp = aExpAmount / (PartyCount + 1);
@@ -151,6 +150,15 @@ namespace Project_1.GameObjects.Entities.Players
 
             owner.GainExperience(dividedExp);
         }
-    }
+        public void GoldToParty(int aGoldAmount)
+        {
+            if (PartyCount == 0)
+            {
+                owner.ChangeGold(aGoldAmount);
+                return;
+            }
 
+            owner.ChangeGold(aGoldAmount / (PartyCount + 1));
+        }
+    }
 }

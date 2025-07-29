@@ -22,9 +22,10 @@ namespace Project_1.UI.HUD
 {
     internal class DescriptorBox : Box
     {
-        DescriptorText descriptedName;
+        DescriptorText descriptedName; //TODO: Shouldn't these just be labels?
         DescriptorText description;
         DescriptorText statSheet;
+        DescriptorText goldCost;
 
         void CalculateMaxX(RelativeScreenPosition aScreenSize) => maxX = (aScreenSize.ToAbsoluteScreenPos()).X;
         float maxX;
@@ -38,6 +39,7 @@ namespace Project_1.UI.HUD
             descriptedName = new DescriptorText(maxX, "Gloryse", Color.White);
             description = new DescriptorText(maxX, "Gloryse", Color.White);
             statSheet = new DescriptorText(maxX, "Gloryse", Color.White);
+            goldCost = new DescriptorText(maxX, "Gloryse", Color.White);
 
             Visible = false;
             AlwaysFullyOnScreen = true;
@@ -75,6 +77,8 @@ namespace Project_1.UI.HUD
                 spacingNeeded += 1;
             }
             else { statSheet.Value = null; }
+
+            //TODO: Show gold cost / 4 and and image for gold
             int y = (int)(descriptedName.Offset.Y + description.Offset.Y + statSheet.Offset.Y);
             int x = (int)Math.Max(descriptedName.Offset.X, Math.Max(description.Offset.X, statSheet.Offset.X));
             Resize(new AbsoluteScreenPosition(x, y).ToRelativeScreenPosition() + spacing.OnlyX * 2 + spacing.OnlyY * spacingNeeded);
@@ -87,6 +91,7 @@ namespace Project_1.UI.HUD
             descriptedName.Value = null;
             description.Value = null;
             statSheet.Value = null;
+            goldCost.Value = null;
             Resize(RelativeScreenPosition.Zero);
             return;
         }

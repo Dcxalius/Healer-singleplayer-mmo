@@ -18,6 +18,7 @@ using Project_1.Camera;
 using Project_1.UI.UIElements.Buttons;
 using System.Diagnostics;
 using Project_1.UI.HUD.Managers;
+using Project_1.GameObjects.Unit;
 
 namespace Project_1.GameObjects.Entities.Players
 {
@@ -35,6 +36,9 @@ namespace Project_1.GameObjects.Entities.Players
         Guild guild;
         public bool LockedMovement => lockedMovement;
         bool lockedMovement = false;
+
+        public int Gold => PlayerData.Gold;
+
 
         public bool InCombatOrPartyInCombat => party.IsInCombat || InCombat;
 
@@ -55,6 +59,7 @@ namespace Project_1.GameObjects.Entities.Players
             HUDManager.windowHandler.RefreshSpellBook(SpellBook.Spells);
             HUDManager.windowHandler.SetCharacterWindow(this);
             HUDManager.plateBoxHandler.SetPlayerPlateBox(this);
+            HUDManager.RefreshGold(Gold);
         }
 
         public override void Update()
@@ -125,6 +130,11 @@ namespace Project_1.GameObjects.Entities.Players
             velocity *= (float)(UnitData.MovementData.Speed * TimeManager.SecondsSinceLastFrame);
         }
 
+        public void ChangeGold(int aAmount)
+        {
+            PlayerData.Gold += aAmount;
+            HUDManager.RefreshGold(Gold);
+        }
 
         protected override bool CheckForRelation()
         {

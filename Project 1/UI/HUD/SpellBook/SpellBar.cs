@@ -18,7 +18,7 @@ namespace Project_1.UI.HUD.SpellBook
     {
         SpellButton[] spellButtons;
         Border border;
-        public SpellBar(UITexture aGfx, int aButtonCount, RelativeScreenPosition aPos, float aSizeX) : base(aGfx, aPos, new RelativeScreenPosition(aSizeX, calcY(aSizeX, aButtonCount)))
+        public SpellBar(Color aBackgroundColor, int aButtonCount, RelativeScreenPosition aPos, float aSizeX) : base(new UITexture("WhiteBackground", aBackgroundColor), aPos, new RelativeScreenPosition(aSizeX, calcY(aSizeX, aButtonCount)))
         {
             Vector2 offset = RelativeScreenPosition.GetSquareFromX(calcOffset(1, aButtonCount), Size);
             float buttonSize = calcButtonSize(1, aButtonCount);

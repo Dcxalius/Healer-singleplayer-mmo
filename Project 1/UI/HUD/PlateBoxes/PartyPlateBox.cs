@@ -3,6 +3,7 @@ using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.Input;
+using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements;
 using System;
 using System.Collections.Generic;
@@ -93,7 +94,7 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         protected override void ClickedOnMe(ClickEvent aClick)
         {
-            if (hudMoving)
+            if (HUDManager.HudMoving)
             {
                 base.ClickedOnMe(aClick);
                 return;
