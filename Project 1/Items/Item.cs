@@ -41,6 +41,8 @@ namespace Project_1.Items
         [JsonIgnore]
         public string Description => itemData.Description;
         [JsonIgnore]
+        public int SellPrice => (int)MathF.Floor((float)itemData.Cost / 4);
+        [JsonIgnore]
         public int Cost => itemData.Cost;
         [JsonIgnore]
         public Color ItemQualityColor

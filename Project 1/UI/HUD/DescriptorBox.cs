@@ -14,6 +14,7 @@ using SharpDX.DirectWrite;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO.Packaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,25 +23,34 @@ namespace Project_1.UI.HUD
 {
     internal class DescriptorBox : Box
     {
-        DescriptorText descriptedName; //TODO: Shouldn't these just be labels?
-        DescriptorText description;
-        DescriptorText statSheet;
-        DescriptorText goldCost;
+        Label itemName;
+        Label itemDescription;
+        Label itemStats;
+        Label itemSellPrice;
 
-        void CalculateMaxX(RelativeScreenPosition aScreenSize) => maxX = (aScreenSize.ToAbsoluteScreenPos()).X;
-        float maxX;
+        Image goldImage;
+
+        float xMax;
         readonly RelativeScreenPosition spacingFromItem = RelativeScreenPosition.GetSquareFromX(0.0005f);
-        readonly RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
+        RelativeScreenPosition spacingInWorld;
 
 
         public DescriptorBox() : base(new UITexture("GrayBackground", Color.White), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
         {
-            CalculateMaxX(new RelativeScreenPosition(0.15f));
-            descriptedName = new DescriptorText(maxX, "Gloryse", Color.White);
-            description = new DescriptorText(maxX, "Gloryse", Color.White);
-            statSheet = new DescriptorText(maxX, "Gloryse", Color.White);
-            goldCost = new DescriptorText(maxX, "Gloryse", Color.White);
+            xMax = 0.15f;
 
+            itemName = new Label(null, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopLeft);
+            AddChild(itemName);
+            itemDescription = new Label(null, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopLeft);
+            AddChild(itemDescription);
+            itemStats = new Label(null, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopLeft);
+            AddChild(itemStats);
+            itemSellPrice = new Label(null, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreRight);
+            AddChild(itemSellPrice);
+
+            goldImage = new Image(new UITexture("Gold", Color.White), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
+
+            AddChild(goldImage);
             Visible = false;
             AlwaysFullyOnScreen = true;
         }
@@ -65,64 +75,90 @@ namespace Project_1.UI.HUD
             SetToItem(item, aItem.RelativePositionOnScreen);
         }
 
-        public void SetToItem(Items.Item aItem, RelativeScreenPosition aPos)
+        public void SetToItem(Items.Item aItem, RelativeScreenPosition aPos) //TODO: Should this be public?
         {
             Visible = true;
-            descriptedName.Value = aItem.Name;
-            description.Value = aItem.Description;
-            int spacingNeeded = 3;
+            spacingInWorld = RelativeScreenPosition.GetSquareFromX(0.005f);
+
+            SetText(aItem, out float ySize, out int spacingNeeded);
+            
+            Resize(new RelativeScreenPosition(xMax, ySize / Camera.Camera.ScreenRectangle.Height) + spacingInWorld.OnlyX * 2 + spacingInWorld.OnlyY * spacingNeeded);
+            Move(aPos - spacingFromItem - RelativeSize);
+            RelativeScreenPosition spacingInBox = spacingInWorld.ToAbsoluteScreenPos().ToRelativeScreenPosition(Size);
+
+            RelativeScreenPosition pos = spacingInBox;
+            itemName.Resize(new AbsoluteScreenPosition(Size.X, (int)itemName.UnderlyingTextOffset.Y).ToRelativeScreenPosition(Size));
+            itemName.Move(pos);
+            pos += itemName.RelativeSize.OnlyY + spacingInBox.OnlyY;
+
+            itemDescription.Resize(new AbsoluteScreenPosition(Size.X, (int)itemDescription.UnderlyingTextOffset.Y).ToRelativeScreenPosition(Size));
+            itemDescription.Move(pos);
+            pos += itemDescription.RelativeSize.OnlyY + spacingInBox.OnlyY;
+
+            if (itemStats.Text != null)
+            {
+                itemStats.Resize(new AbsoluteScreenPosition(Size.X, (int)itemStats.UnderlyingTextOffset.Y).ToRelativeScreenPosition(Size));
+                itemStats.Move(pos);
+                pos += itemStats.RelativeSize.OnlyY + spacingInBox.OnlyY;
+            }
+
+            if (itemSellPrice.Text != null)
+            {
+                itemSellPrice.Resize(new RelativeScreenPosition(1 - RelativeScreenPosition.GetSquareFromY(itemSellPrice.UnderlyingTextOffset.Y / Size.Y, Size).X - spacingInBox.X * 2, itemSellPrice.UnderlyingTextOffset.Y / Size.Y));
+                itemSellPrice.Move(pos);
+                //pos += itemSellPrice.RelativeSize.OnlyY + spacing.OnlyY;
+
+                goldImage.Resize(RelativeScreenPosition.GetSquareFromY(itemSellPrice.RelativeSize.Y, Size));
+                goldImage.Move(RelativeScreenPosition.One - goldImage.RelativeSize - spacingInBox); //TODO: Allign image better
+            }
+
+        }
+
+        void SetText(Items.Item aItem, out float ySize, out int spacingNeeded)
+        {
+            ySize = 0;
+            spacingNeeded = 1;
+            itemName.Text = aItem.Name;
+            ySize += itemName.UnderlyingTextOffset.Y;
+
+            spacingNeeded += 1;
+            itemDescription.Text = aItem.Description;
+            ySize += itemDescription.UnderlyingTextOffset.Y;
+
+            spacingNeeded += 1;
+
             if (aItem.ItemType == Items.ItemData.ItemType.Equipment || aItem.ItemType == Items.ItemData.ItemType.Weapon)
             {
-                statSheet.Value = (aItem as Equipment).StatReport.Value;
+                itemStats.Text = (aItem as Equipment).StatReport.Value;
                 spacingNeeded += 1;
-            }
-            else { statSheet.Value = null; }
+                ySize += itemStats.UnderlyingTextOffset.Y;
 
-            //TODO: Show gold cost / 4 and and image for gold
-            int y = (int)(descriptedName.Offset.Y + description.Offset.Y + statSheet.Offset.Y);
-            int x = (int)Math.Max(descriptedName.Offset.X, Math.Max(description.Offset.X, statSheet.Offset.X));
-            Resize(new AbsoluteScreenPosition(x, y).ToRelativeScreenPosition() + spacing.OnlyX * 2 + spacing.OnlyY * spacingNeeded);
-            Move(aPos - spacingFromItem - RelativeSize);
+            }
+            else { itemStats.Text = null; }
+
+            goldImage.Visible = false;
+            if (aItem.Cost > 0)
+            {
+                goldImage.Visible = true;
+                itemSellPrice.Text = aItem.SellPrice.ToString();
+                spacingNeeded += 1;
+                ySize += itemSellPrice.UnderlyingTextOffset.Y;
+
+            }
+            else { itemSellPrice.Text = null; }
         }
+
+        
 
         void ResetDescriptor()
         {
             Visible = false;
-            descriptedName.Value = null;
-            description.Value = null;
-            statSheet.Value = null;
-            goldCost.Value = null;
+            itemName.Text = null;
+            itemDescription.Text = null;
+            itemStats.Text = null;
+            itemSellPrice.Text = null;
             Resize(RelativeScreenPosition.Zero);
             return;
-        }
-
-        public override void Update()
-        {
-            base.Update();
-
-        }
-
-        public override void Rescale()
-        {
-            base.Rescale();
-            CalculateMaxX(new RelativeScreenPosition(0.15f));
-        }
-
-        public override void Draw(SpriteBatch aBatch)
-        {
-            base.Draw(aBatch);
-            DrawText(aBatch);
-        }
-
-        void DrawText(SpriteBatch aBatch)
-        {
-            AbsoluteScreenPosition pos = ((AbsoluteScreenPosition)AbsolutePos.Location + spacing.ToAbsoluteScreenPos());
-            descriptedName.TopLeftDraw(aBatch, pos);
-            pos = pos + spacing.ToAbsoluteScreenPos().OnlyY + new AbsoluteScreenPosition(0, (int)descriptedName.Offset.Y);
-            description.TopLeftDraw(aBatch, pos);
-            pos = pos + spacing.ToAbsoluteScreenPos().OnlyY + new AbsoluteScreenPosition(0, (int)description.Offset.Y);
-            statSheet.TopLeftDraw(aBatch, pos);
-
         }
     }
 }
