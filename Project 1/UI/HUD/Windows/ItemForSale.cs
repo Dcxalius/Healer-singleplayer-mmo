@@ -46,6 +46,8 @@ namespace Project_1.UI.HUD.Windows
             AddChild(itemName); 
             AddChild(goldCost);
             AddChild(goldImage);
+
+            //TODO: Allow the setting of an item to have multiple counts
         }
 
         protected override void OnHover()
@@ -53,6 +55,7 @@ namespace Project_1.UI.HUD.Windows
             base.OnHover();
 
             if (!Visible) return;
+            if (itemForSale == null) return;
             HUDManager.SetDescriptorBox(itemForSale, RelativePositionOnScreen);
         }
 
@@ -74,7 +77,7 @@ namespace Project_1.UI.HUD.Windows
             if (itemForSale.Cost > ObjectManager.Player.Gold) return; //TODO: Print error msg
 
             ObjectManager.Player.ChangeGold(-itemForSale.Cost);
-            ObjectManager.Player.Inventory.AddItem(itemForSale);
+            ObjectManager.Player.Inventory.AddItem( new Items.Item(itemForSale.ID, itemForSale.Count));
         }
 
         public void Set(int aItemID)
@@ -83,11 +86,13 @@ namespace Project_1.UI.HUD.Windows
             displayItem.SetImage(itemForSale.GfxPath);
             goldCost.Text = itemForSale.Cost.ToString();
             itemName.Text = itemForSale.Name;
+            goldImage.Visible = true;
         }
 
         public void Clear()
         {
             displayItem.ClearImage();
+            goldImage.Visible = false;
             itemName.Text = null;
             goldCost.Text = null;
             itemForSale = null;

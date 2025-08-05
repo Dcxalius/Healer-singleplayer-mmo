@@ -550,6 +550,18 @@ namespace Project_1.Items
             return false;
         }
 
+        public int DestroyItemAtSlot(int aBagIndex, int aSlotIndex)
+        {
+            if (items[aBagIndex][aSlotIndex] == null)
+            {
+                DebugManager.Print(GetType(), "Tried to destoy item but couldnt find it.");
+                return 0;
+            }
+            int count = items[aBagIndex][aSlotIndex].Count;
+            items[aBagIndex][aSlotIndex] = null;
+            return count;
+        }
+
         void AddItemToInventoryFromInventory(Item aItem, int aInventory)
         {
             for (int i = 0; i < items[aInventory].Length; i++)

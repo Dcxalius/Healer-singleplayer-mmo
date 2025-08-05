@@ -67,17 +67,7 @@ namespace Project_1.UI.HUD.Inventory
             usesPressedGfx = false;
         }
 
-        protected override void ClickedOnMe(ClickEvent aClick)
-        {
-            base.ClickedOnMe(aClick);
-
-            if (aClick.ButtonPressed != InputManager.ClickType.Left) return;
-
-            if (isEmpty == false && holdable)
-            {
-                HUDManager.HoldItem(this, InputManager.GetMousePosAbsolute() - Location);
-            }
-        }
+        
 
         public void AssignItem(Items.Item aItem)
         {
@@ -336,6 +326,18 @@ namespace Project_1.UI.HUD.Inventory
             return true;
         }
 
+        protected override void ClickedOnMe(ClickEvent aClick)
+        {
+            base.ClickedOnMe(aClick);
+
+            if (aClick.ButtonPressed != InputManager.ClickType.Left) return;
+
+            if (isEmpty == false && holdable)
+            {
+                HUDManager.HoldItem(this, InputManager.GetMousePosAbsolute() - Location);
+            }
+        }
+
         public override void ClickedOnAndReleasedOnMe()
         {
             if (isEmpty == false && !isHeld && holdable && heldEvents.ClickThatCreated == InputManager.ClickType.Right)
@@ -369,6 +371,14 @@ namespace Project_1.UI.HUD.Inventory
             if (bagIndex >= 0)
             {
                 Friendly target;
+                if (HUDManager.windowHandler.IsShopOpen())
+                {
+                    //TODO: This is wrong approach, need to add item to a refund system in shop instead of just deleting it
+
+                    //int count = ObjectManager.Player.Inventory.DestroyItemAtSlot(bagIndex, slotIndex);
+                    //ObjectManager.Player.ChangeGold(count * );
+                }
+
                 if (HUDManager.windowHandler.GetGuildMemberInspectWindowTarget() == null || HUDManager.windowHandler.PlayerCharacterPaneOpen) target = ObjectManager.Player;
                 else target = HUDManager.windowHandler.GetGuildMemberInspectWindowTarget();
                 switch (ObjectManager.Player.Inventory.GetItemInSlot(Index).ItemType)

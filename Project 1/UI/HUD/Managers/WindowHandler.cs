@@ -163,6 +163,10 @@ namespace Project_1.UI.HUD.Managers
             inspectWindow.ToggleVisibilty();
         }
 
+        public bool IsShopOpen()
+        {
+            return shopWindow.Visible;
+        }
 
         public void AddSpellToSpellBook(Spell aSpell) => spellBookWindow.AssignSpell(aSpell);
         public void RefreshSpellBook(Spell[] aSpells) => spellBookWindow.RefreshSpells(aSpells);
