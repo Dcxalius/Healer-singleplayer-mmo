@@ -44,6 +44,9 @@ namespace Project_1.Tiles
             }
         }
 
+        [JsonIgnore]
+        public Color MinimapColor { get; private set; }
+
         public bool IsAdjacent(Tile aPossibleNeighbour)
         {
             if (Math.Abs(aPossibleNeighbour.GridPos.X-GridPos.X) > 1 || Math.Abs(aPossibleNeighbour.GridPos.Y-GridPos.Y) > 1) return false;
@@ -76,6 +79,8 @@ namespace Project_1.Tiles
                 yText = new Text("Gloryse", tilePos.Y.ToString(), Color.Yellow);
             }
             Position = new WorldSpace(aPos);
+
+            MinimapColor = gfx.AvgColor;
         }
 
         public void AddDebugSquare()

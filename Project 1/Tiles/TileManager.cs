@@ -27,7 +27,8 @@ namespace Project_1.Tiles
 {
     internal static class TileManager
     {
-        static Tile Tile(int aChunkId, int aX, int aY) => chunks.Find(x => x.ID == aChunkId).Tile(aX, aY);
+        static Tile Tile(int aChunkId, int aX, int aY) => chunks.Find(x => x.Id == aChunkId).Tile(aX, aY);
+        static Chunk GetChunk(int aId) => chunks.Find(x => x.Id == aId);
         static List<Chunk> chunks;
 
         static TileManager()
@@ -42,8 +43,9 @@ namespace Project_1.Tiles
             int y = aY;
 
             int dirInt;
-            int max = Math.Max(Math.Abs(x), Math.Abs(y));
-            int min = Math.Min(Math.Abs(x), Math.Abs(y));
+
+            int max;
+            int min;
 
             if (Math.Abs(x) >= Math.Abs(y))
             {
@@ -56,6 +58,8 @@ namespace Project_1.Tiles
                     dirInt = 7;
                 }
 
+                max = x;
+                min = y;
             }
             else
             {
@@ -67,9 +71,12 @@ namespace Project_1.Tiles
                 {
                     dirInt = 5;
                 }
+
+                max = y;
+                min = x;
             }
 
-            return (dirInt * max) + TriangleNumber(max) + min; //min is wrong, min is always positive but we want the actual value
+            return (dirInt * max) + TriangleNumber(max) + min;
         }
 
         public static Point GetChunkPosition(int aId)//TODO: Needs testing
@@ -120,7 +127,7 @@ namespace Project_1.Tiles
         static int TriangleNumber(int aX) => (8 * ((aX * aX) - aX) / 2);
 
 
-        readonly static Point TileSize = new Point(32, 32);
+        public readonly static Point TileSize = new Point(32, 32);
         const int sizeOfSquareToCheck = 3; // this should always be odd
 
         public readonly static Point debugSize = new Point(100, 100);
@@ -308,6 +315,11 @@ namespace Project_1.Tiles
             Tile t = chunks[0].Tile((int)Math.Floor(aWorldSpace.X / TileSize.X), (int)Math.Floor(aWorldSpace.Y / TileSize.Y));
             //Tile t = tiles[(int)Math.Floor(aWorldSpace.X / TileSize.X), (int)Math.Floor(aWorldSpace.Y / TileSize.Y)];
             return t;
+        }
+
+        public static Chunk GetChunkUnder(WorldSpace aWorldSpace)
+        {
+            return chunks[0];
         }
 
         public static WorldSpace FindClosestWalkableWorldSpace(WorldSpace aWorldSpace, WorldSpace aSize)
@@ -548,12 +560,20 @@ namespace Project_1.Tiles
 
             for (int i = 0; i < chunks.Count; i++)
             {
-                SaveManager.ExportData(aSave.Tiles + "\\" + chunks[i].ID + ".tilemap", chunks[i]);
+                SaveManager.ExportData(aSave.Tiles + "\\" + chunks[i].Id + ".tilemap", chunks[i]);
 
             }
 
         }
 
+        public static void MinimapDraw(SpriteBatch aBatch, WorldSpace aMinimapWorldPos, Vector2 aSize)
+        {
+            //TODO: Draw neighbours as well
+            //int chunkID = GetChunkId((int)aMinimapWorldPos.X / (debugSize.X * TileSize.X), (int)aMinimapWorldPos.Y / (debugSize.Y * TileSize.Y));
+            //GetChunk(chunkID).MinimapDraw(aBatch, aMinimapWorldPos);
+            GetChunk(0).MinimapDraw(aBatch, aMinimapWorldPos);
+
+        }
 
         public static void Draw(SpriteBatch aBatch)
         {

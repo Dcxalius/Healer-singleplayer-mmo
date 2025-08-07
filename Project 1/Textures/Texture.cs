@@ -36,6 +36,25 @@ namespace Project_1.Textures
 
         public Vector2 Offset { get => offset; set => offset = value; }
 
+        public Color AvgColor
+        {
+            get
+            {
+                Point bounds = gfx.Bounds.Size;
+                Color[] c = new Color[bounds.X * bounds.Y];
+                gfx.GetData(c);
+                Color c2 = c[0];
+                for (int i = 1; i < c.Length; i++)
+                {
+                    c2.R = (byte)((c2.R + c[i].R) / 2);
+                    c2.G = (byte)((c2.G + c[i].G) / 2);
+                    c2.B = (byte)((c2.B + c[i].B) / 2);
+                }
+                c2.A = 255;
+                return c2;
+            }
+        }
+
         protected Vector2 offset;
         protected SpriteEffects flip;
         public Texture(GfxPath aPath) : this(aPath, Vector2.Zero, Point.Zero, Color.White) { }

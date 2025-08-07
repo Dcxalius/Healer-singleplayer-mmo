@@ -34,6 +34,7 @@ namespace Project_1.UI.HUD.Managers
         static CastBar playerCastBar;
         static SpellBar firstSpellBar;
 
+        static Minimap minimap;
 
 
         static HeldItem heldItem;
@@ -82,6 +83,10 @@ namespace Project_1.UI.HUD.Managers
             heldSpell = new HeldSpell();
 
             dialogueBoxes = new List<DialogueBox>();
+
+            RelativeScreenPosition mmSize = RelativeScreenPosition.GetSquareFromX(0.2f);
+            minimap = new Minimap(new RelativeScreenPosition(0.75f, 0.05f), mmSize);
+            hudElements.Add(minimap);
         }
 
         static void ImportSettings()

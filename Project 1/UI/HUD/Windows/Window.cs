@@ -94,10 +94,5 @@ namespace Project_1.UI.HUD.Windows
             }
             openWindows.Remove(this);
         }
-
-        public override void Draw(SpriteBatch aBatch)
-        {
-            base.Draw(aBatch);
-        }
     }
 }

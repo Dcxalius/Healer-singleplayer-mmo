@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
+using Project_1.Camera;
 using Project_1.GameObjects.Spawners;
 using Project_1.GameObjects.Spawners.Pathing;
 using Project_1.Managers;
@@ -12,6 +13,12 @@ namespace Project_1.Tiles
     {
         readonly Point TileSize = new Point(32);
         public static readonly Point ChunkSize = new Point(100);
+
+        [JsonIgnore]
+        public RenderTarget2D minimap;
+
+
+        public WorldSpace Position { get; private set; }
 
         public Tile Tile((int, int) aXY) => Tile(aXY.Item1, aXY.Item2);
         public Tile Tile(int aX, int aY)
@@ -43,13 +50,13 @@ namespace Project_1.Tiles
 
 
         Tile[,] tiles;
-        [JsonIgnore]
-        public int ID => id;
+        public int Id => id;
         int id;
         public Chunk(Point aLeftUppermostTile, int aId) 
         {
             id = aId;
             tiles = new Tile[ChunkSize.X, ChunkSize.Y];
+            Position = new WorldSpace(aLeftUppermostTile);
 
             for (int i = 0; i < ChunkSize.X; i++)
             {
@@ -108,17 +115,17 @@ namespace Project_1.Tiles
         }
 
         [JsonConstructor]
-        public Chunk(int[,] tilesAsIDs, int aId)
+        public Chunk(int[,] tilesAsIDs, int id, WorldSpace position)
         {
-            id = aId;
-            Point tilePos = TileManager.GetChunkPosition(id);
+            Position = position;
+            this.id = id;
             tiles = new Tile[tilesAsIDs.GetLength(0), tilesAsIDs.GetLength(1)];
 
             for (int i = 0; i < tiles.GetLength(0); i++)
             {
                 for (int j = 0; j < tiles.GetLength(1); j++)
                 {
-                    Point pos = new Point(tilePos.X * ChunkSize.X + TileSize.X * i, tilePos.Y * ChunkSize.Y + TileSize.Y * j);
+                    Point pos = new Point((int)position.X * ChunkSize.X + TileSize.X * i, (int)position.Y * ChunkSize.Y + TileSize.Y * j);
 
                     tiles[i, j] = new Tile(TileFactory.GetTileData(tilesAsIDs[i, j]), pos, new Point(i, j));
                 }
@@ -130,6 +137,22 @@ namespace Project_1.Tiles
             if (id < other.id) return -1;
             if (id > other.id) return 1;
             throw new NotImplementedException();
+        }
+
+        public void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin)
+        {
+            if (minimap == null)
+            {
+                minimap = GraphicsManager.CreateRenderTarget(ChunkSize);
+                Color[] c = new Color[ChunkSize.X * ChunkSize.Y];
+                for (int i = 0; i < c.Length; i++)
+                {
+                    c[i] = tiles[i % ChunkSize.X, i / ChunkSize.Y].MinimapColor;
+                }
+                minimap.SetData(c);
+            }
+
+            aBatch.Draw(minimap, Position - aOrigin, Color.White);
         }
 
         public void Draw(SpriteBatch aBatch)
