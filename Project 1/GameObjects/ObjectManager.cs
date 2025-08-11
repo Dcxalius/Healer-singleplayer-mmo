@@ -234,6 +234,14 @@ namespace Project_1.GameObjects
         }
         #endregion
 
+        public static void MinimapDraw(SpriteBatch aBatch, AbsoluteScreenPosition aTopLeftOfMinimap)
+        {
+            for (int i = 0; i < All.Count; i++)
+            {
+                All[i].MinimapDraw(aBatch, aTopLeftOfMinimap);
+            }
+        }
+
         public static void Draw(SpriteBatch aSpriteBatch)
         {
             player.Draw(aSpriteBatch);

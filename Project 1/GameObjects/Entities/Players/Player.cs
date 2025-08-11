@@ -24,6 +24,7 @@ namespace Project_1.GameObjects.Entities.Players
 {
     internal class Player : Friendly
     {
+        public override Color MinimapColor => Color.White;
         public PlayerData PlayerData => UnitData as PlayerData;
         public Inventory Inventory => PlayerData.Inventory;
 

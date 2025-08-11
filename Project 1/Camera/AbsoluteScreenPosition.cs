@@ -40,10 +40,7 @@ namespace Project_1.Camera
 
         public AbsoluteScreenPosition(int aX) : this(new Point(aX)) { }
         public AbsoluteScreenPosition(int aX, int aY) : this(new Point(aX, aY)) { }
-        public AbsoluteScreenPosition(Point aPosition)
-        {
-            position = aPosition;
-        }
+        public AbsoluteScreenPosition(Point aPosition) => position = aPosition;
 
 
 
@@ -55,68 +52,35 @@ namespace Project_1.Camera
             //DebugManager.Print(typeof(Camera), "Abs pos = " + pos + ", and relative pos = " + aPos);
         }
 
-        static public RelativeScreenPosition ToRelativeScreenPos(AbsoluteScreenPosition aAbsoluteScreenPosition)
-        {
-            return RelativeScreenPosition.FromAbsoluteScreenPosition(aAbsoluteScreenPosition);
-        }
+        static public RelativeScreenPosition ToRelativeScreenPos(AbsoluteScreenPosition aAbsoluteScreenPosition) => RelativeScreenPosition.FromAbsoluteScreenPosition(aAbsoluteScreenPosition);
 
-        static public RelativeScreenPosition ToRelativeScreenPos(AbsoluteScreenPosition aAbsoluteScreenPosition, AbsoluteScreenPosition aContext)
-        {
-            return RelativeScreenPosition.FromAbsoluteScreenPosition(aAbsoluteScreenPosition, aContext);
-        }
+        static public RelativeScreenPosition ToRelativeScreenPos(AbsoluteScreenPosition aAbsoluteScreenPosition, AbsoluteScreenPosition aContext) => RelativeScreenPosition.FromAbsoluteScreenPosition(aAbsoluteScreenPosition, aContext);
 
-        public RelativeScreenPosition ToRelativeScreenPosition()
-        {
-            return ToRelativeScreenPos(this);
-        }
+        public RelativeScreenPosition ToRelativeScreenPosition() => ToRelativeScreenPos(this);
 
-        public RelativeScreenPosition ToRelativeScreenPosition(AbsoluteScreenPosition aContext)
-        {
-            return ToRelativeScreenPos(this, aContext);
-        }
+        public RelativeScreenPosition ToRelativeScreenPosition(AbsoluteScreenPosition aContext) => ToRelativeScreenPos(this, aContext);
+        
+        static public WorldSpace ToWorldSpace(AbsoluteScreenPosition aPos) => new WorldSpace(Camera.WorldRectangle.Location + aPos * Camera.Scale);
+        public WorldSpace ToWorldSpace() => ToWorldSpace(this);
 
         public static implicit operator Point(AbsoluteScreenPosition absP) => absP.position;
         public static explicit operator AbsoluteScreenPosition(Point p) => new AbsoluteScreenPosition(p);
 
         public static AbsoluteScreenPosition operator +(AbsoluteScreenPosition aScreenPosition) => aScreenPosition;
 
-        public static AbsoluteScreenPosition operator +(AbsoluteScreenPosition aScreenPosition, AbsoluteScreenPosition bScreenPosition)
-        {
-            return new AbsoluteScreenPosition(aScreenPosition.position + bScreenPosition.position);
-        }
+        public static AbsoluteScreenPosition operator +(AbsoluteScreenPosition aScreenPosition, AbsoluteScreenPosition bScreenPosition) => new AbsoluteScreenPosition(aScreenPosition.position + bScreenPosition.position);
 
-        public static AbsoluteScreenPosition operator -(AbsoluteScreenPosition aScreenPosition, AbsoluteScreenPosition bScreenPosition)
-        {
-            return new AbsoluteScreenPosition(aScreenPosition.position - bScreenPosition.position);
-        }
+        public static AbsoluteScreenPosition operator -(AbsoluteScreenPosition aScreenPosition, AbsoluteScreenPosition bScreenPosition) => new AbsoluteScreenPosition(aScreenPosition.position - bScreenPosition.position);
 
-        public static AbsoluteScreenPosition operator *(AbsoluteScreenPosition aScreenPosition, AbsoluteScreenPosition bScreenPosition)
-        {
-            return new AbsoluteScreenPosition(aScreenPosition.position * bScreenPosition.position);
-        }
-        public static AbsoluteScreenPosition operator *(AbsoluteScreenPosition aScreenPosition, float aMultiplier)
-        {
-            return new AbsoluteScreenPosition(new Point((int)(aScreenPosition.position.X * aMultiplier), (int)(aScreenPosition.position.Y * aMultiplier)));
-        }
+        public static AbsoluteScreenPosition operator *(AbsoluteScreenPosition aScreenPosition, AbsoluteScreenPosition bScreenPosition) => new AbsoluteScreenPosition(aScreenPosition.position * bScreenPosition.position);
+        public static AbsoluteScreenPosition operator *(AbsoluteScreenPosition aScreenPosition, float aMultiplier) => new AbsoluteScreenPosition(new Point((int)(aScreenPosition.position.X * aMultiplier), (int)(aScreenPosition.position.Y * aMultiplier)));
 
-        public static AbsoluteScreenPosition operator /(AbsoluteScreenPosition aScreenPosition, AbsoluteScreenPosition bScreenPosition)
-        {
-            return new AbsoluteScreenPosition(aScreenPosition.position / bScreenPosition.position);
-        }
-        public static AbsoluteScreenPosition operator /(AbsoluteScreenPosition aScreenPosition, float aDivisor)
-        {
-            return new AbsoluteScreenPosition(new Point((int)(aScreenPosition.position.X / aDivisor), (int)(aScreenPosition.position.Y / aDivisor)));
-        }
+        public static AbsoluteScreenPosition operator /(AbsoluteScreenPosition aScreenPosition, AbsoluteScreenPosition bScreenPosition) => new AbsoluteScreenPosition(aScreenPosition.position / bScreenPosition.position);
+        public static AbsoluteScreenPosition operator /(AbsoluteScreenPosition aScreenPosition, float aDivisor) => new AbsoluteScreenPosition(new Point((int)(aScreenPosition.position.X / aDivisor), (int)(aScreenPosition.position.Y / aDivisor)));
 
-        public static bool operator ==(AbsoluteScreenPosition aLhs, AbsoluteScreenPosition aRhs)
-        {
-            return aLhs.position == aRhs.position;
-        }
+        public static bool operator ==(AbsoluteScreenPosition aLhs, AbsoluteScreenPosition aRhs) => aLhs.position == aRhs.position;
 
-        public static bool operator !=(AbsoluteScreenPosition aLhs, AbsoluteScreenPosition aRhs)
-        {
-            return aLhs.position != aRhs.position;
-        }
+        public static bool operator !=(AbsoluteScreenPosition aLhs, AbsoluteScreenPosition aRhs) => aLhs.position != aRhs.position;
 
         public override int GetHashCode()
         {
@@ -132,24 +96,12 @@ namespace Project_1.Camera
             return false;
         }
 
-        public bool Equals(AbsoluteScreenPosition obj)
-        {
-            return (position == obj.position);
-        }
+        public bool Equals(AbsoluteScreenPosition obj) => position == obj.position;
 
-        public Point ToPoint()
-        {
-            return position;
-        }
+        public Point ToPoint() => position;
 
-        public Vector2 ToVector2()
-        {
-            return position.ToVector2();
-        }
+        public Vector2 ToVector2() => position.ToVector2();
 
-        public override string ToString()
-        {
-            return position.ToString();
-        }
+        public override string ToString() => position.ToString();
     }
 }

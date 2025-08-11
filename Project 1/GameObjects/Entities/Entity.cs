@@ -23,6 +23,7 @@ using System.Threading.Tasks.Dataflow;
 using Project_1.GameObjects.FloatingTexts;
 using Project_1.GameObjects.Entities.Corspes;
 using Project_1.UI.HUD.Managers;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -48,6 +49,8 @@ namespace Project_1.GameObjects.Entities
         #region UnitData
         protected UnitData UnitData => unitData;
         UnitData unitData;
+
+        public virtual Color MinimapColor => Color.White;
 
         public bool HasDestination => unitData.Destination.HasDestination;
         public Destination Destination => unitData.Destination;
@@ -520,5 +523,10 @@ namespace Project_1.GameObjects.Entities
         }
 
         #endregion
+
+        public void MinimapDraw(SpriteBatch aBatch, AbsoluteScreenPosition aTopleftOfMinimap)
+        {
+            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(aTopleftOfMinimap - new AbsoluteScreenPosition(FeetPosition.ToPoint()), new Point(1)), MinimapColor);            
+        }
     }
 }

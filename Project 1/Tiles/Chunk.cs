@@ -152,7 +152,8 @@ namespace Project_1.Tiles
                 minimap.SetData(c);
             }
 
-            aBatch.Draw(minimap, Position - aOrigin, Color.White);
+            //aBatch.Draw(minimap, Position - aOrigin, Color.White);
+            aBatch.Draw(minimap, (aOrigin - Position).ToAbsoltueScreenPosition().ToVector2(), Color.White);
         }
 
         public void Draw(SpriteBatch aBatch)

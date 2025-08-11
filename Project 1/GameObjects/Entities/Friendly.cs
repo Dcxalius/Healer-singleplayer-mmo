@@ -1,4 +1,5 @@
-﻿using Project_1.Camera;
+﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Unit.Classes;
 using System;
@@ -11,6 +12,7 @@ namespace Project_1.GameObjects.Entities
 {
     internal class Friendly : Entity
     {
+        public override Color MinimapColor => Color.Green;
         public new FriendlyClassData ClassData => base.ClassData as FriendlyClassData;
         public Friendly(UnitData aUnitData) : base(aUnitData)
         {

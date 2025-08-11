@@ -16,6 +16,13 @@ namespace Project_1.UI.UIElements
 {
     internal class Minimap : Box
     {
+        public static UITexture minimapDot;
+
+        static Minimap()
+        {
+            minimapDot = new UITexture("MinimapDot", Color.White);
+        }
+
         public Minimap(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", Color.White), aPos, aSize)
         {
         }
@@ -24,8 +31,9 @@ namespace Project_1.UI.UIElements
         {
             //TODO: Draw to a rendertarget first and then draw that in the correct positon?
             base.Draw(aBatch);
-            GraphicsManager.CaptureScissor(this, AbsolutePos);
+            ////GraphicsManager.CaptureScissor(this, AbsolutePos);
             Point p = ObjectManager.Player.FeetPosition.ToPoint() - (Size * TileManager.TileSize) / new Point(2);
+
             DebugManager.Print(GetType(), "New draw");
             DebugManager.Print(GetType(), p);
             DebugManager.Print(GetType(), (Size * TileManager.TileSize));
@@ -34,8 +42,9 @@ namespace Project_1.UI.UIElements
             WorldSpace ws = new WorldSpace(Location + p / (TileManager.TileSize));
             DebugManager.Print(GetType(), p / (TileManager.TileSize));
             DebugManager.Print(GetType(), ws);
-            TileManager.MinimapDraw(aBatch, ws, Size.ToVector2());
-            GraphicsManager.ReleaseScissor(this);
+            TileManager.MinimapDraw(aBatch, ws + new WorldSpace(Size / 2), Size.ToVector2());
+            ObjectManager.MinimapDraw(aBatch, new AbsoluteScreenPosition((int)ws.X, (int)ws.Y) + Size / 2);
+            //GraphicsManager.ReleaseScissor(this);
 
         }
     }

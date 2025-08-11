@@ -44,22 +44,16 @@ namespace Project_1.Camera
         public WorldSpace(float aX) : this(aX, aX) { }
         public WorldSpace(float aX, float aY) : this(new Vector2(aX, aY)) { }
 
-        public float DistanceTo(WorldSpace aOtherSpace)
-        {
-            return (this - aOtherSpace).ToVector2().Length();
-        }
+        public float DistanceTo(WorldSpace aOtherSpace) => (this - aOtherSpace).ToVector2().Length();
 
         public AbsoluteScreenPosition ToAbsoltueScreenPosition()
         {
-            WorldSpace topLeft = Camera.CentreInWorldSpace * Camera.Scale - new WorldSpace(Camera.WindowSize.ToVector2() / 2);
+            WorldSpace topLeft = Camera.CentreInWorldSpace * Camera.Scale - new WorldSpace(Camera.WindowSize.ToVector2() / 2); //TODO: This is wrong, no way its Centre*Scale
 
             //return new AbsoluteScreenPosition((int)Math.Round(this.X * Camera.Scale - topLeft.X, MidpointRounding.ToPositiveInfinity), (int)Math.Round(this.Y * Camera.Scale - topLeft.Y, MidpointRounding.ToPositiveInfinity));
             return new AbsoluteScreenPosition((int)Math.Floor(this.X * Camera.Scale - topLeft.X), (int)Math.Floor(this.Y * Camera.Scale - topLeft.Y));
         }
-        public static WorldSpace FromRelativeScreenSpace(RelativeScreenPosition aScreenSpace)
-        {
-            return FromAbsoluteScreenSpace(aScreenSpace.ToAbsoluteScreenPos());
-        }
+        public static WorldSpace FromRelativeScreenSpace(RelativeScreenPosition aScreenSpace) => FromAbsoluteScreenSpace(aScreenSpace.ToAbsoluteScreenPos());
 
         public static WorldSpace FromAbsoluteScreenSpace(AbsoluteScreenPosition aScreenSpace)
         {
@@ -75,54 +69,20 @@ namespace Project_1.Camera
         public static explicit operator WorldSpace(Vector2 v) => new WorldSpace(v);
 
         public static WorldSpace operator +(WorldSpace aScreenPosition) => aScreenPosition;
+        public static WorldSpace operator +(WorldSpace aScreenPosition, WorldSpace bScreenPosition) => new WorldSpace(aScreenPosition.position + bScreenPosition.position);
+        public static WorldSpace operator -(WorldSpace aScreenPosition, WorldSpace bScreenPosition) => new WorldSpace(aScreenPosition.position - bScreenPosition.position);
 
-        public static WorldSpace operator +(WorldSpace aScreenPosition, WorldSpace bScreenPosition)
-        {
-            return new WorldSpace(aScreenPosition.position + bScreenPosition.position);
-        }
+        public static WorldSpace operator *(WorldSpace aScreenPosition, WorldSpace bScreenPosition) => new WorldSpace(aScreenPosition.position * bScreenPosition.position);
+        public static WorldSpace operator *(WorldSpace aScreenPosition, float aMultiplier) => new WorldSpace(aScreenPosition.position * aMultiplier);
+        public static WorldSpace operator *(float aMultiplier, WorldSpace aScreenPosition) => new WorldSpace(aScreenPosition.position * aMultiplier);
 
-        public static WorldSpace operator -(WorldSpace aScreenPosition, WorldSpace bScreenPosition)
-        {
-            return new WorldSpace(aScreenPosition.position - bScreenPosition.position);
-        }
+        public static WorldSpace operator /(WorldSpace aScreenPosition, WorldSpace bScreenPosition) => new WorldSpace(aScreenPosition.position / bScreenPosition.position);
+        public static WorldSpace operator /(WorldSpace aScreenPosition, float aDivisor) => new WorldSpace(aScreenPosition.position / aDivisor);
 
-        public static WorldSpace operator *(WorldSpace aScreenPosition, WorldSpace bScreenPosition)
-        {
-            return new WorldSpace(aScreenPosition.position * bScreenPosition.position);
-        }
-        public static WorldSpace operator *(WorldSpace aScreenPosition, float aMultiplier)
-        {
-            return new WorldSpace(aScreenPosition.position * aMultiplier);
-        }
+        public static bool operator ==(WorldSpace aLhs, WorldSpace aRhs) => aLhs.position == aRhs.position;
+        public static bool operator !=(WorldSpace aLhs, WorldSpace aRhs) => aLhs.position != aRhs.position;
 
-        public static WorldSpace operator *(float aMultiplier, WorldSpace aScreenPosition)
-        {
-            return new WorldSpace(aScreenPosition.position * aMultiplier);
-        }
-
-        public static WorldSpace operator /(WorldSpace aScreenPosition, WorldSpace bScreenPosition)
-        {
-            return new WorldSpace(aScreenPosition.position / bScreenPosition.position);
-        }
-        public static WorldSpace operator /(WorldSpace aScreenPosition, float aDivisor)
-        {
-            return new WorldSpace(aScreenPosition.position / aDivisor);
-        }
-
-        public static bool operator ==(WorldSpace aLhs, WorldSpace aRhs)
-        {
-            return aLhs.position == aRhs.position;
-        }
-
-        public static bool operator !=(WorldSpace aLhs, WorldSpace aRhs)
-        {
-            return aLhs.position != aRhs.position;
-        }
-
-        public override int GetHashCode()
-        {
-            return position.GetHashCode();
-        }
+        public override int GetHashCode() => position.GetHashCode();
 
         public override bool Equals(object obj)
         {
@@ -133,34 +93,16 @@ namespace Project_1.Camera
             return false;
         }
 
-        public bool Equals(WorldSpace obj)
-        {
-            return (position == obj.position);
-        }
+        public bool Equals(WorldSpace obj) => position == obj.position;
 
-        public void Normalize()
-        {
-            position.Normalize();
-        }
+        public void Normalize() => position.Normalize();
 
-        static public WorldSpace Normalize(WorldSpace ws)
-        {
-            return new WorldSpace(Vector2.Normalize(ws.position));
-        }
+        static public WorldSpace Normalize(WorldSpace ws) => new WorldSpace(Vector2.Normalize(ws.position));
 
-        public Point ToPoint()
-        {
-            return position.ToPoint();
-        }
+        public Point ToPoint() => position.ToPoint();
 
-        public Vector2 ToVector2()
-        {
-            return position;
-        }
+        public Vector2 ToVector2() => position;
 
-        public override string ToString()
-        {
-            return position.ToString();
-        }
+        public override string ToString() => position.ToString();
     }
 }
