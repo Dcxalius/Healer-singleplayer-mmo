@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects;
+using Project_1.GameObjects.Spawners;
 using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.Tiles;
@@ -29,22 +30,15 @@ namespace Project_1.UI.UIElements
 
         public override void Draw(SpriteBatch aBatch)
         {
-            //TODO: Draw to a rendertarget first and then draw that in the correct positon?
             base.Draw(aBatch);
-            ////GraphicsManager.CaptureScissor(this, AbsolutePos);
-            Point p = ObjectManager.Player.FeetPosition.ToPoint() - (Size * TileManager.TileSize) / new Point(2);
+            GraphicsManager.CaptureScissor(this, AbsolutePos);
 
-            DebugManager.Print(GetType(), "New draw");
-            DebugManager.Print(GetType(), p);
-            DebugManager.Print(GetType(), (Size * TileManager.TileSize));
-            DebugManager.Print(GetType(), "");
-
-            WorldSpace ws = new WorldSpace(Location + p / (TileManager.TileSize));
-            DebugManager.Print(GetType(), p / (TileManager.TileSize));
-            DebugManager.Print(GetType(), ws);
-            TileManager.MinimapDraw(aBatch, ws + new WorldSpace(Size / 2), Size.ToVector2());
-            ObjectManager.MinimapDraw(aBatch, new AbsoluteScreenPosition((int)ws.X, (int)ws.Y) + Size / 2);
-            //GraphicsManager.ReleaseScissor(this);
+            WorldSpace ws = ObjectManager.Player.FeetPosition;
+            TileManager.MinimapDraw(aBatch, ws, Location, Size);
+            Camera.Camera.MinimapDraw(aBatch, ws, Location, Size);
+            SpawnerManager.MinimapDraw(aBatch, ws, Location, Size);
+            ObjectManager.MinimapDraw(aBatch, ws, Location, Size);
+            GraphicsManager.ReleaseScissor(this);
 
         }
     }

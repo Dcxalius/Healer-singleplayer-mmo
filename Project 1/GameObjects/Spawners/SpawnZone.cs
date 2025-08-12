@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
+using Project_1.Camera;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spawners.Pathing;
 using Project_1.GameObjects.Unit;
@@ -193,9 +194,16 @@ namespace Project_1.GameObjects.Spawners
             return savedMobData.ToArray();
         }
 
+        internal void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
+        {
+            for (int i = 0; i < spawners.Count; i++) spawners[i].MinimapDraw(aBatch, aOrigin, aMinimapOffset, aMinimapSize);
+        }
+
         internal void Draw(SpriteBatch aBatch)
         {
             for (int i = 0; i < spawners.Count; i++) spawners[i].Draw(aBatch);
         }
+
+        
     }
 }

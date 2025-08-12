@@ -184,6 +184,14 @@ namespace Project_1.GameObjects.Spawners
             return false;
         }
 
+        public static void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
+        {
+            for (int i = 0; i < spawnZones.Count; i++)
+            {
+                spawnZones[i].MinimapDraw(aBatch, aOrigin, aMinimapOffset, aMinimapSize);
+            }
+        }
+
         internal static void Draw(SpriteBatch aBatch)
         {
             for (int i = 0; i < spawnZones.Count; i++)

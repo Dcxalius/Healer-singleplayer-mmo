@@ -139,7 +139,7 @@ namespace Project_1.Tiles
             throw new NotImplementedException();
         }
 
-        public void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin)
+        public void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
         {
             if (minimap == null)
             {
@@ -153,7 +153,7 @@ namespace Project_1.Tiles
             }
 
             //aBatch.Draw(minimap, Position - aOrigin, Color.White);
-            aBatch.Draw(minimap, (aOrigin - Position).ToAbsoltueScreenPosition().ToVector2(), Color.White);
+            aBatch.Draw(minimap, ( new AbsoluteScreenPosition((Position - aOrigin).ToPoint()) / (TileManager.TileSize) + aMinimapOffset + aMinimapSize / 2).ToVector2(), Color.White);
         }
 
         public void Draw(SpriteBatch aBatch)

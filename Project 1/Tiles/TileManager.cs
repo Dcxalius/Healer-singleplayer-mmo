@@ -566,12 +566,12 @@ namespace Project_1.Tiles
 
         }
 
-        public static void MinimapDraw(SpriteBatch aBatch, WorldSpace aMinimapWorldPos, Vector2 aSize)
+        public static void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aSize)
         {
             //TODO: Draw neighbours as well
             //int chunkID = GetChunkId((int)aMinimapWorldPos.X / (debugSize.X * TileSize.X), (int)aMinimapWorldPos.Y / (debugSize.Y * TileSize.Y));
             //GetChunk(chunkID).MinimapDraw(aBatch, aMinimapWorldPos);
-            GetChunk(0).MinimapDraw(aBatch, aMinimapWorldPos);
+            GetChunk(0).MinimapDraw(aBatch, aOrigin, aMinimapOffset, aSize);
 
         }
 

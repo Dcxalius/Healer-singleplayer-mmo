@@ -12,7 +12,7 @@ namespace Project_1.GameObjects.Entities
 {
     internal class Friendly : Entity
     {
-        public override Color MinimapColor => Color.Green;
+        public override Color MinimapColor => Color.Pink;
         public new FriendlyClassData ClassData => base.ClassData as FriendlyClassData;
         public Friendly(UnitData aUnitData) : base(aUnitData)
         {

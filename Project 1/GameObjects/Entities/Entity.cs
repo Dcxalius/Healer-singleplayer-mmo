@@ -524,9 +524,9 @@ namespace Project_1.GameObjects.Entities
 
         #endregion
 
-        public void MinimapDraw(SpriteBatch aBatch, AbsoluteScreenPosition aTopleftOfMinimap)
+        public void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
         {
-            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(aTopleftOfMinimap - new AbsoluteScreenPosition(FeetPosition.ToPoint()), new Point(1)), MinimapColor);            
+            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition((Position - aOrigin).ToPoint()) / (TileManager.TileSize) + aMinimapOffset + aMinimapSize / 2 + new Point(0, 1), new Point(1)), MinimapColor);            
         }
     }
 }

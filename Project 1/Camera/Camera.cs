@@ -186,5 +186,14 @@ namespace Project_1.Camera
             return WorldRectangle.Contains(aWorldPos);
         }
         #endregion
+
+        public static void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
+        {
+            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition(WorldRectangle.Location - aOrigin.ToPoint()) / (TileManager.TileSize) + aMinimapOffset + aMinimapSize / 2, new Point(1, WorldRectangle.Size.Y / TileManager.TileSize.Y)), Color.White);
+            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition(WorldRectangle.Location - aOrigin.ToPoint()) / (TileManager.TileSize) + aMinimapOffset + aMinimapSize / 2, new Point(WorldRectangle.Size.X / TileManager.TileSize.X, 1)), Color.White);
+            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition(WorldRectangle.Location + new Point(WorldRectangle.Size.X, 0) - aOrigin.ToPoint()) / (TileManager.TileSize) + aMinimapOffset + aMinimapSize / 2, new Point(1, WorldRectangle.Size.Y / TileManager.TileSize.Y)), Color.White);
+            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition(WorldRectangle.Location + new Point(0, WorldRectangle.Size.Y)- aOrigin.ToPoint()) / (TileManager.TileSize) + aMinimapOffset + aMinimapSize / 2, new Point(WorldRectangle.Size.X / TileManager.TileSize.X, 1)), Color.White);
+
+        }
     }
 }

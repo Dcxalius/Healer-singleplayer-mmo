@@ -114,12 +114,7 @@ namespace Project_1.GameObjects.Spawners
             }
         }
 
-        internal void Draw(SpriteBatch aBatch)
-        {
-            if (spawn == null) return;
-
-            spawn.Draw(aBatch);
-        }
+        
 
         internal bool Click(ClickEvent aClickEvent)
         {
@@ -133,6 +128,20 @@ namespace Project_1.GameObjects.Spawners
             if (spawn == null) return;
 
             spawn.RefreshPlates();
+        }
+
+        internal void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
+        {
+            if (spawn == null) return;
+
+            spawn.MinimapDraw(aBatch, aOrigin, aMinimapOffset, aMinimapSize);
+        }
+
+        internal void Draw(SpriteBatch aBatch)
+        {
+            if (spawn == null) return;
+
+            spawn.Draw(aBatch);
         }
     }
 }
