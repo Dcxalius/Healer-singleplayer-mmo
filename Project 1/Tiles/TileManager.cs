@@ -10,6 +10,7 @@ using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spawners;
 using Project_1.Managers;
 using Project_1.Managers.Saves;
+using SharpDX.Direct3D11;
 using SharpDX.Direct3D9;
 using System;
 using System.Collections;
@@ -29,27 +30,64 @@ namespace Project_1.Tiles
     {
         static Tile Tile(int aChunkId, int aX, int aY) => chunks.Find(x => x.Id == aChunkId).Tile(aX, aY);
         static Chunk GetChunk(int aId) => chunks.Find(x => x.Id == aId);
-        static List<Chunk> chunks;
+        static List<Chunk> chunks; //TODO: Use SortedList?
+        const int surroundingChunkCheckSize = 3;// this should always be odd
+
+        public static CollisionManager CollisionManager;
+
+
+        public readonly static Point TileSize = new Point(32, 32);
+        const int sizeOfSquareToCheck = 3; // this should always be odd
+
+
+        static PathFinder pathFinder = new PathFinder();
 
         static TileManager()
         {
             chunks = new List<Chunk>();
+            CollisionManager = new CollisionManager();
         }
 
+        public static void Update()
+        {
+            Chunk[,] surroundingChunks = new Chunk[surroundingChunkCheckSize, surroundingChunkCheckSize];
+            Chunk centreChunk = GetChunkUnder(ObjectManager.Player.FeetPosition);
+            Point centreChunkPos = GetChunkPosition(centreChunk.Id);
+            surroundingChunks[surroundingChunkCheckSize / 2, surroundingChunkCheckSize / 2] = centreChunk;
+            bool addedNew = false;
+            for (int i = 0; i < surroundingChunks.GetLength(0); i++)
+            {
+                for (int j = 0; j < surroundingChunks.GetLength(1); j++)
+                {
+                    if (i == surroundingChunkCheckSize / 2 && j == surroundingChunkCheckSize / 2) continue;
+                    int newId = GetChunkId(centreChunkPos + new Point(i - surroundingChunkCheckSize / 2, j - surroundingChunkCheckSize / 2));
+                    surroundingChunks[i, j] = GetChunk(newId);
+
+                    if (surroundingChunks[i, j] != null) continue;
+                    addedNew = true;
+
+                    DebugManager.Print(typeof(TileManager), "x = " + (centreChunkPos.X + i - surroundingChunkCheckSize / 2) + ", y = " + (centreChunkPos.Y + j - surroundingChunkCheckSize / 2) + " == " + newId);
+                    surroundingChunks[i, j] = new Chunk((centreChunk.Position + new WorldSpace((i - surroundingChunkCheckSize / 2) * TileSize.X * Chunk.ChunkSize.X, (j - surroundingChunkCheckSize / 2) * TileSize.Y * Chunk.ChunkSize.Y)).ToPoint(), newId);
+                    chunks.Add(surroundingChunks[i, j]);
+                }
+            }
+            if (addedNew) chunks.Sort((x, y) => x.Id.CompareTo(y.Id));
+        }
+
+        static int GetChunkId(Point aPos) => GetChunkId(aPos.X, aPos.Y);
         static int GetChunkId(int aX, int aY) //TODO: Needs testing
         {
             if (aX == 0 && aY == 0) return 0;
-            int x = aX;
-            int y = aY;
+            
 
             int dirInt;
 
             int max;
             int min;
 
-            if (Math.Abs(x) >= Math.Abs(y))
+            if (Math.Abs(aX) >= Math.Abs(aY))
             {
-                if (x < 0) //Left
+                if (aX < 0) //Left
                 {
                     dirInt = 3;
                 }
@@ -58,12 +96,12 @@ namespace Project_1.Tiles
                     dirInt = 7;
                 }
 
-                max = x;
-                min = y;
+                max = aX;
+                min = aY;
             }
             else
             {
-                if (y < 0) //Up
+                if (aY < 0) //Up
                 {
                     dirInt = 1;
                 }
@@ -72,70 +110,65 @@ namespace Project_1.Tiles
                     dirInt = 5;
                 }
 
-                max = y;
-                min = x;
+                max = aY;
+                min = aX;
             }
 
-            return (dirInt * max) + TriangleNumber(max) + min;
+            return (dirInt * Math.Abs(max)) + HighestNrInCircle(Math.Abs(max) - 1) + min;
         }
 
         public static Point GetChunkPosition(int aId)//TODO: Needs testing
         {
             double triangle = (Math.Sqrt(aId + 1) - 1) / 2;
             int circle = (int)Math.Ceiling(triangle);
-            int highestNrInCircle = TriangleNumber(circle);
+            int highestNrInCircle = HighestNrInCircle(circle);
             int dif = highestNrInCircle - aId;
-            if (dif == 0) return new Point(highestNrInCircle, -highestNrInCircle);
+            if (dif == 0) return new Point(circle, -circle);
             
-            int sideLength = circle * 2;
+            int sideLength = circle * 2 + 1;
             if (dif % (sideLength) == 0)
             {
-                if (dif / (sideLength) == 1) return new Point(highestNrInCircle, highestNrInCircle);
-                if (dif / (sideLength) == 2) return new Point(-highestNrInCircle, highestNrInCircle);
-                if (dif / (sideLength) == 3) return new Point(-highestNrInCircle, -highestNrInCircle);
+                if (dif / (sideLength) == 1) return new Point(circle, circle);
+                if (dif / (sideLength) == 2) return new Point(-circle, circle);
+                if (dif / (sideLength) == 3) return new Point(-circle, -circle);
                 throw new Exception("ohno");
             }
 
             int x;
             int y;
 
-            if (dif / (sideLength) < 1)
+            if (dif / (sideLength - 1) < 1)
             {
-                x = highestNrInCircle;
+                x = circle;
                 y = -sideLength / 2 + sideLength * dif / sideLength;
             }
-            else if (dif / (sideLength) < 2)
+            else if (dif / (sideLength - 1) < 2)
             {
-                x = sideLength / 2 - sideLength * (dif - sideLength) / sideLength;
-                y = highestNrInCircle;
+                x = sideLength / 2 + sideLength * (dif - sideLength) / sideLength;
+                y = circle;
             }
-            else if (dif / sideLength < 3)
+            else if (dif / sideLength - 1 < 3)
             {
-                x = -highestNrInCircle;
-                y = sideLength / 2 - sideLength * (dif - sideLength * 2) / sideLength;
+                x = -circle;
+                y = sideLength / 2 + sideLength * (dif - sideLength * 2) / sideLength;
             }
-            else if (dif / sideLength < 4)
+            else if (dif / sideLength - 1 < 4)
             {
                 x = -sideLength / 2 + sideLength * (dif - sideLength * 3) / sideLength;
-                y = -highestNrInCircle;
+                y = -circle;
             }
             else throw new Exception("ohno");
 
             return new Point(x, y);
         }
 
-        static int TriangleNumber(int aX) => (8 * ((aX * aX) - aX) / 2);
+        static int HighestNrInCircle(int aCricleSize) => 4 * (((aCricleSize+1) * (aCricleSize+1)) - (aCricleSize+1)); //(2*aCS-1)^2-1
 
 
-        public readonly static Point TileSize = new Point(32, 32);
-        const int sizeOfSquareToCheck = 3; // this should always be odd
-
-        public readonly static Point debugSize = new Point(100, 100);
-
-        static PathFinder pathFinder = new PathFinder();
 
         public static void New()
         {
+            chunks.Clear();
             chunks.Add(new Chunk(Point.Zero, 0));
         }
 
@@ -208,118 +241,23 @@ namespace Project_1.Tiles
 
         public static Path GetPath(WorldSpace aStartPosition, WorldSpace aTargetPosition, WorldSpace aSize) => pathFinder.GeneratePath(aStartPosition, aTargetPosition, aSize);
 
-        public static List<(Rectangle, Rectangle)> CollisionsWithUnwalkable(Entity aEntity)
-        {
-
-            List<Rectangle> finalColliders = ConvertUnwalkableTilesToRectangles(aEntity.FeetPosition);
-            Rectangle entityRectangle = aEntity.WorldRectangle;
-            List<(Rectangle, Rectangle)> collisions = new List<(Rectangle, Rectangle)>();
-            foreach (var collider in finalColliders)
-            {
-                if (entityRectangle.Intersects(collider))
-                {
-                    collisions.Add((Rectangle.Intersect(entityRectangle, collider), collider));
-                }
-            }
-            return collisions;
-        }
-
-        static List<Rectangle> ConvertUnwalkableTilesToRectangles(WorldSpace aPos)
-        {
-            Tile[,] tilesSurroundingObject = GetSurroundingTiles(GetTileUnder(aPos));
-
-            Rectangle?[,] colliders = GetColliders(tilesSurroundingObject);
-
-            return Merge(colliders);
-        }
-
-        static List<Rectangle> Merge(Rectangle?[,] aCollidersToMerge)
-        {
-            List<Rectangle> finalColliders = RightMerge(aCollidersToMerge);
-            finalColliders.AddRange(DownMerge(aCollidersToMerge));
-
-            return finalColliders;
-        }
-        static List<Rectangle> DownMerge(Rectangle?[,] aCollidersToCheck)
-        {
-            List<Rectangle> finalColliders = new List<Rectangle>();
-            int[,] consumedBy = new int[aCollidersToCheck.GetLength(0), aCollidersToCheck.GetLength(1)];
-            for (int i = 0; i < aCollidersToCheck.GetLength(0); i++)
-            {
-                for (int j = 0; j < aCollidersToCheck.GetLength(1) - 1; j++)
-                {
-                    if (aCollidersToCheck[i, j] == null || aCollidersToCheck[i, j + 1] == null)
-                    {
-                        continue;
-                    }
-                    if (aCollidersToCheck[i, j].Value.Bottom == aCollidersToCheck[i, j + 1].Value.Top && aCollidersToCheck[i, j].Value.X == aCollidersToCheck[i, j + 1].Value.X)
-                    {
-                        consumedBy[i, j + 1] = finalColliders.Count;
-                        if (consumedBy[i, j] != 0)
-                        {
-                            Rectangle r = Rectangle.Union(finalColliders[consumedBy[i, j]], aCollidersToCheck[i, j + 1].Value);
-
-                            finalColliders[consumedBy[i, j]] = r;
-                            consumedBy[i, j + 1] = consumedBy[i, j];
-                        }
-                        else
-                        {
-                            finalColliders.Add(Rectangle.Union(aCollidersToCheck[i, j].Value, aCollidersToCheck[i, j + 1].Value));
-                        }
-
-                    }
-                }
-
-            }
-
-            return finalColliders;
-        }
-
-        static List<Rectangle> RightMerge(Rectangle?[,] aCollidersToCheck)
-        {
-            List<Rectangle> finalColliders = new List<Rectangle>();
-            bool[] consumed = new bool[aCollidersToCheck.Length];
-            for (int i = 0; i < aCollidersToCheck.GetLength(0) - 1; i++)
-            {
-                for (int j = 0; j < aCollidersToCheck.GetLength(1); j++)
-                {
-                    if (aCollidersToCheck[i, j] == null || aCollidersToCheck[i + 1, j] == null)
-                    {
-                        continue;
-                    }
-                    if (aCollidersToCheck[i, j].Value.Right == aCollidersToCheck[i + 1, j].Value.Left && aCollidersToCheck[i, j].Value.Y == aCollidersToCheck[i + 1, j].Value.Y)
-                    {
-                        consumed[i + 1] = true;
-                        if (consumed[i])
-                        {
-                            Rectangle r = Rectangle.Union(finalColliders.Last(), aCollidersToCheck[i + 1, j].Value);
-
-                            finalColliders.RemoveAt(finalColliders.Count - 1);
-
-                            finalColliders.Add(r);
-                        }
-                        else
-                        {
-                            finalColliders.Add(Rectangle.Union(aCollidersToCheck[i, j].Value, aCollidersToCheck[i + 1, j].Value));
-                        }
-
-                    }
-                }
-            }
-            return finalColliders;
-        }
+        
 
         public static Tile GetTileUnder(WorldSpace aWorldSpace)
         {
-            if (aWorldSpace.X < 0 || aWorldSpace.X > debugSize.X * TileSize.X || aWorldSpace.Y < 0 || aWorldSpace.Y > debugSize.Y * TileSize.Y) return null; //DEBUG
-            Tile t = chunks[0].Tile((int)Math.Floor(aWorldSpace.X / TileSize.X), (int)Math.Floor(aWorldSpace.Y / TileSize.Y));
+            Chunk c = GetChunkUnder(aWorldSpace);
+            int x = (int)Math.Floor((aWorldSpace.X - c.Position.X) / TileSize.X);
+            int y = (int)Math.Floor((aWorldSpace.Y - c.Position.Y) / TileSize.Y);
+            Tile t = c.Tile(x, y);
+            Debug.Assert(t != null);
             //Tile t = tiles[(int)Math.Floor(aWorldSpace.X / TileSize.X), (int)Math.Floor(aWorldSpace.Y / TileSize.Y)];
             return t;
         }
 
         public static Chunk GetChunkUnder(WorldSpace aWorldSpace)
         {
-            return chunks[0];
+            int id = GetChunkId((int)MathF.Floor(aWorldSpace.X / TileSize.X / Chunk.ChunkSize.X), (int)MathF.Floor(aWorldSpace.Y / TileSize.Y / Chunk.ChunkSize.Y));
+            return chunks.Find(x => x.Id == id);
         }
 
         public static WorldSpace FindClosestWalkableWorldSpace(WorldSpace aWorldSpace, WorldSpace aSize)
@@ -479,7 +417,7 @@ namespace Project_1.Tiles
         }
 
 
-        static Tile[,] GetSurroundingTiles(Tile aTile)
+        public static Tile[,] GetSurroundingTiles(Tile aTile)
         {
             Tile[,] a = new Tile[sizeOfSquareToCheck, sizeOfSquareToCheck];
 
@@ -496,23 +434,7 @@ namespace Project_1.Tiles
             return a;
         }
 
-        static Rectangle?[,] GetColliders(Tile[,] aTileArray)
-        {
-            Rectangle?[,] colliders = new Rectangle?[aTileArray.GetLength(0),aTileArray.GetLength(1)];
-            for (int i = 0; i < aTileArray.GetLength(0); i++)
-            {
-                for (int j = 0; j < aTileArray.GetLength(1); j++)
-                {
-                    if (aTileArray[i, j] == null) continue;
-                    if (!aTileArray[i, j].Walkable)
-                    {
-                        colliders[i,j] = aTileArray[i, j].WorldRectangle;
-                    }
-                }
-            }
-
-            return colliders;
-        }
+        
 
         public static Tile GetTileAt(Point aCoord) => GetTileAt(aCoord.X, aCoord.Y);
 
@@ -571,7 +493,10 @@ namespace Project_1.Tiles
             //TODO: Draw neighbours as well
             //int chunkID = GetChunkId((int)aMinimapWorldPos.X / (debugSize.X * TileSize.X), (int)aMinimapWorldPos.Y / (debugSize.Y * TileSize.Y));
             //GetChunk(chunkID).MinimapDraw(aBatch, aMinimapWorldPos);
-            GetChunk(0).MinimapDraw(aBatch, aOrigin, aMinimapOffset, aSize);
+            for (int i = 0; i < chunks.Count; i++)
+            {
+                chunks[i].MinimapDraw(aBatch, aOrigin, aMinimapOffset, aSize);
+            }
 
         }
 

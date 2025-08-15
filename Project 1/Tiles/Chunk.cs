@@ -11,7 +11,7 @@ namespace Project_1.Tiles
 {
     internal class Chunk : IComparable<Chunk>
     {
-        readonly Point TileSize = new Point(32);
+        static readonly Point TileSize = TileManager.TileSize;
         public static readonly Point ChunkSize = new Point(100);
 
         [JsonIgnore]
@@ -104,14 +104,14 @@ namespace Project_1.Tiles
                     }
                 }
             }
-            SpawnerManager.CreateNewSpawnZone(new string[] { "sheep" });
-            for (int i = 0; i < 10; i++)
-            {
-                Point size = new Point(10 + RandomManager.RollInt(500), 10 + RandomManager.RollInt(500));
-                Rectangle r = new Rectangle(new Point(RandomManager.RollInt(size.X), RandomManager.RollInt(size.Y)), size);
-                SpawnerManager.CreateNewSpawner(0, new Wander(r));
+            //SpawnerManager.CreateNewSpawnZone(new string[] { "sheep" });
+            //for (int i = 0; i < 10; i++)
+            //{
+            //    Point size = new Point(10 + RandomManager.RollInt(500), 10 + RandomManager.RollInt(500));
+            //    Rectangle r = new Rectangle(new Point(RandomManager.RollInt(size.X), RandomManager.RollInt(size.Y)), size);
+            //    SpawnerManager.CreateNewSpawner(0, new Wander(r));
 
-            } 
+            //} 
         }
 
         [JsonConstructor]
@@ -125,7 +125,7 @@ namespace Project_1.Tiles
             {
                 for (int j = 0; j < tiles.GetLength(1); j++)
                 {
-                    Point pos = new Point((int)position.X * ChunkSize.X + TileSize.X * i, (int)position.Y * ChunkSize.Y + TileSize.Y * j);
+                    Point pos = new Point((int)position.X + TileSize.X * i, (int)position.Y + TileSize.Y * j);
 
                     tiles[i, j] = new Tile(TileFactory.GetTileData(tilesAsIDs[i, j]), pos, new Point(i, j));
                 }

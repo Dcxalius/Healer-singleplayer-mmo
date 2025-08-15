@@ -45,8 +45,6 @@ namespace Project_1.Textures
             return aSize - reduceSizeBy;
         }
 
-
-
         public override void Draw(SpriteBatch aBatch, Rectangle aPosition, Color aColor)
         {
             base.Draw(aBatch, new Rectangle(aPosition.Location, GetReducedSize(aPosition.Size)), aColor);

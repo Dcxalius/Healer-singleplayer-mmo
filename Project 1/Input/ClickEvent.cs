@@ -25,7 +25,7 @@ namespace Project_1.Input
         public ClickEvent(RelativeScreenPosition aClickPos, InputManager.ClickType aButtonPressed, bool[] aModifiers)
         {
             clickPos = aClickPos;
-            DebugManager.Print(GetType(), "Click: " + clickPos);
+            //DebugManager.Print(GetType(), "Click: " + clickPos);
 
             buttonPressed = aButtonPressed;
             modifierHeld = aModifiers;

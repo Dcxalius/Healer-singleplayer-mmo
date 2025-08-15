@@ -57,11 +57,11 @@ namespace Project_1.Camera
         WindowType fullscreen;
 
         [JsonConstructor]
-        public CameraSettings(Follow followSetting, Point windowSize, WindowType xddFullscreen)
+        public CameraSettings(Follow followSetting, Point windowSize, WindowType fullscreen)
         {
             follow = followSetting;
             this.windowSize = windowSize;
-            this.fullscreen = xddFullscreen;
+            this.fullscreen = fullscreen;
         }
 
         public void SetCamera()

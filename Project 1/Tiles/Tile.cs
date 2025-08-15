@@ -15,7 +15,7 @@ namespace Project_1.Tiles
 {
     internal class Tile
     {
-        readonly static Point tileSize = new Point(32);
+        readonly static Point tileSize = TileManager.TileSize;
         [JsonProperty("id")]
         public int ID => tileData.ID;
         

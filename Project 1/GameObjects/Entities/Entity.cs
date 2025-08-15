@@ -24,6 +24,7 @@ using Project_1.GameObjects.FloatingTexts;
 using Project_1.GameObjects.Entities.Corspes;
 using Project_1.UI.HUD.Managers;
 using Microsoft.Xna.Framework.Graphics;
+using System.Drawing.Printing;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -202,7 +203,7 @@ namespace Project_1.GameObjects.Entities
         void CheckForCollisions() //TODO: Rework this?
         {
 
-            List<(Rectangle, Rectangle)> resultingCollisions = TileManager.CollisionsWithUnwalkable(this);
+            List<(Rectangle, Rectangle)> resultingCollisions = TileManager.CollisionManager.CollisionsWithUnwalkable(this);
 
             if (resultingCollisions.Count != 0)
             {
@@ -210,36 +211,53 @@ namespace Project_1.GameObjects.Entities
                 {
                     //TODO: Ponder how to make it not jump
                     //Related to the fact that when colliding with corners it uses feetpos rather than the border of feet
-                    
+
+                    bool hit = false;
+
+                    //if (WorldRectangle.Right > resultingCollisions[i].Item2.Left)
+                    //{
+                    //    FeetPosition = new WorldSpace(resultingCollisions[i].Item2.Location.X - FeetSize.X / 2, FeetPosition.Y);
+
+                    //    velocity.X = 0;
+                    //    momentum.X = 0;
+                    //    hit = true;
+                    //}
+
                     if (FeetPosition.X - resultingCollisions[i].Item1.Left < 0)
                     {
-                        FeetPosition = new WorldSpace(MathF.Round(FeetPosition.X), FeetPosition.Y) - new WorldSpace(resultingCollisions[i].Item1.Width, 0);
+                        FeetPosition = new WorldSpace(resultingCollisions[i].Item2.Location.X - FeetSize.X / 2, FeetPosition.Y);
+
                         velocity.X = 0;
                         momentum.X = 0;
-                        //DebugManager.Print(GetType(), (FeetPosition.X - resultingCollisions[i].Item1.Left).ToString());
+                        hit = true;
                     }
                     if (FeetPosition.X - resultingCollisions[i].Item1.Right > 0)
                     {
-                        FeetPosition = new WorldSpace(MathF.Round(FeetPosition.X), FeetPosition.Y) + new WorldSpace(resultingCollisions[i].Item1.Width, 0);
+                        FeetPosition = new WorldSpace(resultingCollisions[i].Item2.Location.X + resultingCollisions[i].Item2.Width + FeetSize.X / 2, FeetPosition.Y);
+
                         velocity.X = 0;
                         momentum.X = 0;
-                        //DebugManager.Print(GetType(), (FeetPosition.X - resultingCollisions[i].Item1.Right).ToString());
+                        hit = true;
 
                     }
                     if (FeetPosition.Y - resultingCollisions[i].Item1.Top < 0)
                     {
                         FeetPosition = new WorldSpace(FeetPosition.X, MathF.Round(FeetPosition.Y)) - new WorldSpace(0, resultingCollisions[i].Item1.Height);
+
                         velocity.Y = 0;
                         momentum.Y = 0;
-                        //DebugManager.Print(GetType(), (FeetPosition.Y - resultingCollisions[i].Item1.Top).ToString());
+                        hit = true;
+
                     }
                     if (FeetPosition.Y - resultingCollisions[i].Item1.Bottom > 0)
                     {
                         FeetPosition = new WorldSpace(FeetPosition.X, MathF.Round(FeetPosition.Y)) + new WorldSpace(0, resultingCollisions[i].Item1.Height);
+
                         velocity.Y = 0;
                         momentum.Y = 0;
-                        //DebugManager.Print(GetType(), (FeetPosition.Y - resultingCollisions[i].Item1.Bottom).ToString());
+                        hit = true;
                     }
+                    //Debug.Assert(hit, "How did we get here?");
                 }
             }
 

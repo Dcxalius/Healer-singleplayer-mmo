@@ -41,6 +41,7 @@ namespace Project_1.Managers.States
             }
             Camera.Camera.Update();
             ObjectManager.Update();
+            TileManager.Update();
             FloatingTextManager.Update();
             CorpseManager.Update();
             DoodadManager.Update();

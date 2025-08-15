@@ -89,6 +89,7 @@ namespace Project_1.Camera
             {
                 string json = File.ReadAllText(SaveManager.CameraSettings);
                 cameraSettings = SaveManager.ImportData<CameraSettings>(json);
+                Debug.Assert(cameraSettings != null);
             }
             else
             {
