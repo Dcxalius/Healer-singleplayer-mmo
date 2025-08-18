@@ -36,23 +36,23 @@ namespace Project_1.Textures
 
         public Vector2 Offset { get => offset; set => offset = value; }
 
-        public Color AvgColor
+        public static Color AvgColor(GfxPath aPath) //TODO: Move this?
         {
-            get
+            Texture2D gfx = TextureManager.GetTexture(aPath);
+            
+            Point bounds = gfx.Bounds.Size;
+            Color[] c = new Color[bounds.X * bounds.Y];
+            gfx.GetData(c);
+            Color c2 = c[0];
+            for (int i = 1; i < c.Length; i++)
             {
-                Point bounds = gfx.Bounds.Size;
-                Color[] c = new Color[bounds.X * bounds.Y];
-                gfx.GetData(c);
-                Color c2 = c[0];
-                for (int i = 1; i < c.Length; i++)
-                {
-                    c2.R = (byte)((c2.R + c[i].R) / 2);
-                    c2.G = (byte)((c2.G + c[i].G) / 2);
-                    c2.B = (byte)((c2.B + c[i].B) / 2);
-                }
-                c2.A = 255;
-                return c2;
+                c2.R = (byte)((c2.R + c[i].R) / 2);
+                c2.G = (byte)((c2.G + c[i].G) / 2);
+                c2.B = (byte)((c2.B + c[i].B) / 2);
             }
+            c2.A = 255;
+            return c2;
+            
         }
 
         protected Vector2 offset;
@@ -99,56 +99,33 @@ namespace Project_1.Textures
 
         public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, float aFeetPosY) => Draw(aBatch, aPos, color, offset, aFeetPosY);
 
-        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, Color aColor, float aFeetPosY) => Draw(aBatch, aPos, aColor, offset, aFeetPosY); //TODO: Remove these?
+        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, Color aColor, float aFeetPosY) => Draw(aBatch, aPos, aColor, offset, aFeetPosY);
 
-        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, Color aColor, Vector2 aOffset, float aFeetPosY)
-        {
-            if (gfx == null) return;
-
-            if (Camera.Camera.MomAmIInFrame(new Rectangle(aPos.ToPoint(), (size.ToVector2() * Camera.Camera.Scale).ToPoint())))
-            {
-                //aBatch.Draw(gfx, aPos, visible, aColor, rotation, offset, Camera.Camera.Scale, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
-                //aBatch.Draw(gfx, new Rectangle(aPos.ToPoint(),ScaledSize), visible, aColor, rotation, offset, flip, aFeetPosY / (Camera.Camera.WorldRectangle.Bottom + size.Y));
-                aBatch.Draw(gfx, new Rectangle(new Point((int)Math.Round(aPos.X), (int)Math.Round(aPos.Y)), ScaledSize), visible, aColor, rotation, aOffset, flip, (aFeetPosY - Camera.Camera.WorldRectangle.Top) / (Camera.Camera.WorldRectangle.Bottom - Camera.Camera.WorldRectangle.Top));
-            }
-        }
+        public virtual void Draw(SpriteBatch aBatch, Vector2 aPos, Color aColor, Vector2 aOffset, float aFeetPosY) => FinalDraw(aBatch, new Rectangle(aPos.ToPoint(), ScaledSize), aColor, aOffset, aFeetPosY);
 
         public virtual void Draw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, float aFeetPosY) => Draw(aBatch, aPos, Color.White, aFeetPosY);
         public virtual void Draw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, Color aColor, float aFeetPosY) => Draw(aBatch, aPos, aColor, offset, aFeetPosY);
-        public virtual void Draw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, Color aColor, Vector2 aOffset, float aFeetPosY)
+        public virtual void Draw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, Color aColor, Vector2 aOffset, float aFeetPosY) => FinalDraw(aBatch, new Rectangle(aPos, ScaledSize), aColor, aOffset, aFeetPosY);
+
+        public virtual void Draw(SpriteBatch aBatch, Rectangle aPos, Color aColor, Vector2 aOffset, float aFeetPosY) => FinalDraw(aBatch, aPos, aColor, aOffset, aFeetPosY);
+
+
+        void FinalDraw(SpriteBatch aBatch, Rectangle aPos, Color aColor, Vector2 aOffset, float aFeetPosY)
         {
             if (gfx == null) return;
-
-            if (Camera.Camera.MomAmIInFrame(new Rectangle(aPos, (size.ToVector2() * Camera.Camera.Scale).ToPoint())))
-            {
-                aBatch.Draw(gfx, new Rectangle(aPos, ScaledSize), visible, aColor, rotation, aOffset, flip, (aFeetPosY - Camera.Camera.WorldRectangle.Top) / (Camera.Camera.WorldRectangle.Bottom - Camera.Camera.WorldRectangle.Top));
-            }
-        }
-
-        public virtual void Draw(SpriteBatch aBatch, Rectangle aPos, Color aColor, Vector2 aOffset, float aFeetPosY)
-        {
-            if (gfx == null) return;
-
-            //if (Camera.Camera.MomAmIInFrame(aPos * Camera.Camera.Scale)) TODO: Make this check if its in frame.
-            {
-                aBatch.Draw(gfx, aPos, visible, aColor, rotation, aOffset, flip, (aFeetPosY - Camera.Camera.WorldRectangle.Top) / (Camera.Camera.WorldRectangle.Bottom - Camera.Camera.WorldRectangle.Top)); 
-            }
+            if (!Camera.Camera.MomAmIInFrame(aPos)) return;
+            aBatch.Draw(gfx, aPos, visible, aColor, rotation, aOffset, flip, (aFeetPosY - Camera.Camera.WorldRectangle.Top) / (Camera.Camera.WorldRectangle.Bottom - Camera.Camera.WorldRectangle.Top));
         }
 
         public void ChangeGfx(GfxPath aPath)
         {
-            if (aPath != null) 
+            if (aPath == null || aPath.Name == null)
             {
-                if (aPath.Name != null)
-                {
-                    gfx = TextureManager.GetTexture(aPath);
-                    return;
-                }
+                gfx = null;
+                return;
             }
-            
 
-            gfx = null;
-
+            gfx = TextureManager.GetTexture(aPath);
         }
     }
 }

@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
+using Project_1.Textures;
+using SharpDX.Direct3D9;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.Tiles
 {
-    internal struct TileData : IComparable<TileData>
+    internal class TileData : IComparable<TileData>
     {
         public int ID => id;
         int id;
@@ -19,6 +23,20 @@ namespace Project_1.Tiles
 
         public bool Transparent => transparent;
         bool transparent;
+
+        [JsonIgnore]
+        public Color AvgColor
+        {
+            get
+            {
+                if (avgColor == null)
+                {
+                    avgColor = Textures.Texture.AvgColor(new GfxPath(GfxType.Tile, Name));
+                }
+                return avgColor.Value;
+            }
+        }
+        Color? avgColor;
 
         public TileData(int id, string name, bool walkable, float dragCoeficient, bool transparent)
         {

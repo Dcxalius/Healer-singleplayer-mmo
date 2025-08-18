@@ -122,7 +122,7 @@ namespace Project_1.Camera
 
         void CheckForSpacePress()
         {
-            if (InputManager.GetPress(Microsoft.Xna.Framework.Input.Keys.Space))
+            if (InputManager.GetPress(Microsoft.Xna.Framework.Input.Keys.Space)) //TODO: This should be modernized
             {
                 if (boundObject == null)
                 {
@@ -130,6 +130,8 @@ namespace Project_1.Camera
                     return;
                 }
                 CentreInWorldSpace = boundObject.FeetPosition;
+                velocity = WorldSpace.Zero;
+                momentum = WorldSpace.Zero;
             }
         }
 

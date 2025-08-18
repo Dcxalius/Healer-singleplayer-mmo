@@ -28,8 +28,16 @@ namespace Project_1.Tiles
 {
     internal static class TileManager
     {
-        static Tile Tile(int aChunkId, int aX, int aY) => chunks.Find(x => x.Id == aChunkId).Tile(aX, aY);
-        static Chunk GetChunk(int aId) => chunks.Find(x => x.Id == aId);
+        static Tile GetTile(WorldSpace aSpace) => throw new NotImplementedException();
+        static Tile GetTile(Chunk aChunk, int aX, int aY) => throw new NotImplementedException();
+        static Tile GetTile(int aChunkId, int aX, int aY) => chunks.Find(x => x.Id == aChunkId).Tile(aX, aY);
+
+        public static Chunk GetChunk(int aId) => chunks.Find(x => x.Id == aId);
+        public static Chunk GetChunk(Point aPos) => GetChunk(aPos.X, aPos.Y);
+        public static Chunk GetChunk(int aX, int aY) => GetChunk(GetChunkId(aX, aY));
+        public static Chunk GetChunk(WorldSpace aSpaceInWorld) => GetChunk(aSpaceInWorld.ToPoint() / Chunk.ChunkSize / TileSize);
+        
+
         static List<Chunk> chunks; //TODO: Use SortedList?
         const int surroundingChunkCheckSize = 3;// this should always be odd
 
@@ -66,7 +74,6 @@ namespace Project_1.Tiles
                     if (surroundingChunks[i, j] != null) continue;
                     addedNew = true;
 
-                    DebugManager.Print(typeof(TileManager), "x = " + (centreChunkPos.X + i - surroundingChunkCheckSize / 2) + ", y = " + (centreChunkPos.Y + j - surroundingChunkCheckSize / 2) + " == " + newId);
                     surroundingChunks[i, j] = new Chunk((centreChunk.Position + new WorldSpace((i - surroundingChunkCheckSize / 2) * TileSize.X * Chunk.ChunkSize.X, (j - surroundingChunkCheckSize / 2) * TileSize.Y * Chunk.ChunkSize.Y)).ToPoint(), newId);
                     chunks.Add(surroundingChunks[i, j]);
                 }
@@ -75,57 +82,60 @@ namespace Project_1.Tiles
         }
 
         static int GetChunkId(Point aPos) => GetChunkId(aPos.X, aPos.Y);
-        static int GetChunkId(int aX, int aY) //TODO: Needs testing
+        static int GetChunkId(int aX, int aY)
         {
             if (aX == 0 && aY == 0) return 0;
             
-
             int dirInt;
-
-            int max;
-            int min;
+            int furthestDir;
+            int shortestDir;
 
             if (Math.Abs(aX) >= Math.Abs(aY))
             {
                 if (aX < 0) //Left
                 {
                     dirInt = 3;
+                    shortestDir = aY;
                 }
                 else //Right
                 {
                     dirInt = 7;
+                    shortestDir = -aY;
                 }
 
-                max = aX;
-                min = aY;
+                furthestDir = aX;
             }
             else
             {
                 if (aY < 0) //Up
                 {
                     dirInt = 1;
+                    shortestDir = -aX;
                 }
                 else //Down
                 {
                     dirInt = 5;
+                    shortestDir = aX;
                 }
 
-                max = aY;
-                min = aX;
+                furthestDir = aY;
             }
 
-            return (dirInt * Math.Abs(max)) + HighestNrInCircle(Math.Abs(max) - 1) + min;
+            return dirInt * Math.Abs(furthestDir) + HighestNrInCircle(Math.Abs(furthestDir) - 1) + shortestDir;
         }
 
-        public static Point GetChunkPosition(int aId)//TODO: Needs testing
+        public static Point GetChunkPosition(int aId)
         {
-            double triangle = (Math.Sqrt(aId + 1) - 1) / 2;
-            int circle = (int)Math.Ceiling(triangle);
+
+            int circle = (int)Math.Ceiling((Math.Sqrt(aId + 1) - 1) / 2);
             int highestNrInCircle = HighestNrInCircle(circle);
             int dif = highestNrInCircle - aId;
-            if (dif == 0) return new Point(circle, -circle);
-            
-            int sideLength = circle * 2 + 1;
+            if (dif == 0)
+            {
+                return new Point(circle, -circle);
+            }
+
+            int sideLength = circle * 2;
             if (dif % (sideLength) == 0)
             {
                 if (dif / (sideLength) == 1) return new Point(circle, circle);
@@ -134,32 +144,31 @@ namespace Project_1.Tiles
                 throw new Exception("ohno");
             }
 
-            int x;
-            int y;
+            Point returnPoint = new Point();
 
-            if (dif / (sideLength - 1) < 1)
+            if ((float)dif / (sideLength) < 1f)//Right
             {
-                x = circle;
-                y = -sideLength / 2 + sideLength * dif / sideLength;
+                returnPoint.X = circle;
+                returnPoint.Y = -circle + dif;
             }
-            else if (dif / (sideLength - 1) < 2)
+            else if ((float)dif / (sideLength) < 2f)//Down
             {
-                x = sideLength / 2 + sideLength * (dif - sideLength) / sideLength;
-                y = circle;
+                returnPoint.X = circle - (dif - sideLength);
+                returnPoint.Y = circle;
             }
-            else if (dif / sideLength - 1 < 3)
+            else if ((float)dif / sideLength < 3f)//Left
             {
-                x = -circle;
-                y = sideLength / 2 + sideLength * (dif - sideLength * 2) / sideLength;
+                returnPoint.X = -circle;
+                returnPoint.Y = circle - (dif - sideLength * 2);
             }
-            else if (dif / sideLength - 1 < 4)
+            else if ((float)dif / sideLength < 4f)//Up
             {
-                x = -sideLength / 2 + sideLength * (dif - sideLength * 3) / sideLength;
-                y = -circle;
+                returnPoint.X = -circle + (dif - sideLength * 3);
+                returnPoint.Y = -circle;
             }
             else throw new Exception("ohno");
 
-            return new Point(x, y);
+            return returnPoint;
         }
 
         static int HighestNrInCircle(int aCricleSize) => 4 * (((aCricleSize+1) * (aCricleSize+1)) - (aCricleSize+1)); //(2*aCS-1)^2-1
@@ -420,15 +429,41 @@ namespace Project_1.Tiles
         public static Tile[,] GetSurroundingTiles(Tile aTile)
         {
             Tile[,] a = new Tile[sizeOfSquareToCheck, sizeOfSquareToCheck];
+            int chunkX = (int)MathF.Floor((float)aTile.WorldRectangle.Center.X / Chunk.ChunkSize.X / TileSize.X);
+            int chunkY = (int)MathF.Floor((float)aTile.WorldRectangle.Center.Y / Chunk.ChunkSize.Y / TileSize.Y);
+            Chunk middleChunk = GetChunk(chunkX, chunkY);
 
             for (int i = 0; i < sizeOfSquareToCheck; i++)
             {
                 for (int j = 0; j < sizeOfSquareToCheck; j++)
                 {
-                    int x = aTile.GridPos.X - (int)Math.Floor(sizeOfSquareToCheck / 2m) + i;
-                    int y = aTile.GridPos.Y - (int)Math.Floor(sizeOfSquareToCheck / 2m) + j;
-                    a[i, j] = chunks[0].Tile(x, y);
-                    //a[i, j] = tiles[x, y];
+                    int x = aTile.GridPos.X - sizeOfSquareToCheck / 2 + i;
+                    int y = aTile.GridPos.Y - sizeOfSquareToCheck / 2 + j;
+                    Chunk chunkToGetTileFrom = middleChunk;
+
+                    if (x < 0)
+                    {
+                        chunkToGetTileFrom = GetChunk(chunkToGetTileFrom.ChunkPosition + new Point(-1, 0));
+                        x += Chunk.ChunkSize.X;
+                    }
+                    else if (x >= Chunk.ChunkSize.X)
+                    {
+                        chunkToGetTileFrom = GetChunk(chunkToGetTileFrom.ChunkPosition + new Point(1, 0));
+                        x -= Chunk.ChunkSize.X; 
+                    }
+
+                    if (y < 0)
+                    {
+                        chunkToGetTileFrom = GetChunk(chunkToGetTileFrom.ChunkPosition + new Point(0, -1));
+                        y += Chunk.ChunkSize.Y;
+                    }
+                    else if (y >= Chunk.ChunkSize.Y)
+                    {
+                        chunkToGetTileFrom = GetChunk(chunkToGetTileFrom.ChunkPosition + new Point(-1, 0));
+                        y -= Chunk.ChunkSize.Y;
+                    }
+
+                    a[i, j] = chunkToGetTileFrom.Tile(x, y);
                 }
             }
             return a;
@@ -436,38 +471,55 @@ namespace Project_1.Tiles
 
         
 
-        public static Tile GetTileAt(Point aCoord) => GetTileAt(aCoord.X, aCoord.Y);
-
-        public static Tile GetTileAt(int aX, int aY) => Tile(0, aX, aY);
-        //public static Tile GetTileAt(int aX, int aY) => Tile(aX, aY);
-
-        public static Tile[] GetNeighbours(Point aCoord)
-        {
-            Tile[] neighbours = new Tile[8];
-            neighbours[0] = GetTileAt(aCoord.X - 1, aCoord.Y - 0);
-            neighbours[1] = GetTileAt(aCoord.X + 1, aCoord.Y - 0);
-            neighbours[2] = GetTileAt(aCoord.X + 0, aCoord.Y - 1);
-            neighbours[3] = GetTileAt(aCoord.X + 0, aCoord.Y + 1);
-            neighbours[4] = GetTileAt(aCoord.X + 1, aCoord.Y + 1);
-            neighbours[5] = GetTileAt(aCoord.X + 1, aCoord.Y - 1);
-            neighbours[6] = GetTileAt(aCoord.X - 1, aCoord.Y + 1);
-            neighbours[7] = GetTileAt(aCoord.X - 1, aCoord.Y - 1);
-            return neighbours;
-        }
-
         public static Tile[] GetTilesAroundPosition(WorldSpace aPosition, float aDistance)
         {
             List<Tile> returnable = new List<Tile>();
             Tile midTile = GetTileUnder(aPosition);
             float distanceInTiles = aDistance / TileSize.X;
             int tilesAround = (int)(distanceInTiles * Math.PI) * 2;
+
+            int chunkX = (int)MathF.Floor((float)midTile.WorldRectangle.Center.X / Chunk.ChunkSize.X / TileSize.X);
+            int chunkY = (int)MathF.Floor((float)midTile.WorldRectangle.Center.Y / Chunk.ChunkSize.Y / TileSize.Y);
+            Chunk middleChunk = GetChunk(chunkX, chunkY);
+
             for (int i = 0; i < tilesAround; i++)
             {
                 Point tilePos = midTile.GridPos;
-                
-                Tile t = Tile(0, (int)Math.Round(tilePos.X + distanceInTiles * Math.Sin((i * 2 * Math.PI / tilesAround))), (int)Math.Floor(tilePos.Y + distanceInTiles * Math.Cos(i * 2 * Math.PI / tilesAround)));
 
-                if (t == null) continue;
+                int x = (int)Math.Round(tilePos.X + distanceInTiles * Math.Sin(i * 2 * Math.PI / tilesAround));
+                int y = (int)Math.Floor(tilePos.Y + distanceInTiles * Math.Cos(i * 2 * Math.PI / tilesAround));
+
+                Chunk chunkToGetTileFrom = middleChunk;
+
+                if (x < 0)
+                {
+                    chunkToGetTileFrom = GetChunk(chunkToGetTileFrom.ChunkPosition + new Point(-1, 0));
+                    x += Chunk.ChunkSize.X;
+                }
+                else if (x >= Chunk.ChunkSize.X)
+                {
+                    chunkToGetTileFrom = GetChunk(chunkToGetTileFrom.ChunkPosition + new Point(1, 0));
+                    x -= Chunk.ChunkSize.X;
+                }
+
+                if (y < 0)
+                {
+                    chunkToGetTileFrom = GetChunk(chunkToGetTileFrom.ChunkPosition + new Point(0, -1));
+                    y += Chunk.ChunkSize.Y;
+                }
+                else if (y >= Chunk.ChunkSize.Y)
+                {
+                    chunkToGetTileFrom = GetChunk(chunkToGetTileFrom.ChunkPosition + new Point(-1, 0));
+                    y -= Chunk.ChunkSize.Y;
+                }
+
+                Tile t = chunkToGetTileFrom.Tile(x, y);
+
+                if (t == null)
+                {
+                    DebugManager.Print(typeof(TileManager), "Tried to get tile from chunk " + chunkToGetTileFrom.ToString() + "but it returned null.");
+                    continue;
+                }
 
                 if (!t.Walkable) continue;
                 returnable.Add(t);
@@ -504,6 +556,7 @@ namespace Project_1.Tiles
         {
             foreach (var chunk in chunks)
             {
+                //if (!Camera.Camera.MomAmIInFrame(chunk.WorldRectangle)) continue;
                 chunk.Draw(aBatch);
             }
         }

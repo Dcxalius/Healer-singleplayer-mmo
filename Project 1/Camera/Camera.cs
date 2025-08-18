@@ -177,7 +177,7 @@ namespace Project_1.Camera
 
 
         #region FrameBoundry
-        public static bool MomAmIInFrame(Rectangle aRect)
+        public static bool MomAmIInFrame(Rectangle aRect) //TODO: These should be differntatied more, one is for world one is for screen
         {
             return ScreenRectangle.Intersects(aRect);
         }

@@ -45,7 +45,7 @@ namespace Project_1.Tiles
         }
 
         [JsonIgnore]
-        public Color MinimapColor { get; private set; }
+        public Color MinimapColor => tileData.AvgColor;
 
         public bool IsAdjacent(Tile aPossibleNeighbour)
         {
@@ -79,8 +79,6 @@ namespace Project_1.Tiles
                 yText = new Text("Gloryse", tilePos.Y.ToString(), Color.Yellow);
             }
             Position = new WorldSpace(aPos);
-
-            MinimapColor = gfx.AvgColor;
         }
 
         public void AddDebugSquare()

@@ -13,11 +13,16 @@ namespace Project_1.Tiles
     {
         static readonly Point TileSize = TileManager.TileSize;
         public static readonly Point ChunkSize = new Point(100);
+        [JsonIgnore]
+        public Rectangle WorldRectangle => new Rectangle(Position.ToPoint(), ChunkSize * TileSize);
+
+        [JsonIgnore]
+        public Point ChunkPosition { get; private set; }
 
         [JsonIgnore]
         public RenderTarget2D minimap;
 
-
+        [JsonIgnore]
         public WorldSpace Position { get; private set; }
 
         public Tile Tile((int, int) aXY) => Tile(aXY.Item1, aXY.Item2);
@@ -57,13 +62,16 @@ namespace Project_1.Tiles
             id = aId;
             tiles = new Tile[ChunkSize.X, ChunkSize.Y];
             Position = new WorldSpace(aLeftUppermostTile);
+            ChunkPosition = TileManager.GetChunkPosition(aId);
+
+            Point pos;
+
 
             for (int i = 0; i < ChunkSize.X; i++)
             {
                 for (int j = 0; j < ChunkSize.Y; j++)
                 {
-                    Point pos = new Point(aLeftUppermostTile.X + TileSize.X * i, aLeftUppermostTile.Y + TileSize.Y * j);
-
+                    pos = new Point(aLeftUppermostTile.X + TileSize.X * i, aLeftUppermostTile.Y + TileSize.Y * j);
                     if (i == 0 || j == 0 || i == ChunkSize.X - 1 || j == ChunkSize.Y - 1 || (i >= 4 && i < 6 && j >= 4 && j < 6))
                     {
                         tiles[i, j] = new Tile(TileFactory.GetTileData("Wall"), pos, new Point(i, j));
@@ -115,9 +123,10 @@ namespace Project_1.Tiles
         }
 
         [JsonConstructor]
-        public Chunk(int[,] tilesAsIDs, int id, WorldSpace position)
+        public Chunk(int[,] tilesAsIDs, int id)
         {
-            Position = position;
+            ChunkPosition = TileManager.GetChunkPosition(id);
+            Position = new WorldSpace(ChunkPosition * ChunkSize * TileSize);
             this.id = id;
             tiles = new Tile[tilesAsIDs.GetLength(0), tilesAsIDs.GetLength(1)];
 
@@ -125,7 +134,7 @@ namespace Project_1.Tiles
             {
                 for (int j = 0; j < tiles.GetLength(1); j++)
                 {
-                    Point pos = new Point((int)position.X + TileSize.X * i, (int)position.Y + TileSize.Y * j);
+                    Point pos = new Point((int)Position.X + TileSize.X * i, (int)Position.Y + TileSize.Y * j);
 
                     tiles[i, j] = new Tile(TileFactory.GetTileData(tilesAsIDs[i, j]), pos, new Point(i, j));
                 }
@@ -158,9 +167,36 @@ namespace Project_1.Tiles
 
         public void Draw(SpriteBatch aBatch)
         {
-            foreach (var tile in tiles)
+            int minI = 0;
+            int minJ = 0;
+            int maxJ = tiles.GetLength(1);
+            for (int i = minI; i < tiles.GetLength(0); i++)
             {
-                tile.Draw(aBatch);
+                for (int j = minJ; j < maxJ; j++)
+                {
+                    if (tiles[i, j].WorldRectangle.Bottom < Camera.Camera.WorldRectangle.Top)
+                    {
+                        minJ = j + 1;
+                        continue;
+                    }
+                    if (tiles[i, j].WorldRectangle.Right < Camera.Camera.WorldRectangle.Left)
+                    {
+                        minI = i;
+                        break;
+                    }
+                    if (tiles[i, j].WorldRectangle.Left > Camera.Camera.WorldRectangle.Right)
+                    {
+                        return;
+                    }
+                    if (tiles[i, j].WorldRectangle.Top > Camera.Camera.WorldRectangle.Bottom)
+                    {
+                        maxJ = j;
+                        break;
+                    }
+
+                    tiles[i, j].Draw(aBatch);
+
+                }
             }
         }
     }

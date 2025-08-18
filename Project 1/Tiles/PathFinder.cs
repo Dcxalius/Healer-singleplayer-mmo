@@ -48,8 +48,7 @@ namespace Project_1.Tiles
                     break;
                 }
 
-
-                Tile[] neighbours = TileManager.GetNeighbours(currentTile.Tile.GridPos);
+                Tile[] neighbours = GetSortedNeighbours(TileManager.GetSurroundingTiles(currentTile.Tile));
                 List<int> wallIndicies = new List<int>();
                 for (int i = 0; i < neighbours.Length; i++)
                 {
@@ -106,8 +105,26 @@ namespace Project_1.Tiles
             searchedTiles.Clear();
             return new Path(returnTiles, aEndPos);
         }
+        Tile[] GetSortedNeighbours(Tile[,] aNeighbours) //UGLY EWW YUCK
+        {
+            Tile[] neighbours = new Tile[8];
+            neighbours[4] = aNeighbours[0, 0];
+            neighbours[0] = aNeighbours[0, 1];
+            neighbours[5] = aNeighbours[0, 2];
+            neighbours[1] = aNeighbours[1, 0];
+            _ = aNeighbours[1, 1];
+            neighbours[3] = aNeighbours[1, 2];
+            neighbours[6] = aNeighbours[2, 0];
+            neighbours[2] = aNeighbours[2, 1];
+            neighbours[7] = aNeighbours[2, 2];
+
+
+
+            return neighbours;
+        }
     }
 
+    
 
 
     internal class PathFindingTile : IHeapItem<PathFindingTile>

@@ -61,7 +61,7 @@ namespace Project_1.Tiles
 
             return finalColliders;
         }
-        List<Rectangle> DownMerge(Rectangle?[,] aCollidersToCheck)
+        List<Rectangle> DownMerge(Rectangle?[,] aCollidersToCheck) //TODO: This has bugs in it
         {
             List<Rectangle> finalColliders = new List<Rectangle>();
             int[,] consumedBy = new int[aCollidersToCheck.GetLength(0), aCollidersToCheck.GetLength(1)];
