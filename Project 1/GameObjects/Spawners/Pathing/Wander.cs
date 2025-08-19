@@ -25,7 +25,7 @@ namespace Project_1.GameObjects.Spawners.Pathing
                 StartTimer();
                 if (!TimeForMove()) return null;
 
-                return NewSpawn(GetLatestSpace);
+                return NewTarget();
             }
         }
 
@@ -45,12 +45,21 @@ namespace Project_1.GameObjects.Spawners.Pathing
             this.boundry = boundry;
         }
 
+        WorldSpace NewTarget()
+        {
+            WorldSpace newSpace = new WorldSpace
+            {
+                X = (float)(boundry.Location.X + RandomManager.RollDouble() * boundry.Width),
+                Y = (float)(boundry.Location.Y + RandomManager.RollDouble() * boundry.Height)
+            };
+
+            return newSpace;
+        }
+
         public override WorldSpace NewSpawn(WorldSpace aSize)
         {
             Reset();
-            WorldSpace newSpace = new WorldSpace();
-            newSpace.X = (float)(boundry.Location.X + RandomManager.RollDouble() * boundry.Width);
-            newSpace.Y = (float)(boundry.Location.Y + RandomManager.RollDouble() * boundry.Height);
+            WorldSpace newSpace = NewTarget();
             newSpace = TileManager.FindClosestWalkableWorldSpace(newSpace, aSize);
             return newSpace;
         }

@@ -276,7 +276,7 @@ namespace Project_1.Tiles
                 return aWorldSpace;
             }
 
-            Tile closestTile = FindClosestWalkable(aWorldSpace);
+            Tile closestTile = FindClosestWalkableTile(aWorldSpace);
 
             //DebugManager.Print(typeof(TileManager), "Tileboundries are " + closestTile.WorldRectangle);
 
@@ -302,7 +302,7 @@ namespace Project_1.Tiles
             }
         }
 
-        public static Tile FindClosestWalkable(WorldSpace aWorldSpace)
+        public static Tile FindClosestWalkableTile(WorldSpace aWorldSpace)
         {
             Tile underStart = GetTileUnder(aWorldSpace);
             if (underStart.Walkable) return underStart;
@@ -542,11 +542,9 @@ namespace Project_1.Tiles
 
         public static void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aSize)
         {
-            //TODO: Draw neighbours as well
-            //int chunkID = GetChunkId((int)aMinimapWorldPos.X / (debugSize.X * TileSize.X), (int)aMinimapWorldPos.Y / (debugSize.Y * TileSize.Y));
-            //GetChunk(chunkID).MinimapDraw(aBatch, aMinimapWorldPos);
             for (int i = 0; i < chunks.Count; i++)
             {
+                //TODO: Boundscheck before drawing
                 chunks[i].MinimapDraw(aBatch, aOrigin, aMinimapOffset, aSize);
             }
 
@@ -556,7 +554,7 @@ namespace Project_1.Tiles
         {
             foreach (var chunk in chunks)
             {
-                //if (!Camera.Camera.MomAmIInFrame(chunk.WorldRectangle)) continue;
+                if (!Camera.Camera.WorldspaceBoundsCheck(chunk.WorldRectangle)) continue;
                 chunk.Draw(aBatch);
             }
         }

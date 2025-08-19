@@ -46,13 +46,18 @@ namespace Project_1.GameObjects.Entities
 
             aggroTable.Update();
 
+
+            GetNewPath();
+        }
+
+        void GetNewPath()
+        {
             if (!Destination.HasDestination)
             {
                 WorldSpace? nextSpace = pathing.GetNextSpace;
                 if (!nextSpace.HasValue) return;
                 Destination.AddDestination(nextSpace.Value);
             }
-
         }
         protected override void Death()
         {

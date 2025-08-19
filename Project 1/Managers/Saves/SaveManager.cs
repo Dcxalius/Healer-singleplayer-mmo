@@ -19,6 +19,8 @@ namespace Project_1.Managers
         static string contentRootDirectory;
         static JsonSerializerSettings serializerSettings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto};
         static string saveFolder;
+
+        public static string Effects => contentRootDirectory + "\\Effects";
         public static string Settings => contentRootDirectory + "\\Settings";
         public static string HudSettings => Settings + "\\Hud.set";
         public static string CameraSettings => Settings + "\\Camera.set";

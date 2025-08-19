@@ -113,7 +113,7 @@ namespace Project_1.Textures
         void FinalDraw(SpriteBatch aBatch, Rectangle aPos, Color aColor, Vector2 aOffset, float aFeetPosY)
         {
             if (gfx == null) return;
-            if (!Camera.Camera.MomAmIInFrame(aPos)) return;
+            if (!Camera.Camera.ScreenspaceBoundsCheck(aPos)) return;
             aBatch.Draw(gfx, aPos, visible, aColor, rotation, aOffset, flip, (aFeetPosY - Camera.Camera.WorldRectangle.Top) / (Camera.Camera.WorldRectangle.Bottom - Camera.Camera.WorldRectangle.Top));
         }
 

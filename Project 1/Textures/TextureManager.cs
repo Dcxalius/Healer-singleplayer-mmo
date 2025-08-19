@@ -30,7 +30,7 @@ namespace Project_1.Textures
             contentManager = Game1.ContentManager;
             InitArrays();
             InitFonts();
-            textOutline = contentManager.Load<Effect>("TextOutline");
+            textOutline = contentManager.Load<Effect>("Effects\\TextOutline");
             //textOutline.Parameters["texelSize"].SetValue()
         }
 

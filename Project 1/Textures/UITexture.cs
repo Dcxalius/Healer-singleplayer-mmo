@@ -46,7 +46,7 @@ namespace Project_1.Textures
             {
                 return;
             }
-            if (Camera.Camera.MomAmIInFrame(aPosRectangle))
+            if (Camera.Camera.ScreenspaceBoundsCheck(aPosRectangle))
             {
                 aBatch.Draw(gfx, aPosRectangle, Visible, aColor, Rotation, offset, flip, 1f);
 
