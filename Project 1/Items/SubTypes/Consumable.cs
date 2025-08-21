@@ -20,6 +20,9 @@ namespace Project_1.Items.SubTypes
         {
         }
 
+        [JsonConstructor]
+        Consumable(int id, int count) : this(ItemFactory.GetItemData<ConsumableData>(id), count) { }
+
         public Consumable(ConsumableData aData, int aCount) : base(aData, aCount)
         {
 

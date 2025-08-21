@@ -54,6 +54,10 @@ namespace Project_1.Items.SubTypes
         [JsonIgnore]
         public PairReport StatReport => EquipmentData.StatReport;
 
+        [JsonConstructor]
+        Equipment(int id) : this(ItemFactory.GetItemData<EquipmentData>(id)) { }
+
+
         public Equipment(LootData aLoot) : base(aLoot)
         {
         }

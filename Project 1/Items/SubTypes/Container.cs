@@ -13,6 +13,9 @@ namespace Project_1.Items.SubTypes
         [JsonIgnore]
         public int SlotCount { get => (itemData as ContainerData).SlotCount; }
 
+        [JsonConstructor]
+        Container(int id) : this(ItemFactory.GetItemData<ContainerData>(id)) { }
+
         public Container(ContainerData aData) : base(aData, 1)
         {
         }

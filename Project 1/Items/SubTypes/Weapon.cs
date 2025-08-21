@@ -48,6 +48,10 @@ namespace Project_1.Items.SubTypes
         [JsonIgnore]
         public HandRequirement handRequirement;
 
+
+        [JsonConstructor]
+        Weapon(int id) : this(ItemFactory.GetItemData<WeaponData>(id)) { }
+
         public Weapon(LootData aLoot) : base(aLoot)
         {
         }

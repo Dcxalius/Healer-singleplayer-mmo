@@ -44,14 +44,16 @@ namespace Project_1.GameObjects.Entities.Corspes
         [JsonIgnore]
         public bool Despawned => isDespawning && timeDespawnStart + despawnTime < TimeManager.TotalFrameTime;
 
-        const double hardDecayTime = 30000;
-        const double softDecayTime = 60000;
+        const double hardDecayTime = 60000;
+        const double softDecayTime = 30000;
 
         const double despawnTime = 1000;
 
+        [JsonProperty]
         double timeDied;
 
         bool isDespawning;
+        [JsonProperty]
         double timeDespawnStart;
 
         public override float MaxSpeed => 0;
@@ -78,9 +80,18 @@ namespace Project_1.GameObjects.Entities.Corspes
         }
 
         [JsonConstructor] //TODO: Make this take timers for despawnlogic
-        Corpse(string corpseName, LootDrop drop, WorldSpace pos) : this(new GfxPath(GfxType.Corpse, corpseName), pos)
+        Corpse(string corpseName, LootDrop drop, WorldSpace pos, double timeDied, double timeDespawnStart) : this(new GfxPath(GfxType.Corpse, corpseName), pos)
         {
             this.drop = drop;
+            if (timeDespawnStart != 0)
+            {
+                this.timeDespawnStart = timeDespawnStart;
+                isDespawning = true;
+            }
+            else
+            {
+                this.timeDied = timeDied;
+            }
         }
 
         Corpse(GfxPath aPath, WorldSpace aPosition) : base(new Textures.Texture(aPath), aPosition)
@@ -130,6 +141,7 @@ namespace Project_1.GameObjects.Entities.Corspes
             if (!isDespawning) return;
             if (!Despawned) return;
 
+            drop.Despawned = true;
             CorpseManager.RemoveCorpse(this);
         }
 

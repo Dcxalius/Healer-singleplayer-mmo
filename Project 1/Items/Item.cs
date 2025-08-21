@@ -77,11 +77,8 @@ namespace Project_1.Items
         int count;
 
         [JsonConstructor]
-        public Item(int id, int count)
-        {
-            itemData = ItemFactory.GetItemData(id);
-            this.count = count;
-        }
+        public Item(int id, int count) : this(ItemFactory.GetItemData(id), count) { }
+        public Item(LootData aLoot) : this(aLoot.ItemData, RandomManager.RollInt(aLoot.MinCount, aLoot.MaxCount)) { }
 
         public Item(ItemData aData, int aCount)
         {
@@ -90,11 +87,7 @@ namespace Project_1.Items
             count = aCount;
         }
 
-        public Item(LootData aLoot)
-        {
-            itemData = aLoot.ItemData;
-            count = RandomManager.RollInt(aLoot.MinCount, aLoot.MaxCount);
-        }
+        
 
         public int AddToStack(int aCount)
         {

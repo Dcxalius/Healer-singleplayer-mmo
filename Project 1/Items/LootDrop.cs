@@ -1,4 +1,5 @@
-﻿using Project_1.Camera;
+﻿using Newtonsoft.Json;
+using Project_1.Camera;
 using Project_1.GameObjects;
 using System;
 using System.Collections.Generic;
@@ -15,18 +16,21 @@ namespace Project_1.Items
 
         WorldObject dropper;
 
+        [JsonIgnore]
         public bool Despawned;
 
+        [JsonIgnore]
         public bool IsEmpty => drop.All(drop => drop == null);
 
+        [JsonIgnore]
         public bool InDistance => dropper.FeetPosition.DistanceTo(ObjectManager.Player.FeetPosition) < dropper.FeetSize.Y / 2 + ObjectManager.Player.FeetSize.Y / 2;
 
-        
+        //public LootDrop()
 
-        public LootDrop(Item[] aDrop, WorldObject aObject)
+        public LootDrop(Item[] drop, WorldObject @object)
         {
-            drop = aDrop;
-            dropper = aObject;
+            this.drop = drop;
+            dropper = @object;
         }
     }
 }
