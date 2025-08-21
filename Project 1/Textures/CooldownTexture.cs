@@ -18,22 +18,23 @@ namespace Project_1.Textures
             LeftSwirl
         }
 
-        public double Ratio { set => ratio = value; }
+        public float Ratio { set => ratio = value; }
 
-        public string Effect => "CooldownSwirl";
+        public string EffectName => "CooldownSwirl";
 
-        public Texture Texture => swirlTexture;
+        public Texture TextureToEffectWith => swirlTexture;
         static Texture swirlTexture = new UITexture("LeftSwirl", Color.White);
         public RenderTarget2D ReturnedRenderTarget { get => effectsRenderTarget; set => effectsRenderTarget = value; }
         RenderTarget2D effectsRenderTarget;
 
         public EffectManager.SimpleEffectParam SimpleEffectParam => simpleEffectParam;
         EffectManager.SimpleEffectParam simpleEffectParam;
-        double ratio;
+        float ratio;
         CooldownGfxType cdType;
 
-        public CooldownTexture() : base("Cooldown", Color.White)
+        public CooldownTexture(CooldownGfxType aCDGfxType) : base("Cooldown", Color.White)
         {
+            cdType = aCDGfxType;
             Visible = new Rectangle(Point.Zero, size);
             simpleEffectParam = new EffectManager.SimpleEffectParam("duration", ratio);
         }
@@ -57,6 +58,12 @@ namespace Project_1.Textures
             }
 
             return aSize - reduceSizeBy;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            ListForEffect();
         }
 
         public void ListForEffect()

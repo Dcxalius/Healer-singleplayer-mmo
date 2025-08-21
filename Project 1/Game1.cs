@@ -68,6 +68,7 @@ namespace Project_1
         {
             GraphicsDevice.Clear(Color.HotPink);
 
+            EffectManager.EffectDraw();
             StateManager.Draw();
             
 

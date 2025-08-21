@@ -22,7 +22,7 @@ namespace Project_1.Tiles
             searchedTiles = new List<PathFindingTile>();
         }
 
-        public Path GeneratePath(WorldSpace aStartPos, WorldSpace aEndPos, WorldSpace aSize)
+        public Path GeneratePath(WorldSpace aStartPos, WorldSpace aEndPos, WorldSpace aSize) //TODO: Have a max search
         {
             Tile startTile = TileManager.GetTileUnder(aStartPos);
             Tile endTile = TileManager.GetTileUnder(aEndPos);

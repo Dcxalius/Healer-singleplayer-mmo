@@ -31,7 +31,7 @@ namespace Project_1.Managers
             for (int i = 0; i < files.Length; i++)
             {
                 string name = SaveManager.TrimToNameOnly(files[i]);
-                Effect e = Game1.ContentManager.Load<Effect>(name);
+                Effect e = Game1.ContentManager.Load<Effect>("Effects\\" + name);
                 effects.Add(name, e);
                 debug += name + ", ";
             }
@@ -53,27 +53,32 @@ namespace Project_1.Managers
                     
                 }
 
-                EffectParameter e = effects[effectToProcess.Effect].Parameters[effectToProcess.SimpleEffectParam.Name];
-                
-                switch(effectToProcess.SimpleEffectParam.GetType().Name)
+                EffectParameter e = effects[effectToProcess.EffectName].Parameters[effectToProcess.SimpleEffectParam.Name];
+
+                //DebugManager.Print(typeof(EffectManager), effectToProcess.SimpleEffectParam.value.GetType().ToString());
+                switch(effectToProcess.SimpleEffectParam.value.GetType().Name)
                 {
-                    case "float":
+                    case "Single":
                         e.SetValue((float)effectToProcess.SimpleEffectParam.value);
                         break;
-                    case "float[]":
+                    case "Double":
+                        float f = (float)effectToProcess.SimpleEffectParam.value;
+                        e.SetValue(f);
+                        break;
+                    case "Float[]":
                         e.SetValue((float[])effectToProcess.SimpleEffectParam.value);
                         break;
-                    case "int":
+                    case "Int":
                         e.SetValue((int)effectToProcess.SimpleEffectParam.value);
                         break;
                 }
 
                 
                 GraphicsManager.SetRenderTarget(curRenderT);
-                spriteBatch.Begin(effect: effects[effectToProcess.Effect]);
+                spriteBatch.Begin(effect: effects[effectToProcess.EffectName]);
                 GraphicsManager.ClearScreen(Color.Transparent);
 
-                effectToProcess.Texture.Draw(spriteBatch, Vector2.Zero);
+                effectToProcess.TextureToEffectWith.Draw(spriteBatch, Vector2.Zero);
 
                 spriteBatch.End();
                 GraphicsManager.SetRenderTarget(null);

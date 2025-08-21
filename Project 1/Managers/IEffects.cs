@@ -11,10 +11,11 @@ namespace Project_1.Managers
 {
     internal interface IEffects
     {
-        public string Effect { get; }
-        public Point Size => Texture.size;
+        public string EffectName { get; }
+        public string Effect => "Effects" + EffectName;
+        public Point Size => TextureToEffectWith.size;
 
-        public Textures.Texture Texture { get; }
+        public Textures.Texture TextureToEffectWith { get; }
         public RenderTarget2D ReturnedRenderTarget { get; set; }
         public void AddEffectToNextDraw() => EffectManager.AddEffectToProcess(this);
 

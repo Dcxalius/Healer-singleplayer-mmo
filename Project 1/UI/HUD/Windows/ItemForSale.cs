@@ -77,7 +77,7 @@ namespace Project_1.UI.HUD.Windows
             if (itemForSale.Cost > ObjectManager.Player.Gold) return; //TODO: Print error msg
 
             ObjectManager.Player.ChangeGold(-itemForSale.Cost);
-            ObjectManager.Player.Inventory.AddItem( new Items.Item(itemForSale.ID, itemForSale.Count));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(itemForSale.ID, itemForSale.Count));
         }
 
         public void Set(int aItemID)

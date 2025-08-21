@@ -42,7 +42,7 @@ namespace Project_1.GameObjects.Spawners
             ImportZones(aSave, unitData);
         }
 
-        static void ImportZones(Save aSave, SavedMobData[] aUnitData)
+        static void ImportZones(Save aSave, SavedMobData[] aUnitData) //TODO: This doesn't load spawners that doesnt have mobs in them
         {
             string path = aSave.SpawnZones;
 

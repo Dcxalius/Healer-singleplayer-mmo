@@ -73,7 +73,7 @@ namespace Project_1.GameObjects.Entities
 
                 }
 
-                CastSpell(channeledSpell);
+                CastSpell(channeledSpell, channelTarget);
 
                 HUDManager.FinishChannel();
                 channeledSpell = null;
@@ -87,14 +87,18 @@ namespace Project_1.GameObjects.Entities
         bool StartChannel(Spell aSpell)
         {
             if (ChannelChecks(aSpell)) return false; 
+
             channelTarget = owner.Target;
-            if (channelTarget == null) { channelTarget = owner; }
+            if (channelTarget == null) channelTarget = owner; 
+            
             lastCastSpell = TimeManager.TotalFrameTime;
             channeledSpellStartPosition = owner.FeetPosition;
             channeledSpell = aSpell;
             startCastTime = TimeManager.TotalFrameTime;
+            
             HUDManager.ChannelSpell(channeledSpell);
             HUDManager.UpdateChannelSpell(0);
+            
             return true;
         }
 
@@ -137,13 +141,13 @@ namespace Project_1.GameObjects.Entities
                 return true;
             }
             lastCastSpell = TimeManager.TotalFrameTime;
-            return CastSpell(aSpell);
+            return CastSpell(aSpell, owner.Target);
         }
 
-        bool CastSpell(Spell aSpell)
+        bool CastSpell(Spell aSpell, Entity aTarget)
         {
 
-            if (!aSpell.Cast(owner.Target)) return false;
+            if (!aSpell.Cast(aTarget)) return false;
             owner.Resource.CastSpell(aSpell.ResourceCost);
 
             return true;

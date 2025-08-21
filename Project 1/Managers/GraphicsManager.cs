@@ -102,6 +102,9 @@ namespace Project_1.Managers
         public static void SetManager(Microsoft.Xna.Framework.Game aGame)
         {
             graphicsDeviceManager = new GraphicsDeviceManager(aGame);
+
+            graphicsDeviceManager.GraphicsProfile = GraphicsProfile.HiDef;
+            graphicsDeviceManager.ApplyChanges();
             graphicsAdapter = GraphicsAdapter.DefaultAdapter;
             gameWindow = aGame.Window;
         }

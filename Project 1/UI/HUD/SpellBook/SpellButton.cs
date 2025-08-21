@@ -29,7 +29,7 @@ namespace Project_1.UI.HUD.SpellBook
         public SpellButton(KeyBindManager.KeyListner aKeyListner, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Spell aSpell = null) : base(Spell.GetGfxPath(aSpell), aPos, aSize, Color.Gray)
         {
             keyListner = aKeyListner;
-            onCooldownGfx = new CooldownTexture();
+            onCooldownGfx = new CooldownTexture(CooldownTexture.CooldownGfxType.LeftSwirl);
         }
 
 
@@ -51,7 +51,8 @@ namespace Project_1.UI.HUD.SpellBook
 
             if (spellData == null) return;
 
-            onCooldownGfx.Ratio = Math.Min(spellData.RatioOfCooldownDone, ObjectManager.Player.RatioOfGlobalCooldownDone); //TODO: Consider splitting the cd effect to two seperate ones
+            onCooldownGfx.Update();
+            onCooldownGfx.Ratio = (float)Math.Min(spellData.RatioOfCooldownDone, ObjectManager.Player.RatioOfGlobalCooldownDone); //TODO: Consider splitting the cd effect to two seperate ones
             if (spellData.OffCooldown && ObjectManager.Player.OffGlobalCooldown) onCooldownGfx.Ratio = 0;
 
 

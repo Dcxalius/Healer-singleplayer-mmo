@@ -24,7 +24,7 @@ namespace Project_1.UI.UIElements.Bars
         {
             ((BarTexture)gfx).Filled = aNewValue;
             RelativeScreenPosition v = RelativeSize;
-            v.X = aMaxX * aNewValue;
+            v.X = aNewValue;
             Resize(v);
         }
     }

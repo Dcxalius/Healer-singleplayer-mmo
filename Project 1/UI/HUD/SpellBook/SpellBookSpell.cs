@@ -35,7 +35,7 @@ namespace Project_1.UI.HUD.SpellBook
 
         public SpellBookSpell(RelativeScreenPosition aPos, RelativeScreenPosition aSize, Spell aSpell = null) : base(Spell.GetGfxPath(aSpell), aPos, aSize, Color.White)
         {
-            onCooldownGfx = new CooldownTexture();
+            onCooldownGfx = new CooldownTexture(CooldownTexture.CooldownGfxType.LeftSwirl);
             if (aSpell != null)
             {
                 spellData = aSpell;

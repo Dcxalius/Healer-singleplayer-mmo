@@ -54,32 +54,34 @@ namespace Project_1.GameObjects.Spells
 
         public bool Cast(Entity aTarget)
         {
-            if (!OffCooldown)
-            {
-                return false;
-            }
+            if (aTarget == null) return Cast(owner);
 
-            if (aTarget == null)
-            {
-                return Trigger(owner);
-            }
+            if (!TryCast(aTarget)) return false;
+            
+            ProccessCast(aTarget);
+            
+            return true;
+        }
 
-            if (!spellData.Targetable(aTarget.RelationToPlayer))
-            {
-                return false;
-            }
+        bool TryCast(Entity aTarget)
+        {
+            if (!OffCooldown) return false;
+            if (!spellData.Targetable(aTarget.RelationToPlayer)) return false;
+            return true;
+        }
 
+        void ProccessCast(Entity aTarget)
+        {
             lastTimeCasted = TimeManager.TotalFrameTime;
 
             if (spellData.Travel == SpellData.TravelType.Instant)
             {
-                return Trigger(aTarget);
+                Trigger(aTarget);
+                return;
             }
 
             ProjectileFactory.CreateProjectile(owner.Centre, this, aTarget);
-            return true;
         }
-
 
         public bool Trigger(Entity aTarget)
         {
