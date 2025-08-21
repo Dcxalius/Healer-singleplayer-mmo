@@ -84,6 +84,7 @@ namespace Project_1.Managers.Saves
         {
             SaveSaveDetails();
             Camera.Camera.SavePosition(this);
+
             ObjectFactory.SaveData(this);
             CorpseManager.Save(this);
             TileManager.SaveData(this);
@@ -104,10 +105,9 @@ namespace Project_1.Managers.Saves
 
         public void ClearFolder(string aPath)
         {
-            string[] files = System.IO.Directory.GetDirectories(aPath);
-            for (int i = 0; i < files.Length; i++)
+            foreach (string filePath in Directory.GetFiles(aPath))
             {
-                System.IO.Directory.Delete(files[i]);
+                File.Delete(filePath);
             }
         }
 

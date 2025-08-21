@@ -5,6 +5,7 @@ using Project_1.Managers.Saves;
 using SharpDX.Direct3D11;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,20 +27,22 @@ namespace Project_1.GameObjects.Entities.Corspes
 
         public static void Reset() => corpses.Clear();
 
-        internal static void Save(Save save)
+        internal static void Save(Save aSave)
         {
+            aSave.ClearFolder(aSave.Corpses);
             for (int i = 0; i < corpses.Count; i++)
             {
-                SaveManager.ExportData(save.Corpses + "\\" + i + ".corpse", corpses[i]);
+                SaveManager.ExportData(aSave.Corpses + "\\" + i + ".corpse", corpses[i]);
             }
         }
 
         public static void Load(Save aSave)
         {
-            string[] files = System.IO.Directory.GetFiles(aSave.Corpses);
+            corpses.Clear();
+            string[] files = Directory.GetFiles(aSave.Corpses);
             for (int i = 0; i < files.Length; i++)
             {
-                string json = System.IO.File.ReadAllText(files[i]);
+                string json = File.ReadAllText(files[i]);
                 Corpse c = SaveManager.ImportData<Corpse>(json);
                 corpses.Add(c);
             }
