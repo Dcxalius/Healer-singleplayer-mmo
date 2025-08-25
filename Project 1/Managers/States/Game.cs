@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Doodads;
 using Project_1.GameObjects.Entities.Corspes;
+using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Entities.Projectiles;
 using Project_1.GameObjects.FloatingTexts;
 using Project_1.GameObjects.Spawners;
@@ -93,9 +94,24 @@ namespace Project_1.Managers.States
         public override RenderTarget2D Draw()
         {
             UIDraw();
-            PrepRender(Color.White, SpriteSortMode.FrontToBack);
+            Effect e = EffectManager.GetEffect("TestDarkness");
+            PrepRender(Color.White, SpriteSortMode.FrontToBack, effect: e, blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointWrap);
+            EffectParameterCollection epc = e.Parameters;
+            epc["minLength"].SetValue(500f);
+            epc["maxBrightness"].SetValue(200f);
+            epc["cameraWorldPos"].SetValue(new Vector2(Camera.Camera.WorldRectangle.Location.X, Camera.Camera.WorldRectangle.Location.Y));
+            epc["cameraSize"].SetValue(new Vector2(Camera.Camera.WorldRectangle.Size.X, Camera.Camera.WorldRectangle.Size.Y));
+            Vector2[] v = new Vector2[5];
+            for (int i = 0; i < v.Length; i++)
+            {
+                v[i] = ObjectManager.Player.Party.GetPositions[i];
+            }
+            epc["lightPos"].SetValue(v);
+            
 
             DrawList(spriteBatch);
+            spriteBatch.End();
+            spriteBatch.Begin(SpriteSortMode.Deferred);
             spriteBatch.Draw(uITarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
 
             CleanRender();

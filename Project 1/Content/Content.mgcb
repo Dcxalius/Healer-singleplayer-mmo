@@ -19,6 +19,12 @@
 /processorParam:DebugMode=Auto
 /build:Effects/CooldownSwirl.fx
 
+#begin Effects/TestDarkness.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/TestDarkness.fx
+
 #begin Effects/TextOutline.fx
 /importer:EffectImporter
 /processor:EffectProcessor

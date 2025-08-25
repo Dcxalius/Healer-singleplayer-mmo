@@ -28,6 +28,20 @@ namespace Project_1.GameObjects.Entities.Players
 
         public bool IsInCombat => party.Any(x => x.InCombat);
 
+        public WorldSpace[] GetPositions
+        {
+            get
+            {
+                WorldSpace[] pos = new WorldSpace[5];
+                pos[0] = owner.FeetPosition;
+                for (int i = 0; i < party.Count; i++)
+                {
+                    pos[i+1] = party[i].FeetPosition;
+                }
+                return pos;
+            }
+        }
+
         public Party(Player aOwner)
         {
             owner = aOwner;

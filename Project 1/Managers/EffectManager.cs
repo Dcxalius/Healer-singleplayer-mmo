@@ -15,6 +15,8 @@ namespace Project_1.Managers
     {
         static Dictionary<string, Effect> effects;
 
+        public static Effect GetEffect(string aName) => effects[aName];
+
         static List<IEffects> effectsToProcess;
         static Dictionary<IEffects, RenderTarget2D> rendertargets;
         static SpriteBatch spriteBatch;
