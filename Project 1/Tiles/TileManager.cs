@@ -10,8 +10,6 @@ using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spawners;
 using Project_1.Managers;
 using Project_1.Managers.Saves;
-using SharpDX.Direct3D11;
-using SharpDX.Direct3D9;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,15 +26,45 @@ namespace Project_1.Tiles
 {
     internal static class TileManager
     {
-        static Tile GetTile(WorldSpace aSpace) => throw new NotImplementedException();
-        static Tile GetTile(Chunk aChunk, int aX, int aY) => throw new NotImplementedException();
+        static Tile GetTile(WorldSpace aSpace) => GetTile(GetChunk(aSpace), ((int)aSpace.X / TileSize.X) % Chunk.ChunkSize.Y, ((int)aSpace.Y / TileSize.Y) % Chunk.ChunkSize.Y);
+        static Tile GetTile(Chunk aChunk, int aX, int aY) => GetTile(aChunk.Id, aX, aY);
         static Tile GetTile(int aChunkId, int aX, int aY) => chunks.Find(x => x.Id == aChunkId).Tile(aX, aY);
 
         public static Chunk GetChunk(int aId) => chunks.Find(x => x.Id == aId);
-        public static Chunk GetChunk(Point aPos) => GetChunk(aPos.X, aPos.Y);
         public static Chunk GetChunk(int aX, int aY) => GetChunk(GetChunkId(aX, aY));
+        public static Chunk GetChunk(Point aPos) => GetChunk(aPos.X, aPos.Y);
         public static Chunk GetChunk(WorldSpace aSpaceInWorld) => GetChunk(aSpaceInWorld.ToPoint() / Chunk.ChunkSize / TileSize);
-        
+
+        static Tile transparacyGetCentre;
+        static Texture2D transparacyMap;
+        public static Texture2D GetTransparent(WorldSpace aOrigin)
+        {
+            if (transparacyGetCentre != null && transparacyGetCentre == GetTileUnder(aOrigin)) return transparacyMap;
+            transparacyGetCentre = GetTileUnder(aOrigin);
+            const int size = 64;//64 is based on HLSL code in TestDarkness.fx
+            if (transparacyMap == null) transparacyMap = GraphicsManager.CreateNewTexture(new Point(size));
+
+            Color[] data = new Color[size * size];
+
+            for (int i = 0; i < size; i++)
+            {
+                for (int j = 0; j < size; j++)
+                {
+                    Tile tile = GetTile(aOrigin - new WorldSpace(TileSize.X * (i - size), TileSize.Y * (j - size)));
+                    if (tile == null)
+                    {
+                        data[i * size + j] = new Color(0,0,0,0);
+                        continue;
+                    }
+
+                    data[i * size + j] = new Color(0, 0, 0, 1f);
+                }
+            }
+
+            transparacyMap.SetData(data);
+
+            return transparacyMap;
+        }
 
         static List<Chunk> chunks; //TODO: Use SortedList?
         const int surroundingChunkCheckSize = 3;// this should always be odd
@@ -54,6 +82,8 @@ namespace Project_1.Tiles
         {
             chunks = new List<Chunk>();
             CollisionManager = new CollisionManager();
+            Debug.Assert(sizeOfSquareToCheck % 2 == 1);
+            Debug.Assert(surroundingChunkCheckSize % 2 == 1);
         }
 
         public static void Update()

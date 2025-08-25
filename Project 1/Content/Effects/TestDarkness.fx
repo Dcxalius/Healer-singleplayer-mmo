@@ -25,6 +25,8 @@ float2 cameraWorldPos;
 float2 cameraSize;
 float minLength;
 float maxBrightness;
+//bool tileTransparent[4096];
+texture transparentMap;
 
 
 
@@ -33,6 +35,20 @@ sampler TextureSampler : register(s0);
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
     float minDistance = minLength;
+    
+    int2 centre = int2(32, 32);
+    float2 inMapSpace = (cameraWorldPos / 32 + input.Position.xy / 32) - lightPos[0];
+    
+    bool2 xdd = (inMapSpace.xy >= 0 && inMapSpace.xy < 64);
+    if (xdd.x && xdd.y)
+    {
+        
+        for (int i = 0; i < 20; i++)
+        {
+        
+        }
+    }
+    
     for (int i = 0; i < 5; i++)
     {
         bool2 a = (lightPos[i] == float2(0, 0));
@@ -40,7 +56,9 @@ float4 MainPS(VertexShaderOutput input) : COLOR
             continue;
         
         float d = distance(lightPos[i], (cameraWorldPos + input.Position.xy));
-        //float distance = sqrt(pow(lightPos[i].x - (cameraWorldPos.x + input.TextureCoordinates.x * cameraSize), 2) + pow(lightPos[i].y - (cameraWorldPos.y + input.TextureCoordinates.y * cameraSize), 2));
+        
+        
+    //float distance = sqrt(pow(lightPos[i].x - (cameraWorldPos.x + input.TextureCoordinates.x * cameraSize), 2) + pow(lightPos[i].y - (cameraWorldPos.y + input.TextureCoordinates.y * cameraSize), 2));
         
         if (d < minDistance)
         {

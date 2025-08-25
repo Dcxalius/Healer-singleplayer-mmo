@@ -106,8 +106,9 @@ namespace Project_1.Managers.States
             {
                 v[i] = ObjectManager.Player.Party.GetPositions[i];
             }
+            //epc["tileTransparent"].SetValue(TileManager.GetTransparent(ObjectManager.Player.FeetPosition));
             epc["lightPos"].SetValue(v);
-            
+            epc["transparentMap"].SetValue(TileManager.GetTransparent(ObjectManager.Player.FeetPosition));
 
             DrawList(spriteBatch);
             spriteBatch.End();
