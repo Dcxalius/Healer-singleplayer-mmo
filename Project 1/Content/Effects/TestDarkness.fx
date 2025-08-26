@@ -6,6 +6,10 @@
 #define PS_SHADERMODEL ps_4_0
 #endif
 
+#define TILE_SIZE uint2(32, 32)
+#define MAP_MAX_SIZE uint2(63, 63)
+
+
 struct VertexShaderInput
 {
     float4 Position : POSITION0;
@@ -26,29 +30,96 @@ float2 cameraSize;
 float minLength;
 float maxBrightness;
 //bool tileTransparent[4096];
-texture transparentMap;
+texture FirstTexture;
 
 
+sampler TextureSampler : register(s0) = sampler_state
+{
+    Texture = <FirstTexture>;
+};
 
-sampler TextureSampler : register(s0);
+Texture2D transparentMap;
+
+sampler2D transpSamp : register(s1) = sampler_state
+{
+    Texture = <transparentMap>;
+};
+
+
+bool b2Check(bool2 aBool) 
+{
+    return aBool.x && aBool.y;
+}
+
+bool LineOfSight(float2 aStartPos, float2 aEndPos)
+{
+    bool2 xdd = (aEndPos.xy >= 0 && aEndPos.xy <= MAP_MAX_SIZE.x);
+    if (!(xdd.x && xdd.y))
+    {
+        return false;
+    }
+      
+    float2 dirVector = normalize(aEndPos - aStartPos);
+    
+    float dirX = sign(dirVector.x);
+    float dirY = sign(dirVector.y);
+    float m = (aEndPos.y - aStartPos.y) / (aEndPos.x - aStartPos.x);
+    float c = aStartPos.y - m * aStartPos.x;
+    
+    float2 posToCheck = aStartPos / MAP_MAX_SIZE;
+    int2 pointToCheck = aStartPos;
+    int2 endPoint = aEndPos;
+    
+    float2 lastPoint;
+    uint step = 0;
+    for (uint i = 0; i <= MAP_MAX_SIZE.x + MAP_MAX_SIZE.y; i++)
+    {
+        lastPoint = pointToCheck;
+        if (b2Check(pointToCheck == endPoint))
+            return true;
+        float4 solidF = tex2D(transpSamp, pointToCheck / MAP_MAX_SIZE);
+        //float4 solidF = tex2Dlod(transpSamp, float4(pointToCheck / MAP_MAX_SIZE, 0, 0));
+        if (solidF.g > 0)
+            return false;
+        
+        
+//        Initially:
+//        d = m(x + 1) + b - y
+//–
+//        Then:
+//        d += m
+        
+        float borderInX;
+        if (dirX < 0)
+            borderInX = pointToCheck.x;
+        else
+            borderInX = pointToCheck.x + solidF.a / solidF.b;
+        float yAtBorder = m * borderInX + c;
+        
+        
+        if (yAtBorder > pointToCheck.y && yAtBorder < pointToCheck.y + 1)
+        {
+            pointToCheck += int2(1, 0);
+        }
+        else
+        {
+            pointToCheck += int2(0, 1);
+        }
+
+    }
+    
+            return false;
+}
+
+
 
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
     float minDistance = minLength;
     
-    int2 centre = int2(32, 32);
-    float2 inMapSpace = (cameraWorldPos / 32 + input.Position.xy / 32) - lightPos[0];
+    float2 centreOfMapSpaceInWorld = lightPos[0] / TILE_SIZE;
     
-    bool2 xdd = (inMapSpace.xy >= 0 && inMapSpace.xy < 64);
-    if (xdd.x && xdd.y)
-    {
-        
-        for (int i = 0; i < 20; i++)
-        {
-        
-        }
-    }
-    
+    bool behindWall = true;
     for (int i = 0; i < 5; i++)
     {
         bool2 a = (lightPos[i] == float2(0, 0));
@@ -57,17 +128,22 @@ float4 MainPS(VertexShaderOutput input) : COLOR
         
         float d = distance(lightPos[i], (cameraWorldPos + input.Position.xy));
         
+        float2 lightPosInMapSpace = lightPos[i] / TILE_SIZE - centreOfMapSpaceInWorld;
+        float2 inMapSpace = (cameraWorldPos / TILE_SIZE + input.Position.xy / TILE_SIZE) - lightPosInMapSpace;
         
-    //float distance = sqrt(pow(lightPos[i].x - (cameraWorldPos.x + input.TextureCoordinates.x * cameraSize), 2) + pow(lightPos[i].y - (cameraWorldPos.y + input.TextureCoordinates.y * cameraSize), 2));
+        if(behindWall)
+            behindWall = !LineOfSight(lightPosInMapSpace, inMapSpace);
         
         if (d < minDistance)
-        {
             minDistance = d;
-        }
     }
     
-    float4 texColor = tex2D(TextureSampler, input.TextureCoordinates) * input.Color;
     
+    
+    float4 texColor = tex2D(TextureSampler, input.TextureCoordinates) * input.Color;
+    float4 xdd = tex2D(transpSamp, input.TextureCoordinates);
+    if (behindWall)
+        return float4(0.5, 0.5, 0.5, xdd.a);
     if (minDistance < minLength)
     {
         if (minDistance < maxBrightness)
@@ -85,6 +161,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     else
         return float4(0, 0, 0, texColor.a);
 }
+
 
 technique BasicColorDrawing
 {

@@ -57,7 +57,8 @@ namespace Project_1.Tiles
                         continue;
                     }
 
-                    data[i * size + j] = new Color(0, 0, 0, 1f);
+                    if(tile.Transparent) data[i * size + j] = new Color(0, 0, 0, 0);
+                    else data[i * size + j] = new Color(1, 1, 1, 1);
                 }
             }
 
@@ -263,7 +264,7 @@ namespace Project_1.Tiles
                 double yAtBorder = m * borderInX + c;
                 if (yAtBorder > lastTile.WorldRectangle.Top && yAtBorder < lastTile.WorldRectangle.Bottom)
                 {
-                    lastTile = chunks[0].Tile(lastTile.GridPos.X + (int)dirX, lastTile.GridPos.Y);
+                    lastTile = chunks[0].Tile(lastTile.GridPos.X + (int)dirX, lastTile.GridPos.Y); //TODO: Chunkize this
                     //lastTile = tiles[lastTile.GridPos.X + (int)dirX, lastTile.GridPos.Y];
                 }
                 else
