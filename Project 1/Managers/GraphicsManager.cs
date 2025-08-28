@@ -56,6 +56,10 @@ namespace Project_1.Managers
             //SetWindowSize(Camera.Camera.devScreenBorder, );
         }
 
+        public static void SetTexture(int aIndex, Texture aTexture)
+        {
+            graphicsDeviceManager.GraphicsDevice.Textures[aIndex] = aTexture;
+        }
 
         public static bool CaptureScissor(object aCaptor, Rectangle aRect)
         {

@@ -50,7 +50,7 @@ namespace Project_1.Tiles
             {
                 for (int j = 0; j < size; j++)
                 {
-                    Tile tile = GetTile(aOrigin - new WorldSpace(TileSize.X * (i - size), TileSize.Y * (j - size)));
+                    Tile tile = GetTile(aOrigin - new WorldSpace(TileSize.X * (i - size / 2), TileSize.Y * (j - size / 2)));
                     if (tile == null)
                     {
                         data[i * size + j] = new Color(0,0,0,0);

@@ -95,7 +95,7 @@ namespace Project_1.Managers.States
         {
             UIDraw();
             Effect e = EffectManager.GetEffect("TestDarkness");
-            PrepRender(Color.White, SpriteSortMode.FrontToBack, effect: e, blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointWrap);
+            PrepRender(Color.White, SpriteSortMode.FrontToBack, effect: e);
             EffectParameterCollection epc = e.Parameters;
             epc["minLength"].SetValue(500f);
             epc["maxBrightness"].SetValue(200f);
@@ -108,8 +108,8 @@ namespace Project_1.Managers.States
             }
             //epc["tileTransparent"].SetValue(TileManager.GetTransparent(ObjectManager.Player.FeetPosition));
             epc["lightPos"].SetValue(v);
-            epc["transparentMap"].SetValue(TileManager.GetTransparent(ObjectManager.Player.FeetPosition));
-
+            //epc["transparentMap"].SetValue(TileManager.GetTransparent(ObjectManager.Player.FeetPosition));
+            GraphicsManager.SetTexture(2, TileManager.GetTransparent(ObjectManager.Player.FeetPosition));
             DrawList(spriteBatch);
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred);
