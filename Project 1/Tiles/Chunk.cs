@@ -28,7 +28,7 @@ namespace Project_1.Tiles
         public Tile Tile((int, int) aXY) => Tile(aXY.Item1, aXY.Item2);
         public Tile Tile(int aX, int aY)
         {
-            if (aX < 0 || aX > ChunkSize.X || aY < 0 || aY > ChunkSize.Y) return null;
+            if (aX < 0 || aX > ChunkSize.X || aY < 0 || aY > ChunkSize.Y) throw new IndexOutOfRangeException();
             return tiles[aX, aY];
         }
 

@@ -6,16 +6,17 @@
 #define PS_SHADERMODEL ps_4_0
 #endif
 
-#define TILE_SIZE uint2(32, 32)
-#define MAP_MAX_SIZE uint2(63, 63)
+#define TILE_SIZE float2(32, 32)
+#define MAP_MAX_SIZE uint2(64, 64)
+#define FMAP_MAX_SIZE float2(64, 64)
 #define ZERO_LIGHT float2(0,0)
 
-Texture2D Texture : register(t1);
+sampler2D TextureSampler : register(s0);
 
-sampler2D TextureSampler : register(s2);
+Texture2D transparentMap : register(t1);
 sampler2D transpSamp : register(s1) = sampler_state
 {
-    Texture = <Texture>;
+    Texture = <transparentMap>;
 };
 
 struct VertexShaderInput
@@ -37,12 +38,16 @@ float2 cameraWorldPos;
 float2 cameraSize;
 float minLength;
 float maxBrightness;
+
 //bool tileTransparent[4096];
 
 
+bool b2oCheck(bool2 aBool)
+{
+    return aBool.x || aBool.y;
+}
 
-
-bool b2Check(bool2 aBool) 
+bool b2aCheck(bool2 aBool) 
 {
     return aBool.x && aBool.y;
 }
@@ -55,39 +60,75 @@ bool LineOfSight(float2 aStartPos, float2 aEndPos, out float4 aDebug)
     //    aDebug = float4(1, 0, 0, 1);
     //    return false;
     //}
+    
+    if (b2oCheck((aEndPos - lightPos[0] / TILE_SIZE) / FMAP_MAX_SIZE + float2(0.5f, 0.5f) > 1 || (aEndPos - lightPos[0] / TILE_SIZE) / FMAP_MAX_SIZE + float2(0.5f, 0.5f) < 0))
+    {
+        aDebug = float4(1, 0, 1, 1);
+        return false;
+    }
       
-    float2 dirVector = normalize(aEndPos - aStartPos);
+    float2 dirVector = aEndPos - aStartPos;
     
     float dirX = sign(dirVector.x);
     float dirY = sign(dirVector.y);
     float m = (aEndPos.y - aStartPos.y) / (aEndPos.x - aStartPos.x);
     float c = aStartPos.y - m * aStartPos.x;
     
-    float2 posToCheck = aStartPos / MAP_MAX_SIZE;
-    int2 pointToCheck = aStartPos;
-    int2 endPoint = aEndPos;
+    float2 pointToCheck = aStartPos;
+    float2 endPoint = aEndPos;
     
-    float2 lastPoint;
-    uint step = 0;
-    for (uint i = 0; i <= MAP_MAX_SIZE.x + MAP_MAX_SIZE.y; i++)
+    float stepSize = 0.02f;
+    
+    for (uint i = 0; i <= (MAP_MAX_SIZE.x + MAP_MAX_SIZE.y)  / stepSize; i++)
     {
-        lastPoint = pointToCheck;
-        if (distance(pointToCheck, endPoint) < 5)
-        //if (b2Check(pointToCheck == endPoint))
+        float2 inMapSpace = (pointToCheck - lightPos[0] / TILE_SIZE) / FMAP_MAX_SIZE +float2(0.5, 0.5);
+        
+        
+        
+        //float2 inMapSpace = float2((pointToCheck.x - lightPos[0].x / TILE_SIZE.x) / FMAP_MAX_SIZE.x + 0.5f, (pointToCheck.y - lightPos[0].y / TILE_SIZE.y) / FMAP_MAX_SIZE.y + 0.5f);
+        if (distance(pointToCheck, endPoint) < 1)
+        //if (b2aCheck(pointToCheck == endPoint))
         {
-            aDebug = float4(0, 0, 1, 0.2);
+            aDebug = float4(1, 1, 1, 1);
+            
             return true;
         }
             
-        float4 solidF = tex2D(transpSamp, pointToCheck / MAP_MAX_SIZE);
+        if (b2oCheck(inMapSpace > 1 || inMapSpace < 0))
+        {
+            if(inMapSpace.x > 1 )
+            {
+                aDebug = float4(0, inMapSpace.x, 0, 1);
+                return false;
+                
+            }
+            if (inMapSpace.x < 0);
+            {
+                aDebug = float4(inMapSpace.x, inMapSpace.x, inMapSpace.x, 1);
+                return false;
+            }
+            if (inMapSpace.y > 1)
+            {
+                //aDebug = float4(pointToCheck.y / 64 + 0.5f, inMapSpace.x, inMapSpace.y, 1);
+                
+                aDebug = float4(0, 0, inMapSpace.y, 1);
+                return false;
+            }
+            
+            aDebug = float4(inMapSpace.y, 0, inMapSpace.y, 1);
+            return false;
+        }
+        
+        
+        float4 solidF = tex2Dlod(transpSamp, float4(inMapSpace, 0, 0));
         if (solidF.a > 0)
         {
-            aDebug = float4(0, 1, 0, 0.2);
+            aDebug = float4(0, 0, 0, 1);
             return false;
         }
             
         
-        
+        //https://www.dcc.fc.up.pt/~mcoimbra/lectures/CG_1213/CG_1213_T5_Rasterization.pdf
 //        Initially:
 //        d = m(x + 1) + b - y
 //–
@@ -95,34 +136,32 @@ bool LineOfSight(float2 aStartPos, float2 aEndPos, out float4 aDebug)
 //        d += m
         
         float borderInX;
-        if (dirX < 0)
-            borderInX = pointToCheck.x;
+        if (dirX <= 0)
+            borderInX = pointToCheck.x - 0.5;
         else
-            borderInX = pointToCheck.x + 1;
+            borderInX = pointToCheck.x +0.5;
         float yAtBorder = m * borderInX + c;
         
         
         if (yAtBorder > pointToCheck.y && yAtBorder < pointToCheck.y + 1)
-        {
-            pointToCheck += int2(1, 0);
-        }
+            pointToCheck += float2(dirX * stepSize, 0);
         else
-        {
-            pointToCheck += int2(0, 1);
-        }
+            pointToCheck += float2(0, dirY * stepSize);
 
     }
     
-    aDebug = float4(1, 0, 0, 0.2);
+    aDebug = float4(1, 0, 0, 1);
     return false;
 }
 
 
 
 float4 MainPS(VertexShaderOutput input) : COLOR0
-{
+{   
     float minDistance = minLength;
     float4 texColor = tex2D(TextureSampler, input.TextureCoordinates) * input.Color;
+    
+    float2 pixelPos = cameraWorldPos + input.Position.xy;
     
     float2 centreOfMapSpaceInWorld = lightPos[0] / TILE_SIZE; 
     float4 DEBUG = float4(0, 0, 0, 0);
@@ -133,41 +172,36 @@ float4 MainPS(VertexShaderOutput input) : COLOR0
         if (a.x && a.y) 
             continue;
         
-        float d = distance(lightPos[i], (cameraWorldPos + input.Position.xy));
+        float d = distance(lightPos[i], pixelPos);
         
-        float2 lightPosInMapSpace = lightPos[i] / TILE_SIZE - centreOfMapSpaceInWorld;
-        float2 inMapSpace = (cameraWorldPos / TILE_SIZE + input.Position.xy / TILE_SIZE) - lightPosInMapSpace;
+        float2 lightPosInTileSpace = lightPos[i] / TILE_SIZE;
+        float2 pixelPosInTileSpace = pixelPos / TILE_SIZE;
         
         if(behindWall)
-            behindWall = !LineOfSight(lightPosInMapSpace, inMapSpace, DEBUG);
+            behindWall = !LineOfSight(lightPosInTileSpace, pixelPosInTileSpace, DEBUG);
         
         if (d < minDistance)
             minDistance = d;
     }
     
+    //float2 ppInMap = pixelPos / TILE_SIZE / FMAP_MAX_SIZE;
+    //float2 lpInMap = lightPos[0] / TILE_SIZE / FMAP_MAX_SIZE;
     
     
-    //float4 solidF = tex2D(transpSamp, input.TextureCoordinates);
+    //float4 solidF = tex2D(transpSamp, lpInMap - ppInMap + float2(0.5f, 0.5f));
     
-    ;
-        //return float4(0.5, 0.5, 0.5, xdd.a);
-    if (minDistance < minLength)
-    {
-        if (minDistance < maxBrightness)
-            return texColor;
-        else
-        {
-            float a = ((minDistance - maxBrightness) / (minLength - maxBrightness));
-            float r = texColor.r * (1 - a);
-            float g = texColor.g * (1 - a);
-            float b = texColor.b * (1 - a);
-            return float4(r, g, b, texColor.a + texColor.a);
-        }
-        
-    }
-    else if (!behindWall)
+    if (behindWall)
         return DEBUG;
+    texColor *= DEBUG;
+    
+        //return float4(0.5, 0.5, 0.5, xdd.a);
+    if (minDistance >= minLength)
         return float4(0, 0, 0, 1);
+    
+    if (minDistance < maxBrightness)
+        return texColor;
+    
+    return float4(texColor.rgb * (1 - ((minDistance - maxBrightness) / (minLength - maxBrightness))), texColor.a);
 }
 
 

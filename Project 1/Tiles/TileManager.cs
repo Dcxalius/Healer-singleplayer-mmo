@@ -26,14 +26,19 @@ namespace Project_1.Tiles
 {
     internal static class TileManager
     {
-        static Tile GetTile(WorldSpace aSpace) => GetTile(GetChunk(aSpace), ((int)aSpace.X / TileSize.X) % Chunk.ChunkSize.Y, ((int)aSpace.Y / TileSize.Y) % Chunk.ChunkSize.Y);
-        static Tile GetTile(Chunk aChunk, int aX, int aY) => GetTile(aChunk.Id, aX, aY);
+        static int Modulo(int x, int y)
+        {
+            int r = x % y;
+            return r < 0 ? r + y : r;
+        }
+        static Tile GetTile(WorldSpace aSpace) => GetTile(GetChunk(aSpace), Modulo((int)MathF.Floor(aSpace.X / TileSize.X), Chunk.ChunkSize.X), Modulo((int)MathF.Floor(aSpace.Y / TileSize.Y), Chunk.ChunkSize.Y));
+        static Tile GetTile(Chunk aChunk, int aX, int aY) => aChunk.Tile(aX, aY);
         static Tile GetTile(int aChunkId, int aX, int aY) => chunks.Find(x => x.Id == aChunkId).Tile(aX, aY);
 
         public static Chunk GetChunk(int aId) => chunks.Find(x => x.Id == aId);
         public static Chunk GetChunk(int aX, int aY) => GetChunk(GetChunkId(aX, aY));
         public static Chunk GetChunk(Point aPos) => GetChunk(aPos.X, aPos.Y);
-        public static Chunk GetChunk(WorldSpace aSpaceInWorld) => GetChunk(aSpaceInWorld.ToPoint() / Chunk.ChunkSize / TileSize);
+        public static Chunk GetChunk(WorldSpace aSpaceInWorld) => GetChunk(new Point((int)MathF.Floor(aSpaceInWorld.X / Chunk.ChunkSize.X / TileSize.X), (int)MathF.Floor(aSpaceInWorld.Y / Chunk.ChunkSize.Y / TileSize.Y)));
 
         static Tile transparacyGetCentre;
         static Texture2D transparacyMap;
@@ -41,7 +46,7 @@ namespace Project_1.Tiles
         {
             if (transparacyGetCentre != null && transparacyGetCentre == GetTileUnder(aOrigin)) return transparacyMap;
             transparacyGetCentre = GetTileUnder(aOrigin);
-            const int size = 64;//64 is based on HLSL code in TestDarkness.fx
+            const int size = 65;//64 is based on HLSL code in TestDarkness.fx
             if (transparacyMap == null) transparacyMap = GraphicsManager.CreateNewTexture(new Point(size));
 
             Color[] data = new Color[size * size];
@@ -50,15 +55,15 @@ namespace Project_1.Tiles
             {
                 for (int j = 0; j < size; j++)
                 {
-                    Tile tile = GetTile(aOrigin - new WorldSpace(TileSize.X * (i - size / 2), TileSize.Y * (j - size / 2)));
+                    Tile tile = GetTile(aOrigin + new WorldSpace(TileSize.X * (i - size / 2), TileSize.Y * (j - size / 2)));
                     if (tile == null)
                     {
-                        data[i * size + j] = new Color(0,0,0,0);
+                        data[j * size + i] = new Color(0,0,0,0);
                         continue;
                     }
 
-                    if(tile.Transparent) data[i * size + j] = new Color(0, 0, 0, 0);
-                    else data[i * size + j] = new Color(1, 1, 1, 1);
+                    if(tile.Transparent) data[j * size + i] = new Color(0, 0, 0, 0);
+                    else data[j * size + i] = new Color(1, 1, 1, 1);
                 }
             }
 
@@ -73,7 +78,7 @@ namespace Project_1.Tiles
         public static CollisionManager CollisionManager;
 
 
-        public readonly static Point TileSize = new Point(32, 32);
+        public readonly static Point TileSize = new Point(32, 32); //If this is changed, change TILE_SIZE in TestDarkness.fx
         const int sizeOfSquareToCheck = 3; // this should always be odd
 
 
@@ -249,7 +254,7 @@ namespace Project_1.Tiles
 
         static bool LineOfSight(WorldSpace aStartPos, WorldSpace aEndPos, Func<Tile, bool> aFalseCondition, Func<Tile, bool> aTrueCondition)
         {
-            Vector2 dirVector = Vector2.Normalize(aEndPos - aStartPos);
+            Vector2 dirVector = aEndPos - aStartPos;
 
             float dirX = Math.Sign(dirVector.X);
             float dirY = Math.Sign(dirVector.Y);
