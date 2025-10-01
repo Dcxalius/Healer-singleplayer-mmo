@@ -35,16 +35,15 @@ This project simulates the complexity of a healer role inside an RPG environment
 ## Installation / Setup
 
 1. Download or clone this repository.  
-2. Place the `Healer-singleplayer-mmo` folder in your `AddOns` or equivalent directory (if testing as a WoW addon).  
-3. Launch the game and enable the addon in the UI.  
-4. Use the provided slash commands and keybinds to test healer systems.  
+2. Place the data zip file where it should be
+3. Launch the game.
 
 ---
 
 ## Goals
 
 - Simulate MMO-style healer gameplay without requiring multiplayer.  
-- Serve as a teaching tool for addon/UI design and modular Lua systems.  
+- //Serve as a teaching tool for addon/UI design and modular Lua systems.  
 - Explore Obsidian as a documentation layer for game projects.  
 
 ---
@@ -66,5 +65,6 @@ Expect incomplete features, experimental code, and placeholder systems. The focu
 ---
 
 ## License
+
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
