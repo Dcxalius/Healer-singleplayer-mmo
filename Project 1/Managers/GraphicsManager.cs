@@ -37,6 +37,7 @@ namespace Project_1.Managers
         static GraphicsAdapter graphicsAdapter;
         public static GameWindow GameWindow => gameWindow;
         static GameWindow gameWindow;
+        static Microsoft.Xna.Framework.Game game;
 
         //--- Window stuff
         readonly static Point windowsTitleBarStuff = new Point(128, 32); //128 is a guesstimation of the minimum width, 32 is the required height based on https://learn.microsoft.com/en-us/windows/apps/design/basics/titlebar-design
@@ -50,6 +51,7 @@ namespace Project_1.Managers
         static Rectangle unCaptueredScissorRect;
         static object scissorRectCaptor = null;
         static List<(object, Rectangle)> scissors;
+        static readonly bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         static GraphicsManager()
         {
             scissors = new List<(object, Rectangle)>();
@@ -111,6 +113,7 @@ namespace Project_1.Managers
             graphicsDeviceManager.ApplyChanges();
             graphicsAdapter = GraphicsAdapter.DefaultAdapter;
             gameWindow = aGame.Window;
+            game = aGame;
         }
 
 
@@ -135,7 +138,7 @@ namespace Project_1.Managers
             windowBounds.Size = gameWindow.ClientBounds.Size + windowBounds.Location;
             //DebugManager.Print(typeof(GraphicsManager), InputManager.GetMousePosAbsolute().ToString());
             //rect.Location += 
-            if (ApplicationIsActivated()) //TODO: Add an option for this
+            if (isWindows && ApplicationIsActivated()) //TODO: Add an option for this
             {
                 ClipCursor(ref windowBounds);
 
@@ -256,16 +259,26 @@ namespace Project_1.Managers
         /// from https://stackoverflow.com/questions/7162834/determine-if-current-application-is-activated-has-focus
         public static bool ApplicationIsActivated()
         {
-            IntPtr activatedHandle = GetForegroundWindow();
-            if (activatedHandle == IntPtr.Zero)
+            if (isWindows)
             {
-                return false;       // No window is currently activated
+                IntPtr activatedHandle = GetForegroundWindow();
+                if (activatedHandle == IntPtr.Zero)
+                {
+                    return false;       // No window is currently activated
+                }
+
+                int procId = Process.GetCurrentProcess().Id;
+                _ = GetWindowThreadProcessId(activatedHandle, out int activeProcId);
+
+                return activeProcId == procId;
             }
 
-            int procId = Process.GetCurrentProcess().Id;
-            _ = GetWindowThreadProcessId(activatedHandle, out int activeProcId);
+            if (game != null)
+            {
+                return game.IsActive;
+            }
 
-            return activeProcId == procId;
+            return true;
         }
 
 
