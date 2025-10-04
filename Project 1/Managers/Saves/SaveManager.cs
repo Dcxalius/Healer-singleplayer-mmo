@@ -8,6 +8,7 @@ using Project_1.UI.HUD.Managers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,18 +21,18 @@ namespace Project_1.Managers
         static JsonSerializerSettings serializerSettings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto};
         static string saveFolder;
 
-        public static string Effects => contentRootDirectory + "\\Effects";
-        public static string Settings => contentRootDirectory + "\\Settings";
-        public static string HudSettings => Settings + "\\Hud.set";
-        public static string CameraSettings => Settings + "\\Camera.set";
-        public static string KeyBindSettings => Settings + "\\KeyBind.set";
+        public static string Effects => Path.Combine(contentRootDirectory, "Effects");
+        public static string Settings => Path.Combine(contentRootDirectory, "Settings");
+        public static string HudSettings => Path.Combine(Settings, "Hud.set");
+        public static string CameraSettings => Path.Combine(Settings, "Camera.set");
+        public static string KeyBindSettings => Path.Combine(Settings, "KeyBind.set");
 
 
 
-        public static string DefaultSettings => Settings + "\\Default";
-        public static string DefaultHudSettings => DefaultSettings + "\\Hud.def";
-        public static string DefaultCameraSettings => DefaultSettings + "\\Camera.def";
-        public static string DefaultKeyBindSettings => DefaultSettings + "\\KeyBind.def";
+        public static string DefaultSettings => Path.Combine(Settings, "Default");
+        public static string DefaultHudSettings => Path.Combine(DefaultSettings, "Hud.def");
+        public static string DefaultCameraSettings => Path.Combine(DefaultSettings, "Camera.def");
+        public static string DefaultKeyBindSettings => Path.Combine(DefaultSettings, "KeyBind.def");
         public static Save[] Saves => saves.ToArray();
         static List<Save> saves;
 
@@ -43,7 +44,7 @@ namespace Project_1.Managers
         {
             contentRootDirectory = Game1.ContentManager.RootDirectory;
 
-            saveFolder = contentRootDirectory + "\\Saves";
+            saveFolder = Path.Combine(contentRootDirectory, "Saves");
 
             InitSaveFolder();
 
@@ -117,8 +118,8 @@ namespace Project_1.Managers
 
         public static string TrimToNameOnly(string aFile)
         {
-            string fileOnly = aFile.Split('\\').Last();
-            return fileOnly.Split(".")[0];
+            string fileOnly = Path.GetFileName(aFile);
+            return Path.GetFileNameWithoutExtension(fileOnly);
         }
     }
 }
