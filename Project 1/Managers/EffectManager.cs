@@ -33,7 +33,7 @@ namespace Project_1.Managers
             for (int i = 0; i < files.Length; i++)
             {
                 string name = SaveManager.TrimToNameOnly(files[i]);
-                Effect e = Game1.ContentManager.Load<Effect>("Effects\\" + name);
+                Effect e = Game1.ContentManager.Load<Effect>("Effects/" + name);
                 effects.Add(name, e);
                 debug += name + ", ";
             }

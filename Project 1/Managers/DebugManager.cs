@@ -23,6 +23,7 @@ namespace Project_1.Managers
     enum DebugMode
     {
         DebugShapes,
+        DebugOverlay,
         Print,
         FalseRandom,
         TileCoords,
@@ -41,6 +42,11 @@ namespace Project_1.Managers
         static int printLogCount = 0;
         static StreamWriter logger;
 
+        static Text fpsText;
+        static Text frameTimeText;
+        static Text totalTimeText;
+        static AbsoluteScreenPosition debugTextOrigin;
+
 
         public static bool Mode(DebugMode aMode) => modes[(int)aMode];
         static readonly bool[] modes = new bool[(int)DebugMode.Count];
@@ -53,6 +59,7 @@ namespace Project_1.Managers
         static DebugManager()
         {
             modes[(int)DebugMode.DebugShapes] = true;
+            modes[(int)DebugMode.DebugOverlay] = true;
             modes[(int)DebugMode.FalseRandom] = false;
             modes[(int)DebugMode.Print] = true;
             modes[(int)DebugMode.TileCoords] = false;
@@ -68,6 +75,11 @@ namespace Project_1.Managers
                 AllocConsole();
                 //logger = new StreamWriter(Console.OpenStandardOutput());
             }
+
+            fpsText = new Text("Gloryser", Color.Chartreuse);
+            frameTimeText = new Text("Gloryser", Color.Chartreuse);
+            totalTimeText = new Text("Gloryser", Color.Chartreuse);
+            debugTextOrigin = new AbsoluteScreenPosition(12, 12);
         }
 
         public static void Update()
@@ -76,6 +88,22 @@ namespace Project_1.Managers
             TeleportPlayer();
 
             ClearDebugShapes();
+
+            UpdateOverlayText();
+        }
+
+        static void UpdateOverlayText()
+        {
+            if (!modes[(int)DebugMode.DebugOverlay]) return;
+
+            double deltaSeconds = TimeManager.SecondsSinceLastFrame;
+            double fps = deltaSeconds > 0 ? 1.0 / deltaSeconds : 0;
+            double frameTimeMs = deltaSeconds * 1000.0;
+            TimeSpan totalTime = TimeManager.InstanceTotalFrameTimeAsTimeSpan;
+
+            fpsText.Value = $"FPS: {fps:0.0}";
+            frameTimeText.Value = $"Frame: {frameTimeMs:0.00} ms";
+            totalTimeText.Value = $"Total: {totalTime:hh\\:mm\\:ss}";
         }
 
         public static void AddDebugShape(DebugShape aShape)
@@ -180,11 +208,26 @@ namespace Project_1.Managers
         }
         public static void Draw(SpriteBatch aBatch)
         {
-            if (!modes[(int)DebugMode.DebugShapes]) return;
+            bool drawShapes = modes[(int)DebugMode.DebugShapes];
+            bool drawOverlay = modes[(int)DebugMode.DebugOverlay];
 
-            for (int i = 0; i < debugShapes.Count; i++)
+            if (!drawShapes && !drawOverlay) return;
+
+            if (drawShapes)
             {
-                debugShapes[i].Draw(aBatch);
+                for (int i = 0; i < debugShapes.Count; i++)
+                {
+                    debugShapes[i].Draw(aBatch);
+                }
+            }
+
+            if (drawOverlay)
+            {
+                fpsText.TopLeftDraw(aBatch, debugTextOrigin);
+                AbsoluteScreenPosition frameTimePos = debugTextOrigin + new AbsoluteScreenPosition(0, (int)Math.Ceiling(fpsText.Offset.Y) + 2);
+                frameTimeText.TopLeftDraw(aBatch, frameTimePos);
+                AbsoluteScreenPosition totalTimePos = frameTimePos + new AbsoluteScreenPosition(0, (int)Math.Ceiling(frameTimeText.Offset.Y) + 2);
+                totalTimeText.TopLeftDraw(aBatch, totalTimePos);
             }
         }
     }
