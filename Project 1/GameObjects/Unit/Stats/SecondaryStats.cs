@@ -1,81 +1,33 @@
-﻿using Project_1.GameObjects.Entities;
-using Project_1.GameObjects.Spawners;
-using Project_1.Items.SubTypes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Project_1.GameObjects.Unit.Stats
 {
     internal class SecondaryStats
     {
-       
-
-        public bool CalculateDodge() => new Random().NextDouble() < dodgeChance;
-        public bool CalculateParry() => new Random().NextDouble() < parryChance;
-        public bool CalculateBlock() => new Random().NextDouble() < blockChance;
-        public Damage CalculateBlockReduction(Damage aDamage)
+        public SecondaryStats()
         {
-            if (CalculateBlock())
-            {
-                double reducedAmount = aDamage.DamageAmount - blockValue;
-                return new Damage(reducedAmount < 0 ? 0 : reducedAmount, aDamage.DamageType);
-            }
-            else return aDamage;
-        }
-        public double CalculateEHP(double playerHealth, double armorDamageReduction)
-        {
-            if (armorDamageReduction < 0 || armorDamageReduction >= 1)
-                throw new ArgumentOutOfRangeException(nameof(armorDamageReduction), "Damage reduction must be between 0 and 1 (exclusive).");
-
-            return playerHealth / (1 - armorDamageReduction);
+            Attack = new AttackSecondaryStats();
+            Spell = new SpellSecondaryStats();
+            Defensive = new DefensiveSecondaryStats();
         }
 
-        public double CalculateDamageReduction(double armor, int attackerLevel)
+        public SecondaryStats(
+            AttackSecondaryStats? attack,
+            SpellSecondaryStats? spell,
+            DefensiveSecondaryStats? defensive)
         {
-            double damageReduction;
-
-            if (attackerLevel < 60)
-            {
-                damageReduction = armor / (armor + 400 + 85 * attackerLevel);
-            }
-            else
-            {
-                damageReduction = armor / (armor + 400 + 85 * (attackerLevel + 4.5 * (attackerLevel - 59)));
-            }
-
-            return damageReduction;
+            Attack = attack ?? new AttackSecondaryStats();
+            Spell = spell ?? new SpellSecondaryStats();
+            Defensive = defensive ?? new DefensiveSecondaryStats();
         }
 
-        double attackCriticalChance;
-        double attackCriticalDamage;
-        double perArmorPenetration;
-        int flatArmorPenetration;
-        double lifeSteal;
-        double bonusAttackHitChance;
+        public AttackSecondaryStats Attack { get; }
+        public SpellSecondaryStats Spell { get; }
+        public DefensiveSecondaryStats Defensive { get; }
 
-
-        double spellCriticalChance;
-        double spellCriticalDamage;
-        double perSpellPenetration;
-        int flatSpellPenetration;
-        double spellVamp;
-        double bonusSpellHitChance;
-
-        double healthRegen;
-        double dodgeChance;
-        double parryChance;
-        double blockChance;
-        double blockValue;
-
-
-        Armor armor;
-        SpellResitance spellResitance;
-        SpellDamage spellDamage;
-        WeaponSkill weaponSkill;
-        int defense;
-
+        public bool CalculateDodge() => Defensive.CalculateDodge();
+        public bool CalculateParry() => Defensive.CalculateParry();
+        public bool CalculateBlock() => Defensive.CalculateBlock();
+        public Damage CalculateBlockReduction(Damage aDamage) => Defensive.CalculateBlockReduction(aDamage);
+        public double CalculateEHP(double playerHealth, double armorDamageReduction) => Defensive.CalculateEHP(playerHealth, armorDamageReduction);
+        public double CalculateDamageReduction(double armor, int attackerLevel) => Defensive.CalculateDamageReduction(armor, attackerLevel);
     }
 }
