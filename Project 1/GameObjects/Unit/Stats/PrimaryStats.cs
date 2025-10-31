@@ -12,7 +12,7 @@ namespace Project_1.GameObjects.Unit.Stats
 {
     internal class PrimaryStats
     {
-        public enum PrimaryStat
+        public enum PrimaryStat //TODO: This orders is wrong should be a, str, sta, i, sp
         {
             Strength,
             Agility,
