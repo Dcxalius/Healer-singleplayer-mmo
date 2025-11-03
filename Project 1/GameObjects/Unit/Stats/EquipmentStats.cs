@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.GameObjects.Unit.Stats
 {
-    internal class EquipmentStats : PrimaryStats
+    internal class EquipmentStats : PrimaryStats //TODO: Shouldn't this be in items?
     {
         public Armor TotalArmor => armor;
         Armor armor;

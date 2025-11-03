@@ -81,11 +81,12 @@ namespace Project_1.GameObjects.Unit.Classes
         public bool CanDualWield => canDualWield;
         bool canDualWield;
 
-
+        public bool IsCaster => isCaster;
+        bool isCaster;
         [JsonConstructor]
         public ClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float baseHpPer5,
             float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed, MeleeAttackPowerBonus meleeAttackPowerBonus, float dodgeScaling, float meleeCritScaling,
-            Weapon.WeaponType weaponsAllowed, bool canDualWield)
+            Weapon.WeaponType weaponsAllowed, bool canDualWield, bool isCaster)
         {
             this.name = name;
             this.resource = resource;
@@ -103,6 +104,7 @@ namespace Project_1.GameObjects.Unit.Classes
             this.meleeCritScaling = meleeCritScaling == 0 ? 0.01f / 20f : meleeCritScaling;
             this.weaponsAllowed = weaponsAllowed;
             this.canDualWield = canDualWield;
+            this.isCaster = isCaster;
         }
 
        
