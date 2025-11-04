@@ -55,6 +55,10 @@ namespace Project_1.GameObjects.Unit
         BaseStats baseStats;
 
         [JsonIgnore]
+        public SecondaryStats SecondaryStats => secondaryStats;
+        SecondaryStats secondaryStats;
+
+        [JsonIgnore]
         public Health Health => baseStats.Health;
         [JsonIgnore]
         public Resource Resource => baseStats.Resource;
@@ -92,6 +96,10 @@ namespace Project_1.GameObjects.Unit
         #endregion
 
         #region Attack
+        public WeaponSkill WeaponSkill => weaponSkill;
+        WeaponSkill weaponSkill;
+
+
         [JsonIgnore]
         public AttackData AttackData
         {

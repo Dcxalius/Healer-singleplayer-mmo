@@ -31,9 +31,26 @@ namespace Project_1.GameObjects.Unit.Classes
         
 
         public bool WeaponUsuable(Weapon.WeaponType aType) => WeaponsAllowed.HasFlag(aType);
+        
+        public bool[] w
+        {
+            get
+            {
+                bool[] ww = new bool[Enum.GetValues<Weapon.WeaponType>().Length];
+                for (int i = 0; i < ww.Length; i++)
+                {
+                    ww[i] = (int)weaponsAllowed % (2 ^ (i + 1)) == 0;
+                }
+
+                return ww;
+            }
+        }
+
 
         public Weapon.WeaponType WeaponsAllowed => weaponsAllowed;
         Weapon.WeaponType weaponsAllowed;
+
+
 
 
         public string Name => name;
@@ -75,14 +92,39 @@ namespace Project_1.GameObjects.Unit.Classes
         public float DodgeScaling => dodgeScaling;
         float dodgeScaling;
 
-        public float MeleeCritScaling => meleeCritScaling;
-        float meleeCritScaling;
-
         public bool CanDualWield => canDualWield;
         bool canDualWield;
 
         public bool IsCaster => isCaster;
         bool isCaster;
+
+//        Druids, Paladins, Shaman and Warriors receive 1% Critical Strike Chance for every 20 points of Agility.
+//Rogues receive 1% Critical Strike Chance for every 29 points of Agility.
+//Hunters receive 1% Critical Strike Chance for every 53 points of Agility.
+
+        public double AttackCritChanceScaler => attackCritChanceScaler;
+        double attackCritChanceScaler;
+
+
+        //        You gain Critical Strike chance at varying points, depending on your class:
+        //Warlocks receive 1% Spell Critical Strike chance for every 60.6 points of intellect.
+        //Druids receive 1% Spell Critical Strike chance for every 60 points of intellect.
+        //Shamans receive 1% Spell Critical Strike chance for every 59.5 points of intellect.
+        //Mages receive 1% Spell Critical Strike chance for every 59.5 points of intellect.
+        //Priests receive 1% Spell Critical Strike chance for every 59.2 points of intellect.
+        //Paladins receive 1% Spell Critical Strike chance for every 54 points of intellect.
+
+
+        public double SpellCritChanceScaler => spellCritChanceScaler;
+        double spellCritChanceScaler;
+
+        //All classes but Hunters and Rogues receive 1% Dodge for every 20 points of Agility.
+        //Rogues receive 1% Dodge for every 14.5 points of Agility.
+        //Hunters receive 1% Dodge for every 26 points of Agility.
+
+        public double DodgeChanceScaler => dodgeChanceScaler;
+        double dodgeChanceScaler;
+
         [JsonConstructor]
         public ClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float baseHpPer5,
             float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed, MeleeAttackPowerBonus meleeAttackPowerBonus, float dodgeScaling, float meleeCritScaling,
@@ -105,6 +147,7 @@ namespace Project_1.GameObjects.Unit.Classes
             this.weaponsAllowed = weaponsAllowed;
             this.canDualWield = canDualWield;
             this.isCaster = isCaster;
+
         }
 
        

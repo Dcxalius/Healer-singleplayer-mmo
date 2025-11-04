@@ -18,12 +18,8 @@ namespace Project_1.GameObjects.Unit.Stats
             if (aClass.MeleeAttackBonus != ClassData.MeleeAttackPowerBonus.Agility) return 0; 
             return Value;
         }
-        public double GetMeleeCritChance(ClassData aClass) => Value * aClass.MeleeCritScaling;
-        public double GetDodge(ClassData aClass) => Value * aClass.DodgeScaling;
 
-        public Agility(int aValue) : base(aValue)
-        {
-        }
+        public Agility(int aValue) : base(aValue) { }
 
 
         public static bool operator ==(Agility lhs, Agility rhs) => lhs.Equals(rhs);

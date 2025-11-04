@@ -93,7 +93,7 @@ namespace Project_1.GameObjects.Unit.Stats
         {
             int enemyWeaponSkill = aMobData.Level.CurrentLevel * 5;
 
-            double crushChance = ((enemyWeaponSkill - defense) * 2) - 15;
+            double crushChance = ((enemyWeaponSkill - aStats.defense) * 2) - 15;
 
             if (crushChance < 0)
                 crushChance = 0;
