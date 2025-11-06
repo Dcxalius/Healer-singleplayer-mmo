@@ -112,7 +112,7 @@ namespace Project_1.GameObjects.Unit.Stats
             else if (crushChance > 100)
                 crushChance = 100;
 
-            // Modify the damage based on the calculated crush chance
+            // AI did this and it seems wrong xdd
             damageAmount *= (1 + (crushChance / 100));
         }
     }
