@@ -10,6 +10,20 @@ namespace Project_1.GameObjects.Unit.Stats
 {
     internal struct Damage
     {
+        [Flags]
+        public enum Result
+        {
+            Miss = 0,
+            Hit = 1,
+            Dodge = 2,
+            Parry = 4,
+            Block = 8,
+            Resist = 16,
+            Crushing = 32,
+            Crit = 64
+        }
+
+
         public double DamageAmount => damageAmount; 
         double damageAmount;
         public DamageTypes DamageType => damageType;
@@ -20,15 +34,15 @@ namespace Project_1.GameObjects.Unit.Stats
             damageType = aDamageType;
         }
 
-        public void ApplyGlancingBlowDamage(MobData aMobData, Entity aAttacker)
+        public void ApplyGlancingBlowDamage(MobData aMobData, UnitData aAttackingUnit, Unit.Attack aAttack)
         {
-            int attackerWeaponSkill = Math.Min(weaponSkill.GetSkill(), aAttacker.CurrentLevel * 5);
+            int attackerWeaponSkill = Math.Min(aAttackingUnit.WeaponSkill.GetSkill(aAttack.WeaponType), aAttackingUnit.Level.CurrentLevel * 5);
             int mobDefense = aMobData.Level.CurrentLevel * 5;
             int ratingDifference = Math.Max(0, mobDefense - attackerWeaponSkill);
 
             double lowValue, highValue;
 
-            if (aAttacker.ClassData.IsCaster)
+            if (aAttackingUnit.ClassData.IsCaster)
             {
                 lowValue = Math.Max(0.01, 1.3 - 0.05 * ratingDifference - 0.7);
                 highValue = Math.Min(0.99, 1.2 - 0.03 * ratingDifference - 0.3);
@@ -44,7 +58,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
             double averageReduction = (lowValue + highValue) / 2;
 
-            if (aMobData.Level.CurrentLevel > aAttacker.CurrentLevel)
+            if (aMobData.Level.CurrentLevel > aAttackingUnit.Level.CurrentLevel)
             {
                 double glancingBlowChance = 0.2;
 
@@ -56,13 +70,12 @@ namespace Project_1.GameObjects.Unit.Stats
         }
 
 
-        public double CalculateDamageAfterReduction(ref Damage aDamage, Entity aAttacker)
+        public double CalculateDamageAfterReduction(ref Damage aDamage, UnitData aAttacker, UnitData aDefender)
         {
             switch (aDamage.DamageType)
             {
                 case DamageTypes.Physical:
-                    aDamage.damageAmount -= CalculateDamageReduction(armor, aAttacker.CurrentLevel);
-                    break;
+                    return aDamage.damageAmount -= Defense.CalculateDamageReductionArmor(aDefender.Equipment.GetArmor, aAttacker.Level.CurrentLevel);
                 case DamageTypes.Arcane:
                     // Implement Arcane damage reduction logic here
                     break;
@@ -82,18 +95,17 @@ namespace Project_1.GameObjects.Unit.Stats
                     // Implement Shadow damage reduction logic here
                     break;
                 case DamageTypes.True:
-                    // Implement True damage reduction logic here
-                    break;
+                    return aDamage.DamageAmount;
                 default:
-                    break;
+                    throw new Exception("huh");
             }
             return aDamage.DamageAmount;
         }
-        public void ModifyDamage(MobData aMobData, SecondaryStats aStats)
+        public void CrushingDamage(MobData aMobData, UnitData aUnitData)
         {
             int enemyWeaponSkill = aMobData.Level.CurrentLevel * 5;
 
-            double crushChance = ((enemyWeaponSkill - aStats.defense) * 2) - 15;
+            double crushChance = ((enemyWeaponSkill - aUnitData.DefenseSkill) * 2) - 15;
 
             if (crushChance < 0)
                 crushChance = 0;

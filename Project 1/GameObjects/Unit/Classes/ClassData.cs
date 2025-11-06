@@ -143,7 +143,6 @@ namespace Project_1.GameObjects.Unit.Classes
             this.meleeAttackPowerBonus = meleeAttackPowerBonus;
             movementData = new Movement(speed, maxSpeed);
             this.dodgeScaling = dodgeScaling == 0 ? 0.01f / 20f : dodgeScaling;
-            this.meleeCritScaling = meleeCritScaling == 0 ? 0.01f / 20f : meleeCritScaling;
             this.weaponsAllowed = weaponsAllowed;
             this.canDualWield = canDualWield;
             this.isCaster = isCaster;

@@ -1,4 +1,5 @@
-﻿using Project_1.Managers;
+﻿using Project_1.Items.SubTypes;
+using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -43,17 +44,19 @@ namespace Project_1.GameObjects.Unit
             }
         }
 
+        public Weapon.WeaponType WeaponType => weaponType;
+        Weapon.WeaponType weaponType; 
+
         const float meleeAR = 50;
         const float rangeAR = 500;
         Type type;
 
-
-        public Attack(float aDmgMin, float aDmgMax, float aSecondsPerAttack)
+        public Attack(float aDmgMin, float aDmgMax, float aSecondsPerAttack, Weapon.WeaponType aWeapon)
         {
             attackDamageMin = aDmgMin;
             attackDamageMax = aDmgMax;
             secondsPerAttack = aSecondsPerAttack;
-
+            weaponType = aWeapon;
             //Debug.Assert(secondsPerAttack > 0 && attackDamageMin > 0 && attackDamageMax > 0);
         }
     }

@@ -33,6 +33,34 @@ namespace Project_1.Items.SubTypes
             Count
         }
 
+        public enum SecondaryStatsOnItems
+        {
+            BonusDamage,
+            Armor,
+            Hit,
+            Crit,
+            Vampirism,
+            Dodge,
+            Parry,
+            Block,
+
+            BaseSpellDamage,
+            SpellCrit,
+            ArcaneSpellDamage,
+            FireSpellDamage,
+            FrostSpellDamage,
+            HolySpellDamage,
+            NatureSpellDamage,
+            ShadowSpellDamage,
+            ArcaneCrit,
+            FireCrit,
+            FrostCrit,
+            HolyCrit,
+            NatureCrit,
+            ShadowCrit,
+            SpellVamp,
+        }
+
         public enum GearType
         {
             Cloth,

@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Project_1.GameObjects.Unit
@@ -99,6 +100,8 @@ namespace Project_1.GameObjects.Unit
         public WeaponSkill WeaponSkill => weaponSkill;
         WeaponSkill weaponSkill;
 
+        public int DefenseSkill => defenseSkill;
+        int defenseSkill;
 
         [JsonIgnore]
         public AttackData AttackData
@@ -167,13 +170,14 @@ namespace Project_1.GameObjects.Unit
             velocity = WorldSpace.Zero;
             momentum = WorldSpace.Zero;
             destination = new Destination(null);
+            secondaryStats = new SecondaryStats(this);
             Assert();
         }
 
 
         [JsonConstructor]
         public UnitData(string name, string corpseGfxName, string className, Relation.RelationToPlayer? relation, int level, int experience,
-            float currentHp, float currentResource, int?[] equipment, WorldSpace position, WorldSpace momentum, WorldSpace velocity, List<WorldSpace> destinations)
+            float currentHp, float currentResource, int?[] equipment, WorldSpace position, WorldSpace momentum, WorldSpace velocity, List<WorldSpace> destinations, int defenseSkill)
         {
             this.name = name;
             Debug.Assert(relation.HasValue);
@@ -185,7 +189,7 @@ namespace Project_1.GameObjects.Unit
             this.momentum = new WorldSpace(momentum);
             this.velocity = new WorldSpace(velocity);
             this.destination = new Destination(destinations);
-            
+            this.defenseSkill = defenseSkill;
             baseStats = new BaseStats(classData, this.level.CurrentLevel, this.equipment.EquipmentStats, currentHp, currentResource);
 
             gfxPath = new GfxPath(GfxType.Object, className);
@@ -201,6 +205,7 @@ namespace Project_1.GameObjects.Unit
 
             nextAvailableMainHandAttack = TimeSpan.Zero;
             nextAvailableOffHandAttack = TimeSpan.Zero;
+            this.secondaryStats = new SecondaryStats(this);
             Assert();
         }
 

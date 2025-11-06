@@ -9,6 +9,7 @@ using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace Project_1.GameObjects.Unit
 {
@@ -44,7 +45,46 @@ namespace Project_1.GameObjects.Unit
 
         Items.SubTypes.Equipment[] equipped;
 
-        public int MeleeAttackPower
+        public int GetBaseSpellPower
+        {
+            get
+            {
+                for (int i = 0; i < equipped.Length; i++)
+                {
+                    if (equipped[i] == null)
+                    {
+                        continue;
+                    }
+
+                    //equipped[i].SpellDamage
+                }
+                return 0; //TODO: Implement this
+            }
+        }
+
+        public Dictionary<SpellSchool, int> GetSchoolSpellDamage
+        {
+            get
+            {
+                var returnable = new Dictionary<SpellSchool, int>();
+                for (int i = 0; i < equipped.Length; i++)
+                {
+                    if (equipped[i] == null)
+                    {
+                        continue;
+                    }
+
+                    //if (!returnable.TryAdd(equipped[i].Key, equipped[i].Val)) returnable[equipped[i].Key] += equipped[i].Val;
+                    //returnabl.SpellDamage
+                }
+                return returnable; //TODO: Implement this
+
+            }
+        }
+
+        public int GetArmor => equipmentStats.Armor;
+
+        public int SetMeleeAttackPower
         {
             set
             {
@@ -130,7 +170,7 @@ namespace Project_1.GameObjects.Unit
                 {
                     totalStats[j] += equipped[i].Stats.Stats[j];
                 }
-                armor += equipped[i].Stats.TotalArmor;
+                armor += equipped[i].Stats.Armor;
             }
             equipmentStats = new EquipmentStats(totalStats, armor);
         }

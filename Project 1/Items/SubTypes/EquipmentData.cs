@@ -20,7 +20,7 @@ namespace Project_1.Items.SubTypes
             {
                 PairReport report = new PairReport();
 
-                if (baseStats.TotalArmor != 0) report.AddLine("Armor", baseStats.TotalArmor);
+                if (baseStats.Armor != 0) report.AddLine("Armor", baseStats.Armor);
                 baseStats.AppendToExistingReport(ref report);
 
                 return report;

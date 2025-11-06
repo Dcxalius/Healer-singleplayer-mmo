@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Project_1.GameObjects.Unit.Stats
 {
-    internal class EquipmentStats : PrimaryStats //TODO: Shouldn't this be in items?
+    internal class EquipmentStats : PrimaryStats //TODO: Shouldn't this be in items? Also I dont think I like that both items and the units both uses this
     {
-        public Armor TotalArmor => armor;
+        public Armor Armor => armor;
         Armor armor;
 
         public EquipmentStats(int[] aStats, int aArmor) : base(aStats)

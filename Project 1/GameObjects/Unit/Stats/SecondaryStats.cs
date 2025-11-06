@@ -11,14 +11,14 @@ namespace Project_1.GameObjects.Unit.Stats
 {
     internal class SecondaryStats
     {
-        public SecondaryStats(Entity aEntity)
+        public SecondaryStats(UnitData aUnitData)
         {
-            if (aEntity.ClassData.IsCaster)
+            if (aUnitData.ClassData.IsCaster)
             {
-                spell = new Spell();
+                spell = new Spell(aUnitData);
             }
-            attack = new Attack();
-            defense = new Defense();
+            attack = new Attack(aUnitData);
+            defense = new Defense(aUnitData);
         }
 
 
@@ -30,11 +30,10 @@ namespace Project_1.GameObjects.Unit.Stats
                 return spell;
             }
         }
-
-        Spell spell = new Spell();
+        Spell spell;
         public Defense Defense => defense;
-        Defense defense = new Defense();
+        Defense defense;
         public Attack Attack => attack;
-        Attack attack = new Attack();
+        Attack attack;
     }
 }

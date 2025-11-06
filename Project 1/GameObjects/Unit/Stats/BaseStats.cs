@@ -48,7 +48,7 @@ namespace Project_1.GameObjects.Unit.Stats
         public BaseStats(ClassData aClassData, int aLevel, EquipmentStats aEquipmentStats, float aCurrentHealth = float.MaxValue, float aCurrentResource = float.MaxValue)
         {
             basePrimaryStats = new BasePrimaryStats(aClassData.BaseStats, aClassData.PerLevelStats, aLevel);
-            baseArmor = new Armor(aEquipmentStats.TotalArmor);
+            baseArmor = new Armor(aEquipmentStats.Armor);
             health = new Health(aClassData, basePrimaryStats, aLevel, aCurrentHealth);
             classData = aClassData;
             totalPrimaryStats = new TotalPrimaryStats(basePrimaryStats, aEquipmentStats);
@@ -105,7 +105,7 @@ namespace Project_1.GameObjects.Unit.Stats
         {
             health.Refresh(TotalPrimaryStats);
             resource.Refresh(TotalPrimaryStats);
-            owner.Equipment.MeleeAttackPower = GetAttackPower(classData);
+            owner.Equipment.SetMeleeAttackPower = GetAttackPower(classData);
             fistAttack.AttackPower = GetAttackPower(classData);
 
 
@@ -116,7 +116,7 @@ namespace Project_1.GameObjects.Unit.Stats
         public void RefreshEquipmentStats(EquipmentStats aEquipmentStats)
         {
             totalPrimaryStats.UpdateEquipmentStats(aEquipmentStats);
-            baseArmor = aEquipmentStats.TotalArmor;
+            baseArmor = aEquipmentStats.Armor;
             RefreshStats();
         }
     }

@@ -9,7 +9,6 @@ namespace Project_1.GameObjects.Unit.Stats
 {
     internal class Defense
     {
-        int defenseSkill;
         Armor armor;
         double healthRegen;
         double dodgeChance;
@@ -18,11 +17,17 @@ namespace Project_1.GameObjects.Unit.Stats
         double blockValue;
         SpellResitance spellResitance;
 
-        public Defense(Entity aEntity)
+        public Defense(UnitData aUnitData)
         {
 //            All classes but Hunters and Rogues receive 1 % Dodge for every 20 points of Agility.
 //Rogues receive 1 % Dodge for every 14.5 points of Agility.
 //Hunters receive 1 % Dodge for every 26 points of Agility.
+
+        }
+
+        public void Refresh(UnitData aUnitData)
+        {
+            armor = new Armor(aUnitData.Equipment.GetArmor);
         }
 
         public bool CalculateDodge() => new Random().NextDouble() < dodgeChance;
@@ -37,7 +42,7 @@ namespace Project_1.GameObjects.Unit.Stats
             }
             else return aDamage;
         }
-        public double CalculateEHP(double playerHealth, double armorDamageReduction)
+        public static double CalculateEHP(double playerHealth, double armorDamageReduction)
         {
             if (armorDamageReduction < 0 || armorDamageReduction >= 1)
                 throw new ArgumentOutOfRangeException(nameof(armorDamageReduction), "Damage reduction must be between 0 and 1 (exclusive).");
@@ -45,7 +50,7 @@ namespace Project_1.GameObjects.Unit.Stats
             return playerHealth / (1 - armorDamageReduction);
         }
 
-        public double CalculateDamageReduction(double armor, int attackerLevel)
+        public static double CalculateDamageReductionArmor(double armor, int attackerLevel)
         {
             double damageReduction;
 

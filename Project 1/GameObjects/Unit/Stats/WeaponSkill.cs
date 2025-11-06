@@ -62,7 +62,8 @@ namespace Project_1.GameObjects.Unit.Stats
         public int GetSkill(Weapon.WeaponType aType)
         {
             if (!skills.TryGetValue(aType, out int returnable)) returnable = 0;
-            return returnable;
+            bonuses.TryGetValue(aType, out int bonus);
+            return returnable + bonus;
         }
 
         public void UpdateBonus(Equipment aEquipment /* Racials */)

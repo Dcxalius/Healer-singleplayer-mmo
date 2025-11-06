@@ -439,11 +439,8 @@ namespace Project_1.GameObjects.Entities
         float CalculateDamage(Entity aAttacker, float aDamageTaken)
         {
             float damageAfterArmor = (1f - unitData.BaseStats.TotalArmor.GetGetReductionPercentage(aAttacker.CurrentLevel)) * aDamageTaken; //TODO: Check if this gives right values
-            float healthBeforeHit = unitData.Health.CurrentHealth;
             unitData.Health.CurrentHealth -= damageAfterArmor;
-            float healthAfterHit = unitData.Health.CurrentHealth;
-            float damageVisiblyTaken = MathF.Round(healthBeforeHit - healthAfterHit, 1);
-            return damageVisiblyTaken;
+            return MathF.Round(damageAfterArmor, 1);
         }
 
         WorldSpace GetDirOfFloatingText(WorldSpace aFeetPosOfTriggerer)
