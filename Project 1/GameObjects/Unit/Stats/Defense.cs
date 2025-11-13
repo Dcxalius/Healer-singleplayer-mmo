@@ -9,25 +9,34 @@ namespace Project_1.GameObjects.Unit.Stats
 {
     internal class Defense
     {
+        public Armor Armor => armor;
         Armor armor;
+        public double HealthRegen => healthRegen;
         double healthRegen;
+        public double DodgeChance => dodgeChance;
         double dodgeChance;
+        public double ParryChance => parryChance;
         double parryChance;
+        public double BlockChance => blockChance;
         double blockChance;
+        public double BlockValue => blockValue;
         double blockValue;
+        public SpellResitance SpellResitance => spellResitance;
         SpellResitance spellResitance;
 
         public Defense(UnitData aUnitData)
         {
-//            All classes but Hunters and Rogues receive 1 % Dodge for every 20 points of Agility.
-//Rogues receive 1 % Dodge for every 14.5 points of Agility.
-//Hunters receive 1 % Dodge for every 26 points of Agility.
+            armor = new Armor(aUnitData.Equipment.GetArmor);
+            //            All classes but Hunters and Rogues receive 1 % Dodge for every 20 points of Agility.
+            //Rogues receive 1 % Dodge for every 14.5 points of Agility.
+            //Hunters receive 1 % Dodge for every 26 points of Agility.
 
         }
 
         public void Refresh(UnitData aUnitData)
         {
-            armor = new Armor(aUnitData.Equipment.GetArmor);
+            armor.Value = aUnitData.Equipment.GetArmor;
+
         }
 
         public bool CalculateDodge() => new Random().NextDouble() < dodgeChance;

@@ -25,6 +25,7 @@ using Project_1.GameObjects.Entities.Corspes;
 using Project_1.UI.HUD.Managers;
 using Microsoft.Xna.Framework.Graphics;
 using System.Drawing.Printing;
+using Project_1.GameObjects.Unit.Stats;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -67,6 +68,7 @@ namespace Project_1.GameObjects.Entities
         public float MaxHealth => unitData.Health.MaxHealth;
         public float CurrentHealth => unitData.Health.CurrentHealth;
 
+        public SecondaryStats SecondaryStats => unitData.SecondaryStats;
         public Equipment Equipment => unitData.Equipment;
         public Level Level => unitData.Level;
         public Resource.ResourceType ResourceType => unitData.Resource.Type;

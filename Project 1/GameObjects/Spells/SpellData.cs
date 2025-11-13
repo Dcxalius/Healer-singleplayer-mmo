@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Project_1.GameObjects.Unit;
+using Project_1.GameObjects.Unit.Stats;
 using Project_1.Textures;
 using SharpDX.Direct3D11;
 using SharpDX.Direct3D9;
@@ -50,8 +51,11 @@ namespace Project_1.GameObjects.Spells
         public TravelType Travel { get => travelType; }
         TravelType travelType;
 
+        public SpellSchool[] SpellSchools => spellSchools;
+        SpellSchool[] spellSchools;
+
         [JsonConstructor]
-        public SpellData(string name, string buttonGfx, string hitEffectGfx, string[] effects, TravelType travelType, Relation.RelationToPlayer[] acceptableTargets, float castDistance, double castTime = -1, double cooldown = -1, float resourceCost = -1)
+        public SpellData(string name, string buttonGfx, string hitEffectGfx, string[] effects, TravelType travelType, Relation.RelationToPlayer[] acceptableTargets, float castDistance, SpellSchool[] spellSchools, double castTime = -1, double cooldown = -1, float resourceCost = -1)
         {
             this.name = name;
             this.buttonGfxName = buttonGfx;
@@ -69,6 +73,7 @@ namespace Project_1.GameObjects.Spells
             this.acceptableTargets = acceptableTargets;
             this.castDistance = castDistance;
             this.travelType = travelType;
+            this.spellSchools = spellSchools;
             Assert();
         }
         

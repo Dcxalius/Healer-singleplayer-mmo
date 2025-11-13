@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using Project_1.GameObjects.Entities.Projectiles;
+using Project_1.GameObjects.Unit.Stats;
 
 namespace Project_1.GameObjects.Spells
 {
@@ -30,6 +31,7 @@ namespace Project_1.GameObjects.Spells
         public float ResourceCost { get => spellData.ResourceCost; }
         public bool Targetable(Relation.RelationToPlayer aTarget) => spellData.Targetable(aTarget);
         public GfxPath GfxPath { get => spellData.ButtonGfxPath; }
+        public SpellSchool[] SpellSchools => spellData.SpellSchools;
 
         Entity owner;
         SpellData spellData;
