@@ -30,11 +30,11 @@ namespace Project_1.GameObjects.Unit.Stats
         }
 
 
-        public double DamageAmount => damageAmount; 
-        double damageAmount;
-        public DamageTypes DamageType => damageType;
-        DamageTypes damageType;
-        public Damage(double aDamageAmount, DamageTypes aDamageType)
+        public double[] DamageAmount => damageAmount; 
+        double[] damageAmount;
+        public DamageTypes[] DamageType => damageType;
+        DamageTypes[] damageType;
+        public Damage(double[] aDamageAmount, DamageTypes[] aDamageType)
         {
             damageAmount = aDamageAmount;
             damageType = aDamageType;
@@ -66,43 +66,53 @@ namespace Project_1.GameObjects.Unit.Stats
 
                 if (RandomManager.RollDouble() < glancingBlowChance)
                 {
-                    damageAmount *= RandomManager.RollDouble(lowValue, highValue);
+                    for (int i = 0; i < damageAmount.Length; i++)
+                    {
+                        if (damageType[i] == DamageTypes.Physical)
+                            damageAmount[i] *= RandomManager.RollDouble(lowValue, highValue);
+                    }
                 }
             }
         }
 
 
-        public void CalculateDamageAfterReduction(UnitData aAttacker, UnitData aDefender)
+        public void CalculateDamageAfterReduction(UnitData aAttacker, UnitData aDefender, IDamager aDamager)
         {
-            switch (DamageType)
+            for (int i = 0; i < damageAmount.Length; i++)
             {
-                case DamageTypes.Physical:
-                    damageAmount *= Defense.CalculateDamageReductionArmor(aDefender.Equipment.GetArmor * aAttacker.SecondaryStats.Attack.PercentPenetration - aAttacker.SecondaryStats.Attack.FlatPenetration, aAttacker.Level.CurrentLevel);
-                    break;
-                case DamageTypes.Arcane:
-                    
-                    // Implement Arcane damage reduction logic here
-                    break;
-                case DamageTypes.Fire:
-                    // Implement Fire damage reduction logic here
-                    break;
-                case DamageTypes.Frost:
-                    // Implement Frost damage reduction logic here
-                    break;
-                case DamageTypes.Holy:
-                    // Implement Holy damage reduction logic here
-                    break;
-                case DamageTypes.Nature:
-                    // Implement Nature damage reduction logic here
-                    break;
-                case DamageTypes.Shadow:
-                    // Implement Shadow damage reduction logic here
-                    break;
-                case DamageTypes.True:
-                    break;
-                default:
-                    throw new Exception("huh");
+                switch (damageType[i])
+                {
+                    case DamageTypes.Physical:
+                        damageAmount[i] *= Defense.CalculateDamageReductionArmor(aDefender.Equipment.GetArmor * aAttacker.SecondaryStats.Attack.PercentPenetration - aAttacker.SecondaryStats.Attack.FlatPenetration, aAttacker.Level.CurrentLevel);
+                        break;
+                    case DamageTypes.Arcane:
+                        //How do we want to handle resistances for spells with multiple schools?
+                        //How do we want to handle partial resists for binary spells? If wow like not at all
+                        //How do we handle spelleffects, do slows and stuff only binary or partial as well?
+                        damageAmount[i] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Arcane);
+                        break;
+                    case DamageTypes.Fire:
+                        // Implement Fire damage reduction logic here
+                        break;
+                    case DamageTypes.Frost:
+                        // Implement Frost damage reduction logic here
+                        break;
+                    case DamageTypes.Holy:
+                        // Implement Holy damage reduction logic here
+                        break;
+                    case DamageTypes.Nature:
+                        // Implement Nature damage reduction logic here
+                        break;
+                    case DamageTypes.Shadow:
+                        // Implement Shadow damage reduction logic here
+                        break;
+                    case DamageTypes.True:
+                        break;
+                    default:
+                        throw new Exception("huh");
+                }
             }
+            
         }
         public void CrushingDamage(MobData aMobData, UnitData aUnitData)
         {

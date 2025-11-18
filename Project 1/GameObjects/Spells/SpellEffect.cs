@@ -25,7 +25,7 @@ namespace Project_1.GameObjects.Spells
             Debug.Assert(name != null, "No name");
         }
 
-        public virtual bool Trigger(Entity aCaster, Entity aTarget)
+        public virtual bool Trigger(Entity aTarget, Entity aCaster)
         {
             
 

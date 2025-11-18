@@ -53,14 +53,14 @@ namespace Project_1.GameObjects.Entities.Players
             string[] learnables = f.ClassData.LearnableSpells;
             for (int i = 0; i < learnables.Length; i++)
             {
-                learnableSpells.Add(new Spell(learnables[i], owner));
+                learnableSpells.Add(new Spell(learnables[i]));
             }
 
             string[] levelOneSpells = f.ClassData.LevelOneSpells;
 
             for (int i = 0; i < levelOneSpells.Length; i++)
             {
-                AddSpell(new Spell(levelOneSpells[i], owner));
+                AddSpell(new Spell(levelOneSpells[i]));
             }
 
             for (int i = 0; i < loadedSpells.Length; i++)
@@ -71,7 +71,7 @@ namespace Project_1.GameObjects.Entities.Players
 
             if (DebugManager.Mode(DebugMode.LearnKill))
             {
-                AddSpell(new Spell("Kill", owner));
+                AddSpell(new Spell("Kill"));
             }
         }
 

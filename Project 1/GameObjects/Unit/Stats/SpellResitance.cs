@@ -1,11 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Project_1.GameObjects.Entities;
-using SharpDX.Direct3D9;
+using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project_1.GameObjects.Unit.Stats
 {
@@ -57,48 +55,86 @@ namespace Project_1.GameObjects.Unit.Stats
             }
         }
 
-        //public static double CalculateDamageReductionSpellResitance(int spellResitance, int casterLevel)
-        //{
-        //    double damageReduction;
-        //    //effective resistance rating = Rb + max((Lt - Lc) * 5, 0) - min(P, Rb)
-        //    //Rb - target base resistance
-        //    //Lt - target level
-        //    //Lc - caster level
-        //    //P - caster spell penetration
-        //    //Damage reduction percentage = 100 % *effective resistance rating / (K + effective resistance rating )
-
-        //    //Resistance Score             |50  100 150 200 250
-        //    //Chance to Resist 100% Damage |0%  1%	1%	11%	25%
-        //    //Chance to Resist 75 % Damage |2%  6%  18% 34% 55%
-        //    //Chance to Resist 50 % Damage |11% 24% 48% 40% 16%
-        //    //Chance to Resist 25 % Damage |33% 49% 26% 14% 3%
-        //    //Chance to Take Full Damage   |54% 20% 7% 1% 1%
-
-        //    if (damageReduction < 0)
-        //        damageReduction = 0;
-
-        //    return damageReduction;
-        //}
-        public static double CalculateDamageReductionSpellResistance(Entity aTarget, Entity aCaster, Spells.Spell aCastSpell)
+        public static double CalculateDamageReductionNonBinary(UnitData aTarget, UnitData aCaster, SpellSchool aResist)
         {
             // effective resistance rating = Rb + max((Lt - Lc) * 5, 0) - min(P, Rb)
-            int levelDifference = aTarget.CurrentLevel - aCaster.CurrentLevel;
+            int levelDifference = aTarget.Level.CurrentLevel - aCaster.Level.CurrentLevel;
+            int cap = aTarget.Level.CurrentLevel * 5;
 
-            int effectiveResistance = aTarget.SecondaryStats.Defense.SpellResitance.GetResitance(aCastSpell.SpellSchools) + Math.Max(levelDifference * 5, 0) - Math.Min(aCaster.SecondaryStats.Spell.FlatPenetration, );
+            int flatPenetration = Math.Min(aCaster.SecondaryStats.Spell.FlatPenetration, aTarget.SecondaryStats.Defense.SpellResitance.GetResitance(aResist));
+            int percentPenetration = (int)(aTarget.SecondaryStats.Defense.SpellResitance.GetResitance(aResist) * aCaster.SecondaryStats.Spell.PercentPenetration);
+
+            int effectiveResistance = aTarget.SecondaryStats.Defense.SpellResitance.GetResitance(aResist) + Math.Max(levelDifference * 5, 0) - flatPenetration - percentPenetration;
+            if (aTarget.UnitType >= UnitType.Normal && levelDifference > 0)
+            {
+                effectiveResistance += (2 / 15 * aCaster.Level.CurrentLevel * levelDifference);
+            }
 
             if (effectiveResistance <= 0)
                 return 0.0;
+            //Resist stregth will always be one of these, 0%, 25%, 50%, 75%
+            //The chance for each one increases linearly within each third of the cap
+            //Resist % of cap   | 0%    | 25%   | 50%   | 75%   |Avg Resist
+            //0.0 %             | 100%  | 0%    | 0%    | 0%    | 0.00 %
+            //33.3 %            | 24%   | 55%   | 18%   | 3%    | 25.00 %
+            //Note: chance of 0 % resist appears to be 1 % at just under 2 / 3, 0 % at 2 / 3 and above
+            //66.7 %            | 0%    | 22%   | 56%   | 22%   | 50.00 %
+            //100.0 %           | 0%    | 4%    | 16%   | 80%   | 69.00 %
 
-            // Damage reduction percentage = 100% * effective resistance / (K + effective resistance)
-            double damageReduction = 100.0 * effectiveResistance / (k + effectiveResistance);
+            double resistanceRatio = cap > 0 ? Math.Clamp((double)effectiveResistance / cap, 0.0, 1.0) : 0.0;
+            double[] anchors = new[] { 0.0, 1.0 / 3.0, 2.0 / 3.0, 1.0 };
 
-            // Clamp just in case of odd inputs
-            if (damageReduction < 0.0)
-                damageReduction = 0.0;
-            else if (damageReduction > 100.0)
-                damageReduction = 100.0;
+            double Interpolate(double[] values)
+            {
+                for (int i = 0; i < anchors.Length - 1; i++)
+                {
+                    if (resistanceRatio <= anchors[i + 1])
+                    {
+                        double t = (resistanceRatio - anchors[i]) / (anchors[i + 1] - anchors[i]);
+                        return values[i] + (values[i + 1] - values[i]) * t;
+                    }
+                }
+                return values[^1];
+            }
 
-            return damageReduction;
+            // Probabilities for 0%, 25%, 50%, 75% damage reduction at the anchor points.
+            double[] chance0 = new[] { 1.0, 0.24, 0.0, 0.0 };
+            double[] chance25 = new[] { 0.0, 0.55, 0.22, 0.04 };
+            double[] chance50 = new[] { 0.0, 0.18, 0.56, 0.16 };
+            double[] chance75 = new[] { 0.0, 0.03, 0.22, 0.80 };
+
+            double[] probabilities =
+            {
+                Interpolate(chance0),
+                Interpolate(chance25),
+                Interpolate(chance50),
+                Interpolate(chance75)
+            };
+
+            double probabilitySum = probabilities.Sum();
+            if (probabilitySum > 0)
+            {
+                for (int i = 0; i < probabilities.Length; i++)
+                {
+                    probabilities[i] /= probabilitySum;
+                }
+            }
+
+            double roll = RandomManager.RollDouble();
+            double cumulative = 0.0;
+            double[] reductionValues = { 0.0, 0.25, 0.5, 0.75 };
+            double damageReduction = reductionValues[^1];
+
+            for (int i = 0; i < probabilities.Length; i++)
+            {
+                cumulative += probabilities[i];
+                if (roll <= cumulative)
+                {
+                    return reductionValues[i];
+                }
+            }
+
+            throw new Exception("How did you get here????");
         }
     }
 

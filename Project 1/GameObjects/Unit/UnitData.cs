@@ -20,13 +20,24 @@ using System.Threading.Tasks;
 
 namespace Project_1.GameObjects.Unit
 {
+    enum UnitType
+    {
+        Player,
+        Normal,
+        Elite,
+        Boss
+    }
     class UnitData
     {
+        
         public string Name => name;
         string name;
 
         [JsonProperty(PropertyName = "ClassName")]
         string className => classData.Name;
+
+        public UnitType UnitType => unitType;
+        UnitType unitType;
 
         [JsonIgnore]
         public ClassData ClassData => classData;
@@ -171,6 +182,7 @@ namespace Project_1.GameObjects.Unit
             momentum = WorldSpace.Zero;
             destination = new Destination(null);
             secondaryStats = new SecondaryStats(this);
+            unitType = aData.UnitType;
             Assert();
         }
 
@@ -191,6 +203,7 @@ namespace Project_1.GameObjects.Unit
             this.destination = new Destination(destinations);
             this.defenseSkill = defenseSkill;
             baseStats = new BaseStats(classData, this.level.CurrentLevel, this.equipment.EquipmentStats, currentHp, currentResource);
+            this.unitType = UnitType.Player;
 
             gfxPath = new GfxPath(GfxType.Object, className);
 

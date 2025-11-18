@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.GameObjects.Unit
 {
-    internal class Attack
+    internal class Attack : IDamager
     {
         public enum Type
         {
@@ -45,6 +45,9 @@ namespace Project_1.GameObjects.Unit
         }
 
         public Weapon.WeaponType WeaponType => weaponType;
+
+        public bool BinarySpell => false;
+
         Weapon.WeaponType weaponType; 
 
         const float meleeAR = 50;

@@ -51,11 +51,15 @@ namespace Project_1.GameObjects.Spells
         public TravelType Travel { get => travelType; }
         TravelType travelType;
 
+        public bool IsBinary => isBinary;
+        bool isBinary;
         public SpellSchool[] SpellSchools => spellSchools;
         SpellSchool[] spellSchools;
 
+
+
         [JsonConstructor]
-        public SpellData(string name, string buttonGfx, string hitEffectGfx, string[] effects, TravelType travelType, Relation.RelationToPlayer[] acceptableTargets, float castDistance, SpellSchool[] spellSchools, double castTime = -1, double cooldown = -1, float resourceCost = -1)
+        public SpellData(string name, string buttonGfx, string hitEffectGfx, string[] effects, TravelType travelType, Relation.RelationToPlayer[] acceptableTargets, float castDistance, SpellSchool[] spellSchools, bool isBinary = false, double castTime = -1, double cooldown = -1, float resourceCost = -1)
         {
             this.name = name;
             this.buttonGfxName = buttonGfx;

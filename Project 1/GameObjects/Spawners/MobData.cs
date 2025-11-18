@@ -46,8 +46,11 @@ namespace Project_1.GameObjects.Spawners
 
         public WorldSpace Size => new WorldSpace(32, 16); //TODO: Fix
 
+        public UnitType UnitType => unitType;
+        UnitType unitType;
+
         [JsonConstructor]
-        public MobData(string name, string corpseGfxName, string className, Aggresive relation, int minLevel, int maxLevel, int?[] equipment)
+        public MobData(string name, string corpseGfxName, string className, Aggresive relation, int minLevel, int maxLevel, int?[] equipment, UnitType unitType = UnitType.Normal)
         {
             this.name = name;
             relationData = new Relation(relation);
@@ -55,6 +58,7 @@ namespace Project_1.GameObjects.Spawners
             this.maxLevel = maxLevel;
             this.minLevel = minLevel;
             this.equipment = new Equipment(equipment);
+            this.unitType = unitType;
 
             gfxPath = new GfxPath(GfxType.Object, name);
 

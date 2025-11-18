@@ -35,6 +35,8 @@ namespace Project_1.GameObjects.Entities
         public virtual Entity Target { get => target; }
         protected Entity target = null;
 
+        
+
         public override WorldSpace FeetSize { get => new WorldSpace(Size.X, Size.Y / 2); }
 
         public override Rectangle WorldRectangle
@@ -51,6 +53,8 @@ namespace Project_1.GameObjects.Entities
         #region UnitData
         protected UnitData UnitData => unitData;
         UnitData unitData;
+
+        public UnitType UnitType => unitData.UnitType;
 
         public virtual Color MinimapColor => Color.White;
 
