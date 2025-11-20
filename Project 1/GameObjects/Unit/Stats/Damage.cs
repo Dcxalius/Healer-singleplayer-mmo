@@ -32,9 +32,9 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public double[] DamageAmount => damageAmount; 
         double[] damageAmount;
-        public DamageTypes[] DamageType => damageType;
-        DamageTypes[] damageType;
-        public Damage(double[] aDamageAmount, DamageTypes[] aDamageType)
+        public DamageType[] DamageType => damageType;
+        DamageType[] damageType;
+        public Damage(double[] aDamageAmount, DamageType[] aDamageType)
         {
             damageAmount = aDamageAmount;
             damageType = aDamageType;
@@ -62,14 +62,12 @@ namespace Project_1.GameObjects.Unit.Stats
 
             if (aMobData.Level.CurrentLevel > aAttackingUnit.Level.CurrentLevel)
             {
-                double glancingBlowChance = 0.1 + 0.02 * cappedRatingDifference;
-
-                if (RandomManager.RollDouble() < glancingBlowChance)
+                for (int i = 0; i < damageAmount.Length; i++)
                 {
-                    for (int i = 0; i < damageAmount.Length; i++)
+                    if (damageType[i] == Stats.DamageType.Physical)
                     {
-                        if (damageType[i] == DamageTypes.Physical)
-                            damageAmount[i] *= RandomManager.RollDouble(lowValue, highValue);
+                        damageAmount[i] *= RandomManager.RollDouble(lowValue, highValue);
+                        return;
                     }
                 }
             }
@@ -78,35 +76,44 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void CalculateDamageAfterReduction(UnitData aAttacker, UnitData aDefender, IDamager aDamager)
         {
+            void SRCDAR(ref double aDamage, SpellSchool aSpellSchool)
+            {
+                aDamage *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, aSpellSchool);
+            }
             for (int i = 0; i < damageAmount.Length; i++)
             {
                 switch (damageType[i])
                 {
-                    case DamageTypes.Physical:
+                    case Stats.DamageType.Physical:
                         damageAmount[i] *= Defense.CalculateDamageReductionArmor(aDefender.Equipment.GetArmor * aAttacker.SecondaryStats.Attack.PercentPenetration - aAttacker.SecondaryStats.Attack.FlatPenetration, aAttacker.Level.CurrentLevel);
                         break;
-                    case DamageTypes.Arcane:
+                    case Stats.DamageType.Arcane:
                         //How do we want to handle resistances for spells with multiple schools?
                         //How do we want to handle partial resists for binary spells? If wow like not at all
                         //How do we handle spelleffects, do slows and stuff only binary or partial as well?
-                        damageAmount[i] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Arcane);
+                        SRCDAR(ref damageAmount[i], SpellSchool.Arcane);
                         break;
-                    case DamageTypes.Fire:
+                    case Stats.DamageType.Fire:
                         // Implement Fire damage reduction logic here
+                        SRCDAR(ref damageAmount[i], SpellSchool.Fire);
                         break;
-                    case DamageTypes.Frost:
+                    case Stats.DamageType.Frost:
                         // Implement Frost damage reduction logic here
+                        SRCDAR(ref damageAmount[i], SpellSchool.Frost);
                         break;
-                    case DamageTypes.Holy:
+                    case Stats.DamageType.Holy:
                         // Implement Holy damage reduction logic here
+                        SRCDAR(ref damageAmount[i], SpellSchool.Holy);
                         break;
-                    case DamageTypes.Nature:
+                    case Stats.DamageType.Nature:
                         // Implement Nature damage reduction logic here
+                        SRCDAR(ref damageAmount[i], SpellSchool.Nature);
                         break;
-                    case DamageTypes.Shadow:
+                    case Stats.DamageType.Shadow:
                         // Implement Shadow damage reduction logic here
+                        SRCDAR(ref damageAmount[i], SpellSchool.Shadow);
                         break;
-                    case DamageTypes.True:
+                    case Stats.DamageType.True:
                         break;
                     default:
                         throw new Exception("huh");
@@ -116,6 +123,8 @@ namespace Project_1.GameObjects.Unit.Stats
         }
         public void CrushingDamage(MobData aMobData, UnitData aUnitData)
         {
+            if (!damageType.Contains(Stats.DamageType.Physical))
+                return;
             int enemyWeaponSkill = aMobData.Level.CurrentLevel * 5;
 
             double crushChance = ((enemyWeaponSkill - aUnitData.DefenseSkill) * 2) - 15;
@@ -126,14 +135,21 @@ namespace Project_1.GameObjects.Unit.Stats
                 crushChance = 100;
 
             // AI did this and it seems wrong xdd
-            damageAmount *= (1 + (crushChance / 100));
+            for (int i = 0; i < damageType.Length; i++)
+            {
+                if (damageType[i] == Stats.DamageType.Physical)
+                {
+                    damageAmount[i] *= (1 + (crushChance / 100));
+                    return;
+                }
+            }
         }
     }
 
    
 
 
-    public enum DamageTypes
+    public enum DamageType
     {
         Physical,
         Arcane,

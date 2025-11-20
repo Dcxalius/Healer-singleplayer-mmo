@@ -62,6 +62,27 @@ namespace Project_1.GameObjects.Unit
             }
         }
 
+        public bool IsDualWielding
+        {
+            get
+            {
+                if (equipped[(int)Slot.OffHand] == null) return false;
+                if (equipped[(int)Slot.MainHand] == null) return false;
+                if ((equipped[(int)Slot.OffHand] as Weapon).WeaponData.WeaponType >= Weapon.WeaponType.Shield) return false;
+                return true;
+            }
+        }
+
+        public bool HasShield
+        {
+            get
+            {
+                if (equipped[(int)Slot.OffHand] == null) return false;
+                if ((equipped[(int)Slot.OffHand] as Weapon).WeaponData.WeaponType == Weapon.WeaponType.Shield) return true;
+                return false;
+            }
+        }
+
         public Dictionary<SpellSchool, int> GetSchoolSpellDamage
         {
             get

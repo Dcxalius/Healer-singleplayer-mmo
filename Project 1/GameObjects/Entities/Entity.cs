@@ -1,31 +1,32 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json.Linq;
 using Project_1.Camera;
-using Project_1.GameObjects.Unit;
-using Project_1.GameObjects.Unit.Resources;
+using Project_1.GameObjects.Entities.Corspes;
 using Project_1.GameObjects.Entities.GroundEffect;
 using Project_1.GameObjects.Entities.Players;
+using Project_1.GameObjects.FloatingTexts;
 using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Spells.Buff;
+using Project_1.GameObjects.Unit;
+using Project_1.GameObjects.Unit.Classes;
+using Project_1.GameObjects.Unit.Resources;
+using Project_1.GameObjects.Unit.Stats;
 using Project_1.Input;
+using Project_1.Items;
 using Project_1.Managers;
 using Project_1.Particles;
 using Project_1.Textures;
+using Project_1.Textures.AnimatedTextures;
 using Project_1.Tiles;
 using Project_1.UI.HUD;
+using Project_1.UI.HUD.Managers;
 using System;
 using System.Collections.Generic;
-using Project_1.Textures.AnimatedTextures;
-using static Project_1.GameObjects.Unit.Equipment;
 using System.Diagnostics;
-using Project_1.Items;
-using Project_1.GameObjects.Unit.Classes;
-using System.Threading.Tasks.Dataflow;
-using Project_1.GameObjects.FloatingTexts;
-using Project_1.GameObjects.Entities.Corspes;
-using Project_1.UI.HUD.Managers;
-using Microsoft.Xna.Framework.Graphics;
 using System.Drawing.Printing;
-using Project_1.GameObjects.Unit.Stats;
+using System.Threading.Tasks.Dataflow;
+using static Project_1.GameObjects.Unit.Equipment;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -73,12 +74,15 @@ namespace Project_1.GameObjects.Entities
         public float CurrentHealth => unitData.Health.CurrentHealth;
 
         public SecondaryStats SecondaryStats => unitData.SecondaryStats;
+        public int DefenseSkill => unitData.DefenseSkill;
+        public WeaponSkill WeaponSkill => unitData.WeaponSkill;
+        public bool IsDualWielding => Equipment.IsDualWielding;
         public Equipment Equipment => unitData.Equipment;
         public Level Level => unitData.Level;
         public Resource.ResourceType ResourceType => unitData.Resource.Type;
         public float MaxResource => unitData.Resource.MaxValue;
         public float CurrentResource => unitData.Resource.Value;
-
+        public bool HasControl => true; //TODO: Implement cc
         public Resource Resource => unitData.Resource;
 
         public Color ResourceColor => unitData.Resource.ResourceColor;
@@ -283,7 +287,7 @@ namespace Project_1.GameObjects.Entities
             CheckAttackSpeed(ref unitData.NextAvailableOffHandAttack, a.OffHandAttack);
         }
 
-        void CheckAttackSpeed(ref TimeSpan aLockoutTime, Attack aAttack)
+        void CheckAttackSpeed(ref TimeSpan aLockoutTime, Unit.Attack aAttack)
         {
             if (aAttack == null) return;
             if (aLockoutTime > TimeManager.TotalFrameTimeAsTimeSpan) return;
@@ -292,13 +296,19 @@ namespace Project_1.GameObjects.Entities
             AttackIfInRange(aAttack);
         }
 
-        void AttackIfInRange(Attack aAttack)
+        void AttackIfInRange(Unit.Attack aAttack)
         {
-
-            timeSinceLastAttack = 0;
             float damage = aAttack.GetAttackDamage;
 
             if (damage <= 0) return;
+            //Miss	27.00%	0.01 - 27.00
+            //Dodge   6.50 % 27.01 - 33.50
+            //Parry   14.00 % 33.51 - 47.50
+            //Glancing Blow   24.00 % 47.51 - 71.50
+            //Block   6.50 % 71.51 - 78.00
+            //Critical hit    22.00 % 78.01 - 100.00
+            //Crushing Blow   0 %  —
+            //Ordinary hit    0 %  —
             //TODO: Calculate misses
             //TODO: Calculate mitigation (dodge, parry, block)
             //TODO: Calculate crit

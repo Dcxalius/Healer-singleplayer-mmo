@@ -98,9 +98,12 @@ namespace Project_1.GameObjects.Unit.Classes
         public bool IsCaster => isCaster;
         bool isCaster;
 
-//        Druids, Paladins, Shaman and Warriors receive 1% Critical Strike Chance for every 20 points of Agility.
-//Rogues receive 1% Critical Strike Chance for every 29 points of Agility.
-//Hunters receive 1% Critical Strike Chance for every 53 points of Agility.
+        public bool CanParry => canParry;
+        bool canParry;
+
+        //        Druids, Paladins, Shaman and Warriors receive 1% Critical Strike Chance for every 20 points of Agility.
+        //Rogues receive 1% Critical Strike Chance for every 29 points of Agility.
+        //Hunters receive 1% Critical Strike Chance for every 53 points of Agility.
 
         public double AttackCritChanceScaler => attackCritChanceScaler;
         double attackCritChanceScaler;
@@ -125,10 +128,24 @@ namespace Project_1.GameObjects.Unit.Classes
         public double DodgeChanceScaler => dodgeChanceScaler;
         double dodgeChanceScaler;
 
+        public double BaseDodge => baseDodge;
+        double baseDodge;
+
+        //Class	    Base dodge	AGI:Dodge ratio
+        //Druid	    0.9%	    20
+        //Hunter	0.0%	    26.5
+        //Mage	    3.2%	    19.444
+        //Paladin	0.7%	    19.767
+        //Priest	3.0%	    20
+        //Rogue	    0.0%	    14.5
+        //Shaman	1.7%	    19.697
+        //Warlock	2.0%	    20
+        //Warrior	0.0%	    20
+
         [JsonConstructor]
         public ClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float baseHpPer5,
-            float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed, MeleeAttackPowerBonus meleeAttackPowerBonus, float dodgeScaling, float meleeCritScaling,
-            Weapon.WeaponType weaponsAllowed, bool canDualWield, bool isCaster)
+            float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed, MeleeAttackPowerBonus meleeAttackPowerBonus, float dodgeScaling, float baseDodge, float meleeCritScaling,
+            Weapon.WeaponType weaponsAllowed, bool canDualWield, bool isCaster, bool canParry)
         {
             this.name = name;
             this.resource = resource;
@@ -143,10 +160,11 @@ namespace Project_1.GameObjects.Unit.Classes
             this.meleeAttackPowerBonus = meleeAttackPowerBonus;
             movementData = new Movement(speed, maxSpeed);
             this.dodgeScaling = dodgeScaling == 0 ? 0.01f / 20f : dodgeScaling;
+            this.baseDodge = baseDodge;
             this.weaponsAllowed = weaponsAllowed;
             this.canDualWield = canDualWield;
             this.isCaster = isCaster;
-
+            this.canParry = canParry;
         }
 
        

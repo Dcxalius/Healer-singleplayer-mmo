@@ -14,9 +14,9 @@ namespace Project_1.GameObjects.Unit.Stats
         public double HealthRegen => healthRegen;
         double healthRegen;
         public double DodgeChance => dodgeChance;
-        double dodgeChance;
+        double dodgeChance;//Base dodge + (Agility / Agility to Dodge ratio) + Talent bonuses + Race Bonuses + Item Bonuses
         public double ParryChance => parryChance;
-        double parryChance;
+        double parryChance; //5% base + parry rating + parry talents
         public double BlockChance => blockChance;
         double blockChance;
         public double BlockValue => blockValue;
@@ -27,9 +27,7 @@ namespace Project_1.GameObjects.Unit.Stats
         public Defense(UnitData aUnitData)
         {
             armor = new Armor(aUnitData.Equipment.GetArmor);
-            //            All classes but Hunters and Rogues receive 1 % Dodge for every 20 points of Agility.
-            //Rogues receive 1 % Dodge for every 14.5 points of Agility.
-            //Hunters receive 1 % Dodge for every 26 points of Agility.
+
 
         }
 
@@ -38,18 +36,16 @@ namespace Project_1.GameObjects.Unit.Stats
             armor.Value = aUnitData.Equipment.GetArmor;
 
         }
-
-        public bool CalculateDodge() => new Random().NextDouble() < dodgeChance;
-        public bool CalculateParry() => new Random().NextDouble() < parryChance;
-        public bool CalculateBlock() => new Random().NextDouble() < blockChance;
-        public Damage CalculateBlockReduction(Damage aDamage)
+        public void CalculateBlockReduction(ref Damage aDamage)
         {
-            if (CalculateBlock())
+            for (int i = 0; i < aDamage.DamageAmount.Length; i++)
             {
-                double reducedAmount = aDamage.DamageAmount - blockValue;
-                return new Damage(reducedAmount < 0 ? 0 : reducedAmount, aDamage.DamageType);
+                if (aDamage.DamageType[i] == DamageType.Physical)
+                {
+                    double reducedAmount = aDamage.DamageAmount[i] - blockValue;
+                    aDamage.DamageAmount[i] = reducedAmount < 0 ? 0 : reducedAmount;
+                }
             }
-            else return aDamage;
         }
         public static double CalculateEHP(double playerHealth, double armorDamageReduction)
         {
