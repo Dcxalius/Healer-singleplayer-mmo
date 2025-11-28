@@ -70,9 +70,9 @@ namespace Project_1.GameObjects.Entities
             base.Death();
         }
 
-        public override void TakeDamage(Entity aAttacker, float aDamageTaken)
+        public override void RecieveAttack(Entity aAttacker, float aDamageTaken)
         {
-            base.TakeDamage(aAttacker, aDamageTaken);
+            base.RecieveAttack(aAttacker, aDamageTaken);
             aggroTable.AddToAggroTable(aAttacker, aDamageTaken);
 
         }

@@ -6,6 +6,7 @@ using Project_1.Managers;
 using Project_1.UI.UIElements.Bars;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,32 +16,35 @@ namespace Project_1.GameObjects.Unit.Stats
 {
     internal struct Damage
     {
-        [Flags]
-        public enum Result
-        {
-            Miss = 0,
-            Hit = 1,
-            Dodge = 2,
-            Parry = 4,
-            Block = 8,
-            Resist = 16,
-            Crushing = 32,
-            Glancing = 64,
-            Crit = 128
-        }
+        public bool ContainsDamage => value.Values.Sum() > 0;
+        public double Sum => value.Values.Sum();
+        public int Count => value.Count;
+        public ImmutableList<DamageType> Types => value.Keys.ToImmutableList();
+        public double this[DamageType aType] => value.ContainsKey(aType) ? value[aType] : 0;
 
+        Dictionary<DamageType, double> value;
 
-        public double[] DamageAmount => damageAmount; 
-        double[] damageAmount;
-        public DamageType[] DamageType => damageType;
-        DamageType[] damageType;
         public Damage(double[] aDamageAmount, DamageType[] aDamageType)
         {
-            damageAmount = aDamageAmount;
-            damageType = aDamageType;
+            value = new Dictionary<DamageType, double>();
         }
 
-        public void ApplyGlancingBlowDamage(UnitData aAttackingUnit, Unit.Attack aAttack, MobData aMobData)
+        public Damage(Damage aDamageTaken)
+        {
+            value = new Dictionary<DamageType, double>(aDamageTaken.value);
+        }
+
+        public void ApplyCriticalStrike(Entity aAttacker, Entity aDefender)
+        {
+            double attackerCrit = aAttacker.SecondaryStats.Attack.CriticalDamage;
+            double totalCrit = Math.Max(attackerCrit - aDefender.SecondaryStats.Defense.CriticalDamageReduction, 0);
+            foreach (var (k, v) in value)
+            {
+                 value[k] *= totalCrit;
+            }
+        }
+
+        public void ApplyGlancingBlowDamage(Entity aAttackingUnit, Unit.Attack aAttack, Entity aMobData)
         {
             int attackerWeaponSkill = Math.Min(aAttackingUnit.WeaponSkill.GetSkill(aAttack.WeaponType), aAttackingUnit.Level.CurrentLevel * 5);
             int mobDefense = aMobData.Level.CurrentLevel * 5;
@@ -56,64 +60,69 @@ namespace Project_1.GameObjects.Unit.Stats
             }
             else
             {
+                //307 skill level should be softcap glancing blows
                 lowValue = Math.Max(0.01, Math.Min(0.91, 1.3 - 0.05 * ratingDifference));
                 highValue = Math.Max(0.2, Math.Min(0.99, 1.2 - 0.03 * ratingDifference));
             }
 
             if (aMobData.Level.CurrentLevel > aAttackingUnit.Level.CurrentLevel)
             {
-                for (int i = 0; i < damageAmount.Length; i++)
+                foreach (var (k, v) in value)
                 {
-                    if (damageType[i] == Stats.DamageType.Physical)
+                    if (k == DamageType.Physical)
                     {
-                        damageAmount[i] *= RandomManager.RollDouble(lowValue, highValue);
+                        value[k] *= RandomManager.RollDouble(lowValue, highValue);
                         return;
                     }
                 }
             }
         }
 
-
-        public void CalculateDamageAfterReduction(UnitData aAttacker, UnitData aDefender, IDamager aDamager)
+        public void ApplyBlocked(Entity aAttacker, Entity aDefender)
         {
-            void SRCDAR(ref double aDamage, SpellSchool aSpellSchool)
+            foreach (var (k, v) in value)
             {
-                aDamage *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, aSpellSchool);
+                if (v <= 0) continue;
+                if (aDefender.Equipment.CanShieldBlock(k)) value[k] = Math.Max(0, v - aDefender.SecondaryStats.Defense.BlockValue);
             }
-            for (int i = 0; i < damageAmount.Length; i++)
+        }
+
+        public void ApplyDamageReduction(Entity aAttacker, Entity aDefender, IDamager aDamager)
+        {
+            foreach (var (k, v) in value)
             {
-                switch (damageType[i])
+                switch (k)
                 {
-                    case Stats.DamageType.Physical:
-                        damageAmount[i] *= Defense.CalculateDamageReductionArmor(aDefender.Equipment.GetArmor * aAttacker.SecondaryStats.Attack.PercentPenetration - aAttacker.SecondaryStats.Attack.FlatPenetration, aAttacker.Level.CurrentLevel);
+                    case DamageType.Physical:
+                        value[k] *= Defense.CalculateDamageReductionArmor(aDefender.Equipment.GetArmor * aAttacker.SecondaryStats.Attack.PercentPenetration - aAttacker.SecondaryStats.Attack.FlatPenetration, aAttacker.Level.CurrentLevel);
                         break;
-                    case Stats.DamageType.Arcane:
+                    case DamageType.Arcane:
                         //How do we want to handle resistances for spells with multiple schools?
                         //How do we want to handle partial resists for binary spells? If wow like not at all
                         //How do we handle spelleffects, do slows and stuff only binary or partial as well?
-                        SRCDAR(ref damageAmount[i], SpellSchool.Arcane);
+                        value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Arcane);
                         break;
                     case Stats.DamageType.Fire:
                         // Implement Fire damage reduction logic here
-                        SRCDAR(ref damageAmount[i], SpellSchool.Fire);
+                        value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Fire);
                         break;
-                    case Stats.DamageType.Frost:
+                    case DamageType.Frost:
                         // Implement Frost damage reduction logic here
-                        SRCDAR(ref damageAmount[i], SpellSchool.Frost);
+                        value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Frost);
                         break;
-                    case Stats.DamageType.Holy:
+                    case DamageType.Holy:
                         // Implement Holy damage reduction logic here
-                        SRCDAR(ref damageAmount[i], SpellSchool.Holy);
+                        value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Holy);
                         break;
-                    case Stats.DamageType.Nature:
+                    case DamageType.Nature:
                         // Implement Nature damage reduction logic here
-                        SRCDAR(ref damageAmount[i], SpellSchool.Nature);
+                        value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Nature);
                         break;
-                    case Stats.DamageType.Shadow:
+                    case DamageType.Shadow:
                         // Implement Shadow damage reduction logic here
-                        SRCDAR(ref damageAmount[i], SpellSchool.Shadow);
+                        value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Shadow);
                         break;
-                    case Stats.DamageType.True:
+                    case DamageType.True:
                         break;
                     default:
                         throw new Exception("huh");
@@ -121,28 +130,12 @@ namespace Project_1.GameObjects.Unit.Stats
             }
             
         }
-        public void CrushingDamage(MobData aMobData, UnitData aUnitData)
+        public void ApplyCrushingDamage(Entity aMobData, Entity aUnitData)
         {
-            if (!damageType.Contains(Stats.DamageType.Physical))
+            if (!value.Keys.Contains(DamageType.Physical))
                 return;
-            int enemyWeaponSkill = aMobData.Level.CurrentLevel * 5;
-
-            double crushChance = ((enemyWeaponSkill - aUnitData.DefenseSkill) * 2) - 15;
-
-            if (crushChance < 0)
-                crushChance = 0;
-            else if (crushChance > 100)
-                crushChance = 100;
-
-            // AI did this and it seems wrong xdd
-            for (int i = 0; i < damageType.Length; i++)
-            {
-                if (damageType[i] == Stats.DamageType.Physical)
-                {
-                    damageAmount[i] *= (1 + (crushChance / 100));
-                    return;
-                }
-            }
+            
+            value[DamageType.Physical] *= 1.5;
         }
     }
 

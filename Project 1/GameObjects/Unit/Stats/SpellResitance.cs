@@ -55,7 +55,7 @@ namespace Project_1.GameObjects.Unit.Stats
             }
         }
 
-        public static double CalculateDamageReductionNonBinary(UnitData aTarget, UnitData aCaster, SpellSchool aResist)
+        public static double CalculateDamageReductionNonBinary(Entity aTarget, Entity aCaster, SpellSchool aResist)
         {
             // effective resistance rating = Rb + max((Lt - Lc) * 5, 0) - min(P, Rb)
             int levelDifference = aTarget.Level.CurrentLevel - aCaster.Level.CurrentLevel;

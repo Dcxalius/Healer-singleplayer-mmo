@@ -77,6 +77,7 @@ namespace Project_1.GameObjects.Spells
             this.acceptableTargets = acceptableTargets;
             this.castDistance = castDistance;
             this.travelType = travelType;
+            this.isBinary = isBinary;
             this.spellSchools = spellSchools;
             Assert();
         }

@@ -21,6 +21,10 @@ namespace Project_1.GameObjects.Unit.Stats
         double blockChance;
         public double BlockValue => blockValue;
         double blockValue;
+        public double CriticalChanceReduction => criticalChanceReduction;
+        double criticalChanceReduction;
+        public double CriticalDamageReduction => criticalDamageReduction;
+        double criticalDamageReduction;
         public SpellResitance SpellResitance => spellResitance;
         SpellResitance spellResitance;
 
@@ -35,17 +39,6 @@ namespace Project_1.GameObjects.Unit.Stats
         {
             armor.Value = aUnitData.Equipment.GetArmor;
 
-        }
-        public void CalculateBlockReduction(ref Damage aDamage)
-        {
-            for (int i = 0; i < aDamage.DamageAmount.Length; i++)
-            {
-                if (aDamage.DamageType[i] == DamageType.Physical)
-                {
-                    double reducedAmount = aDamage.DamageAmount[i] - blockValue;
-                    aDamage.DamageAmount[i] = reducedAmount < 0 ? 0 : reducedAmount;
-                }
-            }
         }
         public static double CalculateEHP(double playerHealth, double armorDamageReduction)
         {

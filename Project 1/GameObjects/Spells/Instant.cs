@@ -64,7 +64,7 @@ namespace Project_1.GameObjects.Spells
         {
             if (type == Type.Attack)
             {
-                aTarget.TakeDamage(aCaster, RandomValue);
+                aTarget.RecieveAttack(aCaster, RandomValue);
                 return true;
             }
 

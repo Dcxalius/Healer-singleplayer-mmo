@@ -27,7 +27,7 @@ namespace Project_1.GameObjects.Unit
         float secondsPerAttack;
 
         public float dps => ((Damage.Item1 + Damage.Item2) / 2) / secondsPerAttack;
-        public (float, float) Damage => (attackDamageMin + (attackPower / 14) * secondsPerAttack, attackDamageMax + (attackPower / 14) * secondsPerAttack);
+        (float, float) Damage => (attackDamageMin + (attackPower / 14) * secondsPerAttack, attackDamageMax + (attackPower / 14) * secondsPerAttack);
         float attackDamageMin;
         float attackDamageMax;
 

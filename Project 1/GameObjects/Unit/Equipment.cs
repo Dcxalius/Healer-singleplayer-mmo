@@ -62,6 +62,8 @@ namespace Project_1.GameObjects.Unit
             }
         }
 
+        public bool CanShieldBlock(DamageType aDamageType) => aDamageType == DamageType.Physical; //TODO: Implement shields that can block certain damage types
+
         public bool IsDualWielding
         {
             get

@@ -11,7 +11,7 @@ namespace Project_1.GameObjects.Unit
 {
     internal class Health
     {
-        public float MaxHealth 
+        public double MaxHealth 
         { 
             get => maxHealth;
             private set
@@ -25,7 +25,7 @@ namespace Project_1.GameObjects.Unit
             }
         }
 
-        public float CurrentHealth
+        public double CurrentHealth
         {
             get => currentHealth;
             set
@@ -39,15 +39,15 @@ namespace Project_1.GameObjects.Unit
             }
         }
 
-        float maxHealth;
-        float currentHealth;
+        double maxHealth;
+        double currentHealth;
 
-        float baseMaxHealth;
+        double baseMaxHealth;
 
-        float baseHealthPer5;
-        float healthPer5;
+        double baseHealthPer5;
+        double healthPer5;
 
-        public Health(ClassData aClassData, BasePrimaryStats aPrimaryStats, int aLevel, float aCurrentHp) 
+        public Health(ClassData aClassData, BasePrimaryStats aPrimaryStats, int aLevel, double aCurrentHp) 
         {
             Debug.Assert(aCurrentHp > 0);
 
@@ -73,7 +73,7 @@ namespace Project_1.GameObjects.Unit
             healthPer5 = baseHealthPer5 + aPrimaryStats.Spirit.Hp5Bonus;
         }
 
-        internal void LevelUp(float aPerLevelHp, int aStamina)
+        internal void LevelUp(double aPerLevelHp, int aStamina)
         {
             baseMaxHealth += aPerLevelHp;
             UpdateStamina(aStamina);
