@@ -73,7 +73,7 @@ namespace Project_1.GameObjects.Unit.Stats
                     throw new NotImplementedException();
             }
 
-            fistAttack = new AttackData(AttackData.AttackStyle.OneHander, new Attack(aClassData.FistMinAttackDamage, aClassData.FistMaxAttackDamage, aClassData.FistAttackSpeed), null);
+            fistAttack = new AttackData(AttackData.AttackStyle.OneHander, new Unit.Attack(aClassData.FistMinAttackDamage, aClassData.FistMaxAttackDamage, aClassData.FistAttackSpeed, Items.SubTypes.Weapon.WeaponType.None), null);
             fistAttack.AttackPower = GetAttackPower(aClassData);
 
         }

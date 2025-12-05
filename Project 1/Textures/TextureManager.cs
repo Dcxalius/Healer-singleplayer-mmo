@@ -17,7 +17,7 @@ namespace Project_1.Textures
 {
     internal static class TextureManager
     {
-
+        const string FALLBACK_FONT = "Gloryse";
         static Dictionary<string, Texture2D>[] texturesDict;
         static Dictionary<string, SpriteFont> fontDict;//TODO: Font is not open source so need to be change at some point
 
@@ -52,6 +52,7 @@ namespace Project_1.Textures
 
             }
 
+            DebugManager.Print(typeof(GraphicsManager), debug);
         }
 
         static void InitArrays()
@@ -108,22 +109,49 @@ namespace Project_1.Textures
         }
 
 
-        public static ref SpriteFont GetFont(string fontName)
+        public static SpriteFont GetFont(string fontName)
         {
-            return ref CollectionsMarshal.GetValueRefOrNullRef(fontDict, fontName);
+            if (fontDict == null)
+                throw new InvalidOperationException("TextureManager fonts not initialized.");
+
+            if (!fontDict.TryGetValue(fontName, out var font))
+            {
+                DebugManager.Print(typeof(TextureManager), $"Font '{fontName}' not found. Falling back to '{FALLBACK_FONT}'.");
+                if (!fontDict.TryGetValue(FALLBACK_FONT, out font))
+                    throw new KeyNotFoundException($"Fallback font '{FALLBACK_FONT}' not found. Loaded fonts: {string.Join(", ", fontDict.Keys)}");
+            }
+            return font;
         }
 
-        public static ref Texture2D GetTexture(GfxPath aGfxPath)
+        public static Texture2D GetTexture(GfxPath aGfxPath)
         {
-            ref Texture2D? a = ref CollectionsMarshal.GetValueRefOrNullRef(texturesDict[(int)aGfxPath.Type], aGfxPath.Name);
+            // Basic safety checks
+            if (texturesDict == null)
+                throw new InvalidOperationException("TextureManager: texturesDict is null. InitArrays() / static ctor did not run.");
 
-            if (System.Runtime.CompilerServices.Unsafe.IsNullRef(ref a)) 
+            int typeIndex = (int)aGfxPath.Type;
+            if (typeIndex < 0 || typeIndex >= texturesDict.Length)
+                throw new ArgumentOutOfRangeException(nameof(aGfxPath), $"Invalid GfxType index: {typeIndex}");
+
+            var dict = texturesDict[typeIndex];
+
+            if (!dict.TryGetValue(aGfxPath.Name, out var texture))
             {
-                DebugManager.Print(typeof(TextureManager), "Texture " + aGfxPath.Name + " from type " + aGfxPath.Type + " was not found.");
-                a = ref CollectionsMarshal.GetValueRefOrNullRef(texturesDict[(int)GfxType.Debug], "MissingTexture");
+                DebugManager.Print(
+                    typeof(TextureManager),
+                    "Texture " + aGfxPath.Name + " from type " + aGfxPath.Type + " was not found."
+                );
+
+                // Fallback to MissingTexture in the Debug gfx type
+                var debugDict = texturesDict[(int)GfxType.Debug];
+
+                if (!debugDict.TryGetValue("MissingTexture", out texture))
+                    throw new KeyNotFoundException(
+                        "Fallback texture 'MissingTexture' not found in GfxType.Debug."
+                    );
             }
 
-            return ref a ;
+            return texture;
         }
 
     }

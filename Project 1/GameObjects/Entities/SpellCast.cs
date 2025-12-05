@@ -12,7 +12,7 @@ using static Project_1.GameObjects.Spells.AoE.AreaOfEffectData;
 
 namespace Project_1.GameObjects.Entities
 {
-    internal class SpellCast
+    internal class SpellCast //Should this be part of enitity instead?
     {
         Entity owner;
 
@@ -147,7 +147,7 @@ namespace Project_1.GameObjects.Entities
         bool CastSpell(Spell aSpell, Entity aTarget)
         {
 
-            if (!aSpell.Cast(aTarget)) return false;
+            if (!aSpell.Cast(aTarget, owner)) return false;
             owner.Resource.CastSpell(aSpell.ResourceCost);
 
             return true;

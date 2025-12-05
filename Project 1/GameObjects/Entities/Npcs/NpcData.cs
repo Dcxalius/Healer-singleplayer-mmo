@@ -20,7 +20,8 @@ namespace Project_1.GameObjects.Entities.Npcs
         
 
         [JsonConstructor]
-        public NpcData(string name, string corpseGfxName, string className, Relation.RelationToPlayer? relation, int level, int experience, float currentHp, float currentResource, int?[] equipment, WorldSpace position, WorldSpace momentum, WorldSpace velocity, List<WorldSpace> destinations) : base(name, corpseGfxName, className, relation, level, experience, currentHp, currentResource, equipment, position, momentum, velocity, destinations)
+        public NpcData(string name, string corpseGfxName, string className, Relation.RelationToPlayer? relation, int level, int experience, float currentHp, float currentResource, int?[] equipment, WorldSpace position, WorldSpace momentum, WorldSpace velocity, List<WorldSpace> destinations)
+            : base(name, corpseGfxName, className, relation, level, experience, currentHp, currentResource, equipment, position, momentum, velocity, destinations, level * 5)
         {
         }
     }

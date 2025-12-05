@@ -58,9 +58,9 @@ namespace Project_1.GameObjects.Unit
         Level level;
 
         [JsonProperty]
-        float CurrentHp => baseStats.Health.CurrentHealth;
+        double CurrentHp => baseStats.Health.CurrentHealth;
         [JsonProperty]
-        float CurrentResource => baseStats.Resource.Value;
+        double CurrentResource => baseStats.Resource.Value;
 
         [JsonIgnore]
         public BaseStats BaseStats => baseStats;

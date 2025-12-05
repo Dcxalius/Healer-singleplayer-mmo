@@ -8,9 +8,12 @@ namespace Project_1.GameObjects.Unit.Stats
 {
     internal class Armor : Stat
     {
-        public float GetGetReductionPercentage(int aAttackLevel)
+        public float GetGetReductionPercentage(int aAttackerLevel)
         {
-            return (float)(Value) / (float)(Value + 400f + 85f * aAttackLevel);
+            if (aAttackerLevel < 60)
+                return (float)((Value) / (Value + 400f + 85f * aAttackerLevel));
+
+            return (float)(Value / (Value + 400 + 85 * (aAttackerLevel + 4.5 * (aAttackerLevel - 59))));
         }
 
         public Armor(int aValue) : base(aValue)

@@ -70,12 +70,9 @@ namespace Project_1.GameObjects.Spells
             lastTimeCasted = TimeManager.TotalFrameTime;
 
             if (spellData.Travel == SpellData.TravelType.Instant)
-            {
                 Trigger(aCaster, aTarget);
-                return;
-            }
-
-            ProjectileFactory.CreateProjectile(aCaster.Centre, this, aTarget);
+            else
+                ProjectileFactory.CreateProjectile(aCaster, aCaster.Centre, this, aTarget);
         }
 
         public bool Trigger(Entity aTarget, Entity aCaster)

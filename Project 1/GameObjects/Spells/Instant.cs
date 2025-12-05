@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Unit.Stats;
 using Project_1.Managers;
 using System;
 using System.Collections.Generic;
@@ -35,36 +36,25 @@ namespace Project_1.GameObjects.Spells
             }
         }
 
+        DamageType damageType;
         int minValue;
         int maxValue;
-        Type type 
-        {
-            get
-            {
-                if (minValue > 0)
-                {
-                    return Type.Heal;
-                }
-                else
-                {
-                    return Type.Attack;
-                }
-            }
-        }
+        Type type => minValue > 0 ? Type.Heal : Type.Attack;
 
         [JsonConstructor]
-        public Instant(string name, int minValue, int maxValue) : base(name)
+        public Instant(string name, int minValue, int maxValue, DamageType damageType) : base(name)
         {
             Debug.Assert(maxValue != 0, "Tried to make effect with no effect.");
             this.minValue = minValue;
             this.maxValue = maxValue;
+            this.damageType = damageType;
         }
 
         public override bool Trigger(Entity aCaster, Entity aTarget)
         {
             if (type == Type.Attack)
             {
-                aTarget.RecieveAttack(aCaster, RandomValue);
+                aTarget.RecieveSpellAttack(aCaster, Name, new Damage(RandomValue, damageType));
                 return true;
             }
 

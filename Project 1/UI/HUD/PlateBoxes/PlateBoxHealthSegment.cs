@@ -29,14 +29,14 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         public override void Refresh(Entity aEntity)
         {
-            healthBar.MaxValue = aEntity.MaxHealth;
-            healthBar.Value = aEntity.CurrentHealth;
+            healthBar.MaxValue = (float)aEntity.MaxHealth;
+            healthBar.Value = (float)aEntity.CurrentHealth;
         }
 
         public void SetTarget(Entity aEntity)
         {
-            healthBar.MaxValue = aEntity.MaxHealth;
-            healthBar.Value = aEntity.CurrentHealth;
+            healthBar.MaxValue = (float)aEntity.MaxHealth;
+            healthBar.Value = (float)aEntity.CurrentHealth;
         }
 
 

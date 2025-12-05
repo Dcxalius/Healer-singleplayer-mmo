@@ -8,23 +8,36 @@ internal static class Program
     private const string LaunchFlag = "--run-game";
 
     [STAThread]
-    private static void Main(string[] args)
+    private static int Main(string[] args)
     {
-        if (ShouldLaunchGame(args))
+        try
         {
-            using var game = new Game1();
-            game.Run();
-            return;
-        }
+            if (ShouldLaunchGame(args))
+            {
+                using var game = new Game1();
+                game.Run();
+                return 0;
+            }
 
 #if NET6_0_OR_GREATER
-        ApplicationConfiguration.Initialize();
+            ApplicationConfiguration.Initialize();
 #else
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
 #endif
 
-        Application.Run(new StartGameForm());
+            Application.Run(new StartGameForm());
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Unhandled exception:");
+            Console.WriteLine(ex);
+            Console.WriteLine();
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey(true);
+            return 1;
+        }
+        return 0;
     }
 
     private static bool ShouldLaunchGame(string[] args)

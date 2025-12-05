@@ -24,9 +24,22 @@ namespace Project_1.GameObjects.Unit.Stats
 
         Dictionary<DamageType, double> value;
 
+        public Damage(double aDamageAmount, DamageType aDamageType)
+        {
+            value = new Dictionary<DamageType, double>
+            {
+                { aDamageType, aDamageAmount }
+            };
+        }
+
         public Damage(double[] aDamageAmount, DamageType[] aDamageType)
         {
             value = new Dictionary<DamageType, double>();
+            for (int i = 0; i < aDamageAmount.Length; i++)
+            {
+                if (!value.TryAdd(aDamageType[i], aDamageAmount[i]))
+                    throw new Exception("Tried to add same damage type twice in Damage constructor.");
+            }
         }
 
         public Damage(Damage aDamageTaken)

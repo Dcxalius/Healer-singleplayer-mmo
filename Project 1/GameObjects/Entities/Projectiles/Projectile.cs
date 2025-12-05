@@ -15,6 +15,7 @@ namespace Project_1.GameObjects.Entities.Projectiles
     internal class Projectile : MovingObject
     {
         Entity target;
+        Entity caster;
         ProjectileData projectileData;
         Spell spell;
 
@@ -22,10 +23,11 @@ namespace Project_1.GameObjects.Entities.Projectiles
         bool isFinished;
         public override float MaxSpeed => projectileData.MaxSpeed;
 
-        public Projectile(WorldSpace aPos, ProjectileData aProjectileData, Spell aSpell, Entity aTarget) : base(new Texture(aProjectileData.GfxPath), aPos)
+        public Projectile(Entity aCaster, WorldSpace aPos, ProjectileData aProjectileData, Spell aSpell, Entity aTarget) : base(new Texture(aProjectileData.GfxPath), aPos)
         {
             isFinished = false;
 
+            caster = aCaster;
             target = aTarget;
             projectileData = aProjectileData;
             spell = aSpell;
@@ -55,7 +57,7 @@ namespace Project_1.GameObjects.Entities.Projectiles
 
             if (Centre.DistanceTo(target.Centre) < Size.X / 2)
             {
-                spell.Trigger(target);
+                spell.Trigger(target, caster);
                 isFinished = true;
             }
 

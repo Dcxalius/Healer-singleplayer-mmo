@@ -2,6 +2,7 @@
 using Project_1.Camera;
 using Project_1.GameObjects.Spawners.Pathing;
 using Project_1.GameObjects.Unit;
+using Project_1.GameObjects.Unit.Stats;
 using Project_1.Items;
 using Project_1.Managers;
 using Project_1.Textures;
@@ -61,7 +62,6 @@ namespace Project_1.GameObjects.Entities
         }
         protected override void Death()
         {
-
             int[] averageLevel = aggroTable.GetLevelOfAggroTable();
 
             int exp = UnitData.Level.ExpReward((int)Math.Round(averageLevel.Average()));
@@ -70,11 +70,10 @@ namespace Project_1.GameObjects.Entities
             base.Death();
         }
 
-        public override void RecieveAttack(Entity aAttacker, float aDamageTaken)
+        protected override void ProcessDamage(Entity aCause, string aCauseName, float aDamageTaken, DamageType aDamageType, string aPrefix, string aSuffix)
         {
-            base.RecieveAttack(aAttacker, aDamageTaken);
-            aggroTable.AddToAggroTable(aAttacker, aDamageTaken);
-
+            base.ProcessDamage(aCause, aCauseName, aDamageTaken, aDamageType, aPrefix, aSuffix);
+            aggroTable.AddToAggroTable(aCause, aDamageTaken);
         }
 
         public virtual void AddToAggroTable(Entity aEntityToAdd, float aThreatValue)

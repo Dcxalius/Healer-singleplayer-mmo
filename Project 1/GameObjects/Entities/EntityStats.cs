@@ -42,8 +42,16 @@ namespace Project_1.GameObjects.Entities
         public int CurrentLevel => unitData.Level.CurrentLevel;
         public bool Alive => unitData.Health.CurrentHealth > 0;
         public bool FullHealth => unitData.Health.MaxHealth == unitData.Health.CurrentHealth;
-        public float MaxHealth => unitData.Health.MaxHealth;
-        public float CurrentHealth => unitData.Health.CurrentHealth;
+        public double MaxHealth => unitData.Health.MaxHealth;
+        public double CurrentHealth
+        {
+            get => unitData.Health.CurrentHealth;
+            set
+            {
+                unitData.Health.CurrentHealth = value;
+                FlagForRefresh();
+            }
+        }
 
         public SecondaryStats SecondaryStats => unitData.SecondaryStats;
         public int DefenseSkill => unitData.DefenseSkill;
@@ -142,7 +150,7 @@ namespace Project_1.GameObjects.Entities
 
         float CalculateHealing(float aHealingTaken)
         {
-            float value = aHealingTaken;
+            double value = aHealingTaken;
             if (CurrentHealth + value > MaxHealth) value = MaxHealth - CurrentHealth;
 
             int beforeHealingTaken = (int)Math.Round(unitData.Health.CurrentHealth);
@@ -151,101 +159,6 @@ namespace Project_1.GameObjects.Entities
 
             return beforeHealingTaken - afterHealingTaken;
         }
-
-        public virtual void RecieveAttack(HitTable.HitResult aHitResult, Entity aAttacker, Unit.Attack aAttack, Damage aDamageTaken)
-        {
-            string resultString = "";
-            Color resultColor = Color.White;
-            if (aHitResult <= HitTable.HitResult.Parry)
-            {
-                switch (aHitResult)
-                {
-                    case HitTable.HitResult.Miss:
-                        resultString = "Miss";
-                        resultColor = Color.Gray;
-                        break;
-                    case HitTable.HitResult.Dodge:
-                        resultString = "Dodge";
-                        resultColor = Color.DarkGray;
-                        //TODO: Trigger dodge event
-                        break;
-                    case HitTable.HitResult.Parry:
-                        resultString = "Parry";
-                        resultColor = Color.DarkSlateGray;
-                        //TODO: Trigger parry event
-                        break;
-                }
-
-                SpawnFlyingText(resultString, GetDirOfFloatingText(aAttacker.FeetPosition), resultColor);
-                return;
-            }
-            Damage premitigation = new Damage(aDamageTaken);
-            switch (aHitResult)
-            {
-                case HitTable.HitResult.Glancing:
-                    Debug.Assert(UnitType != UnitType.Player);
-                    aDamageTaken.ApplyGlancingBlowDamage(aAttacker, aAttack, this);
-                    resultColor = Color.DimGray;
-                    break;
-                case HitTable.HitResult.Block:
-                    aDamageTaken.ApplyBlocked(aAttacker, this);
-                    resultColor = Color.LightGray;
-                    //TODO: Trigger block event
-                    if (!aDamageTaken.ContainsDamage)
-                    {
-                        resultString = "Blocked";
-                        SpawnFlyingText(resultString, GetDirOfFloatingText(aAttacker.FeetPosition), resultColor);
-                        return;
-                    }
-                    break;
-                case HitTable.HitResult.Crit:
-                    aDamageTaken.ApplyCriticalStrike(aAttacker, this);
-                    resultColor = Color.Yellow;
-                    break;
-                case HitTable.HitResult.Crushing:
-                    aDamageTaken.ApplyCrushingDamage(aAttacker, this);
-                    resultColor = Color.Orange;
-                    break;
-                case HitTable.HitResult.Hit:
-                    resultColor = Color.Red; //TODO: Instead of just using text color, have the text color depend on the damage type and glancing/blocked/crit/crushing/hit change the border color
-                    break;
-                default:
-                    break;
-            }
-            aDamageTaken.ApplyDamageReduction(aAttacker, this, aAttack);
-
-            if (aDamageTaken.Sum <= 0) return;
-
-            for (int i = 0; i < aDamageTaken.Count; i++)
-            {
-                //TODO: When different damage types are implemented, show different colors for different damage types
-                // For example, physical damage could be red, fire damage orange, frost damage blue, etc.
-                // And introduce a offset to the floating text position so that multiple damage types don't overlap
-                unitData.Health.CurrentHealth -= aDamageTaken[aDamageTaken.Types[i]];
-
-                WorldSpace dir = GetDirOfFloatingText(aAttacker.FeetPosition);
-                SpawnFlyingText(resultString, dir, resultColor);
-            }
-
-            ParticleMovement bloodMovement = new ParticleMovement(GetDirOfFloatingText(aAttacker.FeetPosition), WorldSpace.Zero, 0.9f);
-            ParticleManager.SpawnParticle(bloodsplatter, WorldRectangle, this, bloodMovement, (int)Math.Max(1, Math.Min((aDamageTaken.Sum / MaxHealth) * 100, 100)));
-            FlagForRefresh(); //TODO: Check death here?
-        }
-
-        void SpawnFlyingText(string aHealthChangeValue, WorldSpace aDirOfFlyingStuff, Color aTextColor) => FloatingTextManager.AddFloatingText(new FloatingText(aHealthChangeValue, aTextColor, FeetPosition, aDirOfFlyingStuff));
-
-
-        WorldSpace GetDirOfFloatingText(WorldSpace aFeetPosOfTriggerer)
-        {
-            WorldSpace dirOfFlyingStuff = (FeetPosition - aFeetPosOfTriggerer);
-            if (dirOfFlyingStuff == WorldSpace.Zero)
-            {
-                dirOfFlyingStuff.Y = 1;
-            }
-            dirOfFlyingStuff.Normalize();
-            return dirOfFlyingStuff;
-        }
-
 
 
         public abstract void ExpToParty(int aExpAmount);

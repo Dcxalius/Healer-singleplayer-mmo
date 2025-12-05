@@ -26,7 +26,8 @@ namespace Project_1.GameObjects.Unit
         
 
         [JsonConstructor]
-        public SavedMobData(string name, int spawnerID, int spawnZoneID, int level, float currentHp, float currentResource, int?[] equipment, WorldSpace position, WorldSpace momentum, WorldSpace velocity, List<WorldSpace> destinations) : base(name, ObjectFactory.GetMobData(name).CorpseGfxPath.Name, ObjectFactory.GetMobData(name).ClassData.Name, ObjectFactory.GetMobData(name).RelationData.ToPlayer, level, 0, currentHp, currentResource, equipment, position, momentum, velocity, destinations)
+        public SavedMobData(string name, int spawnerID, int spawnZoneID, int level, float currentHp, float currentResource, int?[] equipment, WorldSpace position, WorldSpace momentum, WorldSpace velocity, List<WorldSpace> destinations) 
+            : base(name, ObjectFactory.GetMobData(name).CorpseGfxPath.Name, ObjectFactory.GetMobData(name).ClassData.Name, ObjectFactory.GetMobData(name).RelationData.ToPlayer, level, 0, currentHp, currentResource, equipment, position, momentum, velocity, destinations, level * 5)
         {
             this.spawnerID = spawnerID;
             this.spawnZoneID = spawnZoneID;

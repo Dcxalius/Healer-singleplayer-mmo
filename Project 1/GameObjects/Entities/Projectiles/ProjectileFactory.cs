@@ -31,9 +31,9 @@ namespace Project_1.GameObjects.Entities.Projectiles
             }
         }
 
-        public static Projectile CreateProjectile(WorldSpace aStartPosition, Spell aSpell, Entity aTarget)
+        public static Projectile CreateProjectile(Entity aCaster, WorldSpace aStartPosition, Spell aSpell, Entity aTarget)
         {
-            return new Projectile(aStartPosition, projectiles[aSpell.Name], aSpell, aTarget);
+            return new Projectile(aCaster, aStartPosition, projectiles[aSpell.Name], aSpell, aTarget);
         }
     }
 }

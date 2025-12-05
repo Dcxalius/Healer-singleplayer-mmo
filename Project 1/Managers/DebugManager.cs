@@ -76,9 +76,13 @@ namespace Project_1.Managers
                 //logger = new StreamWriter(Console.OpenStandardOutput());
             }
 
-            fpsText = new Text("Gloryser", Color.Chartreuse);
-            frameTimeText = new Text("Gloryser", Color.Chartreuse);
-            totalTimeText = new Text("Gloryser", Color.Chartreuse);
+        }
+
+        public static void LoadContent()
+        {
+            fpsText = new Text("Gloryse", Color.Chartreuse);
+            frameTimeText = new Text("Gloryse", Color.Chartreuse);
+            totalTimeText = new Text("Gloryse", Color.Chartreuse);
             debugTextOrigin = new AbsoluteScreenPosition(12, 12);
         }
 

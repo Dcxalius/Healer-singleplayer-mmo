@@ -52,7 +52,7 @@ namespace Project_1.UI.HUD
         void SetTarget(Entity aEntity) //TODO: Add a minimum size for bar and a maximum size of name.
         {
             name.Text = aEntity.Name;
-            healthBar.Value = aEntity.CurrentHealth / aEntity.MaxHealth;
+            healthBar.Value = (float)(aEntity.CurrentHealth / aEntity.MaxHealth);
 
             AbsoluteScreenPosition textOffset = new AbsoluteScreenPosition((int)name.UnderlyingTextOffset.X, (int)name.UnderlyingTextOffset.Y);
 
@@ -82,7 +82,7 @@ namespace Project_1.UI.HUD
 
         public void Refresh(Entity aEntity)
         {
-            healthBar.Value = aEntity.CurrentHealth / aEntity.MaxHealth;
+            healthBar.Value = (float)(aEntity.CurrentHealth / aEntity.MaxHealth);
         }
 
         public void Reposition(Entity aEntity)

@@ -20,6 +20,36 @@ namespace Project_1.GameObjects.Unit.Stats
 
     internal class SpellDamage //TODO: Redo this possibly? Instead make an instance of a class per spellschool (including non/base) and then return base + the correct school. Crit, spell etc should be packed in there aswell
     {
+        static public SpellSchool DamageToSpellType(DamageType aDamageType)
+        {
+            return aDamageType switch
+            {
+                DamageType.Arcane => SpellSchool.Arcane,
+                DamageType.Fire => SpellSchool.Fire,
+                DamageType.Frost => SpellSchool.Frost,
+                DamageType.Holy => SpellSchool.Holy,
+                DamageType.Nature => SpellSchool.Nature,
+                DamageType.Shadow => SpellSchool.Shadow,
+                DamageType.Physical => throw new ArgumentException("Invalid damage type for spell school conversion"),
+                DamageType.True => throw new ArgumentException("Invalid damage type for spell school conversion"),
+                _ => throw new ArgumentException("Invalid damage type for spell school conversion"),
+            };
+        }
+
+        static public DamageType SpellToDamageType(SpellSchool aSpellSchool)
+        {
+            return aSpellSchool switch
+            {
+                SpellSchool.Arcane => DamageType.Arcane,
+                SpellSchool.Fire => DamageType.Fire,
+                SpellSchool.Frost => DamageType.Frost,
+                SpellSchool.Holy => DamageType.Holy,
+                SpellSchool.Nature => DamageType.Nature,
+                SpellSchool.Shadow => DamageType.Shadow,
+                _ => throw new ArgumentException("Invalid spell school for damage type conversion"),
+            };
+        }
+
         int baseSpellDamage;
         Dictionary<SpellSchool, int> spellDamageBySchool;
 

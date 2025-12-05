@@ -22,13 +22,10 @@ namespace Project_1.GameObjects.Unit.Classes
         public string[] LevelOneSpells => levelOneSpells;
         string[] levelOneSpells;
 
-        public FriendlyClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float baseHpPer5,
-            float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed, MeleeAttackPowerBonus meleeAttackPowerBonus, float dodgeScaling, float meleeCritScaling,
-            Weapon.WeaponType weaponsAllowed, string[] learnableSpells, string[] levelOneSpells, int[] gearAllowed, bool canDualWield) 
-            : base(name, resource, baseStats, perLevelStats, baseHp, perLevelHp, baseHpPer5, fistAttackSpeed, fistMinAttackDamage, fistMaxAttackDamage, speed, maxSpeed, meleeAttackPowerBonus, dodgeScaling, meleeCritScaling, weaponsAllowed, canDualWield)
+        public FriendlyClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float baseHpPer5, float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed, MeleeAttackPowerBonus meleeAttackPowerBonus, float dodgeScaling, float baseDodge, float meleeCritScaling, Weapon.WeaponType weaponsAllowed, string[] learnableSpells, string[] levelOneSpells, int[] gearAllowed, bool canDualWield, bool isCaster, bool canParry)
+            : base(name, resource, baseStats, perLevelStats, baseHp, perLevelHp, baseHpPer5, fistAttackSpeed, fistMinAttackDamage, fistMaxAttackDamage, speed, maxSpeed, meleeAttackPowerBonus, dodgeScaling, baseDodge, meleeCritScaling, weaponsAllowed, canDualWield, isCaster, canParry)
         {
             this.gearAllowed = gearAllowed;
-
             this.learnableSpells = learnableSpells;
             this.levelOneSpells = levelOneSpells;
             Assert();
