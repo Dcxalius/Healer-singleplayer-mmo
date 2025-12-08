@@ -49,7 +49,7 @@ namespace Project_1.GameObjects.Entities
         {
             get
             {
-                if (paths.Count == 0) return null;
+                if (paths.Count == 0) return new Path(new List<WorldSpace>() { owner.FeetPosition });
                 return paths[0];
             }
         }
@@ -132,18 +132,23 @@ namespace Project_1.GameObjects.Entities
         {
             paths.Clear();
             destination = null;
-            paths.Add(TileManager.GetPath(owner.FeetPosition, aDestination, new WorldSpace(owner.FeetSize)));
+            Path path = TileManager.GetPath(owner.FeetPosition, aDestination, new WorldSpace(owner.FeetSize));
+            if (path != null)
+            {
+                paths.Add(path);
+            }
         }
 
         public void AddDestination(WorldSpace aDestination)
         {
-            if (paths.Count > 0)
-            {
-                paths.Add(TileManager.GetPath(paths[paths.Count - 1].CheckLastSpace, aDestination, new WorldSpace(owner.FeetSize)));
+            Path lastPath = paths.Count > 0 ? paths[paths.Count - 1] : null;
+            WorldSpace start = lastPath != null ? lastPath.CheckLastSpace : owner.FeetPosition;
+            Path pathToAdd = TileManager.GetPath(start, aDestination, new WorldSpace(owner.FeetSize));
 
-                return;
+            if (pathToAdd != null)
+            {
+                paths.Add(pathToAdd);
             }
-            paths.Add(TileManager.GetPath(owner.FeetPosition, aDestination, new WorldSpace(owner.FeetSize)));
         }
 
         void UpdateDirection(WorldSpace aDestination)

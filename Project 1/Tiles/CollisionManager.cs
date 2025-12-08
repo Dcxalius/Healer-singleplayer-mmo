@@ -1,19 +1,31 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project_1.Tiles
 {
     internal class CollisionManager
     {
+        readonly List<Rectangle> mergedColliders;
+        readonly Dictionary<(int X, int Width), ActiveStrip> activeStrips;
+        readonly List<(int X, int Width)> keysToRemove;
+
+        struct ActiveStrip
+        {
+            public Rectangle Rectangle;
+            public int LastRow;
+        }
+
+        public CollisionManager()
+        {
+            mergedColliders = new List<Rectangle>();
+            activeStrips = new Dictionary<(int X, int Width), ActiveStrip>();
+            keysToRemove = new List<(int X, int Width)>();
+        }
+
         public List<(Rectangle, Rectangle)> CollisionsWithUnwalkable(Entity aEntity)
         {
-
             List<Rectangle> finalColliders = ConvertUnwalkableTilesToRectangles(aEntity.FeetPosition);
             Rectangle entityRectangle = aEntity.WorldRectangle;
             List<(Rectangle, Rectangle)> collisions = new List<(Rectangle, Rectangle)>();
@@ -24,6 +36,7 @@ namespace Project_1.Tiles
                     collisions.Add((Rectangle.Intersect(entityRectangle, collider), collider));
                 }
             }
+            mergedColliders.Clear();
             return collisions;
         }
 
@@ -31,103 +44,106 @@ namespace Project_1.Tiles
         {
             Tile[,] tilesSurroundingObject = TileManager.GetSurroundingTiles(TileManager.GetTileUnder(aPos));
 
-            Rectangle?[,] colliders = GetColliders(tilesSurroundingObject);
-
-            return Merge(colliders);
+            BuildMergedColliders(tilesSurroundingObject);
+            return mergedColliders;
         }
 
-        Rectangle?[,] GetColliders(Tile[,] aTileArray)
+        void BuildMergedColliders(Tile[,] tiles)
         {
-            Rectangle?[,] colliders = new Rectangle?[aTileArray.GetLength(0), aTileArray.GetLength(1)];
-            for (int i = 0; i < aTileArray.GetLength(0); i++)
+            mergedColliders.Clear();
+            activeStrips.Clear();
+            keysToRemove.Clear();
+
+            int width = tiles.GetLength(0);
+            int height = tiles.GetLength(1);
+
+            for (int row = 0; row < height; row++)
             {
-                for (int j = 0; j < aTileArray.GetLength(1); j++)
+                Tile runStartTile = null;
+                int runStartIndex = -1;
+                for (int column = 0; column < width; column++)
                 {
-                    if (aTileArray[i, j] == null) continue;
-                    if (!aTileArray[i, j].Walkable)
+                    Tile tile = tiles[column, row];
+                    bool blocked = tile != null && !tile.Walkable;
+                    if (blocked)
                     {
-                        colliders[i, j] = aTileArray[i, j].WorldRectangle;
-                    }
-                }
-            }
-
-            return colliders;
-        }
-
-        List<Rectangle> Merge(Rectangle?[,] aCollidersToMerge)
-        {
-            List<Rectangle> finalColliders = RightMerge(aCollidersToMerge);
-            finalColliders.AddRange(DownMerge(aCollidersToMerge));
-
-            return finalColliders;
-        }
-        List<Rectangle> DownMerge(Rectangle?[,] aCollidersToCheck) //TODO: This has bugs in it
-        {
-            List<Rectangle> finalColliders = new List<Rectangle>();
-            int[,] consumedBy = new int[aCollidersToCheck.GetLength(0), aCollidersToCheck.GetLength(1)];
-            for (int i = 0; i < aCollidersToCheck.GetLength(0); i++)
-            {
-                for (int j = 0; j < aCollidersToCheck.GetLength(1) - 1; j++)
-                {
-                    if (aCollidersToCheck[i, j] == null || aCollidersToCheck[i, j + 1] == null)
-                    {
-                        continue;
-                    }
-                    if (aCollidersToCheck[i, j].Value.Bottom == aCollidersToCheck[i, j + 1].Value.Top && aCollidersToCheck[i, j].Value.X == aCollidersToCheck[i, j + 1].Value.X)
-                    {
-                        consumedBy[i, j + 1] = finalColliders.Count;
-                        if (consumedBy[i, j] != 0)
+                        if (runStartIndex < 0)
                         {
-                            Rectangle r = Rectangle.Union(finalColliders[consumedBy[i, j]], aCollidersToCheck[i, j + 1].Value);
-
-                            finalColliders[consumedBy[i, j]] = r;
-                            consumedBy[i, j + 1] = consumedBy[i, j];
+                            runStartIndex = column;
+                            runStartTile = tile;
                         }
-                        else
-                        {
-                            finalColliders.Add(Rectangle.Union(aCollidersToCheck[i, j].Value, aCollidersToCheck[i, j + 1].Value));
-                        }
-
+                    }
+                    else if (runStartIndex >= 0)
+                    {
+                        AddHorizontalStrip(runStartTile, runStartIndex, column, row);
+                        runStartIndex = -1;
+                        runStartTile = null;
                     }
                 }
 
-            }
-
-            return finalColliders;
-        }
-
-        List<Rectangle> RightMerge(Rectangle?[,] aCollidersToCheck)
-        {
-            List<Rectangle> finalColliders = new List<Rectangle>();
-            bool[] consumed = new bool[aCollidersToCheck.Length];
-            for (int i = 0; i < aCollidersToCheck.GetLength(0) - 1; i++)
-            {
-                for (int j = 0; j < aCollidersToCheck.GetLength(1); j++)
+                if (runStartIndex >= 0 && runStartTile != null)
                 {
-                    if (aCollidersToCheck[i, j] == null || aCollidersToCheck[i + 1, j] == null)
+                    AddHorizontalStrip(runStartTile, runStartIndex, width, row);
+                    runStartIndex = -1;
+                    runStartTile = null;
+                }
+
+                keysToRemove.Clear();
+                foreach (var kvp in activeStrips)
+                {
+                    if (kvp.Value.LastRow < row)
                     {
-                        continue;
-                    }
-                    if (aCollidersToCheck[i, j].Value.Right == aCollidersToCheck[i + 1, j].Value.Left && aCollidersToCheck[i, j].Value.Y == aCollidersToCheck[i + 1, j].Value.Y)
-                    {
-                        consumed[i + 1] = true;
-                        if (consumed[i])
-                        {
-                            Rectangle r = Rectangle.Union(finalColliders.Last(), aCollidersToCheck[i + 1, j].Value);
-
-                            finalColliders.RemoveAt(finalColliders.Count - 1);
-
-                            finalColliders.Add(r);
-                        }
-                        else
-                        {
-                            finalColliders.Add(Rectangle.Union(aCollidersToCheck[i, j].Value, aCollidersToCheck[i + 1, j].Value));
-                        }
-
+                        mergedColliders.Add(kvp.Value.Rectangle);
+                        keysToRemove.Add(kvp.Key);
                     }
                 }
+                for (int i = 0; i < keysToRemove.Count; i++)
+                {
+                    activeStrips.Remove(keysToRemove[i]);
+                }
             }
-            return finalColliders;
+
+            foreach (var kvp in activeStrips)
+            {
+                mergedColliders.Add(kvp.Value.Rectangle);
+            }
+            activeStrips.Clear();
+            keysToRemove.Clear();
+        }
+
+        void AddHorizontalStrip(Tile startTile, int runStart, int runEnd, int row)
+        {
+            Point location = startTile.WorldRectangle.Location;
+            int width = TileManager.TileSize.X * (runEnd - runStart);
+            Rectangle strip = new Rectangle(location, new Point(width, TileManager.TileSize.Y));
+            var key = (strip.X, strip.Width);
+
+            if (activeStrips.TryGetValue(key, out ActiveStrip active))
+            {
+                if (active.LastRow == row - 1 && active.Rectangle.Bottom == strip.Top)
+                {
+                    active.Rectangle = Rectangle.Union(active.Rectangle, strip);
+                    active.LastRow = row;
+                    activeStrips[key] = active;
+                }
+                else
+                {
+                    mergedColliders.Add(active.Rectangle);
+                    activeStrips[key] = new ActiveStrip
+                    {
+                        Rectangle = strip,
+                        LastRow = row
+                    };
+                }
+            }
+            else
+            {
+                activeStrips[key] = new ActiveStrip
+                {
+                    Rectangle = strip,
+                    LastRow = row
+                };
+            }
         }
     }
 }

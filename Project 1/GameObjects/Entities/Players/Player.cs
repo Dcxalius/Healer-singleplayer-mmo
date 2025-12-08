@@ -108,7 +108,7 @@ namespace Project_1.GameObjects.Entities.Players
 
         void KeyboardWalk()
         {
-            if (HasDestination) { return; }
+            if (HasDestination && LockedMovement) { return; }
             if (KeyBindManager.GetHold(KeyBindManager.KeyListner.MoveCharacterLeft))
             {
                 velocity.X -= 1;

@@ -42,40 +42,94 @@ float maxBrightness;
 //bool tileTransparent[4096];
 
 
-bool b2oCheck(bool2 aBool)
-{
-    return aBool.x || aBool.y;
-}
-
-bool b2aCheck(bool2 aBool) 
-{
-    return aBool.x && aBool.y;
-}
 
 float2 TileToUV(int2 tileIndex)
 {
-    float2 playerTilePos = lightPos[0] / TILE_SIZE; // player = origin of transpMap
+    // Player is origin of the 65×65 transparency map
+    float2 playerTilePos = lightPos[0] / TILE_SIZE;
     float2 tileF = (float2) tileIndex;
 
-    // Δtile in [-32,+32] → [0,1]
+    // Δtile in [-32, +32] → [0, 1]
     return (tileF - playerTilePos) / FMAP_MAX_SIZE + float2(0.5f, 0.5f);
 }
 
 bool LineOfSight(int2 startTile, int2 endTile, out float4 aDebug)
 {
-    int2 pos = startTile;
-    int2 d = int2(abs(endTile.x - startTile.x), abs(endTile.y - startTile.y));
-    int2 s = int2(startTile.x < endTile.x ? 1 : -1,
-                    startTile.y < endTile.y ? 1 : -1);
+    // Same tile → trivially visible
+    if (startTile.x == endTile.x && startTile.y == endTile.y)
+    {
+        aDebug = float4(1, 1, 1, 1);
+        return true;
+    }
 
-    int err = d.x - d.y;
+    // Ray origin/end at tile centres
+    float2 start = (float2) startTile + 0.5f;
+    float2 end = (float2) endTile + 0.5f;
+    float2 dir = end - start;
+
+    // Avoid degenerate rays
+    if (abs(dir.x) < 1e-4 && abs(dir.y) < 1e-4)
+    {
+        aDebug = float4(1, 1, 1, 1);
+        return true;
+    }
+
+    int2 current = startTile;
+
+    // Step direction per axis
+    int2 step;
+    step.x = (dir.x > 0.0f) ? 1 : ((dir.x < 0.0f) ? -1 : 0);
+    step.y = (dir.y > 0.0f) ? 1 : ((dir.y < 0.0f) ? -1 : 0);
+
+    // Distance between next vertical / horizontal crossings
+    float2 deltaDist;
+    deltaDist.x = (abs(dir.x) > 1e-4) ? abs(1.0f / dir.x) : 1e6;
+    deltaDist.y = (abs(dir.y) > 1e-4) ? abs(1.0f / dir.y) : 1e6;
+
+    // Distance from start to first vertical / horizontal crossing
+    float2 sideDist;
+
+    if (dir.x > 0.0f)
+        sideDist.x = ((float) (current.x + 1) - start.x) * deltaDist.x;
+    else
+        sideDist.x = (start.x - (float) current.x) * deltaDist.x;
+
+    if (dir.y > 0.0f)
+        sideDist.y = ((float) (current.y + 1) - start.y) * deltaDist.y;
+    else
+        sideDist.y = (start.y - (float) current.y) * deltaDist.y;
+
+    if (step.x == 0)
+    {
+        deltaDist.x = 1e6;
+        sideDist.x = 1e6;
+    }
+
+    if (step.y == 0)
+    {
+        deltaDist.y = 1e6;
+        sideDist.y = 1e6;
+    }
 
     [loop]
-    for (int i = 0; i < 200; i++) // safety cap
+    for (int i = 0; i < 256; ++i)  // safety cap
     {
-        float2 uv = TileToUV(pos);
+        // Step to next tile along the ray
+        if (sideDist.x < sideDist.y)
+        {
+            sideDist.x += deltaDist.x;
+            current.x += step.x;
+        }
+        else
+        {
+            sideDist.y += deltaDist.y;
+            current.y += step.y;
+        }
 
-        // outside 65×65 window → treat as blocked
+        // Any solid tile blocks the ray before reaching the target
+        float2 uv = TileToUV(current);
+
+        // Outside the 65×65 window → treat as blocked
         if (any(uv < 0.0f) || any(uv > 1.0f))
         {
             aDebug = float4(1, 0, 0, 1);
@@ -83,39 +137,82 @@ bool LineOfSight(int2 startTile, int2 endTile, out float4 aDebug)
         }
 
         float4 solidF = tex2Dlod(transpSamp, float4(uv, 0, 0));
+        bool reachedTarget = (current.x == endTile.x && current.y == endTile.y);
 
-        // solid tile that is NOT start or end → blocks view
-        if (solidF.a > 0.0f &&
-            !(pos.x == startTile.x && pos.y == startTile.y) &&
-            !(pos.x == endTile.x && pos.y == endTile.y))
+        if (solidF.a > 0.0f)
         {
+            // Solid tile blocks visibility, including the end tile
             aDebug = float4(0, 0, 0, 1);
             return false;
         }
 
-        // reached target tile: LOS ok (even if that tile is solid)
-        if (pos.x == endTile.x && pos.y == endTile.y)
+        if (reachedTarget)
         {
             aDebug = float4(1, 1, 1, 1);
             return true;
         }
-
-        int e2 = 2 * err;
-        if (e2 > -d.y)
-        {
-            err -= d.y;
-            pos.x += s.x;
-        }
-        if (e2 < d.x)
-        {
-            err += d.x;
-            pos.y += s.y;
-        }
     }
 
+    // Should not normally hit this
     aDebug = float4(1, 0, 0, 1);
     return false;
 }
+
+//bool NotThatOldLineOfSight(int2 startTile, int2 endTile, out float4 aDebug)
+//{
+//    // Ray from tile center to tile center
+//    float2 start = (float2(startTile) + 0.5f);
+//    float2 end = (float2(endTile) + 0.5f);
+
+//    float2 delta = end - start;
+//    float dist = length(delta);
+
+//    if (dist < 0.001f)
+//    {
+//        aDebug = float4(1, 1, 1, 1);
+//        return true;
+//    }
+
+//    float2 dir = delta / dist;
+//    float step = 0.2f; // samples per tile along the ray
+//    float tMax = dist + 0.5f; // small extra margin
+
+//    [loop]
+//    for (float t = 0.0f; t <= tMax; t += step)
+//    {
+//        float2 pos = start + dir * t; // tile-space float
+//        int2 tile = (int2) floor(pos); // tile index
+//        float2 uv = TileToUV(tile);
+
+//        // Outside the 65×65 window → treat as blocked
+//        if (any(uv < 0.0f) || any(uv > 1.0f))
+//        {
+//            aDebug = float4(1, 0, 0, 1);
+//            return false;
+//        }
+
+//        float4 solidF = tex2Dlod(transpSamp, float4(uv, 0, 0));
+        
+
+//        // Once we've clearly passed the end tile, stop
+//        if (length((float2) tile + 0.5f - end) < 0.25f)
+//        {
+//            aDebug = float4(1, 1, 1, 1);
+//            return true;
+//        }
+//        // Solid tile that is not start or end → blocks view
+//        if (solidF.a > 0.0f &&
+//            !(tile.x == startTile.x && tile.y == startTile.y) &&
+//            !(tile.x == endTile.x && tile.y == endTile.y))
+//        {
+//            aDebug = float4(0, 0, 0, 1);
+//            return false;
+//        }
+//    }
+
+//    aDebug = float4(1, 0, 0, 1);
+//    return false;
+//}
 
 //bool OldLineOfSight(float2 aStartPos, float2 aEndPos, out float4 aDebug)
 //{
@@ -223,16 +320,14 @@ bool LineOfSight(int2 startTile, int2 endTile, out float4 aDebug)
 float4 MainPS(VertexShaderOutput input) : COLOR0
 {
     float4 texColor = tex2D(TextureSampler, input.TextureCoordinates) * input.Color;
-
     float2 pixelPos = cameraWorldPos + input.Position.xy;
 
-    // Tile index for this pixel (no +0.5 → tile-aligned)
+    // Tile index for this pixel (tile-aligned LOS)
     int2 tileIndex = (int2) floor(pixelPos / TILE_SIZE);
-    float2 tileCenterWorld = (float2(tileIndex) + 0.5f) * TILE_SIZE;
 
     float minDistance = minLength;
     float4 DEBUG = float4(0, 0, 0, 0);
-    bool behindWall = true;
+    bool anyLit = false;
 
     for (int i = 0; i < 5; i++)
     {
@@ -242,20 +337,25 @@ float4 MainPS(VertexShaderOutput input) : COLOR0
         float2 lightWorld = lightPos[i];
         int2 lightTile = (int2) floor(lightWorld / TILE_SIZE);
 
-        float d = distance(lightWorld, tileCenterWorld);
+        // Per-pixel gradient distance (reverted)
+        float d = distance(lightWorld, pixelPos);
 
-        if (behindWall)
-            behindWall = !LineOfSight(lightTile, tileIndex, DEBUG);
-
-        if (d < minDistance)
-            minDistance = d;
+        float4 losDebug;
+        if (LineOfSight(lightTile, tileIndex, losDebug))
+        {
+            anyLit = true;
+            DEBUG = losDebug; // keep last LOS debug color
+            if (d < minDistance)
+                minDistance = d;
+        }
     }
 
-    // If all LOS tests blocked, whole tile is in shadow
-    if (behindWall)
-        return DEBUG; // or float4(0,0,0,1);
+    // If no light has LOS, whole tile is in shadow
+    if (!anyLit)
+        return float4(0, 0, 0, 1);
 
-    texColor *= DEBUG; // if you still want debug tint
+    // Optional: debug tint
+    //texColor *= DEBUG;
 
     if (minDistance >= minLength)
         return float4(0, 0, 0, 1);

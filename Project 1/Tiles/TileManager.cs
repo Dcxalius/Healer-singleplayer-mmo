@@ -495,7 +495,7 @@ namespace Project_1.Tiles
                     }
                     else if (y >= Chunk.ChunkSize.Y)
                     {
-                        chunkToGetTileFrom = GetChunk(chunkToGetTileFrom.ChunkPosition + new Point(-1, 0));
+                        chunkToGetTileFrom = GetChunk(chunkToGetTileFrom.ChunkPosition + new Point(0, 1));
                         y -= Chunk.ChunkSize.Y;
                     }
 
@@ -545,7 +545,7 @@ namespace Project_1.Tiles
                 }
                 else if (y >= Chunk.ChunkSize.Y)
                 {
-                    chunkToGetTileFrom = GetChunk(chunkToGetTileFrom.ChunkPosition + new Point(-1, 0));
+                    chunkToGetTileFrom = GetChunk(chunkToGetTileFrom.ChunkPosition + new Point(0, 1));
                     y -= Chunk.ChunkSize.Y;
                 }
 
