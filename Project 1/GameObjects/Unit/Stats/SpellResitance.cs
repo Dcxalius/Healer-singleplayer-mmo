@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Project_1.GameObjects.Entities;
 using Project_1.Managers;
+using SharpDX.MediaFoundation.DirectX;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,9 +30,7 @@ namespace Project_1.GameObjects.Unit.Stats
         }
 
         public int GetResitance(SpellSchool aSchool) => baseResitance + (resitanceBySchool.TryGetValue(aSchool, out int schoolResitance) ? schoolResitance : 0);
-        //TODO: code bellow needs think time, should resitance be treated like this if no ratios are given?
-        public int GetResitance(SpellSchool[] aSchools) => baseResitance + aSchools.Select(school => resitanceBySchool.TryGetValue(school, out int schoolResitance) ? (int)(schoolResitance / aSchools.Count()) : 0).Sum();
-        public int GetResitance(SpellSchool[] aSchools, double[] aRatio) => (int)(baseResitance + (aSchools.Select((school, index) => (resitanceBySchool.TryGetValue(school, out int schoolResitance) ? schoolResitance : 0) * aRatio[index]).Sum()));
+        public int GetResitance(HashSet<SpellSchool> aSchools) => baseResitance + aSchools.Select(school => resitanceBySchool.TryGetValue(school, out int schoolResitance) ? (int)(schoolResitance / aSchools.Count()) : 0).Sum();
         public SpellResitance(int aBaseResitance, Dictionary<SpellSchool, int> aResitanceBySchool)
         {
             baseResitance = aBaseResitance;
@@ -55,16 +54,31 @@ namespace Project_1.GameObjects.Unit.Stats
             }
         }
 
-        public static double CalculateDamageReductionNonBinary(Entity aTarget, Entity aCaster, SpellSchool aResist)
+        public static double CalculateResistanceChanceBinary(Entity aTarget, Entity aCaster, HashSet<SpellSchool> spellSchools)
+        {
+            // Hit chance=BaseHitChance*(100%-75%*ResistanceScore/Cap)+SpellHitBonus
+            int leveldiff = aTarget.CurrentLevel - aCaster.CurrentLevel;
+            float levelHit = MathF.Max(0.01f, leveldiff >= 3 ? 0.96f - leveldiff * 0.01f : 0.83f - (leveldiff - 3) * 0.11f);
+
+            int cap = aCaster.Level.CurrentLevel * 5;
+            int totalResistance = aTarget.SecondaryStats.Defense.SpellResistance.GetResitance(spellSchools);
+            double resistReduction = 1.0 - (0.75 * Math.Clamp((double)totalResistance / cap, 0, 1));
+
+            float totalHit = levelHit * (float)resistReduction + aCaster.SecondaryStats.Spell.BonusHitChance;
+            return totalHit;
+        }
+
+        public static double CalculateDamageReductionNonBinary(Entity aTarget, Entity aCaster, SpellSchool aResist) => CalculateDamageReductionNonBinary(aTarget, aCaster, new HashSet<SpellSchool> { aResist });
+        public static double CalculateDamageReductionNonBinary(Entity aTarget, Entity aCaster, HashSet<SpellSchool> aResist)
         {
             // effective resistance rating = Rb + max((Lt - Lc) * 5, 0) - min(P, Rb)
             int levelDifference = aTarget.Level.CurrentLevel - aCaster.Level.CurrentLevel;
             int cap = aTarget.Level.CurrentLevel * 5;
 
-            int flatPenetration = Math.Min(aCaster.SecondaryStats.Spell.FlatPenetration, aTarget.SecondaryStats.Defense.SpellResitance.GetResitance(aResist));
-            int percentPenetration = (int)(aTarget.SecondaryStats.Defense.SpellResitance.GetResitance(aResist) * aCaster.SecondaryStats.Spell.PercentPenetration);
+            int flatPenetration = Math.Min(aCaster.SecondaryStats.Spell.FlatPenetration, aTarget.SecondaryStats.Defense.SpellResistance.GetResitance(aResist));
+            int percentPenetration = (int)(aTarget.SecondaryStats.Defense.SpellResistance.GetResitance(aResist) * aCaster.SecondaryStats.Spell.PercentPenetration);
 
-            int effectiveResistance = aTarget.SecondaryStats.Defense.SpellResitance.GetResitance(aResist) + Math.Max(levelDifference * 5, 0) - flatPenetration - percentPenetration;
+            int effectiveResistance = aTarget.SecondaryStats.Defense.SpellResistance.GetResitance(aResist) + Math.Max(levelDifference * 5, 0) - flatPenetration - percentPenetration;
             if (aTarget.UnitType >= UnitType.Normal && levelDifference > 0)
             {
                 effectiveResistance += (2 / 15 * aCaster.Level.CurrentLevel * levelDifference);

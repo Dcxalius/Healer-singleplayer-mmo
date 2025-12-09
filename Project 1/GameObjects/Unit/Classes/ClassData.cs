@@ -105,8 +105,8 @@ namespace Project_1.GameObjects.Unit.Classes
         //Rogues receive 1% Critical Strike Chance for every 29 points of Agility.
         //Hunters receive 1% Critical Strike Chance for every 53 points of Agility.
 
-        public double AttackCritChanceScaler => attackCritChanceScaler;
-        double attackCritChanceScaler;
+        public float AttackCritChanceScaler => attackCritChanceScaler;
+        float attackCritChanceScaler;
 
 
         //        You gain Critical Strike chance at varying points, depending on your class:
@@ -118,18 +118,18 @@ namespace Project_1.GameObjects.Unit.Classes
         //Paladins receive 1% Spell Critical Strike chance for every 54 points of intellect.
 
 
-        public double SpellCritChanceScaler => spellCritChanceScaler;
-        double spellCritChanceScaler;
+        public float SpellCritChanceScaler => spellCritChanceScaler;
+        float spellCritChanceScaler;
 
         //All classes but Hunters and Rogues receive 1% Dodge for every 20 points of Agility.
         //Rogues receive 1% Dodge for every 14.5 points of Agility.
         //Hunters receive 1% Dodge for every 26 points of Agility.
 
-        public double DodgeChanceScaler => dodgeChanceScaler;
-        double dodgeChanceScaler;
+        public float DodgeChanceScaler => dodgeChanceScaler;
+        float dodgeChanceScaler;
 
-        public double BaseDodge => baseDodge;
-        double baseDodge;
+        public float BaseDodge => baseDodge;
+        float baseDodge;
 
         //Class	    Base dodge	AGI:Dodge ratio
         //Druid	    0.9%	    20

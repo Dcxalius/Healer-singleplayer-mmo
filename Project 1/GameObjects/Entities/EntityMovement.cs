@@ -38,7 +38,7 @@ namespace Project_1.GameObjects.Entities
             unitData.Velocity = velocity;
         }
 
-        void CheckForCollisions() //TODO: Rework this?
+        void CheckForCollisions() 
         {
 
             List<(Rectangle, Rectangle)> resultingCollisions = TileManager.CollisionManager.CollisionsWithUnwalkable(this);

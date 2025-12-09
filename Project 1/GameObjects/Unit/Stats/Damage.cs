@@ -102,6 +102,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void ApplyDamageReduction(Entity aAttacker, Entity aDefender, IDamager aDamager)
         {
+           
             foreach (var (k, v) in value)
             {
                 switch (k)
@@ -113,27 +114,30 @@ namespace Project_1.GameObjects.Unit.Stats
                         //How do we want to handle resistances for spells with multiple schools?
                         //How do we want to handle partial resists for binary spells? If wow like not at all
                         //How do we handle spelleffects, do slows and stuff only binary or partial as well?
-                        value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Arcane);
+                        
+
+                        if (!aDamager.BinarySpell)
+                            value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Arcane);
                         break;
                     case Stats.DamageType.Fire:
-                        // Implement Fire damage reduction logic here
-                        value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Fire);
+                        if (!aDamager.BinarySpell)
+                            value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Fire);
                         break;
                     case DamageType.Frost:
-                        // Implement Frost damage reduction logic here
-                        value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Frost);
+                        if (!aDamager.BinarySpell)
+                            value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Frost);
                         break;
                     case DamageType.Holy:
-                        // Implement Holy damage reduction logic here
-                        value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Holy);
+                        if (!aDamager.BinarySpell)
+                            value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Holy);
                         break;
                     case DamageType.Nature:
-                        // Implement Nature damage reduction logic here
-                        value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Nature);
+                        if (!aDamager.BinarySpell)
+                            value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Nature);
                         break;
                     case DamageType.Shadow:
-                        // Implement Shadow damage reduction logic here
-                        value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Shadow);
+                        if (!aDamager.BinarySpell)
+                            value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Shadow);
                         break;
                     case DamageType.True:
                         break;
@@ -145,10 +149,10 @@ namespace Project_1.GameObjects.Unit.Stats
         }
         public void ApplyCrushingDamage(Entity aMobData, Entity aUnitData)
         {
-            if (!value.Keys.Contains(DamageType.Physical))
-                return;
-            
-            value[DamageType.Physical] *= 1.5;
+            foreach (var (k, v) in value)
+            {
+                value[k] *= 1.5;
+            }
         }
     }
 

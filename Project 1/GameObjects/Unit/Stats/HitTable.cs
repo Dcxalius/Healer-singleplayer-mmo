@@ -29,7 +29,7 @@ namespace Project_1.GameObjects.Unit.Stats
             //TODO: https://github.com/magey/classic-warrior/issues/5
 
             double[] table = new double[Enum.GetNames<HitResult>().Length];
-            double dualWieldPenalty = aAttacker.IsDualWielding ? 0.19 : 0.0;
+            double dualWieldPenalty = aAttacker.IsDualWielding ? 0.19 : 0.0; //TODO: Ignore this if attacking with spell
             int attackerSkillGap = aAttacker.WeaponSkill.GetSkill(aAttack.WeaponType) - aTarget.DefenseSkill;
             int defenderSkillGap = aTarget.DefenseSkill - aAttacker.WeaponSkill.GetSkill(aAttack.WeaponType);
             int attackerSkillGapWithDefenseCapped = aAttacker.WeaponSkill.GetSkill(aAttack.WeaponType) - Math.Min(aTarget.DefenseSkill, aAttacker.CurrentLevel * 5);
@@ -47,7 +47,7 @@ namespace Project_1.GameObjects.Unit.Stats
                 else
                     table[(int)HitResult.Parry] = 0.0;
 
-                if (aTarget.Equipment.HasShield)
+                if (aTarget.Equipment.HasShield) //TODO: Check if shield can block damagetype being dealt
                     table[(int)HitResult.Block] = aTarget.SecondaryStats.Defense.BlockChance + defenderSkillGap * 0.04;
                 else
                     table[(int)HitResult.Block] = 0.0;

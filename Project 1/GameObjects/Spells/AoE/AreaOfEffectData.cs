@@ -45,7 +45,6 @@ namespace Project_1.GameObjects.Spells.AoE
             List<SpellEffect> spellEffects = new List<SpellEffect>();
             for (int i = 0; i < effects.Length; i++)
             {
-                spellEffects.Add(new SpellEffect(effects[i]));
             }
             this.effects = spellEffects.ToArray();
             this.targets = targets;

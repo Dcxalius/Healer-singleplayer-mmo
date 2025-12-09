@@ -70,7 +70,7 @@ namespace Project_1.GameObjects.Entities
             base.Death();
         }
 
-        protected override void ProcessDamage(Entity aCause, string aCauseName, float aDamageTaken, DamageType aDamageType, string aPrefix, string aSuffix)
+        protected override void ProcessDamage(Entity aCause, string aCauseName, float aDamageTaken, DamageType aDamageType, string aPrefix, string aSuffix) //TODO: Determine if this should always be called, even if attack dealt no damage to handle threat. Alternatively, handle base threat elsewhere and only do damage threat here
         {
             base.ProcessDamage(aCause, aCauseName, aDamageTaken, aDamageType, aPrefix, aSuffix);
             aggroTable.AddToAggroTable(aCause, aDamageTaken);

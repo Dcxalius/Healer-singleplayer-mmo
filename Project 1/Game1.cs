@@ -38,12 +38,12 @@ namespace Project_1
         {
 
             //DEBUG
-            
-            //if(DebugManager.Mode(DebugMode.InstantlyContinue))
-            //{
-            //    SaveManager.ContinueLastSave();
-            //    StateManager.SetState(StateManager.States.Game);
-            //}
+
+            if (DebugManager.Mode(DebugMode.InstantlyContinue))
+            {
+                SaveManager.ContinueLastSave();
+                StateManager.SetState(StateManager.States.Game);
+            }
             base.Initialize();
         }
 

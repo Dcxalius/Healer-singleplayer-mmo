@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Unit.Stats;
 using Project_1.Managers;
 using Project_1.Textures;
 using System;
@@ -31,7 +32,7 @@ namespace Project_1.GameObjects.Spells.Buff
 
 
         [JsonConstructor]
-        public OverTime(string name, string gfxName, string hitEffectGfx, string[] effectNames, double duration, double tickRate) : base(name)
+        public OverTime(string name, string gfxName, string hitEffectGfx, string[] effectNames, double duration, double tickRate, bool isBinary, HashSet<SpellSchool> spellSchools) : base(name, isBinary, spellSchools)
         {
             this.duration = duration * 1000;
             this.tickRate = tickRate * 1000;

@@ -25,7 +25,7 @@ namespace Project_1.GameObjects.Unit.Stats
         double criticalChanceReduction;
         public double CriticalDamageReduction => criticalDamageReduction;
         double criticalDamageReduction;
-        public SpellResitance SpellResitance => spellResitance;
+        public SpellResitance SpellResistance => spellResitance;
         SpellResitance spellResitance;
 
         public Defense(UnitData aUnitData)

@@ -20,7 +20,7 @@ namespace Project_1.GameObjects.Unit.Stats
         public override void Refresh(UnitData unitData)
         {
             //TODO: Implement spell stats calculations bellow, Don't forget adding racials and talents.
-            criticalChance = Math.Max(0, Math.Min(100,/* unitData.Equipment.GetSpellCrit */ unitData.BaseStats.TotalPrimaryStats.Intellect * unitData.ClassData.SpellCritChanceScaler));
+            criticalChance = MathF.Max(0, MathF.Min(100,/* unitData.Equipment.GetSpellCrit */ unitData.BaseStats.TotalPrimaryStats.Intellect * unitData.ClassData.SpellCritChanceScaler));
             criticalDamage = 2 * (1/* + unitData.CriticalDamageMultiplier*/);
             percentPenetration = 0 /*+ unitData.Equipment.GetPercentSpellPen*/;
             flatPenetration = 0 /*+ unitData.Equipment.GetFlatSpellPen*/;

@@ -42,7 +42,7 @@ namespace Project_1.GameObjects.Spells
         Type type => minValue > 0 ? Type.Heal : Type.Attack;
 
         [JsonConstructor]
-        public Instant(string name, int minValue, int maxValue, DamageType damageType) : base(name)
+        public Instant(string name, int minValue, int maxValue, DamageType damageType, bool isBinary, HashSet<SpellSchool> spellSchools) : base(name, isBinary, spellSchools)
         {
             Debug.Assert(maxValue != 0, "Tried to make effect with no effect.");
             this.minValue = minValue;
@@ -54,7 +54,7 @@ namespace Project_1.GameObjects.Spells
         {
             if (type == Type.Attack)
             {
-                aTarget.RecieveSpellAttack(aCaster, Name, new Damage(RandomValue, damageType));
+                aTarget.RecieveSpellAttack(aCaster, this, new Damage(RandomValue, damageType));
                 return true;
             }
 

@@ -18,19 +18,19 @@ namespace Project_1.GameObjects.Unit.Stats
 
         protected Attack() { }
 
-        protected double criticalChance;
-        protected double criticalDamage;
-        protected double percentPenetration;
+        protected float criticalChance;
+        protected float criticalDamage;
+        protected float percentPenetration;
         protected int flatPenetration;
-        protected double vampirism;
-        protected double bonusHitChance;
+        protected float vampirism;
+        protected float bonusHitChance;
 
-        public double CriticalChance => criticalChance;
-        public double CriticalDamage => criticalDamage;
-        public double PercentPenetration => percentPenetration;
+        public float CriticalChance => criticalChance;
+        public float CriticalDamage => criticalDamage;
+        public float PercentPenetration => percentPenetration;
         public int FlatPenetration => flatPenetration;
-        public double Vampirism => vampirism;
-        public double BonusHitChance => bonusHitChance;
+        public float Vampirism => vampirism;
+        public float BonusHitChance => bonusHitChance;
 
         public virtual void Refresh(UnitData aUnitData)
         {

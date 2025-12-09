@@ -205,26 +205,57 @@ namespace Project_1.GameObjects.Entities
             FlagForRefresh(); //TODO: Check death here?
         }
 
-        public void RecieveSpellAttack(Entity aCaster, string aCauseName, Damage aDamageTaken)
+        public void RecieveSpellAttack(Entity aCaster, SpellEffect aSpellEffect, Damage aDamageTaken)
         {
             string resultString = "";
             var damageType = aDamageTaken.Types;
-            
+            int leveldiff = CurrentLevel - aCaster.CurrentLevel;
+            float levelHit = MathF.Max(0.01f, leveldiff >= 3 ? 0.96f - leveldiff * 0.01f : 0.83f - (leveldiff - 3) * 0.11f);
+            float totalHit = MathF.Min(0.99f, levelHit + aCaster.SecondaryStats.Spell.BonusHitChance);
+
+
+            //TODO: Crit
+
+            if (aSpellEffect.IsBinary)
+            {
+                totalHit = (float)SpellResitance.CalculateResistanceChanceBinary(this, aCaster, aSpellEffect.SpellSchools);
+
+                if (RandomManager.RollDouble() > totalHit)
+                {
+                    SpawnFlyingText("Resist", GetDirOfFloatingText(aCaster.FeetPosition), Color.Gray);
+                    return;
+                }
+
+                for (int i = 0; i < damageType.Count; i++)
+                {
+                    ProcessDamage(aCaster, aSpellEffect.Name, (float)aDamageTaken[damageType[i]], damageType[i]);
+                    SpawnFlyingText(aDamageTaken[damageType[i]].ToString(), GetDirOfFloatingText(aCaster.FeetPosition), Color.Red);
+                }
+                return;
+            }
+
+            if (RandomManager.RollDouble() > totalHit)
+            {
+                SpawnFlyingText("Resist", GetDirOfFloatingText(aCaster.FeetPosition), Color.Gray);
+                return;
+            }
+
+
             for (int i = 0; i < damageType.Count; i++)
             {
                 switch (damageType[i])
                 {
                     case DamageType.True:
-                        ProcessDamage(aCaster, aCauseName, (float)aDamageTaken[DamageType.True], DamageType.True, aDamageTaken[DamageType.True].ToString());
+                        ProcessDamage(aCaster, aSpellEffect.Name, (float)aDamageTaken[DamageType.True], DamageType.True, aDamageTaken[DamageType.True].ToString());
                         continue;
                     case DamageType.Physical:
                         float reduction = SecondaryStats.Defense.Armor.GetGetReductionPercentage(aCaster.Level.CurrentLevel);
                         float damageTaken = (float)(aDamageTaken[DamageType.Physical] * (1 - reduction));
                         resultString = damageTaken.ToString();
-                        ProcessDamage(aCaster, aCauseName, damageTaken, DamageType.Physical);
+                        ProcessDamage(aCaster, aSpellEffect.Name, damageTaken, DamageType.Physical);
                         break;
                     default:
-                        
+                        //TODO: Implement spell color on damage text
                         float damageBeforeResist = (float)(aDamageTaken[damageType[i]]);
                         double resistance = SpellResitance.CalculateDamageReductionNonBinary(this, aCaster, SpellDamage.DamageToSpellType(damageType[i]));
                         string preFix = "";
@@ -246,13 +277,15 @@ namespace Project_1.GameObjects.Entities
                             SpawnFlyingText(resultString, GetDirOfFloatingText(aCaster.FeetPosition), Color.Gray);
                             continue;
                         }
-                        ProcessDamage(aCaster, aCauseName, damageTaken, damageType[i], preFix, suffix);
+                        ProcessDamage(aCaster, aSpellEffect.Name, damageTaken, damageType[i], preFix, suffix);
                         break;
                         
                 }
+                SpawnFlyingText(resultString, GetDirOfFloatingText(aCaster.FeetPosition), Color.Red);
             }
         }
 
+        //TODO: aCauseName should probably not be a string, but rather some kind of reference to the spell/ability/item that caused the damage
         protected virtual void ProcessDamage(Entity aCause, string aCauseName, float aDamageTaken, DamageType aDamageType, string aPrefix = "", string aSuffix = "")
         {
             Color textColor = Color.Red; //TODO: Different colors for different damage types
