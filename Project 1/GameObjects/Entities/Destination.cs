@@ -11,7 +11,7 @@ using static Project_1.GameObjects.Spells.AoE.AreaOfEffectData;
 
 namespace Project_1.GameObjects.Entities
 {
-    internal class Destination
+    internal partial class Destination
     {
         public List<WorldSpace> DestinationsAsWP
         {
@@ -136,6 +136,10 @@ namespace Project_1.GameObjects.Entities
             if (path != null)
             {
                 paths.Add(path);
+            }
+            else if (DebugManager.Mode(DebugMode.TeleportStuckThings))
+            {
+                owner.Teleport(aDestination);
             }
         }
 

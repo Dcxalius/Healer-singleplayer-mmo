@@ -1,4 +1,5 @@
 ﻿using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Entities.GuildMember;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -31,6 +31,7 @@ namespace Project_1.Managers
         Teleport,
         InstantlyContinue,
         Console,
+        TeleportStuckThings,
         LearnKill,
         Count
     }
@@ -67,6 +68,7 @@ namespace Project_1.Managers
             modes[(int)DebugMode.Teleport] = true;
             modes[(int)DebugMode.InstantlyContinue] = true;
             modes[(int)DebugMode.Console] = true;
+            modes[(int)DebugMode.TeleportStuckThings] = true;
             modes[(int)DebugMode.LearnKill] = true;
 
 

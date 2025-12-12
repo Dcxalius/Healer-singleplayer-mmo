@@ -33,34 +33,6 @@ namespace Project_1.Items.SubTypes
             Count
         }
 
-        public enum SecondaryStatsOnItems
-        {
-            BonusDamage,
-            Armor,
-            Hit,
-            Crit,
-            Vampirism,
-            Dodge,
-            Parry,
-            Block,
-
-            BaseSpellDamage,
-            SpellCrit,
-            ArcaneSpellDamage,
-            FireSpellDamage,
-            FrostSpellDamage,
-            HolySpellDamage,
-            NatureSpellDamage,
-            ShadowSpellDamage,
-            ArcaneCrit,
-            FireCrit,
-            FrostCrit,
-            HolyCrit,
-            NatureCrit,
-            ShadowCrit,
-            SpellVamp,
-        }
-
         public enum GearType
         {
             Cloth,
@@ -81,6 +53,12 @@ namespace Project_1.Items.SubTypes
         public GearType Material => EquipmentData.Material;
         [JsonIgnore]
         public PairReport StatReport => EquipmentData.StatReport;
+
+        [JsonIgnore]
+        public SecondayStatBonus<int>[] SecondaryStatsInt => EquipmentData.SecondayStatsInt;
+
+        [JsonIgnore]
+        public SecondayStatBonus<float>[] SecondaryStatsFloat => EquipmentData.SecondayStatsFloat;
 
         [JsonConstructor]
         Equipment(int id) : this(ItemFactory.GetItemData<EquipmentData>(id)) { }

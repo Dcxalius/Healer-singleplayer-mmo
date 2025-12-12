@@ -27,6 +27,11 @@ namespace Project_1.Items.SubTypes
             }
         }
 
+        public SecondayStatBonus<int>[] SecondayStatsInt => secondaryStatsInt;
+        SecondayStatBonus<int>[] secondaryStatsInt;
+        public SecondayStatBonus<float>[] SecondayStatsFloat => secondaryStatsFloat;
+        SecondayStatBonus<float>[] secondaryStatsFloat;
+
         public EquipmentStats BaseStats => baseStats;
         EquipmentStats baseStats;
 
@@ -36,17 +41,18 @@ namespace Project_1.Items.SubTypes
         public Equipment.Type Slot { get => slot; } //TODO: Find better name
         Equipment.Type slot;
 
-        public EquipmentData(int id, string gfxName, string name, string description, Equipment.Type slot, ItemType itemType, int armor, int[] baseStats, Item.Quality quality, int cost, GearType material) : base(id, gfxName, name, description, 1, itemType, quality, cost)
+        public EquipmentData(int id, string gfxName, string name, string description, Equipment.Type slot, ItemType itemType, int armor, int[] baseStats, Item.Quality quality, int cost, GearType material, SecondayStatBonus<int>[] secondaryStatsInt, SecondayStatBonus<float>[] secondaryStatsFloat) : base(id, gfxName, name, description, 1, itemType, quality, cost)
         {
             this.slot = slot;
             //this.baseStats = new EquipmentStats(baseStats);
             //DEBUG
             this.baseStats = new EquipmentStats(baseStats, armor);
             this.material = material;
-
+            this.secondaryStatsInt = secondaryStatsInt;
+            this.secondaryStatsFloat = secondaryStatsFloat;
         }
 
         [JsonConstructor]
-        public EquipmentData(int id, string gfxName, string name, string description, Equipment.Type slot, int armor, int[] baseStats, Item.Quality quality, int cost, GearType material) : this(id, gfxName, name, description, slot, ItemType.Equipment, armor, baseStats, quality, cost, material) { }
+        public EquipmentData(int id, string gfxName, string name, string description, Equipment.Type slot, int armor, int[] baseStats, Item.Quality quality, int cost, GearType material, SecondayStatBonus<int>[] secondaryStatsInt, SecondayStatBonus<float>[] secondayStatFloat) : this(id, gfxName, name, description, slot, ItemType.Equipment, armor, baseStats, quality, cost, material, secondaryStatsInt, secondayStatFloat) { }
     }
 }

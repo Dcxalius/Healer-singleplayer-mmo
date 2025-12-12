@@ -89,7 +89,6 @@ namespace Project_1.GameObjects.Spells
             Debug.Assert(castTime >= 0, "Cast Time was not set in Spell.");
             Debug.Assert(resourceCost != -1, "Resource Cost was not set in Spell.");
             Debug.Assert(effects.Length > 0, "Spell had no effects.");
-            Debug.Assert(castDistance > 0, "distance had no value.");
             Debug.Assert(acceptableTargets.Length > 0, "Spell had no targets.");
             Debug.Assert(travelType > TravelType.None, "Spell never assigned travel type.");
         }

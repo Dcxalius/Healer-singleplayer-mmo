@@ -13,6 +13,7 @@ using Project_1.UI.UIElements.Buttons;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Spells;
+using Project_1.GameObjects.Entities.GuildMember;
 
 namespace Project_1.UI.HUD.Managers
 {

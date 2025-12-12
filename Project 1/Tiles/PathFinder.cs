@@ -127,6 +127,7 @@ namespace Project_1.Tiles
 
             availableTiles.Clear();
             searchedTiles.Clear();
+
             return returnPath;
         }
 

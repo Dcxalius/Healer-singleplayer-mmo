@@ -9,6 +9,7 @@ using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Project_1.GameObjects.Unit
@@ -85,24 +86,40 @@ namespace Project_1.GameObjects.Unit
             }
         }
 
-        public Dictionary<SpellSchool, int> GetSchoolSpellDamage
+        
+
+        public T GetSecondaryStat<T>(string aSecondaryStat)
         {
-            get
+            T returnable = default;
+            for (int i = 0; i < equipped.Length; i++)
             {
-                var returnable = new Dictionary<SpellSchool, int>();
-                for (int i = 0; i < equipped.Length; i++)
+                if (equipped[i] == null)
                 {
-                    if (equipped[i] == null)
-                    {
-                        continue;
-                    }
-
-                    //if (!returnable.TryAdd(equipped[i].Key, equipped[i].Val)) returnable[equipped[i].Key] += equipped[i].Val;
-                    //returnabl.SpellDamage
+                    continue;
                 }
-                return returnable; //TODO: Implement this
 
+                if (typeof(T) == typeof(int))
+                {
+                    var secondaryStatsInt = equipped[i].EquipmentData.SecondayStatsInt;
+                    var single = secondaryStatsInt.Single(x => x.SecondaryStat == aSecondaryStat);
+                    if (single == null) continue;
+
+                    returnable = (T)(object)(single.Value + (int)(object)returnable);
+                }
+                else if (typeof(T) == typeof(float))
+                {
+                    var secondaryStatsFloat = equipped[i].EquipmentData.SecondayStatsFloat;
+                    var single = secondaryStatsFloat.Single(x => x.SecondaryStat == aSecondaryStat);
+                    if (single == null) continue;
+
+                    returnable = (T)(object)(single.Value + (float)(object)returnable);
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
             }
+            return returnable;
         }
 
         public int GetArmor => equipmentStats.Armor;

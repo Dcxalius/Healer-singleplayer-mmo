@@ -15,6 +15,7 @@ using Project_1.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Managers;
 using System.Diagnostics;
+using Project_1.GameObjects.Entities.GuildMember;
 
 namespace Project_1.UI.HUD.Managers
 {

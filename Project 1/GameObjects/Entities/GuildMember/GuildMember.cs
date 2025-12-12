@@ -11,11 +11,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.Entities
+namespace Project_1.GameObjects.Entities.GuildMember
 {
     internal class GuildMember : Friendly
     {
         
+
+        public AttackTree AttackLogic => attackTree;
+        internal float MinimumAttackRange => CalculateMinimumAttackRange();
+
+        readonly AttackTree attackTree;
 
         public struct GuildMemberData
         {
@@ -42,6 +47,7 @@ namespace Project_1.GameObjects.Entities
         {
             RemoveNamePlate(); //TODO: Think of a better way to handle this
             leaving = false;
+            attackTree = new AttackTree(this);
         }
 
         public override void Update()
@@ -85,7 +91,7 @@ namespace Project_1.GameObjects.Entities
         {
             CreateNamePlate();
             base.MoveNamePlate();
-            base.FlagForRefresh();
+            FlagForRefresh();
             leaving = false;
         }
 
@@ -148,6 +154,28 @@ namespace Project_1.GameObjects.Entities
 
             party.DivideExpAmongParty(aExpAmount);
 
+        }
+
+        float CalculateMinimumAttackRange()
+        {
+            AttackData attacks = UnitData.AttackData;
+
+            if (attacks.MainHandAttack != null && attacks.OffHandAttack != null)
+            {
+                return Math.Min(attacks.MainHandAttack.Range, attacks.OffHandAttack.Range);
+            }
+
+            if (attacks.MainHandAttack == null && attacks.OffHandAttack != null)
+            {
+                return attacks.OffHandAttack.Range;
+            }
+
+            if (attacks.MainHandAttack != null)
+            {
+                return attacks.MainHandAttack.Range;
+            }
+
+            return 0f;
         }
     }
 }

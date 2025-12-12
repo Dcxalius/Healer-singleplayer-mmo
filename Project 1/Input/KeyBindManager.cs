@@ -20,7 +20,7 @@ namespace Project_1.Input
         {
             MoveCharacterUp, MoveCharacterLeft, MoveCharacterDown, MoveCharacterRight,
             DebugTeleport, DebugHealthPotion, DebugManaPotion, DebugDeleteShapes, DebugTestGear,
-            Inventory, SpellBook, Character, GuildRoster, 
+            Inventory, SpellBook, Character, GuildRoster, LogicWindow,
             SpellBar1Spell1, SpellBar1Spell2, SpellBar1Spell3, SpellBar1Spell4, SpellBar1Spell5, SpellBar1Spell6, SpellBar1Spell7, SpellBar1Spell8, SpellBar1Spell9, SpellBar1Spell10,
 
             Count
@@ -86,7 +86,7 @@ namespace Project_1.Input
             string dataAsString = File.ReadAllText(aKeyBindSetting);
 
             KeySet[] importedBinds = SaveManager.ImportData<KeySet[]>(dataAsString);
-
+            Debug.Assert(importedBinds.Length == (int)KeyListner.Count * 2);
             for (int i = 0; i < (int)KeyListner.Count; i++)
             {
                 firstButtons[i] = importedBinds[i];
