@@ -4,7 +4,8 @@ using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.GuildMember;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.Textures;
-using Project_1.UI.HUD.Managers;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.UI.UIElements.Buttons;
 using System;
 using System.Collections.Generic;
@@ -20,10 +21,10 @@ namespace Project_1.UI.HUD.Guild
         {
             if (aFriendly.RelationToPlayer == GameObjects.Unit.Relation.RelationToPlayer.Self)
             {
-                HUDManager.windowHandler.ToggleCharacterWindow();
+                Mailboxes.Ui.Publish(new CharacterWindowToggled());
                 return;
             }
-            HUDManager.windowHandler.ToggleInspectWindow(aFriendly as GuildMember);
+            Mailboxes.Ui.Publish(new InspectWindowToggled(aFriendly as GuildMember));
         }
 
         public OpenInspectWindow(Friendly aFriendly, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new List<Action>() { new Action(() => OpenWindow(aFriendly)) }, new GfxPath(GfxType.Item, "TestDagger"), aPos, aSize, Color.White)

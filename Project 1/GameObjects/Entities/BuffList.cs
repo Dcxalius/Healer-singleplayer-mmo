@@ -1,5 +1,7 @@
 ﻿using Project_1.GameObjects.Spells.Buff;
 using Project_1.UI.HUD.Managers;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +44,7 @@ namespace Project_1.GameObjects.Entities
             }
 
             buffs.Add(aBuff);
-            HUDManager.plateBoxHandler.AddBuff(buffs.Last(), aOwner);
+            Mailboxes.Ui.Publish(new BuffAdded(aOwner, buffs.Last()));
         }
 
         public List<Buff> GetAllBuffs()

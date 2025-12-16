@@ -3,6 +3,8 @@ using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.Items;
 using Project_1.Managers;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.HUD.Inventory;
 using Project_1.UI.HUD.Managers;
@@ -56,14 +58,14 @@ namespace Project_1.UI.HUD.Windows
 
             if (!Visible) return;
             if (itemForSale == null) return;
-            HUDManager.SetDescriptorBox(itemForSale, RelativePositionOnScreen);
+            Mailboxes.Ui.Publish(new DescriptorBoxSet(itemForSale, RelativePositionOnScreen.ToAbsoluteScreenPos()));
         }
 
         protected override void OnDeHover()
         {
             base.OnDeHover();
 
-            HUDManager.SetDescriptorBox(null);
+            Mailboxes.Ui.Publish(new DescriptorBoxClear());
         }
 
         public override void ClickedOnAndReleasedOnMe()

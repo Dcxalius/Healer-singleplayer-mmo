@@ -22,6 +22,7 @@ namespace Project_1.Managers
         static SpriteBatch spriteBatch;
         static EffectManager()
         {
+            ThreadAffinity.AssertMainThread();
             effectsToProcess = new List<IEffects>();
             effects = new Dictionary<string, Effect>();
             rendertargets = new Dictionary<IEffects, RenderTarget2D>();
@@ -100,6 +101,11 @@ namespace Project_1.Managers
                 value = aValue;
                 Name = aName;
             }
+        }
+
+        public static void Init()
+        {
+            ThreadAffinity.AssertMainThread();
         }
     }
 

@@ -7,7 +7,8 @@ using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Unit.Stats;
 using Project_1.Managers;
 using Project_1.Particles;
-using Project_1.UI.HUD.Managers;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using SharpDX.DXGI;
 using System;
 using System.Collections.Generic;
@@ -32,13 +33,13 @@ namespace Project_1.GameObjects.Entities
         public void SetTarget(Entity aEntity)
         {
             target = aEntity;
-            HUDManager.plateBoxHandler.SetNewTarget(this, target);
+            Mailboxes.Ui.Publish(new TargetChanged(this, target));
         }
 
         public void RemoveTarget()
         {
             target = null;
-            HUDManager.plateBoxHandler.SetNewTarget(this, null);
+            Mailboxes.Ui.Publish(new TargetChanged(this, null));
         }
 
 

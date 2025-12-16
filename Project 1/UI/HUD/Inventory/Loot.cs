@@ -19,11 +19,13 @@ namespace Project_1.UI.HUD.Inventory
     {
         Item item;
         Label itemName;
+        readonly int slotIndex;
 
         RelativeScreenPosition Spacing => RelativeScreenPosition.GetSquareFromX(0.005f, Size);
 
         public Loot(int aSlotIndex, Items.Item aItem, GfxPath aPath) : base(new UITexture("GrayBackground", Color.AliceBlue), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
         {
+            slotIndex = aSlotIndex;
             if (aItem == null) return;
             item = new Item(-2, aSlotIndex, true, aItem.ItemQualityColor, aPath, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
             itemName = new Label(aItem.Name, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreLeft, aItem.ItemQualityColor);
@@ -53,6 +55,35 @@ namespace Project_1.UI.HUD.Inventory
             gfx = null;
             item = null;
             Resize(RelativeScreenPosition.Zero);
+        }
+
+        public void UpdateItem(Items.Item aItem)
+        {
+            if (aItem == null)
+            {
+                Hide();
+                return;
+            }
+
+            if (item == null)
+            {
+                // recreate if previously hidden
+                item = new Item(-2, slotIndex, true, aItem.ItemQualityColor, aItem.GfxPath, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
+                AddChild(item);
+            }
+
+            item.AssignItem(aItem);
+            if (itemName == null)
+            {
+                itemName = new Label(aItem.Name, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreLeft, aItem.ItemQualityColor);
+                AddChild(itemName);
+            }
+            else
+            {
+                itemName.Text = aItem.Name;
+                itemName.Color = aItem.ItemQualityColor;
+            }
+            Resize(RelativeScreenPosition.Zero); // force layout on next Resize call
         }
 
         public override void ClickedOnAndReleasedOnMe()

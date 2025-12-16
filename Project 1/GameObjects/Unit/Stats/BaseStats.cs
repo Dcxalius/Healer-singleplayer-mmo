@@ -1,6 +1,8 @@
 ﻿using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Unit.Classes;
 using Project_1.GameObjects.Unit.Resources;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.UI.HUD.Managers;
 using System;
 using System.Collections.Generic;
@@ -81,7 +83,7 @@ namespace Project_1.GameObjects.Unit.Stats
         public void SetOwner(Entity aEntity)
         {
             owner = aEntity;
-            HUDManager.windowHandler.RefreshCharacterWindowStats(StatReport, owner as Friendly);
+            Mailboxes.Ui.Publish(new StatsRefreshed(owner as Friendly, StatReport));
         }
 
         public bool CheckIfResourceRegened()
@@ -110,7 +112,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
 
             if (!(owner is Friendly)) return;
-            HUDManager.windowHandler.RefreshCharacterWindowStats(StatReport, owner as Friendly);
+            Mailboxes.Ui.Publish(new StatsRefreshed(owner as Friendly, StatReport));
         }
 
         public void RefreshEquipmentStats(EquipmentStats aEquipmentStats)

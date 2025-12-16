@@ -30,7 +30,7 @@ namespace Project_1.GameObjects.Entities.Players
         SpellBook spellBook;
 
         [JsonProperty("SpellOnBar")]
-        string[] SpellsOnBar => HUDManager.SaveSpellBar;
+        string[] SpellsOnBar => spellOnBar;
 
         [JsonIgnore]
         public string[] SavedSpellsOnBar => spellOnBar;

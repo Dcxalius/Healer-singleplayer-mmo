@@ -27,11 +27,17 @@ namespace Project_1.Textures
 
         static TextureManager()
         {
+            ThreadAffinity.AssertMainThread();
             contentManager = Game1.ContentManager;
             InitArrays();
             InitFonts();
             textOutline = contentManager.Load<Effect>("Effects\\TextOutline");
             //textOutline.Parameters["texelSize"].SetValue()
+        }
+
+        public static void Init()
+        {
+            ThreadAffinity.AssertMainThread();
         }
 
         static void InitFonts()

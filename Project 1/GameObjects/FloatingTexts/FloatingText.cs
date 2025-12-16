@@ -15,8 +15,8 @@ namespace Project_1.GameObjects.FloatingTexts
 {
     internal class FloatingText
     {
-        Text text;
         Color color;
+        readonly string textValue;
         WorldSpace position;
         float speed;
         WorldSpace momentum;
@@ -24,14 +24,11 @@ namespace Project_1.GameObjects.FloatingTexts
         double spawnTime;
 
         double duration;
-
-        RenderTarget2D renderTarget;
-        SpriteBatch spriteBatch;
+        Text builtText;
 
         public FloatingText(string aTextToDisplay, Color aColor, WorldSpace aStartPos, WorldSpace aHeadingVector, WorldSpace? aVelocity = null, float aSpeed = 75, double aDuration = 600d)
         {
-            text = new Text("Gloryse", aTextToDisplay, aColor);
-            Point textSize = text.Offset.ToPoint();
+            textValue = aTextToDisplay;
             speed = aSpeed;
             color = aColor;
             position = aStartPos;
@@ -47,22 +44,6 @@ namespace Project_1.GameObjects.FloatingTexts
                 velocity = new WorldSpace(0, 9.8f);
             }
             duration = aDuration;
-
-            //renderTarget = GraphicsManager.CreateRenderTarget(new Point(30, 10));
-            renderTarget = GraphicsManager.CreateRenderTarget(textSize); //Once effect is properly implement test to see if its quicker to create rendertargets for every one or have a render target for all
-            spriteBatch = GraphicsManager.CreateSpriteBatch();
-
-            GraphicsManager.SetRenderTarget(renderTarget);
-            GraphicsManager.ClearScreen(Color.Transparent);
-            spriteBatch.Begin(SpriteSortMode.Deferred);
-            //spriteBatch.Begin(samplerState : SamplerState.PointClamp, effect : TextureManager.textOutline);
-            text.CentreLeftDraw(spriteBatch, new AbsoluteScreenPosition(0, textSize.Y / 2));
-
-            spriteBatch.End();
-            GraphicsManager.SetRenderTarget(null);
-            //Stream stream = File.OpenWrite("xdd.png");
-            //renderTarget.SaveAsPng(stream, textSize.X, textSize.Y);
-            //stream.Close();
         }
 
         public void Update()
@@ -80,8 +61,10 @@ namespace Project_1.GameObjects.FloatingTexts
 
         public void Draw(SpriteBatch aBatch)
         {
-            aBatch.Draw(renderTarget, position.ToAbsoltueScreenPosition().ToVector2(), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
-            //aBatch.Draw(renderTarget, Camera.Camera.WorldPosToCameraSpace(position), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+            ThreadAffinity.AssertMainThread();
+
+            builtText ??= new Text("Gloryse", textValue, color);
+            builtText.TopLeftDraw(aBatch, position.ToAbsoltueScreenPosition());
         }
     }
 }

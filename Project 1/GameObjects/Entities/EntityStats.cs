@@ -11,6 +11,8 @@ using Project_1.Items;
 using Project_1.Particles;
 using Project_1.UI.HUD;
 using Project_1.UI.HUD.Managers;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -168,21 +170,21 @@ namespace Project_1.GameObjects.Entities
             unitData.GainExp(aExpAmount);
 
             if (!(this is Friendly)) return;
-            HUDManager.windowHandler.RefreshCharacterWindowExpBar(this as Friendly);
+            Mailboxes.Ui.Publish(new ExperienceRefreshed(this as Friendly));
         }
 
 
         protected void CreateNamePlate()
         {
             namePlate = new NamePlate(this);
-            HUDManager.namePlateHandler.AddNamePlate(this, namePlate);
+            Mailboxes.Ui.Publish(new NamePlateAdded(namePlate, this));
 
         }
 
         protected void RemoveNamePlate()
         {
             namePlate = null;
-            HUDManager.namePlateHandler.RemoveNamePlate(this);
+            Mailboxes.Ui.Publish(new NamePlateRemoved(this));
         }
 
         protected void FlagForRefresh() => namePlateRequiresUpdate = true;
@@ -190,7 +192,7 @@ namespace Project_1.GameObjects.Entities
         public virtual void RefreshPlates()
         {
             if (!namePlateRequiresUpdate) return;
-            HUDManager.plateBoxHandler.RefreshPlates(this);
+            Mailboxes.Ui.Publish(new PlateRefreshRequested(this));
         }
 
         protected virtual void MoveNamePlate()

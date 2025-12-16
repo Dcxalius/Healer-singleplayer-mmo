@@ -108,7 +108,7 @@ namespace Project_1.Managers.States
             }
             //epc["tileTransparent"].SetValue(TileManager.GetTransparent(ObjectManager.Player.FeetPosition));
             epc["lightPos"].SetValue(v);
-            epc["transparentMap"].SetValue(TileManager.GetTransparent(ObjectManager.Player.FeetPosition));
+            epc["transparentMap"].SetValue(TileRenderCache.GetTransparencyMap(ObjectManager.Player.FeetPosition));
             //GraphicsManager.SetTexture(1, TileManager.GetTransparent(ObjectManager.Player.FeetPosition));
             DrawList(spriteBatch);
             spriteBatch.End();

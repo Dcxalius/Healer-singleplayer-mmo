@@ -4,6 +4,8 @@ using Project_1.GameObjects.Unit.Classes;
 using Project_1.GameObjects.Unit.Stats;
 using Project_1.Items;
 using Project_1.Items.SubTypes;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.UI.HUD.Managers;
 using SharpDX.Direct3D9;
 using System;
@@ -196,7 +198,7 @@ namespace Project_1.GameObjects.Unit
         public void SetOwner(Entity aOwner)
         {
             owner = aOwner;
-            HUDManager.windowHandler.RefreshAllCharacterWindowSlots(this, owner as Friendly);
+            Mailboxes.Ui.Publish(new EquipmentSlotsRefreshed(owner as Friendly, this));
         }
 
         void RefreshStatsFromEquipment()
@@ -455,7 +457,7 @@ namespace Project_1.GameObjects.Unit
             equipped[(int)aSlot] = aEquipment;
             equipmentStats.AddStats(aEquipment.Stats);
             
-            HUDManager.windowHandler.RefreshCharacterWindowSlot(aSlot, this, owner as Friendly); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
+            Mailboxes.Ui.Publish(new EquipmentSlotChanged(owner as Friendly, aSlot, this)); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
             return previouslyEquiped;
         }
 
@@ -466,7 +468,7 @@ namespace Project_1.GameObjects.Unit
             //if (GearTypeCheck(aEquipment)) return; //I think this is only called when an equipment has type none anyways
             equipped[(int)aSlot] = aEquipment;
             equipmentStats.AddStats(aEquipment.Stats);
-            HUDManager.windowHandler.RefreshCharacterWindowSlot(aSlot, this, owner as Friendly); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
+            Mailboxes.Ui.Publish(new EquipmentSlotChanged(owner as Friendly, aSlot, this)); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
         }
 
         bool UnableToDualWield(Items.SubTypes.Equipment aEquipment, Slot aSlot)
@@ -500,7 +502,7 @@ namespace Project_1.GameObjects.Unit
             
 
             equipmentStats.RemoveStats(item.Stats);
-            HUDManager.windowHandler.RefreshCharacterWindowSlot(aSlot, this, owner as Friendly);
+            Mailboxes.Ui.Publish(new EquipmentSlotChanged(owner as Friendly, aSlot, this));
             return item;
         }
 

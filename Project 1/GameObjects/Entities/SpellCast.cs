@@ -1,8 +1,9 @@
 ﻿using Project_1.Camera;
 using Project_1.GameObjects.Spells;
 using Project_1.Managers;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.Tiles;
-using Project_1.UI.HUD.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,12 +51,12 @@ namespace Project_1.GameObjects.Entities
 
             if (FinishChannel()) return;
 
-            HUDManager.UpdateChannelSpell((float)((TimeManager.TotalFrameTime - startCastTime) / channeledSpell.CastTime));
+            Mailboxes.Ui.Publish(new CastChannelProgress(owner, channeledSpell, (float)((TimeManager.TotalFrameTime - startCastTime) / channeledSpell.CastTime)));
         }
 
         void CancelChannel()
         {
-            HUDManager.CancelChannel();
+            Mailboxes.Ui.Publish(new CastChannelCancelled(owner, channeledSpell));
             channelTarget = null;
             channeledSpell = null;
             channeledSpellStartPosition = WorldSpace.Zero;
@@ -75,7 +76,7 @@ namespace Project_1.GameObjects.Entities
 
                 CastSpell(channeledSpell, channelTarget);
 
-                HUDManager.FinishChannel();
+                Mailboxes.Ui.Publish(new CastChannelFinished(owner, channeledSpell));
                 channeledSpell = null;
                 channelTarget = null;
                 channeledSpellStartPosition = WorldSpace.Zero;
@@ -96,8 +97,8 @@ namespace Project_1.GameObjects.Entities
             channeledSpell = aSpell;
             startCastTime = TimeManager.TotalFrameTime;
             
-            HUDManager.ChannelSpell(channeledSpell);
-            HUDManager.UpdateChannelSpell(0);
+            Mailboxes.Ui.Publish(new CastChannelStarted(owner, channeledSpell, startCastTime, channeledSpell.CastTime));
+            Mailboxes.Ui.Publish(new CastChannelProgress(owner, channeledSpell, 0));
             
             return true;
         }

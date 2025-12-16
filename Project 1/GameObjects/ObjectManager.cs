@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Project_1.Input;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -116,7 +118,7 @@ namespace Project_1.GameObjects
         {
             ObjectFactory.AddGuildMember("xdddd", "Rogue");
             guild = ObjectFactory.GetGuildMemebers();
-            HUDManager.windowHandler.AddGuildMember(guild.Last());
+            Mailboxes.Ui.Publish(new GuildMemberAdded(guild.Last()));
         }
 
         public static void Reset()
@@ -125,7 +127,7 @@ namespace Project_1.GameObjects
             {
                 guild[i].Delete();
             }
-            HUDManager.plateBoxHandler.ClearParty();
+            Mailboxes.Ui.Publish(new PartyCleared());
             entities.Clear();
             guild.Clear();
             npcs.Clear();

@@ -54,6 +54,7 @@ namespace Project_1.Managers
         static readonly bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         static GraphicsManager()
         {
+            ThreadAffinity.AssertMainThread();
             scissors = new List<(object, Rectangle)>();
             //SetWindowSize(Camera.Camera.devScreenBorder, );
         }

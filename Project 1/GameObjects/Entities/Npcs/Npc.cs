@@ -3,6 +3,8 @@ using Project_1.GameObjects.Unit;
 using Project_1.Input;
 using Project_1.UI.HUD.Managers;
 using Project_1.UI.HUD.Windows.Gossip;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +31,7 @@ namespace Project_1.GameObjects.Entities.Npcs
 
             if (!InConversationRange(ObjectManager.Player.FeetPosition)) return;
 
-            HUDManager.windowHandler.OpenGossipWindow(gossip.Start, this);
+            Mailboxes.Ui.Publish(new GossipOpened(gossip.Start, this));
         }
 
         public override void ExpToParty(int aExpAmount)

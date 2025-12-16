@@ -34,6 +34,7 @@ namespace Project_1.Tiles
         static Tile GetTile(WorldSpace aSpace) => GetTile(GetChunk(aSpace), Modulo((int)MathF.Floor(aSpace.X / TileSize.X), Chunk.ChunkSize.X), Modulo((int)MathF.Floor(aSpace.Y / TileSize.Y), Chunk.ChunkSize.Y));
         static Tile GetTile(Chunk aChunk, int aX, int aY) => aChunk.Tile(aX, aY);
         static Tile GetTile(int aChunkId, int aX, int aY) => chunks.Find(x => x.Id == aChunkId).Tile(aX, aY);
+        public static Tile GetTileAt(WorldSpace aSpace) => GetTile(aSpace);
 
         public static Chunk GetChunk(int aId) => chunks.Find(x => x.Id == aId);
         public static Chunk GetChunk(int aX, int aY) => GetChunk(GetChunkId(aX, aY));
@@ -44,6 +45,7 @@ namespace Project_1.Tiles
         static Texture2D transparacyMap;
         public static Texture2D GetTransparent(WorldSpace aOrigin)
         {
+            ThreadAffinity.AssertMainThread();
             if (transparacyGetCentre != null && transparacyGetCentre == GetTileUnder(aOrigin)) return transparacyMap;
             transparacyGetCentre = GetTileUnder(aOrigin);
             const int size = 65;//64 is based on HLSL code in TestDarkness.fx

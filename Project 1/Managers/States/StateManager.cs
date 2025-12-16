@@ -54,6 +54,7 @@ namespace Project_1.Managers.States
 
         static StateManager()
         {
+            ThreadAffinity.AssertMainThread();
             finalBatch = GraphicsManager.CreateSpriteBatch();
 
             startScreen = new StartScreen();
@@ -72,6 +73,11 @@ namespace Project_1.Managers.States
             //    SaveManager.LoadData();
             //    SetState(States.Game);
             //}
+        }
+
+        public static void Init()
+        {
+            ThreadAffinity.AssertMainThread();
         }
 
         public static void Update()

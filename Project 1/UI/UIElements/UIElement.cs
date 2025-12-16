@@ -6,6 +6,8 @@ using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.UI.HUD.Managers;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

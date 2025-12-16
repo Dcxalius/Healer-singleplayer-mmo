@@ -14,7 +14,10 @@ namespace Project_1.Items
         public Item[] Drop => drop;
         Item[] drop;
 
-        WorldObject dropper;
+        public WorldSpace DropperFeet => dropperFeet;
+        WorldSpace dropperFeet;
+        public float DropperHalfHeight => dropperHalfHeight;
+        float dropperHalfHeight;
 
         [JsonIgnore]
         public bool Despawned;
@@ -23,14 +26,27 @@ namespace Project_1.Items
         public bool IsEmpty => drop.All(drop => drop == null);
 
         [JsonIgnore]
-        public bool InDistance => dropper.FeetPosition.DistanceTo(ObjectManager.Player.FeetPosition) < dropper.FeetSize.Y / 2 + ObjectManager.Player.FeetSize.Y / 2;
+        public bool InDistance
+        {
+            get
+            {
+                float allowed = dropperHalfHeight + (float)ObjectManager.Player.FeetSize.Y / 2f;
+                return dropperFeet.DistanceTo(ObjectManager.Player.FeetPosition) < allowed;
+            }
+        }
 
         //public LootDrop()
 
         public LootDrop(Item[] drop, WorldObject @object)
         {
             this.drop = drop;
-            dropper = @object;
+            dropperFeet = @object.FeetPosition;
+            dropperHalfHeight = (float)@object.FeetSize.Y / 2f;
+        }
+
+        public void SetDrop(Item[] newDrop)
+        {
+            drop = newDrop;
         }
     }
 }

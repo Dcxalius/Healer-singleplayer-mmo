@@ -7,6 +7,8 @@ using Project_1.Textures;
 using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Buttons;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,7 +56,7 @@ namespace Project_1.UI.HUD.SpellBook
 
             if (spellData != null)
             {
-                HUDManager.HoldSpell(spellData, InputManager.GetMousePosAbsolute() - Location);
+                Mailboxes.Ui.Publish(new HeldSpellStart(spellData, InputManager.GetMousePosAbsolute() - Location));
             }
         }
 
@@ -62,13 +64,13 @@ namespace Project_1.UI.HUD.SpellBook
         {
             base.ClickedOnAndReleasedOnMe();
 
-            HUDManager.ReleaseSpell();
+            Mailboxes.Ui.Publish(new HeldSpellEnd());
         }
 
         protected override void HoldReleaseAwayFromMe()
         {
 
-            HUDManager.ReleaseSpell();
+            Mailboxes.Ui.Publish(new HeldSpellEnd());
 
             if (spellData != null)
             {

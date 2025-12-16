@@ -5,6 +5,8 @@ using Project_1.GameObjects.Spells;
 using Project_1.Input;
 using Project_1.Items;
 using Project_1.Managers;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.UI.HUD.Inventory;
 using Project_1.UI.HUD.SpellBook;
 using Project_1.UI.UIElements;
@@ -48,8 +50,10 @@ namespace Project_1.UI.HUD.Managers
 
         public static bool HudMoving => hudMoving;
         static bool hudMoving;
+        static bool initialized;
         static HUDManager()
         {
+            ThreadAffinity.AssertMainThread();
             plateBoxHandler = new PlateBoxHandler();
             namePlateHandler = new NamePlateHandler();
             windowHandler = new WindowHandler();
@@ -87,6 +91,17 @@ namespace Project_1.UI.HUD.Managers
             RelativeScreenPosition mmSize = RelativeScreenPosition.GetSquareFromX(0.2f);
             minimap = new Minimap(new RelativeScreenPosition(0.75f, 0.05f), mmSize);
             hudElements.Add(minimap);
+        }
+
+        public static void Init()
+        {
+            ThreadAffinity.AssertMainThread();
+            if (initialized) return;
+            initialized = true;
+
+            Mailboxes.Ui.Subscribe<LootOpened>(HandleLootOpened);
+            Mailboxes.Ui.Subscribe<LootSlotChanged>(e => lootBox.RefreshSlot(e.Slot));
+            Mailboxes.Ui.Subscribe<LootSlotRemoved>(e => lootBox.RefreshSlot(e.Slot));
         }
 
         static void ImportSettings()
@@ -279,8 +294,10 @@ namespace Project_1.UI.HUD.Managers
 
         #region Loot
         public static Items.Item GetLootItem(int aSlotInLoot) => lootBox.GetItem(aSlotInLoot);
-        public static void ReduceLootItem(int aSlotInLoot, int aCount) => lootBox.ReduceItem(aSlotInLoot, aCount);
-        public static void Loot(LootDrop aDrop) => lootBox.Loot(aDrop);
+        public static void Loot(LootDrop aDrop, Items.Item[] snapshot, LootContext context) => lootBox.Loot(context, snapshot);
+        public static void RefreshLootSlot(int slot) => lootBox.RefreshSlot(slot);
+
+        static void HandleLootOpened(LootOpened e) => Loot(e.Drop, e.Snapshot, e.Context);
 
         public static void HoldItem(Item aItem, AbsoluteScreenPosition aGrabOffset) => heldItem.HoldItem(aItem, aGrabOffset);
         public static void ReleaseItem() => heldItem.ReleaseMe();

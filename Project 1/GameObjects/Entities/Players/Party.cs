@@ -3,6 +3,8 @@ using Project_1.Camera;
 using Project_1.GameObjects.Unit;
 using Project_1.Input;
 using Project_1.UI.HUD.Managers;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -65,7 +67,7 @@ namespace Project_1.GameObjects.Entities.Players
 
         public void ClearCommand()
         {
-            HUDManager.plateBoxHandler.RemoveWalkerFromControl(commands.ToArray());
+            Mailboxes.Ui.Publish(new PartyControlCleared(commands.ToArray()));
             commands.Clear();
         }
 
@@ -73,7 +75,7 @@ namespace Project_1.GameObjects.Entities.Players
         {
             if (commands.Contains(aGuildMember)) { return; }
 
-            HUDManager.plateBoxHandler.AddGuildMemberToControl(aGuildMember);
+            Mailboxes.Ui.Publish(new PartyWalkerAdded(aGuildMember));
             commands.Add(aGuildMember);
         }
 
@@ -88,7 +90,7 @@ namespace Project_1.GameObjects.Entities.Players
         {
             if (!commands.Contains(aGuildMember)) { return; }
 
-            HUDManager.plateBoxHandler.RemoveWalkerFromControl(new GuildMember[] { aGuildMember });
+            Mailboxes.Ui.Publish(new PartyWalkerRemoved(aGuildMember));
             commands.Remove(aGuildMember);
         }
 
@@ -99,7 +101,7 @@ namespace Project_1.GameObjects.Entities.Players
             party.Add(aGuildMember);
             aGuildMember.AddedToParty();
 
-            HUDManager.plateBoxHandler.AddGuildMemberToParty(party[party.Count - 1]);
+            Mailboxes.Ui.Publish(new PartyMemberAdded(party[party.Count - 1]));
             return true;
         }
 
@@ -109,7 +111,7 @@ namespace Project_1.GameObjects.Entities.Players
             Debug.Assert(aGuildMember != null);
             Debug.Assert(IsInParty(aGuildMember));
 
-            HUDManager.plateBoxHandler.RemoveGuildMemberFromParty(aGuildMember);
+            Mailboxes.Ui.Publish(new PartyMemberRemoved(aGuildMember));
             party.Remove(aGuildMember);
             aGuildMember.RemovedFromParty();
             return true;

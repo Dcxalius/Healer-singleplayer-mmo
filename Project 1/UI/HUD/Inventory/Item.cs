@@ -8,6 +8,8 @@ using Project_1.Input;
 using Project_1.Items;
 using Project_1.Items.SubTypes;
 using Project_1.Managers;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements.Buttons;
@@ -47,11 +49,18 @@ namespace Project_1.UI.HUD.Inventory
 
                 if (bagIndex == -1) return ObjectManager.Player.Inventory.GetBag(slotIndex);
 
-                if (bagIndex == -2) return HUDManager.GetLootItem(slotIndex);
+                if (bagIndex == -2)
+                {
+                    return LootState.Peek(slotIndex);
+                }
 
                 if (bagIndex == -3) return ObjectManager.Player.Equipment.EquipedInSlot((GameObjects.Unit.Equipment.Slot)slotIndex);
 
-                if (bagIndex == -4) return HUDManager.windowHandler.GetGuildMemberInspectWindowTarget().Equipment.EquipedInSlot((GameObjects.Unit.Equipment.Slot)slotIndex);
+                if (bagIndex == -4)
+                {
+                    GuildMember inspectTarget = HUDManager.windowHandler.GetGuildMemberInspectWindowTarget();
+                    return inspectTarget?.Equipment.EquipedInSlot((GameObjects.Unit.Equipment.Slot)slotIndex);
+                }
 
                 throw new NotImplementedException();
             }
@@ -263,7 +272,9 @@ namespace Project_1.UI.HUD.Inventory
         {
             if (aItemDroppedOnMe.bagIndex != -4) return false;
 
-            Entity openGuildPage = HUDManager.windowHandler.GetGuildMemberInspectWindowTarget();
+            GuildMember inspectTarget = HUDManager.windowHandler.GetGuildMemberInspectWindowTarget();
+            if (inspectTarget == null) return true;
+            Entity openGuildPage = inspectTarget;
             if (bagIndex == -4)
             {
                 Equipment thisItem = GetActualItem as Equipment;
@@ -315,7 +326,11 @@ namespace Project_1.UI.HUD.Inventory
         bool ToGuildMemberCharacterPane(Item aItemDroppedOnMe)
         {
             if (bagIndex != -4) return false;
-            ObjectManager.Player.Inventory.SwapEquipment(aItemDroppedOnMe.Index, slotIndex, HUDManager.windowHandler.GetGuildMemberInspectWindowTarget());
+            GuildMember inspectTarget = HUDManager.windowHandler.GetGuildMemberInspectWindowTarget();
+            if (inspectTarget != null)
+            {
+                ObjectManager.Player.Inventory.SwapEquipment(aItemDroppedOnMe.Index, slotIndex, inspectTarget);
+            }
             //TODO: Handle if trying to drag inbetween sheets.
             return true;
         }
@@ -334,7 +349,8 @@ namespace Project_1.UI.HUD.Inventory
 
             if (isEmpty == false && holdable)
             {
-                HUDManager.HoldItem(this, InputManager.GetMousePosAbsolute() - Location);
+                Mailboxes.Ui.Publish(new DescriptorBoxClear());
+                Mailboxes.Ui.Publish(new HeldItemStart(this, InputManager.GetMousePosAbsolute() - Location));
             }
         }
 
@@ -347,7 +363,8 @@ namespace Project_1.UI.HUD.Inventory
 
             if (isEmpty == false && holdable && heldEvents.ClickThatCreated == InputManager.ClickType.Left)
             {
-                HUDManager.ReleaseItem();
+                Mailboxes.Ui.Publish(new DescriptorBoxClear());
+                Mailboxes.Ui.Publish(new HeldItemEnd());
             }
 
             base.ClickedOnAndReleasedOnMe();
@@ -360,7 +377,8 @@ namespace Project_1.UI.HUD.Inventory
             if (isEmpty == false && holdable && heldEvents.ClickThatCreated == InputManager.ClickType.Left)
             {
                 InputManager.CreateReleaseEvent(this, heldEvents.ClickThatCreated);
-                HUDManager.ReleaseItem();
+                Mailboxes.Ui.Publish(new DescriptorBoxClear());
+                Mailboxes.Ui.Publish(new HeldItemEnd());
             }
             base.HoldReleaseAwayFromMe();
 
@@ -371,16 +389,15 @@ namespace Project_1.UI.HUD.Inventory
             if (bagIndex >= 0)
             {
                 Friendly target;
-                if (HUDManager.windowHandler.IsShopOpen())
+                bool shopOpen = HUDManager.windowHandler.IsShopOpen();
+                if (shopOpen)
                 {
-                    //TODO: This is wrong approach, need to add item to a refund system in shop instead of just deleting it
-
-                    //int count = ObjectManager.Player.Inventory.DestroyItemAtSlot(bagIndex, slotIndex);
-                    //ObjectManager.Player.ChangeGold(count * );
+                    //TODO: Add refund system instead of direct deletion.
                 }
 
-                if (HUDManager.windowHandler.GetGuildMemberInspectWindowTarget() == null || HUDManager.windowHandler.PlayerCharacterPaneOpen) target = ObjectManager.Player;
-                else target = HUDManager.windowHandler.GetGuildMemberInspectWindowTarget();
+                GuildMember inspectTarget = HUDManager.windowHandler.GetGuildMemberInspectWindowTarget();
+                if (inspectTarget == null || HUDManager.windowHandler.PlayerCharacterPaneOpen) target = ObjectManager.Player;
+                else target = inspectTarget;
                 switch (ObjectManager.Player.Inventory.GetItemInSlot(Index).ItemType)
                 {
                     case ItemData.ItemType.NotSet:
@@ -420,10 +437,8 @@ namespace Project_1.UI.HUD.Inventory
             base.OnHover();
 
             if (!Visible) return;
-            if (holdable)
-            {
-                HUDManager.SetDescriptorBox(this);
-            }
+            if (!holdable) return;
+            Mailboxes.Ui.Publish(new DescriptorBoxSet(this));
         }
 
         protected override void OnDeHover()
@@ -435,10 +450,8 @@ namespace Project_1.UI.HUD.Inventory
 
         protected void HideDescriptorBox()
         {
-            if (holdable)
-            {
-                HUDManager.SetDescriptorBox(null);
-            }
+            if (!holdable) return;
+            Mailboxes.Ui.Publish(new DescriptorBoxClear());
         }
 
         public override void Rescale()

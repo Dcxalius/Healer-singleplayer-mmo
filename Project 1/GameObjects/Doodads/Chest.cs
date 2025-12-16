@@ -3,6 +3,8 @@ using Project_1.Input;
 using Project_1.Items;
 using Project_1.Textures;
 using Project_1.UI.HUD.Managers;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +28,9 @@ namespace Project_1.GameObjects.Doodads
 
             if (lootDrop == null) lootDrop = t.GenerateDrop(this);
 
-            HUDManager.Loot(lootDrop);
+            var snapshot = LootState.Open(lootDrop);
+            var context = LootState.BuildContext(lootDrop);
+            Mailboxes.Ui.Publish(new LootOpened(lootDrop, snapshot, context));
         }
     }
 }

@@ -20,9 +20,6 @@ namespace Project_1.Tiles
         public Point ChunkPosition { get; private set; }
 
         [JsonIgnore]
-        public RenderTarget2D minimap;
-
-        [JsonIgnore]
         public WorldSpace Position { get; private set; }
 
         public Tile Tile((int, int) aXY) => Tile(aXY.Item1, aXY.Item2);
@@ -30,6 +27,14 @@ namespace Project_1.Tiles
         {
             if (aX < 0 || aX > ChunkSize.X || aY < 0 || aY > ChunkSize.Y) throw new IndexOutOfRangeException();
             return tiles[aX, aY];
+        }
+
+        internal void FillMinimapColors(Color[] buffer)
+        {
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                buffer[i] = tiles[i % ChunkSize.X, i / ChunkSize.Y].MinimapColor;
+            }
         }
 
         [JsonProperty]
@@ -150,19 +155,10 @@ namespace Project_1.Tiles
 
         public void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
         {
-            if (minimap == null)
-            {
-                minimap = GraphicsManager.CreateRenderTarget(ChunkSize);
-                Color[] c = new Color[ChunkSize.X * ChunkSize.Y];
-                for (int i = 0; i < c.Length; i++)
-                {
-                    c[i] = tiles[i % ChunkSize.X, i / ChunkSize.Y].MinimapColor;
-                }
-                minimap.SetData(c);
-            }
+            ThreadAffinity.AssertMainThread();
+            var minimapTexture = TileRenderCache.GetChunkMinimap(this);
 
-            //aBatch.Draw(minimap, Position - aOrigin, Color.White);
-            aBatch.Draw(minimap, ( new AbsoluteScreenPosition((Position - aOrigin).ToPoint()) / (TileManager.TileSize) + aMinimapOffset + aMinimapSize / 2).ToVector2(), Color.White);
+            aBatch.Draw(minimapTexture, ( new AbsoluteScreenPosition((Position - aOrigin).ToPoint()) / (TileManager.TileSize) + aMinimapOffset + aMinimapSize / 2).ToVector2(), Color.White);
         }
 
         public void Draw(SpriteBatch aBatch)

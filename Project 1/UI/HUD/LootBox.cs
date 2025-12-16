@@ -19,7 +19,7 @@ namespace Project_1.UI.HUD
 {
     internal class LootBox : Box
     {
-        LootDrop lootedDrop;
+        LootContext context;
         Loot[] loot;
         ScrollableBox scrollableComponent;
 
@@ -37,48 +37,38 @@ namespace Project_1.UI.HUD
             hudMoveable = false;
         }
 
-        public Items.Item GetItem(int aIndex)
+        public Items.Item GetItem(int aIndex) => Messaging.LootState.Peek(aIndex);
+
+        public void RefreshSlot(int slot)
         {
-            return lootedDrop.Drop[aIndex];
+            if (loot == null) return;
+            if (slot < 0 || slot >= loot.Length) return;
+            loot[slot]?.UpdateItem(Messaging.LootState.Peek(slot));
         }
 
-        public void ReduceItem(int aIndex, int aCount)
+        public void Loot(LootContext lootContext, Items.Item[] snapshot)
         {
-            int newCount = lootedDrop.Drop[aIndex].Count - aCount;
-            Debug.Assert(newCount >= 0, "Tried to reduce items by more then it had.");
-            if (newCount == 0)
-            {
-                lootedDrop.Drop[aIndex] = null;
-                loot[aIndex].Hide();
-                return;
-            }
-            lootedDrop.Drop[aIndex].Count -= aCount; //TODO: Make this not remove directly from property
-        }
-
-        public void Loot(LootDrop aDrop)
-        {
-            if (aDrop.IsEmpty)
+            if (snapshot == null || snapshot.Length == 0 || snapshot.All(item => item == null))
             {
                 return;
             }
 
             ClearLoot();
-            lootedDrop = aDrop;
+            context = lootContext;
             Visible = true;
-            CreateLoot();
+            CreateLoot(snapshot);
         }
 
-        void CreateLoot()
+        void CreateLoot(Items.Item[] snapshot)
         {
-            Items.Item[] loots = lootedDrop.Drop;
-            loot = new Loot[loots.Length];
+            loot = new Loot[snapshot.Length];
             List<int> indexToHide = new List<int>(); //TODO: Make this not hideous
             for (int i = 0; i < loot.Length; i++)
             {
-                if (loots[i] != null)
+                Items.Item snap = snapshot[i];
+                if (snap != null)
                 {
-                    loot[i] = new Loot(i, loots[i], loots[i].GfxPath);
-
+                    loot[i] = new Loot(i, snap, snap.GfxPath);
                 }
                 else
                 {
@@ -104,28 +94,16 @@ namespace Project_1.UI.HUD
 
         void CheckIfShouldClose()
         {
-            if (lootedDrop == null) return;
-            
-            if (CheckIfCorpseDespawned()) return;
-
             if (CheckIfOutOfRange()) return;
 
             CheckIfLootedAll();
         }
 
-        bool CheckIfCorpseDespawned()
-        {
-            if (lootedDrop.Despawned)
-            {
-                StopLoot();
-                return true;
-            }
-            return false;
-        }
-
         bool CheckIfOutOfRange()
         {
-            if (!lootedDrop.InDistance)
+            if (context.AllowedDistance <= 0f) return false;
+            if (context.Despawned) { StopLoot(); return true; }
+            if (context.Position.DistanceTo(ObjectManager.Player.FeetPosition) > context.AllowedDistance)
             {
                 StopLoot();
                 return true;
@@ -135,7 +113,8 @@ namespace Project_1.UI.HUD
 
         void CheckIfLootedAll()
         {
-            if (lootedDrop.IsEmpty)
+            if (loot == null) return;
+            if (loot.All(x => x == null))
             {
                 StopLoot();
             }
@@ -151,7 +130,7 @@ namespace Project_1.UI.HUD
         {
             //children.RemoveAll(child => loot.Contains(child));
             loot = null;
-            lootedDrop = null;
+            context = default;
             scrollableComponent.RemoveAllScrollableElements();
         }
     }

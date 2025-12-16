@@ -4,6 +4,8 @@ using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.Items.SubTypes;
 using Project_1.Managers;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.UI.HUD.Managers;
 using System;
 using System.Collections.Generic;
@@ -135,7 +137,7 @@ namespace Project_1.Items
             if (!(items[aBagIndex][aSlotIndex] as Consumable).Use(aFriendly)) return false;
 
             TrimStack(aBagIndex, aSlotIndex, 1);
-            HUDManager.RefreshInventorySlot(aBagIndex, aSlotIndex, this);
+            NotifySlotChanged(aBagIndex, aSlotIndex, this);
             return true;
         }
 
@@ -181,8 +183,8 @@ namespace Project_1.Items
                     items[i] = new Item[bags[i].SlotCount];
 
                     items[aBagAndSlot.Item1][aBagAndSlot.Item2] = null;
-                    HUDManager.RefreshInventorySlot(-1, i, this);
-                    HUDManager.RefreshInventorySlot(aBagAndSlot, this);
+                    NotifySlotChanged(-1, i, this);
+                    NotifySlotChanged(aBagAndSlot, this);
 
 
                     return true;
@@ -198,7 +200,7 @@ namespace Project_1.Items
             Debug.Assert(bags[aEmptySlotToAddTo] == null, "Tried to add to occupied slot.");
             bags[aEmptySlotToAddTo] = aBag;
             items[aEmptySlotToAddTo] = new Item[aBag.SlotCount];
-            HUDManager.RefreshInventorySlot(-1, aEmptySlotToAddTo, this);
+            NotifySlotChanged(-1, aEmptySlotToAddTo, this);
         }
 
         public bool UnequipBag(int aBagSlot)
@@ -211,7 +213,7 @@ namespace Project_1.Items
                 {
                     bags[aBagSlot] = null;
                     items[aBagSlot] = null;
-                    HUDManager.RefreshInventorySlot(-1, aBagSlot, this);
+                    NotifySlotChanged(-1, aBagSlot, this);
                 }
                 return true;
             }
@@ -226,8 +228,8 @@ namespace Project_1.Items
             items[aInventorySlot.Item1][aInventorySlot.Item2] = bags[aBag];
             bags[aBag] = null;
             items[aBag] = null;
-            HUDManager.RefreshInventorySlot(aInventorySlot, this);
-            HUDManager.RefreshInventorySlot(-1, aBag, this);
+            NotifySlotChanged(aInventorySlot, this);
+            NotifySlotChanged(-1, aBag, this);
 
         }
 
@@ -239,8 +241,8 @@ namespace Project_1.Items
             bags[aBagSlot] = bags[aSlotToSwapWith];
             items[aSlotToSwapWith] = tempItems;
             bags[aSlotToSwapWith] = tempBag;
-            HUDManager.RefreshInventorySlot(-1, aBagSlot, this);
-            HUDManager.RefreshInventorySlot(-1, aSlotToSwapWith, this);
+            NotifySlotChanged(-1, aBagSlot, this);
+            NotifySlotChanged(-1, aSlotToSwapWith, this);
         }
 
         public void SwapPlacesOfBags(int aBagSlot, int aSlotToSwapWith)
@@ -256,8 +258,8 @@ namespace Project_1.Items
                 bags[aBagSlot] = null;
                 items[aBagSlot] = null;
 
-                HUDManager.RefreshInventorySlot(-1, aBagSlot, this);
-                HUDManager.RefreshInventorySlot(-1, aSlotToSwapWith, this);
+                NotifySlotChanged(-1, aBagSlot, this);
+                NotifySlotChanged(-1, aSlotToSwapWith, this);
                 return;
             }
 
@@ -270,8 +272,8 @@ namespace Project_1.Items
             bags[aSlotToSwapWith] = tempBag;
             items[aSlotToSwapWith] = tempItems;
 
-            HUDManager.RefreshInventorySlot(-1, aBagSlot, this);
-            HUDManager.RefreshInventorySlot(-1, aSlotToSwapWith, this);
+            NotifySlotChanged(-1, aBagSlot, this);
+            NotifySlotChanged(-1, aSlotToSwapWith, this);
         }
 
         public void SwapBags((int, int) aSlot, int aSlotToSwapWith)
@@ -284,8 +286,8 @@ namespace Project_1.Items
                 //Bag to empty
                 AddBag(items[aSlot.Item1][aSlot.Item2] as Container, aSlotToSwapWith);
                 items[aSlot.Item1][aSlot.Item2] = null;
-                HUDManager.RefreshInventorySlot(aSlot, this);
-                HUDManager.RefreshInventorySlot(-1, aSlotToSwapWith, this);
+                NotifySlotChanged(aSlot, this);
+                NotifySlotChanged(-1, aSlotToSwapWith, this);
                 return;
             }
 
@@ -306,8 +308,8 @@ namespace Project_1.Items
 
             }
             items[aSlot.Item1][aSlot.Item2] = tempBag;
-            HUDManager.RefreshInventorySlot(aSlot, this);
-            HUDManager.RefreshInventorySlot(-1, aSlotToSwapWith, this);
+            NotifySlotChanged(aSlot, this);
+            NotifySlotChanged(-1, aSlotToSwapWith, this);
         }
 
 
@@ -318,63 +320,71 @@ namespace Project_1.Items
 
         public void LootItem(int aLootIndex)
         {
-            Item item = HUDManager.GetLootItem(aLootIndex);
-            for (int i = 0; i < items.Length; i++)
+            while (true)
             {
-                if (items[i] == null) continue;
-                for (int j = 0; j < items[i].Length; j++)
+                Item available = LootState.Peek(aLootIndex);
+                if (available == null) return;
+
+                bool placed = false;
+
+                for (int i = 0; i < items.Length && !placed; i++)
                 {
-                    if (items[i][j] == null)
+                    if (items[i] == null) continue;
+                    for (int j = 0; j < items[i].Length && !placed; j++)
                     {
-                        items[i][j] = item;
-                        HUDManager.ReduceLootItem(aLootIndex, item.Count);
-                        HUDManager.RefreshInventorySlot(i, j, this);
-                        return;
+                        if (items[i][j] == null)
+                        {
+                            Item taken = LootState.Take(aLootIndex, available.Count);
+                            if (taken == null) return;
+                            items[i][j] = taken;
+                            NotifySlotChanged(i, j, this);
+                            placed = true;
+                            break;
+                        }
+
+                        if (items[i][j].ID != available.ID) continue;
+
+                        int capacity = items[i][j].MaxStack - items[i][j].Count;
+                        if (capacity <= 0) continue;
+
+                        int takeAmount = Math.Min(capacity, available.Count);
+                        Item taken = LootState.Take(aLootIndex, takeAmount);
+                        if (taken == null) return;
+                        items[i][j].Count += taken.Count;
+                        NotifySlotChanged(i, j, this);
+                        placed = true;
+                        break;
                     }
-
-                    if (items[i][j].ID != item.ID) continue;
-
-                    if (items[i][j].Count + item.Count <= item.MaxStack)
-                    {
-                        items[i][j].Count += item.Count;
-                        HUDManager.ReduceLootItem(aLootIndex, item.Count);
-                        HUDManager.RefreshInventorySlot(i, j, this);
-                        return;
-                    }
-
-                    int c = item.MaxStack - items[i][j].Count;
-                    items[i][j].Count = item.MaxStack;
-                    HUDManager.ReduceLootItem(aLootIndex, c);
-                    HUDManager.RefreshInventorySlot(i, j, this);
                 }
+
+                if (!placed) return;
             }
         }
 
         public void LootItem(int aLootIndex, (int, int) aBagAndSlot)
         {
-            Item item = HUDManager.GetLootItem(aLootIndex);
+            Item available = LootState.Peek(aLootIndex);
+            if (available == null) return;
+
             if (items[aBagAndSlot.Item1][aBagAndSlot.Item2] == null)
             {
-                items[aBagAndSlot.Item1][aBagAndSlot.Item2] = item;
-                HUDManager.ReduceLootItem(aLootIndex, item.Count);
-                HUDManager.RefreshInventorySlot(aBagAndSlot, this);
-                return;
-            }
-            if (item.ID != items[aBagAndSlot.Item1][aBagAndSlot.Item2].ID) return;
-            
-
-            if (items[aBagAndSlot.Item1][aBagAndSlot.Item2].Count + item.Count <= item.MaxStack)
-            {
-                items[aBagAndSlot.Item1][aBagAndSlot.Item2].Count += item.Count;
-                HUDManager.ReduceLootItem(aLootIndex, item.Count);
-                HUDManager.RefreshInventorySlot(aBagAndSlot, this);
+                Item taken = LootState.Take(aLootIndex, available.Count);
+                if (taken == null) return;
+                items[aBagAndSlot.Item1][aBagAndSlot.Item2] = taken;
+                NotifySlotChanged(aBagAndSlot, this);
                 return;
             }
 
-            int c = item.MaxStack - items[aBagAndSlot.Item1][aBagAndSlot.Item2].Count;
-            items[aBagAndSlot.Item1][aBagAndSlot.Item2].Count = item.MaxStack;
-            HUDManager.ReduceLootItem(aLootIndex, c);
-            HUDManager.RefreshInventorySlot(aBagAndSlot, this);
+            if (available.ID != items[aBagAndSlot.Item1][aBagAndSlot.Item2].ID) return;
+
+            int capacity = items[aBagAndSlot.Item1][aBagAndSlot.Item2].MaxStack - items[aBagAndSlot.Item1][aBagAndSlot.Item2].Count;
+            if (capacity <= 0) return;
+
+            int takeAmount = Math.Min(capacity, available.Count);
+            Item takenPartial = LootState.Take(aLootIndex, takeAmount);
+            if (takenPartial == null) return;
+            items[aBagAndSlot.Item1][aBagAndSlot.Item2].Count += takenPartial.Count;
+            NotifySlotChanged(aBagAndSlot, this);
 
         }
 
@@ -392,7 +402,7 @@ namespace Project_1.Items
                     if (items[i][j].ID == aItem.ID)
                     {
                         int tempCount = items[i][j].AddToStack(count);
-                        HUDManager.RefreshInventorySlot(i, j, this);
+                        NotifySlotChanged(i, j, this);
                         if (tempCount == 0)
                         {
                             return true;
@@ -418,12 +428,12 @@ namespace Project_1.Items
                         {
                             items[i][j].Count = aItem.MaxStack;
                             count -= aItem.MaxStack;
-                            HUDManager.RefreshInventorySlot(i, j, this);
+                            NotifySlotChanged(i, j, this);
                         }
                         else
                         {
                             items[i][j].Count = count;
-                            HUDManager.RefreshInventorySlot(i, j, this);
+                            NotifySlotChanged(i, j, this);
                             return true;
                         }
                     }
@@ -452,8 +462,8 @@ namespace Project_1.Items
             {
                 items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2] = items[aSlot.Item1][aSlot.Item2];
                 items[aSlot.Item1][aSlot.Item2] = null;
-                HUDManager.RefreshInventorySlot(aSlot.Item1, aSlot.Item2, this);
-                HUDManager.RefreshInventorySlot(aSlotToSwapWith.Item1, aSlotToSwapWith.Item2, this);
+                NotifySlotChanged(aSlot.Item1, aSlot.Item2, this);
+                NotifySlotChanged(aSlotToSwapWith.Item1, aSlotToSwapWith.Item2, this);
                 return;
             }
 
@@ -478,8 +488,8 @@ namespace Project_1.Items
                 items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2] = tempItem;
             }
 
-            HUDManager.RefreshInventorySlot(aSlot.Item1, aSlot.Item2, this);
-            HUDManager.RefreshInventorySlot(aSlotToSwapWith.Item1, aSlotToSwapWith.Item2, this);
+            NotifySlotChanged(aSlot.Item1, aSlot.Item2, this);
+            NotifySlotChanged(aSlotToSwapWith.Item1, aSlotToSwapWith.Item2, this);
         }
 
         public bool RemoveItem(Item aItem, int aCountToRemove)
@@ -524,7 +534,7 @@ namespace Project_1.Items
             {
                 items[aBagIndex][aSlotIndex] = null;
             }
-            HUDManager.RefreshInventorySlot(aBagIndex, aSlotIndex, this);
+            NotifySlotChanged(aBagIndex, aSlotIndex, this);
         }
 
         public void TrimStack((int, int) aBagAndSlotIndex, int aCount)
@@ -653,7 +663,11 @@ namespace Project_1.Items
         public void AssignItem(Item aItem, int aBagIndex, int aSlotIndex)
         {
             items[aBagIndex][aSlotIndex] = aItem;
-            HUDManager.RefreshInventorySlot(aBagIndex, aSlotIndex, this);
+            NotifySlotChanged(aBagIndex, aSlotIndex, this);
         }
+
+        void NotifySlotChanged(int bagIndex, int slotIndex, Inventory inventory) => Mailboxes.Ui.Publish(new InventorySlotChanged(bagIndex, slotIndex, inventory));
+        void NotifySlotChanged((int, int) bagAndSlot, Inventory inventory) => NotifySlotChanged(bagAndSlot.Item1, bagAndSlot.Item2, inventory);
+
     }
 }

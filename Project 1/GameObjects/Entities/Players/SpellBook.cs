@@ -1,6 +1,8 @@
 ﻿using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Unit;
 using Project_1.Managers;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.UI.HUD.Managers;
 using System;
 using System.Collections.Generic;
@@ -90,7 +92,7 @@ namespace Project_1.GameObjects.Entities.Players
         public void AddSpell(Spell aSpell)
         {
             knownSpells.Add(aSpell);
-            HUDManager.windowHandler.AddSpellToSpellBook(aSpell);
+            Mailboxes.Ui.Publish(new SpellbookRefreshed(owner as Friendly, knownSpells.ToArray()));
         }
 
 

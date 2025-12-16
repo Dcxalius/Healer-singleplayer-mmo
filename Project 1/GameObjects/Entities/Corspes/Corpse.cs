@@ -6,6 +6,8 @@ using Project_1.Camera;
 using Project_1.Input;
 using Project_1.Items;
 using Project_1.Managers;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.Particles;
 using Project_1.Textures;
 using Project_1.UI.HUD.Managers;
@@ -115,7 +117,9 @@ namespace Project_1.GameObjects.Entities.Corspes
             if (ObjectManager.Player.FeetPosition.DistanceTo(Centre) > lootLength) return false;
             if (drop.IsEmpty) return false;
 
-            HUDManager.Loot(drop);
+            var snapshot = LootState.Open(drop);
+            var context = LootState.BuildContext(drop);
+            Mailboxes.Ui.Publish(new LootOpened(drop, snapshot, context));
 
             return true;
         }

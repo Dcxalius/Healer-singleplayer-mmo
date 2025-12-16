@@ -4,7 +4,7 @@ using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Spawners.Pathing;
 using Project_1.Managers;
-using Project_1.Managers.States;
+using Project_1.Messaging;
 using Project_1.UI;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
@@ -282,8 +282,8 @@ namespace Project_1.Input
             inputToWriteTo = null;
 
             ClickEvent clickEvent = new ClickEvent(GetMousePosRelative(), aTypeOfClick, heldModifiers);
-                
-            StateManager.Click(clickEvent);
+
+            Mailboxes.Ui.Publish(clickEvent);
         }
 
         public static void CreateReleaseEvent(UIElement aCreator, InputManager.ClickType aTypeOfRelease)
@@ -291,7 +291,7 @@ namespace Project_1.Input
             bool[] heldModifiers = CheckHoldModifiers();
 
             ReleaseEvent releaseEvent = new ReleaseEvent(aCreator, GetMousePosRelative(), aTypeOfRelease, heldModifiers);
-            StateManager.Release(releaseEvent);
+            Mailboxes.Ui.Publish(releaseEvent);
         }
 
         static void CreateScrollEvent()
@@ -303,7 +303,7 @@ namespace Project_1.Input
 
             ScrollEvent scrollEvent = new ScrollEvent(GetMousePosRelative(), amount, direction, heldModifiers);
 
-            StateManager.Scroll(scrollEvent);
+            Mailboxes.Ui.Publish(scrollEvent);
         }
 
         public static bool[] CheckHoldModifiers()
