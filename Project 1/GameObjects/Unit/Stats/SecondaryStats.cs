@@ -21,33 +21,33 @@ namespace Project_1.GameObjects.Unit.Stats
             defense = new Defense(aUnitData);
         }
 
-        public SecondayStatBonus<T> xdd<T>(string aSecondaryStat, DamageType damageType)
-        {
-            if (damageType == DamageType.Physical) ;
-                //return Attack.
-            if (spell != null)
-            {
-                SpellSchool spellSchool = damageType switch
-                {
-                    DamageType.Arcane => SpellSchool.Arcane,
-                    DamageType.Fire => SpellSchool.Fire,
-                    DamageType.Frost => SpellSchool.Frost,
-                    DamageType.Holy => SpellSchool.Holy,
-                    DamageType.Nature => SpellSchool.Nature,
-                    DamageType.Shadow => SpellSchool.Shadow,
-                    _ => SpellSchool.Base,
-                };
-                return spell.GetSecondaryStat<T>(spellSchool, aSecondaryStat);
-            }
-        }
+        //public SecondayStatBonus<T> xdd<T>(string aSecondaryStat, DamageType damageType)
+        //{
+        //    if (damageType == DamageType.Physical);
+        //        //return Attack.
+        //    if (spell != null)
+        //    {
+        //        SpellSchool spellSchool = damageType switch
+        //        {
+        //            DamageType.Arcane => SpellSchool.Arcane,
+        //            DamageType.Fire => SpellSchool.Fire,
+        //            DamageType.Frost => SpellSchool.Frost,
+        //            DamageType.Holy => SpellSchool.Holy,
+        //            DamageType.Nature => SpellSchool.Nature,
+        //            DamageType.Shadow => SpellSchool.Shadow,
+        //            _ => SpellSchool.Base,
+        //        };
+        //        return spell.GetSecondaryStat<T>(spellSchool, aSecondaryStat);
+        //    }
+        //}
 
         public Attack Spell
         {
             get
             {
-                DamageType damageType = attack.DamageType;
+                //DamageType damageType = attack.DamageType;
                 if (spell == null) return attack;
-                return spell;
+                return attack;
             }
         }
         Spell spell;

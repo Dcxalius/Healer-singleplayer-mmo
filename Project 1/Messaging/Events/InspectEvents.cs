@@ -1,4 +1,4 @@
-﻿using Project_1.GameObjects.Entities.Players;
+﻿using Project_1.GameObjects.Entities.GuildMembers;
 
 namespace Project_1.Messaging.Events
 {

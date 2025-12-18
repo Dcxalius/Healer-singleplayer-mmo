@@ -21,6 +21,7 @@ using Project_1.UI.HUD.Managers;
 using Project_1.GameObjects.Unit;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
+using Project_1.GameObjects.Entities.GuildMembers;
 
 namespace Project_1.GameObjects.Entities.Players
 {

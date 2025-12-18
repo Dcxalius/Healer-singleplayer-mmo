@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Newtonsoft.Json;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities.GuildMember;
+using Project_1.GameObjects.Entities.GuildMembers;
 using Project_1.GameObjects.Entities.Npcs;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Spawners;

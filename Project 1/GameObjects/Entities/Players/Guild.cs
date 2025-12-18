@@ -8,6 +8,7 @@ using System.Diagnostics;
 using Project_1.UI.HUD.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
+using Project_1.GameObjects.Entities.GuildMembers;
 
 namespace Project_1.GameObjects.Entities.Players
 {
@@ -26,22 +27,22 @@ namespace Project_1.GameObjects.Entities.Players
             SetRosterWindow();
         }
 
-        public GuildMember GetGuildMemberByName(string aName)
+        public GuildMembers.GuildMember GetGuildMemberByName(string aName)
         {
             Debug.Assert(aName != null);
             Debug.Assert(aName != owner.Name, "Tried to get Player.");
 
-            return guildMembers.Single(guildMember =>  guildMember.Name == aName) as GuildMember;
+            return guildMembers.Single(guildMember =>  guildMember.Name == aName) as GuildMembers.GuildMember;
         }
 
         void SetRosterWindow()
         {
-            GuildMember.GuildMemberData[] data = new GuildMember.GuildMemberData[guildMembers.Count];
+            GuildMembers.GuildMember.GuildMemberData[] data = new GuildMembers.GuildMember.GuildMemberData[guildMembers.Count];
             for (int i = 0; i < guildMembers.Count; i++)
             {
                 data[i] = guildMembers[i].CreateGuildMemberData();
             }
-            Mailboxes.Ui.Publish(new GuildMembersSet(guildMembers.Select(gm => gm as GuildMember).ToArray()));
+            Mailboxes.Ui.Publish(new GuildMembersSet(guildMembers.Select(gm => gm as GuildMembers.GuildMember).ToArray()));
         }
     }
 }

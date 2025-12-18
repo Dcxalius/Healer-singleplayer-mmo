@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Entities.GuildMembers;
 using Project_1.Input;
 using Project_1.Items;
 using Project_1.Items.SubTypes;

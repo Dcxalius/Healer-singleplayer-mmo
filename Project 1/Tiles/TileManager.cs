@@ -31,9 +31,9 @@ namespace Project_1.Tiles
             int r = x % y;
             return r < 0 ? r + y : r;
         }
-        static Tile GetTile(WorldSpace aSpace) => GetTile(GetChunk(aSpace), Modulo((int)MathF.Floor(aSpace.X / TileSize.X), Chunk.ChunkSize.X), Modulo((int)MathF.Floor(aSpace.Y / TileSize.Y), Chunk.ChunkSize.Y));
-        static Tile GetTile(Chunk aChunk, int aX, int aY) => aChunk.Tile(aX, aY);
-        static Tile GetTile(int aChunkId, int aX, int aY) => chunks.Find(x => x.Id == aChunkId).Tile(aX, aY);
+        public static Tile GetTile(WorldSpace aSpace) => GetTile(GetChunk(aSpace), Modulo((int)MathF.Floor(aSpace.X / TileSize.X), Chunk.ChunkSize.X), Modulo((int)MathF.Floor(aSpace.Y / TileSize.Y), Chunk.ChunkSize.Y));
+        public static Tile GetTile(Chunk aChunk, int aX, int aY) => aChunk.Tile(aX, aY);
+        public static Tile GetTile(int aChunkId, int aX, int aY) => chunks.Find(x => x.Id == aChunkId).Tile(aX, aY);
         public static Tile GetTileAt(WorldSpace aSpace) => GetTile(aSpace);
 
         public static Chunk GetChunk(int aId) => chunks.Find(x => x.Id == aId);

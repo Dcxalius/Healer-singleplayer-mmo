@@ -1,4 +1,4 @@
-﻿using Project_1.GameObjects.Entities.Players;
+﻿using GuildMemberEntity = Project_1.GameObjects.Entities.GuildMembers.GuildMember;
 using Project_1.UI.UIElements.Buttons;
 using System.Collections.Generic;
 
@@ -6,65 +6,65 @@ namespace Project_1.Messaging.Events
 {
     internal readonly struct PartyControlCleared
     {
-        public PartyControlCleared(IList<GuildMember> members)
+        public PartyControlCleared(IList<GuildMemberEntity> members)
         {
             Members = members;
         }
-        public IList<GuildMember> Members { get; }
+        public IList<GuildMemberEntity> Members { get; }
     }
 
     internal readonly struct PartyWalkerAdded
     {
-        public PartyWalkerAdded(GuildMember member)
+        public PartyWalkerAdded(GuildMemberEntity member)
         {
             Member = member;
         }
-        public GuildMember Member { get; }
+        public GuildMemberEntity Member { get; }
     }
 
     internal readonly struct PartyWalkerRemoved
     {
-        public PartyWalkerRemoved(GuildMember member)
+        public PartyWalkerRemoved(GuildMemberEntity member)
         {
             Member = member;
         }
-        public GuildMember Member { get; }
+        public GuildMemberEntity Member { get; }
     }
 
     internal readonly struct PartyMemberAdded
     {
-        public PartyMemberAdded(GuildMember member)
+        public PartyMemberAdded(GuildMemberEntity member)
         {
             Member = member;
         }
-        public GuildMember Member { get; }
+        public GuildMemberEntity Member { get; }
     }
 
     internal readonly struct PartyMemberRemoved
     {
-        public PartyMemberRemoved(GuildMember member)
+        public PartyMemberRemoved(GuildMemberEntity member)
         {
             Member = member;
         }
-        public GuildMember Member { get; }
+        public GuildMemberEntity Member { get; }
     }
 
     internal readonly struct GuildMembersSet
     {
-        public GuildMembersSet(GuildMember[] members)
+        public GuildMembersSet(GuildMemberEntity[] members)
         {
             Members = members;
         }
-        public GuildMember[] Members { get; }
+        public GuildMemberEntity[] Members { get; }
     }
 
     internal readonly struct GuildMemberAdded
     {
-        public GuildMemberAdded(GuildMember member)
+        public GuildMemberAdded(GuildMemberEntity member)
         {
             Member = member;
         }
-        public GuildMember Member { get; }
+        public GuildMemberEntity Member { get; }
     }
 
     internal readonly struct PartyCleared

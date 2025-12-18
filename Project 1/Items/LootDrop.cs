@@ -14,6 +14,8 @@ namespace Project_1.Items
         public Item[] Drop => drop;
         Item[] drop;
 
+        static int nextId;
+        public int Id { get; }
         public WorldSpace DropperFeet => dropperFeet;
         WorldSpace dropperFeet;
         public float DropperHalfHeight => dropperHalfHeight;
@@ -40,6 +42,7 @@ namespace Project_1.Items
         public LootDrop(Item[] drop, WorldObject @object)
         {
             this.drop = drop;
+            Id = System.Threading.Interlocked.Increment(ref nextId);
             dropperFeet = @object.FeetPosition;
             dropperHalfHeight = (float)@object.FeetSize.Y / 2f;
         }

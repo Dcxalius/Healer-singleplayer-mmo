@@ -15,9 +15,17 @@ namespace Project_1.UI.HUD.Managers
     {
         Dictionary<Entity, NamePlate> namePlates = new Dictionary<Entity, NamePlate>();
 
-        public void AddNamePlate(Entity aEntity, NamePlate aNamePlate) => namePlates.Add(aEntity, aNamePlate);
+        public void AddNamePlate(Entity aEntity, NamePlate aNamePlate)
+        {
+            namePlates.Add(aEntity, aNamePlate);
+            HUDManager.PlatesInvalidated?.Invoke();
+        }
 
-        public void RemoveNamePlate(Entity aEntity) => namePlates.Remove(aEntity);
+        public void RemoveNamePlate(Entity aEntity)
+        {
+            namePlates.Remove(aEntity);
+            HUDManager.PlatesInvalidated?.Invoke();
+        }
 
 
         public void Update()

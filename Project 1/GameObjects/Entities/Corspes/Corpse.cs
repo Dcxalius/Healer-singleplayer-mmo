@@ -119,7 +119,7 @@ namespace Project_1.GameObjects.Entities.Corspes
 
             var snapshot = LootState.Open(drop);
             var context = LootState.BuildContext(drop);
-            Mailboxes.Ui.Publish(new LootOpened(drop, snapshot, context));
+            Mailboxes.Ui.Publish(new LootOpened(snapshot, context));
 
             return true;
         }
@@ -146,6 +146,7 @@ namespace Project_1.GameObjects.Entities.Corspes
             if (!Despawned) return;
 
             drop.Despawned = true;
+            Mailboxes.Ui.Publish(new LootClosed(drop.Id));
             CorpseManager.RemoveCorpse(this);
         }
 

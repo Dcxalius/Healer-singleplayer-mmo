@@ -1,5 +1,7 @@
-﻿using Project_1.Items;
+﻿using Project_1.GameObjects;
+using Project_1.Items;
 using Project_1.Messaging.Events;
+using System.Linq;
 
 namespace Project_1.Messaging
 {
@@ -9,6 +11,8 @@ namespace Project_1.Messaging
     internal static class LootState
     {
         public static LootDrop Current { get; private set; }
+        public static int CurrentContextId { get; private set; }
+        static bool closedFromEmpty;
 
         public static Item[] Open(LootDrop drop)
         {
@@ -23,9 +27,13 @@ namespace Project_1.Messaging
                 }
                 drop.SetDrop(cloned);
                 Current = drop;
+                CurrentContextId = drop.Id;
+                closedFromEmpty = false;
                 return cloned;
             }
             Current = drop;
+            CurrentContextId = drop?.Id ?? 0;
+            closedFromEmpty = false;
             return drop?.Drop;
         }
 
@@ -33,7 +41,7 @@ namespace Project_1.Messaging
         {
             if (drop == null) return default;
             float allowed = drop.DropperHalfHeight + (float)ObjectManager.Player.FeetSize.Y / 2f;
-            return new LootContext(drop.GetHashCode(), drop.DropperFeet, allowed, drop.Despawned);
+            return new LootContext(drop.Id, drop.DropperFeet, allowed, drop.Despawned);
         }
 
         public static Item Peek(int slot)
@@ -63,7 +71,24 @@ namespace Project_1.Messaging
 
             existing.Count -= takeAmount;
             Mailboxes.Ui.Publish(new LootSlotChanged(slot, new Item(existing.ID, existing.Count), takeAmount));
+            if (Current.Drop.Where(x => x != null).Count() == 0 && !closedFromEmpty)
+            {
+                closedFromEmpty = true;
+                Mailboxes.Ui.Publish(new LootClosed(CurrentContextId));
+                Current = null;
+                CurrentContextId = 0;
+            }
             return new Item(existing.ID, takeAmount);
+        }
+
+        public static void Close(int contextId)
+        {
+            if (Current != null && CurrentContextId == contextId)
+            {
+                Current = null;
+                CurrentContextId = 0;
+                closedFromEmpty = true;
+            }
         }
     }
 }

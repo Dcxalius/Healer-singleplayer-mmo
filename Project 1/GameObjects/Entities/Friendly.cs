@@ -2,6 +2,7 @@
 using Project_1.Camera;
 using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Unit.Classes;
+using Project_1.GameObjects.Entities.GuildMembers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,9 +21,9 @@ namespace Project_1.GameObjects.Entities
         }
 
 
-        public GuildMember.GuildMemberData CreateGuildMemberData()
+        public GuildMembers.GuildMember.GuildMemberData CreateGuildMemberData()
         {
-            return new GuildMember.GuildMemberData(Name, CurrentLevel, Class);
+            return new GuildMembers.GuildMember.GuildMemberData(Name, CurrentLevel, Class);
         }
         public override void ExpToParty(int aExpAmount)
         {

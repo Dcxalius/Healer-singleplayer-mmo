@@ -33,11 +33,14 @@ namespace Project_1.Managers.States
         {
             HUDManager.SetHudMoveable(true);
             cleanGame = StateManager.CleanGameTarget;
+            HUDManager.InvalidateUi();
         }
 
         public override void OnLeave()
         {
             StateManager.RedrawGame(); //TODO: UGLY AF
+            HUDManager.ResetHudMoveable();
+            HUDManager.InvalidateUi();
         }
 
         public override void Update()
@@ -58,12 +61,12 @@ namespace Project_1.Managers.States
 
         public override bool Release(ReleaseEvent aReleaseEvent)
         {
-            throw new NotImplementedException();
+            return HUDManager.Release(aReleaseEvent);
         }
 
         public override bool Scroll(ScrollEvent aScrollEvent)
         {
-            throw new NotImplementedException();
+            return HUDManager.Scroll(aScrollEvent);
         }
 
         public override void Rescale()

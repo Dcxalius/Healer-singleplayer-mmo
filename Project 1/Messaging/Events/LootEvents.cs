@@ -1,16 +1,15 @@
-﻿using Project_1.Items;
+﻿using Project_1.Camera;
+using Project_1.Items;
 
 namespace Project_1.Messaging.Events
 {
     internal readonly struct LootOpened
     {
-        public LootOpened(LootDrop drop, Item[] snapshot, LootContext context)
+        public LootOpened(Item[] snapshot, LootContext context)
         {
-            Drop = drop;
             Snapshot = snapshot;
             Context = context;
         }
-        public LootDrop Drop { get; }
         public Item[] Snapshot { get; }
         public LootContext Context { get; }
     }
@@ -28,6 +27,15 @@ namespace Project_1.Messaging.Events
         public WorldSpace Position { get; }
         public float AllowedDistance { get; }
         public bool Despawned { get; }
+    }
+
+    internal readonly struct LootClosed
+    {
+        public LootClosed(int contextId)
+        {
+            ContextId = contextId;
+        }
+        public int ContextId { get; }
     }
 
     internal readonly struct LootSlotChanged

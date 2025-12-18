@@ -13,7 +13,7 @@ using Project_1.UI.UIElements.Buttons;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Spells;
-using Project_1.GameObjects.Entities.GuildMember;
+using Project_1.GameObjects.Entities.GuildMembers;
 
 namespace Project_1.UI.HUD.Managers
 {
@@ -55,6 +55,7 @@ namespace Project_1.UI.HUD.Managers
         {
             shopWindow.OpenWindow();
             shopWindow.OpenShop(aShop, aNpc);
+            HUDManager.InvalidateUi();
         }
 
         public void OpenGossipWindow(ChatGossipOption aIntro, Npc aNpc)
@@ -62,6 +63,7 @@ namespace Project_1.UI.HUD.Managers
             gossipWindow.OpenWindow();
             gossipWindow.ResetOptions();
             gossipWindow.Set(aIntro, aNpc);
+            HUDManager.InvalidateUi();
             //gossipWindow.SetIntro(aIntro);
             //gossipWindow.AddOptions(aGossipOption);
         }
@@ -69,6 +71,7 @@ namespace Project_1.UI.HUD.Managers
         public void CloseGossipWindow()
         {
             gossipWindow.CloseWindow();
+            HUDManager.InvalidateUi();
         }
 
         public void AddGuildMember(Friendly aData)
@@ -79,14 +82,20 @@ namespace Project_1.UI.HUD.Managers
         public void SetGuildMembers(Friendly[] aData)
         {
             guildWindow.SetRoster(aData);
+            HUDManager.InvalidateUi();
         }
 
         public void SetGuildMemberInviteStatus(List<string> aName, List<TwoStateGFXButton.State> aState)
         {
             guildWindow.SetGuildMemberInviteStatus(aName, aState);
+            HUDManager.InvalidateUi();
         }
         public void SetCharacterWindow(Player aPlayer) => characterWindow.SetData(aPlayer);
-        public void ToggleCharacterWindow() => characterWindow.ToggleVisibilty();
+        public void ToggleCharacterWindow()
+        {
+            characterWindow.ToggleVisibilty();
+            HUDManager.InvalidateUi();
+        }
 
         public void RefreshAllCharacterWindowSlots(Equipment aEquipment, Friendly aFriendly)
         {
@@ -94,6 +103,7 @@ namespace Project_1.UI.HUD.Managers
             {
                 RefreshCharacterWindowSlot((Equipment.Slot)i, aEquipment, aFriendly);
             }
+            HUDManager.InvalidateUi();
         }
 
         public void RefreshCharacterWindowSlot(Equipment.Slot aSlot, Equipment aEquipment, Friendly aFriendly)
@@ -102,12 +112,14 @@ namespace Project_1.UI.HUD.Managers
             if (aFriendly.RelationToPlayer == Relation.RelationToPlayer.Self)
             {
                 characterWindow.SetSlot(aSlot, aEquipment);
+                HUDManager.InvalidateUi();
                 return;
             }
 
             if (!inspectWindow.BelongsTo(aFriendly as GuildMember)) return;
 
             inspectWindow.SetSlot(aSlot, aEquipment);
+            HUDManager.InvalidateUi();
         }
 
         public void RefreshCharacterWindowStats(PairReport aReport, Friendly aFriendly)
@@ -117,11 +129,13 @@ namespace Project_1.UI.HUD.Managers
             if (aFriendly.RelationToPlayer == Relation.RelationToPlayer.Self)
             {
                 characterWindow.SetReportBox(aReport);
+                HUDManager.InvalidateUi();
                 return;
             }
             if (!inspectWindow.BelongsTo(aFriendly as GuildMember)) return;
 
             inspectWindow.SetReportBox(aReport);
+            HUDManager.InvalidateUi();
         }
 
         public void RefreshCharacterWindowExpBar(Friendly aFriendly)
@@ -129,12 +143,14 @@ namespace Project_1.UI.HUD.Managers
             if (aFriendly.RelationToPlayer == Relation.RelationToPlayer.Self)
             {
                 characterWindow.RefreshExp(aFriendly.Level);
+                HUDManager.InvalidateUi();
                 return;
             }
 
             if (!inspectWindow.BelongsTo(aFriendly as GuildMember)) return;
 
             inspectWindow.RefreshExp(aFriendly.Level);
+            HUDManager.InvalidateUi();
 
         }
 

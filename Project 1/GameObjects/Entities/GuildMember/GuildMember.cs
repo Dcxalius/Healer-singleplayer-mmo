@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.Entities.GuildMember
+namespace Project_1.GameObjects.Entities.GuildMembers
 {
     internal class GuildMember : Friendly
     {

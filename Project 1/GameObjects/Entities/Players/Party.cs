@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Bson;
 using Project_1.Camera;
 using Project_1.GameObjects.Unit;
+using Project_1.GameObjects.Entities.GuildMembers;
 using Project_1.Input;
 using Project_1.UI.HUD.Managers;
 using Project_1.Messaging;
@@ -19,14 +20,14 @@ namespace Project_1.GameObjects.Entities.Players
         public const int maxPartySize = 4;
 
         Player owner;
-        List<GuildMember> commands = new List<GuildMember>();
+        List<GuildMembers.GuildMember> commands = new List<GuildMembers.GuildMember>();
 
         public int PartyCount => party.Count;
-        List<GuildMember> party = new List<GuildMember>();
+        List<GuildMembers.GuildMember> party = new List<GuildMembers.GuildMember>();
         const float lengthOfLeash = 500;
 
-        public bool IsInCommand(GuildMember aGuildMember) => commands.IndexOf(aGuildMember) >= 0;
-        public bool IsInParty(GuildMember aGuildMember) => party.IndexOf(aGuildMember) >= 0;
+        public bool IsInCommand(GuildMembers.GuildMember aGuildMember) => commands.IndexOf(aGuildMember) >= 0;
+        public bool IsInParty(GuildMembers.GuildMember aGuildMember) => party.IndexOf(aGuildMember) >= 0;
 
         public bool IsInCombat => party.Any(x => x.InCombat);
 
@@ -71,7 +72,7 @@ namespace Project_1.GameObjects.Entities.Players
             commands.Clear();
         }
 
-        public void AddToCommand(GuildMember aGuildMember)
+        public void AddToCommand(GuildMembers.GuildMember aGuildMember)
         {
             if (commands.Contains(aGuildMember)) { return; }
 
@@ -79,14 +80,14 @@ namespace Project_1.GameObjects.Entities.Players
             commands.Add(aGuildMember);
         }
 
-        public void NeedyAddToCommand(GuildMember aGuildMember)
+        public void NeedyAddToCommand(GuildMembers.GuildMember aGuildMember)
         {
             commands.Clear();
             AddToCommand(aGuildMember);
 
         }
 
-        public void RemoveFromCommand(GuildMember aGuildMember)
+        public void RemoveFromCommand(GuildMembers.GuildMember aGuildMember)
         {
             if (!commands.Contains(aGuildMember)) { return; }
 
@@ -94,7 +95,7 @@ namespace Project_1.GameObjects.Entities.Players
             commands.Remove(aGuildMember);
         }
 
-        public bool AddToParty(GuildMember aGuildMember)
+        public bool AddToParty(GuildMembers.GuildMember aGuildMember)
         {
             if (PartyCount >= maxPartySize) return false;
 
@@ -105,7 +106,7 @@ namespace Project_1.GameObjects.Entities.Players
             return true;
         }
 
-        public bool RemoveFromParty(GuildMember aGuildMember)
+        public bool RemoveFromParty(GuildMembers.GuildMember aGuildMember)
         {
             Debug.Assert(PartyCount > 0);
             Debug.Assert(aGuildMember != null);

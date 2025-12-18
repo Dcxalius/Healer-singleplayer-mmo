@@ -27,7 +27,7 @@ using Project_1.GameObjects.Entities.Projectiles;
 using Project_1.GameObjects.Entities.Npcs;
 using Project_1.GameObjects.Unit;
 using Project_1.UI.HUD.Managers;
-using Project_1.GameObjects.Entities.GuildMember;
+using Project_1.GameObjects.Entities.GuildMembers;
 
 namespace Project_1.GameObjects
 {

@@ -12,6 +12,7 @@ using Project_1.UI.HUD.SpellBook;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Bars;
 using Project_1.UI.UIElements.Boxes;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Item = Project_1.UI.HUD.Inventory.Item;
@@ -49,6 +50,8 @@ namespace Project_1.UI.HUD.Managers
         static List<(string, RelativeScreenPosition, RelativeScreenPosition)> LoadedSettings;
 
         public static bool HudMoving => hudMoving;
+        public static Action UiInvalidated;
+        public static Action PlatesInvalidated;
         static bool hudMoving;
         static bool initialized;
         static HUDManager()
@@ -100,8 +103,22 @@ namespace Project_1.UI.HUD.Managers
             initialized = true;
 
             Mailboxes.Ui.Subscribe<LootOpened>(HandleLootOpened);
-            Mailboxes.Ui.Subscribe<LootSlotChanged>(e => lootBox.RefreshSlot(e.Slot));
-            Mailboxes.Ui.Subscribe<LootSlotRemoved>(e => lootBox.RefreshSlot(e.Slot));
+            Mailboxes.Ui.Subscribe<LootSlotChanged>(e =>
+            {
+                lootBox.RefreshSlot(e.Slot);
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<LootSlotRemoved>(e =>
+            {
+                lootBox.RefreshSlot(e.Slot);
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<LootClosed>(e =>
+            {
+                LootState.Close(e.ContextId);
+                lootBox.CloseIfContext(e.ContextId);
+                InvalidateUi();
+            });
         }
 
         static void ImportSettings()
@@ -253,9 +270,17 @@ namespace Project_1.UI.HUD.Managers
 
 
         #region Dialogue
-        public static void AddDialogueBox(DialogueBox aDialogueBox) => dialogueBoxes.Add(aDialogueBox);
+        public static void AddDialogueBox(DialogueBox aDialogueBox)
+        {
+            dialogueBoxes.Add(aDialogueBox);
+            InvalidateUi();
+        }
 
-        public static void RemoveDialogueBox(DialogueBox aDialogueBox) => dialogueBoxes.Remove(aDialogueBox);
+        public static void RemoveDialogueBox(DialogueBox aDialogueBox)
+        {
+            dialogueBoxes.Remove(aDialogueBox);
+            InvalidateUi();
+        }
         #endregion
 
 
@@ -263,45 +288,113 @@ namespace Project_1.UI.HUD.Managers
 
 
         #region Inventory
-        public static void SetInventory(Items.Inventory aInventory) => inventoryBox.SetInventory(aInventory);
-        public static void RefreshInventorySlot(int aBag, int aSlot, Items.Inventory aInventory) => inventoryBox.RefreshSlot(aBag, aSlot, aInventory);
+        public static void SetInventory(Items.Inventory aInventory)
+        {
+            inventoryBox.SetInventory(aInventory);
+            InvalidateUi();
+        }
+        public static void RefreshInventorySlot(int aBag, int aSlot, Items.Inventory aInventory)
+        {
+            inventoryBox.RefreshSlot(aBag, aSlot, aInventory);
+            InvalidateUi();
+        }
         public static void RefreshInventorySlot((int, int) aBagAndSlot, Items.Inventory aInventory) => RefreshInventorySlot(aBagAndSlot.Item1, aBagAndSlot.Item2, aInventory);
 
-        public static void SetDescriptorBox(Item aItem) => descriptorBox.SetToItem(aItem);
-        public static void SetDescriptorBox(Items.Item aItem, RelativeScreenPosition aPos) => descriptorBox.SetToItem(aItem, aPos);
+        public static void SetDescriptorBox(Item aItem)
+        {
+            descriptorBox.SetToItem(aItem);
+            InvalidateUi();
+        }
+        public static void SetDescriptorBox(Items.Item aItem, RelativeScreenPosition aPos)
+        {
+            descriptorBox.SetToItem(aItem, aPos);
+            InvalidateUi();
+        }
 
-        public static void RefreshGold(int aGoldAmount) => inventoryBox.RefreshGold(aGoldAmount);
+        public static void RefreshGold(int aGoldAmount)
+        {
+            inventoryBox.RefreshGold(aGoldAmount);
+            InvalidateUi();
+        }
         #endregion
 
         
 
         #region Spell
-        public static void HoldSpell(Spell aSpell, AbsoluteScreenPosition aGrabOffset) => heldSpell.HoldMe(aSpell, aGrabOffset);
-        public static void ReleaseSpell() => heldSpell.ReleaseMe();
+        public static void HoldSpell(Spell aSpell, AbsoluteScreenPosition aGrabOffset)
+        {
+            heldSpell.HoldMe(aSpell, aGrabOffset);
+            InvalidateUi();
+        }
+        public static void ReleaseSpell()
+        {
+            heldSpell.ReleaseMe();
+            InvalidateUi();
+        }
 
-        public static void FinishChannel() => playerCastBar.FinishCast();
-        public static void CancelChannel() => playerCastBar.CancelCast();
-        public static void UpdateChannelSpell(float aNewVal) => playerCastBar.Value = aNewVal;
-        public static void ChannelSpell(Spell aSpell) => playerCastBar.CastSpell(aSpell);
+        public static void FinishChannel()
+        {
+            playerCastBar.FinishCast();
+            InvalidateUi();
+        }
+        public static void CancelChannel()
+        {
+            playerCastBar.CancelCast();
+            InvalidateUi();
+        }
+        public static void UpdateChannelSpell(float aNewVal)
+        {
+            playerCastBar.Value = aNewVal;
+            InvalidateUi();
+        }
+        public static void ChannelSpell(Spell aSpell)
+        {
+            playerCastBar.CastSpell(aSpell);
+            InvalidateUi();
+        }
 
         
 
-        public static void LoadSpellBar(Spell[] aSpells) => firstSpellBar.LoadBar(aSpells);
+        public static void LoadSpellBar(Spell[] aSpells)
+        {
+            firstSpellBar.LoadBar(aSpells);
+            InvalidateUi();
+        }
         public static string[] SaveSpellBar => firstSpellBar.SaveBar();
 
 
         #endregion
 
         #region Loot
-        public static Items.Item GetLootItem(int aSlotInLoot) => lootBox.GetItem(aSlotInLoot);
-        public static void Loot(LootDrop aDrop, Items.Item[] snapshot, LootContext context) => lootBox.Loot(context, snapshot);
-        public static void RefreshLootSlot(int slot) => lootBox.RefreshSlot(slot);
+        public static void Loot(Items.Item[] snapshot, LootContext context)
+        {
+            lootBox.Loot(context, snapshot);
+            InvalidateUi();
+        }
+        public static void RefreshLootSlot(int slot)
+        {
+            lootBox.RefreshSlot(slot);
+            InvalidateUi();
+        }
 
-        static void HandleLootOpened(LootOpened e) => Loot(e.Drop, e.Snapshot, e.Context);
+        static void HandleLootOpened(LootOpened e)
+        {
+            Loot(e.Snapshot, e.Context);
+        }
 
-        public static void HoldItem(Item aItem, AbsoluteScreenPosition aGrabOffset) => heldItem.HoldItem(aItem, aGrabOffset);
-        public static void ReleaseItem() => heldItem.ReleaseMe();
+        public static void HoldItem(Item aItem, AbsoluteScreenPosition aGrabOffset)
+        {
+            heldItem.HoldItem(aItem, aGrabOffset);
+            InvalidateUi();
+        }
+        public static void ReleaseItem()
+        {
+            heldItem.ReleaseMe();
+            InvalidateUi();
+        }
         #endregion
+
+        public static void InvalidateUi() => UiInvalidated?.Invoke();
 
 
         #region Mouse
@@ -337,6 +430,7 @@ namespace Project_1.UI.HUD.Managers
             {
                 if (hudElements[i].ReleasedOn(aReleaseEvent)) return true;
             }
+            InvalidateUi();
             return false;
         }
 
@@ -351,6 +445,7 @@ namespace Project_1.UI.HUD.Managers
                 if (hudElements[i].ScrolledOn(aScrollEvent)) return true;
 
             }
+            InvalidateUi();
             return false;
         }
 
@@ -367,9 +462,18 @@ namespace Project_1.UI.HUD.Managers
 
         public static void Draw(SpriteBatch aBatch)
         {
+            DrawPlates(aBatch);
+            DrawUi(aBatch);
+        }
+
+        public static void DrawPlates(SpriteBatch aBatch)
+        {
             namePlateHandler.Draw(aBatch);
             plateBoxHandler.Draw(aBatch);
+        }
 
+        public static void DrawUi(SpriteBatch aBatch)
+        {
             for (int i = 0; i < hudElements.Count; i++)
             {
                 hudElements[i].Draw(aBatch);

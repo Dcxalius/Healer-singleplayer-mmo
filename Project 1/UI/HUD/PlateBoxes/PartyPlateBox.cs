@@ -2,7 +2,7 @@
 using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
-using Project_1.GameObjects.Entities.GuildMember;
+using Project_1.GameObjects.Entities.GuildMembers;
 using Project_1.Input;
 using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements;

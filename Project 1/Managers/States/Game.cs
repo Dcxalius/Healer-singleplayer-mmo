@@ -113,7 +113,8 @@ namespace Project_1.Managers.States
             DrawList(spriteBatch);
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred);
-            spriteBatch.Draw(uITarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+            spriteBatch.Draw(plateTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+            spriteBatch.Draw(uITarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1.1f);
 
             CleanRender();
             return renderTarget;

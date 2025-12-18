@@ -75,47 +75,18 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public SecondayStatBonus<T> GetSecondaryStat<T>(SpellSchool aSpellSchool, string aSecondaryStat)
         {
-            T returnable = default;
+            SecondayStatBonus<T> returnable = default;
 
-            returnable = spellDamage.Single(x => x.SpellSchool == SpellSchool.Base).GetValue<T>(aSecondaryStat);
+            returnable = new SecondayStatBonus<T>(aSecondaryStat, spellDamage.Single(x => x.SpellSchool == SpellSchool.Base).GetValue<T>(aSecondaryStat));
 
-            if (spellDamage.Where(x => x.SpellSchool == aSpellSchool).Count() > 0 || aSpellSchool == SpellSchool.Base) return new SecondayStatBonus<T>(aSecondaryStat, spellDamage.Single(x => x.SpellSchool == SpellSchool.Base).GetValue<T>(aSecondaryStat));
+            if (spellDamage.Where(x => x.SpellSchool == aSpellSchool).Count() > 0 || aSpellSchool == SpellSchool.Base) return returnable;
 
             var stats = SpellStats.SecondaryStatsAsStrings;
             var spellStat = spellDamage.Single(x => x.SpellSchool == aSpellSchool);
-            for (int i = 0; i < stats.Length; i++)
-            {
-                if (stats[i].Item1 == aSecondaryStat && stats[i].Item2 == typeof(T))
-                {
-                    switch (aSecondaryStat)
-                    {
-                        case "SpellDamage":
-                            returnable = (T)(object)(returnable is null ? 0 : (int)(object)returnable + spellStat.SpellDamageValue);
-                            break;
-                        case "SpellCritChance":
-                            returnable = (T)(object)(returnable is null ? 0 : (double)(object)returnable + spellStat.CritChance);
-                            break;
-                        case "SpellCritDamage":
-                            returnable = (T)(object)(returnable is null ? 0 : (double)(object)returnable + spellStat.CritDamage);
-                            break;
-                        case "SpellFlatPenetration":
-                            returnable = (T)(object)(returnable is null ? 0 : (int)(object)returnable + spellStat.FlatPenetration);
-                            break;
-                        case "SpellPercentPenetration":
-                            returnable = (T)(object)(returnable is null ? 0 : (double)(object)returnable + spellStat.PercentPenetration);
-                            break;
-                        case "SpellHaste":
-                            returnable = (T)(object)(returnable is null ? 0 : (double)(object)returnable + spellStat.Haste);
-                            break;
-                        case "SpellVampirism":
-                            returnable = (T)(object)(returnable is null ? 0 : (double)(object)returnable + spellStat.Vampirism);
-                            break;
-                        case "SpellBonusHitChance":
-                            returnable = (T)(object)(returnable is null ? 0 : (double)(object)returnable + spellStat.BonusHitChance);
-                            break;
-                    }
-                }
-            }
+
+            returnable = returnable + spellDamage.Single(x => x.SpellSchool == aSpellSchool).GetValue<T>(aSecondaryStat);
+
+            
             
             return returnable;
 

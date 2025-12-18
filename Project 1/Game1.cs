@@ -85,6 +85,7 @@ namespace Project_1
 
         static void InitializeMainThreadSystems()
         {
+            ThreadAffinity.InitMainThread();
             ThreadAffinity.AssertMainThread();
             Mailboxes.InitMainThread();
             TextureManager.Init();

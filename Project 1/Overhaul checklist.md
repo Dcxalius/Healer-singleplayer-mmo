@@ -20,11 +20,14 @@
 - Removed mailbox request/response hacks for loot/inspect/shop state; inventory UI now queries `LootState` and HUD-managed state directly, and duplicate `ShopOpened` definitions were collapsed.
 - Loot events are now consumed directly by `HUDManager` (no UIEventBridge hop); `LootBox` builds from `LootState` snapshots and refreshes on slot-change/remove events.
 - Loot open now emits snapshots immediately (`LootState.Open` used at publish sites), eliminating re-clone work inside HUD consumption.
-- Loot drops cache dropper position/height instead of holding live world-object references, reducing cross-thread coupling risk; `LootOpened` also carries a UI-safe `LootContext` for range/despawn checks.
+- Loot drops cache dropper position/height instead of holding live world-object references, reducing cross-thread coupling risk; `LootOpened` also carries a UI-safe `LootContext` for range/despawn checks and `LootClosed` fires on corpse despawn.
+- UI invalidation hook added: loot events/closures mark the UI dirty; `GameState` redraws UI targets only on invalidation or a 1s heartbeat.
+- Split UI render targets (plates vs windows) with separate dirty flags; plate/nameplate events now invalidate only the plate surface.
+- UI render targets are recreated on rescale; both UI and plate targets track dirty separately.
 
 ## In Progress / Partial
 - Loot pipeline:
-  - `LootState` owns cloned loot arrays and publishes slot-changed/slot-removed updates; UI now uses `LootContext` for range/despawn checks but still receives the `LootDrop` instance.
+  - `LootState` owns cloned loot arrays and publishes slot-changed/slot-removed updates; UI now uses `LootContext` for range/despawn checks and no longer receives `LootDrop`.
 - Render cache: transparency/minimap done; verify no remaining GPU work in gameplay (e.g., other helpers).
 
 ## Remaining
@@ -42,6 +45,4 @@
   - Add thread assertions in hot paths, queue depth/timing diagnostics, and kill switch for single-thread fallback.
   - Replace temporary bridges with direct event consumption once UI/sim threads are in place.
 
-
-  
-codex resume 019b222f-99c0-7f50-bc7a-cedef025a668
+To continue this session, run codex resume 019b222f-99c0-7f50-bc7a-cedef025a668 

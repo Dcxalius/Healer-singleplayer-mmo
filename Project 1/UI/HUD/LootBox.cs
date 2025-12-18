@@ -4,6 +4,8 @@ using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.Input;
 using Project_1.Items;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.HUD.Inventory;
 using Project_1.UI.UIElements;
@@ -94,9 +96,7 @@ namespace Project_1.UI.HUD
 
         void CheckIfShouldClose()
         {
-            if (CheckIfOutOfRange()) return;
-
-            CheckIfLootedAll();
+            CheckIfOutOfRange();
         }
 
         bool CheckIfOutOfRange()
@@ -111,10 +111,9 @@ namespace Project_1.UI.HUD
             return false;
         }
 
-        void CheckIfLootedAll()
+        public void CloseIfContext(int id)
         {
-            if (loot == null) return;
-            if (loot.All(x => x == null))
+            if (context.Id == id)
             {
                 StopLoot();
             }
@@ -124,6 +123,7 @@ namespace Project_1.UI.HUD
         {
             Visible = false;
             ClearLoot();
+            Managers.HUDManager.InvalidateUi();
         }
 
         void ClearLoot()

@@ -1,6 +1,5 @@
 ﻿using Project_1.GameObjects.Entities;
-using Project_1.GameObjects.Unit.Equipment;
-using Project_1.GameObjects.Unit.Stats;
+using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Spells;
 using System.Collections.Generic;
 
@@ -188,12 +187,12 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct GossipOpened
     {
-        public GossipOpened(Project_1.UI.HUD.Windows.Gossip.GossipWindow.GossipText start, Project_1.GameObjects.Entities.Npcs.Npc npc)
+        public GossipOpened(Project_1.UI.HUD.Windows.Gossip.ChatGossipOption start, Project_1.GameObjects.Entities.Npcs.Npc npc)
         {
             Start = start;
             Npc = npc;
         }
-        public Project_1.UI.HUD.Windows.Gossip.GossipWindow.GossipText Start { get; }
+        public Project_1.UI.HUD.Windows.Gossip.ChatGossipOption Start { get; }
         public Project_1.GameObjects.Entities.Npcs.Npc Npc { get; }
     }
 }
