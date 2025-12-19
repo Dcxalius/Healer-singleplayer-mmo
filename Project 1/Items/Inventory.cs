@@ -348,9 +348,9 @@ namespace Project_1.Items
                         if (capacity <= 0) continue;
 
                         int takeAmount = Math.Min(capacity, available.Count);
-                        Item taken = LootState.Take(aLootIndex, takeAmount);
-                        if (taken == null) return;
-                        items[i][j].Count += taken.Count;
+                        Item takenItem = LootState.Take(aLootIndex, takeAmount);
+                        if (takenItem == null) return;
+                        items[i][j].Count += takenItem.Count;
                         NotifySlotChanged(i, j, this);
                         placed = true;
                         break;

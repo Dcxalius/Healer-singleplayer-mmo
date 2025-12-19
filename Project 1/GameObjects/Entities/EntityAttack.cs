@@ -258,7 +258,7 @@ namespace Project_1.GameObjects.Entities
                     default:
                         //TODO: Implement spell color on damage text
                         float damageBeforeResist = (float)(aDamageTaken[damageType[i]]);
-                        double resistance = SpellResitance.CalculateDamageReductionNonBinary(this, aCaster, SpellStats.DamageToSpellType(damageType[i]));
+                        double resistance = SpellResitance.CalculateDamageReductionNonBinary(this, aCaster, SpellResitance.DamageToSpellType(damageType[i]));
                         string preFix = "";
                         string suffix = "";
                         if (resistance == 0)

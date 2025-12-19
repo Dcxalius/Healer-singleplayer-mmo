@@ -439,7 +439,7 @@ namespace Project_1.UI.HUD.Inventory
 
             if (!Visible) return;
             if (!holdable) return;
-            Mailboxes.Ui.Publish(new DescriptorBoxSet(this));
+            Mailboxes.Ui.Publish(new DescriptorBoxSet(GetActualItem));
         }
 
         protected override void OnDeHover()

@@ -54,6 +54,17 @@ namespace Project_1.GameObjects.Unit.Stats
             }
         }
 
+        public static SpellSchool DamageToSpellType(DamageType type) => type switch
+        {
+            DamageType.Arcane => SpellSchool.Arcane,
+            DamageType.Fire => SpellSchool.Fire,
+            DamageType.Frost => SpellSchool.Frost,
+            DamageType.Holy => SpellSchool.Holy,
+            DamageType.Nature => SpellSchool.Nature,
+            DamageType.Shadow => SpellSchool.Shadow,
+            _ => SpellSchool.Base,
+        };
+
         public static double CalculateResistanceChanceBinary(Entity aTarget, Entity aCaster, HashSet<SpellSchool> spellSchools)
         {
             // Hit chance=BaseHitChance*(100%-75%*ResistanceScore/Cap)+SpellHitBonus

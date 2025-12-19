@@ -80,14 +80,20 @@ namespace Project_1.UI
             });
             Mailboxes.Ui.Subscribe<CharacterWindowSet>(e =>
             {
-                HUDManager.windowHandler.SetCharacterWindow(e.Owner);
+                if (e.Owner is Project_1.GameObjects.Entities.Players.Player p)
+                {
+                    HUDManager.windowHandler.SetCharacterWindow(p);
+                }
                 HUDManager.InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<PlayerPlateSet>(e =>
             {
-                HUDManager.plateBoxHandler.SetPlayerPlateBox(e.Owner);
-                HUDManager.InvalidateUi();
-                HUDManager.PlatesInvalidated?.Invoke();
+                if (e.Owner is Project_1.GameObjects.Entities.Players.Player p)
+                {
+                    HUDManager.plateBoxHandler.SetPlayerPlateBox(p);
+                    HUDManager.InvalidateUi();
+                    HUDManager.PlatesInvalidated?.Invoke();
+                }
             });
             Mailboxes.Ui.Subscribe<GoldChanged>(e =>
             {
@@ -117,7 +123,7 @@ namespace Project_1.UI
             });
             Mailboxes.Ui.Subscribe<DescriptorBoxSet>(e =>
             {
-                if (e.Position.HasValue) HUDManager.SetDescriptorBox(e.Item, e.Position.Value.ToRelativeScreenPosition());
+                if (e.Position.HasValue) HUDManager.SetDescriptorBox(new HUD.Inventory.Item(e.Item.ID, e.Item.Count, true, e.Item.ItemQualityColor, e.Item.GfxPath, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero), e.Position.Value.ToRelativeScreenPosition());
                 else HUDManager.SetDescriptorBox(e.Item);
             });
             Mailboxes.Ui.Subscribe<DescriptorBoxClear>(_ => HUDManager.SetDescriptorBox(null));

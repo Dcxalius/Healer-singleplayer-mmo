@@ -35,6 +35,7 @@ namespace Project_1.Tiles
         public static Tile GetTile(Chunk aChunk, int aX, int aY) => aChunk.Tile(aX, aY);
         public static Tile GetTile(int aChunkId, int aX, int aY) => chunks.Find(x => x.Id == aChunkId).Tile(aX, aY);
         public static Tile GetTileAt(WorldSpace aSpace) => GetTile(aSpace);
+        public static Tile GetTilePublic(WorldSpace aSpace) => GetTile(aSpace);
 
         public static Chunk GetChunk(int aId) => chunks.Find(x => x.Id == aId);
         public static Chunk GetChunk(int aX, int aY) => GetChunk(GetChunkId(aX, aY));

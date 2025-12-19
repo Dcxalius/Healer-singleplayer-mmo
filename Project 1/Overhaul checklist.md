@@ -45,4 +45,4 @@
   - Add thread assertions in hot paths, queue depth/timing diagnostics, and kill switch for single-thread fallback.
   - Replace temporary bridges with direct event consumption once UI/sim threads are in place.
 
-To continue this session, run codex resume 019b222f-99c0-7f50-bc7a-cedef025a668 
+codex resume 019b222f-99c0-7f50-bc7a-cedef025a668  

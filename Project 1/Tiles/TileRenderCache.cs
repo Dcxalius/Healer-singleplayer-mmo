@@ -35,7 +35,7 @@ namespace Project_1.Tiles
             {
                 for (int y = 0; y < TransparencySize; y++)
                 {
-                    Tile tile = TileManager.GetTile(origin + new WorldSpace(TileManager.TileSize.X * (x - TransparencySize / 2), TileManager.TileSize.Y * (y - TransparencySize / 2)));
+                    Tile tile = TileManager.GetTilePublic(origin + new WorldSpace(TileManager.TileSize.X * (x - TransparencySize / 2), TileManager.TileSize.Y * (y - TransparencySize / 2)));
                     if (tile == null)
                     {
                         data[y * TransparencySize + x] = new Color(0, 0, 0, 0);

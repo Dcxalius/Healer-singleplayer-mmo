@@ -162,7 +162,7 @@ namespace Project_1.Managers
             if (!KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugTestGear)) return;
             RelativeScreenPosition dialogueBoxSize = new RelativeScreenPosition(0.2f);
             DialogueBox testDialogueBox = new DialogueBox("Hello Cheater!\n\nxdd", Color.White, DialogueBox.LocationOfPopUp.HUDManager,DialogueBox.PausesGame.Pauses, null, new UITexture(new GfxPath(GfxType.UI, "GrayBackground"), Color.White), new RelativeScreenPosition(0.5f) - dialogueBoxSize / 2, dialogueBoxSize, "Close");
-            Mailboxes.Ui.Publish(new DialogueOpened(testDialogueBox));
+            Mailboxes.Ui.Publish(new Messaging.Events.DialogueOpened(testDialogueBox));
             
             ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("ZweiHander"), 1));
             ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("Axe"), 1));

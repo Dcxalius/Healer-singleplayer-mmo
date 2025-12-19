@@ -18,7 +18,8 @@ namespace Project_1.Items.SubTypes
         Weapon.WeaponType weaponType;
 
 
-        public WeaponData(int id, string gfxName, string name, string description, Equipment.Type slot, int armor, int[] baseStats, int minAttackDamage, int maxAttackDamage, float attackSpeed, Item.Quality quality, Weapon.WeaponType weaponType, int cost) : base(id, gfxName, name, description, slot, ItemType.Weapon, armor, baseStats, quality, cost, Equipment.GearType.None)
+        public WeaponData(int id, string gfxName, string name, string description, Equipment.Type slot, int armor, int[] baseStats, int minAttackDamage, int maxAttackDamage, float attackSpeed, Item.Quality quality, Weapon.WeaponType weaponType, int cost)
+            : base(id, gfxName, name, description, slot, ItemType.Weapon, armor, baseStats, quality, cost, Equipment.GearType.None, Array.Empty<SecondayStatBonus<int>>(), Array.Empty<SecondayStatBonus<float>>())
         {
             attack = new Attack(minAttackDamage, maxAttackDamage, attackSpeed, weaponType);
             this.weaponType = weaponType;
