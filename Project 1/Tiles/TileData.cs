@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using Project_1.Textures;
-using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
 using System.Linq;

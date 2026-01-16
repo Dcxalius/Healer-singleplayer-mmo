@@ -27,7 +27,6 @@ namespace Project_1.GameObjects.Entities.Corspes
 
         [JsonProperty]
         public LootDrop Drop => drop;
-        LootTable loot;
         LootDrop drop;
         [JsonIgnore]
         public float LootLength => lootLength;

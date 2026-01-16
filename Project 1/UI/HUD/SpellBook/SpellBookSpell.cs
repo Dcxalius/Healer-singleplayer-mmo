@@ -22,7 +22,6 @@ namespace Project_1.UI.HUD.SpellBook
     {
 
         CooldownTexture onCooldownGfx;
-        Border emptyBorder;
         public Spell SpellData
         {
             get => spellData;
@@ -41,7 +40,6 @@ namespace Project_1.UI.HUD.SpellBook
             if (aSpell != null)
             {
                 spellData = aSpell;
-                emptyBorder = null;
 
             }
         }
@@ -56,7 +54,7 @@ namespace Project_1.UI.HUD.SpellBook
 
             if (spellData != null)
             {
-                Mailboxes.Ui.Publish(new HeldSpellStart(spellData, InputManager.GetMousePosAbsolute() - Location));
+                Mailboxes.Ui.Publish(new HeldSpellStart(spellData, UiMouseStateCache.Absolute - Location));
             }
         }
 
@@ -74,7 +72,7 @@ namespace Project_1.UI.HUD.SpellBook
 
             if (spellData != null)
             {
-                InputManager.CreateReleaseEvent(this, heldEvents.ClickThatCreated);
+                UiInputBridge.PublishRelease(this, heldEvents.ClickThatCreated);
             }
 
             base.HoldReleaseAwayFromMe();

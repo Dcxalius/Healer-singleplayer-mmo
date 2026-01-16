@@ -113,7 +113,7 @@ namespace Project_1.UI.UIElements.Boxes
         public override void ClickedOnAndReleasedOnMe()
         {
             inputLabel.Color = postClickColor;
-            InputManager.InputToWriteTo = this;
+            UiTextInputManager.Begin(this);
             inputLabel.Text = text;
             base.ClickedOnAndReleasedOnMe();
         }
@@ -194,10 +194,10 @@ namespace Project_1.UI.UIElements.Boxes
         {
             base.Draw(aBatch);
 
-            if (InputManager.InputToWriteTo != this) return;
+            if (UiTextInputManager.ActiveInput != this) return;
             if (TimeManager.InstanceTotalFrameTimeAsTimeSpan.TotalMilliseconds % 750 < 250) return;
             
-            cursor.CentredDraw(aBatch, WhereToDrawCursor(InputManager.CursorPosition));
+            cursor.CentredDraw(aBatch, WhereToDrawCursor(UiTextInputManager.CursorPosition));
             
         }
     }

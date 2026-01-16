@@ -18,13 +18,13 @@ namespace Project_1.UI.HUD.Managers
         public void AddNamePlate(Entity aEntity, NamePlate aNamePlate)
         {
             namePlates.Add(aEntity, aNamePlate);
-            HUDManager.PlatesInvalidated?.Invoke();
+            HUDManager.InvalidatePlates();
         }
 
         public void RemoveNamePlate(Entity aEntity)
         {
             namePlates.Remove(aEntity);
-            HUDManager.PlatesInvalidated?.Invoke();
+            HUDManager.InvalidatePlates();
         }
 
 
@@ -110,5 +110,7 @@ namespace Project_1.UI.HUD.Managers
                 namePlate.Value.Draw(aBatch);
             }
         }
+
+        public NamePlate[] GetDrawList() => namePlates.Values.ToArray();
     }
 }

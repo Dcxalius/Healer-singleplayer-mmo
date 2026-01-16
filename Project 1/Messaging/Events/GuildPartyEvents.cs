@@ -1,4 +1,5 @@
 ﻿using GuildMemberEntity = Project_1.GameObjects.Entities.GuildMembers.GuildMember;
+using Project_1.GameObjects.Entities;
 using Project_1.UI.UIElements.Buttons;
 using System.Collections.Generic;
 
@@ -51,11 +52,11 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct GuildMembersSet
     {
-        public GuildMembersSet(GuildMemberEntity[] members)
+        public GuildMembersSet(Friendly[] members)
         {
             Members = members;
         }
-        public GuildMemberEntity[] Members { get; }
+        public Friendly[] Members { get; }
     }
 
     internal readonly struct GuildMemberAdded

@@ -21,7 +21,7 @@ namespace Project_1.UI.PauseMenu
         {
             base.ClickedOnAndReleasedOnMe();
 
-            StateManager.SetState(StateManager.States.Game);
+            StateManager.RequestStateChange(StateManager.States.Game);
         }
     }
 }

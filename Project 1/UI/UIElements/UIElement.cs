@@ -5,7 +5,6 @@ using Project_1.Camera;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
-using Project_1.UI.HUD.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using System;
@@ -16,13 +15,11 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms.Design;
 using System.Xml.Serialization;
 
 namespace Project_1.UI.UIElements
 {
 
-    [DebuggerStepThrough]
     internal abstract class UIElement
     {
         #region Interactibility
@@ -44,7 +41,7 @@ namespace Project_1.UI.UIElements
 
         protected KeyBindManager.KeyListner? visibleKey;
 
-        bool Hovered => AbsolutePos.Contains(InputManager.GetMousePosAbsolute().ToPoint());
+        bool Hovered => AbsolutePos.Contains(UiMouseStateCache.Absolute.ToPoint());
         protected bool isHovered;
 
         public bool CapturesClick { get => capturesClick; set => capturesClick = value; }
@@ -253,7 +250,7 @@ namespace Project_1.UI.UIElements
             if (!Dragable && !hudMoving) return;
             if (heldEvents.DurationHeld < timeBeforeDragRegisters.TotalSeconds) return;
             
-            Move(InputManager.GetMousePosRelative() - heldEvents.Offset);
+            Move(UiMouseStateCache.Relative - heldEvents.Offset);
         }
 
         protected virtual void Released()
@@ -266,7 +263,7 @@ namespace Project_1.UI.UIElements
         void GetVisibiltyPress()
         {
             if (!visibleKey.HasValue) return;
-            if (KeyBindManager.GetPress(visibleKey.Value))
+            if (UiKeyBindStateCache.GetPress(visibleKey.Value))
             {
                 ToggleVisibilty();
             }
@@ -483,7 +480,7 @@ namespace Project_1.UI.UIElements
         {
             heldEvents = null;
             if (parent != null || !hudMoveable || !hudMoving) return;
-            HUDManager.SetSizeChanger(this);
+            Mailboxes.Ui.Publish(new HudSizeChangerSet(this));
         }
 
         protected virtual void HoldReleaseAwayFromMe() => heldEvents = null;

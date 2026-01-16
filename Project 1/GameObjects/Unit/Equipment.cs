@@ -7,12 +7,10 @@ using Project_1.Items.SubTypes;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.UI.HUD.Managers;
-using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Forms;
 
 namespace Project_1.GameObjects.Unit
 {

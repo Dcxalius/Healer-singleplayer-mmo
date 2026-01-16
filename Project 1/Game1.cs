@@ -45,7 +45,7 @@ namespace Project_1
             if (DebugManager.Mode(DebugMode.InstantlyContinue))
             {
                 SaveManager.ContinueLastSave();
-                StateManager.SetState(StateManager.States.Game);
+                StateManager.RequestStateChange(StateManager.States.Game);
             }
             base.Initialize();
         }
@@ -62,12 +62,40 @@ namespace Project_1
 
             GraphicsManager.Update();
             InputManager.Update();
-            Mailboxes.Ui.DispatchAll();
-            Mailboxes.Main.DispatchAll();
-            StateManager.Update();
-            Mailboxes.Ui.DispatchAll();
-            Mailboxes.Main.DispatchAll();
-            DebugManager.Update();
+            if (UiThread.IsRunning)
+            {
+                UiThread.PulseAndWait(false);
+            }
+            else
+            {
+                lock (HUDManager.UiLock)
+                {
+                    Mailboxes.Ui.DispatchAll();
+                    UiTextInputManager.Update();
+                }
+            }
+            if (SimThread.IsRunning)
+            {
+                SimThread.PulseAndWait();
+            }
+            else
+            {
+                Mailboxes.Main.DispatchAll();
+                StateManager.Update();
+                Mailboxes.Main.DispatchAll();
+                DebugManager.Update();
+            }
+            if (UiThread.IsRunning)
+            {
+                UiThread.PulseAndWait(true);
+            }
+            else
+            {
+                lock (HUDManager.UiLock)
+                {
+                    Mailboxes.Ui.DispatchAll();
+                }
+            }
 
             base.Update(gameTime);
         }
@@ -88,12 +116,15 @@ namespace Project_1
             ThreadAffinity.InitMainThread();
             ThreadAffinity.AssertMainThread();
             Mailboxes.InitMainThread();
+            DebugManager.Init();
             TextureManager.Init();
             EffectManager.Init();
             StateManager.Init();
             HUDManager.Init();
             InputEventBridge.Init();
-            UIEventBridge.Init();
+            UiInputBridge.Init();
+            UiThread.Start();
+            SimThread.Start();
         }
     }
 }

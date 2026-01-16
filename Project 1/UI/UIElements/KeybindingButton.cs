@@ -43,7 +43,7 @@ namespace Project_1.UI.UIElements
 
         void CheckForEscape()
         {
-            if (InputManager.GetPress(Keys.Escape))
+            if (UiKeyboardStateCache.GetPress(Keys.Escape))
             {
                 KeySet keySet = KeyBindManager.GetKey(buttonLevel, keyListner);
 
@@ -64,18 +64,18 @@ namespace Project_1.UI.UIElements
 
         void ActualKey()
         {
-            Keys? newKey = InputManager.GetAnyKey;
+            Keys? newKey = UiKeyboardStateCache.GetAnyKey();
 
             if (!newKey.HasValue)
             {
                 return;
             }
-            if (newKey.Value == Keys.Escape || InputManager.IsModifier(newKey.Value))
+            if (newKey.Value == Keys.Escape || UiKeyboardStateCache.IsModifier(newKey.Value))
             {
                 return;
             }
 
-            KeySet keySet = new KeySet(newKey.Value, InputManager.CheckHoldModifiers());
+            KeySet keySet = new KeySet(newKey.Value, UiKeyboardStateCache.GetHoldModifiers());
 
             if (!KeyBindManager.CheckForNoDupeKeys(keySet))
             {

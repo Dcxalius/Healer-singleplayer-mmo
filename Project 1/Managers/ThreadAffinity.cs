@@ -11,6 +11,9 @@ namespace Project_1.Managers
         static int? simThreadId;
         static int? uiThreadId;
 
+        public static bool IsMainThread => mainThreadId.HasValue && mainThreadId == Environment.CurrentManagedThreadId;
+        public static bool IsSimThread => simThreadId.HasValue && simThreadId == Environment.CurrentManagedThreadId;
+
         public static void InitMainThread()
         {
             if (mainThreadId.HasValue) return;

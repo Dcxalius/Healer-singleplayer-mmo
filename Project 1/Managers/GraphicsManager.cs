@@ -42,15 +42,12 @@ namespace Project_1.Managers
         //--- Window stuff
         readonly static Point windowsTitleBarStuff = new Point(128, 32); //128 is a guesstimation of the minimum width, 32 is the required height based on https://learn.microsoft.com/en-us/windows/apps/design/basics/titlebar-design
         static Rectangle windowBounds;
-        static readonly Point offset = new Point(8, 31); //I dont know why this is neccessary, well y is just the titlebar height but why does x have to 8????
         static readonly Point fullscreenOffset = new Point(0, 0);
 
         static bool fullsceen = false;
-        static bool borderlessFullscreen = false;
 
         static Rectangle unCaptueredScissorRect;
-        static object scissorRectCaptor = null;
-        static List<(object, Rectangle)> scissors;
+        static List<(object captor, Rectangle rectangle)> scissors;
         static readonly bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         static GraphicsManager()
         {
@@ -71,7 +68,7 @@ namespace Project_1.Managers
 
             for (int i = 0; i < scissors.Count; i++)
             {
-                r = Rectangle.Intersect(r, scissors[i].Item2);
+                r = Rectangle.Intersect(r, scissors[i].rectangle);
             }
             scissors.Add((aCaptor, r));
 
@@ -85,7 +82,7 @@ namespace Project_1.Managers
         public static bool ReleaseScissor(object aReleaser)
         {
 
-            Debug.Assert(aReleaser == scissors[scissors.Count - 1].Item1);
+            Debug.Assert(aReleaser == scissors[scissors.Count - 1].captor);
             scissors.RemoveAt((scissors.Count - 1));
 
 
@@ -95,8 +92,13 @@ namespace Project_1.Managers
                 return true;
             }
 
-            graphicsDeviceManager.GraphicsDevice.ScissorRectangle = scissors[scissors.Count - 1].Item2;
+            graphicsDeviceManager.GraphicsDevice.ScissorRectangle = scissors[scissors.Count - 1].rectangle;
             return true;
+        }
+
+        public static void AssertScissorStackEmpty()
+        {
+            Debug.Assert(scissors.Count == 0, "Scissor stack not empty at start of UI draw.");
         }
 
 
@@ -132,7 +134,7 @@ namespace Project_1.Managers
             }
             else
             {
-                windowBounds.Location = gameWindow.Position + offset;
+                windowBounds.Location = gameWindow.Position;
 
             }
 
@@ -197,7 +199,7 @@ namespace Project_1.Managers
             Camera.Camera.SetWindowSize(new Camera.AbsoluteScreenPosition(aSize));
             StateManager.Rescale();
             unCaptueredScissorRect = graphicsDeviceManager.GraphicsDevice.ScissorRectangle;
-
+            graphicsDeviceManager.GraphicsDevice.ScissorRectangle = unCaptueredScissorRect;
         }
 
         //stolen from https://community.monogame.net/t/how-do-i-make-full-screen-stretch-to-the-entire-screen-and-have-black-bars-on-the-sides-if-the-screen-aspect-ratio-isnt-16-9/17364

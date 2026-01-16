@@ -21,6 +21,7 @@ namespace Project_1.Managers.Saves
         static int currentVersion = 0; //TODO: Increment this whenever major changes to the save system is implemented
         public string Name => name;
         string name;
+        public int Version => version;
         public string nameAsPath => contentRootDirectory + name.ToUpper();
 
         int version;

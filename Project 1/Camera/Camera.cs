@@ -18,7 +18,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Security.Permissions;
-using System.Windows.Forms;
 
 namespace Project_1.Camera
 {
@@ -79,6 +78,7 @@ namespace Project_1.Camera
 
         public static void Update()
         {
+            ThreadAffinity.AssertSimThread();
             cameraMover.Move();
         }
 

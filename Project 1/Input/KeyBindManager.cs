@@ -115,6 +115,8 @@ namespace Project_1.Input
 
         public static bool GetHold(KeyListner aListner) => firstButtons[(int)aListner].GetHold || secondButtons[(int)aListner].GetHold;
 
+        public static bool GetRelease(KeyListner aListner) => firstButtons[(int)aListner].GetRelease || secondButtons[(int)aListner].GetRelease;
+
         public static void SetKey(bool aFirstButton, KeyListner aListner, KeySet aKey)
         {
             if (aFirstButton)

@@ -2,7 +2,6 @@
 using Project_1.Camera;
 using Project_1.Textures;
 using Project_1.UI.UIElements.SelectBoxes;
-using SharpDX.Direct2D1;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

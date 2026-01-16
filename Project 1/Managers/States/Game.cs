@@ -35,9 +35,9 @@ namespace Project_1.Managers.States
 
         public override void Update()
         {
-            if (InputManager.GetPress(Microsoft.Xna.Framework.Input.Keys.Escape))
+            if (KeyboardStateCache.GetPress(Microsoft.Xna.Framework.Input.Keys.Escape))
             {
-                StateManager.SetState(StateManager.States.PauseMenu);
+                StateManager.RequestStateChange(StateManager.States.PauseMenu);
                 return;
             }
             Camera.Camera.Update();
@@ -78,6 +78,10 @@ namespace Project_1.Managers.States
             
 
             TimeManager.StartPause(this);
+        }
+
+        internal void UiOnLeave()
+        {
             HUDManager.LeavingGameState();
         }
 
@@ -100,7 +104,11 @@ namespace Project_1.Managers.States
             epc["minLength"].SetValue(500f);
             epc["maxBrightness"].SetValue(200f);
             epc["cameraWorldPos"].SetValue(new Vector2(Camera.Camera.WorldRectangle.Location.X, Camera.Camera.WorldRectangle.Location.Y));
-            epc["cameraSize"].SetValue(new Vector2(Camera.Camera.WorldRectangle.Size.X, Camera.Camera.WorldRectangle.Size.Y));
+            EffectParameter cameraSizeParam = epc["cameraSize"];
+            if (cameraSizeParam != null)
+            {
+                cameraSizeParam.SetValue(new Vector2(Camera.Camera.WorldRectangle.Size.X, Camera.Camera.WorldRectangle.Size.Y));
+            }
             Vector2[] v = new Vector2[5];
             for (int i = 0; i < v.Length; i++)
             {
@@ -114,7 +122,7 @@ namespace Project_1.Managers.States
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred);
             spriteBatch.Draw(plateTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
-            spriteBatch.Draw(uITarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1.1f);
+            spriteBatch.Draw(uITarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
 
             CleanRender();
             return renderTarget;

@@ -7,7 +7,6 @@ using Project_1.Textures;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
 using Project_1.UI.UIElements.Buttons;
-using SharpDX.XAudio2;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,7 +14,6 @@ using System.Linq;
 using System.Runtime.Remoting;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms.Design.Behavior;
 
 namespace Project_1.UI.HUD.Guild
 {
@@ -78,6 +76,7 @@ namespace Project_1.UI.HUD.Guild
 
         public void SetInviteButtonState(TwoStateGFXButton.State aState)
         {
+            if (invite == null) return;
             invite.state = aState;
         }
 

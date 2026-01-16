@@ -47,6 +47,7 @@ namespace Project_1.UI.UIElements
         public BuffBox(Entity aOwner, FillDirection aDir, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(UITexture.Null, aPos, aSize)
         {
             owner = aOwner;
+            fillDirection = aDir;
             buffs = new List<Buff>();
             AddChildren(buffs);
             capturesClick = false;

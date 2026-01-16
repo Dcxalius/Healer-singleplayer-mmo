@@ -43,7 +43,16 @@ namespace Project_1.Camera
                 return;
             }
 
-            RelativeScreenPosition relativeMousePos = InputManager.GetMousePosRelative();
+            RelativeScreenPosition relativeMousePos = MouseStateCache.Relative;
+            float relX = relativeMousePos.X;
+            float relY = relativeMousePos.Y;
+            if (float.IsNaN(relX) || float.IsNaN(relY) || float.IsInfinity(relX) || float.IsInfinity(relY))
+            {
+                return;
+            }
+            relX = Math.Clamp(relX, 0f, 1f);
+            relY = Math.Clamp(relY, 0f, 1f);
+            relativeMousePos = new RelativeScreenPosition(relX, relY);
             float movementFactor = 0;
 
             if (relativeMousePos.X < cameraMoveBorderSize)
@@ -77,16 +86,26 @@ namespace Project_1.Camera
                 }
             }
 
-            if (movementFactor < 0)
+            movementFactor = Math.Clamp(movementFactor, 0f, 1f);
+            if (movementFactor <= 0f)
             {
                 return;
             }
 
             //DebugManager.Print(typeof(Camera), "Mouse pos = " + relativeMousePos);
 
-            AbsoluteScreenPosition absoluteMosPos = InputManager.GetMousePosAbsolute();
+            AbsoluteScreenPosition absoluteMosPos = MouseStateCache.Absolute;
+            if (absoluteMosPos.X == int.MinValue || absoluteMosPos.Y == int.MinValue)
+            {
+                return;
+            }
 
             Vector2 mouseAbsoluteToCentre = (absoluteMosPos - CentrePointInScreenSpace).ToVector2();
+            if (mouseAbsoluteToCentre.LengthSquared() <= float.Epsilon)
+            {
+                velocity = WorldSpace.Zero;
+                return;
+            }
             mouseAbsoluteToCentre.Normalize();
             velocity = (WorldSpace)(mouseAbsoluteToCentre * (float)(baseSpeed * TimeManager.SecondsSinceLastFrame) * movementFactor);
             //DebugManager.Print(typeof(Camera), "Velocity = " + velocity.ToString());
@@ -101,6 +120,10 @@ namespace Project_1.Camera
                     break;
                 case CameraSettings.Follow.CircleSoftBound:
                     MoveCircleSoftBound();
+                    //if (boundObject.FeetPosition.DistanceTo(centreInWorldSpace) > maxCircleCameraMove)
+                    //{
+                    //    DebugManager.Print(typeof(CameraMover), "How did we get here?");
+                    //}
                     break;
                 case CameraSettings.Follow.RectangleSoftBound:
                     MoveRectangleSoftBound();
@@ -122,7 +145,7 @@ namespace Project_1.Camera
 
         void CheckForSpacePress()
         {
-            if (InputManager.GetPress(Microsoft.Xna.Framework.Input.Keys.Space)) //TODO: This should be modernized
+            if (KeyboardStateCache.GetPress(Microsoft.Xna.Framework.Input.Keys.Space)) //TODO: This should be modernized
             {
                 if (boundObject == null)
                 {
@@ -167,58 +190,20 @@ namespace Project_1.Camera
 
         Vector2 CalculateIntersection() //TODO: split this function more
         {
-
             Vector2 playerStart = boundObject.FeetPosition;
-            Vector2 playerToCameraRay = Vector2.Normalize(CentreInWorldSpace - boundObject.FeetPosition);
-
-            Vector2 rectangleCornerStart = GetClosestRectangleCorner(playerToCameraRay);
-            (Vector2 rectangleSideRay, Vector2 rectangleFurtherSideRay) = GetRectangleRays(rectangleCornerStart);
-
-
-            float u = LengthToCollisionFromFirstVector(playerStart, playerToCameraRay, rectangleCornerStart, rectangleSideRay);
-
-            Vector2 intersection = playerStart + playerToCameraRay * u;
-
-            Vector2 distanceToBinder = boundObject.FeetPosition - intersection;
-            float length = distanceToBinder.Length();
-
-            Vector2 normalized = Vector2.Normalize(distanceToBinder);
-            Vector2 tele = normalized * length * 0.9999f;
-
-            if (!bindingRectangle.Contains(boundObject.FeetPosition - tele))
+            Vector2 delta = CentreInWorldSpace - playerStart;
+            if (delta.LengthSquared() <= float.Epsilon)
             {
-
-                float furtherU = LengthToCollisionFromFirstVector(playerStart, playerToCameraRay, rectangleCornerStart, rectangleFurtherSideRay);
-                Vector2 furtherIntersection = playerStart + playerToCameraRay * furtherU;
-                distanceToBinder = boundObject.FeetPosition - furtherIntersection;
-                length = distanceToBinder.Length();
-
-                normalized = Vector2.Normalize(distanceToBinder);
-                tele = normalized * length * 0.9999f;
-                return tele;
+                return Vector2.Zero;
             }
 
-            Vector2 playerToCorner = rectangleCornerStart - playerStart;
-            Vector2 cameraToCorner = rectangleCornerStart - CentreInWorldSpace;
+            Vector2 halfSize = bindingRectangle.Size.ToVector2() / 2f;
+            float tX = Math.Abs(delta.X) > float.Epsilon ? halfSize.X / Math.Abs(delta.X) : float.PositiveInfinity;
+            float tY = Math.Abs(delta.Y) > float.Epsilon ? halfSize.Y / Math.Abs(delta.Y) : float.PositiveInfinity;
+            float t = Math.Min(tX, tY);
 
-            playerToCorner.Normalize();
-            cameraToCorner.Normalize();
-
-            if (Math.Abs(cameraToCorner.X) > Math.Abs(playerToCorner.X))
-            {
-                return tele;
-            }
-            if (Math.Abs(cameraToCorner.Y) > Math.Abs(playerToCorner.Y))
-            {
-                return tele;
-
-                //return furtherIntersection;
-            }
-
-            DebugManager.Print(typeof(Camera), cameraToCorner.ToString());
-
-            Debug.Assert(false);
-            return Vector2.Zero;
+            Vector2 intersectionOffset = delta * t;
+            return -intersectionOffset * 0.9999f;
         }
 
         float LengthToCollisionFromFirstVector(Vector2 aAStart, Vector2 aADir, Vector2 aBStart, Vector2 aBDir)
@@ -337,10 +322,19 @@ namespace Project_1.Camera
 
         void ApplyMovementToCamera()
         {
-            if (velocity.X == float.NaN || velocity.Y == float.NaN)
+            if (float.IsNaN(velocity.X) || float.IsNaN(velocity.Y) || float.IsInfinity(velocity.X) || float.IsInfinity(velocity.Y))
             {
                 Debug.Assert(false);
                 velocity = WorldSpace.Zero;
+                momentum = WorldSpace.Zero;
+                return;
+            }
+            if (float.IsNaN(momentum.X) || float.IsNaN(momentum.Y) || float.IsInfinity(momentum.X) || float.IsInfinity(momentum.Y))
+            {
+                Debug.Assert(false);
+                momentum = WorldSpace.Zero;
+                velocity = WorldSpace.Zero;
+                return;
             }
             momentum += velocity;
 

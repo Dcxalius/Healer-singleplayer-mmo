@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects.Entities.Corspes;
+using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,7 @@ namespace Project_1.GameObjects.FloatingTexts
 
         public static void Update() 
         {
+            ThreadAffinity.AssertSimThread();
             for (int i = floatingTexts.Count - 1; i >= 0; i--) floatingTexts[i].Update();
         }
 

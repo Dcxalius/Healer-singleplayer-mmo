@@ -4,7 +4,6 @@ using Project_1.Camera;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
-using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
 using System.Linq;

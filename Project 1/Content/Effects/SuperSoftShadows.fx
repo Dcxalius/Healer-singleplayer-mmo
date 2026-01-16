@@ -1,4 +1,12 @@
-﻿// SuperFastSoftShadows.fx
+﻿#if OPENGL
+    #define VS_SHADERMODEL vs_3_0
+    #define PS_SHADERMODEL ps_3_0
+#else
+    #define VS_SHADERMODEL vs_4_0
+    #define PS_SHADERMODEL ps_4_0
+#endif
+
+// SuperFastSoftShadows.fx
 //
 // Port of Scott Lembcke's "2D Lighting with Soft Shadows" shader
 // to HLSL / MonoGame-style effect.
@@ -241,7 +249,7 @@ technique SoftShadow
 {
     pass P0
     {
-        VertexShader = compile vs_4_0 VS_SoftShadow();
-        PixelShader = compile ps_4_0 PS_SoftShadow();
+        VertexShader = compile VS_SHADERMODEL VS_SoftShadow();
+        PixelShader = compile PS_SHADERMODEL PS_SoftShadow();
     }
 }

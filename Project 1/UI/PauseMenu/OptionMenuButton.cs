@@ -19,7 +19,7 @@ namespace Project_1.UI.PauseMenu
 
         public override void ClickedOnAndReleasedOnMe()
         {
-            StateManager.SetState(StateManager.States.OptionMenu);
+            StateManager.RequestStateChange(StateManager.States.OptionMenu);
 
             base.ClickedOnAndReleasedOnMe();
         }

@@ -54,7 +54,7 @@ namespace Project_1.UI.CharacterCreator
             string name = inputBox.Input;
             ObjectManager.CreateNewPlayer(name, ClassSelectButton.ClassName);
             SaveManager.CreateNewSave(name);
-            StateManager.SetState(StateManager.States.Game);
+            StateManager.RequestStateChange(StateManager.States.Game);
         }
     }
 }

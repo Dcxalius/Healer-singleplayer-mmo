@@ -112,19 +112,19 @@ namespace Project_1.GameObjects.Entities.Players
         void KeyboardWalk()
         {
             if (HasDestination && LockedMovement) { return; }
-            if (KeyBindManager.GetHold(KeyBindManager.KeyListner.MoveCharacterLeft))
+            if (KeyBindStateCache.GetHold(KeyBindManager.KeyListner.MoveCharacterLeft))
             {
                 velocity.X -= 1;
             }
-            if (KeyBindManager.GetHold(KeyBindManager.KeyListner.MoveCharacterRight))
+            if (KeyBindStateCache.GetHold(KeyBindManager.KeyListner.MoveCharacterRight))
             {
                 velocity.X += 1;
             }
-            if (KeyBindManager.GetHold(KeyBindManager.KeyListner.MoveCharacterUp))
+            if (KeyBindStateCache.GetHold(KeyBindManager.KeyListner.MoveCharacterUp))
             {
                 velocity.Y -= 1;
             }
-            if (KeyBindManager.GetHold(KeyBindManager.KeyListner.MoveCharacterDown))
+            if (KeyBindStateCache.GetHold(KeyBindManager.KeyListner.MoveCharacterDown))
             {
                 velocity.Y += 1;
             }

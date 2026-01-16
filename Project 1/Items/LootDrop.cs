@@ -41,10 +41,21 @@ namespace Project_1.Items
 
         public LootDrop(Item[] drop, WorldObject @object)
         {
-            this.drop = drop;
+            if (@object == null) throw new ArgumentNullException(nameof(@object));
+            this.drop = drop ?? Array.Empty<Item>();
             Id = System.Threading.Interlocked.Increment(ref nextId);
             dropperFeet = @object.FeetPosition;
             dropperHalfHeight = (float)@object.FeetSize.Y / 2f;
+        }
+
+        [JsonConstructor]
+        public LootDrop(Item[] drop, WorldSpace dropperFeet, float dropperHalfHeight, int id)
+        {
+            this.drop = drop ?? Array.Empty<Item>();
+            Id = id > 0 ? id : System.Threading.Interlocked.Increment(ref nextId);
+            if (Id > nextId) nextId = Id;
+            this.dropperFeet = dropperFeet;
+            this.dropperHalfHeight = dropperHalfHeight;
         }
 
         public void SetDrop(Item[] newDrop)

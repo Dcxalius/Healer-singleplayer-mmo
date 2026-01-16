@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Input;
 using Project_1.Textures;
 using Project_1.UI;
+using Project_1.UI.HUD.Managers;
 using Project_1.UI.OptionMenu;
 using Project_1.UI.PauseMenu;
 using Project_1.UI.UIElements.Boxes;
@@ -31,23 +32,26 @@ namespace Project_1.Managers.States
 
         public override void Update()
         {
-            pauseBox.Update();
-            if (dialogueBoxes.Count > 0)
+            if (UiThread.IsRunning)
             {
-                for (int i = 0; i < dialogueBoxes.Count; i++)
+                if (dialogueBoxes.Count == 0 && KeyboardStateCache.GetPress(Microsoft.Xna.Framework.Input.Keys.Escape))
                 {
-                    dialogueBoxes[i].Update();
+                    StateManager.RequestStateChange(StateManager.States.Game);
                 }
                 return;
             }
-            if (InputManager.GetPress(Microsoft.Xna.Framework.Input.Keys.Escape))
+            UiUpdate();
+            if (dialogueBoxes.Count == 0 && KeyboardStateCache.GetPress(Microsoft.Xna.Framework.Input.Keys.Escape))
             {
-                StateManager.SetState(StateManager.States.Game);
+                StateManager.RequestStateChange(StateManager.States.Game);
             }
         }
         public override void Rescale()
         {
-            pauseBox.Rescale();
+            lock (HUDManager.UiLock)
+            {
+                pauseBox.Rescale();
+            }
             base.Rescale();
 
         }
@@ -56,27 +60,13 @@ namespace Project_1.Managers.States
 
         public override void RemovePopUp(DialogueBox aBox) => Debug.Assert(dialogueBoxes.Remove(aBox));
 
-        public override bool Release(ReleaseEvent aReleaseEvent)
-        {
-            throw new NotImplementedException();
-        }
+        public override bool Release(ReleaseEvent aReleaseEvent) => false;
 
-        public override bool Scroll(ScrollEvent aScrollEvent)
-        {
-            throw new NotImplementedException();
-        }
+        public override bool Scroll(ScrollEvent aScrollEvent) => false;
 
         public override bool Click(ClickEvent aClickEvent)
         {
-            if (dialogueBoxes.Count > 0)
-            {
-                for (int i = 0; i < dialogueBoxes.Count; i++)
-                {
-                    if (dialogueBoxes[i].ClickedOn(aClickEvent)) return true;
-                }
-                return false;
-            }
-            return pauseBox.ClickedOn(aClickEvent);
+            return false;
         }
 
         public override void OnEnter()
@@ -95,14 +85,65 @@ namespace Project_1.Managers.States
 
             spriteBatch.Draw(StateManager.FinalGameFrame, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f); //draw game
             pauseBackground.Draw(spriteBatch, Vector2.Zero); //draw gray screen overlay
-            pauseBox.Draw(spriteBatch); //draw pause menu
-            for (int i = 0; i < dialogueBoxes.Count; i++)
+            lock (HUDManager.UiLock)
             {
-                dialogueBoxes[i].Draw(spriteBatch);
+                pauseBox.Draw(spriteBatch); //draw pause menu
+                for (int i = 0; i < dialogueBoxes.Count; i++)
+                {
+                    dialogueBoxes[i].Draw(spriteBatch);
+                }
             }
 
             CleanRender();
             return renderTarget;
+        }
+
+        internal bool UiClick(ClickEvent aClickEvent)
+        {
+            if (dialogueBoxes.Count > 0)
+            {
+                for (int i = 0; i < dialogueBoxes.Count; i++)
+                {
+                    if (dialogueBoxes[i].ClickedOn(aClickEvent)) return true;
+                }
+                return false;
+            }
+            return pauseBox.ClickedOn(aClickEvent);
+        }
+
+        internal bool UiRelease(ReleaseEvent aReleaseEvent)
+        {
+            if (dialogueBoxes.Count > 0)
+            {
+                for (int i = 0; i < dialogueBoxes.Count; i++)
+                {
+                    if (dialogueBoxes[i].ReleasedOn(aReleaseEvent)) return true;
+                }
+                return false;
+            }
+            return pauseBox.ReleasedOn(aReleaseEvent);
+        }
+
+        internal bool UiScroll(ScrollEvent aScrollEvent)
+        {
+            if (dialogueBoxes.Count > 0)
+            {
+                for (int i = 0; i < dialogueBoxes.Count; i++)
+                {
+                    if (dialogueBoxes[i].ScrolledOn(aScrollEvent)) return true;
+                }
+                return false;
+            }
+            return pauseBox.ScrolledOn(aScrollEvent);
+        }
+
+        internal void UiUpdate()
+        {
+            pauseBox.Update();
+            for (int i = 0; i < dialogueBoxes.Count; i++)
+            {
+                dialogueBoxes[i].Update();
+            }
         }
 
     }

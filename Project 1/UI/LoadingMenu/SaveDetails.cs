@@ -42,7 +42,7 @@ namespace Project_1.UI.LoadingMenu
         void LoadSave()
         {
             SaveManager.LoadData(save);
-            StateManager.SetState(StateManager.States.Game);
+            StateManager.RequestStateChange(StateManager.States.Game);
         }
 
         public void SetSave(Save aSave)

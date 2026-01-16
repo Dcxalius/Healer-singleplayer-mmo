@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Input;
 using Project_1.Textures;
+using Project_1.UI;
 using Project_1.UI.HUD;
 using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements.Boxes;
@@ -21,6 +22,7 @@ namespace Project_1.Managers.States
         Textures.Texture pauseBackground;
         MoveHUDBox MoveHUDBox;
         RenderTarget2D cleanGame;
+        bool needsCleanGame;
 
 
         public MoveHUD() : base()
@@ -31,23 +33,19 @@ namespace Project_1.Managers.States
 
         public override void OnEnter()
         {
-            HUDManager.SetHudMoveable(true);
-            cleanGame = StateManager.CleanGameTarget;
-            HUDManager.InvalidateUi();
         }
 
         public override void OnLeave()
         {
-            StateManager.RedrawGame(); //TODO: UGLY AF
-            HUDManager.ResetHudMoveable();
-            HUDManager.InvalidateUi();
         }
 
         public override void Update()
         {
-            MoveHUDBox.Update();
-            HUDManager.HudMovableUpdate();
-
+            if (UiThread.IsRunning) return;
+            lock (HUDManager.UiLock)
+            {
+                UiUpdate();
+            }
         }
 
         public override void PopUp(DialogueBox aBox)
@@ -61,12 +59,12 @@ namespace Project_1.Managers.States
 
         public override bool Release(ReleaseEvent aReleaseEvent)
         {
-            return HUDManager.Release(aReleaseEvent);
+            return false;
         }
 
         public override bool Scroll(ScrollEvent aScrollEvent)
         {
-            return HUDManager.Scroll(aScrollEvent);
+            return false;
         }
 
         public override void Rescale()
@@ -77,22 +75,57 @@ namespace Project_1.Managers.States
 
         public override bool Click(ClickEvent aClickEvent)
         {
-            if (MoveHUDBox.ClickedOn(aClickEvent)) return true;
-
-            return HUDManager.Click(aClickEvent);
+            return false;
         }
 
         public override RenderTarget2D Draw()
         {
             PrepRender(Color.White, SpriteSortMode.Immediate);
+            if (cleanGame == null || needsCleanGame)
+            {
+                cleanGame = StateManager.CleanGameTarget;
+                needsCleanGame = false;
+            }
 
             spriteBatch.Draw(cleanGame, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f); //draw game
             pauseBackground.Draw(spriteBatch, Vector2.Zero); //draw gray screen overlay
-            HUDManager.HudMoveableDraw(spriteBatch);
-            MoveHUDBox.Draw(spriteBatch);
+            lock (HUDManager.UiLock)
+            {
+                HUDManager.HudMoveableDraw(spriteBatch);
+                MoveHUDBox.Draw(spriteBatch);
+            }
 
             CleanRender();
             return renderTarget;
+        }
+
+        internal bool UiClick(ClickEvent aClickEvent) => MoveHUDBox.ClickedOn(aClickEvent);
+        internal bool UiRelease(ReleaseEvent aReleaseEvent) => MoveHUDBox.ReleasedOn(aReleaseEvent);
+        internal bool UiScroll(ScrollEvent aScrollEvent) => MoveHUDBox.ScrolledOn(aScrollEvent);
+        internal void UiUpdate()
+        {
+            MoveHUDBox.Update();
+            HUDManager.HudMovableUpdate();
+        }
+
+        internal void UiOnEnter()
+        {
+            lock (HUDManager.UiLock)
+            {
+                needsCleanGame = true;
+                HUDManager.SetHudMoveable(true);
+                HUDManager.InvalidateUi();
+            }
+        }
+
+        internal void UiOnLeave()
+        {
+            lock (HUDManager.UiLock)
+            {
+                StateManager.RedrawGame();
+                HUDManager.ResetHudMoveable();
+                HUDManager.InvalidateUi();
+            }
         }
 
     }

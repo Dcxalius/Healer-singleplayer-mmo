@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Input;
 using Project_1.UI;
 using Project_1.UI.HUD;
+using Project_1.UI.HUD.Managers;
 using Project_1.UI.OptionMenu;
 using Project_1.UI.UIElements.Boxes;
 using System;
@@ -21,23 +22,24 @@ namespace Project_1.Managers.States
 
         }
 
-        public override void Update() => OptionManager.Update();
-
-        public override bool Click(ClickEvent aClickEvent) => OptionManager.Click(aClickEvent);
-
-        public override bool Release(ReleaseEvent aReleaseEvent)
+        public override void Update()
         {
-            throw new NotImplementedException();
+            if (UiThread.IsRunning) return;
+            UiUpdate();
         }
-        public override bool Scroll(ScrollEvent aScrollEvent)
-        {
-            return OptionManager.Scroll(aScrollEvent);
-        }
+
+        public override bool Click(ClickEvent aClickEvent) => false;
+
+        public override bool Release(ReleaseEvent aReleaseEvent) => false;
+        public override bool Scroll(ScrollEvent aScrollEvent) => false;
 
         public override void Rescale()
         {
             base.Rescale();
-            OptionManager.Rescale();
+            lock (HUDManager.UiLock)
+            {
+                OptionManager.Rescale();
+            }
         }
 
         public override void OnEnter()
@@ -46,13 +48,15 @@ namespace Project_1.Managers.States
 
         public override void OnLeave()
         {
-            OptionManager.ClearButtons();
         }
         public override RenderTarget2D Draw()
         {
             PrepRender(Color.Pink, sortMode: SpriteSortMode.Immediate, rasterizerState: new RasterizerState() { ScissorTestEnable = true });
 
-            OptionManager.Draw(spriteBatch);
+            lock (HUDManager.UiLock)
+            {
+                OptionManager.Draw(spriteBatch);
+            }
 
             CleanRender();
 
@@ -67,6 +71,23 @@ namespace Project_1.Managers.States
         public override void RemovePopUp(DialogueBox aBox)
         {
             throw new NotImplementedException();
+        }
+
+        internal bool UiClick(ClickEvent aClickEvent) => OptionManager.Click(aClickEvent);
+        internal bool UiRelease(ReleaseEvent aReleaseEvent) => false;
+        internal bool UiScroll(ScrollEvent aScrollEvent) => OptionManager.Scroll(aScrollEvent);
+        internal void UiUpdate() => OptionManager.Update();
+
+        internal void UiOnEnter()
+        {
+        }
+
+        internal void UiOnLeave()
+        {
+            lock (HUDManager.UiLock)
+            {
+                OptionManager.ClearButtons();
+            }
         }
     }
 }

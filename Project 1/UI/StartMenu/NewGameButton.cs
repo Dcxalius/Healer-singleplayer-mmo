@@ -22,7 +22,7 @@ namespace Project_1.UI.StartMenu
         {
             base.ClickedOnAndReleasedOnMe();
 
-            StateManager.SetState(StateManager.States.NewGame);
+            StateManager.RequestStateChange(StateManager.States.NewGame);
             TileManager.New();
         }
     }

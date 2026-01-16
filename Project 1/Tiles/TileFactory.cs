@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Content;
 using Newtonsoft.Json;
 using Project_1.DebugTools;
-using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

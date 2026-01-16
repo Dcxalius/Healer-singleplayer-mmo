@@ -32,17 +32,17 @@ namespace Project_1.GameObjects.Unit.Classes
 
         public bool WeaponUsuable(Weapon.WeaponType aType) => WeaponsAllowed.HasFlag(aType);
         
-        public bool[] w
+        public bool[] skillAsBools
         {
             get
             {
-                bool[] ww = new bool[Enum.GetValues<Weapon.WeaponType>().Length];
-                for (int i = 0; i < ww.Length; i++)
+                bool[] bools = new bool[Enum.GetValues<Weapon.WeaponType>().Length];
+                for (int i = 0; i < bools.Length; i++)
                 {
-                    ww[i] = (int)weaponsAllowed % (2 ^ (i + 1)) == 0;
+                    bools[i] = (int)weaponsAllowed % (Math.Pow(2, i)) == 0;
                 }
 
-                return ww;
+                return bools;
             }
         }
 
@@ -119,14 +119,14 @@ namespace Project_1.GameObjects.Unit.Classes
 
 
         public float SpellCritChanceScaler => spellCritChanceScaler;
-        float spellCritChanceScaler;
+        float spellCritChanceScaler = 0f;
 
         //All classes but Hunters and Rogues receive 1% Dodge for every 20 points of Agility.
         //Rogues receive 1% Dodge for every 14.5 points of Agility.
         //Hunters receive 1% Dodge for every 26 points of Agility.
 
         public float DodgeChanceScaler => dodgeChanceScaler;
-        float dodgeChanceScaler;
+        float dodgeChanceScaler = 0f;
 
         public float BaseDodge => baseDodge;
         float baseDodge;
@@ -161,6 +161,7 @@ namespace Project_1.GameObjects.Unit.Classes
             movementData = new Movement(speed, maxSpeed);
             this.dodgeScaling = dodgeScaling == 0 ? 0.01f / 20f : dodgeScaling;
             this.baseDodge = baseDodge;
+            this.attackCritChanceScaler = meleeCritScaling;
             this.weaponsAllowed = weaponsAllowed;
             this.canDualWield = canDualWield;
             this.isCaster = isCaster;

@@ -3,7 +3,8 @@ using Newtonsoft.Json;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Spawners;
 using Project_1.Managers.Saves;
-using Project_1.UI.HUD.Managers;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -100,7 +101,7 @@ namespace Project_1.Managers
             currentSave.LoadData();
         }
 
-        public static void SaveHUD() => HUDManager.Save();
+        public static void SaveHUD() => Mailboxes.Ui.Publish(new HudSaveRequested());
 
         public static void SaveData() => currentSave.SaveData();
 

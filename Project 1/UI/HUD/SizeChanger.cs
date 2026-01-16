@@ -4,7 +4,6 @@ using Project_1.Textures;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
 using Project_1.UI.UIElements.Buttons;
-using SharpDX.DXGI;
 using System;
 using System.Collections.Generic;
 using System.Linq;

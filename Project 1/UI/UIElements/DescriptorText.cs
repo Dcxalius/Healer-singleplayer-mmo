@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Textures;
-using SharpDX.MediaFoundation;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

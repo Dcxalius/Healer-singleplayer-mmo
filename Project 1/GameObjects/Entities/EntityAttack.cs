@@ -9,7 +9,6 @@ using Project_1.Managers;
 using Project_1.Particles;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
-using SharpDX.DXGI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -27,7 +26,6 @@ namespace Project_1.GameObjects.Entities
         public virtual bool InCombat => aggroTablesIAmOn.Count > 0;
         List<NonFriendly> aggroTablesIAmOn;
 
-        float timeSinceLastAttack = 0;
         protected abstract bool CheckForRelation();
 
         public void SetTarget(Entity aEntity)

@@ -25,8 +25,6 @@ namespace Project_1.Textures
 
         public static UITexture Null => new UITexture(GfxPath.NullPath, Color.White);
 
-        public float layer;
-
         public UITexture(GfxPath aPath, Color aColor) : base(aPath, aColor) { }
 
         public UITexture(string aPath, Color aColor) : base( new GfxPath(GfxType.UI, aPath), aColor)

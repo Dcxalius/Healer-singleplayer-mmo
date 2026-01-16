@@ -130,12 +130,12 @@ namespace Project_1.UI.HUD.Managers
             if (targetBuffBox.IsThisMine(aEntity))
             {
                 targetBuffBox.AddBuff(aBuff);
-                HUDManager.PlatesInvalidated?.Invoke();
+                HUDManager.InvalidatePlates();
             }
             if (playerBuffBox.IsThisMine(aEntity))
             {
                 playerBuffBox.AddBuff(aBuff);
-                HUDManager.PlatesInvalidated?.Invoke();
+                HUDManager.InvalidatePlates();
                 return;
             }
             for (int i = 0; i < partyBuffBoxes.Length; i++)
@@ -145,7 +145,7 @@ namespace Project_1.UI.HUD.Managers
                 if (partyBuffBoxes[i].IsThisMine(aEntity))
                 {
                     partyBuffBoxes[i].AddBuff(aBuff);
-                    HUDManager.PlatesInvalidated?.Invoke();
+                    HUDManager.InvalidatePlates();
                     return;
                 }
             }
@@ -161,7 +161,7 @@ namespace Project_1.UI.HUD.Managers
                     playerPlateBox.Refresh(aEntity);
                     if (!targetPlateBox.BelongsTo(aEntity)) break;
                     targetPlateBox.Refresh(aEntity);
-                    HUDManager.PlatesInvalidated?.Invoke();
+                    HUDManager.InvalidatePlates();
                     break;
                 case Relation.RelationToPlayer.Friendly:
                     if (targetPlateBox.BelongsTo(aEntity)) targetPlateBox.Refresh(aEntity);
@@ -170,7 +170,7 @@ namespace Project_1.UI.HUD.Managers
                         if (partyPlateBoxes[i].BelongsTo(null)) break;
                         if (!partyPlateBoxes[i].BelongsTo(aEntity as GuildMember)) continue;
                         partyPlateBoxes[i].Refresh(aEntity);
-                        HUDManager.PlatesInvalidated?.Invoke();
+                        HUDManager.InvalidatePlates();
                         break;
                     }
                     break;
@@ -178,7 +178,7 @@ namespace Project_1.UI.HUD.Managers
                 case Relation.RelationToPlayer.Hostile:
                     if (!targetPlateBox.BelongsTo(aEntity)) break;
                     targetPlateBox.Refresh(aEntity);
-                    HUDManager.PlatesInvalidated?.Invoke();
+                    HUDManager.InvalidatePlates();
                     break;
                 default:
                     break;
@@ -191,7 +191,7 @@ namespace Project_1.UI.HUD.Managers
                 case Relation.RelationToPlayer.Self:
                     targetPlateBox.SetTarget(aTarget);
                     targetBuffBox.AssignBox(aTarget);
-                    HUDManager.PlatesInvalidated?.Invoke();
+                    HUDManager.InvalidatePlates();
                     break;
                 case Relation.RelationToPlayer.Friendly:
                 case Relation.RelationToPlayer.Neutral:
@@ -214,7 +214,7 @@ namespace Project_1.UI.HUD.Managers
 
             partyPlateBoxes[PartyPlateBox.PartyBoxesActive].SetTarget(aGuildMember);
             partyBuffBoxes[PartyPlateBox.PartyBoxesActive - 1].AssignBox(aGuildMember);
-            HUDManager.PlatesInvalidated?.Invoke();
+            HUDManager.InvalidatePlates();
         }
 
         public void RemoveGuildMemberFromParty(GuildMember aGuildMember)
@@ -235,7 +235,7 @@ namespace Project_1.UI.HUD.Managers
             }
 
             partyPlateBoxes[PartyPlateBox.PartyBoxesActive - 1].RemoveTarget();
-            HUDManager.PlatesInvalidated?.Invoke();
+            HUDManager.InvalidatePlates();
         }
 
         public void ClearParty()
@@ -245,7 +245,7 @@ namespace Project_1.UI.HUD.Managers
                 partyPlateBoxes[i].RemoveTarget();
             }
             PartyPlateBox.ClearPartyBoxes();
-            HUDManager.PlatesInvalidated?.Invoke();
+            HUDManager.InvalidatePlates();
         }
 
         public int FindGuildMemberPartyIndex(GuildMember aGuildMember)
@@ -277,7 +277,7 @@ namespace Project_1.UI.HUD.Managers
             if (index == -1) return;
 
             partyPlateBoxes[index].VisibleBorder = false;
-            HUDManager.PlatesInvalidated?.Invoke();
+            HUDManager.InvalidatePlates();
         }
         public void RemoveWalkerFromControl(GuildMember[] aGuildMembers)
         {
@@ -294,7 +294,7 @@ namespace Project_1.UI.HUD.Managers
             if (index == -1) return;
 
             partyPlateBoxes[index].VisibleBorder = false;
-            HUDManager.PlatesInvalidated?.Invoke();
+            HUDManager.InvalidatePlates();
         }
 
         public void HudMovableDraw(SpriteBatch aBatch)
@@ -312,5 +312,7 @@ namespace Project_1.UI.HUD.Managers
                 plateBoxes[i].Draw(aBatch);
             }
         }
+
+        public UIElement[] GetDrawList() => plateBoxes.ToArray();
     }
 }

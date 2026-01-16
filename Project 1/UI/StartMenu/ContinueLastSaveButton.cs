@@ -23,7 +23,7 @@ namespace Project_1.UI.StartMenu
 
             SaveManager.ContinueLastSave();
 
-            StateManager.SetState(StateManager.States.Game);
+            StateManager.RequestStateChange(StateManager.States.Game);
         }
     }
 }

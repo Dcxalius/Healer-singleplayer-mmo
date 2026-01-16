@@ -10,7 +10,8 @@ using Project_1.Managers.States;
 using Project_1.UI.UIElements.Buttons;
 using System.Diagnostics.CodeAnalysis;
 using Project_1.Managers;
-using Project_1.UI.HUD.Managers;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 
 namespace Project_1.UI.UIElements.Boxes
 {
@@ -51,7 +52,7 @@ namespace Project_1.UI.UIElements.Boxes
             switch (aLocation)
             {
                 case LocationOfPopUp.HUDManager:
-                    buttons.First().AddAction(new Action(() => HUDManager.RemoveDialogueBox(this)));
+                    buttons.First().AddAction(new Action(() => Mailboxes.Ui.Publish(new DialogueClosed(this))));
                     break;
                 case LocationOfPopUp.StateManager:
                     buttons.First().AddAction(new Action(() => StateManager.RemovePopUp(this)));

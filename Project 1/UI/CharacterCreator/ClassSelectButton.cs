@@ -12,7 +12,6 @@ namespace Project_1.UI.CharacterCreator
 {
     internal class ClassSelectButton : GFXButton
     {
-        bool selected;
         string className;
 
         public static string ClassName => classSelected;
@@ -23,14 +22,12 @@ namespace Project_1.UI.CharacterCreator
             for (int i = 0; i < classSelectButtons.Count; i++)
             {
                 classSelectButtons[i].Color = Color.White;
-                classSelectButtons[i].selected = false;
             }
             classSelected = null;
         }
 
         public ClassSelectButton(string aClassName, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new GfxPath(GfxType.UI, aClassName), aPos, aSize, Color.White)
         {
-            selected = false;
             className = aClassName;
             classSelectButtons.Add(this);
         }
@@ -42,7 +39,6 @@ namespace Project_1.UI.CharacterCreator
             DeselectAll();
             classSelected = className;
             Color = Color.DarkBlue;
-            selected = true;
         }
 
 

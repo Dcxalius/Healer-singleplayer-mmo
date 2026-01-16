@@ -50,15 +50,12 @@ namespace Project_1.GameObjects.Entities
                     //TODO: Ponder how to make it not jump
                     //Related to the fact that when colliding with corners it uses feetpos rather than the border of feet
 
-                    bool hit = false;
-
                     //if (WorldRectangle.Right > resultingCollisions[i].Item2.Left)
                     //{
                     //    FeetPosition = new WorldSpace(resultingCollisions[i].Item2.Location.X - FeetSize.X / 2, FeetPosition.Y);
 
                     //    velocity.X = 0;
                     //    momentum.X = 0;
-                    //    hit = true;
                     //}
 
                     if (FeetPosition.X - resultingCollisions[i].Item1.Left < 0)
@@ -67,7 +64,6 @@ namespace Project_1.GameObjects.Entities
 
                         velocity.X = 0;
                         momentum.X = 0;
-                        hit = true;
                     }
                     if (FeetPosition.X - resultingCollisions[i].Item1.Right > 0)
                     {
@@ -75,7 +71,6 @@ namespace Project_1.GameObjects.Entities
 
                         velocity.X = 0;
                         momentum.X = 0;
-                        hit = true;
 
                     }
                     if (FeetPosition.Y - resultingCollisions[i].Item1.Top < 0)
@@ -84,7 +79,6 @@ namespace Project_1.GameObjects.Entities
 
                         velocity.Y = 0;
                         momentum.Y = 0;
-                        hit = true;
 
                     }
                     if (FeetPosition.Y - resultingCollisions[i].Item1.Bottom > 0)
@@ -93,7 +87,6 @@ namespace Project_1.GameObjects.Entities
 
                         velocity.Y = 0;
                         momentum.Y = 0;
-                        hit = true;
                     }
                     //Debug.Assert(hit, "How did we get here?");
                 }

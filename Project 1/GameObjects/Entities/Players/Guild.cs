@@ -42,7 +42,7 @@ namespace Project_1.GameObjects.Entities.Players
             {
                 data[i] = guildMembers[i].CreateGuildMemberData();
             }
-            Mailboxes.Ui.Publish(new GuildMembersSet(guildMembers.Select(gm => gm as GuildMembers.GuildMember).ToArray()));
+            Mailboxes.Ui.Publish(new GuildMembersSet(guildMembers.ToArray()));
         }
     }
 }

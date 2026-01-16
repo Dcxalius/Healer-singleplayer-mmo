@@ -52,7 +52,7 @@ namespace Project_1.GameObjects.Unit
 
         const float meleeAR = 50;
         const float rangeAR = 500;
-        Type type;
+        Type type = Type.Melee;
 
         public Attack(float aDmgMin, float aDmgMax, float aSecondsPerAttack, Weapon.WeaponType aWeapon)
         {

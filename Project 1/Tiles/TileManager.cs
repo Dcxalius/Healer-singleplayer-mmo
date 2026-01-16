@@ -18,7 +18,6 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Xml;
 using static Project_1.GameObjects.Spells.AoE.AreaOfEffectData;
 
@@ -97,6 +96,7 @@ namespace Project_1.Tiles
 
         public static void Update()
         {
+            ThreadAffinity.AssertSimThread();
             Chunk[,] surroundingChunks = new Chunk[surroundingChunkCheckSize, surroundingChunkCheckSize];
             Chunk centreChunk = GetChunkUnder(ObjectManager.Player.FeetPosition);
             Point centreChunkPos = GetChunkPosition(centreChunk.Id);

@@ -46,8 +46,14 @@ namespace Project_1.Managers
 
         public static void EffectDraw()
         {
-            foreach (var effectToProcess in effectsToProcess)
+            if (effectsToProcess.Count == 0) return;
+
+            IEffects[] toProcess = effectsToProcess.ToArray();
+            effectsToProcess.Clear();
+
+            for (int i = 0; i < toProcess.Length; i++)
             {
+                IEffects effectToProcess = toProcess[i];
                 if (!rendertargets.TryGetValue(effectToProcess, out RenderTarget2D curRenderT))
                 {
                     
@@ -87,8 +93,6 @@ namespace Project_1.Managers
                 GraphicsManager.SetRenderTarget(null);
                 effectToProcess.ReturnedRenderTarget = curRenderT;
             }
-
-            effectsToProcess.Clear();
         }
 
         public struct SimpleEffectParam

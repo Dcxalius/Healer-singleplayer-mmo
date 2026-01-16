@@ -2,7 +2,6 @@
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Managers.Saves;
-using SharpDX.Direct3D11;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -60,6 +59,7 @@ namespace Project_1.GameObjects.Entities.Corspes
 
         public static void Update()
         {
+            ThreadAffinity.AssertSimThread();
             for (int i = corpses.Count - 1; i >= 0; i--) corpses[i].Update();
         }
 

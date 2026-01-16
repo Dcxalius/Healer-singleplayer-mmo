@@ -46,28 +46,25 @@ namespace Project_1.GameObjects.Spells.Buff
 
         public static bool operator ==(Buff aBuff, Buff bBuff)
         {
+            if (ReferenceEquals(aBuff, bBuff)) return true;
+            if (aBuff is null || bBuff is null) return false;
             return aBuff.effect.Id == bBuff.effect.Id;
         }
 
         public static bool operator !=(Buff aBuff, Buff bBuff)
         {
-            return aBuff.effect.Id != bBuff.effect.Id;
+            return !(aBuff == bBuff);
 
         }
 
-        public override bool Equals(object obj)
-        {
-            if (obj is Buff)
-            {
-                Equals(obj as Buff);
-            }
-
-            return base.Equals(obj);
-        }
+        public override bool Equals(object obj) => obj is Buff other && Equals(other);
 
         public bool Equals(Buff aBuff)
         {
+            if (aBuff is null) return false;
             return effect.Id == aBuff.effect.Id;
         }
+
+        public override int GetHashCode() => effect?.Id.GetHashCode() ?? 0;
     }
 }

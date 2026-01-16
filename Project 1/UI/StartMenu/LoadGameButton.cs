@@ -19,7 +19,7 @@ namespace Project_1.UI.StartMenu
         public override void ClickedOnAndReleasedOnMe()
         {
             base.ClickedOnAndReleasedOnMe();
-            StateManager.SetState(StateManager.States.LoadingMenu);
+            StateManager.RequestStateChange(StateManager.States.LoadingMenu);
         }
     }
 }

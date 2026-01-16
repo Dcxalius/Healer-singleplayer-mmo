@@ -8,14 +8,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace Project_1.GameObjects.Spells.AoE
 {
     internal class AreaOfEffect : GameObject
     {
-        AreaOfEffectData effectData;
-        Entity owner;
         public AreaOfEffect(string aGfxName, WorldSpace aStartingPos, WorldSpace aSize) : base(new Texture(new GfxPath(GfxType.Effect, aGfxName)), aStartingPos)
         {
         }

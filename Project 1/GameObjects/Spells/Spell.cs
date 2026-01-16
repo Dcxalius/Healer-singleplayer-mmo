@@ -5,7 +5,6 @@ using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Unit.Stats;
 using Project_1.Managers;
 using Project_1.Textures;
-using SharpDX.DXGI;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;

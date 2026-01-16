@@ -56,7 +56,7 @@ namespace Project_1.UI.HUD.SpellBook
             if (spellData.OffCooldown && ObjectManager.Player.OffGlobalCooldown) onCooldownGfx.Ratio = 0;
 
 
-            if (KeyBindManager.GetPress(keyListner))
+            if (UiKeyBindStateCache.GetPress(keyListner))
             {
                 Triggered();
             }

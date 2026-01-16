@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 using Project_1.Camera;
 using Project_1.Managers;
 using Project_1.Tiles;
-using SharpDX.MediaFoundation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,6 +52,7 @@ namespace Project_1.GameObjects.Spawners.Pathing
                 Y = (float)(boundry.Location.Y + RandomManager.RollDouble() * boundry.Height)
             };
 
+            lastDirection = newSpace;
             return newSpace;
         }
 

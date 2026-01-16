@@ -143,6 +143,12 @@ namespace Project_1.GameObjects.Unit
         TimeSpan nextAvailableOffHandAttack;//TODO: Load from save
         #endregion
 
+        public void InitializeWeaponSkill(Entity aOwner)
+        {
+            if (weaponSkill != null) return;
+            weaponSkill = new WeaponSkill(aOwner, classData);
+        }
+
         [JsonProperty("Equipment")]
         int?[] EquipmentAsId => equipment.GetEquipementAsIds;
 

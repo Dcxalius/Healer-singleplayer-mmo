@@ -15,7 +15,7 @@ namespace Project_1.UI.LoadingMenu
     internal class ExistingSave : Box
     {
         Label playerName;
-        public Save Save => save;
+        public new Save Save => save;
         Save save;
         public static Action<ExistingSave> callAtClick;
         public ExistingSave(Save aSave) : base(new UITexture("WhiteBackground", Color.White), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)

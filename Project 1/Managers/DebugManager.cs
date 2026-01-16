@@ -10,7 +10,6 @@ using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements.Boxes;
-using SharpDX.Direct3D11;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -41,9 +40,7 @@ namespace Project_1.Managers
     internal static class DebugManager
     {
         static List<DebugShape> debugShapes = new List<DebugShape>();
-        static List<string> printLog = new List<string>();
-        static int printLogCount = 0;
-        static StreamWriter logger;
+        static bool initialized;
 
         static Text fpsText;
         static Text frameTimeText;
@@ -59,8 +56,11 @@ namespace Project_1.Managers
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool AllocConsole();
 
-        static DebugManager()
+        public static void Init()
         {
+            if (initialized) return;
+            initialized = true;
+
             modes[(int)DebugMode.DebugShapes] = true;
             modes[(int)DebugMode.DebugOverlay] = true;
             modes[(int)DebugMode.FalseRandom] = false;
@@ -77,7 +77,6 @@ namespace Project_1.Managers
             if (modes[(int)DebugMode.Console])
             {
                 AllocConsole();
-                //logger = new StreamWriter(Console.OpenStandardOutput());
             }
 
         }
@@ -127,16 +126,6 @@ namespace Project_1.Managers
         {
             if (!modes[(int)DebugMode.Print]) return;
 
-            //logger.WriteLine(aType.ToString() + ": " + aMsg);
-            //if (printLog.Count <= printLogCount)
-            //{
-            //    printLog.Add(aType.ToString() + ": " + aMsg);
-            //}
-            //else
-            //{
-            //    printLog[printLogCount] = aType.ToString() + ": " + aMsg;
-            //}
-            //printLogCount++;
             Console.WriteLine(aType.ToString() + ": " + aMsg);
             //Console.Out.WriteLineAsync(aType.ToString() + ": " + aMsg);
             
@@ -145,7 +134,7 @@ namespace Project_1.Managers
 
         static void ClearDebugShapes()
         {
-            if (!KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugDeleteShapes)) return;
+            if (!KeyBindStateCache.GetPress(KeyBindManager.KeyListner.DebugDeleteShapes)) return;
             
             debugShapes.Clear();
         }
@@ -159,7 +148,7 @@ namespace Project_1.Managers
         }
         static void SpawnTestGear()
         {
-            if (!KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugTestGear)) return;
+            if (!KeyBindStateCache.GetPress(KeyBindManager.KeyListner.DebugTestGear)) return;
             RelativeScreenPosition dialogueBoxSize = new RelativeScreenPosition(0.2f);
             DialogueBox testDialogueBox = new DialogueBox("Hello Cheater!\n\nxdd", Color.White, DialogueBox.LocationOfPopUp.HUDManager,DialogueBox.PausesGame.Pauses, null, new UITexture(new GfxPath(GfxType.UI, "GrayBackground"), Color.White), new RelativeScreenPosition(0.5f) - dialogueBoxSize / 2, dialogueBoxSize, "Close");
             Mailboxes.Ui.Publish(new Messaging.Events.DialogueOpened(testDialogueBox));
@@ -190,7 +179,7 @@ namespace Project_1.Managers
 
         static void SpawnHealthPotion()
         {
-            if (!KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugHealthPotion)) return;
+            if (!KeyBindStateCache.GetPress(KeyBindManager.KeyListner.DebugHealthPotion)) return;
 
             Item hpPot = ItemFactory.CreateItem(ItemFactory.GetItemData("Health Potion"), 1);
             ObjectManager.Player.Inventory.AddItem(hpPot);
@@ -199,7 +188,7 @@ namespace Project_1.Managers
 
         static void SpawnManaPotion()
         {
-            if (!KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugManaPotion)) return;
+            if (!KeyBindStateCache.GetPress(KeyBindManager.KeyListner.DebugManaPotion)) return;
 
             Item mpPot = ItemFactory.CreateItem(ItemFactory.GetItemData("Mana Potion"), 1);
             ObjectManager.Player.Inventory.AddItem(mpPot);
@@ -208,10 +197,10 @@ namespace Project_1.Managers
         static void TeleportPlayer()
         {
             if (!modes[(int)DebugMode.Teleport]) return;
-            if (!KeyBindManager.GetPress(KeyBindManager.KeyListner.DebugTeleport)) return;
+            if (!KeyBindStateCache.GetPress(KeyBindManager.KeyListner.DebugTeleport)) return;
             
 
-            ObjectManager.Player.Teleport(WorldSpace.FromRelativeScreenSpace(InputManager.GetMousePosRelative()));
+            ObjectManager.Player.Teleport(WorldSpace.FromRelativeScreenSpace(MouseStateCache.Relative));
         }
         public static void Draw(SpriteBatch aBatch)
         {

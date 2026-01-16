@@ -8,7 +8,6 @@ using Project_1.Textures;
 using Project_1.UI.HUD.Inventory;
 using Project_1.UI.HUD.Windows.Gossip;
 using Project_1.UI.UIElements.Buttons;
-using SharpDX.XAudio2;
 using System;
 using System.Collections.Generic;
 using System.Linq;

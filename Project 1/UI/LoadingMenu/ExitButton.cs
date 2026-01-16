@@ -21,7 +21,7 @@ namespace Project_1.UI.LoadingMenu
         {
             base.ClickedOnAndReleasedOnMe();
 
-            StateManager.SetState(StateManager.States.StartScreen);
+            StateManager.RequestStateChange(StateManager.States.StartScreen);
         }
     }
 }

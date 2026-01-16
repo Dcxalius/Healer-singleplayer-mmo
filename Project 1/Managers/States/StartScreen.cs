@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Input;
+using Project_1.UI;
 using Project_1.UI.StartMenu;
+using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements.Boxes;
 using System;
 using Project_1.Camera;
@@ -24,7 +26,8 @@ namespace Project_1.Managers.States
 
         public override void Update()
         {
-            mainMenu.Update();
+            if (UiThread.IsRunning) return;
+            UiUpdate();
         }
 
         public override void Rescale()
@@ -36,7 +39,6 @@ namespace Project_1.Managers.States
 
         public override bool Click(ClickEvent aClickEvent)
         {
-            if (mainMenu.ClickedOn(aClickEvent)) return true;
             return false;
         }
 
@@ -60,7 +62,10 @@ namespace Project_1.Managers.States
         {
             PrepRender(Color.White);
 
-            mainMenu.Draw(spriteBatch);
+            lock (HUDManager.UiLock)
+            {
+                mainMenu.Draw(spriteBatch);
+            }
 
             CleanRender();
 
@@ -76,5 +81,10 @@ namespace Project_1.Managers.States
         {
             throw new NotImplementedException();
         }
+
+        internal bool UiClick(ClickEvent aClickEvent) => mainMenu.ClickedOn(aClickEvent);
+        internal bool UiRelease(ReleaseEvent aReleaseEvent) => mainMenu.ReleasedOn(aReleaseEvent);
+        internal bool UiScroll(ScrollEvent aScrollEvent) => mainMenu.ScrolledOn(aScrollEvent);
+        internal void UiUpdate() => mainMenu.Update();
     }
 }

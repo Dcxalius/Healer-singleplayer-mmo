@@ -44,9 +44,9 @@ namespace Project_1.GameObjects.Unit.Stats
         public WeaponSkill(Entity aEntity, Classes.ClassData aClass)
         {
             skills = new Dictionary<Weapon.WeaponType, int>();
-            for (int i = 0; i < aClass.w.Length; i++)
+            for (int i = 0; i < aClass.skillAsBools.Length; i++)
             {
-                if (aClass.w[i]) continue;
+                if (!aClass.skillAsBools[i]) continue;
                 skills.Add((Weapon.WeaponType)i, 1);
             }
             entity = aEntity;

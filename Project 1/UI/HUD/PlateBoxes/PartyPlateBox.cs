@@ -27,8 +27,6 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         CommandBorder border;
 
-        static float spacing = 0.05f;
-
         public static int PartyBoxesActive => partyBoxesActive;
         static int partyBoxesActive = 0;
         public static void ClearPartyBoxes() => partyBoxesActive = 0;

@@ -13,6 +13,7 @@ namespace Project_1.Textures.AnimatedTextures
         AnimatedTexture restAnimation;
         AnimatedTexture triggeredAnimation;
         bool triggered = false;
+        public bool Triggered => triggered;
         public TriggerableAnimatedTexture(AnimatedTexture aRestAnimation, AnimatedTexture aTriggeredAnimation,Point aVisableSize)
         {
             restAnimation = aRestAnimation;

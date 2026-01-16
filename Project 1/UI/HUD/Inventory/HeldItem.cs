@@ -43,7 +43,7 @@ namespace Project_1.UI.HUD.Inventory
                 return;
             }
 
-            Rectangle pos = new Rectangle(InputManager.GetMousePosAbsolute() - grabOffset, size);
+            Rectangle pos = new Rectangle(UiMouseStateCache.Absolute - grabOffset, size);
             Color transparent = new Color(80, 80, 80, 80);
             heldItem.Gfx.Draw(aBatch, pos, transparent);
             heldItem.GfxOnButton.Draw(aBatch, pos, transparent);

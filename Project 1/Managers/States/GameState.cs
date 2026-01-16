@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Input;
 using Project_1.Managers;
+using Project_1.UI;
 using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements.Boxes;
 using System;
@@ -37,7 +38,7 @@ namespace Project_1.Managers.States
         }
         public override bool Click(ClickEvent aClickEvent)
         {
-            return HUDManager.Click(aClickEvent);
+            return false;
         }
 
 
@@ -49,52 +50,82 @@ namespace Project_1.Managers.States
         public override void OnLeave()
         {
         }
-        public override bool Release(ReleaseEvent aReleaseEvent) => HUDManager.Release(aReleaseEvent);
+        public override bool Release(ReleaseEvent aReleaseEvent) => false;
 
 
         public override void Rescale() //TODO: This is wrong, this should rescale everything
         {
             base.Rescale();
-            HUDManager.Rescale();
-            MarkUiDirty();
-            uITarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
-            plateTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
+            lock (HUDManager.UiLock)
+            {
+                HUDManager.Rescale();
+                MarkUiDirty();
+                uITarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
+                plateTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
+            }
 
         }
 
         public override bool Scroll(ScrollEvent aScrollEvent)
         {
-            return HUDManager.Scroll(aScrollEvent);
+            return false;
         }
 
         public override void Update()
         {
-            HUDManager.Update();
-            uiHeartbeatTimer += TimeManager.SecondsSinceLastFrame;
+            lock (HUDManager.UiLock)
+            {
+                if (!UiThread.IsRunning)
+                {
+                    HUDManager.Update();
+                }
+                uiHeartbeatTimer += TimeManager.SecondsSinceLastFrame;
+            }
         }
         protected void UIDraw()
         {
-            if (!uiDirty && !plateDirty && uiHeartbeatTimer < uiHeartbeatSeconds) return;
-            uiHeartbeatTimer = 0;
-            uiDirty = false;
-            plateDirty = false;
+            UiDrawList uiDrawList;
+            PlateDrawList plateDrawList;
+            bool redrawPlates;
+
+            GraphicsManager.AssertScissorStackEmpty();
+
+            lock (HUDManager.UiLock)
+            {
+                if (!uiDirty && !plateDirty && uiHeartbeatTimer < uiHeartbeatSeconds) return;
+                uiHeartbeatTimer = 0;
+                redrawPlates = plateDirty;
+
+                HUDManager.BuildDrawLists();
+                uiDrawList = HUDManager.UiDrawListSnapshot;
+                plateDrawList = HUDManager.PlateDrawListSnapshot;
+
+                if (uiDrawList == null)
+                {
+                    uiDirty = true;
+                    return;
+                }
+
+                uiDirty = false;
+                plateDirty = false;
+            }
 
             GraphicsManager.SetRenderTarget(uITarget);
             GraphicsManager.ClearScreen(Color.Transparent);
             uIDraw.Begin(SpriteSortMode.Immediate, null, null, null, rasterizerState);
 
-            HUDManager.DrawUi(uIDraw);
+            uiDrawList.Draw(uIDraw);
             DebugManager.Draw(uIDraw);
 
             uIDraw.End();
             GraphicsManager.SetRenderTarget(null);
 
-            if (plateDirty)
+            if (redrawPlates && plateDrawList != null)
             {
                 GraphicsManager.SetRenderTarget(plateTarget);
                 GraphicsManager.ClearScreen(Color.Transparent);
                 uIDraw.Begin(SpriteSortMode.Immediate, null, null, null, rasterizerState);
-                HUDManager.DrawPlates(uIDraw);
+                plateDrawList.Draw(uIDraw);
                 uIDraw.End();
                 GraphicsManager.SetRenderTarget(null);
             }
@@ -102,14 +133,20 @@ namespace Project_1.Managers.States
 
         void MarkUiDirty()
         {
-            uiDirty = true;
-            uiHeartbeatTimer = 0;
+            lock (HUDManager.UiLock)
+            {
+                uiDirty = true;
+                uiHeartbeatTimer = 0;
+            }
         }
 
         void MarkPlatesDirty()
         {
-            plateDirty = true;
-            uiHeartbeatTimer = 0;
+            lock (HUDManager.UiLock)
+            {
+                plateDirty = true;
+                uiHeartbeatTimer = 0;
+            }
         }
 
         public override RenderTarget2D Draw()

@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Project_1.UI.HUD.Windows.Gossip;
-using SharpDX.Direct2D1;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

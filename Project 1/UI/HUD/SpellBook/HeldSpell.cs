@@ -40,7 +40,7 @@ namespace Project_1.UI.HUD.SpellBook
         public void Draw(SpriteBatch aBatch)
         {
             if (heldSpell == null) return;
-            Rectangle pos = new Rectangle(InputManager.GetMousePosAbsolute() - grabOffset, size);
+            Rectangle pos = new Rectangle(UiMouseStateCache.Absolute - grabOffset, size);
 
             Color transparent = new Color(80, 80, 80, 80);
             gfx.Draw(aBatch, pos, transparent);

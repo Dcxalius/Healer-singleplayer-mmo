@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Project_1.Input;
+using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace Project_1.GameObjects.Doodads
 
         public static void Update()
         {
+            ThreadAffinity.AssertSimThread();
             for (int i = 0; i < doodads.Count; i++)
             {
                 doodads[i].Update();

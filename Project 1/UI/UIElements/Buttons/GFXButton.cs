@@ -16,7 +16,6 @@ namespace Project_1.UI.UIElements.Buttons
     {
         public UITexture GfxOnButton { get => imageOnButton.Gfx; }
 
-        Rectangle gfxRectangle;
         protected Image imageOnButton;
 
 

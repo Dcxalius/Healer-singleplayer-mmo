@@ -22,7 +22,7 @@ namespace Project_1.UI.PauseMenu
 
         public override void ClickedOnAndReleasedOnMe()
         {
-            StateManager.SetState(StateManager.States.StartScreen);
+            StateManager.RequestStateChange(StateManager.States.StartScreen);
             ObjectManager.Reset();
             base.ClickedOnAndReleasedOnMe();
         }

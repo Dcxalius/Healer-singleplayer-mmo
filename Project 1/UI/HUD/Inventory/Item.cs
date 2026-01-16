@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualBasic.Devices;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects;
@@ -12,7 +11,7 @@ using Project_1.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
-using Project_1.UI.HUD.Managers;
+using Project_1.UI.HUD.Windows;
 using Project_1.UI.UIElements.Buttons;
 using System;
 using System.Collections.Generic;
@@ -33,6 +32,18 @@ namespace Project_1.UI.HUD.Inventory
         public (int, int) Index { get => (bagIndex, slotIndex); } //For bagslots -1 0 is default, unmovable bag, and then -1 1 for first movable bag and so on
         public int bagIndex; //BagIndex 0 and above is the inventory slots, -1 is for the slots for the bags themselves, -2 is for lootwindow, -3 is for equipped
         public int slotIndex;
+
+        static GuildMember GetInspectTarget()
+        {
+            if (!Window.IsWindowOpen(nameof(InspectWindow)))
+            {
+                return null;
+            }
+            return InspectWindow.CurrentTarget;
+        }
+
+        static bool IsCharacterWindowOpen() => Window.IsWindowOpen(nameof(CharacterWindow));
+        static bool IsShopOpen() => Window.IsWindowOpen(nameof(ShopWindow));
 
         public string ItemCount
         {
@@ -59,7 +70,7 @@ namespace Project_1.UI.HUD.Inventory
 
                 if (bagIndex == -4)
                 {
-                    GuildMember inspectTarget = HUDManager.windowHandler.GetGuildMemberInspectWindowTarget();
+                    GuildMember inspectTarget = GetInspectTarget();
                     return inspectTarget?.Equipment.EquipedInSlot((GameObjects.Unit.Equipment.Slot)slotIndex);
                 }
 
@@ -273,7 +284,7 @@ namespace Project_1.UI.HUD.Inventory
         {
             if (aItemDroppedOnMe.bagIndex != -4) return false;
 
-            GuildMember inspectTarget = HUDManager.windowHandler.GetGuildMemberInspectWindowTarget();
+            GuildMember inspectTarget = GetInspectTarget();
             if (inspectTarget == null) return true;
             Entity openGuildPage = inspectTarget;
             if (bagIndex == -4)
@@ -327,7 +338,7 @@ namespace Project_1.UI.HUD.Inventory
         bool ToGuildMemberCharacterPane(Item aItemDroppedOnMe)
         {
             if (bagIndex != -4) return false;
-            GuildMember inspectTarget = HUDManager.windowHandler.GetGuildMemberInspectWindowTarget();
+            GuildMember inspectTarget = GetInspectTarget();
             if (inspectTarget != null)
             {
                 ObjectManager.Player.Inventory.SwapEquipment(aItemDroppedOnMe.Index, slotIndex, inspectTarget);
@@ -351,7 +362,7 @@ namespace Project_1.UI.HUD.Inventory
             if (isEmpty == false && holdable)
             {
                 Mailboxes.Ui.Publish(new DescriptorBoxClear());
-                Mailboxes.Ui.Publish(new HeldItemStart(this, InputManager.GetMousePosAbsolute() - Location));
+                Mailboxes.Ui.Publish(new HeldItemStart(this, UiMouseStateCache.Absolute - Location));
             }
         }
 
@@ -377,7 +388,7 @@ namespace Project_1.UI.HUD.Inventory
 
             if (isEmpty == false && holdable && heldEvents.ClickThatCreated == InputManager.ClickType.Left)
             {
-                InputManager.CreateReleaseEvent(this, heldEvents.ClickThatCreated);
+                UiInputBridge.PublishRelease(this, heldEvents.ClickThatCreated);
                 Mailboxes.Ui.Publish(new DescriptorBoxClear());
                 Mailboxes.Ui.Publish(new HeldItemEnd());
             }
@@ -390,14 +401,14 @@ namespace Project_1.UI.HUD.Inventory
             if (bagIndex >= 0)
             {
                 Friendly target;
-                bool shopOpen = HUDManager.windowHandler.IsShopOpen();
+                bool shopOpen = IsShopOpen();
                 if (shopOpen)
                 {
                     //TODO: Add refund system instead of direct deletion.
                 }
 
-                GuildMember inspectTarget = HUDManager.windowHandler.GetGuildMemberInspectWindowTarget();
-                if (inspectTarget == null || HUDManager.windowHandler.PlayerCharacterPaneOpen) target = ObjectManager.Player;
+                GuildMember inspectTarget = GetInspectTarget();
+                if (inspectTarget == null || IsCharacterWindowOpen()) target = ObjectManager.Player;
                 else target = inspectTarget;
                 switch (ObjectManager.Player.Inventory.GetItemInSlot(Index).ItemType)
                 {

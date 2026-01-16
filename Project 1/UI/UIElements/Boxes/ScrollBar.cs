@@ -41,7 +41,7 @@ namespace Project_1.UI.UIElements.Boxes
 
         public void GetValueFromMouse()
         {
-            float top = (InputManager.GetMousePosAbsolute().Y - AbsolutePos.Y - spacing * AbsolutePos.Size.Y);
+            float top = (UiMouseStateCache.Absolute.Y - AbsolutePos.Y - spacing * AbsolutePos.Size.Y);
             float bottom = AbsolutePos.Size.Y - (spacing * AbsolutePos.Size.Y) * 2;
             (parent as ScrollableBox).SetScrollValue(top   / bottom);
 
@@ -50,7 +50,7 @@ namespace Project_1.UI.UIElements.Boxes
         protected override void ClickedOnMe(ClickEvent aClick)
         {
             base.ClickedOnMe(aClick);
-            float top = (InputManager.GetMousePosAbsolute().Y - AbsolutePos.Y - spacing * AbsolutePos.Size.Y);
+            float top = (UiMouseStateCache.Absolute.Y - AbsolutePos.Y - spacing * AbsolutePos.Size.Y);
             float bottom = AbsolutePos.Size.Y - (spacing * AbsolutePos.Size.Y) * 2;
             (parent as ScrollableBox).SetScrollValue(top / bottom);
         }

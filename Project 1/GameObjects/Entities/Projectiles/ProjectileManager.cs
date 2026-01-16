@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using Project_1.Managers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,7 @@ namespace Project_1.GameObjects.Entities.Projectiles
 
         public static void Update()
         {
+            ThreadAffinity.AssertSimThread();
             for (int i = projectiles.Count - 1; i >= 0; i--)
             {
                 projectiles[i].Update();

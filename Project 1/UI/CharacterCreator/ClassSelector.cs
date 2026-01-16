@@ -4,7 +4,6 @@ using Project_1.Camera;
 using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.UI.UIElements.Boxes;
-using SharpDX.DirectWrite;
 using System;
 using System.Collections.Generic;
 using System.Linq;

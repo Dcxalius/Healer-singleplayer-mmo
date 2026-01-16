@@ -95,6 +95,7 @@ namespace Project_1.GameObjects.Spawners
 
         internal static void Update()
         {
+            ThreadAffinity.AssertSimThread();
             for (int i = 0; i < spawnZones.Count; i++)
             {
                 spawnZones[i].Update();
@@ -169,6 +170,7 @@ namespace Project_1.GameObjects.Spawners
 
         public static void RefreshPlates()
         {
+            ThreadAffinity.AssertSimThread();
             for (int i = 0; i < spawnZones.Count; i++)
             {
                 spawnZones[i].RefreshPlates();

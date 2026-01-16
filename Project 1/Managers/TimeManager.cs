@@ -13,7 +13,6 @@ namespace Project_1.Managers
     {
         static GameTime instanceTime;
         static GameTime playTime;
-        static TimeSpan? timePaused;
         static List<Object> pausers;
 
         public static double SecondsSinceLastFrame => instanceTime.ElapsedGameTime.TotalSeconds;

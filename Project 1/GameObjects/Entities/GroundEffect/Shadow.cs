@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities.GuildMembers;
 using Project_1.Textures;
-using SharpDX.MediaFoundation;
 using System;
 using System.Collections.Generic;
 using System.Linq;

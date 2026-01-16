@@ -30,7 +30,7 @@ namespace Project_1.UI.HUD
             new UITexture("WhiteBackground", Color.Black), Pos, statSize, AButtonPos, BButtonPos, ButtonSize, Color.Gray, "Confirm", "Reset", Color.White)
         {
             Dragable = true;
-            for (int i = 0; i < buttons.Count; i++) buttons[i].AddAction(() => StateManager.SetState(StateManager.States.PauseMenu)); //TODO: Formalize this
+            for (int i = 0; i < buttons.Count; i++) buttons[i].AddAction(() => StateManager.RequestStateChange(StateManager.States.PauseMenu)); //TODO: Formalize this
 
             sizeChangeCheckBox = new DescriptCheckBox("Size change", Color.White, false, () => Mailboxes.Ui.Publish(new HudSizeChangeRequested(true)), () => Mailboxes.Ui.Publish(new HudSizeChangeRequested(false)), Spacing + new RelativeScreenPosition(0.05f).OnlyY, new RelativeScreenPosition(1f, 0.15f), Size);
 

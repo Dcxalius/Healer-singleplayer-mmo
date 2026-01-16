@@ -10,7 +10,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Microsoft.VisualBasic.ApplicationServices;
 using System.Reflection.Metadata;
 using Microsoft.Xna.Framework.Content;
 using Project_1.Managers;
@@ -66,6 +65,7 @@ namespace Project_1.GameObjects
 
         public static void Update()
         {
+            ThreadAffinity.AssertSimThread();
             for (int i = All.Count - 1; i >= 0; i--)
             {
                 All[i].Update();
@@ -82,6 +82,7 @@ namespace Project_1.GameObjects
 
         public static void RefreshPlates()
         {
+            ThreadAffinity.AssertSimThread();
             for (int i = 0; i < All.Count; i++)
             {
                 All[i].RefreshPlates();

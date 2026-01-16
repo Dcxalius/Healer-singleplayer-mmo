@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

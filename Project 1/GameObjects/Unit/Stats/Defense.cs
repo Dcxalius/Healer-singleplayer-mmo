@@ -12,21 +12,21 @@ namespace Project_1.GameObjects.Unit.Stats
         public Armor Armor => armor;
         Armor armor;
         public double HealthRegen => healthRegen;
-        double healthRegen;
+        double healthRegen = 0;
         public double DodgeChance => dodgeChance;
-        double dodgeChance;//Base dodge + (Agility / Agility to Dodge ratio) + Talent bonuses + Race Bonuses + Item Bonuses
+        double dodgeChance = 0;//Base dodge + (Agility / Agility to Dodge ratio) + Talent bonuses + Race Bonuses + Item Bonuses
         public double ParryChance => parryChance;
-        double parryChance; //5% base + parry rating + parry talents
+        double parryChance = 0; //5% base + parry rating + parry talents
         public double BlockChance => blockChance;
-        double blockChance;
+        double blockChance = 0;
         public double BlockValue => blockValue;
-        double blockValue;
+        double blockValue = 0;
         public double CriticalChanceReduction => criticalChanceReduction;
-        double criticalChanceReduction;
+        double criticalChanceReduction = 0;
         public double CriticalDamageReduction => criticalDamageReduction;
-        double criticalDamageReduction;
+        double criticalDamageReduction = 0;
         public SpellResitance SpellResistance => spellResitance;
-        SpellResitance spellResitance;
+        SpellResitance spellResitance = new SpellResitance();
 
         public Defense(UnitData aUnitData)
         {

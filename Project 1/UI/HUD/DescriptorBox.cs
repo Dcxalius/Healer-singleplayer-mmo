@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualBasic.Devices;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects;
@@ -10,7 +9,6 @@ using Project_1.Textures;
 using Project_1.UI.HUD.Inventory;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
-using SharpDX.DirectWrite;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -77,6 +75,11 @@ namespace Project_1.UI.HUD
 
         public void SetToItem(Items.Item aItem, RelativeScreenPosition aPos) //TODO: Should this be public?
         {
+            if (aItem == null)
+            {
+                ResetDescriptor();
+                return;
+            }
             Visible = true;
             spacingInWorld = RelativeScreenPosition.GetSquareFromX(0.005f);
 

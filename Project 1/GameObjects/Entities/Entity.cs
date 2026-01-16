@@ -39,6 +39,7 @@ namespace Project_1.GameObjects.Entities
             unitData.Equipment.SetOwner(this);
             unitData.BaseStats.SetOwner(this);
             unitData.Destination.SetOwner(this);
+            unitData.InitializeWeaponSkill(this);
             bloodsplatter = new ParticleBase((1000d, 2000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[] { Color.Red }, new Point(1));
             namePlateRequiresUpdate = false;
             

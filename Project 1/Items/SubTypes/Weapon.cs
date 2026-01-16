@@ -46,7 +46,7 @@ namespace Project_1.Items.SubTypes
         public WeaponData WeaponData => itemData as WeaponData;
 
         [JsonIgnore]
-        public HandRequirement handRequirement;
+        public HandRequirement handRequirement = HandRequirement.OneHand;
 
 
         [JsonConstructor]

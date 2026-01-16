@@ -22,22 +22,52 @@ namespace Project_1.Textures
         static Dictionary<string, SpriteFont> fontDict;//TODO: Font is not open source so need to be change at some point
 
         static ContentManager contentManager;
+        static bool initialized;
 
         public static Effect textOutline;
 
-        static TextureManager()
+        public static void Init()
         {
             ThreadAffinity.AssertMainThread();
+            if (initialized) return;
+            initialized = true;
+
             contentManager = Game1.ContentManager;
+            EnsureContentRoot();
             InitArrays();
             InitFonts();
             textOutline = contentManager.Load<Effect>("Effects\\TextOutline");
             //textOutline.Parameters["texelSize"].SetValue()
         }
 
-        public static void Init()
+        static void EnsureContentRoot()
         {
-            ThreadAffinity.AssertMainThread();
+            string baseDir = AppContext.BaseDirectory;
+            string currentRoot = Path.GetFullPath(Path.Combine(baseDir, contentManager.RootDirectory));
+            string[] candidates =
+            {
+                currentRoot,
+                Path.Combine(baseDir, "Content"),
+                Path.Combine(baseDir, "..", "..", "..", "..", "Content", "bin", "DesktopGL", "Content"),
+                Path.Combine(baseDir, "..", "..", "..", "..", "Content", "bin", "Windows"),
+                Path.Combine(baseDir, "..", "..", "..", "..", "Content", "bin", "Windows", "Content")
+            };
+
+            for (int i = 0; i < candidates.Length; i++)
+            {
+                string candidate = Path.GetFullPath(candidates[i]);
+                if (!File.Exists(Path.Combine(candidate, "Effects", "TextOutline.xnb"))) continue;
+                contentManager.RootDirectory = candidate;
+                return;
+            }
+
+            for (int i = 0; i < candidates.Length; i++)
+            {
+                string candidate = Path.GetFullPath(candidates[i]);
+                if (!Directory.Exists(Path.Combine(candidate, "Graphics"))) continue;
+                contentManager.RootDirectory = candidate;
+                return;
+            }
         }
 
         static void InitFonts()
@@ -45,7 +75,9 @@ namespace Project_1.Textures
             fontDict = new Dictionary<string, SpriteFont>();
             string debug = "Fonts loaded: ";
 
-            string[] dir = Directory.GetFiles(contentManager.RootDirectory + "\\Font");
+            string fontDir = Path.Combine(contentManager.RootDirectory, "Font");
+            if (!Directory.Exists(fontDir)) return;
+            string[] dir = Directory.GetFiles(fontDir);
 
 
             for (int i = 0; i < dir.Length; i++)
@@ -70,7 +102,12 @@ namespace Project_1.Textures
 
             for (int i = 0; i < texturesDict.Length; i++)
             {
-                string path =  root + (GfxType)i;
+                string path = root + (GfxType)i;
+                if (!Directory.Exists(path))
+                {
+                    texturesDict[i] = new Dictionary<string, Texture2D>();
+                    continue;
+                }
                 string[] dir = Directory.GetFiles(path);
 
                 texturesDict[i] = new Dictionary<string, Texture2D>();

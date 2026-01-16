@@ -52,6 +52,7 @@ namespace Project_1.GameObjects.Spawners.Pathing
             WorldSpace dirVector = new WorldSpace(MathF.Sin(radians), -MathF.Cos(radians));
             WorldSpace newSpawn = bindPoint + dirVector * ((float)RandomManager.RollDouble() * leash);
             newSpawn = TileManager.FindClosestWalkableWorldSpace(newSpawn, aSize);
+            lastDirection = newSpawn;
             return newSpawn;
         }
     }

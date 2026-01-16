@@ -15,7 +15,7 @@ namespace Project_1.GameObjects.Entities.Npcs
         [JsonIgnore]
         public Items.SubTypes.Equipment[] Sellables => sellables;
 
-        Items.SubTypes.Equipment[] sellables;
+        Items.SubTypes.Equipment[] sellables = Array.Empty<Items.SubTypes.Equipment>();
 
         
 

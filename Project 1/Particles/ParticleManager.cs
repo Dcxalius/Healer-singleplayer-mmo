@@ -61,6 +61,7 @@ namespace Project_1.Particles
 
         public static void Update()
         {
+            ThreadAffinity.AssertSimThread();
             for (int i = particles.Count - 1; i >= 0; i--) 
             { 
                 particles[i].Update();

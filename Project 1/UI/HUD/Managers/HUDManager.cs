@@ -1,12 +1,15 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
+using Project_1.GameObjects.Entities.GuildMembers;
+using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Spells;
 using Project_1.Input;
 using Project_1.Items;
 using Project_1.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
+using Project_1.UI;
 using Project_1.UI.HUD.Inventory;
 using Project_1.UI.HUD.SpellBook;
 using Project_1.UI.UIElements;
@@ -15,12 +18,14 @@ using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Item = Project_1.UI.HUD.Inventory.Item;
 
 namespace Project_1.UI.HUD.Managers
 {
     internal static class HUDManager
     {
+        internal static readonly object UiLock = new object();
         public static PlateBoxHandler plateBoxHandler;
         public static NamePlateHandler namePlateHandler;
         public static WindowHandler windowHandler;
@@ -52,6 +57,10 @@ namespace Project_1.UI.HUD.Managers
         public static bool HudMoving => hudMoving;
         public static Action UiInvalidated;
         public static Action PlatesInvalidated;
+        static volatile UiDrawList uiDrawList;
+        static volatile PlateDrawList plateDrawList;
+        static bool uiDrawListDirty = true;
+        static bool plateDrawListDirty = true;
         static bool hudMoving;
         static bool initialized;
         static HUDManager()
@@ -119,6 +128,194 @@ namespace Project_1.UI.HUD.Managers
                 lootBox.CloseIfContext(e.ContextId);
                 InvalidateUi();
             });
+
+            Mailboxes.Ui.Subscribe<InventorySlotChanged>(e => RefreshInventorySlot(e.BagIndex, e.SlotIndex, e.Inventory));
+            Mailboxes.Ui.Subscribe<CastChannelStarted>(e => ChannelSpell(e.Spell));
+            Mailboxes.Ui.Subscribe<CastChannelProgress>(e => UpdateChannelSpell(e.Progress01));
+            Mailboxes.Ui.Subscribe<CastChannelCancelled>(_ => CancelChannel());
+            Mailboxes.Ui.Subscribe<CastChannelFinished>(_ => FinishChannel());
+            Mailboxes.Ui.Subscribe<EquipmentSlotChanged>(e =>
+            {
+                windowHandler.RefreshCharacterWindowSlot(e.Slot, e.Equipment, e.Friendly);
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<EquipmentSlotsRefreshed>(e =>
+            {
+                windowHandler.RefreshAllCharacterWindowSlots(e.Equipment, e.Friendly);
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<StatsRefreshed>(e =>
+            {
+                windowHandler.RefreshCharacterWindowStats(e.Stats, e.Friendly);
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<ExperienceRefreshed>(e =>
+            {
+                windowHandler.RefreshCharacterWindowExpBar(e.Friendly);
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<TargetChanged>(e =>
+            {
+                plateBoxHandler.SetNewTarget(e.Owner, e.Target);
+                InvalidateUi();
+                InvalidatePlates();
+            });
+            Mailboxes.Ui.Subscribe<PlateRefreshRequested>(e =>
+            {
+                plateBoxHandler.RefreshPlates(e.Entity);
+                InvalidateUi();
+                InvalidatePlates();
+            });
+            Mailboxes.Ui.Subscribe<NamePlateAdded>(e =>
+            {
+                namePlateHandler.AddNamePlate(e.Entity, e.Plate);
+                InvalidateUi();
+                InvalidatePlates();
+            });
+            Mailboxes.Ui.Subscribe<NamePlateRemoved>(e =>
+            {
+                namePlateHandler.RemoveNamePlate(e.Entity);
+                InvalidateUi();
+                InvalidatePlates();
+            });
+            Mailboxes.Ui.Subscribe<InventoryAssigned>(e => SetInventory(e.Inventory));
+            Mailboxes.Ui.Subscribe<SpellbookRefreshed>(e =>
+            {
+                windowHandler.RefreshSpellBook(e.Spells);
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<SpellbarLoaded>(e => LoadSpellBar(e.Spells));
+            Mailboxes.Ui.Subscribe<CharacterWindowSet>(e =>
+            {
+                if (e.Owner is Player p)
+                {
+                    windowHandler.SetCharacterWindow(p);
+                }
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<PlayerPlateSet>(e =>
+            {
+                if (e.Owner is Player p)
+                {
+                    plateBoxHandler.SetPlayerPlateBox(p);
+                    InvalidateUi();
+                    InvalidatePlates();
+                }
+            });
+            Mailboxes.Ui.Subscribe<GoldChanged>(e => RefreshGold(e.Gold));
+            Mailboxes.Ui.Subscribe<GuildInviteStatusUpdated>(e =>
+            {
+                windowHandler.SetGuildMemberInviteStatus(
+                    e.MemberNames as System.Collections.Generic.List<string>
+                        ?? new System.Collections.Generic.List<string>(e.MemberNames),
+                    e.Statuses as System.Collections.Generic.List<Project_1.UI.UIElements.Buttons.TwoStateGFXButton.State>
+                        ?? new System.Collections.Generic.List<Project_1.UI.UIElements.Buttons.TwoStateGFXButton.State>(e.Statuses));
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<BuffAdded>(e =>
+            {
+                plateBoxHandler.AddBuff(e.Buff, e.Owner);
+                InvalidateUi();
+                InvalidatePlates();
+            });
+            Mailboxes.Ui.Subscribe<GossipOpened>(e =>
+            {
+                windowHandler.OpenGossipWindow(e.Start, e.Npc);
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<ShopOpened>(e =>
+            {
+                windowHandler.OpenShopWindow(e.Shop, e.Npc);
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<DescriptorBoxSet>(e =>
+            {
+                if (e.Position.HasValue)
+                {
+                    SetDescriptorBox(e.Item, e.Position.Value.ToRelativeScreenPosition());
+                }
+                else
+                {
+                    SetDescriptorBox(e.Item, UiMouseStateCache.Relative);
+                }
+            });
+            Mailboxes.Ui.Subscribe<DescriptorBoxClear>(_ => SetDescriptorBox(null));
+            Mailboxes.Ui.Subscribe<PartyControlCleared>(e =>
+            {
+                plateBoxHandler.RemoveWalkerFromControl(e.Members.ToArray());
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<PartyWalkerAdded>(e =>
+            {
+                plateBoxHandler.AddGuildMemberToControl(e.Member);
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<PartyWalkerRemoved>(e =>
+            {
+                plateBoxHandler.RemoveWalkerFromControl(new GuildMember[] { e.Member });
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<PartyMemberAdded>(e =>
+            {
+                plateBoxHandler.AddGuildMemberToParty(e.Member);
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<PartyMemberRemoved>(e =>
+            {
+                plateBoxHandler.RemoveGuildMemberFromParty(e.Member);
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<GuildMembersSet>(e =>
+            {
+                windowHandler.SetGuildMembers(e.Members);
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<GuildMemberAdded>(e =>
+            {
+                windowHandler.AddGuildMember(e.Member);
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<PartyCleared>(_ =>
+            {
+                plateBoxHandler.ClearParty();
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<InspectWindowToggled>(e =>
+            {
+                windowHandler.ToggleInspectWindow(e.Member);
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<CharacterWindowToggled>(_ =>
+            {
+                windowHandler.ToggleCharacterWindow();
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<HeldItemStart>(e => HoldItem(e.Source as Project_1.UI.HUD.Inventory.Item, e.GrabOffset));
+            Mailboxes.Ui.Subscribe<HeldItemEnd>(_ => ReleaseItem());
+            Mailboxes.Ui.Subscribe<HeldSpellStart>(e => HoldSpell(e.Spell, e.GrabOffset));
+            Mailboxes.Ui.Subscribe<HeldSpellEnd>(_ => ReleaseSpell());
+            Mailboxes.Ui.Subscribe<HudMovableChanged>(e =>
+            {
+                if (e.Enabled) SetHudMoveable(true);
+                else ResetHudMoveable();
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<HudSizeChangeRequested>(e =>
+            {
+                if (e.Enabled) ChangeSizes();
+                else DisableSizeChanges();
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<HudSizeChangerSet>(e => SetSizeChanger(e.Element));
+            Mailboxes.Ui.Subscribe<HudSaveRequested>(_ => Save());
+            Mailboxes.Ui.Subscribe<DialogueOpened>(e => AddDialogueBox(e.Box));
+            Mailboxes.Ui.Subscribe<DialogueClosed>(e => RemoveDialogueBox(e.Box));
+
+            uiDrawListDirty = true;
+            plateDrawListDirty = true;
+            BuildDrawLists();
+            InvalidateUi();
+            InvalidatePlates();
         }
 
         static void ImportSettings()
@@ -149,6 +346,8 @@ namespace Project_1.UI.HUD.Managers
             {
                 dialogueBoxes[i].Update();
             }
+
+            BuildDrawLists();
         }
 
 
@@ -394,7 +593,34 @@ namespace Project_1.UI.HUD.Managers
         }
         #endregion
 
-        public static void InvalidateUi() => UiInvalidated?.Invoke();
+        public static void InvalidateUi()
+        {
+            uiDrawListDirty = true;
+            UiInvalidated?.Invoke();
+        }
+        public static void InvalidatePlates()
+        {
+            plateDrawListDirty = true;
+            PlatesInvalidated?.Invoke();
+        }
+
+        internal static UiDrawList UiDrawListSnapshot => uiDrawList;
+        internal static PlateDrawList PlateDrawListSnapshot => plateDrawList;
+
+        internal static void BuildDrawLists()
+        {
+            if (uiDrawListDirty)
+            {
+                uiDrawList = new UiDrawList(hudElements.ToArray(), dialogueBoxes.ToArray(), descriptorBox, heldItem, heldSpell);
+                uiDrawListDirty = false;
+            }
+
+            if (plateDrawListDirty)
+            {
+                plateDrawList = new PlateDrawList(namePlateHandler.GetDrawList(), plateBoxHandler.GetDrawList());
+                plateDrawListDirty = false;
+            }
+        }
 
 
         #region Mouse
@@ -414,6 +640,7 @@ namespace Project_1.UI.HUD.Managers
                     UIElement temp = hudElements[i];
                     hudElements.RemoveAt(i);
                     hudElements.Add(temp);
+                    InvalidateUi();
                     return true;
                 }
             }
@@ -460,33 +687,5 @@ namespace Project_1.UI.HUD.Managers
         }
         #endregion
 
-        public static void Draw(SpriteBatch aBatch)
-        {
-            DrawPlates(aBatch);
-            DrawUi(aBatch);
-        }
-
-        public static void DrawPlates(SpriteBatch aBatch)
-        {
-            namePlateHandler.Draw(aBatch);
-            plateBoxHandler.Draw(aBatch);
-        }
-
-        public static void DrawUi(SpriteBatch aBatch)
-        {
-            for (int i = 0; i < hudElements.Count; i++)
-            {
-                hudElements[i].Draw(aBatch);
-            }
-
-            for (int i = 0; i < dialogueBoxes.Count; i++)
-            {
-                dialogueBoxes[i].Draw(aBatch);
-            }
-
-            descriptorBox.Draw(aBatch);
-            heldItem.Draw(aBatch);
-            heldSpell.Draw(aBatch);
-        }
     }
 }

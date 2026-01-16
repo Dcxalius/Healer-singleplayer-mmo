@@ -5,6 +5,7 @@ using Project_1.GameObjects;
 using Project_1.GameObjects.Spawners.Pathing;
 using Project_1.Managers;
 using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.UI;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
@@ -162,6 +163,8 @@ namespace Project_1.Input
         static KeyboardState newKeyboardState = Keyboard.GetState();
         static MouseState newMouseState;
         static MouseState oldMouseState;
+        static int scrollDelta;
+        static int scrollWheelValue;
 
         static bool isFocused;
 
@@ -177,6 +180,8 @@ namespace Project_1.Input
             UpdateScrollWheel();
             CheckButtonPress();
             WriteToLabel();
+            PublishKeyboardSnapshots();
+            PublishMouseSnapshot();
         }
 
         private static void WriteToLabel()
@@ -252,6 +257,8 @@ namespace Project_1.Input
 
             oldMouseState = newMouseState;
             newMouseState = Mouse.GetState();
+            scrollWheelValue = newMouseState.ScrollWheelValue;
+            scrollDelta = newMouseState.ScrollWheelValue - oldMouseState.ScrollWheelValue;
 
         }
 
@@ -306,6 +313,36 @@ namespace Project_1.Input
             Mailboxes.Ui.Publish(scrollEvent);
         }
 
+        static void PublishKeyboardSnapshots()
+        {
+            Keys[] downKeys = newKeyboardState.GetPressedKeys();
+            Mailboxes.Ui.Publish(new KeyboardSnapshot(downKeys));
+
+            int count = (int)KeyBindManager.KeyListner.Count;
+            bool[] pressed = new bool[count];
+            bool[] held = new bool[count];
+            bool[] released = new bool[count];
+            if (!UiTextInputManager.IsActive)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    KeyBindManager.KeyListner key = (KeyBindManager.KeyListner)i;
+                    pressed[i] = KeyBindManager.GetPress(key);
+                    held[i] = KeyBindManager.GetHold(key);
+                    released[i] = KeyBindManager.GetRelease(key);
+                }
+            }
+
+            Mailboxes.Ui.Publish(new KeyBindSnapshot(pressed, held, released));
+        }
+
+        static void PublishMouseSnapshot()
+        {
+            AbsoluteScreenPosition absolute = GetMousePosAbsolute();
+            RelativeScreenPosition relative = GetMousePosRelative();
+            Mailboxes.Ui.Publish(new MouseSnapshot(absolute, relative, scrollWheelValue, scrollDelta));
+        }
+
         public static bool[] CheckHoldModifiers()
         {
             bool[] heldModifiers = new bool[(int)HoldModifier.Count];
@@ -338,12 +375,9 @@ namespace Project_1.Input
         static AbsoluteScreenPosition BoundsCheckOnMouse(AbsoluteScreenPosition aMousePos)
         {
             Rectangle bounds = Camera.Camera.ScreenRectangle;
-
-            if (!bounds.Contains(aMousePos.ToPoint()))
-            {
-                return new AbsoluteScreenPosition(int.MinValue);
-            }
-            return aMousePos;
+            int clampedX = Math.Clamp(aMousePos.X, bounds.Left, bounds.Right - 1);
+            int clampedY = Math.Clamp(aMousePos.Y, bounds.Top, bounds.Bottom - 1);
+            return new AbsoluteScreenPosition(clampedX, clampedY);
         }
 
         public static bool GetMousePress(ButtonState aOldMouseButton, ButtonState aNewMouseButton)

@@ -41,7 +41,7 @@ namespace Project_1.UI.OptionMenu
             }
             onExit.Clear();
 
-            StateManager.SetState(StateManager.PreviousState);
+            StateManager.RequestStateChange(StateManager.PreviousState);
         }
 
         public void ClearActions()

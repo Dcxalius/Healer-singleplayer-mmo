@@ -23,7 +23,6 @@ namespace Project_1.UI.HUD
         static Color backgroundColor = new Color(120, 50, 50, 80);
         RelativeScreenPosition barSize = new RelativeScreenPosition(1f, 0.2f);
         //RelativeScreenPosition barSize = new RelativeScreenPosition(0.02f, 0.006f);
-        WorldSpace offset;
 
         static Color ColorTransform(Entity aE)
         {
