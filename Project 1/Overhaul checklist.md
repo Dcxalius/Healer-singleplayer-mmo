@@ -21,6 +21,7 @@
 - Loot events are now consumed directly by `HUDManager` (no UIEventBridge hop); `LootBox` builds from `LootState` snapshots and refreshes on slot-change/remove events.
 - Loot open now emits snapshots immediately (`LootState.Open` used at publish sites), eliminating re-clone work inside HUD consumption.
 - Loot drops cache dropper position/height instead of holding live world-object references, reducing cross-thread coupling risk; `LootOpened` also carries a UI-safe `LootContext` for range/despawn checks and `LootClosed` fires on corpse despawn.
+- Loot UI refreshes are driven by loot event snapshots (no `LootState` peeks in draw/update paths).
 - UI invalidation hook added: loot events/closures mark the UI dirty; `GameState` redraws UI targets only on invalidation or a 1s heartbeat.
 - Split UI render targets (plates vs windows) with separate dirty flags; plate/nameplate events now invalidate only the plate surface.
 - UI render targets are recreated on rescale; both UI and plate targets track dirty separately.
@@ -33,16 +34,25 @@
 - UI draw lists are now snapshot on the UI thread (UI elements + plates) and main thread draws from snapshots using per-surface invalidation flags.
 - Removed UIEventBridge; HUDManager now owns UI mailbox subscriptions for UI state updates.
 - State changes now route through sim-thread requests instead of direct UI-thread calls.
+- Added worker pool with sim-thread callbacks; path requests can be dispatched asynchronously and chunk IDs are pre-generated in background.
+- Added thread toggle/kill switch via `ThreadingSettings` (env overrides for single-thread fallback).
+- Removed static UI/GPU texture initializers (Hitbox/CheckBox/PauseBox/CooldownTexture/UIElement movable overlay) and made them lazy main-thread init.
+- Added mailbox/worker queue depth + dispatch timing diagnostics and surfaced them on the debug overlay.
+- Added thread assertions in hot paths (UIElement update/draw, GameObject update/draw, StateManager draw, InputManager update, DebugManager draw, snapshot build).
+- Removed legacy TileManager transparency-map GPU path; TileRenderCache is the sole renderer for transparency maps.
+- Moved UI update fallback off the sim thread: main-thread Update now runs `StateManager.UiUpdate`/`HUDManager.Update` when the UI thread is disabled.
+- Nameplate positioning is now performed on the UI thread via `NamePlateHandler.Update` (sim update no longer repositions nameplates).
+- Added main-thread asserts on world draw/minimap paths and sim-thread asserts on click routing and game update.
+- Nameplate creation now happens on the UI thread (events carry only the entity; UI constructs NamePlate objects).
+- Texture creation in gameplay no longer hits GPU on sim thread (Texture now defers load + uses size cache; Animated/Random textures use cached sheet sizes).
+- Window size changes are queued if requested off the main thread and applied during `GraphicsManager.Update`.
+- Debug cheat dialogue creation now uses a UI-safe event payload; UI thread constructs the DialogueBox.
+- UI font access now uses `FontCache` (initialized on main thread) instead of calling `TextureManager` from UI thread.
 
 ## In Progress / Partial
-- Loot pipeline:
-  - `LootState` owns cloned loot arrays and publishes slot-changed/slot-removed updates; UI now uses `LootContext` for range/despawn checks and no longer receives `LootDrop`.
 - Render cache: transparency/minimap done; verify no remaining GPU work in gameplay (e.g., other helpers).
 
 ## Remaining
-- Finish loot eventing:
-  - Emit loot snapshot on open; keep UI fully driven by snapshots/events (no HUDManager wiring).
-  - Ensure UI invalidation/redraw cadence aligns with event-driven loot updates.
 - Sweep remaining HUDManager direct calls (HUD internals) now that draw-list refactor landed.
 - UI threading:
   - Add UI thread with event-driven state/hit-testing, invalidation flags per UI surface, draw-list production.
@@ -51,5 +61,5 @@
   - Move game update chain to sim thread with command handlers; main thread only draws.
   - Publish render/UI events from sim; consume input commands from main/UI threads.
 - Cleanup/Telemetry:
-  - Add thread assertions in hot paths, queue depth/timing diagnostics, and kill switch for single-thread fallback.
+  - Add queue depth/timing diagnostics for any remaining non-mailbox queues.
   - Replace temporary bridges with direct event consumption once UI/sim threads are in place.

@@ -14,9 +14,13 @@ namespace Project_1.Particles
     internal static class ParticleManager
     {
         static List<Particle> particles;
+        static volatile Particle[] renderParticles = Array.Empty<Particle>();
+        static bool initialized;
 
-        static ParticleManager()
+        public static void Init()
         {
+            if (initialized) return;
+            initialized = true;
             particles = new List<Particle>();
 
         }
@@ -74,10 +78,17 @@ namespace Project_1.Particles
 
         public static void Draw(SpriteBatch aBatch)
         {
-            for (int i = 0; i < particles.Count; i++)
+            ThreadAffinity.AssertMainThread();
+            Particle[] snapshot = renderParticles;
+            for (int i = 0; i < snapshot.Length; i++)
             {
-                particles[i].Draw(aBatch);
+                snapshot[i].Draw(aBatch);
             }
+        }
+
+        internal static void BuildRenderSnapshot()
+        {
+            renderParticles = particles.ToArray();
         }
     }
 }

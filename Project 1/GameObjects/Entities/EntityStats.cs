@@ -9,8 +9,6 @@ using Project_1.GameObjects.Unit.Resources;
 using Project_1.GameObjects.Unit.Stats;
 using Project_1.Items;
 using Project_1.Particles;
-using Project_1.UI.HUD;
-using Project_1.UI.HUD.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using System;
@@ -28,7 +26,8 @@ namespace Project_1.GameObjects.Entities
         protected UnitData UnitData => unitData;
         UnitData unitData;
 
-        protected NamePlate namePlate;
+        protected bool HasNamePlate => hasNamePlate;
+        bool hasNamePlate;
         public UnitType UnitType => unitData.UnitType;
 
         public virtual Color MinimapColor => Color.White;
@@ -176,14 +175,14 @@ namespace Project_1.GameObjects.Entities
 
         protected void CreateNamePlate()
         {
-            namePlate = new NamePlate(this);
-            Mailboxes.Ui.Publish(new NamePlateAdded(namePlate, this));
+            hasNamePlate = true;
+            Mailboxes.Ui.Publish(new NamePlateAdded(this));
 
         }
 
         protected void RemoveNamePlate()
         {
-            namePlate = null;
+            hasNamePlate = false;
             Mailboxes.Ui.Publish(new NamePlateRemoved(this));
         }
 
@@ -193,11 +192,6 @@ namespace Project_1.GameObjects.Entities
         {
             if (!namePlateRequiresUpdate) return;
             Mailboxes.Ui.Publish(new PlateRefreshRequested(this));
-        }
-
-        protected virtual void MoveNamePlate()
-        {
-            namePlate.Reposition(this);
         }
 
         public Item EquipInParticularSlot(Items.SubTypes.Equipment aEquipment, Slot aSlot)

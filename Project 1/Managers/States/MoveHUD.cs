@@ -41,11 +41,6 @@ namespace Project_1.Managers.States
 
         public override void Update()
         {
-            if (UiThread.IsRunning) return;
-            lock (HUDManager.UiLock)
-            {
-                UiUpdate();
-            }
         }
 
         public override void PopUp(DialogueBox aBox)

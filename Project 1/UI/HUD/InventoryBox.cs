@@ -48,10 +48,6 @@ namespace Project_1.UI.HUD
 
         int columnCount;
 
-        static InventoryBox()
-        {
-        }
-
         public InventoryBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize, int aColumnCount) : base(new UITexture("WhiteBackground",new Color(80, 80, 80, 80)), aPos, new RelativeScreenPosition(0.3f, 0.4f))
         {
             InitUIElement(aColumnCount);

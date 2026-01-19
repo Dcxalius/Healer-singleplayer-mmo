@@ -35,9 +35,12 @@ namespace Project_1.GameObjects
 
         static Dictionary<string, GossipData> gossipData;
 
-        
-        static ObjectFactory()
+        static bool initialized;
+
+        public static void Init()
         {
+            if (initialized) return;
+            initialized = true;
             ImportClassData();
             ImportMobData();
             ImportNpcData();

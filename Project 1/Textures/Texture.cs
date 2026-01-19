@@ -18,6 +18,7 @@ namespace Project_1.Textures
     internal class Texture
     {
         protected Texture2D gfx;
+        protected GfxPath gfxPath;
         
         //TODO: public WorldSpace Size { get => size; }
         //public Point ScaledSize { get => (size.ToVector2() * Camera.Camera.Scale).ToPoint(); }
@@ -37,6 +38,7 @@ namespace Project_1.Textures
 
         public static Color AvgColor(GfxPath aPath) //TODO: Move this?
         {
+            ThreadAffinity.AssertMainThread();
             Texture2D gfx = TextureManager.GetTexture(aPath);
             
             Point bounds = gfx.Bounds.Size;
@@ -72,11 +74,27 @@ namespace Project_1.Textures
             offset = aOffset;
 
 
+            gfxPath = aPath;
             if (aPath == null) return;
             if (aPath.Name == null) return;
-            gfx = TextureManager.GetTexture(aPath);
-            if (aSize == Point.Zero) { size = gfx.Bounds.Size; }
-            else { size = aSize; }
+
+            if (ThreadAffinity.IsMainThread)
+            {
+                gfx = TextureManager.GetTexture(aPath);
+                if (aSize == Point.Zero) { size = gfx.Bounds.Size; }
+                else { size = aSize; }
+            }
+            else
+            {
+                if (aSize == Point.Zero)
+                {
+                    size = TextureManager.GetTextureSize(aPath);
+                }
+                else
+                {
+                    size = aSize;
+                }
+            }
         }
 
         public void Flip()
@@ -111,6 +129,10 @@ namespace Project_1.Textures
 
         void FinalDraw(SpriteBatch aBatch, Rectangle aPos, Color aColor, Vector2 aOffset, float aFeetPosY)
         {
+            if (gfx == null)
+            {
+                EnsureLoaded();
+            }
             if (gfx == null) return;
             if (!Camera.Camera.ScreenspaceBoundsCheck(aPos)) return;
             aBatch.Draw(gfx, aPos, visible, aColor, rotation, aOffset, flip, (aFeetPosY - Camera.Camera.WorldRectangle.Top) / (Camera.Camera.WorldRectangle.Bottom - Camera.Camera.WorldRectangle.Top));
@@ -121,10 +143,39 @@ namespace Project_1.Textures
             if (aPath == null || aPath.Name == null)
             {
                 gfx = null;
+                gfxPath = aPath;
                 return;
             }
 
-            gfx = TextureManager.GetTexture(aPath);
+            gfxPath = aPath;
+            if (ThreadAffinity.IsMainThread)
+            {
+                gfx = TextureManager.GetTexture(aPath);
+                if (size == Point.Zero)
+                {
+                    size = gfx.Bounds.Size;
+                }
+            }
+            else
+            {
+                gfx = null;
+                if (size == Point.Zero)
+                {
+                    size = TextureManager.GetTextureSize(aPath);
+                }
+            }
+        }
+
+        protected void EnsureLoaded()
+        {
+            if (gfx != null) return;
+            if (gfxPath == null || gfxPath.Name == null) return;
+            ThreadAffinity.AssertMainThread();
+            gfx = TextureManager.GetTexture(gfxPath);
+            if (size == Point.Zero)
+            {
+                size = gfx.Bounds.Size;
+            }
         }
     }
 }

@@ -176,6 +176,7 @@ namespace Project_1.Input
 
         public static void Update()
         {
+            ThreadAffinity.AssertMainThread();
             UpdateStates();
             UpdateScrollWheel();
             CheckButtonPress();

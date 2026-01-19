@@ -81,7 +81,7 @@ namespace Project_1.UI.UIElements.Boxes
             RelativeScreenPosition size = RelativeScreenPosition.One - spacingSquare * 2;
 
             //AbsoluteScreenPosition textSize = new AbsoluteScreenPosition(TextureManager.GetFont("Gloryse").MeasureString(aTextBeforeInputWindow).ToPoint());
-            AbsoluteScreenPosition textSize = new AbsoluteScreenPosition(TextureManager.GetFont("Gloryse").MeasureString(aTextBeforeInputWindow).ToPoint());
+            AbsoluteScreenPosition textSize = new AbsoluteScreenPosition(FontCache.GetFont("Gloryse").MeasureString(aTextBeforeInputWindow).ToPoint());
             DebugManager.Print(GetType(), "textSize = " + textSize);
             
             RelativeScreenPosition textSizeRelative = textSize.ToRelativeScreenPosition(new AbsoluteScreenPosition((int)(aThisIsUglyAFButItWorksForNow.X * aSize.X), (int)(aThisIsUglyAFButItWorksForNow.Y * aSize.Y))); //TODO: This has wrong size due to size being unset when objects is created
@@ -122,7 +122,7 @@ namespace Project_1.UI.UIElements.Boxes
         {
             if (validInputs.Contains(ValidInputs.LowerCaseLetters) && !validInputs.Contains(ValidInputs.UpperCaseLetters) && char.IsUpper(aCharToWrite)) aCharToWrite = char.ToLower(aCharToWrite);
             if (validInputs.Contains(ValidInputs.UpperCaseLetters) && !validInputs.Contains(ValidInputs.LowerCaseLetters) && char.IsLower(aCharToWrite)) aCharToWrite = char.ToUpper(aCharToWrite);
-            float x = Text.CalculateOffset(text + aCharToWrite, TextureManager.GetFont("Gloryse")).X;
+            float x = Text.CalculateOffset(text + aCharToWrite, FontCache.GetFont("Gloryse")).X;
             if (x > inputLabel.Size.X) return false;
             if (aIndex == text.Length) text += aCharToWrite;
             else text = text.Insert(aIndex, aCharToWrite.ToString());

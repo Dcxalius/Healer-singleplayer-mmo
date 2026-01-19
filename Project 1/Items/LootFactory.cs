@@ -15,9 +15,12 @@ namespace Project_1.Items
     internal static class LootFactory
     {
         static Dictionary<string, LootTable> lootData;
+        static bool initialized;
 
-        static LootFactory()
+        public static void Init()
         {
+            if (initialized) return;
+            initialized = true;
             lootData = new Dictionary<string, LootTable>();
             ImportData(Game1.ContentManager);
         }

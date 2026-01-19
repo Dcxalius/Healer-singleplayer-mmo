@@ -1,6 +1,7 @@
 using Project_1.Managers.States;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
+using Project_1.Managers;
 using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements;
 
@@ -30,6 +31,7 @@ namespace Project_1.Input
 
         static void HandleClick(ClickEvent clickEvent)
         {
+            ThreadAffinity.AssertUiThread();
             UiTextInputManager.Clear();
             if (StateManager.UiClick(clickEvent)) return;
             if (HUDManager.Click(clickEvent)) return;
@@ -38,6 +40,7 @@ namespace Project_1.Input
 
         static void HandleRelease(ReleaseEvent releaseEvent)
         {
+            ThreadAffinity.AssertUiThread();
             if (StateManager.UiRelease(releaseEvent)) return;
             if (HUDManager.Release(releaseEvent)) return;
             Mailboxes.Main.Publish(releaseEvent);
@@ -45,6 +48,7 @@ namespace Project_1.Input
 
         static void HandleScroll(ScrollEvent scrollEvent)
         {
+            ThreadAffinity.AssertUiThread();
             if (StateManager.UiScroll(scrollEvent)) return;
             if (HUDManager.Scroll(scrollEvent)) return;
             Mailboxes.Main.Publish(scrollEvent);
@@ -52,18 +56,21 @@ namespace Project_1.Input
 
         static void HandleKeyboardSnapshot(KeyboardSnapshot snapshot)
         {
+            ThreadAffinity.AssertUiThread();
             UiKeyboardStateCache.Update(snapshot);
             Mailboxes.Main.Publish(snapshot);
         }
 
         static void HandleKeyBindSnapshot(KeyBindSnapshot snapshot)
         {
+            ThreadAffinity.AssertUiThread();
             UiKeyBindStateCache.Update(snapshot);
             Mailboxes.Main.Publish(snapshot);
         }
 
         static void HandleMouseSnapshot(MouseSnapshot snapshot)
         {
+            ThreadAffinity.AssertUiThread();
             UiMouseStateCache.Update(snapshot);
             Mailboxes.Main.Publish(snapshot);
         }

@@ -1,5 +1,6 @@
 using System.Threading;
 using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.Managers.States;
 
 namespace Project_1.Managers
@@ -20,6 +21,7 @@ namespace Project_1.Managers
         {
             if (running) return;
             running = true;
+            Mailboxes.Main.Subscribe<WorkerCallback>(e => e.Action?.Invoke());
             thread = new Thread(Run)
             {
                 IsBackground = true,

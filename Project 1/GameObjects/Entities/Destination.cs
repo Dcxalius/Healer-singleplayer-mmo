@@ -56,6 +56,10 @@ namespace Project_1.GameObjects.Entities
 
         List<Path> paths;
         WorldSpace? destination;
+        bool pathRequestInFlight;
+        WorldSpace? pendingTarget;
+        int overwriteToken;
+        int requestToken;
         public Destination(List<WorldSpace> aDestinationList)
         {
             paths = new List<Path>();
@@ -130,29 +134,53 @@ namespace Project_1.GameObjects.Entities
 
         public void OverwriteDestination(WorldSpace aDestination)
         {
+            if (pathRequestInFlight && pendingTarget.HasValue && pendingTarget.Value == aDestination)
+            {
+                return;
+            }
+
+            pathRequestInFlight = true;
+            pendingTarget = aDestination;
+            overwriteToken++;
+            int localToken = ++requestToken;
+
             paths.Clear();
             destination = null;
-            Path path = TileManager.GetPath(owner.FeetPosition, aDestination, new WorldSpace(owner.FeetSize));
-            if (path != null)
+
+            TileManager.RequestPath(owner.FeetPosition, aDestination, new WorldSpace(owner.FeetSize), path =>
             {
-                paths.Add(path);
-            }
-            else if (DebugManager.Mode(DebugMode.TeleportStuckThings))
-            {
-                owner.Teleport(aDestination);
-            }
+                if (localToken != requestToken) return;
+                if (overwriteToken == 0) return;
+
+                pathRequestInFlight = false;
+                pendingTarget = null;
+
+                if (path != null)
+                {
+                    paths.Clear();
+                    paths.Add(path);
+                    destination = null;
+                }
+                else if (DebugManager.Mode(DebugMode.TeleportStuckThings))
+                {
+                    owner.Teleport(aDestination);
+                }
+            });
         }
 
         public void AddDestination(WorldSpace aDestination)
         {
             Path lastPath = paths.Count > 0 ? paths[paths.Count - 1] : null;
             WorldSpace start = lastPath != null ? lastPath.CheckLastSpace : owner.FeetPosition;
-            Path pathToAdd = TileManager.GetPath(start, aDestination, new WorldSpace(owner.FeetSize));
-
-            if (pathToAdd != null)
+            int localOverwriteToken = overwriteToken;
+            TileManager.RequestPath(start, aDestination, new WorldSpace(owner.FeetSize), pathToAdd =>
             {
-                paths.Add(pathToAdd);
-            }
+                if (localOverwriteToken != overwriteToken) return;
+                if (pathToAdd != null)
+                {
+                    paths.Add(pathToAdd);
+                }
+            });
         }
 
         void UpdateDirection(WorldSpace aDestination)

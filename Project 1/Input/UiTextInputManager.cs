@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Xna.Framework.Input;
+using Project_1.Managers;
 using Project_1.UI.UIElements.Boxes;
 
 namespace Project_1.Input
@@ -33,6 +34,7 @@ namespace Project_1.Input
 
         public static void Update()
         {
+            ThreadAffinity.AssertUiThread();
             if (activeInput == null) return;
 
             Keys[] downKeys = UiKeyboardStateCache.DownKeys;

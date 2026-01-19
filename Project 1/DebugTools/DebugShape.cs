@@ -16,13 +16,12 @@ namespace Project_1.DebugTools
     {
         protected Texture2D texture;
         protected float size = 1.0f;
+        readonly Color color;
 
         [DebuggerStepThrough]
         public DebugShape(Color c)
         {
-            texture = GraphicsManager.CreateNewTexture(new Point(1));
-            Color[] data = { c };
-            texture.SetData(data);
+            color = c;
         }
 
         public virtual void Draw(SpriteBatch aBatch)
@@ -32,13 +31,24 @@ namespace Project_1.DebugTools
 
         protected virtual void Draw(SpriteBatch aBatch, WorldSpace aPos)
         {
+            EnsureTexture();
             aBatch.Draw(texture, aPos.ToAbsoltueScreenPosition().ToVector2(), null, Color.White, 0f, Vector2.Zero, size, SpriteEffects.None, 1f);
 
         }
 
         protected virtual void Draw(SpriteBatch aBatch, Rectangle aRect)
         {
+            EnsureTexture();
             aBatch.Draw(texture, Camera.Camera.WorldRectToScreenRect(aRect), null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+        }
+
+        void EnsureTexture()
+        {
+            if (texture != null) return;
+            ThreadAffinity.AssertMainThread();
+            texture = GraphicsManager.CreateNewTexture(new Point(1));
+            Color[] data = { color };
+            texture.SetData(data);
         }
     }
 }

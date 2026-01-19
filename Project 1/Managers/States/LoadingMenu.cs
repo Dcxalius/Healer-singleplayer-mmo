@@ -62,8 +62,6 @@ namespace Project_1.Managers.States
 
         public override void Update()
         {
-            if (UiThread.IsRunning) return;
-            UiUpdate();
         }
 
         internal bool UiClick(ClickEvent aClickEvent) => loadingBox.ClickedOn(aClickEvent);

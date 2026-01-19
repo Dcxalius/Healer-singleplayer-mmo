@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects.Spells;
 using Project_1.Managers;
@@ -19,6 +20,7 @@ namespace Project_1.Textures
     {
         const string FALLBACK_FONT = "Gloryse";
         static Dictionary<string, Texture2D>[] texturesDict;
+        static Dictionary<string, Point>[] textureSizes;
         static Dictionary<string, SpriteFont> fontDict;//TODO: Font is not open source so need to be change at some point
 
         static ContentManager contentManager;
@@ -76,7 +78,11 @@ namespace Project_1.Textures
             string debug = "Fonts loaded: ";
 
             string fontDir = Path.Combine(contentManager.RootDirectory, "Font");
-            if (!Directory.Exists(fontDir)) return;
+            if (!Directory.Exists(fontDir))
+            {
+                FontCache.Init(fontDict, FALLBACK_FONT);
+                return;
+            }
             string[] dir = Directory.GetFiles(fontDir);
 
 
@@ -91,11 +97,13 @@ namespace Project_1.Textures
             }
 
             DebugManager.Print(typeof(GraphicsManager), debug);
+            FontCache.Init(fontDict, FALLBACK_FONT);
         }
 
         static void InitArrays()
         {
             texturesDict = new Dictionary<string, Texture2D>[(int)GfxType.Count];
+            textureSizes = new Dictionary<string, Point>[(int)GfxType.Count];
 
             string root = contentManager.RootDirectory + "\\Graphics\\";
             string debug = "Textures loaded: ";
@@ -106,11 +114,13 @@ namespace Project_1.Textures
                 if (!Directory.Exists(path))
                 {
                     texturesDict[i] = new Dictionary<string, Texture2D>();
+                    textureSizes[i] = new Dictionary<string, Point>();
                     continue;
                 }
                 string[] dir = Directory.GetFiles(path);
 
                 texturesDict[i] = new Dictionary<string, Texture2D>();
+                textureSizes[i] = new Dictionary<string, Point>();
 
 
                 for (int j = 0; j < dir.Length; j++)
@@ -118,7 +128,9 @@ namespace Project_1.Textures
                     string filePath = TrimContentFolderAndImageFileExtention(dir[j]); 
                     string textureName = filePath.Split('\\').Last();
 
-                    texturesDict[i].Add(textureName, contentManager.Load<Texture2D>(filePath));
+                    Texture2D texture = contentManager.Load<Texture2D>(filePath);
+                    texturesDict[i].Add(textureName, texture);
+                    textureSizes[i].Add(textureName, texture.Bounds.Size);
                     debug += textureName + ", ";
 
                 }
@@ -133,7 +145,9 @@ namespace Project_1.Textures
                         string filePath = TrimContentFolderAndImageFileExtention(filesInFolders[k]);
                         string textureName = filePath.Split('\\').Last();
 
-                        texturesDict[i].Add(textureName, contentManager.Load<Texture2D>(filePath));
+                        Texture2D texture = contentManager.Load<Texture2D>(filePath);
+                        texturesDict[i].Add(textureName, texture);
+                        textureSizes[i].Add(textureName, texture.Bounds.Size);
                         debug += textureName + ", ";
                     }
                     
@@ -157,13 +171,15 @@ namespace Project_1.Textures
             if (fontDict == null)
                 throw new InvalidOperationException("TextureManager fonts not initialized.");
 
-            if (!fontDict.TryGetValue(fontName, out var font))
+            try
+            {
+                return FontCache.GetFont(fontName);
+            }
+            catch (KeyNotFoundException)
             {
                 DebugManager.Print(typeof(TextureManager), $"Font '{fontName}' not found. Falling back to '{FALLBACK_FONT}'.");
-                if (!fontDict.TryGetValue(FALLBACK_FONT, out font))
-                    throw new KeyNotFoundException($"Fallback font '{FALLBACK_FONT}' not found. Loaded fonts: {string.Join(", ", fontDict.Keys)}");
+                return FontCache.GetFont(FALLBACK_FONT);
             }
-            return font;
         }
 
         public static Texture2D GetTexture(GfxPath aGfxPath)
@@ -195,6 +211,29 @@ namespace Project_1.Textures
             }
 
             return texture;
+        }
+
+        public static Point GetTextureSize(GfxPath aGfxPath)
+        {
+            if (aGfxPath == null || aGfxPath.Name == null) return Point.Zero;
+            if (textureSizes == null) return Point.Zero;
+
+            int typeIndex = (int)aGfxPath.Type;
+            if (typeIndex < 0 || typeIndex >= textureSizes.Length) return Point.Zero;
+
+            var dict = textureSizes[typeIndex];
+            if (dict != null && dict.TryGetValue(aGfxPath.Name, out var size))
+            {
+                return size;
+            }
+
+            var debugDict = textureSizes[(int)GfxType.Debug];
+            if (debugDict != null && debugDict.TryGetValue("MissingTexture", out size))
+            {
+                return size;
+            }
+
+            return Point.Zero;
         }
 
     }

@@ -45,6 +45,9 @@ namespace Project_1.Managers
         static Text fpsText;
         static Text frameTimeText;
         static Text totalTimeText;
+        static Text mailboxText;
+        static Text dispatchText;
+        static Text workerText;
         static AbsoluteScreenPosition debugTextOrigin;
 
 
@@ -86,6 +89,9 @@ namespace Project_1.Managers
             fpsText = new Text("Gloryse", Color.Chartreuse);
             frameTimeText = new Text("Gloryse", Color.Chartreuse);
             totalTimeText = new Text("Gloryse", Color.Chartreuse);
+            mailboxText = new Text("Gloryse", Color.Chartreuse);
+            dispatchText = new Text("Gloryse", Color.Chartreuse);
+            workerText = new Text("Gloryse", Color.Chartreuse);
             debugTextOrigin = new AbsoluteScreenPosition(12, 12);
         }
 
@@ -111,6 +117,14 @@ namespace Project_1.Managers
             fpsText.Value = $"FPS: {fps:0.0}";
             frameTimeText.Value = $"Frame: {frameTimeMs:0.00} ms";
             totalTimeText.Value = $"Total: {totalTime:hh\\:mm\\:ss}";
+
+            var mainStats = Mailboxes.MainStats;
+            var uiStats = Mailboxes.UiStats;
+            var simStats = Mailboxes.SimStats;
+            mailboxText.Value = $"Q M:{mainStats.Pending} U:{uiStats.Pending} S:{simStats.Pending}";
+            dispatchText.Value = $"D M:{mainStats.LastDispatchCount}/{mainStats.LastDispatchMs:0.0}ms U:{uiStats.LastDispatchCount}/{uiStats.LastDispatchMs:0.0}ms S:{simStats.LastDispatchCount}/{simStats.LastDispatchMs:0.0}ms";
+            var workerStats = WorkerPool.Stats;
+            workerText.Value = $"W {workerStats.Pending}/{workerStats.Peak} last:{workerStats.LastWorkMs:0.0}ms";
         }
 
         public static void AddDebugShape(DebugShape aShape)
@@ -150,8 +164,16 @@ namespace Project_1.Managers
         {
             if (!KeyBindStateCache.GetPress(KeyBindManager.KeyListner.DebugTestGear)) return;
             RelativeScreenPosition dialogueBoxSize = new RelativeScreenPosition(0.2f);
-            DialogueBox testDialogueBox = new DialogueBox("Hello Cheater!\n\nxdd", Color.White, DialogueBox.LocationOfPopUp.HUDManager,DialogueBox.PausesGame.Pauses, null, new UITexture(new GfxPath(GfxType.UI, "GrayBackground"), Color.White), new RelativeScreenPosition(0.5f) - dialogueBoxSize / 2, dialogueBoxSize, "Close");
-            Mailboxes.Ui.Publish(new Messaging.Events.DialogueOpened(testDialogueBox));
+            Mailboxes.Ui.Publish(new Messaging.Events.DialogueOpened(
+                "Hello Cheater!\n\nxdd",
+                Color.White,
+                DialogueBox.LocationOfPopUp.HUDManager,
+                DialogueBox.PausesGame.Pauses,
+                null,
+                new GfxPath(GfxType.UI, "GrayBackground"),
+                new RelativeScreenPosition(0.5f) - dialogueBoxSize / 2,
+                dialogueBoxSize,
+                "Close"));
             
             ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("ZweiHander"), 1));
             ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("Axe"), 1));
@@ -204,6 +226,7 @@ namespace Project_1.Managers
         }
         public static void Draw(SpriteBatch aBatch)
         {
+            ThreadAffinity.AssertMainThread();
             bool drawShapes = modes[(int)DebugMode.DebugShapes];
             bool drawOverlay = modes[(int)DebugMode.DebugOverlay];
 
@@ -224,6 +247,12 @@ namespace Project_1.Managers
                 frameTimeText.TopLeftDraw(aBatch, frameTimePos);
                 AbsoluteScreenPosition totalTimePos = frameTimePos + new AbsoluteScreenPosition(0, (int)Math.Ceiling(frameTimeText.Offset.Y) + 2);
                 totalTimeText.TopLeftDraw(aBatch, totalTimePos);
+                AbsoluteScreenPosition mailboxPos = totalTimePos + new AbsoluteScreenPosition(0, (int)Math.Ceiling(totalTimeText.Offset.Y) + 2);
+                mailboxText.TopLeftDraw(aBatch, mailboxPos);
+                AbsoluteScreenPosition dispatchPos = mailboxPos + new AbsoluteScreenPosition(0, (int)Math.Ceiling(mailboxText.Offset.Y) + 2);
+                dispatchText.TopLeftDraw(aBatch, dispatchPos);
+                AbsoluteScreenPosition workerPos = dispatchPos + new AbsoluteScreenPosition(0, (int)Math.Ceiling(dispatchText.Offset.Y) + 2);
+                workerText.TopLeftDraw(aBatch, workerPos);
             }
         }
     }

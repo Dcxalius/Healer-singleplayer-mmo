@@ -75,10 +75,6 @@ namespace Project_1.Managers.States
         {
             lock (HUDManager.UiLock)
             {
-                if (!UiThread.IsRunning)
-                {
-                    HUDManager.Update();
-                }
                 uiHeartbeatTimer += TimeManager.SecondsSinceLastFrame;
             }
         }

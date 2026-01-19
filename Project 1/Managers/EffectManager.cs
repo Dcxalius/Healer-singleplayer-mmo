@@ -20,27 +20,7 @@ namespace Project_1.Managers
         static List<IEffects> effectsToProcess;
         static Dictionary<IEffects, RenderTarget2D> rendertargets;
         static SpriteBatch spriteBatch;
-        static EffectManager()
-        {
-            ThreadAffinity.AssertMainThread();
-            effectsToProcess = new List<IEffects>();
-            effects = new Dictionary<string, Effect>();
-            rendertargets = new Dictionary<IEffects, RenderTarget2D>();
-            spriteBatch = GraphicsManager.CreateSpriteBatch();
-
-            string filePath = SaveManager.Effects;
-            string[] files = Directory.GetFiles(filePath);
-            string debug = "Effects loaded: ";
-            for (int i = 0; i < files.Length; i++)
-            {
-                string name = SaveManager.TrimToNameOnly(files[i]);
-                Effect e = Game1.ContentManager.Load<Effect>("Effects/" + name);
-                effects.Add(name, e);
-                debug += name + ", ";
-            }
-
-            DebugManager.Print(typeof(EffectManager), debug);
-        }
+        static bool initialized;
 
         public static void AddEffectToProcess(IEffects aEffect) => effectsToProcess.Add(aEffect);
 
@@ -110,6 +90,26 @@ namespace Project_1.Managers
         public static void Init()
         {
             ThreadAffinity.AssertMainThread();
+            if (initialized) return;
+            initialized = true;
+
+            effectsToProcess = new List<IEffects>();
+            effects = new Dictionary<string, Effect>();
+            rendertargets = new Dictionary<IEffects, RenderTarget2D>();
+            spriteBatch = GraphicsManager.CreateSpriteBatch();
+
+            string filePath = SaveManager.Effects;
+            string[] files = Directory.GetFiles(filePath);
+            string debug = "Effects loaded: ";
+            for (int i = 0; i < files.Length; i++)
+            {
+                string name = SaveManager.TrimToNameOnly(files[i]);
+                Effect e = Game1.ContentManager.Load<Effect>("Effects/" + name);
+                effects.Add(name, e);
+                debug += name + ", ";
+            }
+
+            DebugManager.Print(typeof(EffectManager), debug);
         }
     }
 

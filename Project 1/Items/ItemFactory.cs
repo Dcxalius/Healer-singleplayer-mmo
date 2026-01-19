@@ -18,13 +18,16 @@ namespace Project_1.Items
     {
         //static Dictionary<int, ItemData> itemData;
         static ItemData[] itemData;
+        static bool initialized;
 
 
         //static int Id { get => nextId++; }
         //static int nextId = 0;
 
-        static ItemFactory()
+        public static void Init()
         {
+            if (initialized) return;
+            initialized = true;
             //itemData = new Dictionary<int, ItemData>();
             List<ItemData> itemList = new List<ItemData>();
 

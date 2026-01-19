@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
+using Project_1.Managers;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,16 @@ namespace Project_1.UI.UIElements
 
         bool ticked;
 
-        static UITexture checkMark = new UITexture("CheckMark", Color.White);
+        static UITexture checkMark;
+        static bool checkMarkInitialized;
+
+        static void EnsureCheckMark()
+        {
+            if (checkMarkInitialized) return;
+            ThreadAffinity.AssertMainThread();
+            checkMark = new UITexture("CheckMark", Color.White);
+            checkMarkInitialized = true;
+        }
 
         void DoTickedActions()
         {
@@ -70,6 +80,7 @@ namespace Project_1.UI.UIElements
 
             if (!ticked) return;
 
+            EnsureCheckMark();
             checkMark.Draw(aBatch, AbsolutePos, Color.White);
         }
     }

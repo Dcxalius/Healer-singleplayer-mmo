@@ -62,6 +62,57 @@ namespace Project_1.Tiles
         Tile[,] tiles;
         public int Id => id;
         int id;
+
+        public static int[,] GenerateTileIds(int chunkId)
+        {
+            Point chunkPos = TileManager.GetChunkPosition(chunkId);
+            int seed = HashCode.Combine(chunkId, chunkPos.X, chunkPos.Y);
+            Random rng = new Random(seed);
+
+            int wallId = TileFactory.GetTileData("Wall").ID;
+            int dirtId = TileFactory.GetTileData("Dirt").ID;
+            int grassId = TileFactory.GetTileData("Grass").ID;
+
+            int[,] ids = new int[ChunkSize.X, ChunkSize.Y];
+
+            for (int i = 0; i < ChunkSize.X; i++)
+            {
+                for (int j = 0; j < ChunkSize.Y; j++)
+                {
+                    if (i == 0 || j == 0 || i == ChunkSize.X - 1 || j == ChunkSize.Y - 1 || (i >= 4 && i < 6 && j >= 4 && j < 6))
+                    {
+                        ids[i, j] = wallId;
+                        continue;
+                    }
+
+                    int leftId = ids[i - 1, j];
+                    int upId = ids[i, j - 1];
+
+                    float oddsOfDirt = 0.1f;
+
+                    if (leftId == wallId || upId == wallId)
+                    {
+                        oddsOfDirt++;
+                    }
+                    if (leftId == wallId || leftId == dirtId)
+                    {
+                        oddsOfDirt += 0.1f;
+                    }
+                    if (upId == wallId || upId == dirtId)
+                    {
+                        if (oddsOfDirt > 0)
+                        {
+                            oddsOfDirt += 0.3f;
+                        }
+                        oddsOfDirt += 0.2f;
+                    }
+
+                    ids[i, j] = rng.NextDouble() < oddsOfDirt ? dirtId : grassId;
+                }
+            }
+
+            return ids;
+        }
         public Chunk(Point aLeftUppermostTile, int aId) 
         {
             id = aId;

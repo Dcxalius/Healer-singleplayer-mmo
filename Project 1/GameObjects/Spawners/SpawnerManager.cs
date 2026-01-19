@@ -21,11 +21,15 @@ namespace Project_1.GameObjects.Spawners
     internal static class SpawnerManager
     {
         static List<SpawnZone> spawnZones;
+        static volatile SpawnZone[] renderSpawnZones = Array.Empty<SpawnZone>();
 
         static Dictionary<string, int> savedMobNames;
+        static bool initialized;
 
-        static SpawnerManager()
+        public static void Init()
         {
+            if (initialized) return;
+            initialized = true;
             savedMobNames = new Dictionary<string, int>();
             spawnZones = new List<SpawnZone>();
 
@@ -179,6 +183,7 @@ namespace Project_1.GameObjects.Spawners
 
         internal static bool Click(ClickEvent aClickEvent)
         {
+            ThreadAffinity.AssertSimThread();
             for (int i = 0; i < spawnZones.Count; i++)
             {
                 if (spawnZones[i].Click(aClickEvent)) return true;
@@ -188,18 +193,27 @@ namespace Project_1.GameObjects.Spawners
 
         public static void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
         {
-            for (int i = 0; i < spawnZones.Count; i++)
+            ThreadAffinity.AssertMainThread();
+            SpawnZone[] snapshot = renderSpawnZones;
+            for (int i = 0; i < snapshot.Length; i++)
             {
-                spawnZones[i].MinimapDraw(aBatch, aOrigin, aMinimapOffset, aMinimapSize);
+                snapshot[i].MinimapDraw(aBatch, aOrigin, aMinimapOffset, aMinimapSize);
             }
         }
 
         internal static void Draw(SpriteBatch aBatch)
         {
-            for (int i = 0; i < spawnZones.Count; i++)
+            ThreadAffinity.AssertMainThread();
+            SpawnZone[] snapshot = renderSpawnZones;
+            for (int i = 0; i < snapshot.Length; i++)
             {
-                spawnZones[i].Draw(aBatch);
+                snapshot[i].Draw(aBatch);
             }
+        }
+
+        internal static void BuildRenderSnapshot()
+        {
+            renderSpawnZones = spawnZones.ToArray();
         }
     }
 }

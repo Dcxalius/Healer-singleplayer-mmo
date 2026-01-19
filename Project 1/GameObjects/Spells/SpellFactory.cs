@@ -19,9 +19,12 @@ namespace Project_1.GameObjects.Spells
         //static Dictionary<int, SpellEffect> spellEffect;
         static Instant[] instantData;
         static OverTime[] overTimeData;
+        static bool initialized;
 
-        static SpellFactory()
+        public static void Init()
         {
+            if (initialized) return;
+            initialized = true;
             InitEffectData();
             InitSpellData();
         }

@@ -14,6 +14,7 @@ using Project_1.Tiles;
 using Project_1.UI;
 using Project_1.UI.HUD.Managers;
 using Project_1.UI.PauseMenu;
+using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,6 +36,7 @@ namespace Project_1.Managers.States
 
         public override void Update()
         {
+            ThreadAffinity.AssertSimThread();
             if (KeyboardStateCache.GetPress(Microsoft.Xna.Framework.Input.Keys.Escape))
             {
                 StateManager.RequestStateChange(StateManager.States.PauseMenu);
@@ -53,6 +55,7 @@ namespace Project_1.Managers.States
 
             ObjectManager.RefreshPlates();
             SpawnerManager.RefreshPlates();
+            RenderSnapshotManager.BuildGameSnapshots();
         }
         //public override void Rescale()
         //{
@@ -61,6 +64,7 @@ namespace Project_1.Managers.States
 
         public override bool Click(ClickEvent aClickEvent)
         {
+            ThreadAffinity.AssertSimThread();
             if (base.Click(aClickEvent)) return true;
             if (ObjectManager.Click(aClickEvent)) return true;
             if (SpawnerManager.Click(aClickEvent)) return true;

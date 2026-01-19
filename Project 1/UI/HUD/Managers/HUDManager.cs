@@ -63,9 +63,29 @@ namespace Project_1.UI.HUD.Managers
         static bool plateDrawListDirty = true;
         static bool hudMoving;
         static bool initialized;
-        static HUDManager()
+
+        static void AssertUiThreadOrMainFallback()
+        {
+            if (UiThread.IsRunning)
+            {
+                ThreadAffinity.AssertUiThread();
+                return;
+            }
+            ThreadAffinity.AssertMainThread();
+        }
+
+        static void AssertUiOrMainThread()
+        {
+            if (ThreadAffinity.IsMainThread) return;
+            ThreadAffinity.AssertUiThread();
+        }
+
+        public static void Init()
         {
             ThreadAffinity.AssertMainThread();
+            if (initialized) return;
+            initialized = true;
+
             plateBoxHandler = new PlateBoxHandler();
             namePlateHandler = new NamePlateHandler();
             windowHandler = new WindowHandler();
@@ -103,23 +123,16 @@ namespace Project_1.UI.HUD.Managers
             RelativeScreenPosition mmSize = RelativeScreenPosition.GetSquareFromX(0.2f);
             minimap = new Minimap(new RelativeScreenPosition(0.75f, 0.05f), mmSize);
             hudElements.Add(minimap);
-        }
-
-        public static void Init()
-        {
-            ThreadAffinity.AssertMainThread();
-            if (initialized) return;
-            initialized = true;
 
             Mailboxes.Ui.Subscribe<LootOpened>(HandleLootOpened);
             Mailboxes.Ui.Subscribe<LootSlotChanged>(e =>
             {
-                lootBox.RefreshSlot(e.Slot);
+                lootBox.RefreshSlot(e.Slot, e.ItemSnapshot);
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<LootSlotRemoved>(e =>
             {
-                lootBox.RefreshSlot(e.Slot);
+                lootBox.RefreshSlot(e.Slot, null);
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<LootClosed>(e =>
@@ -168,7 +181,7 @@ namespace Project_1.UI.HUD.Managers
             });
             Mailboxes.Ui.Subscribe<NamePlateAdded>(e =>
             {
-                namePlateHandler.AddNamePlate(e.Entity, e.Plate);
+                namePlateHandler.AddNamePlate(e.Entity);
                 InvalidateUi();
                 InvalidatePlates();
             });
@@ -308,7 +321,7 @@ namespace Project_1.UI.HUD.Managers
             });
             Mailboxes.Ui.Subscribe<HudSizeChangerSet>(e => SetSizeChanger(e.Element));
             Mailboxes.Ui.Subscribe<HudSaveRequested>(_ => Save());
-            Mailboxes.Ui.Subscribe<DialogueOpened>(e => AddDialogueBox(e.Box));
+            Mailboxes.Ui.Subscribe<DialogueOpened>(AddDialogueBox);
             Mailboxes.Ui.Subscribe<DialogueClosed>(e => RemoveDialogueBox(e.Box));
 
             uiDrawListDirty = true;
@@ -334,6 +347,7 @@ namespace Project_1.UI.HUD.Managers
 
         public static void Update()
         {
+            AssertUiThreadOrMainFallback();
             namePlateHandler.Update();
             plateBoxHandler.Update();
 
@@ -353,6 +367,7 @@ namespace Project_1.UI.HUD.Managers
 
         public static void Rescale()
         {
+            AssertUiOrMainThread();
             namePlateHandler.Rescale();
             plateBoxHandler.Rescale();
 
@@ -363,7 +378,7 @@ namespace Project_1.UI.HUD.Managers
 
             for (int i = 0; i < dialogueBoxes.Count; i++)
             {
-                hudElements[i].Rescale();
+                dialogueBoxes[i].Rescale();
             }
         }
 
@@ -371,6 +386,7 @@ namespace Project_1.UI.HUD.Managers
 
         public static void SetSizeChanger(UIElement aUIElement)
         {
+            AssertUiThreadOrMainFallback();
             if (!sizeChanger.Active) return;
             sizeChanger.SetElement(aUIElement);
         }
@@ -379,6 +395,7 @@ namespace Project_1.UI.HUD.Managers
 
         public static void SetHudMoveable(bool aSet) //TODO: Should this really be done this way and not by a bool flag in hud manager?
         {
+            AssertUiThreadOrMainFallback();
             plateBoxHandler.SetHudMovable(aSet);
 
             for (int i = 0; i < hudElements.Count; i++)
@@ -394,6 +411,7 @@ namespace Project_1.UI.HUD.Managers
 
         public static void ResetHudMoveable()
         {
+            AssertUiThreadOrMainFallback();
             plateBoxHandler.ResetHudMovable();
 
             for (int i = 0; i < hudElements.Count; i++)
@@ -409,6 +427,7 @@ namespace Project_1.UI.HUD.Managers
 
         public static void HudMoveableDraw(SpriteBatch aBatch)
         {
+            ThreadAffinity.AssertMainThread();
             plateBoxHandler.HudMovableDraw(aBatch);
 
             for (int i = 0; i < hudElements.Count; i++)
@@ -426,6 +445,7 @@ namespace Project_1.UI.HUD.Managers
 
         public static void HudMovableUpdate()
         {
+            AssertUiThreadOrMainFallback();
             plateBoxHandler.HudMovableUpdate();
 
             for (int i = 0; i < hudElements.Count; i++)
@@ -441,12 +461,21 @@ namespace Project_1.UI.HUD.Managers
             sizeChanger.Update();
         }
 
-        public static void ChangeSizes() => sizeChanger.Active = true;
+        public static void ChangeSizes()
+        {
+            AssertUiThreadOrMainFallback();
+            sizeChanger.Active = true;
+        }
 
-        public static void DisableSizeChanges() => sizeChanger.Active = false;
+        public static void DisableSizeChanges()
+        {
+            AssertUiThreadOrMainFallback();
+            sizeChanger.Active = false;
+        }
 
         public static void Save()
         {
+            AssertUiThreadOrMainFallback();
             List<(string, RelativeScreenPosition, RelativeScreenPosition)> saveables = new List<(string, RelativeScreenPosition, RelativeScreenPosition)>();
             plateBoxHandler.Save(ref saveables);
 
@@ -471,12 +500,23 @@ namespace Project_1.UI.HUD.Managers
         #region Dialogue
         public static void AddDialogueBox(DialogueBox aDialogueBox)
         {
+            AssertUiThreadOrMainFallback();
             dialogueBoxes.Add(aDialogueBox);
+            InvalidateUi();
+        }
+
+        static void AddDialogueBox(DialogueOpened e)
+        {
+            AssertUiThreadOrMainFallback();
+            UITexture background = e.Background == null ? UITexture.Null : new UITexture(e.Background, Color.White);
+            DialogueBox box = new DialogueBox(e.Text, e.TextColor, e.Location, e.Pauses, e.Title, background, e.Pos, e.Size, e.CloseText);
+            dialogueBoxes.Add(box);
             InvalidateUi();
         }
 
         public static void RemoveDialogueBox(DialogueBox aDialogueBox)
         {
+            AssertUiThreadOrMainFallback();
             dialogueBoxes.Remove(aDialogueBox);
             InvalidateUi();
         }
@@ -489,11 +529,13 @@ namespace Project_1.UI.HUD.Managers
         #region Inventory
         public static void SetInventory(Items.Inventory aInventory)
         {
+            AssertUiThreadOrMainFallback();
             inventoryBox.SetInventory(aInventory);
             InvalidateUi();
         }
         public static void RefreshInventorySlot(int aBag, int aSlot, Items.Inventory aInventory)
         {
+            AssertUiThreadOrMainFallback();
             inventoryBox.RefreshSlot(aBag, aSlot, aInventory);
             InvalidateUi();
         }
@@ -501,17 +543,20 @@ namespace Project_1.UI.HUD.Managers
 
         public static void SetDescriptorBox(Item aItem)
         {
+            AssertUiThreadOrMainFallback();
             descriptorBox.SetToItem(aItem);
             InvalidateUi();
         }
         public static void SetDescriptorBox(Items.Item aItem, RelativeScreenPosition aPos)
         {
+            AssertUiThreadOrMainFallback();
             descriptorBox.SetToItem(aItem, aPos);
             InvalidateUi();
         }
 
         public static void RefreshGold(int aGoldAmount)
         {
+            AssertUiThreadOrMainFallback();
             inventoryBox.RefreshGold(aGoldAmount);
             InvalidateUi();
         }
@@ -522,32 +567,38 @@ namespace Project_1.UI.HUD.Managers
         #region Spell
         public static void HoldSpell(Spell aSpell, AbsoluteScreenPosition aGrabOffset)
         {
+            AssertUiThreadOrMainFallback();
             heldSpell.HoldMe(aSpell, aGrabOffset);
             InvalidateUi();
         }
         public static void ReleaseSpell()
         {
+            AssertUiThreadOrMainFallback();
             heldSpell.ReleaseMe();
             InvalidateUi();
         }
 
         public static void FinishChannel()
         {
+            AssertUiThreadOrMainFallback();
             playerCastBar.FinishCast();
             InvalidateUi();
         }
         public static void CancelChannel()
         {
+            AssertUiThreadOrMainFallback();
             playerCastBar.CancelCast();
             InvalidateUi();
         }
         public static void UpdateChannelSpell(float aNewVal)
         {
+            AssertUiThreadOrMainFallback();
             playerCastBar.Value = aNewVal;
             InvalidateUi();
         }
         public static void ChannelSpell(Spell aSpell)
         {
+            AssertUiThreadOrMainFallback();
             playerCastBar.CastSpell(aSpell);
             InvalidateUi();
         }
@@ -556,10 +607,18 @@ namespace Project_1.UI.HUD.Managers
 
         public static void LoadSpellBar(Spell[] aSpells)
         {
+            AssertUiThreadOrMainFallback();
             firstSpellBar.LoadBar(aSpells);
             InvalidateUi();
         }
-        public static string[] SaveSpellBar => firstSpellBar.SaveBar();
+        public static string[] SaveSpellBar
+        {
+            get
+            {
+                AssertUiThreadOrMainFallback();
+                return firstSpellBar.SaveBar();
+            }
+        }
 
 
         #endregion
@@ -567,12 +626,14 @@ namespace Project_1.UI.HUD.Managers
         #region Loot
         public static void Loot(Items.Item[] snapshot, LootContext context)
         {
+            AssertUiThreadOrMainFallback();
             lootBox.Loot(context, snapshot);
             InvalidateUi();
         }
-        public static void RefreshLootSlot(int slot)
+        public static void RefreshLootSlot(int slot, Items.Item snapshot)
         {
-            lootBox.RefreshSlot(slot);
+            AssertUiThreadOrMainFallback();
+            lootBox.RefreshSlot(slot, snapshot);
             InvalidateUi();
         }
 
@@ -583,11 +644,13 @@ namespace Project_1.UI.HUD.Managers
 
         public static void HoldItem(Item aItem, AbsoluteScreenPosition aGrabOffset)
         {
+            AssertUiThreadOrMainFallback();
             heldItem.HoldItem(aItem, aGrabOffset);
             InvalidateUi();
         }
         public static void ReleaseItem()
         {
+            AssertUiThreadOrMainFallback();
             heldItem.ReleaseMe();
             InvalidateUi();
         }
@@ -595,20 +658,37 @@ namespace Project_1.UI.HUD.Managers
 
         public static void InvalidateUi()
         {
+            AssertUiThreadOrMainFallback();
             uiDrawListDirty = true;
             UiInvalidated?.Invoke();
         }
         public static void InvalidatePlates()
         {
+            AssertUiThreadOrMainFallback();
             plateDrawListDirty = true;
             PlatesInvalidated?.Invoke();
         }
 
-        internal static UiDrawList UiDrawListSnapshot => uiDrawList;
-        internal static PlateDrawList PlateDrawListSnapshot => plateDrawList;
+        internal static UiDrawList UiDrawListSnapshot
+        {
+            get
+            {
+                ThreadAffinity.AssertMainThread();
+                return uiDrawList;
+            }
+        }
+        internal static PlateDrawList PlateDrawListSnapshot
+        {
+            get
+            {
+                ThreadAffinity.AssertMainThread();
+                return plateDrawList;
+            }
+        }
 
         internal static void BuildDrawLists()
         {
+            AssertUiOrMainThread();
             if (uiDrawListDirty)
             {
                 uiDrawList = new UiDrawList(hudElements.ToArray(), dialogueBoxes.ToArray(), descriptorBox, heldItem, heldSpell);
@@ -626,6 +706,7 @@ namespace Project_1.UI.HUD.Managers
         #region Mouse
         public static bool Click(ClickEvent aClickEvent)
         {
+            AssertUiThreadOrMainFallback();
             if (sizeChanger.ClickedOn(aClickEvent)) return true;
 
             for (int i = 0; i < dialogueBoxes.Count; i++)
@@ -653,6 +734,7 @@ namespace Project_1.UI.HUD.Managers
 
         public static bool Release(ReleaseEvent aReleaseEvent)
         {
+            AssertUiThreadOrMainFallback();
             for (int i = hudElements.Count - 1; i >= 0; i--)
             {
                 if (hudElements[i].ReleasedOn(aReleaseEvent)) return true;
@@ -663,6 +745,7 @@ namespace Project_1.UI.HUD.Managers
 
         internal static bool Scroll(ScrollEvent aScrollEvent)
         {
+            AssertUiThreadOrMainFallback();
             for (int i = 0; i < dialogueBoxes.Count; i++)
             {
                 if (dialogueBoxes[i].ScrolledOn(aScrollEvent)) return true;
@@ -678,6 +761,7 @@ namespace Project_1.UI.HUD.Managers
 
         public static void LeavingGameState()
         {
+            AssertUiThreadOrMainFallback();
             for (int i = 0; i < hudElements.Count; i++)
             {
                 hudElements[i].LeavingGameState();

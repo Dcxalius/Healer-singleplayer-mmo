@@ -12,6 +12,9 @@ namespace Project_1.Textures
 {
     internal class AssignableImage : UITexture
     {
+        string pendingPath;
+        bool textureDirty;
+
         public AssignableImage() : base(GfxPath.NullPath, Color.White)
         {
 
@@ -26,9 +29,42 @@ namespace Project_1.Textures
             if (!File.Exists(aPath))
             {
                 //TODO: File not found gfx
+                pendingPath = null;
+                textureDirty = true;
                 return;
             }
-            gfx = GraphicsManager.CreateTextureFromFile(aPath);
+            pendingPath = aPath;
+            textureDirty = true;
+
+            if (ThreadAffinity.IsMainThread)
+            {
+                EnsureTexture();
+            }
+        }
+
+        public override void Draw(SpriteBatch aBatch, Rectangle aPosRectangle)
+        {
+            EnsureTexture();
+            base.Draw(aBatch, aPosRectangle);
+        }
+
+        public override void Draw(SpriteBatch aBatch, Rectangle aPosRectangle, Color aColor)
+        {
+            EnsureTexture();
+            base.Draw(aBatch, aPosRectangle, aColor);
+        }
+
+        void EnsureTexture()
+        {
+            if (!textureDirty) return;
+            textureDirty = false;
+            if (pendingPath == null)
+            {
+                gfx = null;
+                return;
+            }
+            ThreadAffinity.AssertMainThread();
+            gfx = GraphicsManager.CreateTextureFromFile(pendingPath);
         }
     }
 }

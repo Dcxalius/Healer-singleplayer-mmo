@@ -24,6 +24,7 @@ namespace Project_1.GameObjects.Entities.Corspes
     {
         static ParticleBase lootGlow;
         static ParticleMovement lootGlowMovement;
+        static bool initialized;
 
         [JsonProperty]
         public LootDrop Drop => drop;
@@ -66,8 +67,10 @@ namespace Project_1.GameObjects.Entities.Corspes
         [JsonProperty]
         WorldSpace Pos => Position;
 
-        static Corpse()
+        static void Init()
         {
+            if (initialized) return;
+            initialized = true;
             lootGlow = new ParticleBase((1000d, 1000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[] { Color.Yellow }, new Point(1));
             lootGlowMovement = new ParticleMovement(new WorldSpace(0, -1), WorldSpace.Zero, 0.95f);
         }
@@ -97,6 +100,7 @@ namespace Project_1.GameObjects.Entities.Corspes
 
         Corpse(GfxPath aPath, WorldSpace aPosition) : base(new Textures.Texture(aPath), aPosition)
         {
+            Init();
             corpseName = aPath.Name;
 
             lootLength = WorldRectangle.Size.ToVector2().Length(); //TODO: Should this be rect size / 2 + const from player?

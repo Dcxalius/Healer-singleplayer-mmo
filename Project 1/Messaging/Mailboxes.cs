@@ -11,6 +11,10 @@ namespace Project_1.Messaging
         public static Mailbox Ui { get; } = new Mailbox("UI");
         public static Mailbox Sim { get; } = new Mailbox("Sim");
 
+        public static MailboxStats MainStats => Main.GetStats();
+        public static MailboxStats UiStats => Ui.GetStats();
+        public static MailboxStats SimStats => Sim.GetStats();
+
         public static void InitMainThread()
         {
             ThreadAffinity.AssertMainThread();

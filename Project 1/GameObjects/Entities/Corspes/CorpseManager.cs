@@ -14,9 +14,13 @@ namespace Project_1.GameObjects.Entities.Corspes
     internal static class CorpseManager
     {
         static List<Corpse> corpses;
+        static volatile Corpse[] renderCorpses = Array.Empty<Corpse>();
+        static bool initialized;
 
-        static CorpseManager()
+        public static void Init()
         {
+            if (initialized) return;
+            initialized = true;
             corpses = new List<Corpse>();
         }
 
@@ -49,6 +53,7 @@ namespace Project_1.GameObjects.Entities.Corspes
 
         public static bool Click(ClickEvent aClickEvent)
         {
+            ThreadAffinity.AssertSimThread();
             for (int i = 0; i < corpses.Count; i++)
             {
                 if (corpses[i].Click(aClickEvent)) return true;
@@ -65,7 +70,14 @@ namespace Project_1.GameObjects.Entities.Corspes
 
         public static void Draw(SpriteBatch aBatch)
         {
-            for (int i = 0; i < corpses.Count; i++) corpses[i].Draw(aBatch);
+            ThreadAffinity.AssertMainThread();
+            Corpse[] snapshot = renderCorpses;
+            for (int i = 0; i < snapshot.Length; i++) snapshot[i].Draw(aBatch);
+        }
+
+        internal static void BuildRenderSnapshot()
+        {
+            renderCorpses = corpses.ToArray();
         }
     }
 }

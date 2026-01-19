@@ -77,20 +77,14 @@ namespace Project_1.GameObjects.Entities.GuildMembers
 
         }
 
-        protected override void MoveNamePlate()
-        {
-            if (namePlate != null) base.MoveNamePlate();
-        }
-
         public override void RefreshPlates()
         {
-            if (namePlate != null) base.RefreshPlates();
+            if (HasNamePlate) base.RefreshPlates();
         }
 
         public void AddedToParty()
         {
             CreateNamePlate();
-            base.MoveNamePlate();
             FlagForRefresh();
             leaving = false;
         }

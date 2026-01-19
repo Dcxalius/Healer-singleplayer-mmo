@@ -13,21 +13,9 @@ namespace Project_1.Particles
     internal class ParticleBase
     {
 
-        public double LifeSpan
-        {
-            get
-            {
+        public double LifeSpan => RandomManager.RollDouble(lifeSpan);
 
-                if (lifeSpan.Item1 == lifeSpan.Item2)
-                {
-                    return lifeSpan.Item1;
-                }
-
-                return RandomManager.RollDouble(lifeSpan);
-            }
-        }
-
-        (double, double) lifeSpan;
+        (double min, double max) lifeSpan;
 
         public enum ColorType
         {
@@ -69,9 +57,18 @@ namespace Project_1.Particles
 
         }
 
-        public Texture2D Texture { get => texture; }
+        public Texture2D Texture
+        {
+            get
+            {
+                EnsureTexture();
+                return texture;
+            }
+        }
         TextureType textureType;
         Texture2D texture;
+        Point textureSize;
+        Color[] textureData;
 
 
         public enum OpacityType
@@ -83,7 +80,7 @@ namespace Project_1.Particles
         OpacityType opacityType;
 
 
-        public ParticleBase((double, double) aLifeSpan, OpacityType aOpacity, ColorType aColorType, Color[] aColor, Point aSize, TextureType aTextureType = TextureType.Static)
+        public ParticleBase((double min, double max) aLifeSpan, OpacityType aOpacity, ColorType aColorType, Color[] aColor, Point aSize, TextureType aTextureType = TextureType.Static)
         {
             lifeSpan = aLifeSpan;
 
@@ -95,20 +92,20 @@ namespace Project_1.Particles
 
             opacityType = aOpacity;
 
-            textureType = aTextureType; 
-            texture = GraphicsManager.CreateNewTexture(aSize);
-            Color[] textureData;
+            textureType = aTextureType;
+            textureSize = aSize;
+            Color[] builtData;
             switch (textureType)
             {
                 case TextureType.Static:
-                    textureData = Enumerable.Repeat(Color.White, aSize.X * aSize.Y).ToArray();
+                    builtData = Enumerable.Repeat(Color.White, aSize.X * aSize.Y).ToArray();
                     break;
                 case TextureType.Fading:
                     Color color = Color.White;
-                    textureData = new Color[aSize.X * aSize.Y];
+                    builtData = new Color[aSize.X * aSize.Y];
                     for (int i = 0; i < aColor.Length; i++)
                     {
-                        textureData[i] = color;
+                        builtData[i] = color;
                         if (i % aSize.X == 0)
                         {
                             color.R = (byte)(color.R / 2);
@@ -121,6 +118,14 @@ namespace Project_1.Particles
                 default:
                     throw new NotImplementedException();
             }
+            textureData = builtData;
+        }
+
+        void EnsureTexture()
+        {
+            if (texture != null) return;
+            ThreadAffinity.AssertMainThread();
+            texture = GraphicsManager.CreateNewTexture(textureSize);
             texture.SetData(textureData);
         }
     }

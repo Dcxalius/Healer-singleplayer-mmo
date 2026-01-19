@@ -65,11 +65,11 @@ namespace Project_1.GameObjects.Entities
 
         public override void Update()
         {
+            ThreadAffinity.AssertSimThread();
             if (AmIDead()) return;
             TargetAliveCheck();
             if (unitData.BaseStats.CheckIfResourceRegened()) FlagForRefresh();
             
-            MoveNamePlate();
             Movement();
             AttackTarget();
             spellCast.UpdateSpellChannel();
@@ -81,6 +81,7 @@ namespace Project_1.GameObjects.Entities
 
         public void ServerTick() //"Server tick"
         {
+            ThreadAffinity.AssertSimThread();
             if (!InCombat)
             {
                 unitData.Tick();

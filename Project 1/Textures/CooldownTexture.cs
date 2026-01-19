@@ -22,8 +22,9 @@ namespace Project_1.Textures
 
         public string EffectName => "CooldownSwirl";
 
-        public Texture TextureToEffectWith => swirlTexture;
-        static Texture swirlTexture = new UITexture("LeftSwirl", Color.White);
+        public Texture TextureToEffectWith => EnsureSwirlTexture();
+        static Texture swirlTexture;
+        static bool swirlInitialized;
         public RenderTarget2D ReturnedRenderTarget { get => effectsRenderTarget; set => effectsRenderTarget = value; }
         RenderTarget2D effectsRenderTarget;
 
@@ -31,6 +32,15 @@ namespace Project_1.Textures
         EffectManager.SimpleEffectParam simpleEffectParam;
         float ratio;
         CooldownGfxType cdType;
+
+        static Texture EnsureSwirlTexture()
+        {
+            if (swirlInitialized) return swirlTexture;
+            ThreadAffinity.AssertMainThread();
+            swirlTexture = new UITexture("LeftSwirl", Color.White);
+            swirlInitialized = true;
+            return swirlTexture;
+        }
 
         public CooldownTexture(CooldownGfxType aCDGfxType) : base("Cooldown", Color.White)
         {

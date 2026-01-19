@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Input;
+using Project_1.Managers;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Buttons;
 using System;
@@ -48,9 +49,13 @@ namespace Project_1.UI.OptionMenu
 
         static ExitOptionsButton exitOptionsButton;
         static SaveChangesButton saveChangesButton;
+        static bool initialized;
 
-        static OptionManager()
+        public static void Init()
         {
+            ThreadAffinity.AssertMainThread();
+            if (initialized) return;
+            initialized = true;
             changesMade = false;
             InitPermanents();
             InitVideo();

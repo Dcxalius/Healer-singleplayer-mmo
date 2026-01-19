@@ -35,6 +35,11 @@ namespace Project_1.GameObjects
         public const float DistanceOfCircleAroundPlayer = 700;
         public static Player Player { get => player; }
 
+        static volatile Entity[] renderAll = Array.Empty<Entity>();
+        static volatile Entity[] renderEntities = Array.Empty<Entity>();
+        static volatile Npc[] renderNpcs = Array.Empty<Npc>();
+        static volatile Player renderPlayer;
+
         public static List<Entity> entities;
         public static List<GuildMember> guild;
         public static List<Npc> npcs;
@@ -44,6 +49,7 @@ namespace Project_1.GameObjects
         static GuildMember[] GuildMembersInWorld => guild.Where(x => entities.Contains(x)).ToArray();
 
         static Player player = null;
+        static bool initialized;
 
         static List<Entity> All
         {
@@ -56,8 +62,10 @@ namespace Project_1.GameObjects
             }
         }
 
-        static ObjectManager()
+        public static void Init()
         {
+            if (initialized) return;
+            initialized = true;
             entities = new List<Entity>();
             guild = new List<GuildMember>();
             npcs = new List<Npc>();
@@ -190,6 +198,7 @@ namespace Project_1.GameObjects
         #region Click
         public static bool Click(ClickEvent aClickEvent)
         {
+            ThreadAffinity.AssertSimThread();
             if (player.Click(aClickEvent)) return true;
 
             for (int i = 0; i < entities.Count; i++)
@@ -240,24 +249,41 @@ namespace Project_1.GameObjects
 
         public static void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
         {
-            for (int i = 0; i < All.Count; i++)
+            ThreadAffinity.AssertMainThread();
+            Entity[] all = renderAll;
+            for (int i = 0; i < all.Length; i++)
             {
-                All[i].MinimapDraw(aBatch, aOrigin, aMinimapOffset, aMinimapSize);
+                all[i].MinimapDraw(aBatch, aOrigin, aMinimapOffset, aMinimapSize);
             }
         }
 
         public static void Draw(SpriteBatch aSpriteBatch)
         {
-            player.Draw(aSpriteBatch);
-            for (int i = 0; i < entities.Count; i++)
+            ThreadAffinity.AssertMainThread();
+            Player p = renderPlayer;
+            if (p != null)
             {
-                entities[i].Draw(aSpriteBatch);
+                p.Draw(aSpriteBatch);
+            }
+            Entity[] ents = renderEntities;
+            for (int i = 0; i < ents.Length; i++)
+            {
+                ents[i].Draw(aSpriteBatch);
             }
 
-            for (int i = 0; i < npcs.Count; i++)
+            Npc[] snapshotNpcs = renderNpcs;
+            for (int i = 0; i < snapshotNpcs.Length; i++)
             {
-                npcs[i].Draw(aSpriteBatch);
+                snapshotNpcs[i].Draw(aSpriteBatch);
             }
+        }
+
+        internal static void BuildRenderSnapshot()
+        {
+            renderPlayer = player;
+            renderEntities = entities.ToArray();
+            renderNpcs = npcs.ToArray();
+            renderAll = entities.Union(guild).Concat(npcs).Append(player).Where(x => x != null).ToArray();
         }
     }
 }

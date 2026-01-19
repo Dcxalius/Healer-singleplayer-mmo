@@ -21,7 +21,15 @@ namespace Project_1.UI.HUD.Inventory
         Label itemName;
         readonly int slotIndex;
 
-        RelativeScreenPosition Spacing => RelativeScreenPosition.GetSquareFromX(0.005f, Size);
+        RelativeScreenPosition Spacing
+        {
+            get
+            {
+                AbsoluteScreenPosition size = Size;
+                if (size.X <= 0 || size.Y <= 0) return RelativeScreenPosition.Zero;
+                return RelativeScreenPosition.GetSquareFromX(0.005f, size);
+            }
+        }
 
         public Loot(int aSlotIndex, Items.Item aItem, GfxPath aPath) : base(new UITexture("GrayBackground", Color.AliceBlue), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
         {
@@ -41,11 +49,16 @@ namespace Project_1.UI.HUD.Inventory
 
             if (item == null) return;
 
-            item.Move(Spacing);
-            RelativeScreenPosition itemSize = RelativeScreenPosition.GetSquareFromY(1f - Spacing.Y * 2, aSize.ToAbsoluteScreenPos());
+            AbsoluteScreenPosition absSize = aSize.ToAbsoluteScreenPos(ParentSize);
+            if (absSize.X <= 0 || absSize.Y <= 0) return;
+
+            RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f, absSize);
+
+            item.Move(spacing);
+            RelativeScreenPosition itemSize = RelativeScreenPosition.GetSquareFromY(1f - spacing.Y * 2, absSize);
             item.Resize(itemSize);
-            itemName.Move(itemSize.OnlyX + Spacing + Spacing.OnlyX);
-            itemName.Resize(RelativeScreenPosition.One - itemSize.OnlyX - Spacing * 2);
+            itemName.Move(itemSize.OnlyX + spacing + spacing.OnlyX);
+            itemName.Resize(RelativeScreenPosition.One - itemSize.OnlyX - spacing * 2);
 
 
         }
@@ -83,7 +96,7 @@ namespace Project_1.UI.HUD.Inventory
                 itemName.Text = aItem.Name;
                 itemName.Color = aItem.ItemQualityColor;
             }
-            Resize(RelativeScreenPosition.Zero); // force layout on next Resize call
+            Resize(RelativeSize);
         }
 
         public override void ClickedOnAndReleasedOnMe()

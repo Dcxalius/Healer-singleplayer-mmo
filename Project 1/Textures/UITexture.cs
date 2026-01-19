@@ -40,10 +40,8 @@ namespace Project_1.Textures
 
         public virtual void Draw(SpriteBatch aBatch, Rectangle aPosRectangle, Color aColor)
         {
-            if (gfx == null)
-            {
-                return;
-            }
+            EnsureLoaded();
+            if (gfx == null) return;
             if (Camera.Camera.ScreenspaceBoundsCheck(aPosRectangle))
             {
                 aBatch.Draw(gfx, aPosRectangle, Visible, aColor, Rotation, offset, flip, 1f);

@@ -24,8 +24,6 @@ namespace Project_1.Managers.States
 
         public override void Update()
         {
-            if (UiThread.IsRunning) return;
-            UiUpdate();
         }
 
         public override bool Click(ClickEvent aClickEvent) => false;

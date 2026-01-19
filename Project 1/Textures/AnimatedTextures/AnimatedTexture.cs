@@ -37,9 +37,19 @@ namespace Project_1.Textures
 
         void CreateAnimationFrames(int aDeadFrameCount)
         {
-            int rectsInXDir = gfx.Bounds.Width / size.X;
-            int rectsInYDir = gfx.Bounds.Height / size.Y;
-            possibleFrames = new Rectangle[rectsInXDir * rectsInYDir - aDeadFrameCount];
+            Point sheetSize = TextureManager.GetTextureSize(gfxPath);
+            if (size == Point.Zero || sheetSize == Point.Zero)
+            {
+                Point fallbackSize = size == Point.Zero ? new Point(1, 1) : size;
+                possibleFrames = new[] { new Rectangle(Point.Zero, fallbackSize) };
+                return;
+            }
+
+            int rectsInXDir = Math.Max(1, sheetSize.X / size.X);
+            int rectsInYDir = Math.Max(1, sheetSize.Y / size.Y);
+            int totalFrames = rectsInXDir * rectsInYDir - aDeadFrameCount;
+            if (totalFrames <= 0) totalFrames = 1;
+            possibleFrames = new Rectangle[totalFrames];
 
 
             for (int i = 0; i < possibleFrames.Length; i++)

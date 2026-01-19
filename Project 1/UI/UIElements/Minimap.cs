@@ -18,14 +18,19 @@ namespace Project_1.UI.UIElements
     internal class Minimap : Box
     {
         public static UITexture minimapDot;
+        static bool initialized;
 
-        static Minimap()
+        public static void Init()
         {
+            ThreadAffinity.AssertMainThread();
+            if (initialized) return;
+            initialized = true;
             minimapDot = new UITexture("MinimapDot", Color.White);
         }
 
         public Minimap(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", Color.White), aPos, aSize)
         {
+            Init();
         }
 
         public override void Draw(SpriteBatch aBatch)

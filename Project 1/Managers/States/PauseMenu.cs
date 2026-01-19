@@ -32,15 +32,6 @@ namespace Project_1.Managers.States
 
         public override void Update()
         {
-            if (UiThread.IsRunning)
-            {
-                if (dialogueBoxes.Count == 0 && KeyboardStateCache.GetPress(Microsoft.Xna.Framework.Input.Keys.Escape))
-                {
-                    StateManager.RequestStateChange(StateManager.States.Game);
-                }
-                return;
-            }
-            UiUpdate();
             if (dialogueBoxes.Count == 0 && KeyboardStateCache.GetPress(Microsoft.Xna.Framework.Input.Keys.Escape))
             {
                 StateManager.RequestStateChange(StateManager.States.Game);

@@ -14,9 +14,14 @@ namespace Project_1.Textures
     {
         public RandomlyGeneratedTexture(bool aFreelyRandomized, Point aVisibleSize, GfxPath aPath) : base(aPath, aVisibleSize)
         {
+            Point sheetSize = TextureManager.GetTextureSize(aPath);
+            if (sheetSize == Point.Zero)
+            {
+                sheetSize = aVisibleSize;
+            }
             if (aFreelyRandomized) 
             { 
-                Point validPoints = new Point(gfx.Width-aVisibleSize.X, gfx.Height-aVisibleSize.Y);
+                Point validPoints = new Point(sheetSize.X - aVisibleSize.X, sheetSize.Y - aVisibleSize.Y);
 
                 int xRoll = (int)(validPoints.X * RandomManager.RollDouble());
                 int yRoll = (int)(validPoints.Y * RandomManager.RollDouble());
@@ -25,7 +30,7 @@ namespace Project_1.Textures
             }
             else 
             {
-                Point RectsFitted = new Point(gfx.Width/aVisibleSize.X, gfx.Height/aVisibleSize.Y);
+                Point RectsFitted = new Point(sheetSize.X / aVisibleSize.X, sheetSize.Y / aVisibleSize.Y);
 
                 int xRoll = aVisibleSize.X * RandomManager.RollInt(RectsFitted.X);
                 int yRoll = aVisibleSize.Y * RandomManager.RollInt(RectsFitted.Y);

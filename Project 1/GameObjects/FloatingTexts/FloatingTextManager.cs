@@ -12,8 +12,13 @@ namespace Project_1.GameObjects.FloatingTexts
     internal static class FloatingTextManager
     {
         static List<FloatingText> floatingTexts;
-        static FloatingTextManager()
+        static volatile FloatingText[] renderFloatingTexts = Array.Empty<FloatingText>();
+        static bool initialized;
+
+        public static void Init()
         {
+            if (initialized) return;
+            initialized = true;
             floatingTexts = new List<FloatingText>();
         }
 
@@ -32,7 +37,14 @@ namespace Project_1.GameObjects.FloatingTexts
 
         public static void Draw(SpriteBatch aBatch)
         {
-            for (int i = 0; i < floatingTexts.Count; i++) floatingTexts[i].Draw(aBatch);
+            ThreadAffinity.AssertMainThread();
+            FloatingText[] snapshot = renderFloatingTexts;
+            for (int i = 0; i < snapshot.Length; i++) snapshot[i].Draw(aBatch);
+        }
+
+        internal static void BuildRenderSnapshot()
+        {
+            renderFloatingTexts = floatingTexts.ToArray();
         }
     }
 }

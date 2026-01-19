@@ -14,10 +14,12 @@ namespace Project_1.Tiles
     internal static class TileFactory
     {
         static TileData[] tileData;
+        static bool initialized;
 
-        static TileFactory()
+        public static void Init()
         {
-
+            if (initialized) return;
+            initialized = true;
             ImportData();
             //DEBUG:
             //TileManager.GenerateTiles(new Point(0), TileManager.debugSize);

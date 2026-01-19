@@ -16,9 +16,12 @@ namespace Project_1.UI.CharacterCreator
     {
 
         static string[] classNames;
+        static bool initialized;
 
-        static ClassSelector()
+        static void Init()
         {
+            if (initialized) return;
+            initialized = true;
             string root = Game1.ContentManager.RootDirectory;
             classNames = System.IO.Directory.GetFiles(root + "\\Data\\Class\\Player");
             for (int i = 0; i < classNames.Length; i++)
@@ -33,6 +36,7 @@ namespace Project_1.UI.CharacterCreator
 
         public ClassSelector(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.DarkKhaki), aPos, aSize)
         {
+            Init();
             RelativeScreenPosition size = new RelativeScreenPosition(1 / lines, 1 / rows);
             for (int i = 0; i < classNames.Length; i++)
             {

@@ -56,10 +56,14 @@ namespace Project_1.Managers.States
 
         public static States PreviousState => previousState;
         static States previousState;
+        static bool initialized;
 
-        static StateManager()
+        public static void Init()
         {
             ThreadAffinity.AssertMainThread();
+            if (initialized) return;
+            initialized = true;
+
             finalBatch = GraphicsManager.CreateSpriteBatch();
 
             startScreen = new StartScreen();
@@ -70,20 +74,9 @@ namespace Project_1.Managers.States
             loadingMenu = new LoadingMenu();
             newGame = new NewGame();
 
-
             currentState = startScreen;
             currentStateEnum = States.StartScreen;
 
-            //if (DebugManager.Mode(DebugMode.InstantlyLoadSave1)) TODO: implement
-            //{
-            //    SaveManager.LoadData();
-            //    SetState(States.Game);
-            //}
-        }
-
-        public static void Init()
-        {
-            ThreadAffinity.AssertMainThread();
             Mailboxes.Ui.Subscribe<StateChanged>(HandleUiStateChanged);
             Mailboxes.Main.Subscribe<StateChangeRequested>(e => SetState(e.State));
         }
@@ -196,6 +189,7 @@ namespace Project_1.Managers.States
         }
         public static void Draw()
         {
+            ThreadAffinity.AssertMainThread();
             if (pendingRedrawGame && ThreadAffinity.IsMainThread)
             {
                 pendingRedrawGame = false;
@@ -211,6 +205,7 @@ namespace Project_1.Managers.States
 
         internal static bool UiClick(ClickEvent aClick)
         {
+            ThreadAffinity.AssertUiThread();
             switch (currentStateEnum)
             {
                 case States.StartScreen:
@@ -232,6 +227,7 @@ namespace Project_1.Managers.States
 
         internal static bool UiRelease(ReleaseEvent aRelease)
         {
+            ThreadAffinity.AssertUiThread();
             switch (currentStateEnum)
             {
                 case States.StartScreen:
@@ -253,6 +249,7 @@ namespace Project_1.Managers.States
 
         internal static bool UiScroll(ScrollEvent aScroll)
         {
+            ThreadAffinity.AssertUiThread();
             switch (currentStateEnum)
             {
                 case States.StartScreen:
@@ -274,6 +271,7 @@ namespace Project_1.Managers.States
 
         internal static void UiUpdate()
         {
+            ThreadAffinity.AssertUiThread();
             switch (currentStateEnum)
             {
                 case States.StartScreen:
@@ -301,6 +299,7 @@ namespace Project_1.Managers.States
 
         internal static void UiOnLeave(States state)
         {
+            ThreadAffinity.AssertUiThread();
             switch (state)
             {
                 case States.Game:
@@ -325,6 +324,7 @@ namespace Project_1.Managers.States
 
         internal static void UiOnEnter(States state)
         {
+            ThreadAffinity.AssertUiThread();
             switch (state)
             {
                 case States.MoveHUD:

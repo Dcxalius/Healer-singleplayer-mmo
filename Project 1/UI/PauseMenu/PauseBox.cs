@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
+using Project_1.Managers;
 using Project_1.Managers.States;
 using Project_1.Textures;
 using Project_1.UI.UIElements.Boxes;
@@ -15,12 +16,22 @@ namespace Project_1.UI.PauseMenu
     internal class PauseBox : MenuBox
     {
         static RelativeScreenPosition pauseSize = new RelativeScreenPosition(0.2f, 0.5f);
-        static UITexture staticGfx = new UITexture("WhiteBackground", Color.DarkGray);
+        static UITexture staticGfx;
+        static bool gfxInitialized;
 
         static RelativeScreenPosition pausePos = new RelativeScreenPosition(0.5f - (pauseSize.X / 2), 0.5f - pauseSize.Y / 2);
 
 
-        public PauseBox() : base (staticGfx, pausePos, pauseSize) 
+        static UITexture EnsureGfx()
+        {
+            if (gfxInitialized) return staticGfx;
+            ThreadAffinity.AssertMainThread();
+            staticGfx = new UITexture("WhiteBackground", Color.DarkGray);
+            gfxInitialized = true;
+            return staticGfx;
+        }
+
+        public PauseBox() : base (EnsureGfx(), pausePos, pauseSize) 
         {
             AddChild(new ResumeButton(GetStartPositionFromTop, ButtonSize));
             AddChild(new OptionMenuButton(GetStartPositionFromTop, ButtonSize));

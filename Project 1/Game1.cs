@@ -3,7 +3,10 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Project_1.GameObjects;
+using Project_1.GameObjects.Doodads;
+using Project_1.GameObjects.Entities.Corspes;
 using Project_1.GameObjects.Entities.Projectiles;
+using Project_1.GameObjects.FloatingTexts;
 using Project_1.GameObjects.Spawners;
 using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Spells.AoE;
@@ -71,7 +74,6 @@ namespace Project_1
                 lock (HUDManager.UiLock)
                 {
                     Mailboxes.Ui.DispatchAll();
-                    UiTextInputManager.Update();
                 }
             }
             if (SimThread.IsRunning)
@@ -94,6 +96,10 @@ namespace Project_1
                 lock (HUDManager.UiLock)
                 {
                     Mailboxes.Ui.DispatchAll();
+                    UiTextInputManager.Update();
+                    StateManager.UiUpdate();
+                    HUDManager.Update();
+                    HUDManager.BuildDrawLists();
                 }
             }
 
@@ -102,6 +108,7 @@ namespace Project_1
 
         protected override void Draw(GameTime gameTime)
         {
+            ThreadAffinity.AssertMainThread();
             GraphicsDevice.Clear(Color.HotPink);
 
             EffectManager.EffectDraw();
@@ -116,15 +123,38 @@ namespace Project_1
             ThreadAffinity.InitMainThread();
             ThreadAffinity.AssertMainThread();
             Mailboxes.InitMainThread();
+            GraphicsManager.Init();
             DebugManager.Init();
+            ThreadingSettings.Init();
+            SaveManager.Init();
+            RandomManager.Init();
+            TimeManager.Init();
+            Camera.Camera.Init();
+            KeyBindManager.Init();
+            TileManager.Init();
+            TileFactory.Init();
             TextureManager.Init();
             EffectManager.Init();
+            ObjectFactory.Init();
+            ItemFactory.Init();
+            LootFactory.Init();
+            SpellFactory.Init();
+            ProjectileFactory.Init();
+            OptionManager.Init();
             StateManager.Init();
             HUDManager.Init();
+            ObjectManager.Init();
+            SpawnerManager.Init();
+            DoodadManager.Init();
+            FloatingTextManager.Init();
+            CorpseManager.Init();
+            ProjectileManager.Init();
+            ParticleManager.Init();
             InputEventBridge.Init();
             UiInputBridge.Init();
-            UiThread.Start();
-            SimThread.Start();
+            if (ThreadingSettings.UseWorkerThreads) WorkerPool.Start();
+            if (ThreadingSettings.UseUiThread) UiThread.Start();
+            if (ThreadingSettings.UseSimThread) SimThread.Start();
         }
     }
 }

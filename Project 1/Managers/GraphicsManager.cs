@@ -46,23 +46,34 @@ namespace Project_1.Managers
 
         static bool fullsceen = false;
 
+        static readonly object windowSizeLock = new object();
+        static bool pendingWindowSizeChange;
+        static Point pendingWindowSize;
+        static CameraSettings.WindowType pendingWindowMode;
+
         static Rectangle unCaptueredScissorRect;
         static List<(object captor, Rectangle rectangle)> scissors;
         static readonly bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-        static GraphicsManager()
+        static bool initialized;
+
+        public static void Init()
         {
             ThreadAffinity.AssertMainThread();
+            if (initialized) return;
+            initialized = true;
             scissors = new List<(object, Rectangle)>();
             //SetWindowSize(Camera.Camera.devScreenBorder, );
         }
 
         public static void SetTexture(int aIndex, Texture aTexture)
         {
+            ThreadAffinity.AssertMainThread();
             graphicsDeviceManager.GraphicsDevice.Textures[aIndex] = aTexture;
         }
 
         public static bool CaptureScissor(object aCaptor, Rectangle aRect)
         {
+            ThreadAffinity.AssertMainThread();
 
             Rectangle r = aRect;
 
@@ -81,6 +92,7 @@ namespace Project_1.Managers
 
         public static bool ReleaseScissor(object aReleaser)
         {
+            ThreadAffinity.AssertMainThread();
 
             Debug.Assert(aReleaser == scissors[scissors.Count - 1].captor);
             scissors.RemoveAt((scissors.Count - 1));
@@ -98,15 +110,40 @@ namespace Project_1.Managers
 
         public static void AssertScissorStackEmpty()
         {
+            ThreadAffinity.AssertMainThread();
             Debug.Assert(scissors.Count == 0, "Scissor stack not empty at start of UI draw.");
         }
 
 
-        public static Texture2D CreateNewTexture(Point aSize) => new Texture2D(graphicsDeviceManager.GraphicsDevice, aSize.X, aSize.Y);
-        public static SpriteBatch CreateSpriteBatch() => new SpriteBatch(graphicsDeviceManager.GraphicsDevice);
-        public static RenderTarget2D CreateRenderTarget(Point aSize) => new RenderTarget2D(graphicsDeviceManager.GraphicsDevice, aSize.X, aSize.Y);
-        public static Texture2D CreateTextureFromFile(string aPath) => Texture2D.FromFile(graphicsDeviceManager.GraphicsDevice, aPath);
-        public static void SetRenderTarget(RenderTarget2D aRenderTarget) => graphicsDeviceManager.GraphicsDevice.SetRenderTarget(aRenderTarget);
+        public static Texture2D CreateNewTexture(Point aSize)
+        {
+            ThreadAffinity.AssertMainThread();
+            return new Texture2D(graphicsDeviceManager.GraphicsDevice, aSize.X, aSize.Y);
+        }
+
+        public static SpriteBatch CreateSpriteBatch()
+        {
+            ThreadAffinity.AssertMainThread();
+            return new SpriteBatch(graphicsDeviceManager.GraphicsDevice);
+        }
+
+        public static RenderTarget2D CreateRenderTarget(Point aSize)
+        {
+            ThreadAffinity.AssertMainThread();
+            return new RenderTarget2D(graphicsDeviceManager.GraphicsDevice, aSize.X, aSize.Y);
+        }
+
+        public static Texture2D CreateTextureFromFile(string aPath)
+        {
+            ThreadAffinity.AssertMainThread();
+            return Texture2D.FromFile(graphicsDeviceManager.GraphicsDevice, aPath);
+        }
+
+        public static void SetRenderTarget(RenderTarget2D aRenderTarget)
+        {
+            ThreadAffinity.AssertMainThread();
+            graphicsDeviceManager.GraphicsDevice.SetRenderTarget(aRenderTarget);
+        }
 
         public static void SetManager(Microsoft.Xna.Framework.Game aGame)
         {
@@ -146,15 +183,46 @@ namespace Project_1.Managers
                 ClipCursor(ref windowBounds);
 
             }
+
+            if (pendingWindowSizeChange && ThreadAffinity.IsMainThread)
+            {
+                Point size;
+                CameraSettings.WindowType mode;
+                lock (windowSizeLock)
+                {
+                    if (!pendingWindowSizeChange) return;
+                    size = pendingWindowSize;
+                    mode = pendingWindowMode;
+                    pendingWindowSizeChange = false;
+                }
+                ApplyWindowSize(size, mode);
+            }
         }
 
 
         public static void ClearScreen(Color aColor)
         {
+            ThreadAffinity.AssertMainThread();
             graphicsDeviceManager.GraphicsDevice.Clear(aColor);
         }
 
         public static void SetWindowSize(Point aSize, CameraSettings.WindowType aFullscreen) //TODO: Figure out whats wrong with fullscreen.
+        {
+            if (!ThreadAffinity.IsMainThread)
+            {
+                lock (windowSizeLock)
+                {
+                    pendingWindowSize = aSize;
+                    pendingWindowMode = aFullscreen;
+                    pendingWindowSizeChange = true;
+                }
+                return;
+            }
+
+            ApplyWindowSize(aSize, aFullscreen);
+        }
+
+        static void ApplyWindowSize(Point aSize, CameraSettings.WindowType aFullscreen)
         {
             if (!AllowedSize(aSize))
             {

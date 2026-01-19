@@ -39,9 +39,12 @@ namespace Project_1.Managers
 
         public static Save CurrentSave => currentSave;
         static Save currentSave;
+        static bool initialized;
 
-        static SaveManager()
+        public static void Init()
         {
+            if (initialized) return;
+            initialized = true;
             contentRootDirectory = Game1.ContentManager.RootDirectory;
 
             saveFolder = Path.Combine(contentRootDirectory, "Saves");

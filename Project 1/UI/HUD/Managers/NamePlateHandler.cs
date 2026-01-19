@@ -15,9 +15,11 @@ namespace Project_1.UI.HUD.Managers
     {
         Dictionary<Entity, NamePlate> namePlates = new Dictionary<Entity, NamePlate>();
 
-        public void AddNamePlate(Entity aEntity, NamePlate aNamePlate)
+        public void AddNamePlate(Entity aEntity)
         {
-            namePlates.Add(aEntity, aNamePlate);
+            if (aEntity == null) return;
+            if (namePlates.ContainsKey(aEntity)) return;
+            namePlates.Add(aEntity, new NamePlate(aEntity));
             HUDManager.InvalidatePlates();
         }
 
@@ -33,6 +35,7 @@ namespace Project_1.UI.HUD.Managers
 
             foreach (KeyValuePair<Entity, NamePlate> namePlate in namePlates)
             {
+                namePlate.Value.Reposition(namePlate.Key);
                 namePlate.Value.Update();
             }
 

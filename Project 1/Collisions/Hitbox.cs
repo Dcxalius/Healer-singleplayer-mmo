@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Managers;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -17,8 +18,18 @@ namespace Project_1.Collisions
             ellipse,
             rectangle
         }
-        static Texture2D circleDebug = TextureManager.GetTexture(new GfxPath(GfxType.Debug, "DebugCircle"));
-        static Texture2D rectangleDebug = TextureManager.GetTexture(new GfxPath(GfxType.Debug, "Debug"));
+        static Texture2D circleDebug;
+        static Texture2D rectangleDebug;
+        static bool debugTexturesInitialized;
+
+        static void EnsureDebugTextures()
+        {
+            if (debugTexturesInitialized) return;
+            ThreadAffinity.AssertMainThread();
+            circleDebug = TextureManager.GetTexture(new GfxPath(GfxType.Debug, "DebugCircle"));
+            rectangleDebug = TextureManager.GetTexture(new GfxPath(GfxType.Debug, "Debug"));
+            debugTexturesInitialized = true;
+        }
 
         public HitboxType type;
 
@@ -48,6 +59,7 @@ namespace Project_1.Collisions
 
         public void Draw(SpriteBatch aBatch)
         {
+            EnsureDebugTextures();
             switch (type)
             {
                 case HitboxType.circle:

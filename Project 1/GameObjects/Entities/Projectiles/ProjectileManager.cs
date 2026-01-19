@@ -11,9 +11,13 @@ namespace Project_1.GameObjects.Entities.Projectiles
     internal static class ProjectileManager
     {
         static List<Projectile> projectiles;
+        static volatile Projectile[] renderProjectiles = Array.Empty<Projectile>();
+        static bool initialized;
 
-        static ProjectileManager()
+        public static void Init()
         {
+            if (initialized) return;
+            initialized = true;
             projectiles = new List<Projectile>();
         }
 
@@ -34,10 +38,17 @@ namespace Project_1.GameObjects.Entities.Projectiles
 
         public static void Draw(SpriteBatch aBatch)
         {
-            for (int i = 0; i < projectiles.Count; i++)
+            ThreadAffinity.AssertMainThread();
+            Projectile[] snapshot = renderProjectiles;
+            for (int i = 0; i < snapshot.Length; i++)
             {
-                projectiles[i].Draw(aBatch);
+                snapshot[i].Draw(aBatch);
             }
+        }
+
+        internal static void BuildRenderSnapshot()
+        {
+            renderProjectiles = projectiles.ToArray();
         }
     }
 }

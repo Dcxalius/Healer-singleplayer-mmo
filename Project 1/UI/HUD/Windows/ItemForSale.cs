@@ -26,16 +26,25 @@ namespace Project_1.UI.HUD.Windows
         Label goldCost;
         Image goldImage;
 
-        public readonly static RelativeScreenPosition size;
-        readonly static RelativeScreenPosition spacing;
+        public static RelativeScreenPosition size;
+        static RelativeScreenPosition spacing;
+        static bool initialized;
 
-        static ItemForSale()
+        static void Init()
         {
+            if (initialized) return;
+            initialized = true;
             size = new RelativeScreenPosition(0.4f, 0.10f);
             spacing = RelativeScreenPosition.GetSquareFromX(0.06f, size.ToAbsoluteScreenPos(Window.WindowSize.ToAbsoluteScreenPos()));
         }
 
-        public ItemForSale(RelativeScreenPosition aPos) : base(new UITexture("WhiteBackground", Color.Lavender), aPos, size)
+        static RelativeScreenPosition EnsureInitAndGetSize()
+        {
+            Init();
+            return size;
+        }
+
+        public ItemForSale(RelativeScreenPosition aPos) : base(new UITexture("WhiteBackground", Color.Lavender), aPos, EnsureInitAndGetSize())
         {
             displayItem = new Image(UITexture.Null, spacing, RelativeScreenPosition.GetSquareFromY(1f - spacing.Y * 2, size.ToAbsoluteScreenPos(Window.WindowSize.ToAbsoluteScreenPos())));
 

@@ -60,6 +60,7 @@ namespace Project_1.GameObjects
 
         public virtual void Update()
         {
+            ThreadAffinity.AssertSimThread();
             gfx.Update();
             for (int i = effects.Count - 1; i >= 0; i--)
             {
@@ -79,6 +80,7 @@ namespace Project_1.GameObjects
 
         public virtual void Draw(SpriteBatch aBatch)
         {
+            ThreadAffinity.AssertMainThread();
             Debug.Assert(gfx != null);
 
             gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition(), Color.White, FeetPosition.Y);

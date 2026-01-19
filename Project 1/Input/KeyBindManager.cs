@@ -43,9 +43,12 @@ namespace Project_1.Input
         // Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9, Keys.D0};
 
         static string rootDir;
+        static bool initialized;
 
-        static KeyBindManager()
+        public static void Init()
         {
+            if (initialized) return;
+            initialized = true;
             rootDir = Game1.ContentManager.RootDirectory;
             ImportBindings();
         }

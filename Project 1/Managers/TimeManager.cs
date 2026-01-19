@@ -14,6 +14,7 @@ namespace Project_1.Managers
         static GameTime instanceTime;
         static GameTime playTime;
         static List<Object> pausers;
+        static bool initialized;
 
         public static double SecondsSinceLastFrame => instanceTime.ElapsedGameTime.TotalSeconds;
 
@@ -26,8 +27,10 @@ namespace Project_1.Managers
         
         public static bool Paused => pausers.Count > 0;
 
-        static TimeManager()
+        public static void Init()
         {
+            if (initialized) return;
+            initialized = true;
             playTime = new GameTime();
             pausers = new List<object>();
         }

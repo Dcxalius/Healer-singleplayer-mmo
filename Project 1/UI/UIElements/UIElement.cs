@@ -94,7 +94,20 @@ namespace Project_1.UI.UIElements
         protected bool hudMoving; //Todo: Change name on these, this means the hud is in movable state, maybe even move this out
         public bool HudMoveable => hudMoveable;
         protected bool hudMoveable; //Todo: Change name on these, this means the element is movable
-        static UITexture movableGFX => new UITexture("MovableHUD", Color.White);
+        static UITexture movableGfx;
+        static bool movableGfxInitialized;
+
+        static UITexture MovableGfx
+        {
+            get
+            {
+                if (movableGfxInitialized) return movableGfx;
+                ThreadAffinity.AssertMainThread();
+                movableGfx = new UITexture("MovableHUD", Color.White);
+                movableGfxInitialized = true;
+                return movableGfx;
+            }
+        }
         Text nameText;
 
         readonly TimeSpan timeBeforeDragRegisters = TimeSpan.FromSeconds(0.2);
@@ -210,6 +223,7 @@ namespace Project_1.UI.UIElements
         #region Update
         public virtual void Update()
         {
+            ThreadAffinity.AssertUiThread();
             HoldUpdate();
             UpdateChildren();
             HoverUpdate();
@@ -218,6 +232,7 @@ namespace Project_1.UI.UIElements
 
         public void HUDMovableUpdate()
         {
+            ThreadAffinity.AssertUiThread();
             if (!hudMoveable) return;
             HoldUpdate();
         }
@@ -599,17 +614,19 @@ namespace Project_1.UI.UIElements
 
         public void HudMovableDraw(SpriteBatch aBatch)
         {
+            ThreadAffinity.AssertMainThread();
             if (!hudMoveable) return;
 
             if (gfx != null) gfx.Draw(aBatch, AbsolutePos);
 
-            movableGFX.Draw(aBatch, AbsolutePos);
+            MovableGfx.Draw(aBatch, AbsolutePos);
             nameText.CentredDraw(aBatch, Location + Size / 2);
 
         }
 
         public virtual void Draw(SpriteBatch aBatch)
         {
+            ThreadAffinity.AssertMainThread();
             if (!visible) return;
 
             if (gfx != null)

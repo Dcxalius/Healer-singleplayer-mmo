@@ -9,9 +9,12 @@ namespace Project_1.Managers
     internal static class RandomManager
     {
         static Random random;
+        static bool initialized;
 
-        static RandomManager()
+        public static void Init()
         {
+            if (initialized) return;
+            initialized = true;
             if (DebugManager.Mode(DebugMode.FalseRandom))
             {
                 random = new Random(1);

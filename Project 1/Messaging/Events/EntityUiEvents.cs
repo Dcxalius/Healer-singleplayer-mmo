@@ -71,12 +71,10 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct NamePlateAdded
     {
-        public NamePlateAdded(Project_1.UI.HUD.NamePlate plate, Entity entity)
+        public NamePlateAdded(Entity entity)
         {
-            Plate = plate;
             Entity = entity;
         }
-        public Project_1.UI.HUD.NamePlate Plate { get; }
         public Entity Entity { get; }
     }
 

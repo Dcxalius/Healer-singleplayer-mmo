@@ -19,6 +19,8 @@ using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Collections.Concurrent;
+using System.Threading;
 using static Project_1.GameObjects.Spells.AoE.AreaOfEffectData;
 
 namespace Project_1.Tiles
@@ -41,40 +43,11 @@ namespace Project_1.Tiles
         public static Chunk GetChunk(Point aPos) => GetChunk(aPos.X, aPos.Y);
         public static Chunk GetChunk(WorldSpace aSpaceInWorld) => GetChunk(new Point((int)MathF.Floor(aSpaceInWorld.X / Chunk.ChunkSize.X / TileSize.X), (int)MathF.Floor(aSpaceInWorld.Y / Chunk.ChunkSize.Y / TileSize.Y)));
 
-        static Tile transparacyGetCentre;
-        static Texture2D transparacyMap;
-        public static Texture2D GetTransparent(WorldSpace aOrigin)
-        {
-            ThreadAffinity.AssertMainThread();
-            if (transparacyGetCentre != null && transparacyGetCentre == GetTileUnder(aOrigin)) return transparacyMap;
-            transparacyGetCentre = GetTileUnder(aOrigin);
-            const int size = 65;//64 is based on HLSL code in TestDarkness.fx
-            if (transparacyMap == null) transparacyMap = GraphicsManager.CreateNewTexture(new Point(size));
-
-            Color[] data = new Color[size * size];
-
-            for (int i = 0; i < size; i++)
-            {
-                for (int j = 0; j < size; j++)
-                {
-                    Tile tile = GetTile(aOrigin + new WorldSpace(TileSize.X * (i - size / 2), TileSize.Y * (j - size / 2)));
-                    if (tile == null)
-                    {
-                        data[j * size + i] = new Color(0,0,0,0);
-                        continue;
-                    }
-
-                    if(tile.Transparent) data[j * size + i] = new Color(0, 0, 0, 0);
-                    else data[j * size + i] = new Color(1, 1, 1, 1);
-                }
-            }
-
-            transparacyMap.SetData(data);
-
-            return transparacyMap;
-        }
-
         static List<Chunk> chunks; //TODO: Use SortedList?
+        static volatile Chunk[] renderChunks = Array.Empty<Chunk>();
+        static readonly ReaderWriterLockSlim chunkLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        static readonly ConcurrentDictionary<int, int[,]> generatedChunkIds = new ConcurrentDictionary<int, int[,]>();
+        static readonly HashSet<int> pendingChunkGenerations = new HashSet<int>();
         const int surroundingChunkCheckSize = 3;// this should always be odd
 
         public static CollisionManager CollisionManager;
@@ -86,8 +59,12 @@ namespace Project_1.Tiles
 
         static PathFinder pathFinder = new PathFinder();
 
-        static TileManager()
+        static bool initialized;
+
+        public static void Init()
         {
+            if (initialized) return;
+            initialized = true;
             chunks = new List<Chunk>();
             CollisionManager = new CollisionManager();
             Debug.Assert(sizeOfSquareToCheck % 2 == 1);
@@ -97,27 +74,61 @@ namespace Project_1.Tiles
         public static void Update()
         {
             ThreadAffinity.AssertSimThread();
-            Chunk[,] surroundingChunks = new Chunk[surroundingChunkCheckSize, surroundingChunkCheckSize];
-            Chunk centreChunk = GetChunkUnder(ObjectManager.Player.FeetPosition);
-            Point centreChunkPos = GetChunkPosition(centreChunk.Id);
-            surroundingChunks[surroundingChunkCheckSize / 2, surroundingChunkCheckSize / 2] = centreChunk;
-            bool addedNew = false;
-            for (int i = 0; i < surroundingChunks.GetLength(0); i++)
+            chunkLock.EnterWriteLock();
+            try
             {
-                for (int j = 0; j < surroundingChunks.GetLength(1); j++)
+                Chunk[,] surroundingChunks = new Chunk[surroundingChunkCheckSize, surroundingChunkCheckSize];
+                Chunk centreChunk = GetChunkUnder(ObjectManager.Player.FeetPosition);
+                Point centreChunkPos = GetChunkPosition(centreChunk.Id);
+                surroundingChunks[surroundingChunkCheckSize / 2, surroundingChunkCheckSize / 2] = centreChunk;
+                bool addedNew = false;
+                int queuedPrefetch = 0;
+                int immediateRadius = surroundingChunkCheckSize / 2;
+                int prefetchRadius = immediateRadius + 1;
+
+                for (int i = 0; i < surroundingChunks.GetLength(0); i++)
                 {
-                    if (i == surroundingChunkCheckSize / 2 && j == surroundingChunkCheckSize / 2) continue;
-                    int newId = GetChunkId(centreChunkPos + new Point(i - surroundingChunkCheckSize / 2, j - surroundingChunkCheckSize / 2));
-                    surroundingChunks[i, j] = GetChunk(newId);
+                    for (int j = 0; j < surroundingChunks.GetLength(1); j++)
+                    {
+                        if (i == surroundingChunkCheckSize / 2 && j == surroundingChunkCheckSize / 2) continue;
+                        int newId = GetChunkId(centreChunkPos + new Point(i - surroundingChunkCheckSize / 2, j - surroundingChunkCheckSize / 2));
+                        surroundingChunks[i, j] = GetChunk(newId);
 
-                    if (surroundingChunks[i, j] != null) continue;
-                    addedNew = true;
+                        if (surroundingChunks[i, j] != null) continue;
+                        addedNew = true;
 
-                    surroundingChunks[i, j] = new Chunk((centreChunk.Position + new WorldSpace((i - surroundingChunkCheckSize / 2) * TileSize.X * Chunk.ChunkSize.X, (j - surroundingChunkCheckSize / 2) * TileSize.Y * Chunk.ChunkSize.Y)).ToPoint(), newId);
-                    chunks.Add(surroundingChunks[i, j]);
+                        if (!generatedChunkIds.TryRemove(newId, out int[,] tileIds))
+                        {
+                            tileIds = Chunk.GenerateTileIds(newId);
+                        }
+                        surroundingChunks[i, j] = new Chunk(tileIds, newId);
+                        chunks.Add(surroundingChunks[i, j]);
+                    }
+                }
+                if (addedNew) chunks.Sort((x, y) => x.Id.CompareTo(y.Id));
+
+                if (WorkerPool.IsRunning)
+                {
+                    for (int x = -prefetchRadius; x <= prefetchRadius && queuedPrefetch < 4; x++)
+                    {
+                        for (int y = -prefetchRadius; y <= prefetchRadius && queuedPrefetch < 4; y++)
+                        {
+                            if (Math.Abs(x) <= immediateRadius && Math.Abs(y) <= immediateRadius) continue;
+                            int id = GetChunkId(centreChunkPos + new Point(x, y));
+                            if (chunks.Any(c => c.Id == id)) continue;
+                            if (generatedChunkIds.ContainsKey(id)) continue;
+                            if (pendingChunkGenerations.Contains(id)) continue;
+
+                            QueueChunkGeneration(id);
+                            queuedPrefetch++;
+                        }
+                    }
                 }
             }
-            if (addedNew) chunks.Sort((x, y) => x.Id.CompareTo(y.Id));
+            finally
+            {
+                chunkLock.ExitWriteLock();
+            }
         }
 
         static int GetChunkId(Point aPos) => GetChunkId(aPos.X, aPos.Y);
@@ -217,7 +228,7 @@ namespace Project_1.Tiles
         public static void New()
         {
             chunks.Clear();
-            chunks.Add(new Chunk(Point.Zero, 0));
+            chunks.Add(new Chunk(Chunk.GenerateTileIds(0), 0));
         }
 
         public static void Load(Save aSave)
@@ -235,6 +246,20 @@ namespace Project_1.Tiles
 
                 
             }
+        }
+
+        static void QueueChunkGeneration(int chunkId)
+        {
+            if (!pendingChunkGenerations.Add(chunkId)) return;
+
+            WorkerPool.Enqueue(() => Chunk.GenerateTileIds(chunkId), tileIds =>
+            {
+                if (tileIds != null)
+                {
+                    generatedChunkIds[chunkId] = tileIds;
+                }
+                pendingChunkGenerations.Remove(chunkId);
+            });
         }
 
         public static float GetDragCoeficient(WorldSpace aFeetPos) => GetTileUnder(aFeetPos).DragCoeficient;
@@ -287,7 +312,32 @@ namespace Project_1.Tiles
         }
 
 
-        public static Path GetPath(WorldSpace aStartPosition, WorldSpace aTargetPosition, WorldSpace aSize) => pathFinder.GeneratePath(aStartPosition, aTargetPosition, aSize);
+        static Path GeneratePathThreadSafe(WorldSpace aStartPosition, WorldSpace aTargetPosition, WorldSpace aSize)
+        {
+            chunkLock.EnterReadLock();
+            try
+            {
+                return pathFinder.GeneratePath(aStartPosition, aTargetPosition, aSize);
+            }
+            finally
+            {
+                chunkLock.ExitReadLock();
+            }
+        }
+
+        public static Path GetPath(WorldSpace aStartPosition, WorldSpace aTargetPosition, WorldSpace aSize) => GeneratePathThreadSafe(aStartPosition, aTargetPosition, aSize);
+
+        public static void RequestPath(WorldSpace aStartPosition, WorldSpace aTargetPosition, WorldSpace aSize, Action<Path> onComplete)
+        {
+            if (onComplete == null) return;
+            if (!WorkerPool.IsRunning)
+            {
+                onComplete(GeneratePathThreadSafe(aStartPosition, aTargetPosition, aSize));
+                return;
+            }
+
+            WorkerPool.Enqueue(() => GeneratePathThreadSafe(aStartPosition, aTargetPosition, aSize), onComplete);
+        }
 
         
 
@@ -581,21 +631,31 @@ namespace Project_1.Tiles
 
         public static void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aSize)
         {
-            for (int i = 0; i < chunks.Count; i++)
+            ThreadAffinity.AssertMainThread();
+            Chunk[] snapshot = renderChunks;
+            for (int i = 0; i < snapshot.Length; i++)
             {
                 //TODO: Boundscheck before drawing
-                chunks[i].MinimapDraw(aBatch, aOrigin, aMinimapOffset, aSize);
+                snapshot[i].MinimapDraw(aBatch, aOrigin, aMinimapOffset, aSize);
             }
 
         }
 
         public static void Draw(SpriteBatch aBatch)
         {
-            foreach (var chunk in chunks)
+            ThreadAffinity.AssertMainThread();
+            Chunk[] snapshot = renderChunks;
+            for (int i = 0; i < snapshot.Length; i++)
             {
+                Chunk chunk = snapshot[i];
                 if (!Camera.Camera.WorldspaceBoundsCheck(chunk.WorldRectangle)) continue;
                 chunk.Draw(aBatch);
             }
+        }
+
+        internal static void BuildRenderSnapshot()
+        {
+            renderChunks = chunks.ToArray();
         }
     }
 }

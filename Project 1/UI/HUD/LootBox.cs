@@ -41,11 +41,11 @@ namespace Project_1.UI.HUD
 
         public Items.Item GetItem(int aIndex) => Messaging.LootState.Peek(aIndex);
 
-        public void RefreshSlot(int slot)
+        public void RefreshSlot(int slot, Items.Item snapshot)
         {
             if (loot == null) return;
             if (slot < 0 || slot >= loot.Length) return;
-            loot[slot]?.UpdateItem(Messaging.LootState.Peek(slot));
+            loot[slot]?.UpdateItem(snapshot);
         }
 
         public void Loot(LootContext lootContext, Items.Item[] snapshot)
