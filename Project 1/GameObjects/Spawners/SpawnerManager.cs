@@ -201,6 +201,15 @@ namespace Project_1.GameObjects.Spawners
             }
         }
 
+        internal static void AppendMinimapDots(List<MinimapDotSnapshot> dots)
+        {
+            ThreadAffinity.AssertSimThread();
+            for (int i = 0; i < spawnZones.Count; i++)
+            {
+                spawnZones[i].AppendMinimapDots(dots);
+            }
+        }
+
         internal static void Draw(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();

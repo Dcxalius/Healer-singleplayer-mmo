@@ -14,6 +14,20 @@ namespace Project_1.Messaging
         public static int CurrentContextId { get; private set; }
         static bool closedFromEmpty;
 
+        public static void Update()
+        {
+            if (Current == null) return;
+            if (ObjectManager.Player == null) return;
+            if (Current.Despawned || Current.IsEmpty || !Current.InDistance)
+            {
+                int contextId = CurrentContextId;
+                Current = null;
+                CurrentContextId = 0;
+                closedFromEmpty = true;
+                Mailboxes.Ui.Publish(new LootClosed(contextId));
+            }
+        }
+
         public static Item[] Open(LootDrop drop)
         {
             if (drop?.Drop != null)

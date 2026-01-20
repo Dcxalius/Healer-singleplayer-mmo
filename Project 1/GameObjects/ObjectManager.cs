@@ -79,6 +79,9 @@ namespace Project_1.GameObjects
                 All[i].Update();
             }
 
+            LootState.Update();
+            PublishPlayerUiSnapshot();
+
             if (TimeManager.TotalFrameTime % 2000 < 1) //TODO: This can cause issues at lower framerate
             {
                 for (int i = 0; i < All.Count; i++)
@@ -284,6 +287,53 @@ namespace Project_1.GameObjects
             renderEntities = entities.ToArray();
             renderNpcs = npcs.ToArray();
             renderAll = entities.Union(guild).Concat(npcs).Append(player).Where(x => x != null).ToArray();
+        }
+
+        static void PublishPlayerUiSnapshot()
+        {
+            if (player == null)
+            {
+                Mailboxes.Ui.Publish(new PlayerUiSnapshot(false, false, 0, true, 1, WorldSpace.Zero, false, WorldSpace.Zero));
+                return;
+            }
+
+            Entity target = player.Target;
+            Mailboxes.Ui.Publish(new PlayerUiSnapshot(
+                true,
+                player.InCombatOrPartyInCombat,
+                player.Gold,
+                player.OffGlobalCooldown,
+                player.RatioOfGlobalCooldownDone,
+                player.FeetPosition,
+                target != null,
+                target?.FeetPosition ?? WorldSpace.Zero));
+        }
+
+        internal static void AppendMinimapDots(List<MinimapDotSnapshot> dots)
+        {
+            if (dots == null) return;
+            if (player != null)
+            {
+                dots.Add(new MinimapDotSnapshot(player.FeetPosition, player.MinimapColor));
+            }
+            for (int i = 0; i < entities.Count; i++)
+            {
+                Entity entity = entities[i];
+                if (entity == null) continue;
+                dots.Add(new MinimapDotSnapshot(entity.FeetPosition, entity.MinimapColor));
+            }
+            for (int i = 0; i < guild.Count; i++)
+            {
+                GuildMember member = guild[i];
+                if (member == null) continue;
+                dots.Add(new MinimapDotSnapshot(member.FeetPosition, member.MinimapColor));
+            }
+            for (int i = 0; i < npcs.Count; i++)
+            {
+                Npc npc = npcs[i];
+                if (npc == null) continue;
+                dots.Add(new MinimapDotSnapshot(npc.FeetPosition, npc.MinimapColor));
+            }
         }
     }
 }

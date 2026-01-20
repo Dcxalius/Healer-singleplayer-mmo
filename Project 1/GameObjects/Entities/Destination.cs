@@ -30,7 +30,7 @@ namespace Project_1.GameObjects.Entities
             }
         }
 
-        public bool HasDestination => CurrentPath != null;
+        public bool HasDestination => destination.HasValue || paths.Count > 0 || pendingAddRequests > 0 || pathRequestInFlight;
         public WorldSpace DirectionToWalk => directionToWalk;
         public float LengthTo => lengthTo;
         float lengthTo; 
@@ -40,16 +40,16 @@ namespace Project_1.GameObjects.Entities
         Entity owner;
         private void CheckIfClear()
         {
-            if (!HasDestination) return;
+            if (paths.Count == 0) return;
 
-            if (CurrentPath.Count == 0) paths.RemoveAt(0);
+            if (paths[0].Count == 0) paths.RemoveAt(0);
         }
 
         Path CurrentPath
         {
             get
             {
-                if (paths.Count == 0) return new Path(new List<WorldSpace>() { owner.FeetPosition });
+                if (paths.Count == 0) return null;
                 return paths[0];
             }
         }
@@ -57,6 +57,9 @@ namespace Project_1.GameObjects.Entities
         List<Path> paths;
         WorldSpace? destination;
         bool pathRequestInFlight;
+        int pendingAddRequests;
+        Entity lastTarget;
+        WorldSpace lastTargetPosition;
         WorldSpace? pendingTarget;
         int overwriteToken;
         int requestToken;
@@ -80,6 +83,16 @@ namespace Project_1.GameObjects.Entities
             if (!HasDestination) destination = null;
             if (owner.Target == null && CurrentPath != null && destination == null)
             {
+                if (CurrentPath.Count == 0)
+                {
+                    CheckIfClear();
+                    if (CurrentPath == null)
+                    {
+                        directionToWalk = WorldSpace.Zero;
+                        lengthTo = 0;
+                        return;
+                    }
+                }
                 destination = CurrentPath.ComsumeNextPoint;
             }
 
@@ -92,8 +105,43 @@ namespace Project_1.GameObjects.Entities
 
             if (owner.Target != null)
             {
-                OverwriteDestination(owner.Target.FeetPosition);
-                destination = CurrentPath.ComsumeNextPoint;
+                WorldSpace targetPos = owner.Target.FeetPosition;
+                if (lastTarget != owner.Target)
+                {
+                    lastTarget = owner.Target;
+                    lastTargetPosition = targetPos;
+                    OverwriteDestination(targetPos);
+                }
+                else if (targetPos != lastTargetPosition)
+                {
+                    lastTargetPosition = targetPos;
+                    OverwriteDestination(targetPos);
+                }
+
+                if (destination == null && CurrentPath != null)
+                {
+                    if (CurrentPath.Count == 0)
+                    {
+                        CheckIfClear();
+                        if (CurrentPath == null)
+                        {
+                            directionToWalk = WorldSpace.Zero;
+                            lengthTo = 0;
+                            return;
+                        }
+                    }
+                    destination = CurrentPath.ComsumeNextPoint;
+                }
+                if (destination == null)
+                {
+                    directionToWalk = WorldSpace.Zero;
+                    lengthTo = 0;
+                    return;
+                }
+            }
+            else
+            {
+                lastTarget = null;
             }
 
             UpdateDirection(destination.Value);
@@ -120,10 +168,9 @@ namespace Project_1.GameObjects.Entities
             }
             else
             {
-                if (LengthTo < aAttackRange - owner.Target.Size.X / 2 - owner.Size.X / 2)
+                float distanceToTarget = (owner.Target.FeetPosition - owner.FeetPosition).ToVector2().Length();
+                if (distanceToTarget < aAttackRange - owner.Target.Size.X / 2 - owner.Size.X / 2)
                 {
-                    CheckIfClear();
-                    destination = null;
                     return WorldSpace.Zero;
                 }
             }
@@ -173,8 +220,10 @@ namespace Project_1.GameObjects.Entities
             Path lastPath = paths.Count > 0 ? paths[paths.Count - 1] : null;
             WorldSpace start = lastPath != null ? lastPath.CheckLastSpace : owner.FeetPosition;
             int localOverwriteToken = overwriteToken;
+            pendingAddRequests++;
             TileManager.RequestPath(start, aDestination, new WorldSpace(owner.FeetSize), pathToAdd =>
             {
+                if (pendingAddRequests > 0) pendingAddRequests--;
                 if (localOverwriteToken != overwriteToken) return;
                 if (pathToAdd != null)
                 {

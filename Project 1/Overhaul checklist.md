@@ -48,6 +48,17 @@
 - Window size changes are queued if requested off the main thread and applied during `GraphicsManager.Update`.
 - Debug cheat dialogue creation now uses a UI-safe event payload; UI thread constructs the DialogueBox.
 - UI font access now uses `FontCache` (initialized on main thread) instead of calling `TextureManager` from UI thread.
+- Gossip data is now UI-constructed: sim publishes raw gossip data, UI builds `GossipOption` objects on the UI thread.
+- Removed UI enum dependency from sim: `GuildInviteStatusUpdated` now uses `InviteStatus`, mapped to UI states in HUDManager.
+- Gossip/shop range checks now live on the sim thread (UI windows no longer read live NPC/player positions).
+- Loot range checks now live on the sim thread (loot UI no longer reads live player position).
+- Minimap origin/dots/camera-rect now use render snapshot data (dots include active spawns, not spawner positions) with no UI `ObjectManager` access.
+- UI no longer reads `ObjectManager.Player` for save checks, spellbar GCD, shop purchases, or plate targeting; player UI snapshots now feed those UI paths.
+- Party invite/kick requests now flow through sim-thread commands; plate buff box no longer grabs `ObjectManager.Player` during init.
+- Inventory/loot UI now routes actions through sim-thread commands and avoids direct `ObjectManager.Player` access.
+- Loot UI no longer peeks `LootState`; all loot rendering uses UI snapshots.
+- Loot close handling is now sim-driven only; HUD no longer mutates `LootState`.
+- Main menu reset + new player creation now go through sim-thread commands (no UI `ObjectManager` calls).
 
 ## In Progress / Partial
 - Render cache: transparency/minimap done; verify no remaining GPU work in gameplay (e.g., other helpers).

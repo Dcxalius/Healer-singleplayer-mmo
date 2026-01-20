@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Project_1.UI.HUD.Windows.Gossip;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,16 +18,19 @@ namespace Project_1.GameObjects.Entities.Npcs
             Data
         }
 
-        public ChatGossipOption Start => gossipOptions[0] as ChatGossipOption;
-        private GossipOption[] gossipOptions;
+        public string[][] Options => options;
+        public int[][] LinkTree => linkTree;
+        public int StartIndex => 0;
+        string[][] options;
+        int[][] linkTree;
         
 
         [JsonConstructor]
         GossipData(string[][] gossipOptions, int[][] linkTree) //TODO: Think if these two should be merge to a tuple with string, custom class for type, custom class for data, int[] for links
         {
             Asserts(gossipOptions, linkTree);
-            CreateGossipObjects(gossipOptions);
-            LinkGossipObjects(linkTree);
+            options = gossipOptions;
+            this.linkTree = linkTree;
         }
         
         void Asserts(string[][] aOptions, int[][] aLinkTree)
@@ -54,41 +56,5 @@ namespace Project_1.GameObjects.Entities.Npcs
             }
         }
 
-        void CreateGossipObjects(string[][] aOptions)
-        {
-            gossipOptions = new GossipOption[aOptions.Length];
-            for (int i = 0; i < aOptions.Length; i++)
-            {
-                GossipOption gossipOption;
-
-                switch (aOptions[i][(int)optionsContext.Type])
-                {
-                    case "C":
-                        //Chat
-                        gossipOption = new ChatGossipOption(aOptions[i][(int)optionsContext.GossipHeader], aOptions[i][(int)optionsContext.Data]);
-                        break;
-                    case "S":
-                        //Shop
-                        gossipOption = new ShopGossipOption(aOptions[i][(int)optionsContext.GossipHeader], aOptions[i][(int)optionsContext.Data]);
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
-
-                gossipOptions[i] = gossipOption;
-            }
-        }
-
-        void LinkGossipObjects(int[][] aLinkTree)
-        {
-            for (int i = 0; i < aLinkTree.Length; i++)
-            {
-                if (gossipOptions[i] is not ChatGossipOption) continue;
-                for (int j = 0; j < aLinkTree[i].Length; j++)
-                {
-                    (gossipOptions[i] as ChatGossipOption).AddGossipOption(gossipOptions[aLinkTree[i][j]]);
-                }
-            }
-        }
     }
 }

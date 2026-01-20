@@ -1,9 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.GuildMembers;
 using Project_1.Input;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements;
 using System;
@@ -82,7 +83,7 @@ namespace Project_1.UI.HUD.PlateBoxes
         {
             base.ClickedOnAndReleasedOnMe();
 
-            ObjectManager.Player.SetTarget(guildMember);
+            Mailboxes.Main.Publish(new TargetRequested(guildMember));
         }
 
         protected override bool ClickedOnChildren(ClickEvent aClick)

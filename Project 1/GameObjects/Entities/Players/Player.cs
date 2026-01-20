@@ -15,7 +15,6 @@ using Project_1.Textures.AnimatedTextures;
 using Project_1.Items;
 using Project_1.GameObjects.Spells;
 using Project_1.Camera;
-using Project_1.UI.UIElements.Buttons;
 using System.Diagnostics;
 using Project_1.UI.HUD.Managers;
 using Project_1.GameObjects.Unit;
@@ -106,7 +105,7 @@ namespace Project_1.GameObjects.Entities.Players
             }
 
 
-            Mailboxes.Ui.Publish(new GuildInviteStatusUpdated(partyMembers.ToList(), Enumerable.Repeat(TwoStateGFXButton.State.Second, partyMembers.Length).ToList()));
+            Mailboxes.Ui.Publish(new GuildInviteStatusUpdated(partyMembers.ToList(), Enumerable.Repeat(InviteStatus.Accepted, partyMembers.Length).ToList()));
         }
 
         void KeyboardWalk()

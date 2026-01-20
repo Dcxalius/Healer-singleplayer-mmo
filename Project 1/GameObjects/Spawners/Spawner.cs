@@ -137,6 +137,12 @@ namespace Project_1.GameObjects.Spawners
             spawn.MinimapDraw(aBatch, aOrigin, aMinimapOffset, aMinimapSize);
         }
 
+        internal void AppendMinimapDots(List<MinimapDotSnapshot> dots)
+        {
+            if (spawn == null || dots == null) return;
+            dots.Add(new MinimapDotSnapshot(spawn.FeetPosition, spawn.MinimapColor));
+        }
+
         internal void Draw(SpriteBatch aBatch)
         {
             if (spawn == null) return;

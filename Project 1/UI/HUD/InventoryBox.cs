@@ -148,11 +148,11 @@ namespace Project_1.UI.HUD
         {
             if (aBag >= 0)
             {
-                bagBox[aBag].RefreshSlot(aSlot);
+                bagBox[aBag].RefreshSlot(aSlot, aInventory);
                 return;
             }
 
-            bagHolderBox.RefreshSlot(aSlot);
+            bagHolderBox.RefreshSlot(aSlot, aInventory);
             if (aInventory.Bags[aSlot] == null)
             {
                 bagBox[aSlot].Empty();

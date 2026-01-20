@@ -1,8 +1,6 @@
 ﻿using Project_1.Camera;
 using Project_1.GameObjects.Unit;
 using Project_1.Input;
-using Project_1.UI.HUD.Managers;
-using Project_1.UI.HUD.Windows.Gossip;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using System;
@@ -17,6 +15,7 @@ namespace Project_1.GameObjects.Entities.Npcs
     {
         const float speakRange = 100f;
         GossipData gossip;
+        static Npc activeConversation;
 
         public bool InConversationRange(WorldSpace aFeetPos) => aFeetPos.DistanceTo(FeetPosition) < speakRange;
 
@@ -31,7 +30,18 @@ namespace Project_1.GameObjects.Entities.Npcs
 
             if (!InConversationRange(ObjectManager.Player.FeetPosition)) return;
 
-            Mailboxes.Ui.Publish(new GossipOpened(gossip.Start, this));
+            BeginConversation(this);
+            Mailboxes.Ui.Publish(new GossipOpened(gossip));
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (activeConversation != this) return;
+            var player = ObjectManager.Player;
+            if (player == null) return;
+            if (InConversationRange(player.FeetPosition)) return;
+            EndConversation();
         }
 
         public override void ExpToParty(int aExpAmount)
@@ -42,6 +52,21 @@ namespace Project_1.GameObjects.Entities.Npcs
         protected override bool CheckForRelation()
         {
             throw new NotImplementedException();
+        }
+
+        static void BeginConversation(Npc npc)
+        {
+            if (activeConversation == npc) return;
+            EndConversation();
+            activeConversation = npc;
+        }
+
+        static void EndConversation()
+        {
+            if (activeConversation == null) return;
+            activeConversation = null;
+            Mailboxes.Ui.Publish(new GossipClosed());
+            Mailboxes.Ui.Publish(new ShopClosed());
         }
     }
 }

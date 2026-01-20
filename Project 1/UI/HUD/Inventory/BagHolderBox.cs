@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
-using Project_1.GameObjects;
+using Project_1.Items;
 using Project_1.Items.SubTypes;
 using Project_1.Textures;
 using Project_1.UI.HUD;
@@ -36,21 +36,20 @@ namespace Project_1.UI.HUD.Inventory
 
                 if (aBags[i] == null)
                 {
-                    bags[i - 1] = new Item(-1, i, true, Color.DarkGray, new GfxPath(GfxType.Item, null), pos, size);
+                    bags[i - 1] = new Item(-1, i, true, (Items.Item)null, pos, size);
                 }
                 else
                 {
-                    bags[i - 1] = new Item(-1, i, true, aBags[i].ItemQualityColor, aBags[i].GfxPath, pos, size);
+                    bags[i - 1] = new Item(-1, i, true, aBags[i], pos, size);
                 }
             }
 
             AddChildren(bags);
         }
 
-        public void RefreshSlot(int aSlot)
+        public void RefreshSlot(int aSlot, Items.Inventory aInventory)
         {
-
-            bags[aSlot - 1].AssignItem(ObjectManager.Player.Inventory.Bags[aSlot]);
+            bags[aSlot - 1].AssignItem(aInventory.Bags[aSlot]);
         }
 
         public override void Rescale()

@@ -51,18 +51,18 @@ namespace Project_1.UI.HUD.Managers
 
         }
 
-        public void OpenShopWindow(ShopGossipOption aShop, Npc aNpc)
+        public void OpenShopWindow(int[] itemIds)
         {
             shopWindow.OpenWindow();
-            shopWindow.OpenShop(aShop, aNpc);
+            shopWindow.OpenShop(itemIds);
             HUDManager.InvalidateUi();
         }
 
-        public void OpenGossipWindow(ChatGossipOption aIntro, Npc aNpc)
+        public void OpenGossipWindow(GossipData aData)
         {
             gossipWindow.OpenWindow();
             gossipWindow.ResetOptions();
-            gossipWindow.Set(aIntro, aNpc);
+            gossipWindow.Set(aData);
             HUDManager.InvalidateUi();
             //gossipWindow.SetIntro(aIntro);
             //gossipWindow.AddOptions(aGossipOption);
@@ -71,6 +71,13 @@ namespace Project_1.UI.HUD.Managers
         public void CloseGossipWindow()
         {
             gossipWindow.CloseWindow();
+            HUDManager.InvalidateUi();
+        }
+
+        public void CloseShopWindow()
+        {
+            shopWindow.ClearShop();
+            shopWindow.CloseWindow();
             HUDManager.InvalidateUi();
         }
 

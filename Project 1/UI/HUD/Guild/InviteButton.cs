@@ -1,19 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Project_1.Camera;
-using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.GuildMembers;
-using Project_1.Managers;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
-using Project_1.Tiles;
+using Project_1.Camera;
 using Project_1.UI.UIElements.Buttons;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project_1.UI.HUD.Guild
 {
@@ -31,15 +25,12 @@ namespace Project_1.UI.HUD.Guild
 
         void Invite()
         {
-            Debug.Assert(!ObjectManager.Player.Party.IsInParty(guildMember));
-            ObjectManager.SpawnGuildMemberToParty(guildMember, null);
-
+            Mailboxes.Main.Publish(new PartyMemberInviteRequested(guildMember));
         }
 
         void Kick()
         {
-            Debug.Assert(ObjectManager.Player.Party.IsInParty(guildMember));
-            ObjectManager.RemoveGuildMemberFromParty(guildMember);
+            Mailboxes.Main.Publish(new PartyMemberKickRequested(guildMember));
         }
 
     }

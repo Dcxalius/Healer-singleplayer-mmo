@@ -1,8 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects;
-using Project_1.GameObjects.Entities;
-using Project_1.GameObjects.Entities.Npcs;
 using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.UI.HUD.Inventory;
@@ -24,7 +21,6 @@ namespace Project_1.UI.HUD.Windows
         int maxPages;
 
 
-        Npc shopKeeper;
         ItemForSale[] itemsForSale;
         int[] itemIDsInShop;
         public ShopWindow() : base(new UITexture("WhiteBackground", Color.Lime))
@@ -50,20 +46,12 @@ namespace Project_1.UI.HUD.Windows
         {
             base.Update();
 
-            if (shopKeeper != null)
-            {
-                if (!shopKeeper.InConversationRange(ObjectManager.Player.FeetPosition))
-                {
-                    ClearShop();
-                    CloseWindow();
-                }
-            }
+            // Shop range checks are handled on the simulation thread.
         }
 
         void PressRightArrow()
         {
             if (currentPage + 1 == maxPages) return;
-            if (shopKeeper == null) return;
             if (itemIDsInShop.Length > 10 * maxPages) return;
 
             currentPage += 1;
@@ -74,8 +62,6 @@ namespace Project_1.UI.HUD.Windows
         void PressLeftArrow()
         {
             if (currentPage == 0) return;
-            if (shopKeeper == null) return;
-
             currentPage -= 1;
 
             SetNewPage();
@@ -98,14 +84,13 @@ namespace Project_1.UI.HUD.Windows
             }
         }
 
-        public void OpenShop(ShopGossipOption aSO, Npc aShopKeeper)
+        public void OpenShop(int[] itemIds)
         {
-            itemIDsInShop = aSO.ItemIDsInShop;
-            shopKeeper = aShopKeeper;
+            itemIDsInShop = itemIds ?? Array.Empty<int>();
             for (int i = 0; i < itemsForSale.Length; i++)
             {
                 if (itemIDsInShop.Length <= i) break;
-                itemsForSale[i].Set(aSO.ItemIDsInShop[i]);
+                itemsForSale[i].Set(itemIDsInShop[i]);
             }
 
             maxPages = (int)MathF.Floor(itemIDsInShop.Length / 10) + 1;
@@ -119,7 +104,6 @@ namespace Project_1.UI.HUD.Windows
             {
                 itemsForSale[i].Clear();
             }
-            shopKeeper = null;
         }
     }
 }

@@ -1,10 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects;
-using Project_1.GameObjects.Entities;
-using Project_1.Input;
 using Project_1.Items;
-using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.HUD.Inventory;
@@ -38,8 +34,6 @@ namespace Project_1.UI.HUD
             Dragable = true;
             hudMoveable = false;
         }
-
-        public Items.Item GetItem(int aIndex) => Messaging.LootState.Peek(aIndex);
 
         public void RefreshSlot(int slot, Items.Item snapshot)
         {
@@ -85,30 +79,6 @@ namespace Project_1.UI.HUD
                 loot[indexToHide[i]].Visible = false;
             }
             scrollableComponent.SetScrollValue(0f);
-        }
-
-        public override void Update()
-        {
-            base.Update();
-
-            CheckIfShouldClose();
-        }
-
-        void CheckIfShouldClose()
-        {
-            CheckIfOutOfRange();
-        }
-
-        bool CheckIfOutOfRange()
-        {
-            if (context.AllowedDistance <= 0f) return false;
-            if (context.Despawned) { StopLoot(); return true; }
-            if (context.Position.DistanceTo(ObjectManager.Player.FeetPosition) > context.AllowedDistance)
-            {
-                StopLoot();
-                return true;
-            }
-            return false;
         }
 
         public void CloseIfContext(int id)

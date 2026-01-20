@@ -1,8 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
-using Project_1.GameObjects;
 using Project_1.Managers.States;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.UI.UIElements.Buttons;
 using System;
 using System.Collections.Generic;
@@ -22,8 +23,7 @@ namespace Project_1.UI.PauseMenu
 
         public override void ClickedOnAndReleasedOnMe()
         {
-            StateManager.RequestStateChange(StateManager.States.StartScreen);
-            ObjectManager.Reset();
+            Mailboxes.Main.Publish(new ResetToMainMenuRequested());
             base.ClickedOnAndReleasedOnMe();
         }
     }

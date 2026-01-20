@@ -1,3 +1,4 @@
+using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Doodads;
 using Project_1.GameObjects.Entities.Corspes;
@@ -16,12 +17,14 @@ namespace Project_1.Managers
             ThreadAffinity.AssertSimThread();
             TileManager.BuildRenderSnapshot();
             ObjectManager.BuildRenderSnapshot();
+            Camera.Camera.BuildMinimapSnapshot();
             ProjectileManager.BuildRenderSnapshot();
             DoodadManager.BuildRenderSnapshot();
             CorpseManager.BuildRenderSnapshot();
             SpawnerManager.BuildRenderSnapshot();
             ParticleManager.BuildRenderSnapshot();
             FloatingTextManager.BuildRenderSnapshot();
+            MinimapSnapshotManager.BuildSnapshot();
         }
     }
 }

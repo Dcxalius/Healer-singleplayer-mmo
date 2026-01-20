@@ -9,6 +9,7 @@ using Project_1.Items;
 using Project_1.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
+using Project_1.Textures;
 using Project_1.UI;
 using Project_1.UI.HUD.Inventory;
 using Project_1.UI.HUD.SpellBook;
@@ -137,7 +138,6 @@ namespace Project_1.UI.HUD.Managers
             });
             Mailboxes.Ui.Subscribe<LootClosed>(e =>
             {
-                LootState.Close(e.ContextId);
                 lootBox.CloseIfContext(e.ContextId);
                 InvalidateUi();
             });
@@ -216,13 +216,19 @@ namespace Project_1.UI.HUD.Managers
                 }
             });
             Mailboxes.Ui.Subscribe<GoldChanged>(e => RefreshGold(e.Gold));
+            Mailboxes.Ui.Subscribe<PlayerUiSnapshot>(e => UiPlayerStateCache.Update(e));
             Mailboxes.Ui.Subscribe<GuildInviteStatusUpdated>(e =>
             {
-                windowHandler.SetGuildMemberInviteStatus(
-                    e.MemberNames as System.Collections.Generic.List<string>
-                        ?? new System.Collections.Generic.List<string>(e.MemberNames),
-                    e.Statuses as System.Collections.Generic.List<Project_1.UI.UIElements.Buttons.TwoStateGFXButton.State>
-                        ?? new System.Collections.Generic.List<Project_1.UI.UIElements.Buttons.TwoStateGFXButton.State>(e.Statuses));
+                var memberNames = e.MemberNames as System.Collections.Generic.List<string>
+                    ?? new System.Collections.Generic.List<string>(e.MemberNames);
+                var statuses = new System.Collections.Generic.List<Project_1.UI.UIElements.Buttons.TwoStateGFXButton.State>(e.Statuses.Count);
+                for (int i = 0; i < e.Statuses.Count; i++)
+                {
+                    statuses.Add(e.Statuses[i] == InviteStatus.Accepted
+                        ? Project_1.UI.UIElements.Buttons.TwoStateGFXButton.State.Second
+                        : Project_1.UI.UIElements.Buttons.TwoStateGFXButton.State.First);
+                }
+                windowHandler.SetGuildMemberInviteStatus(memberNames, statuses);
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<BuffAdded>(e =>
@@ -233,12 +239,22 @@ namespace Project_1.UI.HUD.Managers
             });
             Mailboxes.Ui.Subscribe<GossipOpened>(e =>
             {
-                windowHandler.OpenGossipWindow(e.Start, e.Npc);
+                windowHandler.OpenGossipWindow(e.Data);
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<GossipClosed>(_ =>
+            {
+                windowHandler.CloseGossipWindow();
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<ShopOpened>(e =>
             {
-                windowHandler.OpenShopWindow(e.Shop, e.Npc);
+                windowHandler.OpenShopWindow(e.ItemIds);
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<ShopClosed>(_ =>
+            {
+                windowHandler.CloseShopWindow();
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<DescriptorBoxSet>(e =>
@@ -509,7 +525,7 @@ namespace Project_1.UI.HUD.Managers
         {
             AssertUiThreadOrMainFallback();
             UITexture background = e.Background == null ? UITexture.Null : new UITexture(e.Background, Color.White);
-            DialogueBox box = new DialogueBox(e.Text, e.TextColor, e.Location, e.Pauses, e.Title, background, e.Pos, e.Size, e.CloseText);
+            DialogueBox box = new DialogueBox(e.Text, e.TextColor, e.Location, e.Pauses, new List<Action>(), background, e.Pos, e.Size, e.CloseText);
             dialogueBoxes.Add(box);
             InvalidateUi();
         }

@@ -1,4 +1,5 @@
-﻿using Project_1.GameObjects.Entities;
+﻿using Project_1.Camera;
+using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Spells;
 using System.Collections.Generic;
@@ -57,6 +58,16 @@ namespace Project_1.Messaging.Events
             Target = target;
         }
         public Entity Owner { get; }
+        public Entity Target { get; }
+    }
+
+    internal readonly struct TargetRequested
+    {
+        public TargetRequested(Entity target)
+        {
+            Target = target;
+        }
+
         public Entity Target { get; }
     }
 
@@ -161,15 +172,45 @@ namespace Project_1.Messaging.Events
         public int Gold { get; }
     }
 
+    internal readonly struct PlayerUiSnapshot
+    {
+        public PlayerUiSnapshot(bool valid, bool inCombatOrPartyInCombat, int gold, bool offGlobalCooldown, double globalCooldownRatio, WorldSpace playerFeet, bool hasTarget, WorldSpace targetFeet)
+        {
+            Valid = valid;
+            InCombatOrPartyInCombat = inCombatOrPartyInCombat;
+            Gold = gold;
+            OffGlobalCooldown = offGlobalCooldown;
+            GlobalCooldownRatio = globalCooldownRatio;
+            PlayerFeet = playerFeet;
+            HasTarget = hasTarget;
+            TargetFeet = targetFeet;
+        }
+
+        public bool Valid { get; }
+        public bool InCombatOrPartyInCombat { get; }
+        public int Gold { get; }
+        public bool OffGlobalCooldown { get; }
+        public double GlobalCooldownRatio { get; }
+        public WorldSpace PlayerFeet { get; }
+        public bool HasTarget { get; }
+        public WorldSpace TargetFeet { get; }
+    }
+
+    internal enum InviteStatus
+    {
+        Pending,
+        Accepted
+    }
+
     internal readonly struct GuildInviteStatusUpdated
     {
-        public GuildInviteStatusUpdated(IList<string> memberNames, IList<Project_1.UI.UIElements.Buttons.TwoStateGFXButton.State> statuses)
+        public GuildInviteStatusUpdated(IList<string> memberNames, IList<InviteStatus> statuses)
         {
             MemberNames = memberNames;
             Statuses = statuses;
         }
         public IList<string> MemberNames { get; }
-        public IList<Project_1.UI.UIElements.Buttons.TwoStateGFXButton.State> Statuses { get; }
+        public IList<InviteStatus> Statuses { get; }
     }
 
     internal readonly struct BuffAdded
@@ -185,12 +226,14 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct GossipOpened
     {
-        public GossipOpened(Project_1.UI.HUD.Windows.Gossip.ChatGossipOption start, Project_1.GameObjects.Entities.Npcs.Npc npc)
+        public GossipOpened(Project_1.GameObjects.Entities.Npcs.GossipData data)
         {
-            Start = start;
-            Npc = npc;
+            Data = data;
         }
-        public Project_1.UI.HUD.Windows.Gossip.ChatGossipOption Start { get; }
-        public Project_1.GameObjects.Entities.Npcs.Npc Npc { get; }
+        public Project_1.GameObjects.Entities.Npcs.GossipData Data { get; }
+    }
+
+    internal readonly struct GossipClosed
+    {
     }
 }

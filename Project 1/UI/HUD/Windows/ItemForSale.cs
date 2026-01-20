@@ -1,11 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects;
 using Project_1.Items;
 using Project_1.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
+using Project_1.UI;
 using Project_1.UI.HUD.Inventory;
 using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements;
@@ -85,10 +85,10 @@ namespace Project_1.UI.HUD.Windows
 
             if (itemForSale == null) return;
 
-            if (itemForSale.Cost > ObjectManager.Player.Gold) return; //TODO: Print error msg
+            if (!UiPlayerStateCache.Valid) return;
+            if (itemForSale.Cost > UiPlayerStateCache.Gold) return; //TODO: Print error msg
 
-            ObjectManager.Player.ChangeGold(-itemForSale.Cost);
-            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(itemForSale.ID, itemForSale.Count));
+            Mailboxes.Main.Publish(new ShopPurchaseRequested(itemForSale.ID, itemForSale.Count));
         }
 
         public void Set(int aItemID)

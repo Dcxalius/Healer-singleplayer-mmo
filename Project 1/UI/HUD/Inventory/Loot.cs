@@ -1,8 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects;
 using Project_1.Input;
 using Project_1.Items;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.HUD;
 using Project_1.UI.UIElements;
@@ -35,7 +36,7 @@ namespace Project_1.UI.HUD.Inventory
         {
             slotIndex = aSlotIndex;
             if (aItem == null) return;
-            item = new Item(-2, aSlotIndex, true, aItem.ItemQualityColor, aPath, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
+            item = new Item(-2, aSlotIndex, true, aItem, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
             itemName = new Label(aItem.Name, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreLeft, aItem.ItemQualityColor);
             AddChild(item);
             AddChild(itemName);
@@ -81,7 +82,7 @@ namespace Project_1.UI.HUD.Inventory
             if (item == null)
             {
                 // recreate if previously hidden
-                item = new Item(-2, slotIndex, true, aItem.ItemQualityColor, aItem.GfxPath, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
+                item = new Item(-2, slotIndex, true, aItem, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
                 AddChild(item);
             }
 
@@ -104,7 +105,7 @@ namespace Project_1.UI.HUD.Inventory
             if (heldEvents.ClickThatCreated != InputManager.ClickType.Right) return;
 
 
-            ObjectManager.Player.Inventory.LootItem(item.slotIndex);
+            Mailboxes.Main.Publish(new LootItemRequested(item.slotIndex, null));
 
             base.ClickedOnAndReleasedOnMe();
         }

@@ -50,6 +50,24 @@ namespace Project_1.Messaging.Events
         public GuildMemberEntity Member { get; }
     }
 
+    internal readonly struct PartyMemberInviteRequested
+    {
+        public PartyMemberInviteRequested(GuildMemberEntity member)
+        {
+            Member = member;
+        }
+        public GuildMemberEntity Member { get; }
+    }
+
+    internal readonly struct PartyMemberKickRequested
+    {
+        public PartyMemberKickRequested(GuildMemberEntity member)
+        {
+            Member = member;
+        }
+        public GuildMemberEntity Member { get; }
+    }
+
     internal readonly struct GuildMembersSet
     {
         public GuildMembersSet(Friendly[] members)

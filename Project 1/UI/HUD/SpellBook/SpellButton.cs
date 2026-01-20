@@ -9,9 +9,10 @@ using Project_1.Input;
 using Project_1.Managers;
 using Project_1.GameObjects.Spells;
 using Microsoft.Xna.Framework.Graphics;
-using Project_1.GameObjects;
-using Project_1.GameObjects.Entities.Players;
 using Project_1.Camera;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
+using Project_1.UI;
 using Project_1.UI.UIElements.Buttons;
 
 namespace Project_1.UI.HUD.SpellBook
@@ -52,8 +53,8 @@ namespace Project_1.UI.HUD.SpellBook
             if (spellData == null) return;
 
             onCooldownGfx.Update();
-            onCooldownGfx.Ratio = (float)Math.Min(spellData.RatioOfCooldownDone, ObjectManager.Player.RatioOfGlobalCooldownDone); //TODO: Consider splitting the cd effect to two seperate ones
-            if (spellData.OffCooldown && ObjectManager.Player.OffGlobalCooldown) onCooldownGfx.Ratio = 0;
+            onCooldownGfx.Ratio = (float)Math.Min(spellData.RatioOfCooldownDone, UiPlayerStateCache.GlobalCooldownRatio); //TODO: Consider splitting the cd effect to two seperate ones
+            if (spellData.OffCooldown && UiPlayerStateCache.OffGlobalCooldown) onCooldownGfx.Ratio = 0;
 
 
             if (UiKeyBindStateCache.GetPress(keyListner))
@@ -61,13 +62,12 @@ namespace Project_1.UI.HUD.SpellBook
                 Triggered();
             }
 
-            Player P = ObjectManager.Player;
-            if (P.Target == null)
+            if (!UiPlayerStateCache.HasTarget)
             {
                 gfx.Color = Color.White;
                 return;
             }
-            if (P.Target.FeetPosition.DistanceTo(P.FeetPosition) > spellData.CastDistance) gfx.Color = Color.Red;
+            if (UiPlayerStateCache.TargetFeet.DistanceTo(UiPlayerStateCache.PlayerFeet) > spellData.CastDistance) gfx.Color = Color.Red;
             else gfx.Color = Color.White;
         }
 
@@ -90,7 +90,7 @@ namespace Project_1.UI.HUD.SpellBook
         {
             if (spellData == null) return;
 
-            ObjectManager.Player.StartCast(spellData);
+            Mailboxes.Main.Publish(new SpellCastRequested(spellData));
 
         }
 
@@ -110,7 +110,7 @@ namespace Project_1.UI.HUD.SpellBook
                 return;
             }
 
-            if (!spellData.OffCooldown || !ObjectManager.Player.OffGlobalCooldown)
+            if (!spellData.OffCooldown || !UiPlayerStateCache.OffGlobalCooldown)
             {
                 onCooldownGfx.Draw(aBatch, AbsolutePos, Color.White);
             }

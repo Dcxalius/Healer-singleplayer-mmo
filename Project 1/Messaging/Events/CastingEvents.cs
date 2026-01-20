@@ -56,4 +56,14 @@ namespace Project_1.Messaging.Events
         public Entity Caster { get; }
         public Spell Spell { get; }
     }
+
+    internal readonly struct SpellCastRequested
+    {
+        public SpellCastRequested(Spell spell)
+        {
+            Spell = spell;
+        }
+
+        public Spell Spell { get; }
+    }
 }

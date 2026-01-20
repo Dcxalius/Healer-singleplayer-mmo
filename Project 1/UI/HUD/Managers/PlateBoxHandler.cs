@@ -1,6 +1,8 @@
-﻿using Project_1.GameObjects.Entities.Players;
-using Project_1.GameObjects.Entities;
+﻿using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Unit;
+using Project_1.GameObjects.Entities.Players;
+using Project_1.Camera;
+using Project_1.Input;
 using Project_1.UI.HUD.PlateBoxes;
 using Project_1.UI.UIElements;
 using System;
@@ -8,10 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Project_1.GameObjects.Spells.AoE.AreaOfEffectData;
-using Project_1.Camera;
-using Project_1.GameObjects;
-using Project_1.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Managers;
 using System.Diagnostics;
@@ -112,7 +110,7 @@ namespace Project_1.UI.HUD.Managers
             plateBoxes.AddRange(partyPlateBoxes);
 
             loadedPos = aLoadedSettings.Where(x => x.Item1 == typeof(BuffBox).Name).ToArray();
-            playerBuffBox = new BuffBox(ObjectManager.Player, BuffBox.FillDirection.TopRightToDown, loadedPos[0].Item2, loadedPos[0].Item3);
+            playerBuffBox = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, loadedPos[0].Item2, loadedPos[0].Item3);
             plateBoxes.Add(playerBuffBox);
             targetBuffBox = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, loadedPos[1].Item2, loadedPos[1].Item3);
             plateBoxes.Add(targetBuffBox);
@@ -151,7 +149,11 @@ namespace Project_1.UI.HUD.Managers
             }
         }
 
-        public void SetPlayerPlateBox(Player aPlayer) => playerPlateBox.SetData(aPlayer);
+        public void SetPlayerPlateBox(Entity aPlayer)
+        {
+            playerPlateBox.SetData(aPlayer);
+            playerBuffBox.AssignBox(aPlayer);
+        }
 
         public void RefreshPlates(Entity aEntity)
         {

@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
-using Project_1.GameObjects;
-using Project_1.GameObjects.Spawners;
 using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.Tiles;
@@ -38,13 +36,28 @@ namespace Project_1.UI.UIElements
             base.Draw(aBatch);
             GraphicsManager.CaptureScissor(this, AbsolutePos);
 
-            WorldSpace ws = ObjectManager.Player.FeetPosition;
+            if (!MinimapSnapshotManager.TryGetOrigin(out WorldSpace ws))
+            {
+                GraphicsManager.ReleaseScissor(this);
+                return;
+            }
             TileManager.MinimapDraw(aBatch, ws, Location, Size);
             Camera.Camera.MinimapDraw(aBatch, ws, Location, Size);
-            SpawnerManager.MinimapDraw(aBatch, ws, Location, Size);
-            ObjectManager.MinimapDraw(aBatch, ws, Location, Size);
+            DrawEntities(aBatch, ws);
             GraphicsManager.ReleaseScissor(this);
 
+        }
+
+        void DrawEntities(SpriteBatch aBatch, WorldSpace origin)
+        {
+            MinimapDotSnapshot[] dots = MinimapSnapshotManager.Snapshot;
+            for (int i = 0; i < dots.Length; i++)
+            {
+                MinimapDotSnapshot dot = dots[i];
+                minimapDot.Draw(aBatch,
+                    new Rectangle(new AbsoluteScreenPosition((dot.Position - origin).ToPoint()) / (TileManager.TileSize) + Location + Size / 2 + new Point(0, 1), new Point(1)),
+                    dot.Color);
+            }
         }
     }
 }

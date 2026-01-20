@@ -28,6 +28,7 @@ namespace Project_1.UI.HUD.Inventory
         bool isEmpty = true;
         bool holdable;
         public bool IsEmpty { get => isEmpty; }
+        Items.Item snapshot;
 
         public (int, int) Index { get => (bagIndex, slotIndex); } //For bagslots -1 0 is default, unmovable bag, and then -1 1 for first movable bag and so on
         public int bagIndex; //BagIndex 0 and above is the inventory slots, -1 is for the slots for the bags themselves, -2 is for lootwindow, -3 is for equipped
@@ -53,29 +54,12 @@ namespace Project_1.UI.HUD.Inventory
         protected Text itemCount;
 
 
-        public Items.Item GetActualItem
+        public Items.Item GetActualItem => snapshot;
+
+        public Item(int aBagIndex, int aSlotIndex, bool aHoldable, Items.Item aItem, RelativeScreenPosition aPos, RelativeScreenPosition aSize)
+            : this(aBagIndex, aSlotIndex, aHoldable, aItem?.ItemQualityColor ?? Color.DarkGray, aItem?.GfxPath ?? new GfxPath(GfxType.Item, null), aPos, aSize)
         {
-            get
-            {
-                if (bagIndex >= 0) return ObjectManager.Player.Inventory.GetItemInSlot(Index);
-
-                if (bagIndex == -1) return ObjectManager.Player.Inventory.GetBag(slotIndex);
-
-                if (bagIndex == -2)
-                {
-                    return LootState.Peek(slotIndex);
-                }
-
-                if (bagIndex == -3) return ObjectManager.Player.Equipment.EquipedInSlot((GameObjects.Unit.Equipment.Slot)slotIndex);
-
-                if (bagIndex == -4)
-                {
-                    GuildMember inspectTarget = GetInspectTarget();
-                    return inspectTarget?.Equipment.EquipedInSlot((GameObjects.Unit.Equipment.Slot)slotIndex);
-                }
-
-                throw new NotImplementedException();
-            }
+            AssignItem(aItem);
         }
 
         public Item(int aBagIndex, int aSlotIndex, bool aHoldable, Color aBackgroundColor, GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPath, aPos, aSize, aBackgroundColor) //TODO: Change this so a nulled path isn't required and figure out what to do with colors.
@@ -98,6 +82,7 @@ namespace Project_1.UI.HUD.Inventory
                 return;
             }
 
+            snapshot = ItemFactory.CreateItem(aItem.ID, aItem.Count);
             imageOnButton.SetImage(aItem.GfxPath);
             isEmpty = false;
             Color = aItem.ItemQualityColor;
@@ -111,6 +96,7 @@ namespace Project_1.UI.HUD.Inventory
             isEmpty = true;
             itemCount.Value = null;
             Color = Color.DarkGray;
+            snapshot = null;
         }
 
         public void HoldMe()
@@ -175,10 +161,10 @@ namespace Project_1.UI.HUD.Inventory
             if (bagIndex >= 0) //Onto Inventory
             {
                 if (aItemDroppedOnMe.slotIndex == bagIndex) return true; //Bag is tried being placed in itself
-                Items.Item i = ObjectManager.Player.Inventory.GetItemInSlot(bagIndex, slotIndex);
+                Items.Item i = GetActualItem;
                 if (i == null)
                 {
-                    ObjectManager.Player.Inventory.UnequipBag(aItemDroppedOnMe.slotIndex, Index);
+                    Mailboxes.Main.Publish(new InventoryUnequipBagRequested(aItemDroppedOnMe.slotIndex, Index));
                     return true;
                 }
                 //Swap bags if dropped on bag no?
@@ -187,7 +173,7 @@ namespace Project_1.UI.HUD.Inventory
 
             if (bagIndex == -1) //Onto bagrack
             {
-                ObjectManager.Player.Inventory.SwapPlacesOfBags(aItemDroppedOnMe.slotIndex, slotIndex);
+                Mailboxes.Main.Publish(new InventorySwapBagSlotsRequested(aItemDroppedOnMe.slotIndex, slotIndex));
                 return true;
             }
 
@@ -200,9 +186,10 @@ namespace Project_1.UI.HUD.Inventory
 
             if (aItemDroppedOnMe.bagIndex == -2) return true; //Drop from loot
 
-            if (ObjectManager.Player.Inventory.GetItemInSlot(aItemDroppedOnMe.Index).ItemType != ItemData.ItemType.Container) return true; //Dropped is not bag
+            Items.Item droppedItem = aItemDroppedOnMe.GetActualItem;
+            if (droppedItem == null || droppedItem.ItemType != ItemData.ItemType.Container) return true; //Dropped is not bag
 
-            ObjectManager.Player.Inventory.SwapBags(aItemDroppedOnMe.Index, slotIndex);
+            Mailboxes.Main.Publish(new InventorySwapBagsRequested(aItemDroppedOnMe.Index, slotIndex));
             return true;
         }
 
@@ -210,7 +197,7 @@ namespace Project_1.UI.HUD.Inventory
         {
             if (aItemDroppedOnMe.bagIndex != -2) return false;
 
-            ObjectManager.Player.Inventory.LootItem(aItemDroppedOnMe.slotIndex, Index);
+            Mailboxes.Main.Publish(new LootItemRequested(aItemDroppedOnMe.slotIndex, Index));
             return true;
         }
 
@@ -232,16 +219,14 @@ namespace Project_1.UI.HUD.Inventory
                 if (!GameObjects.Unit.Equipment.FitsInSlot(droppedItem.type, (GameObjects.Unit.Equipment.Slot)slotIndex)) return true;
                 if (thisItem == null)
                 {
-                    ObjectManager.Player.EquipInParticularSlot(droppedItem, (GameObjects.Unit.Equipment.Slot)slotIndex);
-                    ObjectManager.Player.EquipInParticularSlot(null, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
+                    Mailboxes.Main.Publish(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, null));
                     return true;
                 }
 
                 if (droppedItem.type != thisItem.type) return true;
                 if (droppedItem.type >= Equipment.Type.MainHander) return true;
                 if (thisItem.type >= Equipment.Type.MainHander) return true;
-                ObjectManager.Player.EquipInParticularSlot(droppedItem, (GameObjects.Unit.Equipment.Slot)slotIndex);
-                ObjectManager.Player.EquipInParticularSlot(thisItem, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
+                Mailboxes.Main.Publish(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, null));
 
                 return true;
             }
@@ -253,16 +238,13 @@ namespace Project_1.UI.HUD.Inventory
 
                 if (thisItem == null)
                 {
-                    ObjectManager.Player.Inventory.AddItem(droppedItem, Index);
-
-                    ObjectManager.Player.EquipInParticularSlot(null, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
+                    Mailboxes.Main.Publish(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, null));
                     return true;
                 }
 
                 if (!GameObjects.Unit.Equipment.FitsInSlot(thisItem.type, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex)) return true;
 
-                ObjectManager.Player.Inventory.AssignItem(droppedItem, Index);
-                ObjectManager.Player.EquipInParticularSlot(thisItem, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
+                Mailboxes.Main.Publish(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, null));
 
                 return true;
             }
@@ -275,7 +257,7 @@ namespace Project_1.UI.HUD.Inventory
         bool ToCharacterPane(Item aItemDroppedOnMe)
         {
             if (bagIndex != -3) return false;
-            ObjectManager.Player.Inventory.SwapEquipment(aItemDroppedOnMe.Index, slotIndex, ObjectManager.Player);
+            Mailboxes.Main.Publish(new InventorySwapEquipmentRequested(aItemDroppedOnMe.Index, slotIndex, null));
             //TODO: Handle if trying to drag inbetween sheets.
             return true;
         }
@@ -286,7 +268,7 @@ namespace Project_1.UI.HUD.Inventory
 
             GuildMember inspectTarget = GetInspectTarget();
             if (inspectTarget == null) return true;
-            Entity openGuildPage = inspectTarget;
+            Friendly openGuildPage = inspectTarget;
             if (bagIndex == -4)
             {
                 Equipment thisItem = GetActualItem as Equipment;
@@ -296,16 +278,14 @@ namespace Project_1.UI.HUD.Inventory
                 if (!GameObjects.Unit.Equipment.FitsInSlot(droppedItem.type, (GameObjects.Unit.Equipment.Slot)slotIndex)) return true;
                 if (thisItem == null)
                 {
-                    openGuildPage.EquipInParticularSlot(droppedItem, (GameObjects.Unit.Equipment.Slot)slotIndex);
-                    openGuildPage.EquipInParticularSlot(null, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
+                    Mailboxes.Main.Publish(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, openGuildPage));
                     return true;
                 }
 
                 if (droppedItem.type != thisItem.type) return true;
                 if (droppedItem.type >= Equipment.Type.MainHander) return true;
                 if (thisItem.type >= Equipment.Type.MainHander) return true;
-                openGuildPage.EquipInParticularSlot(droppedItem, (GameObjects.Unit.Equipment.Slot)slotIndex);
-                openGuildPage.EquipInParticularSlot(thisItem, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
+                Mailboxes.Main.Publish(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, openGuildPage));
 
                 return true;
             }
@@ -317,16 +297,13 @@ namespace Project_1.UI.HUD.Inventory
 
                 if (thisItem == null)
                 {
-                    ObjectManager.Player.Inventory.AddItem(droppedItem, Index);
-
-                    openGuildPage.EquipInParticularSlot(null, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
+                    Mailboxes.Main.Publish(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, openGuildPage));
                     return true;
                 }
 
                 if (!GameObjects.Unit.Equipment.FitsInSlot(thisItem.type, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex)) return true;
 
-                ObjectManager.Player.Inventory.AssignItem(droppedItem, Index);
-                openGuildPage.EquipInParticularSlot(thisItem, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex);
+                Mailboxes.Main.Publish(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, openGuildPage));
 
                 return true;
             }
@@ -341,7 +318,7 @@ namespace Project_1.UI.HUD.Inventory
             GuildMember inspectTarget = GetInspectTarget();
             if (inspectTarget != null)
             {
-                ObjectManager.Player.Inventory.SwapEquipment(aItemDroppedOnMe.Index, slotIndex, inspectTarget);
+                Mailboxes.Main.Publish(new InventorySwapEquipmentRequested(aItemDroppedOnMe.Index, slotIndex, inspectTarget));
             }
             //TODO: Handle if trying to drag inbetween sheets.
             return true;
@@ -349,7 +326,7 @@ namespace Project_1.UI.HUD.Inventory
 
         bool InventoryToInventory(Item aItemDroppedOnMe)
         {
-            ObjectManager.Player.Inventory.SwapItems(aItemDroppedOnMe.Index, Index);
+            Mailboxes.Main.Publish(new InventorySwapItemsRequested(aItemDroppedOnMe.Index, Index));
             return true;
         }
 
@@ -408,23 +385,25 @@ namespace Project_1.UI.HUD.Inventory
                 }
 
                 GuildMember inspectTarget = GetInspectTarget();
-                if (inspectTarget == null || IsCharacterWindowOpen()) target = ObjectManager.Player;
+                if (inspectTarget == null || IsCharacterWindowOpen()) target = null;
                 else target = inspectTarget;
-                switch (ObjectManager.Player.Inventory.GetItemInSlot(Index).ItemType)
+                Items.Item actual = GetActualItem;
+                if (actual == null) return;
+                switch (actual.ItemType)
                 {
                     case ItemData.ItemType.NotSet:
                         throw new NotImplementedException();
                     case ItemData.ItemType.Container:
-                        ObjectManager.Player.Inventory.EquipBag(Index);
+                        Mailboxes.Main.Publish(new InventoryEquipBagRequested(Index));
                         return;
                     case ItemData.ItemType.Trash:
                         return;
                     case ItemData.ItemType.Consumable:
-                        ObjectManager.Player.Inventory.ConsumeItem(Index, target);
+                        Mailboxes.Main.Publish(new InventoryConsumeRequested(Index, target));
                         return;
                     case ItemData.ItemType.Equipment:
                     case ItemData.ItemType.Weapon:
-                        ObjectManager.Player.Inventory.Equip(Index, target);
+                        Mailboxes.Main.Publish(new InventoryEquipRequested(Index, target));
                         return;
                     default:
                         throw new NotImplementedException();
@@ -433,13 +412,13 @@ namespace Project_1.UI.HUD.Inventory
 
             if (bagIndex == -1)
             {
-                ObjectManager.Player.Inventory.UnequipBag(slotIndex);
+                Mailboxes.Main.Publish(new InventoryUnequipBagRequested(slotIndex, null));
                 return;
             }
 
             if (bagIndex == -2)
             {
-                ObjectManager.Player.Inventory.LootItem(slotIndex);
+                Mailboxes.Main.Publish(new LootItemRequested(slotIndex, null));
                 return;
             }
         }

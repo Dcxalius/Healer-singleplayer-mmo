@@ -1,8 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects;
 using Project_1.Managers;
 using Project_1.Managers.States;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.UIElements.Boxes;
 using Project_1.UI.UIElements.Buttons;
@@ -52,9 +53,7 @@ namespace Project_1.UI.CharacterCreator
         void CreateNewCharacter()
         {
             string name = inputBox.Input;
-            ObjectManager.CreateNewPlayer(name, ClassSelectButton.ClassName);
-            SaveManager.CreateNewSave(name);
-            StateManager.RequestStateChange(StateManager.States.Game);
+            Mailboxes.Main.Publish(new CreateNewPlayerRequested(name, ClassSelectButton.ClassName));
         }
     }
 }

@@ -23,4 +23,20 @@ namespace Project_1.Messaging.Events
 
         public StateManager.States State { get; }
     }
+
+    internal readonly struct ResetToMainMenuRequested
+    {
+    }
+
+    internal readonly struct CreateNewPlayerRequested
+    {
+        public CreateNewPlayerRequested(string name, string className)
+        {
+            Name = name;
+            ClassName = className;
+        }
+
+        public string Name { get; }
+        public string ClassName { get; }
+    }
 }

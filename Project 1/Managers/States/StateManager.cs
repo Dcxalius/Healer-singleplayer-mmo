@@ -7,10 +7,15 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects;
+using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Entities.GuildMembers;
+using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Spawners;
 using Project_1.Input;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
+using Project_1.Items;
+using Project_1.Items.SubTypes;
 using Project_1.Particles;
 using Project_1.UI;
 using Project_1.UI.HUD.Managers;
@@ -79,6 +84,24 @@ namespace Project_1.Managers.States
 
             Mailboxes.Ui.Subscribe<StateChanged>(HandleUiStateChanged);
             Mailboxes.Main.Subscribe<StateChangeRequested>(e => SetState(e.State));
+            Mailboxes.Main.Subscribe<ResetToMainMenuRequested>(_ => HandleResetToMainMenuRequested());
+            Mailboxes.Main.Subscribe<CreateNewPlayerRequested>(HandleCreateNewPlayerRequested);
+            Mailboxes.Main.Subscribe<ShopPurchaseRequested>(HandleShopPurchaseRequested);
+            Mailboxes.Main.Subscribe<SpellCastRequested>(HandleSpellCastRequested);
+            Mailboxes.Main.Subscribe<TargetRequested>(HandleTargetRequested);
+            Mailboxes.Main.Subscribe<PartyMemberInviteRequested>(HandlePartyMemberInviteRequested);
+            Mailboxes.Main.Subscribe<PartyMemberKickRequested>(HandlePartyMemberKickRequested);
+            Mailboxes.Main.Subscribe<InventorySwapItemsRequested>(HandleInventorySwapItemsRequested);
+            Mailboxes.Main.Subscribe<InventorySwapEquipmentRequested>(HandleInventorySwapEquipmentRequested);
+            Mailboxes.Main.Subscribe<InventoryEquipBagRequested>(HandleInventoryEquipBagRequested);
+            Mailboxes.Main.Subscribe<InventoryUnequipBagRequested>(HandleInventoryUnequipBagRequested);
+            Mailboxes.Main.Subscribe<InventorySwapBagsRequested>(HandleInventorySwapBagsRequested);
+            Mailboxes.Main.Subscribe<InventorySwapBagSlotsRequested>(HandleInventorySwapBagSlotsRequested);
+            Mailboxes.Main.Subscribe<LootItemRequested>(HandleLootItemRequested);
+            Mailboxes.Main.Subscribe<InventoryEquipRequested>(HandleInventoryEquipRequested);
+            Mailboxes.Main.Subscribe<InventoryConsumeRequested>(HandleInventoryConsumeRequested);
+            Mailboxes.Main.Subscribe<EquipmentSwapRequested>(HandleEquipmentSwapRequested);
+            Mailboxes.Main.Subscribe<EquipmentMoveToInventoryRequested>(HandleEquipmentMoveToInventoryRequested);
         }
 
         public static void Update()
@@ -342,6 +365,205 @@ namespace Project_1.Managers.States
                 default:
                     break;
             }
+        }
+
+        static void HandleShopPurchaseRequested(ShopPurchaseRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+
+            Items.Item item = ItemFactory.CreateItem(e.ItemId, e.Count);
+            if (item == null) return;
+            if (item.Cost > player.Gold) return;
+
+            player.ChangeGold(-item.Cost);
+            player.Inventory.AddItem(item);
+        }
+
+        static void HandleSpellCastRequested(SpellCastRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (e.Spell == null) return;
+            ObjectManager.Player?.StartCast(e.Spell);
+        }
+
+        static void HandleTargetRequested(TargetRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+            player.SetTarget(e.Target ?? player);
+        }
+
+        static void HandlePartyMemberInviteRequested(PartyMemberInviteRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            GuildMember member = e.Member;
+            if (member == null) return;
+            ObjectManager.SpawnGuildMemberToParty(member, null);
+        }
+
+        static void HandlePartyMemberKickRequested(PartyMemberKickRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            GuildMember member = e.Member;
+            if (member == null) return;
+            ObjectManager.RemoveGuildMemberFromParty(member);
+        }
+
+        static void HandleResetToMainMenuRequested()
+        {
+            ThreadAffinity.AssertSimThread();
+            SetState(States.StartScreen);
+            ObjectManager.Reset();
+        }
+
+        static void HandleCreateNewPlayerRequested(CreateNewPlayerRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (string.IsNullOrWhiteSpace(e.Name) || string.IsNullOrWhiteSpace(e.ClassName)) return;
+            ObjectManager.CreateNewPlayer(e.Name, e.ClassName);
+            SaveManager.CreateNewSave(e.Name);
+            SetState(States.Game);
+        }
+
+        static void HandleInventorySwapItemsRequested(InventorySwapItemsRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+            player.Inventory.SwapItems(e.From, e.To);
+        }
+
+        static void HandleInventorySwapEquipmentRequested(InventorySwapEquipmentRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+            Friendly target = e.Target ?? player;
+            player.Inventory.SwapEquipment(e.From, e.EquipmentSlot, target);
+        }
+
+        static void HandleInventoryEquipBagRequested(InventoryEquipBagRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+            player.Inventory.EquipBag(e.From);
+        }
+
+        static void HandleInventoryUnequipBagRequested(InventoryUnequipBagRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+            if (e.ToSlot.HasValue)
+            {
+                player.Inventory.UnequipBag(e.BagSlot, e.ToSlot.Value);
+                return;
+            }
+            player.Inventory.UnequipBag(e.BagSlot);
+        }
+
+        static void HandleInventorySwapBagsRequested(InventorySwapBagsRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+            player.Inventory.SwapBags(e.From, e.BagSlot);
+        }
+
+        static void HandleInventorySwapBagSlotsRequested(InventorySwapBagSlotsRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+            player.Inventory.SwapPlacesOfBags(e.FromBagSlot, e.ToBagSlot);
+        }
+
+        static void HandleLootItemRequested(LootItemRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+            if (e.ToSlot.HasValue)
+            {
+                player.Inventory.LootItem(e.LootSlotIndex, e.ToSlot.Value);
+                return;
+            }
+            player.Inventory.LootItem(e.LootSlotIndex);
+        }
+
+        static void HandleInventoryEquipRequested(InventoryEquipRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+            Friendly target = e.Target ?? player;
+            player.Inventory.Equip(e.Index, target);
+        }
+
+        static void HandleInventoryConsumeRequested(InventoryConsumeRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+            Friendly target = e.Target ?? player;
+            player.Inventory.ConsumeItem(e.Index, target);
+        }
+
+        static void HandleEquipmentSwapRequested(EquipmentSwapRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+            Friendly target = e.Target ?? player;
+
+            Equipment fromEquip = target.Equipment.EquipedInSlot((GameObjects.Unit.Equipment.Slot)e.FromSlot) as Equipment;
+            if (fromEquip == null) return;
+            if (!GameObjects.Unit.Equipment.FitsInSlot(fromEquip.type, (GameObjects.Unit.Equipment.Slot)e.ToSlot)) return;
+
+            Equipment toEquip = target.Equipment.EquipedInSlot((GameObjects.Unit.Equipment.Slot)e.ToSlot) as Equipment;
+            if (toEquip == null)
+            {
+                target.EquipInParticularSlot(fromEquip, (GameObjects.Unit.Equipment.Slot)e.ToSlot);
+                target.EquipInParticularSlot(null, (GameObjects.Unit.Equipment.Slot)e.FromSlot);
+                return;
+            }
+
+            if (fromEquip.type != toEquip.type) return;
+            if (fromEquip.type >= Equipment.Type.MainHander) return;
+            if (toEquip.type >= Equipment.Type.MainHander) return;
+
+            target.EquipInParticularSlot(fromEquip, (GameObjects.Unit.Equipment.Slot)e.ToSlot);
+            target.EquipInParticularSlot(toEquip, (GameObjects.Unit.Equipment.Slot)e.FromSlot);
+        }
+
+        static void HandleEquipmentMoveToInventoryRequested(EquipmentMoveToInventoryRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+            Friendly target = e.Target ?? player;
+
+            Equipment fromEquip = target.Equipment.EquipedInSlot((GameObjects.Unit.Equipment.Slot)e.EquipmentSlot) as Equipment;
+            if (fromEquip == null) return;
+
+            Item destItem = player.Inventory.GetItemInSlot(e.InventorySlot);
+            if (destItem == null)
+            {
+                player.Inventory.AddItem(fromEquip, e.InventorySlot);
+                target.EquipInParticularSlot(null, (GameObjects.Unit.Equipment.Slot)e.EquipmentSlot);
+                return;
+            }
+
+            Equipment destEquip = destItem as Equipment;
+            if (destEquip == null) return;
+            if (!GameObjects.Unit.Equipment.FitsInSlot(destEquip.type, (GameObjects.Unit.Equipment.Slot)e.EquipmentSlot)) return;
+
+            player.Inventory.AssignItem(fromEquip, e.InventorySlot);
+            target.EquipInParticularSlot(destEquip, (GameObjects.Unit.Equipment.Slot)e.EquipmentSlot);
         }
 
         static void HandleUiStateChanged(StateChanged e)

@@ -68,6 +68,8 @@ namespace Project_1.Camera
 
         static CameraMover cameraMover;
         static bool initialized;
+        static Rectangle minimapWorldRectangle;
+        static volatile bool minimapWorldRectangleValid;
 
         public static void Init()
         {
@@ -84,6 +86,20 @@ namespace Project_1.Camera
         {
             ThreadAffinity.AssertSimThread();
             cameraMover.Move();
+        }
+
+        internal static void BuildMinimapSnapshot()
+        {
+            ThreadAffinity.AssertSimThread();
+            minimapWorldRectangle = WorldRectangle;
+            minimapWorldRectangleValid = true;
+        }
+
+        internal static bool TryGetMinimapWorldRectangle(out Rectangle rect)
+        {
+            ThreadAffinity.AssertMainThread();
+            rect = minimapWorldRectangle;
+            return minimapWorldRectangleValid;
         }
 
         #region Save/Load
@@ -191,10 +207,11 @@ namespace Project_1.Camera
         public static void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
         {
             ThreadAffinity.AssertMainThread();
-            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition(WorldRectangle.Location - aOrigin.ToPoint()) / (TileManager.TileSize) + aMinimapOffset + aMinimapSize / 2, new Point(1, WorldRectangle.Size.Y / TileManager.TileSize.Y)), Color.White);
-            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition(WorldRectangle.Location - aOrigin.ToPoint()) / (TileManager.TileSize) + aMinimapOffset + aMinimapSize / 2, new Point(WorldRectangle.Size.X / TileManager.TileSize.X, 1)), Color.White);
-            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition(WorldRectangle.Location + new Point(WorldRectangle.Size.X, 0) - aOrigin.ToPoint()) / (TileManager.TileSize) + aMinimapOffset + aMinimapSize / 2 - new Point(1,0), new Point(1, WorldRectangle.Size.Y / TileManager.TileSize.Y)), Color.White);
-            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition(WorldRectangle.Location + new Point(0, WorldRectangle.Size.Y)- aOrigin.ToPoint()) / (TileManager.TileSize) + aMinimapOffset + aMinimapSize / 2, new Point(WorldRectangle.Size.X / TileManager.TileSize.X, 1)), Color.White);
+            if (!TryGetMinimapWorldRectangle(out Rectangle worldRect)) return;
+            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition(worldRect.Location - aOrigin.ToPoint()) / (TileManager.TileSize) + aMinimapOffset + aMinimapSize / 2, new Point(1, worldRect.Size.Y / TileManager.TileSize.Y)), Color.White);
+            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition(worldRect.Location - aOrigin.ToPoint()) / (TileManager.TileSize) + aMinimapOffset + aMinimapSize / 2, new Point(worldRect.Size.X / TileManager.TileSize.X, 1)), Color.White);
+            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition(worldRect.Location + new Point(worldRect.Size.X, 0) - aOrigin.ToPoint()) / (TileManager.TileSize) + aMinimapOffset + aMinimapSize / 2 - new Point(1,0), new Point(1, worldRect.Size.Y / TileManager.TileSize.Y)), Color.White);
+            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition(worldRect.Location + new Point(0, worldRect.Size.Y)- aOrigin.ToPoint()) / (TileManager.TileSize) + aMinimapOffset + aMinimapSize / 2, new Point(worldRect.Size.X / TileManager.TileSize.X, 1)), Color.White);
 
         }
     }

@@ -70,7 +70,7 @@ namespace Project_1.GameObjects.Entities
             TargetAliveCheck();
             if (unitData.BaseStats.CheckIfResourceRegened()) FlagForRefresh();
             
-            Movement();
+            Movement(); //TODO: base.Update() is in here which is ugly AF
             AttackTarget();
             spellCast.UpdateSpellChannel();
             buffList.Update(this);

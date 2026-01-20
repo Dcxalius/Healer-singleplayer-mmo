@@ -1,7 +1,4 @@
-﻿using Project_1.GameObjects.Entities.Npcs;
-using Project_1.UI.HUD.Windows.Gossip;
-
-namespace Project_1.Messaging.Events
+﻿namespace Project_1.Messaging.Events
 {
     internal readonly struct ShopRefundRequest
     {
@@ -14,14 +11,28 @@ namespace Project_1.Messaging.Events
         public int SlotIndex { get; }
     }
 
+    internal readonly struct ShopPurchaseRequested
+    {
+        public ShopPurchaseRequested(int itemId, int count)
+        {
+            ItemId = itemId;
+            Count = count;
+        }
+
+        public int ItemId { get; }
+        public int Count { get; }
+    }
+
     internal readonly struct ShopOpened
     {
-        public ShopOpened(ShopGossipOption shop, Npc npc)
+        public ShopOpened(int[] itemIds)
         {
-            Shop = shop;
-            Npc = npc;
+            ItemIds = itemIds;
         }
-        public ShopGossipOption Shop { get; }
-        public Npc Npc { get; }
+        public int[] ItemIds { get; }
+    }
+
+    internal readonly struct ShopClosed
+    {
     }
 }

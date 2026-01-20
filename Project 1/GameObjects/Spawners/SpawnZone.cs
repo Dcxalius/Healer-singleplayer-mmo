@@ -5,6 +5,7 @@ using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spawners.Pathing;
 using Project_1.GameObjects.Unit;
 using Project_1.Input;
+using Project_1.Managers;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
@@ -197,6 +198,11 @@ namespace Project_1.GameObjects.Spawners
         internal void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
         {
             for (int i = 0; i < spawners.Count; i++) spawners[i].MinimapDraw(aBatch, aOrigin, aMinimapOffset, aMinimapSize);
+        }
+
+        internal void AppendMinimapDots(List<MinimapDotSnapshot> dots)
+        {
+            for (int i = 0; i < spawners.Count; i++) spawners[i].AppendMinimapDots(dots);
         }
 
         internal void Draw(SpriteBatch aBatch)

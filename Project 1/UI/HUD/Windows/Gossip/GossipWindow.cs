@@ -1,7 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects;
-using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Npcs;
 using Project_1.Textures;
 using Project_1.UI.HUD.Managers;
@@ -22,7 +20,6 @@ namespace Project_1.UI.HUD.Windows.Gossip
     {
         Label introduction;
         ScrollableBox options;
-        Npc npcTalkingTo;
 
         public GossipWindow() : base(new UITexture("WhiteBackground", Color.AntiqueWhite))
         {
@@ -37,14 +34,6 @@ namespace Project_1.UI.HUD.Windows.Gossip
         public override void Update()
         {
             base.Update();
-
-            if (npcTalkingTo == null) return;
-            if (!npcTalkingTo.InConversationRange(ObjectManager.Player.FeetPosition))
-            {
-                ResetOptions();
-                npcTalkingTo = null;
-                CloseWindow();
-            }
         }
 
         public Action<ChatGossipOption> GetSet()
@@ -52,18 +41,51 @@ namespace Project_1.UI.HUD.Windows.Gossip
             return Set;
         }
 
-        public void Set(ChatGossipOption aOption, Npc aNpc)
+        public void Set(GossipData aData)
         {
-            npcTalkingTo = aNpc;
-            Set(aOption);
+            ChatGossipOption start = BuildOptions(aData);
+            Set(start);
         }
 
         void Set(ChatGossipOption aOption)
         {
-            Debug.Assert(npcTalkingTo != null);
             ResetOptions();
             introduction.Text = aOption.IntroText;
             AddOptions(aOption.GossipOptions);
+        }
+
+        ChatGossipOption BuildOptions(GossipData aData)
+        {
+            string[][] optionsData = aData.Options;
+            int[][] links = aData.LinkTree;
+            GossipOption[] built = new GossipOption[optionsData.Length];
+
+            for (int i = 0; i < optionsData.Length; i++)
+            {
+                string type = optionsData[i][0];
+                string header = optionsData[i][1];
+                string data = optionsData[i][2];
+
+                built[i] = type switch
+                {
+                    "C" => new ChatGossipOption(header, data),
+                    "S" => new ShopGossipOption(header, data),
+                    _ => throw new NotImplementedException()
+                };
+            }
+
+            for (int i = 0; i < links.Length; i++)
+            {
+                if (built[i] is not ChatGossipOption chat) continue;
+                for (int j = 0; j < links[i].Length; j++)
+                {
+                    chat.AddGossipOption(built[links[i][j]]);
+                }
+            }
+
+            ChatGossipOption start = built[aData.StartIndex] as ChatGossipOption;
+            Debug.Assert(start != null);
+            return start;
         }
 
         public Action<ShopGossipOption> GetClose()
@@ -74,8 +96,7 @@ namespace Project_1.UI.HUD.Windows.Gossip
         void CloseAndOpenShop(ShopGossipOption aSO)
         {
             CloseWindow();
-            Mailboxes.Ui.Publish(new ShopOpened(aSO, npcTalkingTo));
-            
+            Mailboxes.Ui.Publish(new ShopOpened(aSO.ItemIDsInShop));
         }
 
         public void SetIntro(string aIntro) => introduction.Text = aIntro;
