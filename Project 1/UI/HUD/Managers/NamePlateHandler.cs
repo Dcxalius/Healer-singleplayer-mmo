@@ -81,7 +81,7 @@ namespace Project_1.UI.HUD.Managers
             }
             while (collisonRects.Count > 0 && passes < maxPasses);
 
-            //DebugManager.Print(typeof(HUDManager), "Passes of nameplatedupdate was: " + passes);
+            //DebugManager.Print("Passes of nameplatedupdate was: " + passes);
         }
 
         void UpdateSingleNamePlate(NamePlate aNamePlate, Rectangle aRect)
@@ -91,11 +91,11 @@ namespace Project_1.UI.HUD.Managers
 
             if (float.IsNaN(dir.X) || float.IsNaN(dir.Y)) dir = Vector2.Zero;
 
-            //DebugManager.Print(typeof(HUDManager), "Nameplate of " + aNamePlate.Name + " was at " + aNamePlate.RelativePos);
+            //DebugManager.Print("Nameplate of " + aNamePlate.Name + " was at " + aNamePlate.RelativePos);
 
             aNamePlate.Move(aNamePlate.RelativePos + new AbsoluteScreenPosition((int)(aRect.Size.X / 2 * dir.X), (int)(aRect.Size.Y / 2 * dir.Y)).ToRelativeScreenPosition()); //+ new AbsoluteScreenPosition(1 * Math.Sign(dir.X), 1 * Math.Sign(dir.Y))).ToRelativeScreenPosition());
 
-            //DebugManager.Print(typeof(HUDManager), "Nameplate of " + aNamePlate.Name + " is now at " + aNamePlate.RelativePos);
+            //DebugManager.Print("Nameplate of " + aNamePlate.Name + " is now at " + aNamePlate.RelativePos);
         }
 
         public void Rescale()

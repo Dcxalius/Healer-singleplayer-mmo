@@ -16,6 +16,7 @@ namespace Project_1.Input
 {
     internal static class KeyBindManager
     {
+        // Note: Any new key added here must have BOTH primary and secondary entries in the default keybind file.
         public enum KeyListner
         {
             MoveCharacterUp, MoveCharacterLeft, MoveCharacterDown, MoveCharacterRight,
@@ -76,7 +77,7 @@ namespace Project_1.Input
                     throw;
                 }
 
-                DebugManager.Print(typeof(KeyBindManager), "Error Importing Bindings from file.");
+                DebugManager.Print("Error Importing Bindings from file.");
                 //Debug.Assert(defaultFirstKeys.Length == (int)KeyListner.Count && defaultSecondKeys.Length == (int)KeyListner.Count, "Default Key has wrong count");
 
                 GetBindings(SaveManager.DefaultKeyBindSettings);

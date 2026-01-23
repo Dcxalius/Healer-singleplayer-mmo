@@ -210,7 +210,7 @@ namespace Project_1.UI.HUD.Managers
         {
             if (PartyPlateBox.PartyBoxesActive >= Party.maxPartySize)
             {
-                DebugManager.Print(typeof(HUDManager), "Tried to add to full party.");
+                DebugManager.Print("Tried to add to full party.");
                 return;
             }
 

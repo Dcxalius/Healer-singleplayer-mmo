@@ -64,7 +64,7 @@ namespace Project_1.Items
             }
             else
             {
-                DebugManager.Print(typeof(LootFactory), "Error getting data for unit " + aName);
+                DebugManager.Print("Error getting data for unit " + aName);
                 return null;
             }
             

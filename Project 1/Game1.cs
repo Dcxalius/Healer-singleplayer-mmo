@@ -47,8 +47,7 @@ namespace Project_1
 
             if (DebugManager.Mode(DebugMode.InstantlyContinue))
             {
-                SaveManager.ContinueLastSave();
-                StateManager.RequestStateChange(StateManager.States.Game);
+                Mailboxes.Main.Publish(new Messaging.Events.ContinueLastSaveRequested());
             }
             base.Initialize();
         }
@@ -102,6 +101,7 @@ namespace Project_1
                     HUDManager.BuildDrawLists();
                 }
             }
+            SaveManager.ProcessPendingScreenshots();
 
             base.Update(gameTime);
         }
@@ -150,7 +150,6 @@ namespace Project_1
             CorpseManager.Init();
             ProjectileManager.Init();
             ParticleManager.Init();
-            InputEventBridge.Init();
             UiInputBridge.Init();
             if (ThreadingSettings.UseWorkerThreads) WorkerPool.Start();
             if (ThreadingSettings.UseUiThread) UiThread.Start();

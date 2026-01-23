@@ -40,7 +40,7 @@ namespace Project_1.UI.CharacterCreator
             RelativeScreenPosition size = new RelativeScreenPosition(1 / lines, 1 / rows);
             for (int i = 0; i < classNames.Length; i++)
             {
-                DebugManager.Print(GetType(), "i == " + i + "  formula == " + i % (classNames.Length / lines));
+                DebugManager.Print("i == " + i + "  formula == " + i % (classNames.Length / lines));
                 AddChild(new ClassSelectButton(classNames[i], new RelativeScreenPosition(size.X * (i % (classNames.Length)), size.Y * MathF.Floor(i / (classNames.Length))), size));
             }
         }

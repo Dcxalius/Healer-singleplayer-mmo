@@ -82,13 +82,13 @@ namespace Project_1.UI.UIElements.Boxes
 
             //AbsoluteScreenPosition textSize = new AbsoluteScreenPosition(TextureManager.GetFont("Gloryse").MeasureString(aTextBeforeInputWindow).ToPoint());
             AbsoluteScreenPosition textSize = new AbsoluteScreenPosition(FontCache.GetFont("Gloryse").MeasureString(aTextBeforeInputWindow).ToPoint());
-            DebugManager.Print(GetType(), "textSize = " + textSize);
+            DebugManager.Print("textSize = " + textSize);
             
             RelativeScreenPosition textSizeRelative = textSize.ToRelativeScreenPosition(new AbsoluteScreenPosition((int)(aThisIsUglyAFButItWorksForNow.X * aSize.X), (int)(aThisIsUglyAFButItWorksForNow.Y * aSize.Y))); //TODO: This has wrong size due to size being unset when objects is created
             //beforeWindowLabel = new Label(aTextBeforeInputWindow, position, textSizeRelative, Label.TextAllignment.CentreLeft, aTextBeforeColor);
             //beforeWindowLabel = new Label(aTextBeforeInputWindow, position, textSizeRelative.OnlyX + spacingSquare.OnlyX * 2 + size.OnlyY - spacingSquare.OnlyY * 2, Label.TextAllignment.CentreLeft, aTextBeforeColor);
             beforeWindowLabel = new Label(aTextBeforeInputWindow, position, size.OnlyY + textSizeRelative.OnlyX + spacingSquare.OnlyX * 2, Label.TextAllignment.CentreLeft, aTextBeforeColor);
-            DebugManager.Print(GetType(), "after = " + beforeWindowLabel.UnderlyingTextOffset.ToString());
+            DebugManager.Print("after = " + beforeWindowLabel.UnderlyingTextOffset.ToString());
             AddChild(beforeWindowLabel);
 
             RelativeScreenPosition bgPos = RelativeScreenPosition.Zero;

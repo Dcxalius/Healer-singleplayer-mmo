@@ -1,4 +1,5 @@
 using Project_1.Managers.States;
+using Project_1.Managers.Saves;
 
 namespace Project_1.Messaging.Events
 {
@@ -38,5 +39,37 @@ namespace Project_1.Messaging.Events
 
         public string Name { get; }
         public string ClassName { get; }
+    }
+
+    internal readonly struct SaveDataRequested
+    {
+    }
+
+    internal readonly struct LoadSaveRequested
+    {
+        public LoadSaveRequested(Save save)
+        {
+            Save = save;
+        }
+
+        public Save Save { get; }
+    }
+
+    internal readonly struct ContinueLastSaveRequested
+    {
+    }
+
+    internal readonly struct NewGameRequested
+    {
+    }
+
+    internal readonly struct SaveLoadParsed
+    {
+        public SaveLoadParsed(SaveLoadPayload payload)
+        {
+            Payload = payload;
+        }
+
+        public SaveLoadPayload Payload { get; }
     }
 }

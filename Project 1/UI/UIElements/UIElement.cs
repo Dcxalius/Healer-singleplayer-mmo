@@ -570,7 +570,7 @@ namespace Project_1.UI.UIElements
             if (!visible && !(hudMoveable && hudMoving)) return;
             heldEvents = new HoldEvent(aClick, this);
 
-            //DebugManager.Print(GetType(), "Clicked on " + pos);
+            //DebugManager.Print("Clicked on " + pos);
         }
         #endregion
 

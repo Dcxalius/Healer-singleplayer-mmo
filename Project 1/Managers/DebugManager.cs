@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -48,6 +49,7 @@ namespace Project_1.Managers
         static Text mailboxText;
         static Text dispatchText;
         static Text workerText;
+        static Text screenshotText;
         static AbsoluteScreenPosition debugTextOrigin;
 
 
@@ -92,6 +94,7 @@ namespace Project_1.Managers
             mailboxText = new Text("Gloryse", Color.Chartreuse);
             dispatchText = new Text("Gloryse", Color.Chartreuse);
             workerText = new Text("Gloryse", Color.Chartreuse);
+            screenshotText = new Text("Gloryse", Color.Chartreuse);
             debugTextOrigin = new AbsoluteScreenPosition(12, 12);
         }
 
@@ -125,6 +128,8 @@ namespace Project_1.Managers
             dispatchText.Value = $"D M:{mainStats.LastDispatchCount}/{mainStats.LastDispatchMs:0.0}ms U:{uiStats.LastDispatchCount}/{uiStats.LastDispatchMs:0.0}ms S:{simStats.LastDispatchCount}/{simStats.LastDispatchMs:0.0}ms";
             var workerStats = WorkerPool.Stats;
             workerText.Value = $"W {workerStats.Pending}/{workerStats.Peak} last:{workerStats.LastWorkMs:0.0}ms";
+            var screenshotStats = SaveManager.ScreenshotQueueStats;
+            screenshotText.Value = $"S {screenshotStats.Pending}/{screenshotStats.Peak} last:{screenshotStats.LastScreenshotMs:0.0}ms";
         }
 
         public static void AddDebugShape(DebugShape aShape)
@@ -134,15 +139,23 @@ namespace Project_1.Managers
         }
 
 
-        public static void Print(Type aType, object aObject) => Print(aType, aObject.ToString());
+        public static void Print(object aObject,
+            [CallerFilePath] string filePath = "",
+            [CallerLineNumber] int lineNumber = 0,
+            [CallerMemberName] string memberName = "")
+        {
+            Print(aObject?.ToString() ?? "null", filePath, lineNumber, memberName);
+        }
 
-        public static void Print(Type aType, string aMsg)
+        public static void Print(string aMsg,
+            [CallerFilePath] string filePath = "",
+            [CallerLineNumber] int lineNumber = 0,
+            [CallerMemberName] string memberName = "")
         {
             if (!modes[(int)DebugMode.Print]) return;
 
-            Console.WriteLine(aType.ToString() + ": " + aMsg);
-            //Console.Out.WriteLineAsync(aType.ToString() + ": " + aMsg);
-            
+            string fileName = string.IsNullOrWhiteSpace(filePath) ? "unknown" : Path.GetFileName(filePath);
+            Console.WriteLine($"{fileName}:{lineNumber} {memberName}: {aMsg}");
         }
 
 
@@ -253,6 +266,8 @@ namespace Project_1.Managers
                 dispatchText.TopLeftDraw(aBatch, dispatchPos);
                 AbsoluteScreenPosition workerPos = dispatchPos + new AbsoluteScreenPosition(0, (int)Math.Ceiling(dispatchText.Offset.Y) + 2);
                 workerText.TopLeftDraw(aBatch, workerPos);
+                AbsoluteScreenPosition screenshotPos = workerPos + new AbsoluteScreenPosition(0, (int)Math.Ceiling(workerText.Offset.Y) + 2);
+                screenshotText.TopLeftDraw(aBatch, screenshotPos);
             }
         }
     }

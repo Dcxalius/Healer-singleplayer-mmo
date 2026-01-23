@@ -36,7 +36,7 @@ namespace Project_1.UI.CharacterCreator
 
         public override void Update()
         {
-            //DebugManager.Print(GetType(), name);
+            //DebugManager.Print(name);
             base.Update();
             if (SaveManager.NameAlreadyExists(inputBox.Input))
             {

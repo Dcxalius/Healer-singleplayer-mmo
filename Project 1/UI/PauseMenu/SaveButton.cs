@@ -1,7 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.Managers;
 using Project_1.Managers.States;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.UI;
 using Project_1.UI.HUD;
 using Project_1.UI.UIElements.Buttons;
@@ -28,7 +29,7 @@ namespace Project_1.UI.PauseMenu
                 base.ClickedOnAndReleasedOnMe();
                 return;
             }
-            SaveManager.SaveData();
+            Mailboxes.Main.Publish(new SaveDataRequested());
 
             base.ClickedOnAndReleasedOnMe();
 

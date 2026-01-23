@@ -41,9 +41,15 @@ namespace Project_1.Managers.Saves
 
         public string CameraPosition => nameAsPath + "\\Camera.pos";
         string SaveDetailsPath => nameAsPath + "\\Save.Details";
+        internal string SaveDetailsPathForWrite => SaveDetailsPath;
         public string ImagePath => nameAsPath + "\\SaveImage.png";
         public SaveDetails SaveDetails => saveDetails;
         SaveDetails saveDetails;
+
+        internal void SetSaveDetails(SaveDetails details)
+        {
+            saveDetails = details;
+        }
 
         public Save(string aName, bool aExistingSave) 
         {
@@ -74,11 +80,25 @@ namespace Project_1.Managers.Saves
             TimeSpan timeSpan = TimeManager.TotalFrameTimeAsTimeSpan;
             saveDetails = new SaveDetails(name, className, level, timeSpan);
             SaveManager.ExportData(SaveDetailsPath, saveDetails);
+            if (ThreadAffinity.IsMainThread)
+            {
+                SaveScreenshot();
+            }
+            else
+            {
+                SaveManager.RequestScreenshot(this);
+            }
+        }
 
+        internal void SaveScreenshot()
+        {
+            ThreadAffinity.AssertMainThread();
             AbsoluteScreenPosition windowSize = Camera.Camera.WindowSize;
-            Stream imageStream = File.Create(ImagePath);
-            StateManager.FinalGameFrame.SaveAsPng(imageStream, windowSize.X, windowSize.Y);
-            imageStream.Close();
+            using Stream imageStream = File.Create(ImagePath);
+            if (StateManager.FinalGameFrame != null)
+            {
+                StateManager.FinalGameFrame.SaveAsPng(imageStream, windowSize.X, windowSize.Y);
+            }
         }
 
         public void SaveData()

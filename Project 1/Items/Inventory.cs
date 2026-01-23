@@ -158,7 +158,7 @@ namespace Project_1.Items
 
         public bool EquipBag(Container aBag)
         {
-            DebugManager.Print(GetType(), "Depricated Method used");
+            DebugManager.Print("Depricated Method used");
             for (int i = 1; i < bags.Length; i++)
             {
                 if (bags[i] == null)
@@ -293,7 +293,7 @@ namespace Project_1.Items
 
             if ((items[aSlot.Item1][aSlot.Item2] as Container).SlotCount < CountOfItemsInBag(aSlotToSwapWith))
             {
-                DebugManager.Print(GetType(), "Tried to swap with a bag too small.");
+                DebugManager.Print("Tried to swap with a bag too small.");
                 return;
             }
 
@@ -556,7 +556,7 @@ namespace Project_1.Items
                 }
             }
 
-            DebugManager.Print(GetType(), "Tried to destoy item but couldnt find it.");
+            DebugManager.Print("Tried to destoy item but couldnt find it.");
             return false;
         }
 
@@ -564,7 +564,7 @@ namespace Project_1.Items
         {
             if (items[aBagIndex][aSlotIndex] == null)
             {
-                DebugManager.Print(GetType(), "Tried to destoy item but couldnt find it.");
+                DebugManager.Print("Tried to destoy item but couldnt find it.");
                 return 0;
             }
             int count = items[aBagIndex][aSlotIndex].Count;

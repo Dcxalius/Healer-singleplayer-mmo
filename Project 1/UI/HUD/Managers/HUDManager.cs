@@ -11,8 +11,10 @@ using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI;
+using Project_1.UI.HUD;
 using Project_1.UI.HUD.Inventory;
 using Project_1.UI.HUD.SpellBook;
+using Project_1.UI.HUD.Windows.Logic;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Bars;
 using Project_1.UI.UIElements.Boxes;
@@ -44,6 +46,7 @@ namespace Project_1.UI.HUD.Managers
         static SpellBar firstSpellBar;
 
         static Minimap minimap;
+        static SaveStatusIndicator saveStatusIndicator;
 
 
         static HeldItem heldItem;
@@ -124,6 +127,11 @@ namespace Project_1.UI.HUD.Managers
             RelativeScreenPosition mmSize = RelativeScreenPosition.GetSquareFromX(0.2f);
             minimap = new Minimap(new RelativeScreenPosition(0.75f, 0.05f), mmSize);
             hudElements.Add(minimap);
+
+            RelativeScreenPosition saveSize = RelativeScreenPosition.GetSquareFromX(0.03f);
+            RelativeScreenPosition savePos = RelativeScreenPosition.One - saveSize - new RelativeScreenPosition(0.02f, 0.02f);
+            saveStatusIndicator = new SaveStatusIndicator(savePos, saveSize);
+            hudElements.Add(saveStatusIndicator);
 
             Mailboxes.Ui.Subscribe<LootOpened>(HandleLootOpened);
             Mailboxes.Ui.Subscribe<LootSlotChanged>(e =>
@@ -339,6 +347,16 @@ namespace Project_1.UI.HUD.Managers
             Mailboxes.Ui.Subscribe<HudSaveRequested>(_ => Save());
             Mailboxes.Ui.Subscribe<DialogueOpened>(AddDialogueBox);
             Mailboxes.Ui.Subscribe<DialogueClosed>(e => RemoveDialogueBox(e.Box));
+            Mailboxes.Ui.Subscribe<SaveDataStarted>(_ =>
+            {
+                saveStatusIndicator.NotifySaveStarted();
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<SaveDataFinished>(_ =>
+            {
+                saveStatusIndicator.NotifySaveFinished();
+                InvalidateUi();
+            });
 
             uiDrawListDirty = true;
             plateDrawListDirty = true;

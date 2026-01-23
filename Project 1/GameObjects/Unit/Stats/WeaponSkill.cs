@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Project_1.GameObjects.Unit.Stats
 {
@@ -28,27 +29,39 @@ namespace Project_1.GameObjects.Unit.Stats
         Dictionary<Weapon.WeaponType, int> skills;
         Dictionary<Weapon.WeaponType, int> bonuses;
         
-
-        public WeaponSkill(Entity aEntity, int[] aWeaponSkill)
+        [JsonConstructor]
+        public WeaponSkill(int[] aWeaponSkill)
         {
             skills = new Dictionary<Weapon.WeaponType, int>();
             bonuses = new Dictionary<Weapon.WeaponType, int>();
+            if (aWeaponSkill == null) return;
             for (int i = 0; i < aWeaponSkill.Count(); i++)
             {
                 if (aWeaponSkill[i] == 0) continue;
                 skills.Add((Weapon.WeaponType)i, aWeaponSkill[i]);
             }
+        }
+
+        public WeaponSkill(Entity aEntity, int[] aWeaponSkill) : this(aWeaponSkill)
+        {
             entity = aEntity;
         }
 
         public WeaponSkill(Entity aEntity, Classes.ClassData aClass)
         {
             skills = new Dictionary<Weapon.WeaponType, int>();
+            bonuses = new Dictionary<Weapon.WeaponType, int>();
+
             for (int i = 0; i < aClass.skillAsBools.Length; i++)
             {
                 if (!aClass.skillAsBools[i]) continue;
                 skills.Add((Weapon.WeaponType)i, 1);
             }
+            entity = aEntity;
+        }
+
+        public void SetOwner(Entity aEntity)
+        {
             entity = aEntity;
         }
 

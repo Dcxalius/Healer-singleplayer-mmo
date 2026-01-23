@@ -96,7 +96,7 @@ namespace Project_1.Textures
 
             }
 
-            DebugManager.Print(typeof(GraphicsManager), debug);
+            DebugManager.Print(debug);
             FontCache.Init(fontDict, FALLBACK_FONT);
         }
 
@@ -155,7 +155,7 @@ namespace Project_1.Textures
                 }
             }
 
-            DebugManager.Print(typeof(GraphicsManager), debug);
+            DebugManager.Print(debug);
         }
 
 
@@ -177,7 +177,7 @@ namespace Project_1.Textures
             }
             catch (KeyNotFoundException)
             {
-                DebugManager.Print(typeof(TextureManager), $"Font '{fontName}' not found. Falling back to '{FALLBACK_FONT}'.");
+                DebugManager.Print($"Font '{fontName}' not found. Falling back to '{FALLBACK_FONT}'.");
                 return FontCache.GetFont(FALLBACK_FONT);
             }
         }
@@ -196,9 +196,7 @@ namespace Project_1.Textures
 
             if (!dict.TryGetValue(aGfxPath.Name, out var texture))
             {
-                DebugManager.Print(
-                    typeof(TextureManager),
-                    "Texture " + aGfxPath.Name + " from type " + aGfxPath.Type + " was not found."
+                DebugManager.Print("Texture " + aGfxPath.Name + " from type " + aGfxPath.Type + " was not found."
                 );
 
                 // Fallback to MissingTexture in the Debug gfx type

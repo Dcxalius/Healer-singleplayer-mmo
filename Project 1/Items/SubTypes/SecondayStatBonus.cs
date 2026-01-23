@@ -37,7 +37,7 @@ namespace Project_1.Items.SubTypes
         public static SecondayStatBonus<T> operator+ (SecondayStatBonus<T> lhs, T rhs)
         {
             Debug.Assert(lhs.value.GetType() == rhs.GetType());
-            lhs.value = (T)(object)(lhs.value is null ? 0 : (int)(object)lhs.value + (int)(object)rhs);
+            lhs.value = AddValues(lhs.value, rhs);
             return lhs;
         }
 
@@ -47,25 +47,30 @@ namespace Project_1.Items.SubTypes
             Debug.Assert(lhs.SecondaryStat ==  rhs.secondaryStat);
             Debug.Assert(lhs.value.GetType() == rhs.value.GetType());
             
-            switch (lhs.SecondaryStat)
-            {
-                case "SpellDamage":
-                case "SpellFlatPenetration":
-                    lhs.value = (T)(object)(lhs.value is null ? 0 : (int)(object)lhs.value + (int)(object)rhs.value);
-                    break;
-                case "SpellCritChance":
-                case "SpellCritDamage":
-                case "SpellPercentPenetration":
-                case "SpellHaste":
-                case "SpellVampirism":
-                case "SpellBonusHitChance":
-                    lhs.value = (T)(object)(lhs.value is null ? 0 : (double)(object)lhs.value + (double)(object)rhs.value);
-                    break;
-            }
-            
-            
+            lhs.value = AddValues(lhs.value, rhs.value);
 
             return lhs;
+        }
+
+        static T AddValues(T lhs, T rhs)
+        {
+            if (typeof(T) == typeof(int))
+            {
+                int result = (int)(object)lhs + (int)(object)rhs;
+                return (T)(object)result;
+            }
+            if (typeof(T) == typeof(float))
+            {
+                float result = (float)(object)lhs + (float)(object)rhs;
+                return (T)(object)result;
+            }
+            if (typeof(T) == typeof(double))
+            {
+                double result = (double)(object)lhs + (double)(object)rhs;
+                return (T)(object)result;
+            }
+
+            throw new NotImplementedException($"Unsupported secondary stat type: {typeof(T)}");
         }
     }
 }

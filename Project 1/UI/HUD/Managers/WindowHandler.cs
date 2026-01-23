@@ -14,6 +14,7 @@ using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Entities.GuildMembers;
+using Project_1.UI.HUD.Windows.Logic;
 
 namespace Project_1.UI.HUD.Managers
 {
@@ -25,6 +26,8 @@ namespace Project_1.UI.HUD.Managers
         static InspectWindow inspectWindow;
         static GossipWindow gossipWindow;
         static ShopWindow shopWindow;
+        static LogicWindow logicWindow;
+
         public void InitWindows(ref List<UIElement> aHudElements)
         {
             Window.Init(new RelativeScreenPosition(0.05f, 0.2f), new RelativeScreenPosition(0.1f, 0f), new RelativeScreenPosition(0.2f, 0.6f));
@@ -49,6 +52,8 @@ namespace Project_1.UI.HUD.Managers
             shopWindow = new ShopWindow();
             aHudElements.Add(shopWindow);
 
+            logicWindow = new LogicWindow();
+            aHudElements.Add(logicWindow);
         }
 
         public void OpenShopWindow(int[] itemIds)

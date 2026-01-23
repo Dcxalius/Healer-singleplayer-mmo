@@ -61,7 +61,7 @@ namespace Project_1.GameObjects.Entities
         }
         protected override void Death()
         {
-            int[] averageLevel = aggroTable.GetLevelOfAggroTable();
+            int[] averageLevel = aggroTable.GetLevelOfAggroTable(); //TODO: Change this to not be dependant on aggroTable?
 
             int exp = UnitData.Level.ExpReward((int)Math.Round(averageLevel.Average()));
             aggroTable.Tagger.ExpToParty(exp);
@@ -69,10 +69,10 @@ namespace Project_1.GameObjects.Entities
             base.Death();
         }
 
-        protected override void ProcessDamage(Entity aCause, string aCauseName, float aDamageTaken, DamageType aDamageType, string aPrefix, string aSuffix) //TODO: Determine if this should always be called, even if attack dealt no damage to handle threat. Alternatively, handle base threat elsewhere and only do damage threat here
+        protected override void ProcessDamage(Entity aCause, string aCauseName, float aDamageTaken, float aThreatMod, DamageType aDamageType, Color aBorderColor, string aPrefix, string aSuffix) //TODO: Determine if this should always be called, even if attack dealt no damage to handle threat. Alternatively, handle base threat elsewhere and only do damage threat here
         {
-            base.ProcessDamage(aCause, aCauseName, aDamageTaken, aDamageType, aPrefix, aSuffix);
-            aggroTable.AddToAggroTable(aCause, aDamageTaken);
+            aggroTable.AddToAggroTable(aCause, aDamageTaken * aThreatMod);
+            base.ProcessDamage(aCause, aCauseName, aDamageTaken, aThreatMod, aDamageType, aBorderColor, aPrefix, aSuffix);
         }
 
         public virtual void AddToAggroTable(Entity aEntityToAdd, float aThreatValue)

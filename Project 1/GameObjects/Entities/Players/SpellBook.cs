@@ -82,7 +82,7 @@ namespace Project_1.GameObjects.Entities.Players
             Spell s = learnableSpells.Find(x => x.Name == aSpellName);
             if (s == null)
             {
-                DebugManager.Print(GetType(), "Tried to learn spell named " + aSpellName + " but it was null.");
+                DebugManager.Print("Tried to learn spell named " + aSpellName + " but it was null.");
                 return;
             }
 

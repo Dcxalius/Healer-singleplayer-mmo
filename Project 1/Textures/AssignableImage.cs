@@ -63,6 +63,7 @@ namespace Project_1.Textures
                 gfx = null;
                 return;
             }
+            // Render-side texture loading, main-thread only.
             ThreadAffinity.AssertMainThread();
             gfx = GraphicsManager.CreateTextureFromFile(pendingPath);
         }

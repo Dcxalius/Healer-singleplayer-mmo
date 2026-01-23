@@ -366,8 +366,8 @@ namespace Project_1.Input
 
             RelativeScreenPosition mouseVector = new RelativeScreenPosition(mousePoint.X / (float)screenSize.X, mousePoint.Y / (float)screenSize.Y);
 
-            //DebugManager.Print(typeof(InputManager), Camera.Camera.ScreenRectangle.ToString());
-            //DebugManager.Print(typeof(InputManager), mousePoint.ToString());
+            //DebugManager.Print(Camera.Camera.ScreenRectangle.ToString());
+            //DebugManager.Print(mousePoint.ToString());
 
 
             return mouseVector;

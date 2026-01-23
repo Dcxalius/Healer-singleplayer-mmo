@@ -133,7 +133,7 @@ namespace Project_1.GameObjects.Entities.Corspes
 
             if (!IsEmpty)
             {
-                ParticleManager.SpawnParticle(lootGlow, WorldRectangle, this, lootGlowMovement, 60d);
+                ParticleManager.SpawnParticle(lootGlow, WorldRectangle, FeetPosition.Y, lootGlowMovement, 60d);
 
                 DespawnWithoutLootInside();
             }

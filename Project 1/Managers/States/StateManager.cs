@@ -22,6 +22,7 @@ using Project_1.UI.HUD.Managers;
 using Project_1.UI.OptionMenu;
 using Project_1.UI.PauseMenu;
 using Project_1.UI.UIElements.Boxes;
+using Project_1.Tiles;
 
 namespace Project_1.Managers.States
 {
@@ -86,9 +87,14 @@ namespace Project_1.Managers.States
             Mailboxes.Main.Subscribe<StateChangeRequested>(e => SetState(e.State));
             Mailboxes.Main.Subscribe<ResetToMainMenuRequested>(_ => HandleResetToMainMenuRequested());
             Mailboxes.Main.Subscribe<CreateNewPlayerRequested>(HandleCreateNewPlayerRequested);
+            Mailboxes.Main.Subscribe<SaveDataRequested>(_ => HandleSaveDataRequested());
+            Mailboxes.Main.Subscribe<LoadSaveRequested>(HandleLoadSaveRequested);
+            Mailboxes.Main.Subscribe<ContinueLastSaveRequested>(_ => HandleContinueLastSaveRequested());
+            Mailboxes.Main.Subscribe<NewGameRequested>(_ => HandleNewGameRequested());
             Mailboxes.Main.Subscribe<ShopPurchaseRequested>(HandleShopPurchaseRequested);
             Mailboxes.Main.Subscribe<SpellCastRequested>(HandleSpellCastRequested);
             Mailboxes.Main.Subscribe<TargetRequested>(HandleTargetRequested);
+            Mailboxes.Main.Subscribe<SaveLoadParsed>(HandleSaveLoadParsed);
             Mailboxes.Main.Subscribe<PartyMemberInviteRequested>(HandlePartyMemberInviteRequested);
             Mailboxes.Main.Subscribe<PartyMemberKickRequested>(HandlePartyMemberKickRequested);
             Mailboxes.Main.Subscribe<InventorySwapItemsRequested>(HandleInventorySwapItemsRequested);
@@ -102,6 +108,12 @@ namespace Project_1.Managers.States
             Mailboxes.Main.Subscribe<InventoryConsumeRequested>(HandleInventoryConsumeRequested);
             Mailboxes.Main.Subscribe<EquipmentSwapRequested>(HandleEquipmentSwapRequested);
             Mailboxes.Main.Subscribe<EquipmentMoveToInventoryRequested>(HandleEquipmentMoveToInventoryRequested);
+            Mailboxes.Main.Subscribe<ClickEvent>(HandleClickInput);
+            Mailboxes.Main.Subscribe<ReleaseEvent>(HandleReleaseInput);
+            Mailboxes.Main.Subscribe<ScrollEvent>(HandleScrollInput);
+            Mailboxes.Main.Subscribe<KeyboardSnapshot>(e => KeyboardStateCache.Update(e));
+            Mailboxes.Main.Subscribe<KeyBindSnapshot>(e => KeyBindStateCache.Update(e));
+            Mailboxes.Main.Subscribe<MouseSnapshot>(e => MouseStateCache.Update(e));
         }
 
         public static void Update()
@@ -426,6 +438,73 @@ namespace Project_1.Managers.States
             ObjectManager.CreateNewPlayer(e.Name, e.ClassName);
             SaveManager.CreateNewSave(e.Name);
             SetState(States.Game);
+        }
+
+        static void HandleSaveDataRequested()
+        {
+            ThreadAffinity.AssertSimThread();
+            SaveManager.SaveData();
+        }
+
+        static void HandleLoadSaveRequested(LoadSaveRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (e.Save == null) return;
+            bool async = SaveManager.RequestLoadData(e.Save);
+            if (async)
+            {
+                SetState(States.LoadingMenu);
+                return;
+            }
+            SetState(States.Game);
+            RedrawGame();
+        }
+
+        static void HandleContinueLastSaveRequested()
+        {
+            ThreadAffinity.AssertSimThread();
+            bool async = SaveManager.RequestContinueLastSave();
+            if (async)
+            {
+                SetState(States.LoadingMenu);
+                return;
+            }
+            SetState(States.Game);
+            RedrawGame();
+        }
+
+        static void HandleNewGameRequested()
+        {
+            ThreadAffinity.AssertSimThread();
+            TileManager.New();
+            SetState(States.NewGame);
+        }
+
+        static void HandleSaveLoadParsed(SaveLoadParsed e)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (e.Payload == null) return;
+            SaveManager.ApplyLoadPayload(e.Payload);
+            SetState(States.Game);
+            RedrawGame();
+        }
+
+        static void HandleClickInput(ClickEvent e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Click(e);
+        }
+
+        static void HandleReleaseInput(ReleaseEvent e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Release(e);
+        }
+
+        static void HandleScrollInput(ScrollEvent e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Scroll(e);
         }
 
         static void HandleInventorySwapItemsRequested(InventorySwapItemsRequested e)

@@ -129,6 +129,13 @@ namespace Project_1.GameObjects.Spawners
             spawners = new List<Spawner>();
         }
 
+        internal void ApplySaveData(SpawnZoneSaveData data)
+        {
+            if (data == null) return;
+            MobName = data.MobNames ?? Array.Empty<string>();
+            MobPathings = data.Pathing ?? Array.Empty<MobPathing>();
+        }
+
         //public void AddMobToSpawn(MobData aData) => AddMobsToSpawn(new MobData[] { aData });
 
         //public void AddMobsToSpawn(MobData[] aData)

@@ -63,6 +63,8 @@ namespace Project_1.GameObjects.Entities
         WorldSpace? pendingTarget;
         int overwriteToken;
         int requestToken;
+        bool hasPendingOverwrite;
+        Path pendingOverwritePath;
         public Destination(List<WorldSpace> aDestinationList)
         {
             paths = new List<Path>();
@@ -80,6 +82,14 @@ namespace Project_1.GameObjects.Entities
                 if (!(owner as Player).LockedMovement) return;
             }
 
+            if (hasPendingOverwrite)
+            {
+                paths.Clear();
+                paths.Add(pendingOverwritePath);
+                destination = null;
+                pendingOverwritePath = null;
+                hasPendingOverwrite = false;
+            }
             if (!HasDestination) destination = null;
             if (owner.Target == null && CurrentPath != null && destination == null)
             {
@@ -191,9 +201,6 @@ namespace Project_1.GameObjects.Entities
             overwriteToken++;
             int localToken = ++requestToken;
 
-            paths.Clear();
-            destination = null;
-
             TileManager.RequestPath(owner.FeetPosition, aDestination, new WorldSpace(owner.FeetSize), path =>
             {
                 if (localToken != requestToken) return;
@@ -204,9 +211,8 @@ namespace Project_1.GameObjects.Entities
 
                 if (path != null)
                 {
-                    paths.Clear();
-                    paths.Add(path);
-                    destination = null;
+                    pendingOverwritePath = path;
+                    hasPendingOverwrite = true;
                 }
                 else if (DebugManager.Mode(DebugMode.TeleportStuckThings))
                 {
@@ -217,7 +223,15 @@ namespace Project_1.GameObjects.Entities
 
         public void AddDestination(WorldSpace aDestination)
         {
-            Path lastPath = paths.Count > 0 ? paths[paths.Count - 1] : null;
+            Path lastPath = null;
+            for (int i = paths.Count - 1; i >= 0; i--)
+            {
+                if (paths[i].Count > 0)
+                {
+                    lastPath = paths[i];
+                    break;
+                }
+            }
             WorldSpace start = lastPath != null ? lastPath.CheckLastSpace : owner.FeetPosition;
             int localOverwriteToken = overwriteToken;
             pendingAddRequests++;

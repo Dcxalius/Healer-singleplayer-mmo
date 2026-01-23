@@ -45,12 +45,10 @@ namespace Project_1.Managers.States
             Camera.Camera.Update();
             ObjectManager.Update();
             TileManager.Update();
-            FloatingTextManager.Update();
             CorpseManager.Update();
             DoodadManager.Update();
             SpawnerManager.Update();
             ProjectileManager.Update();
-            ParticleManager.Update();
             base.Update();
 
             ObjectManager.RefreshPlates();
@@ -91,6 +89,7 @@ namespace Project_1.Managers.States
 
         public RenderTarget2D CleanGameDraw()
         {            
+            UpdateVfx();
             PrepRender(Color.White, SpriteSortMode.Immediate);
 
             DrawList(spriteBatch);
@@ -101,6 +100,7 @@ namespace Project_1.Managers.States
 
         public override RenderTarget2D Draw()
         {
+            UpdateVfx();
             UIDraw();
             Effect e = EffectManager.GetEffect("TestDarkness");
             PrepRender(Color.White, SpriteSortMode.FrontToBack, effect: e);
@@ -130,6 +130,13 @@ namespace Project_1.Managers.States
 
             CleanRender();
             return renderTarget;
+        }
+
+        void UpdateVfx()
+        {
+            ThreadAffinity.AssertMainThread();
+            ParticleManager.Update();
+            FloatingTextManager.Update();
         }
 
         void DrawList(SpriteBatch aBatch)

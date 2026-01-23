@@ -1,18 +1,16 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using Project_1.GameObjects.Entities.Corspes;
 using Project_1.Managers;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project_1.GameObjects.FloatingTexts
 {
     internal static class FloatingTextManager
     {
         static List<FloatingText> floatingTexts;
-        static volatile FloatingText[] renderFloatingTexts = Array.Empty<FloatingText>();
+        static readonly ConcurrentQueue<FloatingText> pendingAdds = new ConcurrentQueue<FloatingText>();
+        static volatile bool clearRequested;
         static bool initialized;
 
         public static void Init()
@@ -22,29 +20,50 @@ namespace Project_1.GameObjects.FloatingTexts
             floatingTexts = new List<FloatingText>();
         }
 
-        public static void AddFloatingText(FloatingText aFloater) => floatingTexts.Add(aFloater);
+        public static void AddFloatingText(FloatingText aFloater)
+        {
+            if (aFloater == null) return;
+            if (ThreadAffinity.IsMainThread)
+            {
+                floatingTexts.Add(aFloater);
+                return;
+            }
+            pendingAdds.Enqueue(aFloater);
+        }
 
         public static void DoWhatLeaguePlayersTellMe(FloatingText aText) => floatingTexts.Remove(aText);
 
 
-        public static void Reset() => floatingTexts.Clear();
+        public static void Reset()
+        {
+            if (ThreadAffinity.IsMainThread)
+            {
+                floatingTexts.Clear();
+                return;
+            }
+            clearRequested = true;
+        }
 
         public static void Update() 
         {
-            ThreadAffinity.AssertSimThread();
+            ThreadAffinity.AssertMainThread();
+            if (clearRequested)
+            {
+                floatingTexts.Clear();
+                clearRequested = false;
+                while (pendingAdds.TryDequeue(out _)) { }
+            }
+            while (pendingAdds.TryDequeue(out FloatingText pending))
+            {
+                floatingTexts.Add(pending);
+            }
             for (int i = floatingTexts.Count - 1; i >= 0; i--) floatingTexts[i].Update();
         }
 
         public static void Draw(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();
-            FloatingText[] snapshot = renderFloatingTexts;
-            for (int i = 0; i < snapshot.Length; i++) snapshot[i].Draw(aBatch);
-        }
-
-        internal static void BuildRenderSnapshot()
-        {
-            renderFloatingTexts = floatingTexts.ToArray();
+            for (int i = 0; i < floatingTexts.Count; i++) floatingTexts[i].Draw(aBatch);
         }
     }
 }

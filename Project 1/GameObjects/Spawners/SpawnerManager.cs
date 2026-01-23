@@ -1,7 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Newtonsoft.Json;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spawners.Pathing;
@@ -15,6 +13,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace Project_1.GameObjects.Spawners
 {
@@ -44,6 +44,72 @@ namespace Project_1.GameObjects.Spawners
             spawnZones.Clear();
             SavedMobData[] unitData = ImportUnitData(aSave);
             ImportZones(aSave, unitData);
+        }
+
+        public static void LoadFromTokens(IReadOnlyList<JToken> zoneTokens, IReadOnlyList<JToken> mobTokens, JsonSerializer serializer)
+        {
+            for (int i = 0; i < spawnZones.Count; i++)
+            {
+                spawnZones[i].RemoveAllPlates();
+            }
+            spawnZones.Clear();
+
+            if (serializer == null)
+            {
+                return;
+            }
+
+            SavedMobData[] unitData = Array.Empty<SavedMobData>();
+            if (mobTokens != null && mobTokens.Count > 0)
+            {
+                unitData = new SavedMobData[mobTokens.Count];
+                for (int i = 0; i < mobTokens.Count; i++)
+                {
+                    unitData[i] = mobTokens[i].ToObject<SavedMobData>(serializer);
+                }
+            }
+
+            if (zoneTokens == null || zoneTokens.Count == 0)
+            {
+                return;
+            }
+
+            for (int i = 0; i < zoneTokens.Count; i++)
+            {
+                SpawnZoneSaveData zoneData = zoneTokens[i].ToObject<SpawnZoneSaveData>(serializer);
+                if (zoneData == null) continue;
+                SavedMobData[] zoneUnits = unitData.Where(x => x != null && x.SpawnZoneID == zoneData.Id).ToArray();
+                if (zoneUnits.Length == 0)
+                {
+                    spawnZones.Add(new SpawnZone(zoneData.Id, zoneData.MobNames ?? Array.Empty<string>(), zoneData.Pathing ?? Array.Empty<MobPathing>()));
+                    continue;
+                }
+                SpawnZone zone = new SpawnZone(zoneData.Id, zoneUnits);
+                zone.ApplySaveData(zoneData);
+                spawnZones.Add(zone);
+            }
+        }
+
+        public static void GetSaveSnapshot(out SpawnZone[] zones, out SavedMobData[] savedMobs)
+        {
+            zones = spawnZones == null || spawnZones.Count == 0 ? Array.Empty<SpawnZone>() : spawnZones.ToArray();
+            if (zones.Length == 0)
+            {
+                savedMobs = Array.Empty<SavedMobData>();
+                return;
+            }
+
+            List<SavedMobData> mobData = new List<SavedMobData>();
+            for (int i = 0; i < zones.Length; i++)
+            {
+                SavedMobData[] zoneMobs = zones[i].GetSavedMobData();
+                if (zoneMobs == null) continue;
+                for (int j = 0; j < zoneMobs.Length; j++)
+                {
+                    if (zoneMobs[j] != null) mobData.Add(zoneMobs[j]);
+                }
+            }
+            savedMobs = mobData.ToArray();
         }
 
         static void ImportZones(Save aSave, SavedMobData[] aUnitData) //TODO: This doesn't load spawners that doesnt have mobs in them

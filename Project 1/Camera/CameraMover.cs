@@ -92,7 +92,7 @@ namespace Project_1.Camera
                 return;
             }
 
-            //DebugManager.Print(typeof(Camera), "Mouse pos = " + relativeMousePos);
+            //DebugManager.Print("Mouse pos = " + relativeMousePos);
 
             AbsoluteScreenPosition absoluteMosPos = MouseStateCache.Absolute;
             if (absoluteMosPos.X == int.MinValue || absoluteMosPos.Y == int.MinValue)
@@ -108,7 +108,7 @@ namespace Project_1.Camera
             }
             mouseAbsoluteToCentre.Normalize();
             velocity = (WorldSpace)(mouseAbsoluteToCentre * (float)(baseSpeed * TimeManager.SecondsSinceLastFrame) * movementFactor);
-            //DebugManager.Print(typeof(Camera), "Velocity = " + velocity.ToString());
+            //DebugManager.Print("Velocity = " + velocity.ToString());
         }
 
         public void Move()
@@ -122,7 +122,7 @@ namespace Project_1.Camera
                     MoveCircleSoftBound();
                     //if (boundObject.FeetPosition.DistanceTo(centreInWorldSpace) > maxCircleCameraMove)
                     //{
-                    //    DebugManager.Print(typeof(CameraMover), "How did we get here?");
+                    //    DebugManager.Print("How did we get here?");
                     //}
                     break;
                 case CameraSettings.Follow.RectangleSoftBound:
@@ -241,7 +241,7 @@ namespace Project_1.Camera
 
             }
 
-            //DebugManager.Print(typeof(Camera), msg);
+            //DebugManager.Print(msg);
 
             return returnable;
         }
@@ -268,7 +268,7 @@ namespace Project_1.Camera
             otherDirVector.Normalize();
 
 
-            //DebugManager.Print(typeof(Camera), msg);
+            //DebugManager.Print(msg);
 
 
             return (closestDirVector, otherDirVector);

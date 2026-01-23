@@ -124,6 +124,7 @@ namespace Project_1.Particles
         void EnsureTexture()
         {
             if (texture != null) return;
+            // GPU texture creation must stay on the main thread.
             ThreadAffinity.AssertMainThread();
             texture = GraphicsManager.CreateNewTexture(textureSize);
             texture.SetData(textureData);

@@ -126,6 +126,21 @@ namespace Project_1.GameObjects
 
         }
 
+        public static void LoadFromFactoryData()
+        {
+            Reset();
+            guild.AddRange(ObjectFactory.GetGuildMemebers());
+
+            if (ObjectFactory.PlayerData != null)
+            {
+                player = new Player(ObjectFactory.PlayerData);
+                player.GetPartyMembersFromGuild();
+                Camera.Camera.BindCamera(player);
+            }
+
+            npcs.AddRange(ObjectFactory.CreateNpcs());
+        }
+
         public static void CreateNewGuildMember()
         {
             ObjectFactory.AddGuildMember("xdddd", "Rogue");

@@ -18,6 +18,11 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="SpriteFontPlus.MonoGame" Version="0.7.0.22" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content/Settings/**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Target Name="BuildMonoGameContent" BeforeTargets="Build">
     <Exec Command='dotnet mgcb --@="$(MSBuildProjectDirectory)/Content/Content.mgcb" --platform=DesktopGL --outputDir="$(TargetDir)Content" --intermediateDir="$(MSBuildProjectDirectory)/Content/obj/DesktopGL/$(TargetFramework)/Content" --workingDir="$(MSBuildProjectDirectory)/Content" --quiet' />
   </Target>

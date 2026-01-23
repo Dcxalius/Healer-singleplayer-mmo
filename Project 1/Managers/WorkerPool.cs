@@ -131,7 +131,7 @@ namespace Project_1.Managers
                 }
                 catch (Exception ex)
                 {
-                    DebugManager.Print(typeof(WorkerPool), ex.ToString());
+                    DebugManager.Print(ex.ToString());
                 }
             }
         }

@@ -15,6 +15,7 @@ namespace Project_1.UI.HUD.Windows.Logic
         {
             scenarioBox = new ScenarioBox();
             AddChild(scenarioBox);
+            visibleKey = Input.KeyBindManager.KeyListner.LogicWindow;
         }
 
 

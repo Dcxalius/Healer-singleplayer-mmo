@@ -66,7 +66,10 @@ namespace Project_1.GameObjects.Entities
             if (!CheckForRelation()) return;
 
             AttackData a = unitData.AttackData;
-            if ((target.FeetPosition - FeetPosition).ToVector2().Length() >= GetMinAttackRange() - Size.X / 2 - target.Size.X / 2) return;
+            WorldSpace tweenVector = (target.FeetPosition - FeetPosition);
+            float lengthToTarget = tweenVector.ToVector2().Length();
+            float sizeOffset = Size.X / 2 + target.Size.X / 2;
+            if (lengthToTarget - sizeOffset >= GetMinAttackRange()) return;
 
             CheckAttackSpeed(ref unitData.NextAvailableMainHandAttack, a.MainHandAttack);
             if (target == null) return;
@@ -76,14 +79,11 @@ namespace Project_1.GameObjects.Entities
         void CheckAttackSpeed(ref TimeSpan aLockoutTime, Unit.Attack aAttack)
         {
             if (aAttack == null) return;
-            if (!CheckIfInRange(aAttack)) return;
             if (aLockoutTime > TimeManager.TotalFrameTimeAsTimeSpan) return;
 
             aLockoutTime = TimeManager.TotalFrameTimeAsTimeSpan + TimeSpan.FromSeconds(aAttack.SecondsPerAttack);
             HitTarget(aAttack);
         }
-
-        bool CheckIfInRange(Unit.Attack aAttack) => aAttack.Range <= (target.FeetPosition - FeetPosition).ToVector2().Length();
 
         void HitTarget(Unit.Attack aAttack)
         {
@@ -99,7 +99,7 @@ namespace Project_1.GameObjects.Entities
             else
             {
                 //Check if eq/talents/skills/buffs/spells procs
-                damage = new Damage(new double[] { aAttack.GetAttackDamage }, new DamageType[] { DamageType.Physical });
+                damage = new Damage(new double[] { aAttack.GetAttackDamage }, new DamageType[] { DamageType.Physical }); //TODO: Get DamageType from weapon instead
             }
             target.RecieveAttack(hitResult, this, aAttack, damage);
             TargetAliveCheck();
@@ -109,7 +109,7 @@ namespace Project_1.GameObjects.Entities
         {
             if (aggroTablesIAmOn.Contains(aNonfriendly))
             {
-                DebugManager.Print(GetType(), aNonfriendly + " tried to add me to a table I thought I was on.");
+                DebugManager.Print(aNonfriendly + " tried to add me to a table I thought I was on.");
                 return;
             }
             aggroTablesIAmOn.Add(aNonfriendly);
@@ -119,7 +119,7 @@ namespace Project_1.GameObjects.Entities
         {
             if (!aggroTablesIAmOn.Contains(aNonfriendly))
             {
-                DebugManager.Print(GetType(), aNonfriendly + " tried to remove me from a table I didn't know I was on.");
+                DebugManager.Print(aNonfriendly + " tried to remove me from a table I didn't know I was on.");
                 return;
             }
             aggroTablesIAmOn.Remove(aNonfriendly);
@@ -149,6 +149,7 @@ namespace Project_1.GameObjects.Entities
                 }
 
                 SpawnFlyingText(resultString, GetDirOfFloatingText(aAttacker.FeetPosition), resultColor);
+                if (this is NonFriendly nf) nf.AddToAggroTable(aAttacker, 1);
                 return;
             }
             Damage premitigation = new Damage(aDamageTaken);
@@ -167,6 +168,7 @@ namespace Project_1.GameObjects.Entities
                     {
                         resultString = "Blocked";
                         SpawnFlyingText(resultString, GetDirOfFloatingText(aAttacker.FeetPosition), resultColor);
+                        if (this is NonFriendly nf) nf.AddToAggroTable(aAttacker, 1);
                         return;
                     }
                     break;
@@ -186,21 +188,20 @@ namespace Project_1.GameObjects.Entities
             }
             aDamageTaken.ApplyDamageReduction(aAttacker, this, aDamagingThing);
 
-            if (aDamageTaken.Sum <= 0) return;
-
+            if (!aDamageTaken.ContainsDamage) return; //TODO: Spawn Miss or Immune instead of just returning
+            string causeName = aDamagingThing != null ? aDamagingThing.WeaponType.ToString() : "Attack";
             for (int i = 0; i < aDamageTaken.Count; i++)
             {
                 //TODO: When different damage types are implemented, show different colors for different damage types
                 // For example, physical damage could be red, fire damage orange, frost damage blue, etc.
                 // And introduce a offset to the floating text position so that multiple damage types don't overlap
-                unitData.Health.CurrentHealth -= aDamageTaken[aDamageTaken.Types[i]];
-
-                WorldSpace dir = GetDirOfFloatingText(aAttacker.FeetPosition);
-                SpawnFlyingText(resultString, dir, resultColor);
+                float damageValue = (float)aDamageTaken[aDamageTaken.Types[i]];
+                if (damageValue <= 0) continue;
+                ProcessDamage(aAttacker, causeName, damageValue, 1f, aDamageTaken.Types[i], resultColor);
             }
 
             ParticleMovement bloodMovement = new ParticleMovement(GetDirOfFloatingText(aAttacker.FeetPosition), WorldSpace.Zero, 0.9f);
-            ParticleManager.SpawnParticle(bloodsplatter, WorldRectangle, this, bloodMovement, (int)Math.Max(1, Math.Min((aDamageTaken.Sum / MaxHealth) * 100, 100)));
+            ParticleManager.SpawnParticle(bloodsplatter, WorldRectangle, FeetPosition.Y, bloodMovement, (int)Math.Max(1, Math.Min((aDamageTaken.Sum / MaxHealth) * 100, 100)));
             FlagForRefresh(); //TODO: Check death here?
         }
 
@@ -222,13 +223,13 @@ namespace Project_1.GameObjects.Entities
                 if (RandomManager.RollDouble() > totalHit)
                 {
                     SpawnFlyingText("Resist", GetDirOfFloatingText(aCaster.FeetPosition), Color.Gray);
+                    if (this is NonFriendly nf) nf.AddToAggroTable(aCaster, 1);
                     return;
                 }
 
                 for (int i = 0; i < damageType.Count; i++)
                 {
-                    ProcessDamage(aCaster, aSpellEffect.Name, (float)aDamageTaken[damageType[i]], damageType[i]);
-                    SpawnFlyingText(aDamageTaken[damageType[i]].ToString(), GetDirOfFloatingText(aCaster.FeetPosition), Color.Red);
+                    ProcessDamage(aCaster, aSpellEffect.Name, (float)aDamageTaken[damageType[i]], 1f, damageType[i], Color.Red);
                 }
                 return;
             }
@@ -236,6 +237,7 @@ namespace Project_1.GameObjects.Entities
             if (RandomManager.RollDouble() > totalHit)
             {
                 SpawnFlyingText("Resist", GetDirOfFloatingText(aCaster.FeetPosition), Color.Gray);
+                if (this is NonFriendly nf) nf.AddToAggroTable(aCaster, 1);
                 return;
             }
 
@@ -245,13 +247,13 @@ namespace Project_1.GameObjects.Entities
                 switch (damageType[i])
                 {
                     case DamageType.True:
-                        ProcessDamage(aCaster, aSpellEffect.Name, (float)aDamageTaken[DamageType.True], DamageType.True, aDamageTaken[DamageType.True].ToString());
+                        ProcessDamage(aCaster, aSpellEffect.Name, (float)aDamageTaken[DamageType.True], 1f, DamageType.True, Color.Red, aDamageTaken[DamageType.True].ToString());
                         continue;
                     case DamageType.Physical:
                         float reduction = SecondaryStats.Defense.Armor.GetGetReductionPercentage(aCaster.Level.CurrentLevel);
                         float damageTaken = (float)(aDamageTaken[DamageType.Physical] * (1 - reduction));
                         resultString = damageTaken.ToString();
-                        ProcessDamage(aCaster, aSpellEffect.Name, damageTaken, DamageType.Physical);
+                        ProcessDamage(aCaster, aSpellEffect.Name, damageTaken, 1f, DamageType.Physical, Color.Red);
                         break;
                     default:
                         //TODO: Implement spell color on damage text
@@ -276,7 +278,7 @@ namespace Project_1.GameObjects.Entities
                             SpawnFlyingText(resultString, GetDirOfFloatingText(aCaster.FeetPosition), Color.Gray);
                             continue;
                         }
-                        ProcessDamage(aCaster, aSpellEffect.Name, damageTaken, damageType[i], preFix, suffix);
+                        ProcessDamage(aCaster, aSpellEffect.Name, damageTaken, 1f, damageType[i], Color.Red, preFix, suffix);
                         break;
                         
                 }
@@ -285,12 +287,12 @@ namespace Project_1.GameObjects.Entities
         }
 
         //TODO: aCauseName should probably not be a string, but rather some kind of reference to the spell/ability/item that caused the damage
-        protected virtual void ProcessDamage(Entity aCause, string aCauseName, float aDamageTaken, DamageType aDamageType, string aPrefix = "", string aSuffix = "")
+        protected virtual void ProcessDamage(Entity aCause, string aCauseName, float aDamageTaken, float aThreatMod, DamageType aDamageType, Color aBorderColor, string aPrefix = "", string aSuffix = "")
         {
             Color textColor = Color.Red; //TODO: Different colors for different damage types
             CurrentHealth -= aDamageTaken;
 
-            //TODO: aCause.DpsMeter.RegisterDamageDone(aCauseName, aDamageTaken, aDamageType, this);
+            //TODO: aCause.DpsMeter.RegisterDamageDone(this, aCauseName, aDamageTaken, aDamageType);
 
             SpawnFlyingText(aPrefix + aDamageTaken + aSuffix, GetDirOfFloatingText(aCause.FeetPosition), textColor);
         }

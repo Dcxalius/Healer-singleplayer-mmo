@@ -61,6 +61,19 @@ namespace Project_1.GameObjects
             ImportGuildData(aSave);
         }
 
+        public static void ApplyLoadedData(PlayerData loadedPlayer, List<UnitData> loadedGuild)
+        {
+            ResetUnitData();
+            playerData = loadedPlayer;
+            guildData = loadedGuild ?? new List<UnitData>();
+        }
+
+        public static UnitData[] GetGuildDataSnapshot()
+        {
+            if (guildData == null || guildData.Count == 0) return Array.Empty<UnitData>();
+            return guildData.ToArray();
+        }
+
         public static void ResetUnitData()
         {
             playerData = null;

@@ -53,7 +53,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
         {
             base.ClickedOnMe(aClick);
 
-            //DebugManager.Print(this.GetType(), pos.ToString());
+            //DebugManager.Print(pos.ToString());
 
             if (isOpen == true)
             {

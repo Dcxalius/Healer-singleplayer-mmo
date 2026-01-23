@@ -42,7 +42,7 @@ namespace Project_1.UI.UIElements.Boxes
             set => scrollSpeed = value;
         }
         float scrollSpeed = 0.1f;
-        float MaxScroll => originalYPos.Last() + scrollableElements.Last().RelativeSize.Y + Spacing.Y - 1f;
+        float MaxScroll => scrollableElements.Count == 0 ? 0f : originalYPos.Last() + scrollableElements.Last().RelativeSize.Y + Spacing.Y - 1f;
         public RelativeScreenPosition ElementSize
         {
             get => elementSize;
@@ -80,6 +80,12 @@ namespace Project_1.UI.UIElements.Boxes
 
         public void SetScrollValue(float aValue)
         {
+            if (scrollableElements.Count == 0)
+            {
+                scrollValue = 0f;
+                scrollBar.SetValue(0f);
+                return;
+            }
             scrollBar.SetValue(aValue);
             scrollValue = MaxScroll * aValue;
             CapScroll();
@@ -96,7 +102,10 @@ namespace Project_1.UI.UIElements.Boxes
             CapScroll();
             UpdateScrollableComponentPosition();
 
-            scrollBar.SetValue(scrollValue / MaxScroll);
+            if (MaxScroll > 0)
+            {
+                scrollBar.SetValue(scrollValue / MaxScroll);
+            }
         }
 
         public void RemoveAllScrollableElements()
@@ -104,6 +113,9 @@ namespace Project_1.UI.UIElements.Boxes
             for (int i = 0; i < scrollableElements.Count; i++) KillChild(scrollableElements[i]);
             scrollableElements.Clear();
             originalYPos.Clear();
+            scrollValue = 0f;
+            scrollBar.SetValue(0f);
+            scrollBar.SetScrollPlimpSize(1f);
         }
 
 

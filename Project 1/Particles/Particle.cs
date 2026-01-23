@@ -1,13 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
-using Project_1.GameObjects;
 using Project_1.Managers;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project_1.Particles
 {
@@ -17,7 +12,7 @@ namespace Project_1.Particles
         double timeSpawned;
         double lifeSpan;
 
-        GameObject parent;
+        float layerFeetY;
 
         public bool IsDead { get => isDead; }
         bool isDead;
@@ -33,7 +28,7 @@ namespace Project_1.Particles
         ParticleMovement particleMovement;
         float rotation;
 
-        public Particle(WorldSpace aPos, ParticleBase aParticleBase, GameObject aParent, ParticleMovement aMovement)
+        public Particle(WorldSpace aPos, ParticleBase aParticleBase, float aLayerFeetY, ParticleMovement aMovement)
         {
             isDead = false;
 
@@ -47,7 +42,7 @@ namespace Project_1.Particles
             color = aParticleBase.Color;
             opacity = 1d;
 
-            parent = aParent;
+            layerFeetY = aLayerFeetY;
 
             particleMovement = aMovement;
             rotation = (float)Math.Atan2(aMovement.Momentum.Y, aMovement.Momentum.X);
@@ -98,7 +93,7 @@ namespace Project_1.Particles
         {
             if (!Camera.Camera.WorldspaceBoundsCheck(pos)) return;
             
-            aBatch.Draw(particleBase.Texture, pos.ToAbsoltueScreenPosition().ToVector2(), null, GetOpacityColor(color, opacity), rotation, Vector2.Zero, 1f, SpriteEffects.None, (parent.FeetPosition.Y + 1) / (Camera.Camera.WorldRectangle.Bottom)); //TODO: Make this use the layerDepth
+            aBatch.Draw(particleBase.Texture, pos.ToAbsoltueScreenPosition().ToVector2(), null, GetOpacityColor(color, opacity), rotation, Vector2.Zero, 1f, SpriteEffects.None, (layerFeetY + 1) / (Camera.Camera.WorldRectangle.Bottom)); //TODO: Make this use the layerDepth
             //aBatch.Draw(particleBase.Texture, Camera.Camera.WorldPosToCameraSpace(worldPos), null, GetOpacityColor(color, opacity), rotation, Vector2.Zero, 1f, SpriteEffects.None, (parent.FeetPos.Y + 1) / (Camera.Camera.WorldRectangle.Bottom)); //TODO: Make this use the layerDepth
         }
 

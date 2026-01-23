@@ -2,6 +2,8 @@
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Managers.Saves;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -51,6 +53,17 @@ namespace Project_1.GameObjects.Entities.Corspes
             }
         }
 
+        public static void LoadFromTokens(IReadOnlyList<JToken> tokens, JsonSerializer serializer)
+        {
+            corpses.Clear();
+            if (tokens == null || serializer == null) return;
+            for (int i = 0; i < tokens.Count; i++)
+            {
+                if (tokens[i] == null) continue;
+                _ = tokens[i].ToObject<Corpse>(serializer);
+            }
+        }
+
         public static bool Click(ClickEvent aClickEvent)
         {
             ThreadAffinity.AssertSimThread();
@@ -78,6 +91,12 @@ namespace Project_1.GameObjects.Entities.Corspes
         internal static void BuildRenderSnapshot()
         {
             renderCorpses = corpses.ToArray();
+        }
+
+        public static Corpse[] GetSnapshot()
+        {
+            if (corpses == null || corpses.Count == 0) return Array.Empty<Corpse>();
+            return corpses.ToArray();
         }
     }
 }

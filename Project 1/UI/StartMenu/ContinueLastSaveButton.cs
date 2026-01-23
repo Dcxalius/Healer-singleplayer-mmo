@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.Managers;
-using Project_1.Managers.States;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.UI.UIElements.Buttons;
 using System;
 using System.Collections.Generic;
@@ -21,9 +21,7 @@ namespace Project_1.UI.StartMenu
         {
             base.ClickedOnAndReleasedOnMe();
 
-            SaveManager.ContinueLastSave();
-
-            StateManager.RequestStateChange(StateManager.States.Game);
+            Mailboxes.Main.Publish(new ContinueLastSaveRequested());
         }
     }
 }

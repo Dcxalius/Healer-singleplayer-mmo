@@ -68,6 +68,16 @@ namespace Project_1.GameObjects.Unit.Stats
             table[(int)HitResult.Crit] = aAttacker.SecondaryStats.Attack.CriticalChance + attackerSkillGap * 0.04;
             table[(int)HitResult.Crushing] = (aAttacker.UnitType >= UnitType.Normal && aTarget.UnitType == UnitType.Player && attackerSkillGapWithDefenseCapped >= 20) ? attackerSkillGapWithDefenseCapped * 0.02 - 0.15 : 0.0;
 
+            for (int i = 0; i < table.Length; i++)
+            {
+                if (table[i] < 0)
+                {
+                    table[i] = 0;
+                }
+            }
+
+            //DebugManager.Print(FormatHitTable(table));
+
             double roll = RandomManager.RollDouble(0.01, 1);
             double cumulative = 0.0;
             for (int i = 0; i < table.Length - 1; i++)
@@ -75,10 +85,38 @@ namespace Project_1.GameObjects.Unit.Stats
                 cumulative += table[i];
                 if (roll <= cumulative)
                 {
+                    DebugManager.Print("Roll: " + roll + ", Expected: " + (HitResult)i);
+
                     return (HitResult)i;
                 }
             }
+            DebugManager.Print("Roll: " + roll + ", Expected: " + HitResult.Hit);
+
             return HitResult.Hit;
+        }
+
+        static string FormatHitTable(double[] table)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine("Hit table:");
+            string[] names = Enum.GetNames<HitResult>();
+            double cumulative = 0.0;
+
+            for (int i = 0; i < names.Length - 1; i++)
+            {
+                double chance = table[i];
+                double start = cumulative * 100.0;
+                cumulative += chance;
+                double end = cumulative * 100.0;
+                builder.AppendLine($"{names[i],-9} {chance * 100.0,6:0.00}%  [{start,6:0.00}-{end,6:0.00}]");
+            }
+
+            double hitChance = Math.Max(0.0, 1.0 - cumulative);
+            double hitStart = cumulative * 100.0;
+            double hitEnd = (cumulative + hitChance) * 100.0;
+            builder.AppendLine($"{HitResult.Hit,-9} {hitChance * 100.0,6:0.00}%  [{hitStart,6:0.00}-{hitEnd,6:0.00}]");
+
+            return builder.ToString().TrimEnd();
         }
 
         //Miss	27.00%	0.01 - 27.00

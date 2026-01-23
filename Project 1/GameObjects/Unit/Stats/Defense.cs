@@ -61,7 +61,7 @@ namespace Project_1.GameObjects.Unit.Stats
                 damageReduction = armor / (armor + 400 + 85 * (attackerLevel + 4.5 * (attackerLevel - 59)));
             }
 
-            return damageReduction;
+            return 1 - damageReduction;
         }
 
     }

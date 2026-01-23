@@ -49,7 +49,7 @@ namespace Project_1.Camera
             if (!aContext.HasValue) return new AbsoluteScreenPosition((int)(Camera.ScreenRectangle.Width * aRelativePosition.X), (int)(Camera.ScreenRectangle.Height * aRelativePosition.Y));
             return new AbsoluteScreenPosition((int)(aContext.Value.X * aRelativePosition.X), (int)(aContext.Value.Y * aRelativePosition.Y));
 
-            //DebugManager.Print(typeof(Camera), "Abs pos = " + pos + ", and relative pos = " + aPos);
+            //DebugManager.Print("Abs pos = " + pos + ", and relative pos = " + aPos);
         }
 
         static public RelativeScreenPosition ToRelativeScreenPos(AbsoluteScreenPosition aAbsoluteScreenPosition) => RelativeScreenPosition.FromAbsoluteScreenPosition(aAbsoluteScreenPosition);

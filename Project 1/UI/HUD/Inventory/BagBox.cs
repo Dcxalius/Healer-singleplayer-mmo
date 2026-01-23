@@ -75,7 +75,7 @@ namespace Project_1.UI.HUD.Inventory
 
                 float y = spacing.Y + (itemSize.Y + spacing.Y) * (float)Math.Floor((double)i / aColumnCount);
                 RelativeScreenPosition pos = new RelativeScreenPosition(x, y);
-                // DebugManager.Print(GetType(), pos.ToAbsoluteScreenPos(Size).ToString());
+                // DebugManager.Print(pos.ToAbsoluteScreenPos(Size).ToString());
                 if (items[i] != null)
                 {
                     slots[i] = new Item(bagNr, i, true, items[i], pos, itemSize);
@@ -83,7 +83,7 @@ namespace Project_1.UI.HUD.Inventory
                 else
                 {
                     slots[i] = new Item(bagNr, i, true, (Items.Item)null, pos, itemSize);
-                    //DebugManager.Print(GetType(), slots[i].Size.ToString() );
+                    //DebugManager.Print(slots[i].Size.ToString() );
                 }
             }
         }

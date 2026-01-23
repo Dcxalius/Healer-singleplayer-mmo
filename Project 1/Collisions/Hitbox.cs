@@ -25,6 +25,7 @@ namespace Project_1.Collisions
         static void EnsureDebugTextures()
         {
             if (debugTexturesInitialized) return;
+            // Debug render resources are created on the main thread.
             ThreadAffinity.AssertMainThread();
             circleDebug = TextureManager.GetTexture(new GfxPath(GfxType.Debug, "DebugCircle"));
             rectangleDebug = TextureManager.GetTexture(new GfxPath(GfxType.Debug, "Debug"));

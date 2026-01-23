@@ -248,6 +248,15 @@ namespace Project_1.Tiles
             }
         }
 
+        public static void LoadFromChunks(List<Chunk> loadedChunks)
+        {
+            chunks.Clear();
+            if (loadedChunks != null && loadedChunks.Count > 0)
+            {
+                chunks.AddRange(loadedChunks);
+            }
+        }
+
         static void QueueChunkGeneration(int chunkId)
         {
             if (!pendingChunkGenerations.Add(chunkId)) return;
@@ -367,7 +376,7 @@ namespace Project_1.Tiles
 
             Tile closestTile = FindClosestWalkableTile(aWorldSpace);
 
-            //DebugManager.Print(typeof(TileManager), "Tileboundries are " + closestTile.WorldRectangle);
+            //DebugManager.Print("Tileboundries are " + closestTile.WorldRectangle);
 
 
             Vector2 dirVector = Vector2.Normalize(aWorldSpace - closestTile.Centre);
@@ -606,7 +615,7 @@ namespace Project_1.Tiles
 
                 if (t == null)
                 {
-                    DebugManager.Print(typeof(TileManager), "Tried to get tile from chunk " + chunkToGetTileFrom.ToString() + "but it returned null.");
+                    DebugManager.Print("Tried to get tile from chunk " + chunkToGetTileFrom.ToString() + "but it returned null.");
                     continue;
                 }
 
@@ -656,6 +665,12 @@ namespace Project_1.Tiles
         internal static void BuildRenderSnapshot()
         {
             renderChunks = chunks.ToArray();
+        }
+
+        public static Chunk[] GetChunksSnapshot()
+        {
+            if (chunks == null || chunks.Count == 0) return Array.Empty<Chunk>();
+            return chunks.ToArray();
         }
     }
 }

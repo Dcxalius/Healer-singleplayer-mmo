@@ -145,8 +145,12 @@ namespace Project_1.GameObjects.Unit
 
         public void InitializeWeaponSkill(Entity aOwner)
         {
-            if (weaponSkill != null) return;
-            weaponSkill = new WeaponSkill(aOwner, classData);
+            if (weaponSkill == null)
+            {
+                weaponSkill = new WeaponSkill(aOwner, classData);
+                return;
+            }
+            weaponSkill.SetOwner(aOwner);
         }
 
         [JsonProperty("Equipment")]

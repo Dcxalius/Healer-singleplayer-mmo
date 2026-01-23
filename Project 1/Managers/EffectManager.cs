@@ -44,7 +44,7 @@ namespace Project_1.Managers
 
                 EffectParameter e = effects[effectToProcess.EffectName].Parameters[effectToProcess.SimpleEffectParam.Name];
 
-                //DebugManager.Print(typeof(EffectManager), effectToProcess.SimpleEffectParam.value.GetType().ToString());
+                //DebugManager.Print(effectToProcess.SimpleEffectParam.value.GetType().ToString());
                 switch(effectToProcess.SimpleEffectParam.value.GetType().Name)
                 {
                     case "Single":
@@ -109,7 +109,7 @@ namespace Project_1.Managers
                 debug += name + ", ";
             }
 
-            DebugManager.Print(typeof(EffectManager), debug);
+            DebugManager.Print(debug);
         }
     }
 

@@ -3,9 +3,7 @@ using Project_1.GameObjects;
 using Project_1.GameObjects.Doodads;
 using Project_1.GameObjects.Entities.Corspes;
 using Project_1.GameObjects.Entities.Projectiles;
-using Project_1.GameObjects.FloatingTexts;
 using Project_1.GameObjects.Spawners;
-using Project_1.Particles;
 using Project_1.Tiles;
 
 namespace Project_1.Managers
@@ -22,8 +20,6 @@ namespace Project_1.Managers
             DoodadManager.BuildRenderSnapshot();
             CorpseManager.BuildRenderSnapshot();
             SpawnerManager.BuildRenderSnapshot();
-            ParticleManager.BuildRenderSnapshot();
-            FloatingTextManager.BuildRenderSnapshot();
             MinimapSnapshotManager.BuildSnapshot();
         }
     }

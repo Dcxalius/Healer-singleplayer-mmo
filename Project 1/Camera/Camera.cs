@@ -154,7 +154,7 @@ namespace Project_1.Camera
             if (scale <= minScale) return;
             scale -= 0.05f * aScrollEvent.Steps;
 
-            DebugManager.Print(typeof(Camera), "Scale is now " + scale);
+            DebugManager.Print("Scale is now " + scale);
             cameraMover.bindingRectangle.Size = new Point((int)(WindowSize.X / 4 * 3 * Zoom), (int)(WindowSize.Y / 4 * 3 * Zoom));
         }
 
@@ -163,7 +163,7 @@ namespace Project_1.Camera
             if (!aScrollEvent.Down) return;
             if (scale >= maxScale) return;
             scale += 0.05f * aScrollEvent.Steps;
-            DebugManager.Print(typeof(Camera), "Scale is now " + scale);
+            DebugManager.Print("Scale is now " + scale);
 
             cameraMover.bindingRectangle.Size = new Point((int)(WindowSize.X / 4 * 3 * Zoom), (int)(WindowSize.Y / 4 * 3 * Zoom));
         }

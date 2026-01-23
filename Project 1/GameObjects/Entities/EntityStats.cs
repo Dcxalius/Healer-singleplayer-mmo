@@ -139,7 +139,7 @@ namespace Project_1.GameObjects.Entities
             float value = CalculateHealing(aHealingTaken);
             for (int i = 0; i < aggroTablesIAmOn.Count; i++)
             {
-                aggroTablesIAmOn[i].AddToAggroTable(aHealer, value);
+                aggroTablesIAmOn[i].AddToAggroTable(aHealer, value / aggroTablesIAmOn.Count);
             }
 
             WorldSpace dir = GetDirOfFloatingText(aHealer.FeetPosition);

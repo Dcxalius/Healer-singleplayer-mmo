@@ -2,7 +2,8 @@
 using Project_1.Camera;
 using Project_1.Managers;
 using Project_1.Managers.Saves;
-using Project_1.Managers.States;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
@@ -41,8 +42,7 @@ namespace Project_1.UI.LoadingMenu
 
         void LoadSave()
         {
-            SaveManager.LoadData(save);
-            StateManager.RequestStateChange(StateManager.States.Game);
+            Mailboxes.Main.Publish(new LoadSaveRequested(save));
         }
 
         public void SetSave(Save aSave)

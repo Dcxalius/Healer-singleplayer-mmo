@@ -1,20 +1,17 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
-using Project_1.GameObjects;
 using Project_1.Managers;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project_1.Particles
 {
     internal static class ParticleManager
     {
         static List<Particle> particles;
-        static volatile Particle[] renderParticles = Array.Empty<Particle>();
+        static readonly ConcurrentQueue<ParticleSpawnRequest> pendingSpawns = new ConcurrentQueue<ParticleSpawnRequest>();
         static bool initialized;
 
         public static void Init()
@@ -25,25 +22,32 @@ namespace Project_1.Particles
 
         }
 
-        public static void SpawnParticle(ParticleBase aParticle, WorldSpace aWorldPos, GameObject aParent, ParticleMovement aParticleMovement)
+        public static void SpawnParticle(ParticleBase aParticle, WorldSpace aWorldPos, float aLayerFeetY, ParticleMovement aParticleMovement)
         {
-            particles.Add(new Particle(aWorldPos, aParticle, aParent, aParticleMovement));
+            if (ThreadAffinity.IsMainThread)
+            {
+                particles.Add(new Particle(aWorldPos, aParticle, aLayerFeetY, aParticleMovement));
+                return;
+            }
+            pendingSpawns.Enqueue(new ParticleSpawnRequest(aWorldPos, aParticle, aParticleMovement, aLayerFeetY));
         }
 
-        public static void SpawnParticle(ParticleBase aParticle, Rectangle aWorldPos, GameObject aParent, ParticleMovement aParticleMovement)
+        public static void SpawnParticle(ParticleBase aParticle, Rectangle aWorldPos, float aLayerFeetY, ParticleMovement aParticleMovement)
         {
+            ThreadAffinity.AssertSimThread();
             WorldSpace pos = new WorldSpace((float)RandomManager.RollDouble(aWorldPos.Left, aWorldPos.Right), (float)RandomManager.RollDouble(aWorldPos.Top, aWorldPos.Bottom));
-            SpawnParticle(aParticle, pos, aParent, aParticleMovement);
+            SpawnParticle(aParticle, pos, aLayerFeetY, aParticleMovement);
         }
 
-        public static void SpawnParticle(ParticleBase aParticle, Rectangle aWorldPos, GameObject aParent, ParticleMovement aParticleMovement, double aParticlesPerSecond)
+        public static void SpawnParticle(ParticleBase aParticle, Rectangle aWorldPos, float aLayerFeetY, ParticleMovement aParticleMovement, double aParticlesPerSecond)
         {
+            ThreadAffinity.AssertSimThread();
             aParticlesPerSecond *= TimeManager.SecondsSinceLastFrame;
             if (aParticlesPerSecond >= 1)
             {
                 for (int i = 0; i < (int)Math.Floor(aParticlesPerSecond); i++)
                 {
-                    SpawnParticle(aParticle, aWorldPos, aParent, aParticleMovement);
+                    SpawnParticle(aParticle, aWorldPos, aLayerFeetY, aParticleMovement);
                 }
             }
 
@@ -51,21 +55,26 @@ namespace Project_1.Particles
 
             if (RandomManager.RollDouble() <= pps)
             {
-                SpawnParticle(aParticle, aWorldPos, aParent, aParticleMovement);
+                SpawnParticle(aParticle, aWorldPos, aLayerFeetY, aParticleMovement);
             }
         }
 
-        public static void SpawnParticle(ParticleBase aParticle, Rectangle aWorldPos, GameObject aParent, ParticleMovement aParticleMovement, int aParticleCount)
+        public static void SpawnParticle(ParticleBase aParticle, Rectangle aWorldPos, float aLayerFeetY, ParticleMovement aParticleMovement, int aParticleCount)
         {
+            ThreadAffinity.AssertSimThread();
             for (int i = 0; i < aParticleCount; i++)
             {
-                SpawnParticle(aParticle, aWorldPos, aParent, aParticleMovement);
+                SpawnParticle(aParticle, aWorldPos, aLayerFeetY, aParticleMovement);
             }
         }
 
         public static void Update()
         {
-            ThreadAffinity.AssertSimThread();
+            ThreadAffinity.AssertMainThread();
+            while (pendingSpawns.TryDequeue(out ParticleSpawnRequest request))
+            {
+                particles.Add(new Particle(request.WorldPos, request.Particle, request.LayerFeetY, request.Movement));
+            }
             for (int i = particles.Count - 1; i >= 0; i--) 
             { 
                 particles[i].Update();
@@ -79,16 +88,26 @@ namespace Project_1.Particles
         public static void Draw(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();
-            Particle[] snapshot = renderParticles;
-            for (int i = 0; i < snapshot.Length; i++)
+            for (int i = 0; i < particles.Count; i++)
             {
-                snapshot[i].Draw(aBatch);
+                particles[i].Draw(aBatch);
             }
         }
 
-        internal static void BuildRenderSnapshot()
+        readonly struct ParticleSpawnRequest
         {
-            renderParticles = particles.ToArray();
+            public ParticleSpawnRequest(WorldSpace worldPos, ParticleBase particle, ParticleMovement movement, float layerFeetY)
+            {
+                WorldPos = worldPos;
+                Particle = particle;
+                Movement = movement;
+                LayerFeetY = layerFeetY;
+            }
+
+            public WorldSpace WorldPos { get; }
+            public ParticleBase Particle { get; }
+            public ParticleMovement Movement { get; }
+            public float LayerFeetY { get; }
         }
     }
 }

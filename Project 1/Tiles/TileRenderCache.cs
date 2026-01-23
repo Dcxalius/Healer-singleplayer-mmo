@@ -8,6 +8,7 @@ namespace Project_1.Tiles
 {
     /// <summary>
     /// Render-side cache for tile-derived GPU resources (transparency maps, etc.).
+    /// Main-thread only.
     /// </summary>
     internal static class TileRenderCache
     {

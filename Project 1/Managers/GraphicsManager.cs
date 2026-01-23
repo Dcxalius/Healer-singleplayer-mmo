@@ -176,7 +176,7 @@ namespace Project_1.Managers
             }
 
             windowBounds.Size = gameWindow.ClientBounds.Size + windowBounds.Location;
-            //DebugManager.Print(typeof(GraphicsManager), InputManager.GetMousePosAbsolute().ToString());
+            //DebugManager.Print(InputManager.GetMousePosAbsolute().ToString());
             //rect.Location += 
             if (isWindows && ApplicationIsActivated()) //TODO: Add an option for this
             {
@@ -307,19 +307,19 @@ namespace Project_1.Managers
             //https://stackoverflow.com/questions/1264406/how-do-i-get-the-taskbars-position-and-size   
             if (aSize.Y > graphicsAdapter.CurrentDisplayMode.Height - windowsTitleBarStuff.Y)
             {
-                DebugManager.Print(typeof(GraphicsManager), "My Y is too big");
+                DebugManager.Print("My Y is too big");
                 return false;
             }
             if (aSize.X > graphicsAdapter.CurrentDisplayMode.Width)
             {
-                DebugManager.Print(typeof(GraphicsManager), "My X is too big");
+                DebugManager.Print("My X is too big");
                 return false;
 
             }
 
             if (aSize.X < windowsTitleBarStuff.X)
             {
-                DebugManager.Print(typeof(GraphicsManager), "Tried to set it smaller than the required lenght");
+                DebugManager.Print("Tried to set it smaller than the required lenght");
                 return false;
             }
 
