@@ -57,6 +57,14 @@ namespace Project_1.GameObjects.Unit.Stats
             }
         }
 
+        public void ApplyCriticalStrike(double aCriticalMultiplier)
+        {
+            foreach (var (k, v) in value)
+            {
+                value[k] *= aCriticalMultiplier;
+            }
+        }
+
         public void ApplyGlancingBlowDamage(Entity aAttackingUnit, Unit.Attack aAttack, Entity aMobData)
         {
             int attackerWeaponSkill = Math.Min(aAttackingUnit.WeaponSkill.GetSkill(aAttack.WeaponType), aAttackingUnit.Level.CurrentLevel * 5);

@@ -25,6 +25,7 @@ namespace Project_1.GameObjects.Entities
             {
                 if (buffs[i].IsOver)
                 {
+                    buffs[i].OnRemoved(aOwner);
                     buffs.RemoveAt(i);
                     continue;
                 }
@@ -44,6 +45,7 @@ namespace Project_1.GameObjects.Entities
             }
 
             buffs.Add(aBuff);
+            aBuff.OnApplied(aOwner);
             Mailboxes.Ui.Publish(new BuffAdded(aOwner, buffs.Last()));
         }
 

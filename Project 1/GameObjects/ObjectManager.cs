@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using Project_1.Input;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using System;
@@ -40,11 +39,23 @@ namespace Project_1.GameObjects
         static volatile Npc[] renderNpcs = Array.Empty<Npc>();
         static volatile Player renderPlayer;
 
-        public static List<Entity> entities;
-        public static List<GuildMember> guild;
-        public static List<Npc> npcs;
+        static List<Entity> entities;
+        static List<GuildMember> guild;
+        static List<Npc> npcs;
 
-        public static List<GuildMember> GetGuildMembers() => guild;
+        public static GuildMember[] GetGuildMembers()
+        {
+            ThreadAffinity.AssertSimThread();
+            if (guild == null || guild.Count == 0) return Array.Empty<GuildMember>();
+            return guild.ToArray();
+        }
+
+        public static Entity[] GetEntitiesSnapshot()
+        {
+            ThreadAffinity.AssertSimThread();
+            if (entities == null || entities.Count == 0) return Array.Empty<Entity>();
+            return entities.ToArray();
+        }
         static GuildMember GetClosestGuildMember() => entities.MinBy(x => x.DistanceTo(player.FeetPosition)) as GuildMember;
         static GuildMember[] GuildMembersInWorld => guild.Where(x => entities.Contains(x)).ToArray();
 
@@ -102,6 +113,7 @@ namespace Project_1.GameObjects
 
         public static void CreateNewPlayer(string aName, string aClass)
         {
+            ThreadAffinity.AssertSimThread();
             Reset();
             player = new Player(aName, aClass);
             ObjectFactory.PlayerData = player.PlayerData;
@@ -115,6 +127,7 @@ namespace Project_1.GameObjects
 
         public static void Load(Save aSave)
         {
+            ThreadAffinity.AssertSimThread();
             ObjectFactory.Load(aSave);
             Reset();
             guild.AddRange(ObjectFactory.GetGuildMemebers());
@@ -143,6 +156,7 @@ namespace Project_1.GameObjects
 
         public static void CreateNewGuildMember()
         {
+            ThreadAffinity.AssertSimThread();
             ObjectFactory.AddGuildMember("xdddd", "Rogue");
             guild = ObjectFactory.GetGuildMemebers();
             Mailboxes.Ui.Publish(new GuildMemberAdded(guild.Last()));
@@ -150,6 +164,7 @@ namespace Project_1.GameObjects
 
         public static void Reset()
         {
+            ThreadAffinity.AssertSimThread();
             for (int i = guild.Count - 1; i >= 0; i--)
             {
                 guild[i].Delete();
@@ -166,6 +181,7 @@ namespace Project_1.GameObjects
         #region Party/Guild
         public static GuildMember FriendlyTargetCycle()
         {
+            ThreadAffinity.AssertSimThread();
 
             if (player.Target == null) return GetClosestGuildMember();
             if (player.Target.GetType() != typeof(GuildMember)) return GetClosestGuildMember();
@@ -175,6 +191,7 @@ namespace Project_1.GameObjects
 
         public static bool SpawnGuildMemberToParty(GuildMember aMember, WorldSpace? aPosition)
         {
+            ThreadAffinity.AssertSimThread();
             Debug.Assert(guild.Contains(aMember));
             Debug.Assert(!player.Party.IsInParty(aMember));
 
@@ -187,6 +204,7 @@ namespace Project_1.GameObjects
 
         public static bool RemoveGuildMemberFromParty(GuildMember aMember)
         {
+            ThreadAffinity.AssertSimThread();
             Debug.Assert(guild.Contains(aMember));
             Debug.Assert(player.Party.IsInParty(aMember));
 
@@ -213,55 +231,32 @@ namespace Project_1.GameObjects
         }
         #endregion
 
-        #region Click
-        public static bool Click(ClickEvent aClickEvent)
+        #region HitTest
+        public static bool TryGetEntityAt(WorldSpace worldPos, out Entity entity)
         {
             ThreadAffinity.AssertSimThread();
-            if (player.Click(aClickEvent)) return true;
+            entity = null;
+            if (player != null && player.WorldRectangle.Contains(worldPos.ToPoint()))
+            {
+                entity = player;
+                return true;
+            }
 
             for (int i = 0; i < entities.Count; i++)
             {
-                if (entities[i].Click(aClickEvent)) return true;
+                if (!entities[i].WorldRectangle.Contains(worldPos.ToPoint())) continue;
+                entity = entities[i];
+                return true;
             }
 
             for (int i = 0; i < npcs.Count; i++)
             {
-                if (npcs[i].Click(aClickEvent)) return true;
+                if (!npcs[i].WorldRectangle.Contains(worldPos.ToPoint())) continue;
+                entity = npcs[i];
+                return true;
             }
 
             return false;
-        }
-
-        public static bool ClickGround(ClickEvent aClickEvent)
-        {
-            if (LeftClickedGround(aClickEvent)) return true;
-            if (RightClickGround(aClickEvent)) return true;
-            //if (MiddleClickGround(aClickEvent)) return true;
-            return false;
-        }
-
-        static bool LeftClickedGround(ClickEvent aClickEvent)
-        {
-
-            if (aClickEvent.ButtonPressed != InputManager.ClickType.Left) return false;
-
-            if (aClickEvent.ModifiersOr(new InputManager.HoldModifier[] { InputManager.HoldModifier.Shift, InputManager.HoldModifier.Ctrl }))
-            {
-                player.Party.ClearCommand();
-            }
-            else
-            {
-                player.RemoveTarget();
-            }
-            return true;
-        }
-
-        static bool RightClickGround(ClickEvent aClickEvent)
-        {
-            if (aClickEvent.ButtonPressed != InputManager.ClickType.Right) return false;
-
-            player.Party.IssueMoveOrder(aClickEvent);
-            return true;
         }
         #endregion
 
@@ -298,6 +293,7 @@ namespace Project_1.GameObjects
 
         internal static void BuildRenderSnapshot()
         {
+            ThreadAffinity.AssertSimThread();
             renderPlayer = player;
             renderEntities = entities.ToArray();
             renderNpcs = npcs.ToArray();
@@ -326,6 +322,7 @@ namespace Project_1.GameObjects
 
         internal static void AppendMinimapDots(List<MinimapDotSnapshot> dots)
         {
+            ThreadAffinity.AssertSimThread();
             if (dots == null) return;
             if (player != null)
             {

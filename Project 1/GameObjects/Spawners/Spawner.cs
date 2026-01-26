@@ -4,7 +4,6 @@ using Project_1.Camera;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spawners.Pathing;
 using Project_1.GameObjects.Unit;
-using Project_1.Input;
 using Project_1.Managers;
 using System;
 using System.Collections.Generic;
@@ -116,11 +115,22 @@ namespace Project_1.GameObjects.Spawners
 
         
 
-        internal bool Click(ClickEvent aClickEvent)
+        internal bool TryGetSpawnAt(WorldSpace worldPos, out Entity entity)
         {
-            if (spawn == null) return false;
+            if (spawn == null)
+            {
+                entity = null;
+                return false;
+            }
 
-            return spawn.Click(aClickEvent);
+            if (!spawn.WorldRectangle.Contains(worldPos.ToPoint()))
+            {
+                entity = null;
+                return false;
+            }
+
+            entity = spawn;
+            return true;
         }
 
         internal void RefreshPlates()

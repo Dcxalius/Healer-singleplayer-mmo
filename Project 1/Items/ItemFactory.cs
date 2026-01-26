@@ -134,5 +134,10 @@ namespace Project_1.Items
                     throw new NotImplementedException();
             }
         }
+
+        internal static EquipmentProcEffect GetEquipmentProcEffect(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

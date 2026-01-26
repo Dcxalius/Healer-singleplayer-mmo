@@ -68,11 +68,6 @@ namespace Project_1.Managers.States
             base.Rescale();
         }
 
-        public override bool Click(ClickEvent aClickEvent)
-        {
-            return false;
-        }
-
         public override RenderTarget2D Draw()
         {
             PrepRender(Color.White, SpriteSortMode.Immediate);

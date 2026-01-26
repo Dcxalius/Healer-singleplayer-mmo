@@ -36,12 +36,6 @@ namespace Project_1.Managers.States
             HUDManager.UiInvalidated += MarkUiDirty;
             HUDManager.PlatesInvalidated += MarkPlatesDirty;
         }
-        public override bool Click(ClickEvent aClickEvent)
-        {
-            return false;
-        }
-
-
         public override void OnEnter()
         {
             

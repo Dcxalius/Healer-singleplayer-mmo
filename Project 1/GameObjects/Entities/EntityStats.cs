@@ -97,6 +97,7 @@ namespace Project_1.GameObjects.Entities
         }
         protected virtual void Death()
         {
+            Events.Clear();
             for (int i = 0; i < aggroTablesIAmOn.Count; i++)
             {
                 aggroTablesIAmOn[i].RemoveFromAggroTable(this);

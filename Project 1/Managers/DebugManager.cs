@@ -12,6 +12,7 @@ using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -40,7 +41,9 @@ namespace Project_1.Managers
 
     internal static class DebugManager
     {
-        static List<DebugShape> debugShapes = new List<DebugShape>();
+        static readonly List<DebugShape> debugShapes = new List<DebugShape>();
+        static readonly ConcurrentQueue<DebugShape> pendingDebugShapes = new ConcurrentQueue<DebugShape>();
+        static volatile bool clearDebugShapesRequested;
         static bool initialized;
 
         static Text fpsText;
@@ -135,7 +138,8 @@ namespace Project_1.Managers
         public static void AddDebugShape(DebugShape aShape)
         {
             if (!modes[(int)DebugMode.DebugShapes]) return;
-            debugShapes.Add(aShape);
+            if (aShape == null) return;
+            pendingDebugShapes.Enqueue(aShape);
         }
 
 
@@ -162,8 +166,7 @@ namespace Project_1.Managers
         static void ClearDebugShapes()
         {
             if (!KeyBindStateCache.GetPress(KeyBindManager.KeyListner.DebugDeleteShapes)) return;
-            
-            debugShapes.Clear();
+            clearDebugShapesRequested = true;
         }
 
         static void InventoryCheats()
@@ -247,6 +250,16 @@ namespace Project_1.Managers
 
             if (drawShapes)
             {
+                if (clearDebugShapesRequested)
+                {
+                    debugShapes.Clear();
+                    clearDebugShapesRequested = false;
+                    while (pendingDebugShapes.TryDequeue(out _)) { }
+                }
+                while (pendingDebugShapes.TryDequeue(out DebugShape pending))
+                {
+                    debugShapes.Add(pending);
+                }
                 for (int i = 0; i < debugShapes.Count; i++)
                 {
                     debugShapes[i].Draw(aBatch);

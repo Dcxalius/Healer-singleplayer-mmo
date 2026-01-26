@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using Project_1.Input;
+using Project_1.Camera;
 using Project_1.Managers;
 using Project_1.Managers.Saves;
 using Newtonsoft.Json;
@@ -26,14 +26,27 @@ namespace Project_1.GameObjects.Entities.Corspes
             corpses = new List<Corpse>();
         }
 
-        public static void AddCorpse(Corpse aCorpse) => corpses.Add(aCorpse);
+        public static void AddCorpse(Corpse aCorpse)
+        {
+            ThreadAffinity.AssertSimThread();
+            corpses.Add(aCorpse);
+        }
 
-        public static void RemoveCorpse(Corpse aCorpse) => corpses.Remove(aCorpse);
+        public static void RemoveCorpse(Corpse aCorpse)
+        {
+            ThreadAffinity.AssertSimThread();
+            corpses.Remove(aCorpse);
+        }
 
-        public static void Reset() => corpses.Clear();
+        public static void Reset()
+        {
+            ThreadAffinity.AssertSimThread();
+            corpses.Clear();
+        }
 
         internal static void Save(Save aSave)
         {
+            ThreadAffinity.AssertSimThread();
             aSave.ClearFolder(aSave.Corpses);
             for (int i = 0; i < corpses.Count; i++)
             {
@@ -43,6 +56,7 @@ namespace Project_1.GameObjects.Entities.Corspes
 
         public static void Load(Save aSave)
         {
+            ThreadAffinity.AssertSimThread();
             corpses.Clear();
             string[] files = Directory.GetFiles(aSave.Corpses);
             for (int i = 0; i < files.Length; i++)
@@ -55,6 +69,7 @@ namespace Project_1.GameObjects.Entities.Corspes
 
         public static void LoadFromTokens(IReadOnlyList<JToken> tokens, JsonSerializer serializer)
         {
+            ThreadAffinity.AssertSimThread();
             corpses.Clear();
             if (tokens == null || serializer == null) return;
             for (int i = 0; i < tokens.Count; i++)
@@ -64,12 +79,15 @@ namespace Project_1.GameObjects.Entities.Corspes
             }
         }
 
-        public static bool Click(ClickEvent aClickEvent)
+        public static bool TryGetCorpseAt(WorldSpace worldPos, out Corpse corpse)
         {
             ThreadAffinity.AssertSimThread();
+            corpse = null;
             for (int i = 0; i < corpses.Count; i++)
             {
-                if (corpses[i].Click(aClickEvent)) return true;
+                if (!corpses[i].HitTest(worldPos)) continue;
+                corpse = corpses[i];
+                return true;
             }
 
             return false;
@@ -90,11 +108,13 @@ namespace Project_1.GameObjects.Entities.Corspes
 
         internal static void BuildRenderSnapshot()
         {
+            ThreadAffinity.AssertSimThread();
             renderCorpses = corpses.ToArray();
         }
 
         public static Corpse[] GetSnapshot()
         {
+            ThreadAffinity.AssertSimThread();
             if (corpses == null || corpses.Count == 0) return Array.Empty<Corpse>();
             return corpses.ToArray();
         }

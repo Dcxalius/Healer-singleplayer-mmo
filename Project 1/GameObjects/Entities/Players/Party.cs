@@ -2,7 +2,6 @@
 using Project_1.Camera;
 using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Entities.GuildMembers;
-using Project_1.Input;
 using Project_1.UI.HUD.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
@@ -118,18 +117,17 @@ namespace Project_1.GameObjects.Entities.Players
             return true;
         }
 
-        public void IssueMoveOrder(ClickEvent aClick)
+        public void IssueMoveOrder(WorldSpace destination, bool append)
         {
-            WorldSpace worldPosDestination = WorldSpace.FromRelativeScreenSpace(aClick.RelativePos);
             foreach (var walker in commands)
             {
-                if (aClick.Modifier(InputManager.HoldModifier.Shift))
+                if (append)
                 {
-                    walker.AddWalkingOrder(worldPosDestination);
+                    walker.AddWalkingOrder(destination);
                 }
                 else
                 {
-                    walker.RecieveDirectWalkingOrder(worldPosDestination);
+                    walker.RecieveDirectWalkingOrder(destination);
 
                 }
             }

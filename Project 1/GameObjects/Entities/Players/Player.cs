@@ -67,7 +67,6 @@ namespace Project_1.GameObjects.Entities.Players
 
         public override void Update()
         {
-            KeyboardWalk();
             Party.Update();
             base.Update();
         }
@@ -108,26 +107,13 @@ namespace Project_1.GameObjects.Entities.Players
             Mailboxes.Ui.Publish(new GuildInviteStatusUpdated(partyMembers.ToList(), Enumerable.Repeat(InviteStatus.Accepted, partyMembers.Length).ToList()));
         }
 
-        void KeyboardWalk()
+        public void ApplyMoveInput(bool left, bool right, bool up, bool down)
         {
-            if (HasDestination && LockedMovement) { return; }
-            if (KeyBindStateCache.GetHold(KeyBindManager.KeyListner.MoveCharacterLeft))
-            {
-                velocity.X -= 1;
-            }
-            if (KeyBindStateCache.GetHold(KeyBindManager.KeyListner.MoveCharacterRight))
-            {
-                velocity.X += 1;
-            }
-            if (KeyBindStateCache.GetHold(KeyBindManager.KeyListner.MoveCharacterUp))
-            {
-                velocity.Y -= 1;
-            }
-            if (KeyBindStateCache.GetHold(KeyBindManager.KeyListner.MoveCharacterDown))
-            {
-                velocity.Y += 1;
-            }
-
+            if (HasDestination && LockedMovement) return;
+            if (left) velocity.X -= 1;
+            if (right) velocity.X += 1;
+            if (up) velocity.Y -= 1;
+            if (down) velocity.Y += 1;
             if (velocity == WorldSpace.Zero) return;
             velocity.Normalize();
             velocity *= (float)(UnitData.MovementData.Speed * TimeManager.SecondsSinceLastFrame);

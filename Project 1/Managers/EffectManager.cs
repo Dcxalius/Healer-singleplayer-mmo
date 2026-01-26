@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,21 +18,30 @@ namespace Project_1.Managers
 
         public static Effect GetEffect(string aName) => effects[aName];
 
-        static List<IEffects> effectsToProcess;
+        static readonly ConcurrentQueue<IEffects> pendingEffects = new ConcurrentQueue<IEffects>();
         static Dictionary<IEffects, RenderTarget2D> rendertargets;
         static SpriteBatch spriteBatch;
         static bool initialized;
 
-        public static void AddEffectToProcess(IEffects aEffect) => effectsToProcess.Add(aEffect);
+        public static void AddEffectToProcess(IEffects aEffect)
+        {
+            if (aEffect == null) return;
+            pendingEffects.Enqueue(aEffect);
+        }
 
         public static void EffectDraw()
         {
-            if (effectsToProcess.Count == 0) return;
+            ThreadAffinity.AssertMainThread();
+            if (pendingEffects.IsEmpty) return;
 
-            IEffects[] toProcess = effectsToProcess.ToArray();
-            effectsToProcess.Clear();
+            List<IEffects> toProcess = new List<IEffects>();
+            while (pendingEffects.TryDequeue(out IEffects effect))
+            {
+                toProcess.Add(effect);
+            }
+            if (toProcess.Count == 0) return;
 
-            for (int i = 0; i < toProcess.Length; i++)
+            for (int i = 0; i < toProcess.Count; i++)
             {
                 IEffects effectToProcess = toProcess[i];
                 if (!rendertargets.TryGetValue(effectToProcess, out RenderTarget2D curRenderT))
@@ -93,7 +103,6 @@ namespace Project_1.Managers
             if (initialized) return;
             initialized = true;
 
-            effectsToProcess = new List<IEffects>();
             effects = new Dictionary<string, Effect>();
             rendertargets = new Dictionary<IEffects, RenderTarget2D>();
             spriteBatch = GraphicsManager.CreateSpriteBatch();

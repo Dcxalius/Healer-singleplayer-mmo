@@ -39,12 +39,22 @@ namespace Project_1.Managers
         public static string DefaultHudSettings => System.IO.Path.Combine(DefaultSettings, "Hud.def");
         public static string DefaultCameraSettings => System.IO.Path.Combine(DefaultSettings, "Camera.def");
         public static string DefaultKeyBindSettings => System.IO.Path.Combine(DefaultSettings, "KeyBind.def");
-        public static Save[] Saves => saves.ToArray();
+        public static Save[] Saves
+        {
+            get
+            {
+                lock (savesLock)
+                {
+                    return saves.ToArray();
+                }
+            }
+        }
         static List<Save> saves;
+        static readonly object savesLock = new object();
 
 
         public static Save CurrentSave => currentSave;
-        static Save currentSave;
+        static volatile Save currentSave;
         static bool initialized;
 
         public static void Init()
@@ -59,12 +69,15 @@ namespace Project_1.Managers
 
             saves = new List<Save>();
             string[] folders = System.IO.Directory.GetDirectories(saveFolder);
-            for (int i = 0; i < folders.Length; i++)
+            lock (savesLock)
             {
-                string name = TrimToNameOnly(folders[i]).ToUpper();
-                saves.Add(new Save(name, true));
+                for (int i = 0; i < folders.Length; i++)
+                {
+                    string name = TrimToNameOnly(folders[i]).ToUpper();
+                    saves.Add(new Save(name, true));
+                }
+                saves.Sort();
             }
-            saves.Sort();
         }
 
         //public string LoadEntireFile(string aPath)
@@ -82,14 +95,23 @@ namespace Project_1.Managers
         //}
 
 
-        public static bool NameAlreadyExists(string aName) => saves.Find(x => x.Name == aName.ToUpper()) != null;
+        public static bool NameAlreadyExists(string aName)
+        {
+            lock (savesLock)
+            {
+                return saves.Find(x => x.Name == aName.ToUpper()) != null;
+            }
+        }
 
         public static void CreateNewSave(string aName)
         {
             aName = aName.ToUpper();
-            saves.Add(new Save(aName, false));
-            currentSave = saves.Last();
-            saves.Sort();
+            lock (savesLock)
+            {
+                saves.Add(new Save(aName, false));
+                currentSave = saves.Last();
+                saves.Sort();
+            }
         }
 
         static void InitSaveFolder()
@@ -101,12 +123,25 @@ namespace Project_1.Managers
 
         //public static void LoadData(string aName) => LoadData(saves[aName]);
 
-        public static void ContinueLastSave() => LoadData(saves.First());
+        public static void ContinueLastSave()
+        {
+            Save save;
+            lock (savesLock)
+            {
+                save = saves.First();
+            }
+            LoadData(save);
+        }
 
         public static bool RequestContinueLastSave()
         {
-            if (saves.Count == 0) return false;
-            return RequestLoadData(saves.First());
+            Save save;
+            lock (savesLock)
+            {
+                if (saves.Count == 0) return false;
+                save = saves.First();
+            }
+            return RequestLoadData(save);
         }
 
 

@@ -99,7 +99,14 @@ namespace Project_1.UI.HUD.PlateBoxes
                 return;
             }
 
-            guildMember.Command(aClick);
+            if (aClick.Modifier(InputManager.HoldModifier.Shift))
+            {
+                Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.Add, guildMember));
+            }
+            else if (aClick.Modifier(InputManager.HoldModifier.Ctrl))
+            {
+                Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.NeedyAdd, guildMember));
+            }
 
             base.ClickedOnMe(aClick);
         }

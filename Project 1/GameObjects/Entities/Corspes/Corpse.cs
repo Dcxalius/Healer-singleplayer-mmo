@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 using Project_1.Camera;
-using Project_1.Input;
 using Project_1.Items;
 using Project_1.Managers;
 using Project_1.Messaging;
@@ -113,17 +112,14 @@ namespace Project_1.GameObjects.Entities.Corspes
 
         }
 
-        public override bool Click(ClickEvent aClickEvent)
+        public bool TryOpenLoot()
         {
-            if (aClickEvent.ButtonPressed != InputManager.ClickType.Right) return false;
-            if (!Camera.Camera.WorldRectToScreenRect(WorldRectangle).Contains(aClickEvent.AbsolutePos.ToPoint())) return false;
             if (ObjectManager.Player.FeetPosition.DistanceTo(Centre) > lootLength) return false;
             if (drop.IsEmpty) return false;
 
             var snapshot = LootState.Open(drop);
             var context = LootState.BuildContext(drop);
             Mailboxes.Ui.Publish(new LootOpened(snapshot, context));
-
             return true;
         }
 

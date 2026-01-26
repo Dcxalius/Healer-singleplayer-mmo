@@ -4,7 +4,6 @@ using Project_1.Camera;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spawners.Pathing;
 using Project_1.GameObjects.Unit;
-using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Managers.Saves;
 using System;
@@ -37,6 +36,7 @@ namespace Project_1.GameObjects.Spawners
 
         public static void Load(Save aSave)
         {
+            ThreadAffinity.AssertSimThread();
             for (int i = 0; i < spawnZones.Count; i++)
             {
                 spawnZones[i].RemoveAllPlates();
@@ -48,6 +48,7 @@ namespace Project_1.GameObjects.Spawners
 
         public static void LoadFromTokens(IReadOnlyList<JToken> zoneTokens, IReadOnlyList<JToken> mobTokens, JsonSerializer serializer)
         {
+            ThreadAffinity.AssertSimThread();
             for (int i = 0; i < spawnZones.Count; i++)
             {
                 spawnZones[i].RemoveAllPlates();
@@ -92,6 +93,7 @@ namespace Project_1.GameObjects.Spawners
 
         public static void GetSaveSnapshot(out SpawnZone[] zones, out SavedMobData[] savedMobs)
         {
+            ThreadAffinity.AssertSimThread();
             zones = spawnZones == null || spawnZones.Count == 0 ? Array.Empty<SpawnZone>() : spawnZones.ToArray();
             if (zones.Length == 0)
             {
@@ -174,6 +176,7 @@ namespace Project_1.GameObjects.Spawners
 
         public static void SaveData(Save aSave)
         {
+            ThreadAffinity.AssertSimThread();
             aSave.ClearFolder(aSave.SpawnZones);
             aSave.ClearFolder(aSave.NonFriendly);
             for (int i = 0; i < spawnZones.Count; i++)
@@ -247,13 +250,14 @@ namespace Project_1.GameObjects.Spawners
             }
         }
 
-        internal static bool Click(ClickEvent aClickEvent)
+        internal static bool TryGetSpawnAt(WorldSpace worldPos, out Entity entity)
         {
             ThreadAffinity.AssertSimThread();
             for (int i = 0; i < spawnZones.Count; i++)
             {
-                if (spawnZones[i].Click(aClickEvent)) return true;
+                if (spawnZones[i].TryGetSpawnAt(worldPos, out entity)) return true;
             }
+            entity = null;
             return false;
         }
 
@@ -288,6 +292,7 @@ namespace Project_1.GameObjects.Spawners
 
         internal static void BuildRenderSnapshot()
         {
+            ThreadAffinity.AssertSimThread();
             renderSpawnZones = spawnZones.ToArray();
         }
     }

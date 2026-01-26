@@ -160,7 +160,8 @@ namespace Project_1.GameObjects.Entities.GuildMembers
                 Entity newTarget = SelectEnemy(playerTarget, guildMember);
                 if (newTarget == null)
                 {
-                    newTarget = ObjectManager.entities?
+                    Entity[] snapshot = ObjectManager.GetEntitiesSnapshot();
+                    newTarget = snapshot
                         .Where(e => IsEnemy(e, guildMember))
                         .OrderBy(e => e.DistanceTo(guildMember.FeetPosition))
                         .FirstOrDefault();

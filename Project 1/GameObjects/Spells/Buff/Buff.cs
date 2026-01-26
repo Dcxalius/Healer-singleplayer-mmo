@@ -44,6 +44,14 @@ namespace Project_1.GameObjects.Spells.Buff
 
         }
 
+        public virtual void OnApplied(Entity aOwner)
+        {
+        }
+
+        public virtual void OnRemoved(Entity aOwner)
+        {
+        }
+
         public static bool operator ==(Buff aBuff, Buff bBuff)
         {
             if (ReferenceEquals(aBuff, bBuff)) return true;

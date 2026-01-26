@@ -8,7 +8,6 @@ using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Entities.Projectiles;
 using Project_1.GameObjects.FloatingTexts;
 using Project_1.GameObjects.Spawners;
-using Project_1.Input;
 using Project_1.Particles;
 using Project_1.Tiles;
 using Project_1.UI;
@@ -60,18 +59,6 @@ namespace Project_1.Managers.States
         //    base.Rescale();
         //}
 
-        public override bool Click(ClickEvent aClickEvent)
-        {
-            ThreadAffinity.AssertSimThread();
-            if (base.Click(aClickEvent)) return true;
-            if (ObjectManager.Click(aClickEvent)) return true;
-            if (SpawnerManager.Click(aClickEvent)) return true;
-            if (CorpseManager.Click(aClickEvent)) return true;
-            if (DoodadManager.Click(aClickEvent)) return true;
-            return ObjectManager.ClickGround(aClickEvent);
-        }
-
-
         public override void OnEnter() => TimeManager.StopPause(this);
 
         public override void OnLeave()
@@ -120,7 +107,7 @@ namespace Project_1.Managers.States
             }
             //epc["tileTransparent"].SetValue(TileManager.GetTransparent(ObjectManager.Player.FeetPosition));
             epc["lightPos"].SetValue(v);
-            epc["transparentMap"].SetValue(TileRenderCache.GetTransparencyMap(ObjectManager.Player.FeetPosition));
+            epc["transparentMap"].SetValue(TileRenderCache.GetTransparencyMapTexture());
             //GraphicsManager.SetTexture(1, TileManager.GetTransparent(ObjectManager.Player.FeetPosition));
             DrawList(spriteBatch);
             spriteBatch.End();

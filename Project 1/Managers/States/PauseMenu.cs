@@ -55,11 +55,6 @@ namespace Project_1.Managers.States
 
         public override bool Scroll(ScrollEvent aScrollEvent) => false;
 
-        public override bool Click(ClickEvent aClickEvent)
-        {
-            return false;
-        }
-
         public override void OnEnter()
         {
             

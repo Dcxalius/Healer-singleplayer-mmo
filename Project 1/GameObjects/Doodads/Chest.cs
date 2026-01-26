@@ -1,5 +1,4 @@
 ﻿using Project_1.Camera;
-using Project_1.Input;
 using Project_1.Items;
 using Project_1.Textures;
 using Project_1.UI.HUD.Managers;
@@ -22,15 +21,14 @@ namespace Project_1.GameObjects.Doodads
             
         }
 
-        protected override void ClickedOn(ClickEvent aEvent)
+        public bool TryOpenLoot()
         {
-            base.ClickedOn(aEvent);
-
             if (lootDrop == null) lootDrop = t.GenerateDrop(this);
 
             var snapshot = LootState.Open(lootDrop);
             var context = LootState.BuildContext(lootDrop);
             Mailboxes.Ui.Publish(new LootOpened(snapshot, context));
+            return true;
         }
     }
 }

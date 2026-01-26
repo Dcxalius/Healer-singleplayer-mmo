@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using Project_1.Input;
+using Project_1.Camera;
 using Project_1.Managers;
 using System;
 using System.Collections.Generic;
@@ -35,12 +35,15 @@ namespace Project_1.GameObjects.Doodads
             }
         }
 
-        public static bool Click(ClickEvent aClick)
+        public static bool TryGetDoodadAt(WorldSpace worldPos, out Doodad doodad)
         {
             ThreadAffinity.AssertSimThread();
+            doodad = null;
             for (int i = 0; i < doodads.Count; i++)
             {
-                if (doodads[i].Click(aClick)) return true;
+                if (!doodads[i].CanInteract(worldPos)) continue;
+                doodad = doodads[i];
+                return true;
             }
             return false;
         }
@@ -57,6 +60,7 @@ namespace Project_1.GameObjects.Doodads
 
         internal static void BuildRenderSnapshot()
         {
+            ThreadAffinity.AssertSimThread();
             renderDoodads = doodads.ToArray();
         }
     }

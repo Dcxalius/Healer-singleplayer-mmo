@@ -29,8 +29,6 @@ namespace Project_1.Managers.States
 
 
 
-        public override bool Click(ClickEvent aClickEvent) => false;
-
         public override RenderTarget2D Draw()
         {
             PrepRender(Color.Lime, SpriteSortMode.Immediate, null, null, null, rasterizerState);

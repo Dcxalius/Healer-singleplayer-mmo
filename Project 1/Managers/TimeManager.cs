@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Managers.Saves;
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -13,7 +13,7 @@ namespace Project_1.Managers
     {
         static GameTime instanceTime;
         static GameTime playTime;
-        static List<Object> pausers;
+        static ConcurrentDictionary<object, int> pausers;
         static bool initialized;
 
         public static double SecondsSinceLastFrame => instanceTime.ElapsedGameTime.TotalSeconds;
@@ -25,18 +25,19 @@ namespace Project_1.Managers
 
         public static TimeSpan TotalFrameTimeAsTimeSpan => playTime.TotalGameTime;
         
-        public static bool Paused => pausers.Count > 0;
+        public static bool Paused => !pausers.IsEmpty;
 
         public static void Init()
         {
             if (initialized) return;
             initialized = true;
             playTime = new GameTime();
-            pausers = new List<object>();
+            pausers = new ConcurrentDictionary<object, int>();
         }
 
         public static void Update(GameTime aGameTime)
         {
+            ThreadAffinity.AssertMainThread();
             instanceTime = aGameTime;
             if (!Paused)
             {
@@ -44,9 +45,28 @@ namespace Project_1.Managers
             }
         }
 
-        public static void StartPause(Object aPauser) => pausers.Add(aPauser);
+        public static void StartPause(Object aPauser)
+        {
+            if (aPauser == null) return;
+            pausers.AddOrUpdate(aPauser, 1, (_, count) => count + 1);
+        }
 
-        public static void StopPause(Object aPauser) => pausers.Remove(aPauser);
+        public static void StopPause(Object aPauser)
+        {
+            if (aPauser == null) return;
+            while (true)
+            {
+                if (!pausers.TryGetValue(aPauser, out int count)) return;
+                if (count <= 1)
+                {
+                    if (pausers.TryRemove(aPauser, out _)) return;
+                }
+                else
+                {
+                    if (pausers.TryUpdate(aPauser, count - 1, count)) return;
+                }
+            }
+        }
 
         //public static void Save(Save aSave)
         //{

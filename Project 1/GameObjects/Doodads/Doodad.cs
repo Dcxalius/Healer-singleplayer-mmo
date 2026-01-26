@@ -1,6 +1,5 @@
 ﻿using Project_1.Camera;
 using Project_1.GameObjects.Entities.GroundEffect;
-using Project_1.Input;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -22,11 +21,10 @@ namespace Project_1.GameObjects.Doodads
 
         public override float MaxSpeed => 0;
 
-        public override bool Click(ClickEvent aClickEvent)
+        public bool CanInteract(WorldSpace worldPos)
         {
             if (FeetPosition.DistanceTo(ObjectManager.Player.FeetPosition) >= maximumClickDistance) return false;
-
-            return base.Click(aClickEvent);
+            return HitTest(worldPos);
         }
     }
 }

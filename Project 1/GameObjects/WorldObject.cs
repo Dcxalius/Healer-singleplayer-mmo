@@ -12,32 +12,17 @@ namespace Project_1.GameObjects
 {
     internal abstract class WorldObject : MovingObject
     {
-        public bool CapturesClick { get => capturesClick; protected set => capturesClick = value; }
-        bool capturesClick;
-
         protected List<GroundEffect> groundEffects; //TODO: Consider adding a rectangle for only these effects rather than using modded screenrect
 
         public WorldObject(Texture aTexture, WorldSpace aStartingPos) : base(aTexture, aStartingPos)
         {
             groundEffects = new List<GroundEffect>();
-            capturesClick = false;
             
         }
 
         //public override float MaxSpeed => throw new NotImplementedException();
 
-        public virtual bool Click(ClickEvent aClickEvent)
-        {
-            if (Camera.Camera.WorldRectToScreenRect(WorldRectangle).Contains(aClickEvent.AbsolutePos.ToPoint()))
-            {
-                ClickedOn(aClickEvent);
-
-                return capturesClick;
-            }
-            return false;
-        }
-
-        protected virtual void ClickedOn(ClickEvent aEvent) { }
+        public bool HitTest(WorldSpace worldPos) => WorldRectangle.Contains(worldPos.ToPoint());
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)
         {

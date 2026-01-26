@@ -35,7 +35,7 @@ namespace Project_1.Input
             UiTextInputManager.Clear();
             if (StateManager.UiClick(clickEvent)) return;
             if (HUDManager.Click(clickEvent)) return;
-            Mailboxes.Main.Publish(clickEvent);
+            Mailboxes.Main.Publish(new WorldClickRequested(clickEvent));
         }
 
         static void HandleRelease(ReleaseEvent releaseEvent)
@@ -43,7 +43,7 @@ namespace Project_1.Input
             ThreadAffinity.AssertUiThread();
             if (StateManager.UiRelease(releaseEvent)) return;
             if (HUDManager.Release(releaseEvent)) return;
-            Mailboxes.Main.Publish(releaseEvent);
+            Mailboxes.Main.Publish(new WorldReleaseRequested(releaseEvent));
         }
 
         static void HandleScroll(ScrollEvent scrollEvent)
@@ -51,7 +51,7 @@ namespace Project_1.Input
             ThreadAffinity.AssertUiThread();
             if (StateManager.UiScroll(scrollEvent)) return;
             if (HUDManager.Scroll(scrollEvent)) return;
-            Mailboxes.Main.Publish(scrollEvent);
+            Mailboxes.Main.Publish(new WorldScrollRequested(scrollEvent));
         }
 
         static void HandleKeyboardSnapshot(KeyboardSnapshot snapshot)
@@ -66,6 +66,14 @@ namespace Project_1.Input
             ThreadAffinity.AssertUiThread();
             UiKeyBindStateCache.Update(snapshot);
             Mailboxes.Main.Publish(snapshot);
+            if (!UiTextInputManager.IsActive)
+            {
+                Mailboxes.Main.Publish(new PlayerMovementRequested(
+                    UiKeyBindStateCache.GetHold(KeyBindManager.KeyListner.MoveCharacterLeft),
+                    UiKeyBindStateCache.GetHold(KeyBindManager.KeyListner.MoveCharacterRight),
+                    UiKeyBindStateCache.GetHold(KeyBindManager.KeyListner.MoveCharacterUp),
+                    UiKeyBindStateCache.GetHold(KeyBindManager.KeyListner.MoveCharacterDown)));
+            }
         }
 
         static void HandleMouseSnapshot(MouseSnapshot snapshot)

@@ -70,6 +70,7 @@ namespace Project_1.GameObjects
 
         public static UnitData[] GetGuildDataSnapshot()
         {
+            ThreadAffinity.AssertSimThread();
             if (guildData == null || guildData.Count == 0) return Array.Empty<UnitData>();
             return guildData.ToArray();
         }
@@ -96,6 +97,7 @@ namespace Project_1.GameObjects
 
         public static List<GuildMember> GetGuildMemebers()
         {
+            ThreadAffinity.AssertSimThread();
             List<GuildMember> returnable = new List<GuildMember>();
             for (int i = 0; i < guildData.Count; i++)
             {
@@ -110,6 +112,7 @@ namespace Project_1.GameObjects
         public static GossipData GetGossip(string aName) => gossipData[aName];
         public static Npc[] CreateNpcs()
         {
+            ThreadAffinity.AssertSimThread();
             Npc[] returnable = new Npc[npcData.Count];
             for (int i = 0; i < npcData.Count; i++)
             {

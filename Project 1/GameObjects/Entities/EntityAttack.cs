@@ -91,8 +91,7 @@ namespace Project_1.GameObjects.Entities
 
             //TODO: Proc onhits,
             Damage damage;
-
-            if (hitResult == HitTable.HitResult.Miss || hitResult == HitTable.HitResult.Dodge)
+            if (hitResult == HitTable.HitResult.Miss || hitResult == HitTable.HitResult.Dodge || hitResult == HitTable.HitResult.Parry)
             {
                 damage = new Damage(new double[] { 0 }, new DamageType[] { DamageType.True });
             }
@@ -135,16 +134,17 @@ namespace Project_1.GameObjects.Entities
                     case HitTable.HitResult.Miss:
                         resultString = "Miss";
                         resultColor = Color.Gray;
+                        PublishMissEvent(aAttacker, aDamagingThing);
                         break;
                     case HitTable.HitResult.Dodge:
                         resultString = "Dodge";
                         resultColor = Color.DarkGray;
-                        //TODO: Trigger dodge event
+                        PublishDodgeEvent(aAttacker, aDamagingThing);
                         break;
                     case HitTable.HitResult.Parry:
                         resultString = "Parry";
                         resultColor = Color.DarkSlateGray;
-                        //TODO: Trigger parry event
+                        PublishParryEvent(aAttacker, aDamagingThing);
                         break;
                 }
 
@@ -163,11 +163,13 @@ namespace Project_1.GameObjects.Entities
                 case HitTable.HitResult.Block:
                     aDamageTaken.ApplyBlocked(aAttacker, this);
                     resultColor = Color.LightGray;
-                    //TODO: Trigger block event
-                    if (!aDamageTaken.ContainsDamage)
+                    bool fullyBlocked = !aDamageTaken.ContainsDamage;
+                    PublishBlockEvent(aAttacker, aDamagingThing, fullyBlocked);
+                    if (fullyBlocked)
                     {
                         resultString = "Blocked";
                         SpawnFlyingText(resultString, GetDirOfFloatingText(aAttacker.FeetPosition), resultColor);
+                        PublishHitEvent(aAttacker, aDamagingThing, aHitResult, aDamageTaken);
                         if (this is NonFriendly nf) nf.AddToAggroTable(aAttacker, 1);
                         return;
                     }
@@ -187,6 +189,8 @@ namespace Project_1.GameObjects.Entities
                     break;
             }
             aDamageTaken.ApplyDamageReduction(aAttacker, this, aDamagingThing);
+            PublishHitEvent(aAttacker, aDamagingThing, aHitResult, aDamageTaken);
+            PublishOutcomeEvent(aAttacker, aDamagingThing, aHitResult, aDamageTaken);
 
             if (!aDamageTaken.ContainsDamage) return; //TODO: Spawn Miss or Immune instead of just returning
             string causeName = aDamagingThing != null ? aDamagingThing.WeaponType.ToString() : "Attack";
@@ -213,8 +217,12 @@ namespace Project_1.GameObjects.Entities
             float levelHit = MathF.Max(0.01f, leveldiff >= 3 ? 0.96f - leveldiff * 0.01f : 0.83f - (leveldiff - 3) * 0.11f);
             float totalHit = MathF.Min(0.99f, levelHit + aCaster.SecondaryStats.Spell.BonusHitChance);
 
-
-            //TODO: Crit
+            bool isCrit = false;
+            if (RandomManager.RollDouble() <= aCaster.SecondaryStats.Spell.CriticalChance)
+            {
+                isCrit = true;
+                aDamageTaken.ApplyCriticalStrike(aCaster, this);
+            }
 
             if (aSpellEffect.IsBinary)
             {
@@ -223,13 +231,22 @@ namespace Project_1.GameObjects.Entities
                 if (RandomManager.RollDouble() > totalHit)
                 {
                     SpawnFlyingText("Resist", GetDirOfFloatingText(aCaster.FeetPosition), Color.Gray);
+                    PublishSpellResistEvent(aCaster, aSpellEffect, false);
+                    PublishSpellResistedByTargetEvent(aCaster, aSpellEffect, false);
                     if (this is NonFriendly nf) nf.AddToAggroTable(aCaster, 1);
                     return;
                 }
+                PublishSpellHitEvent(aCaster, aSpellEffect);
 
                 for (int i = 0; i < damageType.Count; i++)
                 {
                     ProcessDamage(aCaster, aSpellEffect.Name, (float)aDamageTaken[damageType[i]], 1f, damageType[i], Color.Red);
+                }
+                PublishSpellHitTakenEvent(aCaster, aSpellEffect);
+                if (isCrit)
+                {
+                    PublishSpellCritEvent(aCaster, aSpellEffect);
+                    PublishSpellCritTakenEvent(aCaster, aSpellEffect);
                 }
                 return;
             }
@@ -237,23 +254,28 @@ namespace Project_1.GameObjects.Entities
             if (RandomManager.RollDouble() > totalHit)
             {
                 SpawnFlyingText("Resist", GetDirOfFloatingText(aCaster.FeetPosition), Color.Gray);
+                PublishSpellResistEvent(aCaster, aSpellEffect, false);
+                PublishSpellResistedByTargetEvent(aCaster, aSpellEffect, false);
                 if (this is NonFriendly nf) nf.AddToAggroTable(aCaster, 1);
                 return;
             }
 
-
+            bool anyDamageApplied = false;
+            bool immune = false;
             for (int i = 0; i < damageType.Count; i++)
             {
                 switch (damageType[i])
                 {
                     case DamageType.True:
                         ProcessDamage(aCaster, aSpellEffect.Name, (float)aDamageTaken[DamageType.True], 1f, DamageType.True, Color.Red, aDamageTaken[DamageType.True].ToString());
+                        anyDamageApplied = true;
                         continue;
                     case DamageType.Physical:
                         float reduction = SecondaryStats.Defense.Armor.GetGetReductionPercentage(aCaster.Level.CurrentLevel);
                         float damageTaken = (float)(aDamageTaken[DamageType.Physical] * (1 - reduction));
                         resultString = damageTaken.ToString();
                         ProcessDamage(aCaster, aSpellEffect.Name, damageTaken, 1f, DamageType.Physical, Color.Red);
+                        anyDamageApplied = true;
                         break;
                     default:
                         //TODO: Implement spell color on damage text
@@ -276,13 +298,31 @@ namespace Project_1.GameObjects.Entities
                         {
                             resultString = "Immune";
                             SpawnFlyingText(resultString, GetDirOfFloatingText(aCaster.FeetPosition), Color.Gray);
+                            immune = true;
                             continue;
                         }
                         ProcessDamage(aCaster, aSpellEffect.Name, damageTaken, 1f, damageType[i], Color.Red, preFix, suffix);
+                        anyDamageApplied = true;
                         break;
                         
                 }
                 SpawnFlyingText(resultString, GetDirOfFloatingText(aCaster.FeetPosition), Color.Red);
+            }
+
+            if (anyDamageApplied)
+            {
+                PublishSpellHitEvent(aCaster, aSpellEffect);
+                PublishSpellHitTakenEvent(aCaster, aSpellEffect);
+                if (isCrit)
+                {
+                    PublishSpellCritEvent(aCaster, aSpellEffect);
+                    PublishSpellCritTakenEvent(aCaster, aSpellEffect);
+                }
+            }
+            else if (immune)
+            {
+                PublishSpellResistEvent(aCaster, aSpellEffect, true);
+                PublishSpellResistedByTargetEvent(aCaster, aSpellEffect, true);
             }
         }
 
@@ -309,6 +349,103 @@ namespace Project_1.GameObjects.Entities
             }
             dirOfFlyingStuff.Normalize();
             return dirOfFlyingStuff;
+        }
+
+        void PublishDodgeEvent(Entity aAttacker, Unit.Attack aAttack)
+        {
+            PublishToDefender(new DodgeEvent(aAttacker, this, aAttack));
+            PublishToAttacker(aAttacker, new AttackDodgedEvent(aAttacker, this, aAttack));
+        }
+
+        void PublishParryEvent(Entity aAttacker, Unit.Attack aAttack)
+        {
+            PublishToDefender(new ParryEvent(aAttacker, this, aAttack));
+            PublishToAttacker(aAttacker, new AttackParriedEvent(aAttacker, this, aAttack));
+        }
+
+        void PublishBlockEvent(Entity aAttacker, Unit.Attack aAttack, bool aFullyBlocked)
+        {
+            PublishToDefender(new BlockEvent(aAttacker, this, aAttack, aFullyBlocked));
+            PublishToAttacker(aAttacker, new AttackBlockedEvent(aAttacker, this, aAttack, aFullyBlocked));
+        }
+
+        void PublishMissEvent(Entity aAttacker, Unit.Attack aAttack)
+        {
+            PublishToAttacker(aAttacker, new MissEvent(aAttacker, this, aAttack));
+            PublishToDefender(new MissedByEvent(aAttacker, this, aAttack));
+        }
+
+        void PublishHitEvent(Entity aAttacker, Unit.Attack aAttack, HitTable.HitResult aResult, Damage aDamageTaken)
+        {
+            var snapshot = new Damage(aDamageTaken);
+            PublishToAttacker(aAttacker, new HitEvent(aAttacker, this, aAttack, aResult, snapshot));
+            PublishToDefender(new HitTakenEvent(aAttacker, this, aAttack, aResult, new Damage(snapshot)));
+        }
+
+        void PublishOutcomeEvent(Entity aAttacker, Unit.Attack aAttack, HitTable.HitResult aResult, Damage aDamageTaken)
+        {
+            var snapshot = new Damage(aDamageTaken);
+            switch (aResult)
+            {
+                case HitTable.HitResult.Glancing:
+                    PublishToAttacker(aAttacker, new GlancingEvent(aAttacker, this, aAttack, snapshot));
+                    PublishToDefender(new GlancingTakenEvent(aAttacker, this, aAttack, new Damage(snapshot)));
+                    break;
+                case HitTable.HitResult.Crit:
+                    PublishToAttacker(aAttacker, new CritEvent(aAttacker, this, aAttack, snapshot));
+                    PublishToDefender(new CritTakenEvent(aAttacker, this, aAttack, new Damage(snapshot)));
+                    break;
+                case HitTable.HitResult.Crushing:
+                    PublishToAttacker(aAttacker, new CrushingEvent(aAttacker, this, aAttack, snapshot));
+                    PublishToDefender(new CrushingTakenEvent(aAttacker, this, aAttack, new Damage(snapshot)));
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void PublishSpellHitEvent(Entity aCaster, SpellEffect aSpellEffect)
+        {
+            PublishToAttacker(aCaster, new SpellHitEvent(aCaster, this, aSpellEffect));
+        }
+
+        void PublishSpellCritEvent(Entity aCaster, SpellEffect aSpellEffect)
+        {
+            PublishToAttacker(aCaster, new SpellCritEvent(aCaster, this, aSpellEffect));
+        }
+
+        void PublishSpellResistEvent(Entity aCaster, SpellEffect aSpellEffect, bool aImmune)
+        {
+            PublishToAttacker(aCaster, new SpellResistEvent(aCaster, this, aSpellEffect, aImmune));
+        }
+
+        void PublishSpellHitTakenEvent(Entity aCaster, SpellEffect aSpellEffect)
+        {
+            var evt = new SpellHitTakenEvent(aCaster, this, aSpellEffect);
+            Events.Publish(evt);
+        }
+
+        void PublishSpellCritTakenEvent(Entity aCaster, SpellEffect aSpellEffect)
+        {
+            var evt = new SpellCritTakenEvent(aCaster, this, aSpellEffect);
+            Events.Publish(evt);
+        }
+
+        void PublishSpellResistedByTargetEvent(Entity aCaster, SpellEffect aSpellEffect, bool aImmune)
+        {
+            var evt = new SpellResistedByTargetEvent(aCaster, this, aSpellEffect, aImmune);
+            Events.Publish(evt);
+        }
+
+        void PublishToDefender<T>(T aEvent)
+        {
+            Events.Publish(aEvent);
+        }
+
+        void PublishToAttacker<T>(Entity aAttacker, T aEvent)
+        {
+            if (aAttacker == null) return;
+            aAttacker.Events.Publish(aEvent);
         }
     }
 }

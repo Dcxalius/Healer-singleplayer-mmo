@@ -6,9 +6,13 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.GuildMembers;
+using Project_1.GameObjects.Entities.Corspes;
+using Project_1.GameObjects.Entities.Npcs;
+using Project_1.GameObjects.Doodads;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Spawners;
 using Project_1.Input;
@@ -108,9 +112,15 @@ namespace Project_1.Managers.States
             Mailboxes.Main.Subscribe<InventoryConsumeRequested>(HandleInventoryConsumeRequested);
             Mailboxes.Main.Subscribe<EquipmentSwapRequested>(HandleEquipmentSwapRequested);
             Mailboxes.Main.Subscribe<EquipmentMoveToInventoryRequested>(HandleEquipmentMoveToInventoryRequested);
-            Mailboxes.Main.Subscribe<ClickEvent>(HandleClickInput);
-            Mailboxes.Main.Subscribe<ReleaseEvent>(HandleReleaseInput);
-            Mailboxes.Main.Subscribe<ScrollEvent>(HandleScrollInput);
+            Mailboxes.Main.Subscribe<WorldClickRequested>(HandleWorldClickRequested);
+            Mailboxes.Main.Subscribe<WorldReleaseRequested>(HandleWorldReleaseRequested);
+            Mailboxes.Main.Subscribe<WorldScrollRequested>(HandleWorldScrollRequested);
+            Mailboxes.Main.Subscribe<PlayerMovementRequested>(HandlePlayerMovementRequested);
+            Mailboxes.Main.Subscribe<MoveOrderRequested>(HandleMoveOrderRequested);
+            Mailboxes.Main.Subscribe<PartyTargetOrderRequested>(HandlePartyTargetOrderRequested);
+            Mailboxes.Main.Subscribe<TargetClearedRequested>(_ => HandleTargetClearedRequested());
+            Mailboxes.Main.Subscribe<PartyCommandRequested>(HandlePartyCommandRequested);
+            Mailboxes.Main.Subscribe<InteractRequested>(HandleInteractRequested);
             Mailboxes.Main.Subscribe<KeyboardSnapshot>(e => KeyboardStateCache.Update(e));
             Mailboxes.Main.Subscribe<KeyBindSnapshot>(e => KeyBindStateCache.Update(e));
             Mailboxes.Main.Subscribe<MouseSnapshot>(e => MouseStateCache.Update(e));
@@ -193,12 +203,6 @@ namespace Project_1.Managers.States
             finalGameFrame = game.Draw();
         }
 
-
-        public static bool Click(ClickEvent aClick)
-        {
-            ThreadAffinity.AssertSimThread();
-            return currentState.Click(aClick);
-        }
 
         public static bool Release(ReleaseEvent aRelease)
         {
@@ -489,22 +493,179 @@ namespace Project_1.Managers.States
             RedrawGame();
         }
 
-        static void HandleClickInput(ClickEvent e)
+        static void HandleWorldClickRequested(WorldClickRequested e)
         {
             ThreadAffinity.AssertSimThread();
-            Click(e);
+            if (e.ClickEvent == null) return;
+            if (currentState == null || currentState.GetStateEnum != States.Game) return;
+            RouteWorldClick(e.ClickEvent);
         }
 
-        static void HandleReleaseInput(ReleaseEvent e)
+        static void HandleWorldReleaseRequested(WorldReleaseRequested e)
         {
             ThreadAffinity.AssertSimThread();
-            Release(e);
+            if (e.ReleaseEvent == null) return;
+            Release(e.ReleaseEvent);
         }
 
-        static void HandleScrollInput(ScrollEvent e)
+        static void HandleWorldScrollRequested(WorldScrollRequested e)
         {
             ThreadAffinity.AssertSimThread();
-            Scroll(e);
+            if (e.ScrollEvent == null) return;
+            Scroll(e.ScrollEvent);
+        }
+
+        static void RouteWorldClick(ClickEvent clickEvent)
+        {
+            WorldSpace worldPos = WorldSpace.FromRelativeScreenSpace(clickEvent.RelativePos);
+
+            if (ObjectManager.TryGetEntityAt(worldPos, out Entity entity))
+            {
+                HandleEntityWorldClick(entity, clickEvent);
+                return;
+            }
+
+            if (SpawnerManager.TryGetSpawnAt(worldPos, out Entity spawn))
+            {
+                HandleEntityWorldClick(spawn, clickEvent);
+                return;
+            }
+
+            if (CorpseManager.TryGetCorpseAt(worldPos, out Corpse corpse))
+            {
+                Mailboxes.Main.Publish(new InteractRequested(corpse, clickEvent.ButtonPressed));
+                return;
+            }
+
+            if (DoodadManager.TryGetDoodadAt(worldPos, out Doodad doodad))
+            {
+                Mailboxes.Main.Publish(new InteractRequested(doodad, clickEvent.ButtonPressed));
+                return;
+            }
+
+            HandleGroundWorldClick(worldPos, clickEvent);
+        }
+
+        static void HandleEntityWorldClick(Entity entity, ClickEvent clickEvent)
+        {
+            bool noModifiers = clickEvent.NoModifiers();
+            bool rightClick = clickEvent.ButtonPressed == InputManager.ClickType.Right;
+
+            if (noModifiers)
+            {
+                Mailboxes.Main.Publish(new TargetRequested(entity));
+                if (rightClick)
+                {
+                    Mailboxes.Main.Publish(new PartyTargetOrderRequested(entity));
+                }
+            }
+            else if (entity is GuildMember member)
+            {
+                if (clickEvent.Modifier(InputManager.HoldModifier.Shift))
+                {
+                    Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.Add, member));
+                }
+                else if (clickEvent.Modifier(InputManager.HoldModifier.Ctrl))
+                {
+                    Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.NeedyAdd, member));
+                }
+            }
+
+            if (entity is Npc npc)
+            {
+                Mailboxes.Main.Publish(new InteractRequested(npc, clickEvent.ButtonPressed));
+            }
+        }
+
+        static void HandleGroundWorldClick(WorldSpace worldPos, ClickEvent clickEvent)
+        {
+            if (clickEvent.ButtonPressed == InputManager.ClickType.Left)
+            {
+                if (clickEvent.ModifiersOr(new InputManager.HoldModifier[] { InputManager.HoldModifier.Shift, InputManager.HoldModifier.Ctrl }))
+                {
+                    Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.Clear, null));
+                    return;
+                }
+
+                Mailboxes.Main.Publish(new TargetClearedRequested());
+                return;
+            }
+
+            if (clickEvent.ButtonPressed == InputManager.ClickType.Right)
+            {
+                bool append = clickEvent.Modifier(InputManager.HoldModifier.Shift);
+                Mailboxes.Main.Publish(new MoveOrderRequested(worldPos, append));
+            }
+        }
+
+        static void HandlePlayerMovementRequested(PlayerMovementRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+            player.ApplyMoveInput(e.Left, e.Right, e.Up, e.Down);
+        }
+
+        static void HandleMoveOrderRequested(MoveOrderRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+            player.Party.IssueMoveOrder(e.Destination, e.Append);
+        }
+
+        static void HandlePartyTargetOrderRequested(PartyTargetOrderRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null || e.Target == null) return;
+            player.Party.IssueTargetOrder(e.Target);
+        }
+
+        static void HandleTargetClearedRequested()
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+            player.RemoveTarget();
+        }
+
+        static void HandlePartyCommandRequested(PartyCommandRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+            switch (e.Action)
+            {
+                case PartyCommandAction.Clear:
+                    player.Party.ClearCommand();
+                    break;
+                case PartyCommandAction.Add:
+                    if (e.Member != null) player.Party.AddToCommand(e.Member);
+                    break;
+                case PartyCommandAction.NeedyAdd:
+                    if (e.Member != null) player.Party.NeedyAddToCommand(e.Member);
+                    break;
+            }
+        }
+
+        static void HandleInteractRequested(InteractRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (e.Target == null) return;
+            switch (e.Target)
+            {
+                case Corpse corpse:
+                    if (e.Button != InputManager.ClickType.Right) return;
+                    corpse.TryOpenLoot();
+                    break;
+                case Chest chest:
+                    chest.TryOpenLoot();
+                    break;
+                case Npc npc:
+                    npc.TryBeginConversation();
+                    break;
+            }
         }
 
         static void HandleInventorySwapItemsRequested(InventorySwapItemsRequested e)

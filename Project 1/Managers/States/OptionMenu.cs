@@ -26,8 +26,6 @@ namespace Project_1.Managers.States
         {
         }
 
-        public override bool Click(ClickEvent aClickEvent) => false;
-
         public override bool Release(ReleaseEvent aReleaseEvent) => false;
         public override bool Scroll(ScrollEvent aScrollEvent) => false;
 

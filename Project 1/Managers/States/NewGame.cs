@@ -23,11 +23,6 @@ namespace Project_1.Managers.States
         }
         public override StateManager.States GetStateEnum => StateManager.States.NewGame;
 
-        public override bool Click(ClickEvent aClickEvent)
-        {
-            return false;
-        }
-
         public override RenderTarget2D Draw()
         {
             PrepRender(Color.BlanchedAlmond, SpriteSortMode.Immediate);

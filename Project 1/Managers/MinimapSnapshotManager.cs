@@ -21,24 +21,37 @@ namespace Project_1.Managers
 
     internal static class MinimapSnapshotManager
     {
-        static volatile MinimapDotSnapshot[] dots = Array.Empty<MinimapDotSnapshot>();
-        static WorldSpace origin;
-        static volatile bool originValid;
+        sealed class SnapshotData
+        {
+            public SnapshotData(MinimapDotSnapshot[] dots, WorldSpace origin, bool originValid)
+            {
+                Dots = dots ?? Array.Empty<MinimapDotSnapshot>();
+                Origin = origin;
+                OriginValid = originValid;
+            }
+
+            public MinimapDotSnapshot[] Dots { get; }
+            public WorldSpace Origin { get; }
+            public bool OriginValid { get; }
+        }
+
+        static volatile SnapshotData snapshot = new SnapshotData(Array.Empty<MinimapDotSnapshot>(), WorldSpace.Zero, false);
 
         public static MinimapDotSnapshot[] Snapshot
         {
             get
             {
                 ThreadAffinity.AssertMainThread();
-                return dots;
+                return snapshot.Dots;
             }
         }
 
         public static bool TryGetOrigin(out WorldSpace minimapOrigin)
         {
             ThreadAffinity.AssertMainThread();
-            minimapOrigin = origin;
-            return originValid;
+            SnapshotData local = snapshot;
+            minimapOrigin = local.Origin;
+            return local.OriginValid;
         }
 
         public static void BuildSnapshot()
@@ -47,7 +60,8 @@ namespace Project_1.Managers
             List<MinimapDotSnapshot> list = new List<MinimapDotSnapshot>();
             ObjectManager.AppendMinimapDots(list);
             SpawnerManager.AppendMinimapDots(list);
-            dots = list.ToArray();
+            WorldSpace origin;
+            bool originValid;
             if (ObjectManager.Player != null)
             {
                 origin = ObjectManager.Player.FeetPosition;
@@ -58,6 +72,7 @@ namespace Project_1.Managers
                 origin = WorldSpace.Zero;
                 originValid = false;
             }
+            snapshot = new SnapshotData(list.ToArray(), origin, originValid);
         }
     }
 }

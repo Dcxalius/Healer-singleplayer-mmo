@@ -132,6 +132,7 @@ namespace Project_1
             Camera.Camera.Init();
             KeyBindManager.Init();
             TileManager.Init();
+            TileRenderCache.Init();
             TileFactory.Init();
             TextureManager.Init();
             EffectManager.Init();

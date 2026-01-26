@@ -12,7 +12,6 @@ using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Unit.Classes;
 using Project_1.GameObjects.Unit.Resources;
 using Project_1.GameObjects.Unit.Stats;
-using Project_1.Input;
 using Project_1.Items;
 using Project_1.Managers;
 using Project_1.Particles;
@@ -54,11 +53,11 @@ namespace Project_1.GameObjects.Entities
             groundEffects.Add(new SelectRing());
             CreateNamePlate();
 
-            CapturesClick = true;
         }
 
         public void Delete()
         {
+            Events.Clear();
             RemoveNamePlate();
 
         }
@@ -89,19 +88,6 @@ namespace Project_1.GameObjects.Entities
             }
         }
        
-        protected override void ClickedOn(ClickEvent aClickEvent)
-        {
-            if (aClickEvent.NoModifiers())
-            {
-                ObjectManager.Player.SetTarget(this);
-            }
-
-            if (aClickEvent.NoModifiers() && aClickEvent.ButtonPressed == InputManager.ClickType.Right)
-            {
-                ObjectManager.Player.Party.IssueTargetOrder(this);
-            }
-        }
-
         public void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
         {
             UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition((Position - aOrigin).ToPoint()) / (TileManager.TileSize) + aMinimapOffset + aMinimapSize / 2 + new Point(0, 1), new Point(1)), MinimapColor);            

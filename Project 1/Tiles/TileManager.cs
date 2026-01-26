@@ -36,7 +36,19 @@ namespace Project_1.Tiles
         public static Tile GetTile(Chunk aChunk, int aX, int aY) => aChunk.Tile(aX, aY);
         public static Tile GetTile(int aChunkId, int aX, int aY) => chunks.Find(x => x.Id == aChunkId).Tile(aX, aY);
         public static Tile GetTileAt(WorldSpace aSpace) => GetTile(aSpace);
-        public static Tile GetTilePublic(WorldSpace aSpace) => GetTile(aSpace);
+        public static bool TryGetTileAt(WorldSpace aSpace, out Tile tile)
+        {
+            Chunk chunk = GetChunk(aSpace);
+            if (chunk == null)
+            {
+                tile = null;
+                return false;
+            }
+            int x = Modulo((int)MathF.Floor(aSpace.X / TileSize.X), Chunk.ChunkSize.X);
+            int y = Modulo((int)MathF.Floor(aSpace.Y / TileSize.Y), Chunk.ChunkSize.Y);
+            tile = chunk.Tile(x, y);
+            return tile != null;
+        }
 
         public static Chunk GetChunk(int aId) => chunks.Find(x => x.Id == aId);
         public static Chunk GetChunk(int aX, int aY) => GetChunk(GetChunkId(aX, aY));
@@ -227,12 +239,14 @@ namespace Project_1.Tiles
 
         public static void New()
         {
+            ThreadAffinity.AssertSimThread();
             chunks.Clear();
             chunks.Add(new Chunk(Chunk.GenerateTileIds(0), 0));
         }
 
         public static void Load(Save aSave)
         {
+            ThreadAffinity.AssertSimThread();
             chunks.Clear();
 
             string[] files = System.IO.Directory.GetFiles(aSave.Tiles);
@@ -250,6 +264,7 @@ namespace Project_1.Tiles
 
         public static void LoadFromChunks(List<Chunk> loadedChunks)
         {
+            ThreadAffinity.AssertSimThread();
             chunks.Clear();
             if (loadedChunks != null && loadedChunks.Count > 0)
             {
@@ -628,6 +643,7 @@ namespace Project_1.Tiles
 
         public static void SaveData(Save aSave)
         {
+            ThreadAffinity.AssertSimThread();
 
 
             for (int i = 0; i < chunks.Count; i++)
@@ -664,11 +680,13 @@ namespace Project_1.Tiles
 
         internal static void BuildRenderSnapshot()
         {
+            ThreadAffinity.AssertSimThread();
             renderChunks = chunks.ToArray();
         }
 
         public static Chunk[] GetChunksSnapshot()
         {
+            ThreadAffinity.AssertSimThread();
             if (chunks == null || chunks.Count == 0) return Array.Empty<Chunk>();
             return chunks.ToArray();
         }

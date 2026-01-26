@@ -4,7 +4,6 @@ using Project_1.Camera;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spawners.Pathing;
 using Project_1.GameObjects.Unit;
-using Project_1.Input;
 using Project_1.Managers;
 using System;
 using System.CodeDom;
@@ -175,12 +174,13 @@ namespace Project_1.GameObjects.Spawners
 
         
 
-        internal bool Click(ClickEvent aClickEvent)
+        internal bool TryGetSpawnAt(WorldSpace worldPos, out Entity entity)
         {
             for (int i = 0; i < spawners.Count; i++)
             {
-                if (spawners[i].Click(aClickEvent)) return true;
+                if (spawners[i].TryGetSpawnAt(worldPos, out entity)) return true;
             }
+            entity = null;
             return false;
         }
 

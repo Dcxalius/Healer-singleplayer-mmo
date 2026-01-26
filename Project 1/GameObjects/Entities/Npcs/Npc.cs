@@ -1,6 +1,5 @@
 ﻿using Project_1.Camera;
 using Project_1.GameObjects.Unit;
-using Project_1.Input;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using System;
@@ -24,14 +23,15 @@ namespace Project_1.GameObjects.Entities.Npcs
             gossip = ObjectFactory.GetGossip(Name);
         }
 
-        protected override void ClickedOn(ClickEvent aClickEvent)
+        public bool TryBeginConversation()
         {
-            base.ClickedOn(aClickEvent);
-
-            if (!InConversationRange(ObjectManager.Player.FeetPosition)) return;
+            var player = ObjectManager.Player;
+            if (player == null) return false;
+            if (!InConversationRange(player.FeetPosition)) return false;
 
             BeginConversation(this);
             Mailboxes.Ui.Publish(new GossipOpened(gossip));
+            return true;
         }
 
         public override void Update()

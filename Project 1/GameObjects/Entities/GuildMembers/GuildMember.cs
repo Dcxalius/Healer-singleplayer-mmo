@@ -2,7 +2,6 @@
 using Project_1.Camera;
 using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Unit;
-using Project_1.Input;
 using Project_1.Textures;
 using Project_1.Textures.AnimatedTextures;
 using System;
@@ -69,14 +68,6 @@ namespace Project_1.GameObjects.Entities.GuildMembers
             ObjectManager.RemoveEntity(this);
         }
 
-        protected override void ClickedOn(ClickEvent aClickEvent)
-        {
-            base.ClickedOn(aClickEvent);
-            Command(aClickEvent);
-
-
-        }
-
         public override void RefreshPlates()
         {
             if (HasNamePlate) base.RefreshPlates();
@@ -92,21 +83,6 @@ namespace Project_1.GameObjects.Entities.GuildMembers
         public void RemovedFromParty()
         {
             leaving = true ;
-        }
-
-        public void Command(ClickEvent aClickEvent)
-        {
-            Party party = ObjectManager.Player.Party;
-            if (!party.IsInParty(this)) return;
-            if (aClickEvent.Modifier(InputManager.HoldModifier.Shift))
-            {
-                party.AddToCommand(this);
-            }
-            else if (aClickEvent.Modifier(InputManager.HoldModifier.Ctrl))
-            {
-                party.NeedyAddToCommand(this);
-            }
-
         }
 
         public void RecieveDirectWalkingOrder(WorldSpace aPos)
