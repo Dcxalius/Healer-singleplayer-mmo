@@ -4,6 +4,7 @@ using Project_1.UI.HUD.Inventory;
 using Project_1.UI.HUD.SpellBook;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.UI
 {

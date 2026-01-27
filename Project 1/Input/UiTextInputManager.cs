@@ -20,6 +20,7 @@ namespace Project_1.Input
 
         public static void Begin(InputBox input)
         {
+            ThreadAffinity.AssertUiThread();
             activeInput = input;
             cursorPosition = input?.Input.Length ?? 0;
             isActive = input != null;
@@ -27,6 +28,7 @@ namespace Project_1.Input
 
         public static void Clear()
         {
+            ThreadAffinity.AssertUiThread();
             activeInput = null;
             cursorPosition = 0;
             isActive = false;

@@ -1,37 +1,39 @@
 using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Unit;
+using Project_1.GameObjects.Unit.Stats;
+using Attack = Project_1.GameObjects.Unit.Attack;
 
 namespace Project_1.GameObjects.Entities
 {
     public enum CombatEventType
     {
-        Dodge = 0,
-        Parry = 1,
-        Block = 2,
-        Miss = 3,
-        Glancing = 4,
-        Crit = 5,
-        Crushing = 6,
-        Hit = 7,
+        AttackMissed = 0,
+        AttackDodged = 1,
+        AttackParried = 2,
+        AttackGlanced = 3,
+        AttackBlocked = 4,
+        AttackCrit = 5,
+        AttackCrushed = 6,
+        AttackHit = 7,
         SpellHit = 8,
-        SpellResist = 9,
-        SpellHitTaken = 10,
-        SpellResistedByTarget = 11,
-        AttackDodged = 12,
-        AttackParried = 13,
-        AttackBlocked = 14,
-        MissedBy = 15,
-        GlancingTaken = 16,
-        CritTaken = 17,
-        CrushingTaken = 18,
-        HitTaken = 19,
-        SpellCrit = 20,
-        SpellCritTaken = 21
+        SpellCrit = 9,
+        SpellResist = 10,
+        MissedBy = 11,
+        Dodge = 12,
+        Parry = 13,
+        GlancingTaken = 14,
+        Block = 15,
+        CritTaken = 16,
+        CrushingTaken = 17,
+        HitTaken = 18,
+        SpellHitTaken = 19,
+        SpellCritTaken = 20,
+        SpellResistedByTarget = 21
     }
 
-    internal readonly struct MissEvent
+    internal readonly struct AttackMissedEvent
     {
-        public MissEvent(Entity attacker, Entity defender, Attack attack)
+        public AttackMissedEvent(Entity attacker, Entity defender, Attack attack)
         {
             Attacker = attacker;
             Defender = defender;
@@ -145,9 +147,9 @@ namespace Project_1.GameObjects.Entities
         public bool FullyBlocked { get; }
     }
 
-    internal readonly struct HitEvent
+    internal readonly struct AttackHitEvent
     {
-        public HitEvent(Entity attacker, Entity defender, Attack attack, Unit.Stats.HitTable.HitResult result, Unit.Stats.Damage damage)
+        public AttackHitEvent(Entity attacker, Entity defender, Attack attack, HitTable.HitResult result, Damage damage)
         {
             Attacker = attacker;
             Defender = defender;
@@ -159,13 +161,13 @@ namespace Project_1.GameObjects.Entities
         public Entity Attacker { get; }
         public Entity Defender { get; }
         public Attack Attack { get; }
-        public Unit.Stats.HitTable.HitResult Result { get; }
-        public Unit.Stats.Damage Damage { get; }
+        public HitTable.HitResult Result { get; }
+        public Damage Damage { get; }
     }
 
     internal readonly struct HitTakenEvent
     {
-        public HitTakenEvent(Entity attacker, Entity defender, Attack attack, Unit.Stats.HitTable.HitResult result, Unit.Stats.Damage damage)
+        public HitTakenEvent(Entity attacker, Entity defender, Attack attack, HitTable.HitResult result, Damage damage)
         {
             Attacker = attacker;
             Defender = defender;
@@ -177,13 +179,13 @@ namespace Project_1.GameObjects.Entities
         public Entity Attacker { get; }
         public Entity Defender { get; }
         public Attack Attack { get; }
-        public Unit.Stats.HitTable.HitResult Result { get; }
-        public Unit.Stats.Damage Damage { get; }
+        public HitTable.HitResult Result { get; }
+        public Damage Damage { get; }
     }
 
-    internal readonly struct CritEvent
+    internal readonly struct AttackCritEvent
     {
-        public CritEvent(Entity attacker, Entity defender, Attack attack, Unit.Stats.Damage damage)
+        public AttackCritEvent(Entity attacker, Entity defender, Attack attack, Damage damage)
         {
             Attacker = attacker;
             Defender = defender;
@@ -194,12 +196,12 @@ namespace Project_1.GameObjects.Entities
         public Entity Attacker { get; }
         public Entity Defender { get; }
         public Attack Attack { get; }
-        public Unit.Stats.Damage Damage { get; }
+        public Damage Damage { get; }
     }
 
     internal readonly struct CritTakenEvent
     {
-        public CritTakenEvent(Entity attacker, Entity defender, Attack attack, Unit.Stats.Damage damage)
+        public CritTakenEvent(Entity attacker, Entity defender, Attack attack, Damage damage)
         {
             Attacker = attacker;
             Defender = defender;
@@ -210,12 +212,12 @@ namespace Project_1.GameObjects.Entities
         public Entity Attacker { get; }
         public Entity Defender { get; }
         public Attack Attack { get; }
-        public Unit.Stats.Damage Damage { get; }
+        public Damage Damage { get; }
     }
 
-    internal readonly struct GlancingEvent
+    internal readonly struct AttackGlancedEvent
     {
-        public GlancingEvent(Entity attacker, Entity defender, Attack attack, Unit.Stats.Damage damage)
+        public AttackGlancedEvent(Entity attacker, Entity defender, Attack attack, Damage damage)
         {
             Attacker = attacker;
             Defender = defender;
@@ -226,12 +228,12 @@ namespace Project_1.GameObjects.Entities
         public Entity Attacker { get; }
         public Entity Defender { get; }
         public Attack Attack { get; }
-        public Unit.Stats.Damage Damage { get; }
+        public Damage Damage { get; }
     }
 
     internal readonly struct GlancingTakenEvent
     {
-        public GlancingTakenEvent(Entity attacker, Entity defender, Attack attack, Unit.Stats.Damage damage)
+        public GlancingTakenEvent(Entity attacker, Entity defender, Attack attack, Damage damage)
         {
             Attacker = attacker;
             Defender = defender;
@@ -242,12 +244,12 @@ namespace Project_1.GameObjects.Entities
         public Entity Attacker { get; }
         public Entity Defender { get; }
         public Attack Attack { get; }
-        public Unit.Stats.Damage Damage { get; }
+        public Damage Damage { get; }
     }
 
-    internal readonly struct CrushingEvent
+    internal readonly struct AttackCrushedEvent
     {
-        public CrushingEvent(Entity attacker, Entity defender, Attack attack, Unit.Stats.Damage damage)
+        public AttackCrushedEvent(Entity attacker, Entity defender, Attack attack, Damage damage)
         {
             Attacker = attacker;
             Defender = defender;
@@ -258,12 +260,12 @@ namespace Project_1.GameObjects.Entities
         public Entity Attacker { get; }
         public Entity Defender { get; }
         public Attack Attack { get; }
-        public Unit.Stats.Damage Damage { get; }
+        public Damage Damage { get; }
     }
 
     internal readonly struct CrushingTakenEvent
     {
-        public CrushingTakenEvent(Entity attacker, Entity defender, Attack attack, Unit.Stats.Damage damage)
+        public CrushingTakenEvent(Entity attacker, Entity defender, Attack attack, Damage damage)
         {
             Attacker = attacker;
             Defender = defender;
@@ -274,10 +276,10 @@ namespace Project_1.GameObjects.Entities
         public Entity Attacker { get; }
         public Entity Defender { get; }
         public Attack Attack { get; }
-        public Unit.Stats.Damage Damage { get; }
+        public Damage Damage { get; }
     }
 
-    internal readonly struct SpellHitEvent //TODO: Ponder if SpellEffect is the correct arg or if it should be Spell or even SpellData
+    internal readonly struct SpellHitEvent
     {
         public SpellHitEvent(Entity caster, Entity target, SpellEffect effect)
         {

@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Doodads;
 using Project_1.GameObjects.Entities.Corspes;
-using Project_1.GameObjects.Entities.Players;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.Entities.Projectiles;
 using Project_1.GameObjects.FloatingTexts;
 using Project_1.GameObjects.Spawners;
@@ -20,6 +20,7 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
+using Project_1.Input;
 
 namespace Project_1.Managers.States
 {
@@ -36,11 +37,6 @@ namespace Project_1.Managers.States
         public override void Update()
         {
             ThreadAffinity.AssertSimThread();
-            if (KeyboardStateCache.GetPress(Microsoft.Xna.Framework.Input.Keys.Escape))
-            {
-                StateManager.RequestStateChange(StateManager.States.PauseMenu);
-                return;
-            }
             Camera.Camera.Update();
             ObjectManager.Update();
             TileManager.Update();

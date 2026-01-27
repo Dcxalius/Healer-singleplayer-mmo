@@ -42,4 +42,8 @@ namespace Project_1.Messaging.Events
         public int ScrollWheelValue { get; }
         public int ScrollDelta { get; }
     }
+
+    internal readonly struct EscapePressed
+    {
+    }
 }

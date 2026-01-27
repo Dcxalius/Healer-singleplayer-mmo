@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities;
 using Project_1.UI.UIElements.Buttons;
 using Project_1.UI.HUD.Guild;
+using Project_1.GameObjects.Entities.Friendlies;
 
 namespace Project_1.UI.HUD.Windows
 {

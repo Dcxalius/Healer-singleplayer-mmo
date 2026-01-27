@@ -18,6 +18,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Project_1.GameObjects.Unit.Equipment;
+using Project_1.GameObjects.Entities.Friendlies;
+using System.Globalization;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -137,29 +139,42 @@ namespace Project_1.GameObjects.Entities
         {
             if (FullHealth) return false;
 
-            float value = CalculateHealing(aHealingTaken);
+            double value = CalculateHealing(aHealingTaken);
             for (int i = 0; i < aggroTablesIAmOn.Count; i++)
             {
-                aggroTablesIAmOn[i].AddToAggroTable(aHealer, value / aggroTablesIAmOn.Count);
+                aggroTablesIAmOn[i].AddToAggroTable(aHealer, (float)(value / aggroTablesIAmOn.Count));
             }
 
             WorldSpace dir = GetDirOfFloatingText(aHealer.FeetPosition);
 
-            SpawnFlyingText(aHealingTaken.ToString(), dir, Color.White);//TODO: Change color to green once text border has been implemented
+            SpawnFlyingText(FormatHealthDelta(value), dir, Color.White);//TODO: Change color to green once text border has been implemented
             FlagForRefresh();
             return true;
         }
 
-        float CalculateHealing(float aHealingTaken)
+        double CalculateHealing(double aHealingTaken)
         {
-            double value = aHealingTaken;
-            if (CurrentHealth + value > MaxHealth) value = MaxHealth - CurrentHealth;
+            return ApplyHealthDelta(aHealingTaken);
+        }
 
-            int beforeHealingTaken = (int)Math.Round(unitData.Health.CurrentHealth);
-            unitData.Health.CurrentHealth += value;
-            int afterHealingTaken = (int)Math.Round(unitData.Health.CurrentHealth);
+        double ApplyHealthDelta(double aDelta)
+        {
+            double before = unitData.Health.CurrentHealth;
+            double after = before + aDelta;
+            if (after < 0) after = 0;
+            if (after > MaxHealth) after = MaxHealth;
+            unitData.Health.CurrentHealth = after;
+            return after - before;
+        }
 
-            return beforeHealingTaken - afterHealingTaken;
+        string FormatHealthDelta(double aDelta)
+        {
+            double abs = Math.Abs(aDelta);
+            const double epsilon = 0.005d;
+            if (abs < epsilon) return "0";
+            double rounded = Math.Round(abs);
+            if (Math.Abs(abs - rounded) < epsilon) return rounded.ToString(CultureInfo.InvariantCulture);
+            return abs.ToString("0.##", CultureInfo.InvariantCulture);
         }
 
 

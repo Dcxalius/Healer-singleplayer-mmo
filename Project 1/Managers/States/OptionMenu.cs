@@ -72,6 +72,7 @@ namespace Project_1.Managers.States
         internal bool UiClick(ClickEvent aClickEvent) => OptionManager.Click(aClickEvent);
         internal bool UiRelease(ReleaseEvent aReleaseEvent) => false;
         internal bool UiScroll(ScrollEvent aScrollEvent) => OptionManager.Scroll(aScrollEvent);
+        internal bool UiEscapePressed() => false;
         internal void UiUpdate() => OptionManager.Update();
 
         internal void UiOnEnter()

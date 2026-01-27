@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 using Project_1.GameObjects;
-using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.Items.SubTypes;
 using Project_1.Managers;
 using Project_1.Messaging;

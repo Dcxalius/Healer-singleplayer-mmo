@@ -70,6 +70,7 @@ namespace Project_1.Managers.States
         internal bool UiClick(ClickEvent aClickEvent) => newGameBox.ClickedOn(aClickEvent);
         internal bool UiRelease(ReleaseEvent aReleaseEvent) => newGameBox.ReleasedOn(aReleaseEvent);
         internal bool UiScroll(ScrollEvent aScrollEvent) => newGameBox.ScrolledOn(aScrollEvent);
+        internal bool UiEscapePressed() => false;
         internal void UiUpdate() => newGameBox.Update();
 
         internal void UiOnEnter()

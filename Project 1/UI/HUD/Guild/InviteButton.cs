@@ -1,6 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Project_1.GameObjects.Entities;
-using Project_1.GameObjects.Entities.GuildMembers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
@@ -8,6 +6,8 @@ using Project_1.Camera;
 using Project_1.UI.UIElements.Buttons;
 using System;
 using System.Collections.Generic;
+using Project_1.GameObjects.Entities.Friendlies;
+using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 
 namespace Project_1.UI.HUD.Guild
 {

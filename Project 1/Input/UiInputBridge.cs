@@ -14,6 +14,7 @@ namespace Project_1.Input
     {
         public static void PublishRelease(UIElement creator, InputManager.ClickType clickType)
         {
+            ThreadAffinity.AssertUiThread();
             bool[] heldModifiers = UiKeyboardStateCache.GetHoldModifiers();
             ReleaseEvent releaseEvent = new ReleaseEvent(creator, UiMouseStateCache.Relative, clickType, heldModifiers);
             Mailboxes.Ui.Publish(releaseEvent);
@@ -27,6 +28,7 @@ namespace Project_1.Input
             Mailboxes.Ui.Subscribe<KeyboardSnapshot>(HandleKeyboardSnapshot);
             Mailboxes.Ui.Subscribe<KeyBindSnapshot>(HandleKeyBindSnapshot);
             Mailboxes.Ui.Subscribe<MouseSnapshot>(HandleMouseSnapshot);
+            Mailboxes.Ui.Subscribe<EscapePressed>(HandleEscapePressed);
         }
 
         static void HandleClick(ClickEvent clickEvent)
@@ -81,6 +83,13 @@ namespace Project_1.Input
             ThreadAffinity.AssertUiThread();
             UiMouseStateCache.Update(snapshot);
             Mailboxes.Main.Publish(snapshot);
+        }
+
+        static void HandleEscapePressed(EscapePressed pressed)
+        {
+            ThreadAffinity.AssertUiThread();
+            if (StateManager.UiEscapePressed()) return;
+            Mailboxes.Main.Publish(pressed);
         }
     }
 }

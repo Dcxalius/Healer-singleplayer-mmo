@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 
-namespace Project_1.GameObjects.Entities.GuildMembers
+namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
 {
     internal class LogicNode
     {
@@ -17,7 +18,7 @@ namespace Project_1.GameObjects.Entities.GuildMembers
         Func<bool>[] conditions;
         ILogicResult result;
 
-        public LogicNode NextNode => (nextNodes != null && NextIndex != -1) ? nextNodes[NextIndex] : null;
+        public LogicNode NextNode => nextNodes != null && NextIndex != -1 ? nextNodes[NextIndex] : null;
         public int NextIndex
         {
             get

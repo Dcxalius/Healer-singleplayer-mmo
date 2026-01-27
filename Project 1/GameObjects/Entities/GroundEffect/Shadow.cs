@@ -1,13 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities.GuildMembers;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.GameObjects.Entities.GroundEffect
 {

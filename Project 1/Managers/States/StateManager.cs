@@ -9,11 +9,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
-using Project_1.GameObjects.Entities.GuildMembers;
 using Project_1.GameObjects.Entities.Corspes;
-using Project_1.GameObjects.Entities.Npcs;
 using Project_1.GameObjects.Doodads;
-using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Spawners;
 using Project_1.Input;
 using Project_1.Messaging;
@@ -27,6 +24,10 @@ using Project_1.UI.OptionMenu;
 using Project_1.UI.PauseMenu;
 using Project_1.UI.UIElements.Boxes;
 using Project_1.Tiles;
+using Project_1.GameObjects.Entities.Friendlies;
+using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
+using Project_1.GameObjects.Entities.Friendlies.Players;
+using Project_1.GameObjects.Entities.Friendlies.Npcs;
 
 namespace Project_1.Managers.States
 {
@@ -66,6 +67,8 @@ namespace Project_1.Managers.States
 
         public static States PreviousState => previousState;
         static States previousState;
+        static bool stateChangePending;
+        static States pendingState;
         static bool initialized;
 
         public static void Init()
@@ -124,11 +127,15 @@ namespace Project_1.Managers.States
             Mailboxes.Main.Subscribe<KeyboardSnapshot>(e => KeyboardStateCache.Update(e));
             Mailboxes.Main.Subscribe<KeyBindSnapshot>(e => KeyBindStateCache.Update(e));
             Mailboxes.Main.Subscribe<MouseSnapshot>(e => MouseStateCache.Update(e));
+            Mailboxes.Main.Subscribe<EscapePressed>(_ => HandleEscapePressed());
         }
 
         public static void Update()
         {
             ThreadAffinity.AssertSimThread();
+            KeyboardStateCache.BeginFrame();
+            KeyBindStateCache.BeginFrame();
+            ApplyPendingStateChange();
             currentState.Update();
         }
 
@@ -138,6 +145,29 @@ namespace Project_1.Managers.States
         public static void SetState(States aState)
         {
             ThreadAffinity.AssertSimThread();
+            pendingState = aState;
+            stateChangePending = true;
+        }
+
+        public static void RequestStateChange(States aState)
+        {
+            if (!SimThread.IsRunning || ThreadAffinity.IsSimThread)
+            {
+                SetState(aState);
+                return;
+            }
+            Mailboxes.Main.Publish(new StateChangeRequested(aState));
+        }
+
+        static void ApplyPendingStateChange()
+        {
+            if (!stateChangePending) return;
+            stateChangePending = false;
+            ApplyStateChange(pendingState);
+        }
+
+        static void ApplyStateChange(States aState)
+        {
             lock (HUDManager.UiLock)
             {
                 States leavingState = currentStateEnum;
@@ -181,16 +211,6 @@ namespace Project_1.Managers.States
                     UiOnEnter(aState);
                 }
             }
-        }
-
-        public static void RequestStateChange(States aState)
-        {
-            if (!SimThread.IsRunning || ThreadAffinity.IsSimThread)
-            {
-                SetState(aState);
-                return;
-            }
-            Mailboxes.Main.Publish(new StateChangeRequested(aState));
         }
 
         public static void RedrawGame()
@@ -308,6 +328,28 @@ namespace Project_1.Managers.States
             }
         }
 
+        internal static bool UiEscapePressed()
+        {
+            ThreadAffinity.AssertUiThread();
+            switch (currentStateEnum)
+            {
+                case States.StartScreen:
+                    return startScreen.UiEscapePressed();
+                case States.PauseMenu:
+                    return pauseMenu.UiEscapePressed();
+                case States.OptionMenu:
+                    return optionMenu.UiEscapePressed();
+                case States.LoadingMenu:
+                    return loadingMenu.UiEscapePressed();
+                case States.NewGame:
+                    return newGame.UiEscapePressed();
+                case States.MoveHUD:
+                    return moveHUD.UiEscapePressed();
+                default:
+                    return false;
+            }
+        }
+
         internal static void UiUpdate()
         {
             ThreadAffinity.AssertUiThread();
@@ -330,6 +372,22 @@ namespace Project_1.Managers.States
                     break;
                 case States.MoveHUD:
                     moveHUD.UiUpdate();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        static void HandleEscapePressed()
+        {
+            ThreadAffinity.AssertSimThread();
+            switch (currentStateEnum)
+            {
+                case States.Game:
+                    RequestStateChange(States.PauseMenu);
+                    break;
+                case States.PauseMenu:
+                    pauseMenu.HandleEscapePressed();
                     break;
                 default:
                     break;

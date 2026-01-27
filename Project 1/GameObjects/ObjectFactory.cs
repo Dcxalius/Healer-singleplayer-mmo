@@ -1,9 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Newtonsoft.Json;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities.GuildMembers;
-using Project_1.GameObjects.Entities.Npcs;
-using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Spawners;
 using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Unit.Classes;
@@ -15,6 +12,9 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
+using Project_1.GameObjects.Entities.Friendlies.Players;
+using Project_1.GameObjects.Entities.Friendlies.Npcs;
 
 namespace Project_1.GameObjects
 {
@@ -39,6 +39,7 @@ namespace Project_1.GameObjects
 
         public static void Init()
         {
+            ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
             ImportClassData();
@@ -49,6 +50,7 @@ namespace Project_1.GameObjects
 
         public static void AddGuildMember(string aName, string aClassName)
         {
+            ThreadAffinity.AssertSimThread();
             UnitData xdd = new UnitData(aName, "", aClassName, Relation.RelationToPlayer.Friendly, 1, 0, float.MaxValue, float.MaxValue, null, WorldSpace.Zero, WorldSpace.Zero, WorldSpace.Zero, null, 1);
 
             guildData.Add(xdd);
@@ -56,6 +58,7 @@ namespace Project_1.GameObjects
 
         public static void Load(Save aSave)
         {
+            ThreadAffinity.AssertSimThread();
             ResetUnitData();
             ImportPlayerData(aSave);
             ImportGuildData(aSave);
@@ -63,6 +66,7 @@ namespace Project_1.GameObjects
 
         public static void ApplyLoadedData(PlayerData loadedPlayer, List<UnitData> loadedGuild)
         {
+            ThreadAffinity.AssertSimThread();
             ResetUnitData();
             playerData = loadedPlayer;
             guildData = loadedGuild ?? new List<UnitData>();
@@ -77,6 +81,7 @@ namespace Project_1.GameObjects
 
         public static void ResetUnitData()
         {
+            ThreadAffinity.AssertSimThread();
             playerData = null;
             guildData?.Clear();
         }

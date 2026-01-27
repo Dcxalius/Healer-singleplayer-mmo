@@ -1,4 +1,4 @@
-﻿using Project_1.GameObjects.Entities;
+﻿using Project_1.GameObjects.Entities.Friendlies;
 
 namespace Project_1.Messaging.Events
 {

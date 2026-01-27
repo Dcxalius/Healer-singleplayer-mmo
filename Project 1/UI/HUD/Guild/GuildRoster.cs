@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.Textures;
 using Project_1.UI.UIElements.Boxes;
 using Project_1.UI.UIElements.Buttons;

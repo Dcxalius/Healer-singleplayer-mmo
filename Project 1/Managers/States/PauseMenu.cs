@@ -32,10 +32,6 @@ namespace Project_1.Managers.States
 
         public override void Update()
         {
-            if (dialogueBoxes.Count == 0 && KeyboardStateCache.GetPress(Microsoft.Xna.Framework.Input.Keys.Escape))
-            {
-                StateManager.RequestStateChange(StateManager.States.Game);
-            }
         }
         public override void Rescale()
         {
@@ -123,12 +119,22 @@ namespace Project_1.Managers.States
             return pauseBox.ScrolledOn(aScrollEvent);
         }
 
+        internal bool UiEscapePressed() => false;
+
         internal void UiUpdate()
         {
             pauseBox.Update();
             for (int i = 0; i < dialogueBoxes.Count; i++)
             {
                 dialogueBoxes[i].Update();
+            }
+        }
+
+        internal void HandleEscapePressed()
+        {
+            if (dialogueBoxes.Count == 0)
+            {
+                StateManager.RequestStateChange(StateManager.States.Game);
             }
         }
 

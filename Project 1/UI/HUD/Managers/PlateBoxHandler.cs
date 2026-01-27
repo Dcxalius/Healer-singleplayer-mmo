@@ -1,6 +1,5 @@
 ﻿using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Unit;
-using Project_1.GameObjects.Entities.Players;
 using Project_1.Camera;
 using Project_1.Input;
 using Project_1.UI.HUD.PlateBoxes;
@@ -13,7 +12,8 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Managers;
 using System.Diagnostics;
-using Project_1.GameObjects.Entities.GuildMembers;
+using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.UI.HUD.Managers
 {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input;
+using Project_1.Managers;
 using Project_1.Messaging.Events;
 
 namespace Project_1.Input
@@ -18,6 +19,7 @@ namespace Project_1.Input
 
         public static void Update(KeyboardSnapshot snapshot)
         {
+            ThreadAffinity.AssertUiThread();
             previous.Clear();
             previous.UnionWith(current);
             current.Clear();
@@ -30,16 +32,33 @@ namespace Project_1.Input
             current.UnionWith(lastDownKeys);
         }
 
-        public static bool GetPress(Keys key) => current.Contains(key) && !previous.Contains(key);
+        public static bool GetPress(Keys key)
+        {
+            ThreadAffinity.AssertUiThread();
+            return current.Contains(key) && !previous.Contains(key);
+        }
 
-        public static bool GetHold(Keys key) => current.Contains(key);
+        public static bool GetHold(Keys key)
+        {
+            ThreadAffinity.AssertUiThread();
+            return current.Contains(key);
+        }
 
-        public static bool GetRelease(Keys key) => !current.Contains(key) && previous.Contains(key);
+        public static bool GetRelease(Keys key)
+        {
+            ThreadAffinity.AssertUiThread();
+            return !current.Contains(key) && previous.Contains(key);
+        }
 
-        public static bool IsNewlyPressed(Keys key) => current.Contains(key) && !previous.Contains(key);
+        public static bool IsNewlyPressed(Keys key)
+        {
+            ThreadAffinity.AssertUiThread();
+            return current.Contains(key) && !previous.Contains(key);
+        }
 
         public static Keys? GetAnyKey()
         {
+            ThreadAffinity.AssertUiThread();
             for (int i = 0; i < lastDownKeys.Length; i++)
             {
                 Keys key = lastDownKeys[i];
@@ -51,6 +70,7 @@ namespace Project_1.Input
 
         public static bool[] GetHoldModifiers()
         {
+            ThreadAffinity.AssertUiThread();
             bool[] heldModifiers = new bool[(int)InputManager.HoldModifier.Count];
             heldModifiers[(int)InputManager.HoldModifier.Ctrl] = GetHold(Keys.LeftControl) || GetHold(Keys.RightControl);
             heldModifiers[(int)InputManager.HoldModifier.Alt] = GetHold(Keys.LeftAlt) || GetHold(Keys.RightAlt);

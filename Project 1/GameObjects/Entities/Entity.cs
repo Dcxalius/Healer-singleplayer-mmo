@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities.Corspes;
 using Project_1.GameObjects.Entities.GroundEffect;
-using Project_1.GameObjects.Entities.Players;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.FloatingTexts;
 using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Spells.Buff;

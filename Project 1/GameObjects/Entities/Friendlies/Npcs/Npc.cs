@@ -7,10 +7,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Project_1.GameObjects.Entities.Friendlies.Players;
+using Project_1.GameObjects.Entities.Friendlies.Npcs;
 
-namespace Project_1.GameObjects.Entities.Npcs
+namespace Project_1.GameObjects.Entities.Friendlies.Npcs
 {
-    internal class Npc : Friendly
+    internal class Npc : Friendly //TODO: Should this be friendly?
     {
         const float speakRange = 100f;
         GossipData gossip;

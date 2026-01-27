@@ -20,6 +20,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.Managers
 {
@@ -66,6 +67,7 @@ namespace Project_1.Managers
 
         public static void Init()
         {
+            ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
 
@@ -91,6 +93,7 @@ namespace Project_1.Managers
 
         public static void LoadContent()
         {
+            ThreadAffinity.AssertMainThread();
             fpsText = new Text("Gloryse", Color.Chartreuse);
             frameTimeText = new Text("Gloryse", Color.Chartreuse);
             totalTimeText = new Text("Gloryse", Color.Chartreuse);
@@ -103,6 +106,7 @@ namespace Project_1.Managers
 
         public static void Update()
         {
+            ThreadAffinity.AssertSimThread();
             InventoryCheats();
             TeleportPlayer();
 

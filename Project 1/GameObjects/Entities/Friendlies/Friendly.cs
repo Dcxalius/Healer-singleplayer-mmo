@@ -2,14 +2,14 @@
 using Project_1.Camera;
 using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Unit.Classes;
-using Project_1.GameObjects.Entities.GuildMembers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 
-namespace Project_1.GameObjects.Entities
+namespace Project_1.GameObjects.Entities.Friendlies
 {
     internal class Friendly : Entity
     {
@@ -21,9 +21,10 @@ namespace Project_1.GameObjects.Entities
         }
 
 
-        public GuildMembers.GuildMember.GuildMemberData CreateGuildMemberData()
+
+        public Friendlies.GuildMembers.GuildMember.GuildMemberData CreateGuildMemberData()
         {
-            return new GuildMembers.GuildMember.GuildMemberData(Name, CurrentLevel, Class);
+            return new Friendlies.GuildMembers.GuildMember.GuildMemberData(Name, CurrentLevel, Class);
         }
         public override void ExpToParty(int aExpAmount)
         {

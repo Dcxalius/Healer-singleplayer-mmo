@@ -15,6 +15,7 @@ namespace Project_1.GameObjects.FloatingTexts
 
         public static void Init()
         {
+            ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
             floatingTexts = new List<FloatingText>();

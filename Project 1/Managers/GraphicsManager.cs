@@ -147,6 +147,7 @@ namespace Project_1.Managers
 
         public static void SetManager(Microsoft.Xna.Framework.Game aGame)
         {
+            ThreadAffinity.AssertMainThread();
             graphicsDeviceManager = new GraphicsDeviceManager(aGame);
 
             graphicsDeviceManager.GraphicsProfile = GraphicsProfile.HiDef;
@@ -162,6 +163,7 @@ namespace Project_1.Managers
 
         public static void Update()
         {
+            ThreadAffinity.AssertMainThread();
             //Rectangle rect = Camera.ScreenRectangle;
 
             if (fullsceen)

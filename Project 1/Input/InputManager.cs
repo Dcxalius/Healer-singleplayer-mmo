@@ -178,6 +178,7 @@ namespace Project_1.Input
         {
             ThreadAffinity.AssertMainThread();
             UpdateStates();
+            PublishEscapePressed();
             UpdateScrollWheel();
             CheckButtonPress();
             WriteToLabel();
@@ -314,6 +315,14 @@ namespace Project_1.Input
             Mailboxes.Ui.Publish(scrollEvent);
         }
 
+        static void PublishEscapePressed()
+        {
+            if (!oldKeyboardState.IsKeyDown(Keys.Escape) && newKeyboardState.IsKeyDown(Keys.Escape))
+            {
+                Mailboxes.Ui.Publish(new EscapePressed());
+            }
+        }
+
         static void PublishKeyboardSnapshots()
         {
             Keys[] downKeys = newKeyboardState.GetPressedKeys();
@@ -355,12 +364,14 @@ namespace Project_1.Input
 
         public static AbsoluteScreenPosition GetMousePosAbsolute()
         {
+            ThreadAffinity.AssertMainThread();
             AbsoluteScreenPosition mousePos = BoundsCheckOnMouse(new AbsoluteScreenPosition(newMouseState.Position));
             return mousePos; //TODO: Make this handle the mouse being outside screen
         }
 
         public static RelativeScreenPosition GetMousePosRelative()
         {
+            ThreadAffinity.AssertMainThread();
             Point mousePoint = GetMousePosAbsolute();
             Point screenSize = Camera.Camera.WindowSize.ToPoint();
 
@@ -394,6 +405,7 @@ namespace Project_1.Input
 
         public static bool GetPress(Keys key)
         {
+            ThreadAffinity.AssertMainThread();
             if (WritingToLabel) { return false; }
 
             if (!oldKeyboardState.IsKeyDown(key) && newKeyboardState.IsKeyDown(key))
@@ -406,6 +418,7 @@ namespace Project_1.Input
 
         public static bool GetHold(Keys key)
         {
+            ThreadAffinity.AssertMainThread();
             if (WritingToLabel) { return false; }
             if (oldKeyboardState.IsKeyDown(key) || newKeyboardState.IsKeyDown(key))
             {
@@ -417,6 +430,7 @@ namespace Project_1.Input
 
         public static bool GetRelease(Keys key)
         {
+            ThreadAffinity.AssertMainThread();
             if (WritingToLabel) { return false; }
             if (oldKeyboardState.IsKeyDown(key) && !newKeyboardState.IsKeyDown(key))
             {

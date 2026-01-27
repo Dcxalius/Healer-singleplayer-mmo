@@ -1,5 +1,4 @@
 ﻿using Project_1.Camera;
-using Project_1.GameObjects.Entities.Players;
 using Project_1.Managers;
 using Project_1.Tiles;
 using System;
@@ -8,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Project_1.GameObjects.Spells.AoE.AreaOfEffectData;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.GameObjects.Entities
 {

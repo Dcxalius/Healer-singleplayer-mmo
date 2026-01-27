@@ -1,7 +1,8 @@
-﻿using GuildMemberEntity = Project_1.GameObjects.Entities.GuildMembers.GuildMember;
-using Project_1.GameObjects.Entities;
+﻿using GuildMemberEntity = Project_1.GameObjects.Entities.Friendlies.GuildMembers.GuildMember;
 using Project_1.UI.UIElements.Buttons;
 using System.Collections.Generic;
+using Project_1.GameObjects.Entities.Friendlies;
+using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 
 namespace Project_1.Messaging.Events
 {

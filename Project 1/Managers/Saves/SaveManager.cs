@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Entities.Corspes;
 using Project_1.GameObjects;
@@ -18,6 +17,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Project_1.Tiles;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.Managers
 {
@@ -59,6 +59,7 @@ namespace Project_1.Managers
 
         public static void Init()
         {
+            ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
             contentRootDirectory = Game1.ContentManager.RootDirectory;
@@ -105,6 +106,7 @@ namespace Project_1.Managers
 
         public static void CreateNewSave(string aName)
         {
+            ThreadAffinity.AssertSimThread();
             aName = aName.ToUpper();
             lock (savesLock)
             {
@@ -125,6 +127,7 @@ namespace Project_1.Managers
 
         public static void ContinueLastSave()
         {
+            ThreadAffinity.AssertSimThread();
             Save save;
             lock (savesLock)
             {
@@ -135,6 +138,7 @@ namespace Project_1.Managers
 
         public static bool RequestContinueLastSave()
         {
+            ThreadAffinity.AssertSimThread();
             Save save;
             lock (savesLock)
             {
@@ -147,12 +151,14 @@ namespace Project_1.Managers
 
         public static void LoadData(Save aSave)
         {
+            ThreadAffinity.AssertSimThread();
             currentSave = aSave;
             currentSave.LoadData();
         }
 
         public static bool RequestLoadData(Save save)
         {
+            ThreadAffinity.AssertSimThread();
             if (save == null) return false;
             currentSave = save;
             if (!ThreadingSettings.UseWorkerThreads || !WorkerPool.IsRunning)

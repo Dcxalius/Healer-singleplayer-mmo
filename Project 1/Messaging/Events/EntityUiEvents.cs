@@ -3,6 +3,8 @@ using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Spells;
 using System.Collections.Generic;
+using Project_1.GameObjects.Entities.Friendlies;
+using Project_1.GameObjects.Entities.Friendlies.Npcs;
 
 namespace Project_1.Messaging.Events
 {
@@ -226,11 +228,11 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct GossipOpened
     {
-        public GossipOpened(Project_1.GameObjects.Entities.Npcs.GossipData data)
+        public GossipOpened(GameObjects.Entities.Friendlies.Npcs.GossipData data)
         {
             Data = data;
         }
-        public Project_1.GameObjects.Entities.Npcs.GossipData Data { get; }
+        public GameObjects.Entities.Friendlies.Npcs.GossipData Data { get; }
     }
 
     internal readonly struct GossipClosed

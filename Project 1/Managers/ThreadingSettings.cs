@@ -13,6 +13,7 @@ namespace Project_1.Managers
 
         public static void Init()
         {
+            ThreadAffinity.AssertMainThread();
             bool singleThread = IsEnvTrue("P1_SINGLE_THREAD");
             if (singleThread)
             {

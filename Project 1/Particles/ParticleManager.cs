@@ -16,6 +16,7 @@ namespace Project_1.Particles
 
         public static void Init()
         {
+            ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
             particles = new List<Particle>();

@@ -8,9 +8,10 @@ using System.Diagnostics;
 using Project_1.UI.HUD.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
-using Project_1.GameObjects.Entities.GuildMembers;
+using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 
-namespace Project_1.GameObjects.Entities.Players
+namespace Project_1.GameObjects.Entities.Friendlies.Players
 {
     internal class Guild
     {
@@ -27,17 +28,17 @@ namespace Project_1.GameObjects.Entities.Players
             SetRosterWindow();
         }
 
-        public GuildMembers.GuildMember GetGuildMemberByName(string aName)
+        public GuildMember GetGuildMemberByName(string aName)
         {
             Debug.Assert(aName != null);
             Debug.Assert(aName != owner.Name, "Tried to get Player.");
 
-            return guildMembers.Single(guildMember =>  guildMember.Name == aName) as GuildMembers.GuildMember;
+            return guildMembers.Single(guildMember =>  guildMember.Name == aName) as GuildMember;
         }
 
         void SetRosterWindow()
         {
-            GuildMembers.GuildMember.GuildMemberData[] data = new GuildMembers.GuildMember.GuildMemberData[guildMembers.Count];
+            GuildMember.GuildMemberData[] data = new GuildMember.GuildMemberData[guildMembers.Count];
             for (int i = 0; i < guildMembers.Count; i++)
             {
                 data[i] = guildMembers[i].CreateGuildMemberData();

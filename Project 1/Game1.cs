@@ -60,6 +60,7 @@ namespace Project_1
 
         protected override void Update(GameTime gameTime)
         {
+            ThreadAffinity.AssertMainThread();
             TimeManager.Update(gameTime);
 
             GraphicsManager.Update();

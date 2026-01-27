@@ -1,4 +1,5 @@
 using Project_1.Camera;
+using Project_1.Managers;
 using Project_1.Messaging.Events;
 
 namespace Project_1.Input
@@ -15,6 +16,7 @@ namespace Project_1.Input
 
         public static void Update(MouseSnapshot snapshot)
         {
+            ThreadAffinity.AssertSimThread();
             Absolute = snapshot.Absolute;
             Relative = snapshot.Relative;
             ScrollWheelValue = snapshot.ScrollWheelValue;

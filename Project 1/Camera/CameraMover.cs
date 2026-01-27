@@ -113,6 +113,7 @@ namespace Project_1.Camera
 
         public void Move()
         {
+            ThreadAffinity.AssertSimThread();
             switch (CurrentCameraSetting)
             {
                 case CameraSettings.Follow.Free:
@@ -139,13 +140,14 @@ namespace Project_1.Camera
         }
         public void BindCamera(MovingObject aBinder)
         {
+            ThreadAffinity.AssertSimThread();
             boundObject = aBinder;
         }
 
 
         void CheckForSpacePress()
         {
-            if (KeyboardStateCache.GetPress(Microsoft.Xna.Framework.Input.Keys.Space)) //TODO: This should be modernized
+            if (KeyBindStateCache.GetPress(KeyBindManager.KeyListner.CenterCamera))
             {
                 if (boundObject == null)
                 {

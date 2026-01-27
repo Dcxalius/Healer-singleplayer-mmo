@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.GameObjects.Unit.Classes;
 using Project_1.GameObjects.Unit.Stats;
 using Project_1.Items;

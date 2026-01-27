@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
-using Project_1.GameObjects.Entities.Players;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.Unit;
 using Project_1.Input;
 using Project_1.Managers.States;

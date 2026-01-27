@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
+using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.UI.UIElements.Boxes;
 using Project_1.UI.UIElements.Buttons;
@@ -29,6 +30,7 @@ namespace Project_1.UI.HUD.Windows
 
         static public void Init(RelativeScreenPosition aFurthestLeftWindow, RelativeScreenPosition aSpacing, RelativeScreenPosition aSize)
         {
+            ThreadAffinity.AssertUiThread();
             nrOfBookletsOpen = 0;
             furthestLeftWindow = aFurthestLeftWindow;
             spacing = aSpacing;
@@ -49,6 +51,7 @@ namespace Project_1.UI.HUD.Windows
 
         public void OpenWindow()
         {
+            ThreadAffinity.AssertUiThread();
             if (nrOfBookletsOpen >= maxNrOfOpenWindows) return;
 
             if (!Visible) OpenBooklet();
@@ -57,12 +60,14 @@ namespace Project_1.UI.HUD.Windows
 
         public void CloseWindow()
         {
+            ThreadAffinity.AssertUiThread();
             if (Visible) CloseBooklet();
             Visible = false;
         }
 
         public override void ToggleVisibilty()
         {
+            ThreadAffinity.AssertUiThread();
             if (nrOfBookletsOpen >= maxNrOfOpenWindows && !Visible) return;
 
             if (!Visible) OpenBooklet();
@@ -74,6 +79,7 @@ namespace Project_1.UI.HUD.Windows
 
         protected virtual void OpenBooklet()
         {
+            ThreadAffinity.AssertUiThread();
             Move(GetNextOpenPosition);
             openWindows.Add(this);
             nrOfBookletsOpen++;
@@ -81,6 +87,7 @@ namespace Project_1.UI.HUD.Windows
 
         protected virtual void CloseBooklet()
         {
+            ThreadAffinity.AssertUiThread();
             int startIndex = openWindows.FindIndex(xdd => xdd == this);
             nrOfBookletsOpen--;
             if (startIndex == -1) return;

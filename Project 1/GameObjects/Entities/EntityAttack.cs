@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -330,11 +331,11 @@ namespace Project_1.GameObjects.Entities
         protected virtual void ProcessDamage(Entity aCause, string aCauseName, float aDamageTaken, float aThreatMod, DamageType aDamageType, Color aBorderColor, string aPrefix = "", string aSuffix = "")
         {
             Color textColor = Color.Red; //TODO: Different colors for different damage types
-            CurrentHealth -= aDamageTaken;
+            double appliedDelta = ApplyHealthDelta(-aDamageTaken);
 
             //TODO: aCause.DpsMeter.RegisterDamageDone(this, aCauseName, aDamageTaken, aDamageType);
 
-            SpawnFlyingText(aPrefix + aDamageTaken + aSuffix, GetDirOfFloatingText(aCause.FeetPosition), textColor);
+            SpawnFlyingText(aPrefix + FormatHealthDelta(-appliedDelta) + aSuffix, GetDirOfFloatingText(aCause.FeetPosition), textColor);
         }
 
         void SpawnFlyingText(string aHealthChangeValue, WorldSpace aDirOfFlyingStuff, Color aTextColor) => FloatingTextManager.AddFloatingText(new FloatingText(aHealthChangeValue, aTextColor, FeetPosition, aDirOfFlyingStuff));
@@ -371,14 +372,14 @@ namespace Project_1.GameObjects.Entities
 
         void PublishMissEvent(Entity aAttacker, Unit.Attack aAttack)
         {
-            PublishToAttacker(aAttacker, new MissEvent(aAttacker, this, aAttack));
+            PublishToAttacker(aAttacker, new AttackMissedEvent(aAttacker, this, aAttack));
             PublishToDefender(new MissedByEvent(aAttacker, this, aAttack));
         }
 
         void PublishHitEvent(Entity aAttacker, Unit.Attack aAttack, HitTable.HitResult aResult, Damage aDamageTaken)
         {
             var snapshot = new Damage(aDamageTaken);
-            PublishToAttacker(aAttacker, new HitEvent(aAttacker, this, aAttack, aResult, snapshot));
+            PublishToAttacker(aAttacker, new AttackHitEvent(aAttacker, this, aAttack, aResult, snapshot));
             PublishToDefender(new HitTakenEvent(aAttacker, this, aAttack, aResult, new Damage(snapshot)));
         }
 
@@ -388,15 +389,15 @@ namespace Project_1.GameObjects.Entities
             switch (aResult)
             {
                 case HitTable.HitResult.Glancing:
-                    PublishToAttacker(aAttacker, new GlancingEvent(aAttacker, this, aAttack, snapshot));
+                    PublishToAttacker(aAttacker, new AttackGlancedEvent(aAttacker, this, aAttack, snapshot));
                     PublishToDefender(new GlancingTakenEvent(aAttacker, this, aAttack, new Damage(snapshot)));
                     break;
                 case HitTable.HitResult.Crit:
-                    PublishToAttacker(aAttacker, new CritEvent(aAttacker, this, aAttack, snapshot));
+                    PublishToAttacker(aAttacker, new AttackCritEvent(aAttacker, this, aAttack, snapshot));
                     PublishToDefender(new CritTakenEvent(aAttacker, this, aAttack, new Damage(snapshot)));
                     break;
                 case HitTable.HitResult.Crushing:
-                    PublishToAttacker(aAttacker, new CrushingEvent(aAttacker, this, aAttack, snapshot));
+                    PublishToAttacker(aAttacker, new AttackCrushedEvent(aAttacker, this, aAttack, snapshot));
                     PublishToDefender(new CrushingTakenEvent(aAttacker, this, aAttack, new Damage(snapshot)));
                     break;
                 default:

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities.Players;
 using Project_1.GameObjects.Unit;
 using Project_1.Textures;
 using Project_1.Textures.AnimatedTextures;
@@ -9,8 +8,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 
-namespace Project_1.GameObjects.Entities.GuildMembers
+namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
 {
     internal class GuildMember : Friendly
     {

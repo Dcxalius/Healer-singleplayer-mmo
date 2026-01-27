@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities.Npcs;
 using Project_1.Textures;
 using Project_1.UI.HUD.Managers;
 using Project_1.Messaging;
@@ -13,6 +12,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Project_1.GameObjects.Entities.Friendlies.Npcs;
 
 namespace Project_1.UI.HUD.Windows.Gossip
 {

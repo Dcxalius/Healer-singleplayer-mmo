@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.Input
 {
@@ -22,6 +23,7 @@ namespace Project_1.Input
             MoveCharacterUp, MoveCharacterLeft, MoveCharacterDown, MoveCharacterRight,
             DebugTeleport, DebugHealthPotion, DebugManaPotion, DebugDeleteShapes, DebugTestGear,
             Inventory, SpellBook, Character, GuildRoster, LogicWindow,
+            CenterCamera,
             SpellBar1Spell1, SpellBar1Spell2, SpellBar1Spell3, SpellBar1Spell4, SpellBar1Spell5, SpellBar1Spell6, SpellBar1Spell7, SpellBar1Spell8, SpellBar1Spell9, SpellBar1Spell10,
 
             Count
@@ -48,6 +50,7 @@ namespace Project_1.Input
 
         public static void Init()
         {
+            ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
             rootDir = Game1.ContentManager.RootDirectory;
@@ -100,6 +103,7 @@ namespace Project_1.Input
 
         public static void SaveBindings()
         {
+            ThreadAffinity.AssertUiThread();
             ExportData(SaveManager.KeyBindSettings, firstButtons.Concat(secondButtons));
         }
 
@@ -115,11 +119,23 @@ namespace Project_1.Input
             return secondButtons[(int)aListner];
         }
 
-        public static bool GetPress(KeyListner aListner) => firstButtons[(int)aListner].GetPress || secondButtons[(int)aListner].GetPress;
+        public static bool GetPress(KeyListner aListner)
+        {
+            ThreadAffinity.AssertMainThread();
+            return firstButtons[(int)aListner].GetPress || secondButtons[(int)aListner].GetPress;
+        }
 
-        public static bool GetHold(KeyListner aListner) => firstButtons[(int)aListner].GetHold || secondButtons[(int)aListner].GetHold;
+        public static bool GetHold(KeyListner aListner)
+        {
+            ThreadAffinity.AssertMainThread();
+            return firstButtons[(int)aListner].GetHold || secondButtons[(int)aListner].GetHold;
+        }
 
-        public static bool GetRelease(KeyListner aListner) => firstButtons[(int)aListner].GetRelease || secondButtons[(int)aListner].GetRelease;
+        public static bool GetRelease(KeyListner aListner)
+        {
+            ThreadAffinity.AssertMainThread();
+            return firstButtons[(int)aListner].GetRelease || secondButtons[(int)aListner].GetRelease;
+        }
 
         public static void SetKey(bool aFirstButton, KeyListner aListner, KeySet aKey)
         {

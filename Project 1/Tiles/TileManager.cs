@@ -22,6 +22,7 @@ using System.Xml;
 using System.Collections.Concurrent;
 using System.Threading;
 using static Project_1.GameObjects.Spells.AoE.AreaOfEffectData;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.Tiles
 {
@@ -75,6 +76,7 @@ namespace Project_1.Tiles
 
         public static void Init()
         {
+            ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
             chunks = new List<Chunk>();
@@ -306,33 +308,78 @@ namespace Project_1.Tiles
 
         static bool LineOfSight(WorldSpace aStartPos, WorldSpace aEndPos, Func<Tile, bool> aFalseCondition, Func<Tile, bool> aTrueCondition)
         {
-            Vector2 dirVector = aEndPos - aStartPos;
+            Vector2 start = aStartPos;
+            Vector2 end = aEndPos;
+            float x = start.X / TileSize.X;
+            float y = start.Y / TileSize.Y;
+            float endX = end.X / TileSize.X;
+            float endY = end.Y / TileSize.Y;
 
-            float dirX = Math.Sign(dirVector.X);
-            float dirY = Math.Sign(dirVector.Y);
-            double m = (aEndPos.Y - aStartPos.Y) / (aEndPos.X - aStartPos.X);
-            double c = aStartPos.Y - m * aStartPos.X;
+            Point startGrid = GetGridPos(aStartPos);
+            Point targetGrid = GetGridPos(aEndPos);
+            int tileX = startGrid.X;
+            int tileY = startGrid.Y;
+            int targetX = targetGrid.X;
+            int targetY = targetGrid.Y;
 
-            Tile lastTile = GetTileUnder(aStartPos);
-            while (true)
+            if (tileX == targetX && tileY == targetY) return true;
+
+            float dx = endX - x;
+            float dy = endY - y;
+            int stepX = Math.Sign(dx);
+            int stepY = Math.Sign(dy);
+
+            float tDeltaX = stepX == 0 ? float.PositiveInfinity : MathF.Abs(1f / dx);
+            float tDeltaY = stepY == 0 ? float.PositiveInfinity : MathF.Abs(1f / dy);
+
+            float nextBoundaryX = stepX > 0 ? MathF.Floor(x) + 1 : MathF.Floor(x);
+            float nextBoundaryY = stepY > 0 ? MathF.Floor(y) + 1 : MathF.Floor(y);
+            float tMaxX = stepX == 0 ? float.PositiveInfinity : MathF.Abs((nextBoundaryX - x) / dx);
+            float tMaxY = stepY == 0 ? float.PositiveInfinity : MathF.Abs((nextBoundaryY - y) / dy);
+
+            const float epsilon = 0.00001f;
+            while (tileX != targetX || tileY != targetY)
             {
-
-                float borderInX = dirX > 0 ? lastTile.WorldRectangle.Right : lastTile.WorldRectangle.Left;
-                double yAtBorder = m * borderInX + c;
-                if (yAtBorder > lastTile.WorldRectangle.Top && yAtBorder < lastTile.WorldRectangle.Bottom)
+                if (MathF.Abs(tMaxX - tMaxY) < epsilon)
                 {
-                    lastTile = chunks[0].Tile(lastTile.GridPos.X + (int)dirX, lastTile.GridPos.Y); //TODO: Chunkize this
-                    //lastTile = tiles[lastTile.GridPos.X + (int)dirX, lastTile.GridPos.Y];
+                    tileX += stepX;
+                    tileY += stepY;
+                    tMaxX += tDeltaX;
+                    tMaxY += tDeltaY;
+                }
+                else if (tMaxX < tMaxY)
+                {
+                    tileX += stepX;
+                    tMaxX += tDeltaX;
                 }
                 else
                 {
-                    lastTile = chunks[0].Tile(lastTile.GridPos.X, lastTile.GridPos.Y + (int)dirY);
-                    //lastTile = tiles[lastTile.GridPos.X, lastTile.GridPos.Y + (int)dirY];
+                    tileY += stepY;
+                    tMaxY += tDeltaY;
                 }
 
-                if (aFalseCondition(lastTile)) return false;
-                if (aTrueCondition(lastTile)) return true;
+                Tile tile = GetTileAtGrid(new Point(tileX, tileY));
+                if (tile == null) return false;
+                if (aFalseCondition(tile)) return false;
+                if (aTrueCondition(tile)) return true;
             }
+
+            return true;
+        }
+
+        static Point GetGridPos(WorldSpace aWorldSpace)
+        {
+            return new Point((int)MathF.Floor(aWorldSpace.X / TileSize.X), (int)MathF.Floor(aWorldSpace.Y / TileSize.Y));
+        }
+
+        static Tile GetTileAtGrid(Point aGridPos)
+        {
+            Point chunkPos = new Point((int)MathF.Floor((float)aGridPos.X / Chunk.ChunkSize.X), (int)MathF.Floor((float)aGridPos.Y / Chunk.ChunkSize.Y));
+            Chunk chunk = GetChunk(chunkPos);
+            if (chunk == null) return null;
+            int localX = Modulo(aGridPos.X, Chunk.ChunkSize.X);
+            int localY = Modulo(aGridPos.Y, Chunk.ChunkSize.Y);
+            return chunk.Tile(localX, localY);
         }
 
 

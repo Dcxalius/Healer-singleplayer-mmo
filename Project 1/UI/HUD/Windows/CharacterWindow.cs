@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Bson;
 using Project_1.Camera;
 using Project_1.GameObjects;
-using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.GameObjects.Unit;
 using Project_1.Textures;
 using Project_1.UI.HUD.Inventory;

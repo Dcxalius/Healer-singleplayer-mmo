@@ -1,4 +1,5 @@
 using Project_1.Camera;
+using Project_1.Managers;
 using Project_1.Messaging.Events;
 
 namespace Project_1.UI
@@ -16,6 +17,7 @@ namespace Project_1.UI
 
         public static void Update(PlayerUiSnapshot snapshot)
         {
+            ThreadAffinity.AssertUiThread();
             Valid = snapshot.Valid;
             InCombatOrPartyInCombat = snapshot.InCombatOrPartyInCombat;
             Gold = snapshot.Gold;

@@ -17,6 +17,7 @@ namespace Project_1.GameObjects.Doodads
 
         public static void Init()
         {
+            ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
 

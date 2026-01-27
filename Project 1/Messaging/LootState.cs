@@ -2,6 +2,7 @@
 using Project_1.Items;
 using Project_1.Messaging.Events;
 using System.Linq;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.Messaging
 {

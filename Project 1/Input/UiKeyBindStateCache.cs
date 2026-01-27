@@ -1,4 +1,5 @@
 using Project_1.Messaging.Events;
+using Project_1.Managers;
 
 namespace Project_1.Input
 {
@@ -13,15 +14,28 @@ namespace Project_1.Input
 
         public static void Update(KeyBindSnapshot snapshot)
         {
+            ThreadAffinity.AssertUiThread();
             if (snapshot.Pressed != null) pressed = snapshot.Pressed;
             if (snapshot.Held != null) held = snapshot.Held;
             if (snapshot.Released != null) released = snapshot.Released;
         }
 
-        public static bool GetPress(KeyBindManager.KeyListner key) => pressed[(int)key];
+        public static bool GetPress(KeyBindManager.KeyListner key)
+        {
+            ThreadAffinity.AssertUiThread();
+            return pressed[(int)key];
+        }
 
-        public static bool GetHold(KeyBindManager.KeyListner key) => held[(int)key];
+        public static bool GetHold(KeyBindManager.KeyListner key)
+        {
+            ThreadAffinity.AssertUiThread();
+            return held[(int)key];
+        }
 
-        public static bool GetRelease(KeyBindManager.KeyListner key) => released[(int)key];
+        public static bool GetRelease(KeyBindManager.KeyListner key)
+        {
+            ThreadAffinity.AssertUiThread();
+            return released[(int)key];
+        }
     }
 }

@@ -13,7 +13,6 @@ using System.Reflection.Metadata;
 using Microsoft.Xna.Framework.Content;
 using Project_1.Managers;
 using Project_1.GameObjects.Entities;
-using Project_1.GameObjects.Entities.Players;
 using Project_1.Camera;
 using Project_1.GameObjects.Spawners;
 using System.Diagnostics;
@@ -22,10 +21,11 @@ using Project_1.Managers.Saves;
 using Project_1.GameObjects.FloatingTexts;
 using Project_1.GameObjects.Entities.Corspes;
 using Project_1.GameObjects.Entities.Projectiles;
-using Project_1.GameObjects.Entities.Npcs;
 using Project_1.GameObjects.Unit;
 using Project_1.UI.HUD.Managers;
-using Project_1.GameObjects.Entities.GuildMembers;
+using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
+using Project_1.GameObjects.Entities.Friendlies.Players;
+using Project_1.GameObjects.Entities.Friendlies.Npcs;
 
 namespace Project_1.GameObjects
 {
@@ -75,6 +75,7 @@ namespace Project_1.GameObjects
 
         public static void Init()
         {
+            ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
             entities = new List<Entity>();

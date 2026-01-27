@@ -77,6 +77,7 @@ namespace Project_1.Managers.States
         internal bool UiClick(ClickEvent aClickEvent) => mainMenu.ClickedOn(aClickEvent);
         internal bool UiRelease(ReleaseEvent aReleaseEvent) => mainMenu.ReleasedOn(aReleaseEvent);
         internal bool UiScroll(ScrollEvent aScrollEvent) => mainMenu.ScrolledOn(aScrollEvent);
+        internal bool UiEscapePressed() => false;
         internal void UiUpdate() => mainMenu.Update();
     }
 }

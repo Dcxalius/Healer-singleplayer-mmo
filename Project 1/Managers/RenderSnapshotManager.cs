@@ -5,6 +5,7 @@ using Project_1.GameObjects.Entities.Corspes;
 using Project_1.GameObjects.Entities.Projectiles;
 using Project_1.GameObjects.Spawners;
 using Project_1.Tiles;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.Managers
 {

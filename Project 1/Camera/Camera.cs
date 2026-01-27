@@ -125,11 +125,13 @@ namespace Project_1.Camera
 
         public static void SavePosition(Save aSave)
         {
+            ThreadAffinity.AssertSimThread();
             SaveManager.ExportData(aSave.CameraPosition, cameraMover.CentreInWorldSpace);
         }
 
         public static void LoadPosition(Save aSave)
         {
+            ThreadAffinity.AssertSimThread();
             string json = File.ReadAllText(aSave.CameraPosition);
             WorldSpace ws = SaveManager.ImportData<WorldSpace>(json);
             cameraMover.CentreInWorldSpace = ws;
@@ -144,6 +146,7 @@ namespace Project_1.Camera
 
         internal static void Scroll(ScrollEvent aScrollEvent)
         {
+            ThreadAffinity.AssertSimThread();
             ZoomIn(aScrollEvent);
             ZoomOut(aScrollEvent);
         }
@@ -171,11 +174,13 @@ namespace Project_1.Camera
 
         public static void BindCamera(MovingObject aBinder)
         {
+            ThreadAffinity.AssertSimThread();
             cameraMover.BindCamera(aBinder);
         }
 
         public static void SetWindowSize(AbsoluteScreenPosition aSize)
         {
+            ThreadAffinity.AssertMainThread();
             float x = devScreenBorder.X / aSize.X;
             float y = devScreenBorder.Y / aSize.Y;
             scale = Math.Max(x, y);

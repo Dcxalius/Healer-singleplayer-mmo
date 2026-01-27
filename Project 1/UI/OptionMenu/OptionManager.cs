@@ -118,6 +118,7 @@ namespace Project_1.UI.OptionMenu
 
         public static void SetScreen(OptionScreen aNewScreen)
         {
+            ThreadAffinity.AssertUiThread();
             if (aNewScreen == currentScreen) return;
 
             currentScreen = aNewScreen;
@@ -126,6 +127,7 @@ namespace Project_1.UI.OptionMenu
 
         public static void Update()
         {
+            ThreadAffinity.AssertUiThread();
             for (int i = 0; i < optionScreenPermanents.Count; i++)
             {
                 optionScreenPermanents[i].Update();
@@ -139,6 +141,7 @@ namespace Project_1.UI.OptionMenu
 
         internal static bool Scroll(ScrollEvent aScrollEvent)
         {
+            ThreadAffinity.AssertUiThread();
             for (int i = 0; i < optionElements[(int)currentScreen].Count; i++)
             {
                 bool clickedOn = optionElements[(int)currentScreen][i].ScrolledOn(aScrollEvent);
@@ -154,6 +157,7 @@ namespace Project_1.UI.OptionMenu
 
         public static void CloseAllOptionMenuStuff()
         {
+            ThreadAffinity.AssertUiThread();
             for (int i = 0; i < optionElements.Length; i++)
             {
                 for (int j = 0; j < optionElements[i].Count; j++)
@@ -165,6 +169,7 @@ namespace Project_1.UI.OptionMenu
 
         public static bool Click(ClickEvent aClickEvent)
         {
+            ThreadAffinity.AssertUiThread();
             for (int i = 0; i < optionScreenPermanents.Count; i++)
             {
                 bool clickedOn = optionScreenPermanents[i].ClickedOn(aClickEvent);
@@ -183,6 +188,7 @@ namespace Project_1.UI.OptionMenu
 
         public static void Rescale()
         {
+            ThreadAffinity.AssertMainThread();
             for (int i = 0; i < optionScreenPermanents.Count; i++)
             {
 

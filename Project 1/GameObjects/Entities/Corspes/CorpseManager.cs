@@ -21,6 +21,7 @@ namespace Project_1.GameObjects.Entities.Corspes
 
         public static void Init()
         {
+            ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
             corpses = new List<Corpse>();

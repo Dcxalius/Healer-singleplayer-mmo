@@ -20,9 +20,10 @@ using Project_1.UI.HUD.Managers;
 using Project_1.GameObjects.Unit;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
-using Project_1.GameObjects.Entities.GuildMembers;
+using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 
-namespace Project_1.GameObjects.Entities.Players
+namespace Project_1.GameObjects.Entities.Friendlies.Players
 {
     internal class Player : Friendly
     {
@@ -127,7 +128,7 @@ namespace Project_1.GameObjects.Entities.Players
 
         protected override bool CheckForRelation()
         {
-            if (target.RelationToPlayer == Unit.Relation.RelationToPlayer.Self || target.RelationToPlayer == Unit.Relation.RelationToPlayer.Friendly)
+            if (target.RelationToPlayer == Relation.RelationToPlayer.Self || target.RelationToPlayer == Relation.RelationToPlayer.Friendly)
             {
                 return false;
             }

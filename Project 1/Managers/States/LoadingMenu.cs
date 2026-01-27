@@ -65,6 +65,7 @@ namespace Project_1.Managers.States
         internal bool UiClick(ClickEvent aClickEvent) => loadingBox.ClickedOn(aClickEvent);
         internal bool UiRelease(ReleaseEvent aReleaseEvent) => loadingBox.ReleasedOn(aReleaseEvent);
         internal bool UiScroll(ScrollEvent aScrollEvent) => loadingBox.ScrolledOn(aScrollEvent);
+        internal bool UiEscapePressed() => false;
         internal void UiUpdate() => loadingBox.Update();
 
         internal void UiOnEnter()

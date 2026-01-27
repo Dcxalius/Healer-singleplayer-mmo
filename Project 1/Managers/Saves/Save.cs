@@ -13,6 +13,7 @@ using Project_1.GameObjects.Unit;
 using Project_1.Managers.States;
 using System.IO;
 using Project_1.GameObjects.Entities.Corspes;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.Managers.Saves
 {
@@ -103,6 +104,7 @@ namespace Project_1.Managers.Saves
 
         public void SaveData()
         {
+            ThreadAffinity.AssertSimThread();
             SaveSaveDetails();
             Camera.Camera.SavePosition(this);
 
@@ -115,6 +117,7 @@ namespace Project_1.Managers.Saves
 
         public void LoadData()
         {
+            ThreadAffinity.AssertSimThread();
 
             Camera.Camera.LoadPosition(this);
             TileManager.Load(this); 

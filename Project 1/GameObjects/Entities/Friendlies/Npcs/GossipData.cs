@@ -6,8 +6,9 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
+using Project_1.GameObjects.Entities.Friendlies.Npcs;
 
-namespace Project_1.GameObjects.Entities.Npcs
+namespace Project_1.GameObjects.Entities.Friendlies.Npcs
 {
     internal class GossipData
     {
@@ -52,7 +53,7 @@ namespace Project_1.GameObjects.Entities.Npcs
             Debug.Assert(aLinkTree.Length == d, "Either not enough links or to many links");
             for (int i = 0; i < aLinkTree.Length; i++)
             {
-                Debug.Assert(aOptions[i][(int)optionsContext.Type] == "C" || (aOptions[i][(int)optionsContext.Type] != "C" && aLinkTree[i].Length == 0));
+                Debug.Assert(aOptions[i][(int)optionsContext.Type] == "C" || aOptions[i][(int)optionsContext.Type] != "C" && aLinkTree[i].Length == 0);
             }
         }
 

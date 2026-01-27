@@ -14,6 +14,7 @@ using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.UI;
 using Project_1.UI.UIElements.Buttons;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.UI.HUD.SpellBook
 {

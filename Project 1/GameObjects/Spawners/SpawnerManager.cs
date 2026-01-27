@@ -27,6 +27,7 @@ namespace Project_1.GameObjects.Spawners
 
         public static void Init()
         {
+            ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
             savedMobNames = new Dictionary<string, int>();

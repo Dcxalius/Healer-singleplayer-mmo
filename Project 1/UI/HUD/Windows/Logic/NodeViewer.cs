@@ -2,12 +2,12 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities.GuildMembers;
 using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.UI.UIElements.Boxes;
 using System.Collections.Generic;
 using System.Linq;
+using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 
 namespace Project_1.UI.HUD.Windows.Logic
 {

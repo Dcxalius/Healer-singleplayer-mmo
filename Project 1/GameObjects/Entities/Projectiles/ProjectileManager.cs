@@ -18,6 +18,7 @@ namespace Project_1.GameObjects.Entities.Projectiles
 
         public static void Init()
         {
+            ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
             projectiles = new List<Projectile>();

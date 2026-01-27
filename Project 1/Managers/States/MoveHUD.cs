@@ -92,6 +92,7 @@ namespace Project_1.Managers.States
         internal bool UiClick(ClickEvent aClickEvent) => MoveHUDBox.ClickedOn(aClickEvent);
         internal bool UiRelease(ReleaseEvent aReleaseEvent) => MoveHUDBox.ReleasedOn(aReleaseEvent);
         internal bool UiScroll(ScrollEvent aScrollEvent) => MoveHUDBox.ScrolledOn(aScrollEvent);
+        internal bool UiEscapePressed() => false;
         internal void UiUpdate()
         {
             MoveHUDBox.Update();
