@@ -12,6 +12,7 @@ namespace Project_1.Particles
     {
         static List<Particle> particles;
         static readonly ConcurrentQueue<ParticleSpawnRequest> pendingSpawns = new ConcurrentQueue<ParticleSpawnRequest>();
+        static volatile bool clearRequested;
         static bool initialized;
 
         public static void Init()
@@ -25,11 +26,7 @@ namespace Project_1.Particles
 
         public static void SpawnParticle(ParticleBase aParticle, WorldSpace aWorldPos, float aLayerFeetY, ParticleMovement aParticleMovement)
         {
-            if (ThreadAffinity.IsMainThread)
-            {
-                particles.Add(new Particle(aWorldPos, aParticle, aLayerFeetY, aParticleMovement));
-                return;
-            }
+            ThreadAffinity.AssertSimThread();
             pendingSpawns.Enqueue(new ParticleSpawnRequest(aWorldPos, aParticle, aParticleMovement, aLayerFeetY));
         }
 
@@ -72,6 +69,12 @@ namespace Project_1.Particles
         public static void Update()
         {
             ThreadAffinity.AssertMainThread();
+            if (clearRequested)
+            {
+                particles.Clear();
+                clearRequested = false;
+                while (pendingSpawns.TryDequeue(out _)) { }
+            }
             while (pendingSpawns.TryDequeue(out ParticleSpawnRequest request))
             {
                 particles.Add(new Particle(request.WorldPos, request.Particle, request.LayerFeetY, request.Movement));
@@ -93,6 +96,17 @@ namespace Project_1.Particles
             {
                 particles[i].Draw(aBatch);
             }
+        }
+
+        public static void Reset()
+        {
+            if (ThreadAffinity.IsMainThread)
+            {
+                particles.Clear();
+                while (pendingSpawns.TryDequeue(out _)) { }
+                return;
+            }
+            clearRequested = true;
         }
 
         readonly struct ParticleSpawnRequest

@@ -29,6 +29,7 @@ namespace Project_1.Managers.States
 
         public GameState() : base() 
         {
+            ThreadAffinity.AssertMainThread();
             rasterizerState = new RasterizerState() { ScissorTestEnable = true };
             uIDraw = GraphicsManager.CreateSpriteBatch();
             uITarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
@@ -49,6 +50,7 @@ namespace Project_1.Managers.States
 
         public override void Rescale() //TODO: This is wrong, this should rescale everything
         {
+            ThreadAffinity.AssertMainThread();
             base.Rescale();
             lock (HUDManager.UiLock)
             {
@@ -67,6 +69,7 @@ namespace Project_1.Managers.States
 
         public override void Update()
         {
+            ThreadAffinity.AssertSimThread();
             lock (HUDManager.UiLock)
             {
                 uiHeartbeatTimer += TimeManager.SecondsSinceLastFrame;
@@ -74,6 +77,7 @@ namespace Project_1.Managers.States
         }
         protected void UIDraw()
         {
+            ThreadAffinity.AssertMainThread();
             UiDrawList uiDrawList;
             PlateDrawList plateDrawList;
             bool redrawPlates;
@@ -121,7 +125,7 @@ namespace Project_1.Managers.States
             }
         }
 
-        void MarkUiDirty()
+        internal override void MarkUiDirty()
         {
             lock (HUDManager.UiLock)
             {

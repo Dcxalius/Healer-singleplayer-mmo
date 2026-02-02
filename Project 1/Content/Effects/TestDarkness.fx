@@ -7,8 +7,9 @@
 #endif
 
 #define TILE_SIZE float2(32, 32)
-#define MAP_MAX_SIZE uint2(64, 64)
-#define FMAP_MAX_SIZE float2(64, 64)
+#define MAP_MAX_SIZE uint2(65, 65)
+#define FMAP_MAX_SIZE float2(65, 65)
+#define INV_FMAP_MAX_SIZE float2(1.0f / 65.0f, 1.0f / 65.0f)
 #define ZERO_LIGHT float2(0,0)
 
 sampler2D TextureSampler : register(s0);
@@ -17,6 +18,11 @@ Texture2D transparentMap : register(t1);
 sampler2D transpSamp : register(s1) = sampler_state
 {
     Texture = <transparentMap>;
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
 };
 
 struct VertexShaderInput
@@ -36,6 +42,8 @@ struct VertexShaderOutput
 float2 lightPos[5];
 float2 cameraWorldPos;
 float2 cameraSize;
+float cameraScale;
+float2 transparentMapOriginTile;
 float minLength;
 float maxBrightness;
 
@@ -45,17 +53,18 @@ float maxBrightness;
 
 float2 TileToUV(int2 tileIndex)
 {
-    // Player is origin of the 65×65 transparency map
-    float2 playerTilePos = lightPos[0] / TILE_SIZE;
     float2 tileF = (float2) tileIndex;
 
-    // Δtile in [-32, +32] → [0, 1]
-    return (tileF - playerTilePos) / FMAP_MAX_SIZE + float2(0.5f, 0.5f);
+    // Δtile in [-32, +32] → texel centers in [0, 1]
+    return (tileF - transparentMapOriginTile + float2(32.5f, 32.5f)) * INV_FMAP_MAX_SIZE;
 }
 
-bool LineOfSight(int2 startTile, int2 endTile, out float4 aDebug)
+bool LineOfSight(float2 startPos, float2 endPos, out float4 aDebug)
 {
     // Same tile → trivially visible
+    int2 startTile = (int2) floor(startPos);
+    int2 endTile = (int2) floor(endPos);
+    int2 preTargetTile = endTile;
     if (startTile.x == endTile.x && startTile.y == endTile.y)
     {
         aDebug = float4(1, 1, 1, 1);
@@ -63,9 +72,12 @@ bool LineOfSight(int2 startTile, int2 endTile, out float4 aDebug)
     }
 
     // Ray origin/end at tile centres
-    float2 start = (float2) startTile + 0.5f;
-    float2 end = (float2) endTile + 0.5f;
+    float2 start = startPos;
+    float2 end = endPos;
     float2 dir = end - start;
+    float2 dirStep = normalize(dir);
+    float2 endNudged = end - dirStep * 0.01f;
+    preTargetTile = (int2) floor(endNudged);
 
     // Avoid degenerate rays
     if (abs(dir.x) < 1e-4 && abs(dir.y) < 1e-4)
@@ -111,11 +123,19 @@ bool LineOfSight(int2 startTile, int2 endTile, out float4 aDebug)
         sideDist.y = 1e6;
     }
 
+    const float epsilon = 0.00001f;
     [loop]
     for (int i = 0; i < 256; ++i)  // safety cap
     {
         // Step to next tile along the ray
-        if (sideDist.x < sideDist.y)
+        if (abs(sideDist.x - sideDist.y) < epsilon)
+        {
+            sideDist.x += deltaDist.x;
+            sideDist.y += deltaDist.y;
+            current.x += step.x;
+            current.y += step.y;
+        }
+        else if (sideDist.x < sideDist.y)
         {
             sideDist.x += deltaDist.x;
             current.x += step.x;
@@ -136,20 +156,25 @@ bool LineOfSight(int2 startTile, int2 endTile, out float4 aDebug)
             return false;
         }
 
-        float4 solidF = tex2Dlod(transpSamp, float4(uv, 0, 0));
         bool reachedTarget = (current.x == endTile.x && current.y == endTile.y);
-
-        if (solidF.a > 0.0f)
-        {
-            // Solid tile blocks visibility, including the end tile
-            aDebug = float4(0, 0, 0, 1);
-            return false;
-        }
-
         if (reachedTarget)
         {
             aDebug = float4(1, 1, 1, 1);
             return true;
+        }
+
+        float4 solidF = tex2Dlod(transpSamp, float4(uv, 0, 0));
+        if (solidF.a > 0.0f)
+        {
+            // Solid tile blocks visibility (but the target tile itself should still be visible).
+            // Also allow the tile directly before the target (in ray direction) to be visible.
+            if (current.x == preTargetTile.x && current.y == preTargetTile.y)
+            {
+                aDebug = float4(1, 1, 1, 1);
+                return true;
+            }
+            aDebug = float4(0, 0, 0, 1);
+            return false;
         }
     }
 
@@ -320,10 +345,15 @@ bool LineOfSight(int2 startTile, int2 endTile, out float4 aDebug)
 float4 MainPS(VertexShaderOutput input) : COLOR0
 {
     float4 texColor = tex2D(TextureSampler, input.TextureCoordinates) * input.Color;
-    float2 pixelPos = cameraWorldPos + input.Position.xy;
+    float2 pixelPos = cameraWorldPos + input.Position.xy / cameraScale;
 
     // Tile index for this pixel (tile-aligned LOS)
-    int2 tileIndex = (int2) floor(pixelPos / TILE_SIZE);
+    float2 pixelTilePos = pixelPos / TILE_SIZE;
+    int2 pixelTileIndex = (int2) floor(pixelTilePos);
+    float2 pixelTileCenter = (float2) pixelTileIndex + 0.5f;
+    float2 targetUv = TileToUV(pixelTileIndex);
+    float4 targetSolidF = tex2Dlod(transpSamp, float4(targetUv, 0, 0));
+    bool targetIsSolid = (targetSolidF.a > 0.0f);
 
     float minDistance = minLength;
     float4 DEBUG = float4(0, 0, 0, 0);
@@ -335,13 +365,14 @@ float4 MainPS(VertexShaderOutput input) : COLOR0
             continue;
 
         float2 lightWorld = lightPos[i];
-        int2 lightTile = (int2) floor(lightWorld / TILE_SIZE);
+        float2 lightTilePos = lightWorld / TILE_SIZE;
 
         // Per-pixel gradient distance (reverted)
         float d = distance(lightWorld, pixelPos);
 
         float4 losDebug;
-        if (LineOfSight(lightTile, tileIndex, losDebug))
+        float2 losTarget = targetIsSolid ? pixelTileCenter : pixelTilePos;
+        if (LineOfSight(lightTilePos, losTarget, losDebug))
         {
             anyLit = true;
             DEBUG = losDebug; // keep last LOS debug color
@@ -364,6 +395,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR0
         return texColor;
 
     float atten = 1 - ((minDistance - maxBrightness) / (minLength - maxBrightness));
+    // TODO: Soften/blur the hard lighting edge; current falloff is too harsh.
     return float4(texColor.rgb * atten, texColor.a);
 }
 

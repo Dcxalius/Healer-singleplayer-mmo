@@ -1,6 +1,5 @@
 using Project_1.Managers.States;
 using Project_1.Managers.Saves;
-
 namespace Project_1.Messaging.Events
 {
     internal readonly struct StateChanged
@@ -47,12 +46,12 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct LoadSaveRequested
     {
-        public LoadSaveRequested(Save save)
+        public LoadSaveRequested(string saveName)
         {
-            Save = save;
+            SaveName = saveName;
         }
 
-        public Save Save { get; }
+        public string SaveName { get; }
     }
 
     internal readonly struct ContinueLastSaveRequested

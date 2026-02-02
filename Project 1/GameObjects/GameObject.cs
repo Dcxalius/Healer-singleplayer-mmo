@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
+using System.Threading;
+using Newtonsoft.Json;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +18,10 @@ namespace Project_1.GameObjects
 {
     internal abstract class GameObject
     {
+        static int nextRenderId;
+        [JsonIgnore]
+        public int RenderId { get; }
+
         protected WorldSpace Position { get => position; set => position = value; }
         public WorldSpace Centre { get => position + new WorldSpace(size.ToVector2()) / 2; }
         public WorldSpace FeetPosition { get => Position + new WorldSpace(size.X / 2, size.Y); set => Position = value - new WorldSpace(size.X / 2, size.Y); }
@@ -45,6 +51,7 @@ namespace Project_1.GameObjects
 
         public GameObject(Textures.Texture aGfx, WorldSpace aStartingPos)
         {
+            RenderId = Interlocked.Increment(ref nextRenderId);
             effects = new List<VisualEffect>();
             gfx = aGfx;
             if (aGfx.Visible != null)
@@ -88,6 +95,18 @@ namespace Project_1.GameObjects
             {
                 effects[i].Draw(aBatch, Position, FeetPosition.Y + 0.01f);
             }
+        }
+
+        protected VisualEffectRenderSnapshot[] BuildEffectSnapshot()
+        {
+            ThreadAffinity.AssertSimThread();
+            if (effects == null || effects.Count == 0) return Array.Empty<VisualEffectRenderSnapshot>();
+            VisualEffectRenderSnapshot[] snapshots = new VisualEffectRenderSnapshot[effects.Count];
+            for (int i = 0; i < effects.Count; i++)
+            {
+                snapshots[i] = effects[i].BuildRenderSnapshot();
+            }
+            return snapshots;
         }
     }
 }

@@ -9,18 +9,60 @@ namespace Project_1.Input
     /// </summary>
     internal static class UiMouseStateCache
     {
-        public static AbsoluteScreenPosition Absolute { get; private set; }
-        public static RelativeScreenPosition Relative { get; private set; }
-        public static int ScrollWheelValue { get; private set; }
-        public static int ScrollDelta { get; private set; }
+        static AbsoluteScreenPosition absolute;
+        static RelativeScreenPosition relative;
+        static int scrollWheelValue;
+        static int scrollDelta;
+
+        public static AbsoluteScreenPosition Absolute
+        {
+            get
+            {
+                AssertUiOrMainThread();
+                return absolute;
+            }
+        }
+
+        public static RelativeScreenPosition Relative
+        {
+            get
+            {
+                AssertUiOrMainThread();
+                return relative;
+            }
+        }
+
+        public static int ScrollWheelValue
+        {
+            get
+            {
+                AssertUiOrMainThread();
+                return scrollWheelValue;
+            }
+        }
+
+        public static int ScrollDelta
+        {
+            get
+            {
+                AssertUiOrMainThread();
+                return scrollDelta;
+            }
+        }
 
         public static void Update(MouseSnapshot snapshot)
         {
             ThreadAffinity.AssertUiThread();
-            Absolute = snapshot.Absolute;
-            Relative = snapshot.Relative;
-            ScrollWheelValue = snapshot.ScrollWheelValue;
-            ScrollDelta = snapshot.ScrollDelta;
+            absolute = snapshot.Absolute;
+            relative = snapshot.Relative;
+            scrollWheelValue = snapshot.ScrollWheelValue;
+            scrollDelta = snapshot.ScrollDelta;
+        }
+
+        static void AssertUiOrMainThread()
+        {
+            if (ThreadAffinity.IsMainThread) return;
+            ThreadAffinity.AssertUiThread();
         }
     }
 }

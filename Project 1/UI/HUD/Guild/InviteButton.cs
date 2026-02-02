@@ -25,12 +25,14 @@ namespace Project_1.UI.HUD.Guild
 
         void Invite()
         {
-            Mailboxes.Main.Publish(new PartyMemberInviteRequested(guildMember));
+            if (guildMember == null) return;
+            Mailboxes.Main.Publish(new PartyMemberInviteRequested(guildMember.RenderId));
         }
 
         void Kick()
         {
-            Mailboxes.Main.Publish(new PartyMemberKickRequested(guildMember));
+            if (guildMember == null) return;
+            Mailboxes.Main.Publish(new PartyMemberKickRequested(guildMember.RenderId));
         }
 
     }

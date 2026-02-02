@@ -1,32 +1,64 @@
-﻿using Microsoft.Xna.Framework;
-using Newtonsoft.Json.Bson;
+using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects;
 using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.GameObjects.Unit;
 using Project_1.Textures;
 using Project_1.UI.HUD.Inventory;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Bars;
+using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
+using System.Globalization;
 
 namespace Project_1.UI.HUD.Windows
 {
     internal class CharacterWindow : Window
     {
+        sealed class StatLineElement : UIElement
+        {
+            readonly Label numberLabel;
+            readonly Label textLabel;
+
+            public StatLineElement(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, aPos, aSize)
+            {
+                numberLabel = new Label(null, new RelativeScreenPosition(0f, 0f), new RelativeScreenPosition(0.45f, 1f), Label.TextAllignment.CentreRight, Color.Black);
+                textLabel = new Label(null, new RelativeScreenPosition(0.5f, 0f), new RelativeScreenPosition(0.5f, 1f), Label.TextAllignment.CentreLeft, Color.Black);
+                AddChild(numberLabel);
+                AddChild(textLabel);
+
+                CapturesClick = false;
+                CapturesRelease = false;
+                CapturesScroll = false;
+            }
+
+            public void Set(string aNumber, string aText)
+            {
+                numberLabel.Text = aNumber;
+                textLabel.Text = aText;
+            }
+
+            public void Clear()
+            {
+                numberLabel.Text = null;
+                textLabel.Text = null;
+            }
+        }
+
         protected Label nameLabel;
         Item[] equiped;
-
-        Label nrStatReport;
-        Label stringStatReport;
+        PageBox statPageBox;
+        StatLineElement[] statLines;
         ExpBar expBar;
 
         protected virtual int BagIndexForItem => -3;
+
+        PairReport primaryReport = new PairReport();
+        PairReport secondaryReport = new PairReport();
+        Friendly owner;
+
+        const int StatRowsPerPage = 5;
+        static readonly Point StatPageSize = new Point(1, StatRowsPerPage);
 
         static RelativeScreenPosition itemSize = RelativeScreenPosition.GetSquareFromY(0.09f, WindowSize.ToAbsoluteScreenPos());
         static RelativeScreenPosition itemSpacing = RelativeScreenPosition.GetSquareFromY(0.01f, WindowSize.ToAbsoluteScreenPos());
@@ -51,23 +83,29 @@ namespace Project_1.UI.HUD.Windows
             CreateItems(Equipment.Slot.MainHand, Equipment.Slot.Ranged, bottomSideLeft, xChange);
 
             RelativeScreenPosition topPart = new RelativeScreenPosition(0, yChange.Y * ((int)Equipment.Slot.Hands + 1));
-            RelativeScreenPosition textBoxPos = topPart + itemSpacing;
-            RelativeScreenPosition textBoxSize = new RelativeScreenPosition(1 - itemSpacing.X * 2, 1 - topPart.Y - itemSpacing.Y * 2) / 2;
+            RelativeScreenPosition reportBoxPos = topPart + itemSpacing;
+            RelativeScreenPosition reportBoxSize = new RelativeScreenPosition(1 - itemSpacing.X * 2, 1 - topPart.Y - itemSpacing.Y * 2) / 2;
 
-            nrStatReport = new Label(null, textBoxPos, textBoxSize - new RelativeScreenPosition(itemSpacing.X, 0), Label.TextAllignment.TopRight, Color.Black);
-            stringStatReport = new Label(null, textBoxPos + new RelativeScreenPosition(textBoxSize.X, 0f) + new RelativeScreenPosition(itemSpacing.X, 0), textBoxSize - new RelativeScreenPosition(itemSpacing.X, 0), Label.TextAllignment.TopLeft, Color.Black);
+            statPageBox = new PageBox(new UITexture("WhiteBackground", Color.Transparent), reportBoxPos, reportBoxSize, StatPageSize);
+            statLines = new StatLineElement[StatRowsPerPage];
+            for (int i = 0; i < statLines.Length; i++)
+            {
+                float rowHeight = 1f / StatRowsPerPage;
+                float y = rowHeight * i;
+                statLines[i] = new StatLineElement(new RelativeScreenPosition(0.05f, y), new RelativeScreenPosition(0.9f, rowHeight));
+            }
+            statPageBox.SetPageElements(statLines, BindStatLine, ClearStatLine);
 
             expBar = new ExpBar(expBarPos, expBarSize);
             AddChild(nameLabel);
             AddChildren(equiped);
-            AddChild(nrStatReport);
-            AddChild(stringStatReport);
+            AddChild(statPageBox);
             AddChild(expBar);
-
         }
 
         public virtual void SetData(Friendly aFriendly)
         {
+            owner = aFriendly;
             nameLabel.Text = aFriendly.Name;
             SetReportBox(aFriendly.PrimaryStatReport);
             RefreshExp(aFriendly.Level);
@@ -97,8 +135,71 @@ namespace Project_1.UI.HUD.Windows
 
         public void SetReportBox(PairReport aReport)
         {
-            stringStatReport.Text = aReport.StringsOnly;
-            nrStatReport.Text = aReport.NumbersOnly;
+            primaryReport = aReport ?? new PairReport();
+            secondaryReport = BuildSecondaryReport(owner);
+            RefreshStatPage();
+        }
+
+        void RefreshStatPage()
+        {
+            int currentPage = statPageBox.CurrentPage;
+            int pageCount = ReportHasAnyLine(secondaryReport) ? 2 : 1;
+            statPageBox.Reset(pageCount * statPageBox.ItemsPerPage);
+            statPageBox.SetPage(Math.Min(currentPage, pageCount - 1));
+        }
+
+        static bool ReportHasAnyLine(PairReport aReport)
+        {
+            return aReport != null && aReport.Count > 0;
+        }
+
+        void BindStatLine(UIElement aElement, int aIndex)
+        {
+            StatLineElement line = aElement as StatLineElement;
+            if (line == null) return;
+
+            int page = aIndex / statPageBox.ItemsPerPage;
+            int lineOnPage = aIndex % statPageBox.ItemsPerPage;
+            PairReport report = page == 0 ? primaryReport : secondaryReport;
+            if (report == null || lineOnPage >= report.Count)
+            {
+                line.Clear();
+                return;
+            }
+
+            (string Name, double Value) pair = report.Lines[lineOnPage];
+            line.Set(FormatValue(pair.Value), pair.Name);
+        }
+
+        static void ClearStatLine(UIElement aElement)
+        {
+            StatLineElement line = aElement as StatLineElement;
+            if (line == null) return;
+            line.Clear();
+        }
+
+        static string FormatValue(double aValue)
+        {
+            double rounded = Math.Round(aValue);
+            if (Math.Abs(aValue - rounded) < 0.01d)
+            {
+                return rounded.ToString(CultureInfo.InvariantCulture);
+            }
+
+            return aValue.ToString("0.##", CultureInfo.InvariantCulture);
+        }
+
+        static PairReport BuildSecondaryReport(Friendly aFriendly) //TODO: I think the future implementation of secondary stats will be that the user self can set what stats to show per class through the option menu
+        {
+            PairReport report = new PairReport();
+            if (aFriendly == null) return report;
+
+            report.AddLine("Crit Chance", aFriendly.SecondaryStats.Attack.CriticalChance);
+            report.AddLine("Crit Damage", aFriendly.SecondaryStats.Attack.CriticalDamage);
+            report.AddLine("Hit Chance", aFriendly.SecondaryStats.Attack.BonusHitChance);
+            report.AddLine("Dodge Chance", aFriendly.SecondaryStats.Defense.DodgeChance);
+            report.AddLine("Parry Chance", aFriendly.SecondaryStats.Defense.ParryChance);
+            return report;
         }
 
         public void RefreshExp(Level aLevel)

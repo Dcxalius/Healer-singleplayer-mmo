@@ -1,6 +1,4 @@
-﻿using Project_1.GameObjects.Entities.Friendlies;
-
-namespace Project_1.Messaging.Events
+﻿namespace Project_1.Messaging.Events
 {
     internal readonly struct InventorySlotChanged
     {
@@ -29,15 +27,15 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct InventorySwapEquipmentRequested
     {
-        public InventorySwapEquipmentRequested((int, int) from, int equipmentSlot, Friendly target)
+        public InventorySwapEquipmentRequested((int, int) from, int equipmentSlot, int? targetRenderId)
         {
             From = from;
             EquipmentSlot = equipmentSlot;
-            Target = target;
+            TargetRenderId = targetRenderId;
         }
         public (int, int) From { get; }
         public int EquipmentSlot { get; }
-        public Friendly Target { get; }
+        public int? TargetRenderId { get; }
     }
 
     internal readonly struct InventoryEquipBagRequested
@@ -95,49 +93,49 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct InventoryEquipRequested
     {
-        public InventoryEquipRequested((int, int) index, Friendly target)
+        public InventoryEquipRequested((int, int) index, int? targetRenderId)
         {
             Index = index;
-            Target = target;
+            TargetRenderId = targetRenderId;
         }
         public (int, int) Index { get; }
-        public Friendly Target { get; }
+        public int? TargetRenderId { get; }
     }
 
     internal readonly struct InventoryConsumeRequested
     {
-        public InventoryConsumeRequested((int, int) index, Friendly target)
+        public InventoryConsumeRequested((int, int) index, int? targetRenderId)
         {
             Index = index;
-            Target = target;
+            TargetRenderId = targetRenderId;
         }
         public (int, int) Index { get; }
-        public Friendly Target { get; }
+        public int? TargetRenderId { get; }
     }
 
     internal readonly struct EquipmentSwapRequested
     {
-        public EquipmentSwapRequested(int fromSlot, int toSlot, Friendly target)
+        public EquipmentSwapRequested(int fromSlot, int toSlot, int? targetRenderId)
         {
             FromSlot = fromSlot;
             ToSlot = toSlot;
-            Target = target;
+            TargetRenderId = targetRenderId;
         }
         public int FromSlot { get; }
         public int ToSlot { get; }
-        public Friendly Target { get; }
+        public int? TargetRenderId { get; }
     }
 
     internal readonly struct EquipmentMoveToInventoryRequested
     {
-        public EquipmentMoveToInventoryRequested(int equipmentSlot, (int, int) inventorySlot, Friendly target)
+        public EquipmentMoveToInventoryRequested(int equipmentSlot, (int, int) inventorySlot, int? targetRenderId)
         {
             EquipmentSlot = equipmentSlot;
             InventorySlot = inventorySlot;
-            Target = target;
+            TargetRenderId = targetRenderId;
         }
         public int EquipmentSlot { get; }
         public (int, int) InventorySlot { get; }
-        public Friendly Target { get; }
+        public int? TargetRenderId { get; }
     }
 }

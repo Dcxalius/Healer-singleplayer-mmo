@@ -38,6 +38,7 @@ namespace Project_1.UI.OptionMenu
 
                 }
                 changesMade = value;
+                renderDirty = true;
             }
         }
         static bool changesMade;
@@ -50,6 +51,8 @@ namespace Project_1.UI.OptionMenu
         static ExitOptionsButton exitOptionsButton;
         static SaveChangesButton saveChangesButton;
         static bool initialized;
+        static volatile bool drawListDirty = true;
+        static volatile bool renderDirty = true;
 
         public static void Init()
         {
@@ -57,6 +60,8 @@ namespace Project_1.UI.OptionMenu
             if (initialized) return;
             initialized = true;
             changesMade = false;
+            drawListDirty = true;
+            renderDirty = true;
             InitPermanents();
             InitVideo();
             InitKeybindings();
@@ -96,6 +101,7 @@ namespace Project_1.UI.OptionMenu
             ChangesMade = false;
             exitOptionsButton.ClearActions();
             saveChangesButton.ClearActions();
+            renderDirty = true;
         }
 
         static void InitVideo()
@@ -123,6 +129,8 @@ namespace Project_1.UI.OptionMenu
 
             currentScreen = aNewScreen;
             CloseAllOptionMenuStuff();
+            drawListDirty = true;
+            renderDirty = true;
         }
 
         public static void Update()
@@ -216,6 +224,39 @@ namespace Project_1.UI.OptionMenu
             {
                 optionElements[(int)currentScreen][i].Draw(aBatch);
             }
+        }
+
+        public static UIElement[] BuildDrawList()
+        {
+            ThreadAffinity.AssertUiThread();
+            List<UIElement> drawList = new List<UIElement>(optionScreenPermanents.Count + optionElements[(int)currentScreen].Count);
+            for (int i = 0; i < optionScreenPermanents.Count; i++)
+            {
+                drawList.Add(optionScreenPermanents[i]);
+            }
+
+            for (int i = optionElements[(int)currentScreen].Count - 1; i >= 0; i--)
+            {
+                drawList.Add(optionElements[(int)currentScreen][i]);
+            }
+
+            return drawList.ToArray();
+        }
+
+        public static bool ConsumeDrawListDirty()
+        {
+            ThreadAffinity.AssertUiThread();
+            if (!drawListDirty) return false;
+            drawListDirty = false;
+            return true;
+        }
+
+        public static bool ConsumeRenderDirty()
+        {
+            ThreadAffinity.AssertUiThread();
+            if (!renderDirty) return false;
+            renderDirty = false;
+            return true;
         }
     }
 }

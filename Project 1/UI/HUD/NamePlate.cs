@@ -8,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
-using Project_1.GameObjects.Entities;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Managers;
+using Project_1.Messaging.Events;
 using Project_1.UI.UIElements.Boxes;
 
 namespace Project_1.UI.HUD
@@ -24,34 +24,35 @@ namespace Project_1.UI.HUD
         RelativeScreenPosition barSize = new RelativeScreenPosition(1f, 0.2f);
         //RelativeScreenPosition barSize = new RelativeScreenPosition(0.02f, 0.006f);
 
-        static Color ColorTransform(Entity aE)
+        static Color ColorTransform(Color aRelationColor)
         {
             float transp = 120f / 255f;
 
-            byte r = (byte)((transp * aE.RelationColor.R / 255f) * 255);
-            byte g = (byte)((transp * aE.RelationColor.G / 255f) * 255);
-            byte b = (byte)((transp * aE.RelationColor.B / 255f) * 255);
-            byte a = (byte)((transp * aE.RelationColor.A / 255f) * 255);
+            byte r = (byte)((transp * aRelationColor.R / 255f) * 255);
+            byte g = (byte)((transp * aRelationColor.G / 255f) * 255);
+            byte b = (byte)((transp * aRelationColor.B / 255f) * 255);
+            byte a = (byte)((transp * aRelationColor.A / 255f) * 255);
 
             return new Color(r, g, b, a);
         }
 
-        public NamePlate(Entity aEntity) : base(new UITexture("GrayBackground", ColorTransform(aEntity)), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
+        public NamePlate(in EntityUiSnapshot snapshot) : base(new UITexture("GrayBackground", ColorTransform(snapshot.RelationColor)), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
         {
-            name = new Label(aEntity.Name, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopCentre);
+            name = new Label(snapshot.Name, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopCentre);
             healthBar = new Bar(new BarTexture(BarTexture.FillingDirection.Right, Color.Red), new UITexture("WhiteBackground", backgroundColor), RelativeScreenPosition.Zero, barSize);
             
 
             AddChild(name);
             AddChild(healthBar);
 
-            SetTarget(aEntity);
+            SetTarget(snapshot);
         }
 
-        void SetTarget(Entity aEntity) //TODO: Add a minimum size for bar and a maximum size of name.
+        void SetTarget(in EntityUiSnapshot snapshot) //TODO: Add a minimum size for bar and a maximum size of name.
         {
-            name.Text = aEntity.Name;
-            healthBar.Value = (float)(aEntity.CurrentHealth / aEntity.MaxHealth);
+            name.Text = snapshot.Name;
+            healthBar.Value = (float)(snapshot.CurrentHealth / snapshot.MaxHealth);
+            gfx.Color = ColorTransform(snapshot.RelationColor);
 
             AbsoluteScreenPosition textOffset = new AbsoluteScreenPosition((int)name.UnderlyingTextOffset.X, (int)name.UnderlyingTextOffset.Y);
 
@@ -62,7 +63,7 @@ namespace Project_1.UI.HUD
 
             name.Resize(textOffset.ToRelativeScreenPosition(Size));     
 
-            Reposition(aEntity);
+            Reposition(snapshot);
 
             healthBar.Move(RelativeScreenPosition.One.OnlyY - healthBar.RelativeSize.OnlyY);
         }
@@ -79,15 +80,20 @@ namespace Project_1.UI.HUD
             healthBar.Move(RelativeScreenPosition.One.OnlyY - healthBar.RelativeSize.OnlyY);
         }
 
-        public void Refresh(Entity aEntity)
+        public void Refresh(in EntityUiSnapshot snapshot)
         {
-            healthBar.Value = (float)(aEntity.CurrentHealth / aEntity.MaxHealth);
+            healthBar.Value = (float)(snapshot.CurrentHealth / snapshot.MaxHealth);
+            if (name.Text != snapshot.Name)
+            {
+                SetTarget(snapshot);
+                return;
+            }
+            Reposition(snapshot);
         }
 
-        public void Reposition(Entity aEntity)
+        public void Reposition(in EntityUiSnapshot snapshot)
         {
-            //Move((aEntity.FeetPosition + offset).ToAbsoltueScreenPosition().ToRelativeScreenPosition() - RelativeSize.OnlyY);
-            Move((aEntity.FeetPosition.ToAbsoltueScreenPosition() - new AbsoluteScreenPosition(Size.X / 2, aEntity.WorldRectangle.Size.Y * 2)).ToRelativeScreenPosition() - RelativeSize.OnlyY);
+            Move((snapshot.FeetPosition.ToAbsoltueScreenPosition() - new AbsoluteScreenPosition(Size.X / 2, snapshot.WorldHeight * 2)).ToRelativeScreenPosition() - RelativeSize.OnlyY);
 
         }
     }

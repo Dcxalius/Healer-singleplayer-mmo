@@ -7,6 +7,7 @@ using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.Unit;
 using Project_1.Input;
 using Project_1.Managers.States;
+using Project_1.Messaging.Events;
 using Project_1.UI.UIElements;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace Project_1.UI.HUD.PlateBoxes
     internal class TargetPlateBox : PlateBox
     {
 
-        Entity targetEntity;
+        int? targetRenderId;
 
         PlateBoxNameSegment nameSegment;
         PlateBoxHealthSegment healthSegment;
@@ -49,32 +50,60 @@ namespace Project_1.UI.HUD.PlateBoxes
             resourceSegment.Refresh(aEntity);
         }
 
+        public void Refresh(in EntityUiSnapshot snapshot)
+        {
+            healthSegment.Refresh(snapshot);
+            levelCircle.Refresh(snapshot);
+            resourceSegment.Refresh(snapshot);
+        }
+
         public bool BelongsTo(Entity aEntity)
         {
-            return targetEntity == aEntity;
+            return aEntity != null && targetRenderId.HasValue && targetRenderId.Value == aEntity.RenderId;
 
         }
+        public bool BelongsTo(int? aRenderId) => targetRenderId.HasValue && aRenderId.HasValue && targetRenderId.Value == aRenderId.Value;
+
         public void SetTarget(Entity aTarget) 
         {
-            targetEntity = aTarget;
-            if (targetEntity == null)
+            targetRenderId = aTarget?.RenderId;
+            if (aTarget == null)
             {
                 nameSegment.Name = null;
                 Visible = false;
                 return;
             }
 
-            nameSegment.Refresh(targetEntity);
-            healthSegment.SetTarget(targetEntity);
-            levelCircle.Refresh(targetEntity);
-            resourceSegment.SetTarget(targetEntity);
+            nameSegment.Refresh(aTarget);
+            healthSegment.SetTarget(aTarget);
+            levelCircle.Refresh(aTarget);
+            resourceSegment.SetTarget(aTarget);
+            Visible = true;
+        }
+
+        public void SetTarget(EntityUiSnapshot? aTarget)
+        {
+            if (!aTarget.HasValue)
+            {
+                targetRenderId = null;
+                nameSegment.Name = null;
+                Visible = false;
+                return;
+            }
+
+            EntityUiSnapshot snapshot = aTarget.Value;
+            targetRenderId = snapshot.RenderId;
+            nameSegment.Refresh(snapshot);
+            healthSegment.SetTarget(snapshot);
+            levelCircle.Refresh(snapshot);
+            resourceSegment.SetTarget(snapshot);
             Visible = true;
         }
 
 
         public override void Draw(SpriteBatch aBatch)
         {
-            if (targetEntity == null) return;
+            if (!targetRenderId.HasValue) return;
 
             base.Draw(aBatch);
         }

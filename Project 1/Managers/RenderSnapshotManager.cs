@@ -15,8 +15,10 @@ namespace Project_1.Managers
         {
             ThreadAffinity.AssertSimThread();
             TileManager.BuildRenderSnapshot();
-            TileRenderCache.BuildTransparencySnapshot(ObjectManager.Player.FeetPosition);
             ObjectManager.BuildRenderSnapshot();
+            ObjectManager.PartyLightSnapshot lightSnapshot = ObjectManager.RenderLightSnapshot;
+            WorldSpace lightOrigin = lightSnapshot.Positions.Length > 0 ? lightSnapshot.Positions[0] : WorldSpace.Zero;
+            TileRenderCache.BuildTransparencySnapshot(lightOrigin);
             Camera.Camera.BuildMinimapSnapshot();
             ProjectileManager.BuildRenderSnapshot();
             DoodadManager.BuildRenderSnapshot();

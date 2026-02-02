@@ -1,39 +1,136 @@
 using Project_1.Camera;
 using Project_1.GameObjects;
-using Project_1.GameObjects.Entities;
 using Project_1.Input;
-using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 
 namespace Project_1.Messaging.Events
 {
     internal readonly struct WorldClickRequested
     {
-        public WorldClickRequested(ClickEvent clickEvent)
+        public WorldClickRequested(RelativeScreenPosition relativePos, InputManager.ClickType button, byte modifiersMask)
         {
-            ClickEvent = clickEvent;
+            RelativePos = relativePos;
+            Button = button;
+            ModifiersMask = modifiersMask;
         }
 
-        public ClickEvent ClickEvent { get; }
+        public RelativeScreenPosition RelativePos { get; }
+        public InputManager.ClickType Button { get; }
+        public byte ModifiersMask { get; }
+
+        public bool NoModifiers() => ModifiersMask == 0;
+        public bool Modifier(InputManager.HoldModifier modifier) => (ModifiersMask & (1 << (int)modifier)) != 0;
+        public bool ModifiersOr(InputManager.HoldModifier[] modifiers)
+        {
+            for (int i = 0; i < modifiers.Length; i++)
+            {
+                if (Modifier(modifiers[i])) return true;
+            }
+            return false;
+        }
+
+        public bool[] ToModifiersArray() => ToModifiersArray(ModifiersMask);
+
+        public static WorldClickRequested FromClickEvent(ClickEvent clickEvent)
+        {
+            return new WorldClickRequested(clickEvent.RelativePos, clickEvent.ButtonPressed, BuildModifiersMask(clickEvent.ModifiersSnapshot));
+        }
+
+        static byte BuildModifiersMask(bool[] modifiers)
+        {
+            byte mask = 0;
+            if (modifiers == null) return mask;
+            if (modifiers.Length > (int)InputManager.HoldModifier.Ctrl && modifiers[(int)InputManager.HoldModifier.Ctrl]) mask |= (byte)(1 << (int)InputManager.HoldModifier.Ctrl);
+            if (modifiers.Length > (int)InputManager.HoldModifier.Alt && modifiers[(int)InputManager.HoldModifier.Alt]) mask |= (byte)(1 << (int)InputManager.HoldModifier.Alt);
+            if (modifiers.Length > (int)InputManager.HoldModifier.Shift && modifiers[(int)InputManager.HoldModifier.Shift]) mask |= (byte)(1 << (int)InputManager.HoldModifier.Shift);
+            return mask;
+        }
+
+        static bool[] ToModifiersArray(byte mask)
+        {
+            bool[] modifiers = new bool[(int)InputManager.HoldModifier.Count];
+            modifiers[(int)InputManager.HoldModifier.Ctrl] = (mask & (1 << (int)InputManager.HoldModifier.Ctrl)) != 0;
+            modifiers[(int)InputManager.HoldModifier.Alt] = (mask & (1 << (int)InputManager.HoldModifier.Alt)) != 0;
+            modifiers[(int)InputManager.HoldModifier.Shift] = (mask & (1 << (int)InputManager.HoldModifier.Shift)) != 0;
+            return modifiers;
+        }
     }
 
     internal readonly struct WorldReleaseRequested
     {
-        public WorldReleaseRequested(ReleaseEvent releaseEvent)
+        public WorldReleaseRequested(RelativeScreenPosition relativePos, InputManager.ClickType button, byte modifiersMask)
         {
-            ReleaseEvent = releaseEvent;
+            RelativePos = relativePos;
+            Button = button;
+            ModifiersMask = modifiersMask;
         }
 
-        public ReleaseEvent ReleaseEvent { get; }
+        public RelativeScreenPosition RelativePos { get; }
+        public InputManager.ClickType Button { get; }
+        public byte ModifiersMask { get; }
+
+        public bool[] ToModifiersArray()
+        {
+            bool[] modifiers = new bool[(int)InputManager.HoldModifier.Count];
+            modifiers[(int)InputManager.HoldModifier.Ctrl] = (ModifiersMask & (1 << (int)InputManager.HoldModifier.Ctrl)) != 0;
+            modifiers[(int)InputManager.HoldModifier.Alt] = (ModifiersMask & (1 << (int)InputManager.HoldModifier.Alt)) != 0;
+            modifiers[(int)InputManager.HoldModifier.Shift] = (ModifiersMask & (1 << (int)InputManager.HoldModifier.Shift)) != 0;
+            return modifiers;
+        }
+
+        public static WorldReleaseRequested FromReleaseEvent(ReleaseEvent releaseEvent)
+        {
+            return new WorldReleaseRequested(releaseEvent.RelativePos, releaseEvent.ButtonPressed, BuildModifiersMask(releaseEvent));
+        }
+
+        static byte BuildModifiersMask(ReleaseEvent releaseEvent)
+        {
+            byte mask = 0;
+            if (releaseEvent.Modifier(InputManager.HoldModifier.Ctrl)) mask |= (byte)(1 << (int)InputManager.HoldModifier.Ctrl);
+            if (releaseEvent.Modifier(InputManager.HoldModifier.Alt)) mask |= (byte)(1 << (int)InputManager.HoldModifier.Alt);
+            if (releaseEvent.Modifier(InputManager.HoldModifier.Shift)) mask |= (byte)(1 << (int)InputManager.HoldModifier.Shift);
+            return mask;
+        }
     }
 
     internal readonly struct WorldScrollRequested
     {
-        public WorldScrollRequested(ScrollEvent scrollEvent)
+        public WorldScrollRequested(RelativeScreenPosition relativePos, int steps, bool up, byte modifiersMask)
         {
-            ScrollEvent = scrollEvent;
+            RelativePos = relativePos;
+            Steps = steps;
+            Up = up;
+            ModifiersMask = modifiersMask;
         }
 
-        public ScrollEvent ScrollEvent { get; }
+        public RelativeScreenPosition RelativePos { get; }
+        public int Steps { get; }
+        public bool Up { get; }
+        public byte ModifiersMask { get; }
+
+        public bool Down => !Up;
+
+        public bool[] ToModifiersArray()
+        {
+            bool[] modifiers = new bool[(int)InputManager.HoldModifier.Count];
+            modifiers[(int)InputManager.HoldModifier.Ctrl] = (ModifiersMask & (1 << (int)InputManager.HoldModifier.Ctrl)) != 0;
+            modifiers[(int)InputManager.HoldModifier.Alt] = (ModifiersMask & (1 << (int)InputManager.HoldModifier.Alt)) != 0;
+            modifiers[(int)InputManager.HoldModifier.Shift] = (ModifiersMask & (1 << (int)InputManager.HoldModifier.Shift)) != 0;
+            return modifiers;
+        }
+
+        public static WorldScrollRequested FromScrollEvent(ScrollEvent scrollEvent)
+        {
+            return new WorldScrollRequested(scrollEvent.RelativePos, scrollEvent.Steps, scrollEvent.Up, BuildModifiersMask(scrollEvent));
+        }
+
+        static byte BuildModifiersMask(ScrollEvent scrollEvent)
+        {
+            byte mask = 0;
+            if (scrollEvent.Modifier(InputManager.HoldModifier.Ctrl)) mask |= (byte)(1 << (int)InputManager.HoldModifier.Ctrl);
+            if (scrollEvent.Modifier(InputManager.HoldModifier.Alt)) mask |= (byte)(1 << (int)InputManager.HoldModifier.Alt);
+            if (scrollEvent.Modifier(InputManager.HoldModifier.Shift)) mask |= (byte)(1 << (int)InputManager.HoldModifier.Shift);
+            return mask;
+        }
     }
 
     internal readonly struct PlayerMovementRequested
@@ -66,12 +163,12 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct PartyTargetOrderRequested
     {
-        public PartyTargetOrderRequested(Entity target)
+        public PartyTargetOrderRequested(int targetRenderId)
         {
-            Target = target;
+            TargetRenderId = targetRenderId;
         }
 
-        public Entity Target { get; }
+        public int TargetRenderId { get; }
     }
 
     internal readonly struct TargetClearedRequested
@@ -87,25 +184,25 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct PartyCommandRequested
     {
-        public PartyCommandRequested(PartyCommandAction action, GuildMember member)
+        public PartyCommandRequested(PartyCommandAction action, int? memberRenderId)
         {
             Action = action;
-            Member = member;
+            MemberRenderId = memberRenderId;
         }
 
         public PartyCommandAction Action { get; }
-        public GuildMember Member { get; }
+        public int? MemberRenderId { get; }
     }
 
     internal readonly struct InteractRequested
     {
-        public InteractRequested(WorldObject target, InputManager.ClickType button)
+        public InteractRequested(int targetRenderId, InputManager.ClickType button)
         {
-            Target = target;
+            TargetRenderId = targetRenderId;
             Button = button;
         }
 
-        public WorldObject Target { get; }
+        public int TargetRenderId { get; }
         public InputManager.ClickType Button { get; }
     }
 }

@@ -15,6 +15,7 @@ using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.Entities.Friendlies.Npcs;
+using Project_1.Managers;
 
 namespace Project_1.UI.HUD.Managers
 {
@@ -30,6 +31,7 @@ namespace Project_1.UI.HUD.Managers
 
         public void InitWindows(ref List<UIElement> aHudElements)
         {
+            ThreadAffinity.AssertMainThread();
             Window.Init(new RelativeScreenPosition(0.05f, 0.2f), new RelativeScreenPosition(0.1f, 0f), new RelativeScreenPosition(0.2f, 0.6f));
 
             characterWindow = new CharacterWindow();
@@ -58,6 +60,7 @@ namespace Project_1.UI.HUD.Managers
 
         public void OpenShopWindow(int[] itemIds)
         {
+            ThreadAffinity.AssertUiThread();
             shopWindow.OpenWindow();
             shopWindow.OpenShop(itemIds);
             HUDManager.InvalidateUi();
@@ -65,6 +68,7 @@ namespace Project_1.UI.HUD.Managers
 
         public void OpenGossipWindow(GossipData aData)
         {
+            ThreadAffinity.AssertUiThread();
             gossipWindow.OpenWindow();
             gossipWindow.ResetOptions();
             gossipWindow.Set(aData);
@@ -75,12 +79,14 @@ namespace Project_1.UI.HUD.Managers
 
         public void CloseGossipWindow()
         {
+            ThreadAffinity.AssertUiThread();
             gossipWindow.CloseWindow();
             HUDManager.InvalidateUi();
         }
 
         public void CloseShopWindow()
         {
+            ThreadAffinity.AssertUiThread();
             shopWindow.ClearShop();
             shopWindow.CloseWindow();
             HUDManager.InvalidateUi();
@@ -93,24 +99,32 @@ namespace Project_1.UI.HUD.Managers
 
         public void SetGuildMembers(Friendly[] aData)
         {
+            ThreadAffinity.AssertUiThread();
             guildWindow.SetRoster(aData);
             HUDManager.InvalidateUi();
         }
 
         public void SetGuildMemberInviteStatus(List<string> aName, List<TwoStateGFXButton.State> aState)
         {
+            ThreadAffinity.AssertUiThread();
             guildWindow.SetGuildMemberInviteStatus(aName, aState);
             HUDManager.InvalidateUi();
         }
-        public void SetCharacterWindow(Player aPlayer) => characterWindow.SetData(aPlayer);
+        public void SetCharacterWindow(Player aPlayer)
+        {
+            ThreadAffinity.AssertUiThread();
+            characterWindow.SetData(aPlayer);
+        }
         public void ToggleCharacterWindow()
         {
+            ThreadAffinity.AssertUiThread();
             characterWindow.ToggleVisibilty();
             HUDManager.InvalidateUi();
         }
 
         public void RefreshAllCharacterWindowSlots(Equipment aEquipment, Friendly aFriendly)
         {
+            ThreadAffinity.AssertUiThread();
             for (int i = 0; i < (int)Equipment.Slot.Count; i++)
             {
                 RefreshCharacterWindowSlot((Equipment.Slot)i, aEquipment, aFriendly);
@@ -120,6 +134,7 @@ namespace Project_1.UI.HUD.Managers
 
         public void RefreshCharacterWindowSlot(Equipment.Slot aSlot, Equipment aEquipment, Friendly aFriendly)
         {
+            ThreadAffinity.AssertUiThread();
             if (aFriendly == null) return;
             if (aFriendly.RelationToPlayer == Relation.RelationToPlayer.Self)
             {
@@ -136,6 +151,7 @@ namespace Project_1.UI.HUD.Managers
 
         public void RefreshCharacterWindowStats(PairReport aReport, Friendly aFriendly)
         {
+            ThreadAffinity.AssertUiThread();
             if (aFriendly == null) return;
 
             if (aFriendly.RelationToPlayer == Relation.RelationToPlayer.Self)
@@ -152,6 +168,7 @@ namespace Project_1.UI.HUD.Managers
 
         public void RefreshCharacterWindowExpBar(Friendly aFriendly)
         {
+            ThreadAffinity.AssertUiThread();
             if (aFriendly.RelationToPlayer == Relation.RelationToPlayer.Self)
             {
                 characterWindow.RefreshExp(aFriendly.Level);
@@ -166,12 +183,24 @@ namespace Project_1.UI.HUD.Managers
 
         }
 
-        public GuildMember GetGuildMemberInspectWindowTarget() => inspectWindow.GuildMember;
+        public GuildMember GetGuildMemberInspectWindowTarget()
+        {
+            ThreadAffinity.AssertUiThread();
+            return inspectWindow.GuildMember;
+        }
 
-        public bool PlayerCharacterPaneOpen => characterWindow.Visible;
+        public bool PlayerCharacterPaneOpen
+        {
+            get
+            {
+                ThreadAffinity.AssertUiThread();
+                return characterWindow.Visible;
+            }
+        }
 
         public void ToggleInspectWindow(GuildMember aGuildMember)
         {
+            ThreadAffinity.AssertUiThread();
             if (inspectWindow.Visible == true && inspectWindow.BelongsTo(aGuildMember))
             {
                 inspectWindow.ToggleVisibilty();
@@ -187,6 +216,7 @@ namespace Project_1.UI.HUD.Managers
 
         public void CloseGuildWindow()
         {
+            ThreadAffinity.AssertUiThread();
             if (inspectWindow.Visible == false) return;
 
             inspectWindow.ToggleVisibilty();
@@ -194,10 +224,19 @@ namespace Project_1.UI.HUD.Managers
 
         public bool IsShopOpen()
         {
+            ThreadAffinity.AssertUiThread();
             return shopWindow.Visible;
         }
 
-        public void AddSpellToSpellBook(Spell aSpell) => spellBookWindow.AssignSpell(aSpell);
-        public void RefreshSpellBook(Spell[] aSpells) => spellBookWindow.RefreshSpells(aSpells);
+        public void AddSpellToSpellBook(Spell aSpell)
+        {
+            ThreadAffinity.AssertUiThread();
+            spellBookWindow.AssignSpell(aSpell);
+        }
+        public void RefreshSpellBook(Spell[] aSpells)
+        {
+            ThreadAffinity.AssertUiThread();
+            spellBookWindow.RefreshSpells(aSpells);
+        }
     }
 }

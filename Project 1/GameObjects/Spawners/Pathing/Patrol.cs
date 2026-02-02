@@ -61,10 +61,10 @@ namespace Project_1.GameObjects.Spawners.Pathing
         {
             for (int i = 0; i < aQueue.Length; i++)
             {
-                Tile t = TileManager.GetTileUnder(aQueue[i]);
+                Tile t = TileManager.GetTile(aQueue[i]);
                 if (t.Walkable) continue;
 
-                aQueue[i] = TileManager.FindClosestWalkableWorldSpace(aQueue[i], aUnitSize);
+                aQueue[i] = TileManager.CollisionManager.FindClosestWalkableWorldSpace(aQueue[i], aUnitSize);
             }
             type = aType;
             nextIndex = 1; //Make it take the closest one as first index??
@@ -133,7 +133,7 @@ namespace Project_1.GameObjects.Spawners.Pathing
                 default:
                     break;
             }
-            WorldSpace newSpawn = TileManager.FindClosestWalkableWorldSpace(route[currentIndex], aSize);
+            WorldSpace newSpawn = TileManager.CollisionManager.FindClosestWalkableWorldSpace(route[currentIndex], aSize);
             return newSpawn;
         }
     }

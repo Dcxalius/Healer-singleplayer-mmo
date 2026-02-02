@@ -51,7 +51,7 @@ namespace Project_1.GameObjects.Spawners.Pathing
             float radians = (float)(RandomManager.RollDouble() * Math.PI * 2);
             WorldSpace dirVector = new WorldSpace(MathF.Sin(radians), -MathF.Cos(radians));
             WorldSpace newSpawn = bindPoint + dirVector * ((float)RandomManager.RollDouble() * leash);
-            newSpawn = TileManager.FindClosestWalkableWorldSpace(newSpawn, aSize);
+            newSpawn = TileManager.CollisionManager.FindClosestWalkableWorldSpace(newSpawn, aSize);
             lastDirection = newSpawn;
             return newSpawn;
         }

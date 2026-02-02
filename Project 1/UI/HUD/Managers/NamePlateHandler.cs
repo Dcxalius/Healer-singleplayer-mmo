@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities;
 using Project_1.Managers;
+using Project_1.Messaging.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,29 +13,40 @@ namespace Project_1.UI.HUD.Managers
 {
     internal class NamePlateHandler
     {
-        Dictionary<Entity, NamePlate> namePlates = new Dictionary<Entity, NamePlate>();
+        Dictionary<int, NamePlate> namePlates = new Dictionary<int, NamePlate>();
 
-        public void AddNamePlate(Entity aEntity)
+        public void AddNamePlate(in EntityUiSnapshot snapshot)
         {
-            if (aEntity == null) return;
-            if (namePlates.ContainsKey(aEntity)) return;
-            namePlates.Add(aEntity, new NamePlate(aEntity));
+            ThreadAffinity.AssertUiThread();
+            if (snapshot.RenderId <= 0) return;
+            if (namePlates.ContainsKey(snapshot.RenderId)) return;
+            namePlates.Add(snapshot.RenderId, new NamePlate(snapshot));
             HUDManager.InvalidatePlates();
         }
 
-        public void RemoveNamePlate(Entity aEntity)
+        public void RefreshNamePlate(in EntityUiSnapshot snapshot)
         {
-            namePlates.Remove(aEntity);
+            ThreadAffinity.AssertUiThread();
+            if (snapshot.RenderId <= 0) return;
+            if (!namePlates.TryGetValue(snapshot.RenderId, out NamePlate namePlate)) return;
+            namePlate.Refresh(snapshot);
+        }
+
+        public void RemoveNamePlate(int renderId)
+        {
+            ThreadAffinity.AssertUiThread();
+            if (renderId <= 0) return;
+            namePlates.Remove(renderId);
             HUDManager.InvalidatePlates();
         }
 
 
         public void Update()
         {
+            ThreadAffinity.AssertUiThread();
 
-            foreach (KeyValuePair<Entity, NamePlate> namePlate in namePlates)
+            foreach (KeyValuePair<int, NamePlate> namePlate in namePlates)
             {
-                namePlate.Value.Reposition(namePlate.Key);
                 namePlate.Value.Update();
             }
 
@@ -100,7 +111,8 @@ namespace Project_1.UI.HUD.Managers
 
         public void Rescale()
         {
-            foreach (KeyValuePair<Entity, NamePlate> namePlate in namePlates)
+            AssertUiOrMainThread();
+            foreach (KeyValuePair<int, NamePlate> namePlate in namePlates)
             {
                 namePlate.Value.Rescale();
             }
@@ -108,12 +120,23 @@ namespace Project_1.UI.HUD.Managers
 
         public void Draw(SpriteBatch aBatch)
         {
-            foreach (KeyValuePair<Entity, NamePlate> namePlate in namePlates)
+            ThreadAffinity.AssertMainThread();
+            foreach (KeyValuePair<int, NamePlate> namePlate in namePlates)
             {
                 namePlate.Value.Draw(aBatch);
             }
         }
 
-        public NamePlate[] GetDrawList() => namePlates.Values.ToArray();
+        public NamePlate[] GetDrawList()
+        {
+            AssertUiOrMainThread();
+            return namePlates.Values.ToArray();
+        }
+
+        static void AssertUiOrMainThread()
+        {
+            if (ThreadAffinity.IsMainThread) return;
+            ThreadAffinity.AssertUiThread();
+        }
     }
 }

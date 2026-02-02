@@ -11,7 +11,7 @@ namespace Project_1.Tiles
 {
     internal class Chunk : IComparable<Chunk>
     {
-        static readonly Point TileSize = TileManager.TileSize;
+        static readonly Point TileSize = Tiles.Tile.Size;
         public static readonly Point ChunkSize = new Point(100);
         [JsonIgnore]
         public Rectangle WorldRectangle => new Rectangle(Position.ToPoint(), ChunkSize * TileSize);
@@ -60,12 +60,16 @@ namespace Project_1.Tiles
 
 
         Tile[,] tiles;
+        [JsonIgnore]
+        ChunkRenderSnapshot renderSnapshot;
+        [JsonIgnore]
+        bool renderSnapshotBuilt;
         public int Id => id;
         int id;
 
         public static int[,] GenerateTileIds(int chunkId)
         {
-            Point chunkPos = TileManager.GetChunkPosition(chunkId);
+            Point chunkPos = GetChunkPosition(chunkId);
             int seed = HashCode.Combine(chunkId, chunkPos.X, chunkPos.Y);
             Random rng = new Random(seed);
 
@@ -118,7 +122,7 @@ namespace Project_1.Tiles
             id = aId;
             tiles = new Tile[ChunkSize.X, ChunkSize.Y];
             Position = new WorldSpace(aLeftUppermostTile);
-            ChunkPosition = TileManager.GetChunkPosition(aId);
+            ChunkPosition = GetChunkPosition(aId);
 
             Point pos;
 
@@ -181,7 +185,7 @@ namespace Project_1.Tiles
         [JsonConstructor]
         public Chunk(int[,] tilesAsIDs, int id)
         {
-            ChunkPosition = TileManager.GetChunkPosition(id);
+            ChunkPosition = GetChunkPosition(id);
             Position = new WorldSpace(ChunkPosition * ChunkSize * TileSize);
             this.id = id;
             tiles = new Tile[tilesAsIDs.GetLength(0), tilesAsIDs.GetLength(1)];
@@ -204,12 +208,35 @@ namespace Project_1.Tiles
             throw new NotImplementedException();
         }
 
+        internal ChunkRenderSnapshot BuildRenderSnapshot()
+        {
+            ThreadAffinity.AssertSimThread();
+            if (!renderSnapshotBuilt)
+            {
+                int width = ChunkSize.X;
+                int height = ChunkSize.Y;
+                var snapshots = new Textures.Texture.TextureRenderSnapshot[width * height];
+                for (int i = 0; i < width; i++)
+                {
+                    for (int j = 0; j < height; j++)
+                    {
+                        snapshots[i + j * width] = tiles[i, j].BuildRenderSnapshot();
+                    }
+                }
+                renderSnapshot = new ChunkRenderSnapshot(id, Position, snapshots);
+                renderSnapshotBuilt = true;
+            }
+
+            return renderSnapshot;
+        }
+
         public void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
         {
             ThreadAffinity.AssertMainThread();
-            var minimapTexture = TileRenderCache.GetChunkMinimap(this);
+            var minimapTexture = TileRenderCache.GetChunkMinimap(id);
+            if (minimapTexture == null) return;
 
-            aBatch.Draw(minimapTexture, ( new AbsoluteScreenPosition((Position - aOrigin).ToPoint()) / (TileManager.TileSize) + aMinimapOffset + aMinimapSize / 2).ToVector2(), Color.White);
+            aBatch.Draw(minimapTexture, ( new AbsoluteScreenPosition((Position - aOrigin).ToPoint()) / (TileSize) + aMinimapOffset + aMinimapSize / 2).ToVector2(), Color.White);
         }
 
         public void Draw(SpriteBatch aBatch)
@@ -246,5 +273,97 @@ namespace Project_1.Tiles
                 }
             }
         }
+
+        public static int GetChunkId(Point pos) => GetChunkId(pos.X, pos.Y);
+
+        public static int GetChunkId(int x, int y)
+        {
+            if (x == 0 && y == 0) return 0;
+
+            int dirInt;
+            int furthestDir;
+            int shortestDir;
+
+            if (Math.Abs(x) >= Math.Abs(y))
+            {
+                if (x < 0) //Left
+                {
+                    dirInt = 3;
+                    shortestDir = y;
+                }
+                else //Right
+                {
+                    dirInt = 7;
+                    shortestDir = -y;
+                }
+
+                furthestDir = x;
+            }
+            else
+            {
+                if (y < 0) //Up
+                {
+                    dirInt = 1;
+                    shortestDir = -x;
+                }
+                else //Down
+                {
+                    dirInt = 5;
+                    shortestDir = x;
+                }
+
+                furthestDir = y;
+            }
+
+            return dirInt * Math.Abs(furthestDir) + HighestNrInCircle(Math.Abs(furthestDir) - 1) + shortestDir;
+        }
+
+        public static Point GetChunkPosition(int id)
+        {
+            int circle = (int)Math.Ceiling((Math.Sqrt(id + 1) - 1) / 2);
+            int highestNrInCircle = HighestNrInCircle(circle);
+            int dif = highestNrInCircle - id;
+            if (dif == 0)
+            {
+                return new Point(circle, -circle);
+            }
+
+            int sideLength = circle * 2;
+            if (dif % sideLength == 0)
+            {
+                if (dif / sideLength == 1) return new Point(circle, circle);
+                if (dif / sideLength == 2) return new Point(-circle, circle);
+                if (dif / sideLength == 3) return new Point(-circle, -circle);
+                throw new Exception("ohno");
+            }
+
+            Point returnPoint = new Point();
+
+            if ((float)dif / sideLength < 1f)//Right
+            {
+                returnPoint.X = circle;
+                returnPoint.Y = -circle + dif;
+            }
+            else if ((float)dif / sideLength < 2f)//Down
+            {
+                returnPoint.X = circle - (dif - sideLength);
+                returnPoint.Y = circle;
+            }
+            else if ((float)dif / sideLength < 3f)//Left
+            {
+                returnPoint.X = -circle;
+                returnPoint.Y = circle - (dif - sideLength * 2);
+            }
+            else if ((float)dif / sideLength < 4f)//Up
+            {
+                returnPoint.X = -circle + (dif - sideLength * 3);
+                returnPoint.Y = -circle;
+            }
+            else throw new Exception("ohno");
+
+            return returnPoint;
+        }
+
+        static int HighestNrInCircle(int circleSize) => 4 * (((circleSize + 1) * (circleSize + 1)) - (circleSize + 1));
     }
 }

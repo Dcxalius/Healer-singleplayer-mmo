@@ -23,12 +23,8 @@ namespace Project_1.GameObjects.FloatingTexts
 
         public static void AddFloatingText(FloatingText aFloater)
         {
+            ThreadAffinity.AssertSimThread();
             if (aFloater == null) return;
-            if (ThreadAffinity.IsMainThread)
-            {
-                floatingTexts.Add(aFloater);
-                return;
-            }
             pendingAdds.Enqueue(aFloater);
         }
 

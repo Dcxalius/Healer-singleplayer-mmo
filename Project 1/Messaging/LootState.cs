@@ -1,5 +1,6 @@
 ﻿using Project_1.GameObjects;
 using Project_1.Items;
+using Project_1.Managers;
 using Project_1.Messaging.Events;
 using System.Linq;
 using Project_1.GameObjects.Entities.Friendlies.Players;
@@ -17,6 +18,7 @@ namespace Project_1.Messaging
 
         public static void Update()
         {
+            ThreadAffinity.AssertSimThread();
             if (Current == null) return;
             if (ObjectManager.Player == null) return;
             if (Current.Despawned || Current.IsEmpty || !Current.InDistance)
@@ -31,6 +33,7 @@ namespace Project_1.Messaging
 
         public static Item[] Open(LootDrop drop)
         {
+            ThreadAffinity.AssertSimThread();
             if (drop?.Drop != null)
             {
                 Item[] cloned = new Item[drop.Drop.Length];
@@ -54,6 +57,7 @@ namespace Project_1.Messaging
 
         public static LootContext BuildContext(LootDrop drop)
         {
+            ThreadAffinity.AssertSimThread();
             if (drop == null) return default;
             float allowed = drop.DropperHalfHeight + (float)ObjectManager.Player.FeetSize.Y / 2f;
             return new LootContext(drop.Id, drop.DropperFeet, allowed, drop.Despawned);
@@ -61,6 +65,7 @@ namespace Project_1.Messaging
 
         public static Item Peek(int slot)
         {
+            ThreadAffinity.AssertSimThread();
             if (Current == null || Current.Drop == null) return null;
             if (slot < 0 || slot >= Current.Drop.Length) return null;
             Item existing = Current.Drop[slot];
@@ -70,6 +75,7 @@ namespace Project_1.Messaging
 
         public static Item Take(int slot, int amount)
         {
+            ThreadAffinity.AssertSimThread();
             if (Current == null || Current.Drop == null) return null;
             if (slot < 0 || slot >= Current.Drop.Length) return null;
 
@@ -98,6 +104,7 @@ namespace Project_1.Messaging
 
         public static void Close(int contextId)
         {
+            ThreadAffinity.AssertSimThread();
             if (Current != null && CurrentContextId == contextId)
             {
                 Current = null;

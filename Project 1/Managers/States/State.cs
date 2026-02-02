@@ -14,6 +14,7 @@ namespace Project_1.Managers.States
     {
         protected SpriteBatch spriteBatch;
         protected RenderTarget2D renderTarget;
+        protected volatile bool renderDirty = true;
 
         public abstract StateManager.States GetStateEnum { get; }
 
@@ -30,6 +31,7 @@ namespace Project_1.Managers.States
         public virtual void Rescale()
         {
             renderTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
+            renderDirty = true;
         }
 
         public abstract void PopUp(DialogueBox aBox);
@@ -38,6 +40,11 @@ namespace Project_1.Managers.States
         public abstract bool Release(ReleaseEvent aReleaseEvent);
         public abstract bool Scroll(ScrollEvent aScrollEvent);
         public abstract RenderTarget2D Draw();
+
+        internal virtual void MarkUiDirty()
+        {
+            renderDirty = true;
+        }
 
         public virtual void PrepRender(Color aClearColor, SpriteSortMode sortMode = SpriteSortMode.Deferred, BlendState blendState = null, SamplerState samplerState = null, DepthStencilState depthStencilState = null, RasterizerState rasterizerState = null, Effect effect = null, Matrix? transformMatrix = null)
         {

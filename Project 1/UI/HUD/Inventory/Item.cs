@@ -135,6 +135,7 @@ namespace Project_1.UI.HUD.Inventory
 
         void ItemDroppedOnMe(ReleaseEvent aRelease)
         {
+            if (aRelease.Creator == null) return;
             if (!(aRelease.Creator.GetType().IsSubclassOf(GetType()) || aRelease.Creator.GetType() == GetType())) return;
 
             Item droppedOnMe = aRelease.Creator as Item;
@@ -268,7 +269,7 @@ namespace Project_1.UI.HUD.Inventory
 
             GuildMember inspectTarget = GetInspectTarget();
             if (inspectTarget == null) return true;
-            Friendly openGuildPage = inspectTarget;
+            int inspectTargetRenderId = inspectTarget.RenderId;
             if (bagIndex == -4)
             {
                 Equipment thisItem = GetActualItem as Equipment;
@@ -278,14 +279,14 @@ namespace Project_1.UI.HUD.Inventory
                 if (!GameObjects.Unit.Equipment.FitsInSlot(droppedItem.type, (GameObjects.Unit.Equipment.Slot)slotIndex)) return true;
                 if (thisItem == null)
                 {
-                    Mailboxes.Main.Publish(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, openGuildPage));
+                    Mailboxes.Main.Publish(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, inspectTargetRenderId));
                     return true;
                 }
 
                 if (droppedItem.type != thisItem.type) return true;
                 if (droppedItem.type >= Equipment.Type.MainHander) return true;
                 if (thisItem.type >= Equipment.Type.MainHander) return true;
-                Mailboxes.Main.Publish(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, openGuildPage));
+                Mailboxes.Main.Publish(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, inspectTargetRenderId));
 
                 return true;
             }
@@ -297,13 +298,13 @@ namespace Project_1.UI.HUD.Inventory
 
                 if (thisItem == null)
                 {
-                    Mailboxes.Main.Publish(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, openGuildPage));
+                    Mailboxes.Main.Publish(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, inspectTargetRenderId));
                     return true;
                 }
 
                 if (!GameObjects.Unit.Equipment.FitsInSlot(thisItem.type, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex)) return true;
 
-                Mailboxes.Main.Publish(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, openGuildPage));
+                Mailboxes.Main.Publish(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, inspectTargetRenderId));
 
                 return true;
             }
@@ -318,7 +319,7 @@ namespace Project_1.UI.HUD.Inventory
             GuildMember inspectTarget = GetInspectTarget();
             if (inspectTarget != null)
             {
-                Mailboxes.Main.Publish(new InventorySwapEquipmentRequested(aItemDroppedOnMe.Index, slotIndex, inspectTarget));
+                Mailboxes.Main.Publish(new InventorySwapEquipmentRequested(aItemDroppedOnMe.Index, slotIndex, inspectTarget.RenderId));
             }
             //TODO: Handle if trying to drag inbetween sheets.
             return true;
@@ -377,7 +378,7 @@ namespace Project_1.UI.HUD.Inventory
         {
             if (bagIndex >= 0)
             {
-                Friendly target;
+                int? targetRenderId;
                 bool shopOpen = IsShopOpen();
                 if (shopOpen)
                 {
@@ -385,8 +386,8 @@ namespace Project_1.UI.HUD.Inventory
                 }
 
                 GuildMember inspectTarget = GetInspectTarget();
-                if (inspectTarget == null || IsCharacterWindowOpen()) target = null;
-                else target = inspectTarget;
+                if (inspectTarget == null || IsCharacterWindowOpen()) targetRenderId = null;
+                else targetRenderId = inspectTarget.RenderId;
                 Items.Item actual = GetActualItem;
                 if (actual == null) return;
                 switch (actual.ItemType)
@@ -399,11 +400,11 @@ namespace Project_1.UI.HUD.Inventory
                     case ItemData.ItemType.Trash:
                         return;
                     case ItemData.ItemType.Consumable:
-                        Mailboxes.Main.Publish(new InventoryConsumeRequested(Index, target));
+                        Mailboxes.Main.Publish(new InventoryConsumeRequested(Index, targetRenderId));
                         return;
                     case ItemData.ItemType.Equipment:
                     case ItemData.ItemType.Weapon:
-                        Mailboxes.Main.Publish(new InventoryEquipRequested(Index, target));
+                        Mailboxes.Main.Publish(new InventoryEquipRequested(Index, targetRenderId));
                         return;
                     default:
                         throw new NotImplementedException();

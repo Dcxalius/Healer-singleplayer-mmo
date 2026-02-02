@@ -60,7 +60,7 @@ namespace Project_1.GameObjects.Spawners.Pathing
         {
             Reset();
             WorldSpace newSpace = NewTarget();
-            newSpace = TileManager.FindClosestWalkableWorldSpace(newSpace, aSize);
+            newSpace = TileManager.CollisionManager.FindClosestWalkableWorldSpace(newSpace, aSize);
             return newSpace;
         }
     }

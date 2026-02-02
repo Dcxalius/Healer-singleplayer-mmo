@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
 using System;
@@ -27,6 +28,11 @@ namespace Project_1.UI.HUD.PlateBoxes
         public void Refresh(Entity aEntity)
         {
             numberLabel.Text = aEntity.CurrentLevel.ToString();
+        }
+
+        public void Refresh(in EntityUiSnapshot snapshot)
+        {
+            numberLabel.Text = snapshot.Level.ToString();
         }
 
         //public override void Resize(AbsoluteScreenPosition aSize)

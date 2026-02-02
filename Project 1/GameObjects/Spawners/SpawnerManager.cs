@@ -20,7 +20,9 @@ namespace Project_1.GameObjects.Spawners
     internal static class SpawnerManager
     {
         static List<SpawnZone> spawnZones;
-        static volatile SpawnZone[] renderSpawnZones = Array.Empty<SpawnZone>();
+        static readonly RenderCache<SpawnZoneRenderSnapshot> renderSpawnZones = new RenderCache<SpawnZoneRenderSnapshot>();
+        static readonly HashSet<int> knownZoneIds = new HashSet<int>();
+        static readonly HashSet<int> currentZoneIds = new HashSet<int>();
 
         static Dictionary<string, int> savedMobNames;
         static bool initialized;
@@ -43,6 +45,7 @@ namespace Project_1.GameObjects.Spawners
                 spawnZones[i].RemoveAllPlates();
             }
             spawnZones.Clear();
+            ClearRenderCache();
             SavedMobData[] unitData = ImportUnitData(aSave);
             ImportZones(aSave, unitData);
         }
@@ -55,6 +58,7 @@ namespace Project_1.GameObjects.Spawners
                 spawnZones[i].RemoveAllPlates();
             }
             spawnZones.Clear();
+            ClearRenderCache();
 
             if (serializer == null)
             {
@@ -115,31 +119,38 @@ namespace Project_1.GameObjects.Spawners
             savedMobs = mobData.ToArray();
         }
 
-        static void ImportZones(Save aSave, SavedMobData[] aUnitData) //TODO: This doesn't load spawners that doesnt have mobs in them
+        static void ClearRenderCache()
+        {
+            renderSpawnZones.RequestClear();
+            knownZoneIds.Clear();
+            currentZoneIds.Clear();
+        }
+
+        static void ImportZones(Save aSave, SavedMobData[] aUnitData)
         {
             string path = aSave.SpawnZones;
 
             string[] files = System.IO.Directory.GetFiles(path);
-            SavedMobData[] x = aUnitData.Distinct(new SpawnZoneComparer()).ToArray();
-            int[] spawnZonesWithMobs = new int[x.Count()];
-            for (int i = 0; i < spawnZonesWithMobs.Length; i++)
-            {
-                spawnZonesWithMobs[i] = x[i].SpawnZoneID;
-            }
-            //TODO: Make sure files are sorted
+            SavedMobData[] distinctUnitZones = aUnitData
+                .Where(unit => unit != null)
+                .Distinct(new SpawnZoneComparer())
+                .ToArray();
+            HashSet<int> spawnZonesWithMobs = new HashSet<int>(distinctUnitZones.Select(unit => unit.SpawnZoneID));
+
             for (int i = 0; i < files.Length; i++)
             {
                 string lines = System.IO.File.ReadAllText(files[i]);
 
                 string rawData = lines;
+                int zoneId = int.Parse(SaveManager.TrimToNameOnly(files[i]));
 
-                if (Array.IndexOf(spawnZonesWithMobs, int.Parse(SaveManager.TrimToNameOnly(files[i]))) == -1)
+                if (!spawnZonesWithMobs.Contains(zoneId))
                 {
                     spawnZones.Add(SaveManager.ImportData<SpawnZone>(rawData));
                     continue;
                 }
 
-                spawnZones.Add(new SpawnZone(i, aUnitData.Where(x => x.SpawnZoneID == i).ToArray()));
+                spawnZones.Add(new SpawnZone(zoneId, aUnitData.Where(x => x != null && x.SpawnZoneID == zoneId).ToArray()));
                 JsonSerializerSettings settings = new JsonSerializerSettings() {  ObjectCreationHandling = ObjectCreationHandling.Replace, TypeNameHandling = TypeNameHandling.Auto};
                 JsonConvert.PopulateObject(rawData, spawnZones.Last(), settings);
             }
@@ -182,7 +193,7 @@ namespace Project_1.GameObjects.Spawners
             aSave.ClearFolder(aSave.NonFriendly);
             for (int i = 0; i < spawnZones.Count; i++)
             {
-                SaveManager.ExportData(aSave.SpawnZones + "\\" + i + ".spawn", spawnZones[i]);
+                SaveManager.ExportData(aSave.SpawnZones + "\\" + spawnZones[i].Id + ".spawn", spawnZones[i]);
             }
 
             savedMobNames.Clear();
@@ -262,13 +273,31 @@ namespace Project_1.GameObjects.Spawners
             return false;
         }
 
+        internal static bool TryGetSpawnByRenderId(int renderId, out Entity entity)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (renderId <= 0)
+            {
+                entity = null;
+                return false;
+            }
+
+            for (int i = 0; i < spawnZones.Count; i++)
+            {
+                if (spawnZones[i].TryGetSpawnByRenderId(renderId, out entity)) return true;
+            }
+
+            entity = null;
+            return false;
+        }
+
         public static void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
         {
             ThreadAffinity.AssertMainThread();
-            SpawnZone[] snapshot = renderSpawnZones;
-            for (int i = 0; i < snapshot.Length; i++)
+            renderSpawnZones.ApplyUpdates();
+            foreach (SpawnZoneRenderSnapshot snapshot in renderSpawnZones.Values)
             {
-                snapshot[i].MinimapDraw(aBatch, aOrigin, aMinimapOffset, aMinimapSize);
+                snapshot.MinimapDraw(aBatch, aOrigin, aMinimapOffset, aMinimapSize);
             }
         }
 
@@ -284,17 +313,40 @@ namespace Project_1.GameObjects.Spawners
         internal static void Draw(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();
-            SpawnZone[] snapshot = renderSpawnZones;
-            for (int i = 0; i < snapshot.Length; i++)
+            renderSpawnZones.ApplyUpdates();
+            foreach (SpawnZoneRenderSnapshot snapshot in renderSpawnZones.Values)
             {
-                snapshot[i].Draw(aBatch);
+                snapshot.Draw(aBatch);
             }
         }
 
         internal static void BuildRenderSnapshot()
         {
             ThreadAffinity.AssertSimThread();
-            renderSpawnZones = spawnZones.ToArray();
+            currentZoneIds.Clear();
+            for (int i = 0; i < spawnZones.Count; i++)
+            {
+                SpawnZoneRenderSnapshot snapshot = spawnZones[i].BuildRenderSnapshot();
+                renderSpawnZones.EnqueueUpdate(snapshot);
+                currentZoneIds.Add(snapshot.RenderId);
+            }
+            PublishRemovals();
+        }
+
+        static void PublishRemovals()
+        {
+            foreach (int id in knownZoneIds)
+            {
+                if (!currentZoneIds.Contains(id))
+                {
+                    renderSpawnZones.EnqueueRemove(id);
+                }
+            }
+            knownZoneIds.Clear();
+            foreach (int id in currentZoneIds)
+            {
+                knownZoneIds.Add(id);
+            }
         }
     }
 }

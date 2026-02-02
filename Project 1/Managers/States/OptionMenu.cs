@@ -6,6 +6,7 @@ using Project_1.UI.HUD;
 using Project_1.UI.HUD.Managers;
 using Project_1.UI.OptionMenu;
 using Project_1.UI.UIElements.Boxes;
+using Project_1.UI.UIElements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,7 @@ namespace Project_1.Managers.States
     internal class OptionMenu : State
     {
         public override StateManager.States GetStateEnum => StateManager.States.OptionMenu;
+        volatile UiElementDrawList drawList;
         public OptionMenu() : base()
         {
 
@@ -47,12 +49,11 @@ namespace Project_1.Managers.States
         }
         public override RenderTarget2D Draw()
         {
+            if (!renderDirty || drawList == null) return renderTarget;
+            renderDirty = false;
             PrepRender(Color.Pink, sortMode: SpriteSortMode.Immediate, rasterizerState: new RasterizerState() { ScissorTestEnable = true });
 
-            lock (HUDManager.UiLock)
-            {
-                OptionManager.Draw(spriteBatch);
-            }
+            drawList?.Draw(spriteBatch);
 
             CleanRender();
 
@@ -73,10 +74,26 @@ namespace Project_1.Managers.States
         internal bool UiRelease(ReleaseEvent aReleaseEvent) => false;
         internal bool UiScroll(ScrollEvent aScrollEvent) => OptionManager.Scroll(aScrollEvent);
         internal bool UiEscapePressed() => false;
-        internal void UiUpdate() => OptionManager.Update();
+        internal void UiUpdate()
+        {
+            OptionManager.Update();
+            if (drawList == null || OptionManager.ConsumeDrawListDirty())
+            {
+                drawList = new UiElementDrawList(OptionManager.BuildDrawList());
+                MarkUiDirty();
+            }
+            if (OptionManager.ConsumeRenderDirty() || UiTextInputManager.IsActive)
+            {
+                MarkUiDirty();
+            }
+        }
 
         internal void UiOnEnter()
         {
+            drawList = new UiElementDrawList(OptionManager.BuildDrawList());
+            OptionManager.ConsumeDrawListDirty();
+            OptionManager.ConsumeRenderDirty();
+            MarkUiDirty();
         }
 
         internal void UiOnLeave()
@@ -85,6 +102,8 @@ namespace Project_1.Managers.States
             {
                 OptionManager.ClearButtons();
             }
+            drawList = null;
+            MarkUiDirty();
         }
     }
 }

@@ -28,12 +28,14 @@ namespace Project_1.Tiles
 
         public Path GeneratePath(WorldSpace aStartPos, WorldSpace aEndPos, WorldSpace aSize)
         {
-            Tile startTile = TileManager.GetTileUnder(aStartPos);
-            Tile endTile = TileManager.GetTileUnder(aEndPos);
+            // Perf idea: if tile lookups/locks get hot, consider passing an immutable walkability snapshot
+            // (per-chunk bool grid + version) into pathfinding and rebuilding only when chunks update.
+            Tile startTile = TileManager.GetTile(aStartPos);
+            Tile endTile = TileManager.GetTile(aEndPos);
 
             if (!endTile.Walkable)
             {
-                return GeneratePath(aStartPos, TileManager.FindClosestWalkableWorldSpace(aEndPos, aSize), aSize);
+                return GeneratePath(aStartPos, TileManager.CollisionManager.FindClosestWalkableWorldSpace(aEndPos, aSize), aSize);
             }
 
             Vector2 startToEnd = aEndPos - aStartPos;
@@ -63,7 +65,7 @@ namespace Project_1.Tiles
                     break;
                 }
 
-                Tile[] neighbours = GetSortedNeighbours(TileManager.GetSurroundingTiles(currentTile.Tile));
+                Tile[] neighbours = GetSortedNeighbours(TileQuery.GetSurroundingTiles(currentTile.Tile));
                 List<int> wallIndicies = new List<int>();
                 for (int i = 0; i < neighbours.Length; i++)
                 {
@@ -138,7 +140,7 @@ namespace Project_1.Tiles
             if (distance <= float.Epsilon) return true;
 
             Vector2 direction = Vector2.Normalize(delta);
-            float sampleSpacing = Math.Min(TileManager.TileSize.X, TileManager.TileSize.Y) / 2f;
+            float sampleSpacing = Math.Min(Tile.Size.X, Tile.Size.Y) / 2f;
             int steps = Math.Max(1, (int)Math.Ceiling(distance / sampleSpacing));
             WorldSpace[] offsets = BuildCollisionOffsets(aSize);
 
@@ -190,8 +192,8 @@ namespace Project_1.Tiles
             Chunk chunk = TileManager.GetChunkUnder(aPosition);
             if (chunk == null) return null;
 
-            float localX = (aPosition.X - chunk.Position.X) / TileManager.TileSize.X;
-            float localY = (aPosition.Y - chunk.Position.Y) / TileManager.TileSize.Y;
+            float localX = (aPosition.X - chunk.Position.X) / Tile.Size.X;
+            float localY = (aPosition.Y - chunk.Position.Y) / Tile.Size.Y;
             int tileX = (int)Math.Floor(localX);
             int tileY = (int)Math.Floor(localY);
 

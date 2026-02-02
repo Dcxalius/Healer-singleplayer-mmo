@@ -55,7 +55,7 @@ namespace Project_1.UI.UIElements
             {
                 MinimapDotSnapshot dot = dots[i];
                 minimapDot.Draw(aBatch,
-                    new Rectangle(new AbsoluteScreenPosition((dot.Position - origin).ToPoint()) / (TileManager.TileSize) + Location + Size / 2 + new Point(0, 1), new Point(1)),
+                    new Rectangle(new AbsoluteScreenPosition((dot.Position - origin).ToPoint()) / (Tile.Size) + Location + Size / 2 + new Point(0, 1), new Point(1)),
                     dot.Color);
             }
         }

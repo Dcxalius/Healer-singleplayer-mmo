@@ -16,7 +16,11 @@ namespace Project_1.Managers
     {
         static Dictionary<string, Effect> effects;
 
-        public static Effect GetEffect(string aName) => effects[aName];
+        public static Effect GetEffect(string aName)
+        {
+            ThreadAffinity.AssertMainThread();
+            return effects[aName];
+        }
 
         static readonly ConcurrentQueue<IEffects> pendingEffects = new ConcurrentQueue<IEffects>();
         static Dictionary<IEffects, RenderTarget2D> rendertargets;

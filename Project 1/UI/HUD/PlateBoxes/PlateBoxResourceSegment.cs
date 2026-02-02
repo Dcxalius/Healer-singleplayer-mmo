@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.UIElements.Bars;
 using System;
@@ -28,11 +29,24 @@ namespace Project_1.UI.HUD.PlateBoxes
             resourceBar.MaxValue = aEntity.MaxResource;
         }
 
+        public void Refresh(in EntityUiSnapshot snapshot)
+        {
+            resourceBar.Value = snapshot.CurrentResource;
+            resourceBar.MaxValue = snapshot.MaxResource;
+        }
+
         public void SetTarget(Entity aEntity)
         {
             resourceBar.MaxValue = aEntity.MaxResource;
             resourceBar.Value = aEntity.CurrentResource;
             resourceBar.Color = aEntity.ResourceColor;
+        }
+
+        public void SetTarget(in EntityUiSnapshot snapshot)
+        {
+            resourceBar.MaxValue = snapshot.MaxResource;
+            resourceBar.Value = snapshot.CurrentResource;
+            resourceBar.Color = snapshot.ResourceColor;
         }
 
     }

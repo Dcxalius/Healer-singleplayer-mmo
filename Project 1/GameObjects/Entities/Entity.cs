@@ -68,8 +68,10 @@ namespace Project_1.GameObjects.Entities
             if (AmIDead()) return;
             TargetAliveCheck();
             if (unitData.BaseStats.CheckIfResourceRegened()) FlagForRefresh();
-            
+
+            WorldSpace startFeetPosition = FeetPosition;
             Movement(); //TODO: base.Update() is in here which is ugly AF
+            if (HasNamePlate && startFeetPosition != FeetPosition) FlagForRefresh();
             AttackTarget();
             spellCast.UpdateSpellChannel();
             buffList.Update(this);
@@ -90,7 +92,7 @@ namespace Project_1.GameObjects.Entities
        
         public void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
         {
-            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition((Position - aOrigin).ToPoint()) / (TileManager.TileSize) + aMinimapOffset + aMinimapSize / 2 + new Point(0, 1), new Point(1)), MinimapColor);            
+            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition((Position - aOrigin).ToPoint()) / (Tile.Size) + aMinimapOffset + aMinimapSize / 2 + new Point(0, 1), new Point(1)), MinimapColor);            
         }
     }
 }

@@ -13,5 +13,8 @@ namespace Project_1.GameObjects.Spawners
 
         [JsonProperty("Pathing", TypeNameHandling = TypeNameHandling.Auto)]
         public MobPathing[] Pathing { get; set; }
+
+        [JsonProperty("SpawnerTimers")]
+        public SpawnerTimerSaveData[] SpawnerTimers { get; set; }
     }
 }

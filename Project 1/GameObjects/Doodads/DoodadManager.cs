@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
+using Project_1.GameObjects;
 using Project_1.Managers;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,9 @@ namespace Project_1.GameObjects.Doodads
     internal static class DoodadManager
     {
         static List<Doodad> doodads;
-        static volatile Doodad[] renderDoodads = Array.Empty<Doodad>();
+        static readonly RenderCache<WorldObjectRenderSnapshot> renderDoodads = new RenderCache<WorldObjectRenderSnapshot>();
+        static readonly HashSet<int> knownDoodadIds = new HashSet<int>();
+        static readonly HashSet<int> currentDoodadIds = new HashSet<int>();
         static bool initialized;
 
         public static void Init()
@@ -49,20 +52,58 @@ namespace Project_1.GameObjects.Doodads
             return false;
         }
 
+        public static bool TryGetDoodadByRenderId(int renderId, out Doodad doodad)
+        {
+            ThreadAffinity.AssertSimThread();
+            doodad = null;
+            if (renderId <= 0) return false;
+            for (int i = 0; i < doodads.Count; i++)
+            {
+                if (doodads[i].RenderId != renderId) continue;
+                doodad = doodads[i];
+                return true;
+            }
+
+            return false;
+        }
+
         public static void Draw(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();
-            Doodad[] snapshot = renderDoodads;
-            for (int i = 0; i < snapshot.Length; i++)
+            renderDoodads.ApplyUpdates();
+            foreach (WorldObjectRenderSnapshot snapshot in renderDoodads.Values)
             {
-                snapshot[i].Draw(aBatch);
+                snapshot.Draw(aBatch);
             }
         }
 
         internal static void BuildRenderSnapshot()
         {
             ThreadAffinity.AssertSimThread();
-            renderDoodads = doodads.ToArray();
+            currentDoodadIds.Clear();
+            for (int i = 0; i < doodads.Count; i++)
+            {
+                WorldObjectRenderSnapshot snapshot = doodads[i].BuildRenderSnapshot();
+                renderDoodads.EnqueueUpdate(snapshot);
+                currentDoodadIds.Add(snapshot.RenderId);
+            }
+            PublishRemovals();
+        }
+
+        static void PublishRemovals()
+        {
+            foreach (int id in knownDoodadIds)
+            {
+                if (!currentDoodadIds.Contains(id))
+                {
+                    renderDoodads.EnqueueRemove(id);
+                }
+            }
+            knownDoodadIds.Clear();
+            foreach (int id in currentDoodadIds)
+            {
+                knownDoodadIds.Add(id);
+            }
         }
     }
 }

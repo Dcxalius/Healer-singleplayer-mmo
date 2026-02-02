@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
+using Project_1.GameObjects;
 using Project_1.Managers;
 using Project_1.Managers.Saves;
 using Newtonsoft.Json;
@@ -16,7 +17,9 @@ namespace Project_1.GameObjects.Entities.Corspes
     internal static class CorpseManager
     {
         static List<Corpse> corpses;
-        static volatile Corpse[] renderCorpses = Array.Empty<Corpse>();
+        static readonly RenderCache<WorldObjectRenderSnapshot> renderCorpses = new RenderCache<WorldObjectRenderSnapshot>();
+        static readonly HashSet<int> knownCorpseIds = new HashSet<int>();
+        static readonly HashSet<int> currentCorpseIds = new HashSet<int>();
         static bool initialized;
 
         public static void Init()
@@ -43,6 +46,9 @@ namespace Project_1.GameObjects.Entities.Corspes
         {
             ThreadAffinity.AssertSimThread();
             corpses.Clear();
+            renderCorpses.RequestClear();
+            knownCorpseIds.Clear();
+            currentCorpseIds.Clear();
         }
 
         internal static void Save(Save aSave)
@@ -94,6 +100,21 @@ namespace Project_1.GameObjects.Entities.Corspes
             return false;
         }
 
+        public static bool TryGetCorpseByRenderId(int renderId, out Corpse corpse)
+        {
+            ThreadAffinity.AssertSimThread();
+            corpse = null;
+            if (renderId <= 0) return false;
+            for (int i = 0; i < corpses.Count; i++)
+            {
+                if (corpses[i].RenderId != renderId) continue;
+                corpse = corpses[i];
+                return true;
+            }
+
+            return false;
+        }
+
         public static void Update()
         {
             ThreadAffinity.AssertSimThread();
@@ -103,14 +124,40 @@ namespace Project_1.GameObjects.Entities.Corspes
         public static void Draw(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();
-            Corpse[] snapshot = renderCorpses;
-            for (int i = 0; i < snapshot.Length; i++) snapshot[i].Draw(aBatch);
+            renderCorpses.ApplyUpdates();
+            foreach (WorldObjectRenderSnapshot snapshot in renderCorpses.Values)
+            {
+                snapshot.Draw(aBatch);
+            }
         }
 
         internal static void BuildRenderSnapshot()
         {
             ThreadAffinity.AssertSimThread();
-            renderCorpses = corpses.ToArray();
+            currentCorpseIds.Clear();
+            for (int i = 0; i < corpses.Count; i++)
+            {
+                WorldObjectRenderSnapshot snapshot = corpses[i].BuildRenderSnapshot();
+                renderCorpses.EnqueueUpdate(snapshot);
+                currentCorpseIds.Add(snapshot.RenderId);
+            }
+            PublishRemovals();
+        }
+
+        static void PublishRemovals()
+        {
+            foreach (int id in knownCorpseIds)
+            {
+                if (!currentCorpseIds.Contains(id))
+                {
+                    renderCorpses.EnqueueRemove(id);
+                }
+            }
+            knownCorpseIds.Clear();
+            foreach (int id in currentCorpseIds)
+            {
+                knownCorpseIds.Add(id);
+            }
         }
 
         public static Corpse[] GetSnapshot()

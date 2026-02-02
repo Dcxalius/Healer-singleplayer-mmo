@@ -18,6 +18,7 @@ using Project_1.Messaging.Events;
 using Project_1.Items;
 using Project_1.Items.SubTypes;
 using Project_1.Particles;
+using Project_1.GameObjects.Spells;
 using Project_1.UI;
 using Project_1.UI.HUD.Managers;
 using Project_1.UI.OptionMenu;
@@ -28,6 +29,7 @@ using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.Entities.Friendlies.Npcs;
+using Project_1.Managers.Saves;
 
 namespace Project_1.Managers.States
 {
@@ -240,6 +242,7 @@ namespace Project_1.Managers.States
 
         public static void Rescale()
         {
+            ThreadAffinity.AssertMainThread();
             if (currentState == null) return;
             game.Rescale();
             optionMenu.Rescale();
@@ -350,6 +353,12 @@ namespace Project_1.Managers.States
             }
         }
 
+        internal static void UiInvalidate()
+        {
+            ThreadAffinity.AssertUiThread();
+            currentState?.MarkUiDirty();
+        }
+
         internal static void UiUpdate()
         {
             ThreadAffinity.AssertUiThread();
@@ -458,8 +467,10 @@ namespace Project_1.Managers.States
         static void HandleSpellCastRequested(SpellCastRequested e)
         {
             ThreadAffinity.AssertSimThread();
-            if (e.Spell == null) return;
-            ObjectManager.Player?.StartCast(e.Spell);
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+            if (!player.SpellBook.TryGetSpell(e.SpellName, out Spell spell)) return;
+            player.StartCast(spell);
         }
 
         static void HandleTargetRequested(TargetRequested e)
@@ -467,22 +478,32 @@ namespace Project_1.Managers.States
             ThreadAffinity.AssertSimThread();
             Player player = ObjectManager.Player;
             if (player == null) return;
-            player.SetTarget(e.Target ?? player);
+            if (!e.TargetRenderId.HasValue)
+            {
+                player.SetTarget(player);
+                return;
+            }
+
+            if (!TryResolveEntityByRenderId(e.TargetRenderId.Value, out Entity target))
+            {
+                player.SetTarget(player);
+                return;
+            }
+
+            player.SetTarget(target);
         }
 
         static void HandlePartyMemberInviteRequested(PartyMemberInviteRequested e)
         {
             ThreadAffinity.AssertSimThread();
-            GuildMember member = e.Member;
-            if (member == null) return;
+            if (!ObjectManager.TryGetGuildMemberByRenderId(e.MemberRenderId, out GuildMember member)) return;
             ObjectManager.SpawnGuildMemberToParty(member, null);
         }
 
         static void HandlePartyMemberKickRequested(PartyMemberKickRequested e)
         {
             ThreadAffinity.AssertSimThread();
-            GuildMember member = e.Member;
-            if (member == null) return;
+            if (!ObjectManager.TryGetGuildMemberByRenderId(e.MemberRenderId, out GuildMember member)) return;
             ObjectManager.RemoveGuildMemberFromParty(member);
         }
 
@@ -511,8 +532,8 @@ namespace Project_1.Managers.States
         static void HandleLoadSaveRequested(LoadSaveRequested e)
         {
             ThreadAffinity.AssertSimThread();
-            if (e.Save == null) return;
-            bool async = SaveManager.RequestLoadData(e.Save);
+            if (!SaveManager.TryGetSaveByName(e.SaveName, out Save save)) return;
+            bool async = SaveManager.RequestLoadData(save);
             if (async)
             {
                 SetState(States.LoadingMenu);
@@ -554,26 +575,26 @@ namespace Project_1.Managers.States
         static void HandleWorldClickRequested(WorldClickRequested e)
         {
             ThreadAffinity.AssertSimThread();
-            if (e.ClickEvent == null) return;
             if (currentState == null || currentState.GetStateEnum != States.Game) return;
-            RouteWorldClick(e.ClickEvent);
+            RouteWorldClick(e);
         }
 
         static void HandleWorldReleaseRequested(WorldReleaseRequested e)
         {
             ThreadAffinity.AssertSimThread();
-            if (e.ReleaseEvent == null) return;
-            Release(e.ReleaseEvent);
+            ReleaseEvent releaseEvent = new ReleaseEvent(null, e.RelativePos, e.Button, e.ToModifiersArray());
+            Release(releaseEvent);
         }
 
         static void HandleWorldScrollRequested(WorldScrollRequested e)
         {
             ThreadAffinity.AssertSimThread();
-            if (e.ScrollEvent == null) return;
-            Scroll(e.ScrollEvent);
+            ScrollEvent.Direction direction = e.Up ? ScrollEvent.Direction.Up : ScrollEvent.Direction.Down;
+            ScrollEvent scrollEvent = new ScrollEvent(e.RelativePos, e.Steps, direction, e.ToModifiersArray());
+            Scroll(scrollEvent);
         }
 
-        static void RouteWorldClick(ClickEvent clickEvent)
+        static void RouteWorldClick(in WorldClickRequested clickEvent)
         {
             WorldSpace worldPos = WorldSpace.FromRelativeScreenSpace(clickEvent.RelativePos);
 
@@ -591,53 +612,53 @@ namespace Project_1.Managers.States
 
             if (CorpseManager.TryGetCorpseAt(worldPos, out Corpse corpse))
             {
-                Mailboxes.Main.Publish(new InteractRequested(corpse, clickEvent.ButtonPressed));
+                Mailboxes.Main.Publish(new InteractRequested(corpse.RenderId, clickEvent.Button));
                 return;
             }
 
             if (DoodadManager.TryGetDoodadAt(worldPos, out Doodad doodad))
             {
-                Mailboxes.Main.Publish(new InteractRequested(doodad, clickEvent.ButtonPressed));
+                Mailboxes.Main.Publish(new InteractRequested(doodad.RenderId, clickEvent.Button));
                 return;
             }
 
             HandleGroundWorldClick(worldPos, clickEvent);
         }
 
-        static void HandleEntityWorldClick(Entity entity, ClickEvent clickEvent)
+        static void HandleEntityWorldClick(Entity entity, in WorldClickRequested clickEvent)
         {
             bool noModifiers = clickEvent.NoModifiers();
-            bool rightClick = clickEvent.ButtonPressed == InputManager.ClickType.Right;
+            bool rightClick = clickEvent.Button == InputManager.ClickType.Right;
 
             if (noModifiers)
             {
-                Mailboxes.Main.Publish(new TargetRequested(entity));
+                Mailboxes.Main.Publish(new TargetRequested(entity.RenderId));
                 if (rightClick)
                 {
-                    Mailboxes.Main.Publish(new PartyTargetOrderRequested(entity));
+                    Mailboxes.Main.Publish(new PartyTargetOrderRequested(entity.RenderId));
                 }
             }
             else if (entity is GuildMember member)
             {
                 if (clickEvent.Modifier(InputManager.HoldModifier.Shift))
                 {
-                    Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.Add, member));
+                    Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.Add, member.RenderId));
                 }
                 else if (clickEvent.Modifier(InputManager.HoldModifier.Ctrl))
                 {
-                    Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.NeedyAdd, member));
+                    Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.NeedyAdd, member.RenderId));
                 }
             }
 
             if (entity is Npc npc)
             {
-                Mailboxes.Main.Publish(new InteractRequested(npc, clickEvent.ButtonPressed));
+                Mailboxes.Main.Publish(new InteractRequested(npc.RenderId, clickEvent.Button));
             }
         }
 
-        static void HandleGroundWorldClick(WorldSpace worldPos, ClickEvent clickEvent)
+        static void HandleGroundWorldClick(WorldSpace worldPos, in WorldClickRequested clickEvent)
         {
-            if (clickEvent.ButtonPressed == InputManager.ClickType.Left)
+            if (clickEvent.Button == InputManager.ClickType.Left)
             {
                 if (clickEvent.ModifiersOr(new InputManager.HoldModifier[] { InputManager.HoldModifier.Shift, InputManager.HoldModifier.Ctrl }))
                 {
@@ -649,7 +670,7 @@ namespace Project_1.Managers.States
                 return;
             }
 
-            if (clickEvent.ButtonPressed == InputManager.ClickType.Right)
+            if (clickEvent.Button == InputManager.ClickType.Right)
             {
                 bool append = clickEvent.Modifier(InputManager.HoldModifier.Shift);
                 Mailboxes.Main.Publish(new MoveOrderRequested(worldPos, append));
@@ -676,8 +697,9 @@ namespace Project_1.Managers.States
         {
             ThreadAffinity.AssertSimThread();
             Player player = ObjectManager.Player;
-            if (player == null || e.Target == null) return;
-            player.Party.IssueTargetOrder(e.Target);
+            if (player == null) return;
+            if (!TryResolveEntityByRenderId(e.TargetRenderId, out Entity target)) return;
+            player.Party.IssueTargetOrder(target);
         }
 
         static void HandleTargetClearedRequested()
@@ -699,10 +721,18 @@ namespace Project_1.Managers.States
                     player.Party.ClearCommand();
                     break;
                 case PartyCommandAction.Add:
-                    if (e.Member != null) player.Party.AddToCommand(e.Member);
+                    if (e.MemberRenderId.HasValue &&
+                        ObjectManager.TryGetGuildMemberByRenderId(e.MemberRenderId.Value, out GuildMember addMember))
+                    {
+                        player.Party.AddToCommand(addMember);
+                    }
                     break;
                 case PartyCommandAction.NeedyAdd:
-                    if (e.Member != null) player.Party.NeedyAddToCommand(e.Member);
+                    if (e.MemberRenderId.HasValue &&
+                        ObjectManager.TryGetGuildMemberByRenderId(e.MemberRenderId.Value, out GuildMember needyMember))
+                    {
+                        player.Party.NeedyAddToCommand(needyMember);
+                    }
                     break;
             }
         }
@@ -710,19 +740,26 @@ namespace Project_1.Managers.States
         static void HandleInteractRequested(InteractRequested e)
         {
             ThreadAffinity.AssertSimThread();
-            if (e.Target == null) return;
-            switch (e.Target)
+            if (CorpseManager.TryGetCorpseByRenderId(e.TargetRenderId, out Corpse corpse))
             {
-                case Corpse corpse:
-                    if (e.Button != InputManager.ClickType.Right) return;
-                    corpse.TryOpenLoot();
-                    break;
-                case Chest chest:
+                if (e.Button != InputManager.ClickType.Right) return;
+                corpse.TryOpenLoot();
+                return;
+            }
+
+            if (DoodadManager.TryGetDoodadByRenderId(e.TargetRenderId, out Doodad doodad))
+            {
+                if (doodad is Chest chest)
+                {
                     chest.TryOpenLoot();
-                    break;
-                case Npc npc:
-                    npc.TryBeginConversation();
-                    break;
+                }
+                return;
+            }
+
+            if (!ObjectManager.TryGetEntityByRenderId(e.TargetRenderId, out Entity entity)) return;
+            if (entity is Npc npc)
+            {
+                npc.TryBeginConversation();
             }
         }
 
@@ -739,7 +776,7 @@ namespace Project_1.Managers.States
             ThreadAffinity.AssertSimThread();
             Player player = ObjectManager.Player;
             if (player == null) return;
-            Friendly target = e.Target ?? player;
+            Friendly target = ResolveFriendlyTarget(e.TargetRenderId, player);
             player.Inventory.SwapEquipment(e.From, e.EquipmentSlot, target);
         }
 
@@ -798,7 +835,7 @@ namespace Project_1.Managers.States
             ThreadAffinity.AssertSimThread();
             Player player = ObjectManager.Player;
             if (player == null) return;
-            Friendly target = e.Target ?? player;
+            Friendly target = ResolveFriendlyTarget(e.TargetRenderId, player);
             player.Inventory.Equip(e.Index, target);
         }
 
@@ -807,7 +844,7 @@ namespace Project_1.Managers.States
             ThreadAffinity.AssertSimThread();
             Player player = ObjectManager.Player;
             if (player == null) return;
-            Friendly target = e.Target ?? player;
+            Friendly target = ResolveFriendlyTarget(e.TargetRenderId, player);
             player.Inventory.ConsumeItem(e.Index, target);
         }
 
@@ -816,7 +853,7 @@ namespace Project_1.Managers.States
             ThreadAffinity.AssertSimThread();
             Player player = ObjectManager.Player;
             if (player == null) return;
-            Friendly target = e.Target ?? player;
+            Friendly target = ResolveFriendlyTarget(e.TargetRenderId, player);
 
             Equipment fromEquip = target.Equipment.EquipedInSlot((GameObjects.Unit.Equipment.Slot)e.FromSlot) as Equipment;
             if (fromEquip == null) return;
@@ -843,7 +880,7 @@ namespace Project_1.Managers.States
             ThreadAffinity.AssertSimThread();
             Player player = ObjectManager.Player;
             if (player == null) return;
-            Friendly target = e.Target ?? player;
+            Friendly target = ResolveFriendlyTarget(e.TargetRenderId, player);
 
             Equipment fromEquip = target.Equipment.EquipedInSlot((GameObjects.Unit.Equipment.Slot)e.EquipmentSlot) as Equipment;
             if (fromEquip == null) return;
@@ -862,6 +899,34 @@ namespace Project_1.Managers.States
 
             player.Inventory.AssignItem(fromEquip, e.InventorySlot);
             target.EquipInParticularSlot(destEquip, (GameObjects.Unit.Equipment.Slot)e.EquipmentSlot);
+        }
+
+        static Friendly ResolveFriendlyTarget(int? targetRenderId, Player fallback)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (!targetRenderId.HasValue) return fallback;
+            if (ObjectManager.TryGetFriendlyByRenderId(targetRenderId.Value, out Friendly target))
+            {
+                return target;
+            }
+            return fallback;
+        }
+
+        static bool TryResolveEntityByRenderId(int renderId, out Entity entity)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (ObjectManager.TryGetEntityByRenderId(renderId, out entity))
+            {
+                return true;
+            }
+
+            if (SpawnerManager.TryGetSpawnByRenderId(renderId, out entity))
+            {
+                return true;
+            }
+
+            entity = null;
+            return false;
         }
 
         static void HandleUiStateChanged(StateChanged e)

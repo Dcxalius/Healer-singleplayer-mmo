@@ -15,7 +15,7 @@ namespace Project_1.Tiles
 {
     internal class Tile
     {
-        readonly static Point tileSize = TileManager.TileSize;
+        public static readonly Point Size = new Point(32, 32);
         [JsonProperty("id")]
         public int ID => tileData.ID;
         
@@ -25,9 +25,9 @@ namespace Project_1.Tiles
         public WorldSpace Position { get => position; protected set => position = value; }
         WorldSpace position;
         [JsonIgnore]
-        public WorldSpace Centre { get => position + new WorldSpace(tileSize.ToVector2()) / 2; }
+        public WorldSpace Centre { get => position + new WorldSpace(Size.ToVector2()) / 2; }
         [JsonIgnore]
-        public virtual Rectangle WorldRectangle { get => new Rectangle(position.ToPoint(), tileSize); }
+        public virtual Rectangle WorldRectangle { get => new Rectangle(position.ToPoint(), Size); }
 
         [JsonIgnore]
         public bool Walkable => tileData.Walkable;
@@ -39,7 +39,7 @@ namespace Project_1.Tiles
         {
             get
             {
-                //DebugManager.debugShapes.Add(new DebugTools.DebugSquare(new Rectangle(Position.ToPoint(), tileSize)));
+                //DebugManager.debugShapes.Add(new DebugTools.DebugSquare(new Rectangle(Position.ToPoint(), Size)));
                 return tileData.Transparent;
             }
         }
@@ -69,7 +69,7 @@ namespace Project_1.Tiles
 
         public Tile(TileData aTileData, Point aPos, Point aTilePos)
         {
-            gfx = new Textures.RandomlyGeneratedTexture(true, tileSize, new GfxPath(GfxType.Tile, aTileData.Name));
+            gfx = new Textures.RandomlyGeneratedTexture(true, Size, new GfxPath(GfxType.Tile, aTileData.Name));
             debugTexture = new UITexture(new GfxPath(GfxType.Debug, "Debug"), Color.White);
             tileData = aTileData;
             tilePos = aTilePos;
@@ -83,7 +83,7 @@ namespace Project_1.Tiles
 
         public void AddDebugSquare()
         {
-            DebugManager.AddDebugShape(new DebugTools.DebugSquare(new Rectangle(Position.ToPoint(), tileSize)));
+            DebugManager.AddDebugShape(new DebugTools.DebugSquare(new Rectangle(Position.ToPoint(), Size)));
         }
 
         public void Draw(SpriteBatch aBatch)
@@ -98,6 +98,12 @@ namespace Project_1.Tiles
                 yText.TopLeftDraw(aBatch, new WorldSpace(Position + new WorldSpace(xText.Offset.X, 0)).ToAbsoltueScreenPosition());
             }
             //Camera.Camera.WorldPosToCameraSpace(Position), 0); 
+        }
+
+        internal Textures.Texture.TextureRenderSnapshot BuildRenderSnapshot()
+        {
+            ThreadAffinity.AssertSimThread();
+            return gfx.BuildRenderSnapshot();
         }
     }
 }

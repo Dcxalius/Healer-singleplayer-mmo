@@ -75,6 +75,20 @@ namespace Project_1.GameObjects.Entities.Corspes
             lootGlowMovement = new ParticleMovement(new WorldSpace(0, -1), WorldSpace.Zero, 0.95f);
         }
 
+        internal WorldObjectRenderSnapshot BuildRenderSnapshot()
+        {
+            ThreadAffinity.AssertSimThread();
+            return new WorldObjectRenderSnapshot(
+                RenderId,
+                Position,
+                FeetPosition.Y,
+                Size,
+                gfx.BuildRenderSnapshot(),
+                BuildEffectSnapshot(),
+                false,
+                Color.Black);
+        }
+
         public Corpse(GfxPath aPath, LootTable aLoot, WorldSpace aPos) : this(aPath, aPos)
         {
             if (aLoot != null)

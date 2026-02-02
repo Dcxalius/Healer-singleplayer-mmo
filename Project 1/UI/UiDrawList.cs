@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework.Graphics;
+using Project_1.Managers;
 using Project_1.UI.HUD;
 using Project_1.UI.HUD.Inventory;
 using Project_1.UI.HUD.SpellBook;
@@ -8,6 +9,25 @@ using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.UI
 {
+    internal sealed class UiElementDrawList
+    {
+        readonly UIElement[] elements;
+
+        public UiElementDrawList(UIElement[] elements)
+        {
+            this.elements = elements;
+        }
+
+        public void Draw(SpriteBatch batch)
+        {
+            ThreadAffinity.AssertMainThread();
+            for (int i = 0; i < elements.Length; i++)
+            {
+                elements[i].Draw(batch);
+            }
+        }
+    }
+
     internal sealed class UiDrawList
     {
         readonly UIElement[] hudElements;
@@ -27,6 +47,7 @@ namespace Project_1.UI
 
         public void Draw(SpriteBatch batch)
         {
+            ThreadAffinity.AssertMainThread();
             for (int i = 0; i < hudElements.Length; i++)
             {
                 hudElements[i].Draw(batch);
@@ -56,6 +77,7 @@ namespace Project_1.UI
 
         public void Draw(SpriteBatch batch)
         {
+            ThreadAffinity.AssertMainThread();
             for (int i = 0; i < namePlates.Length; i++)
             {
                 namePlates[i].Draw(batch);
@@ -65,6 +87,43 @@ namespace Project_1.UI
             {
                 plateBoxes[i].Draw(batch);
             }
+        }
+    }
+
+    internal sealed class HudMoveDrawList
+    {
+        readonly UIElement[] plateBoxes;
+        readonly UIElement[] hudElements;
+        readonly DialogueBox[] dialogueBoxes;
+        readonly SizeChanger sizeChanger;
+
+        public HudMoveDrawList(UIElement[] plateBoxes, UIElement[] hudElements, DialogueBox[] dialogueBoxes, SizeChanger sizeChanger)
+        {
+            this.plateBoxes = plateBoxes;
+            this.hudElements = hudElements;
+            this.dialogueBoxes = dialogueBoxes;
+            this.sizeChanger = sizeChanger;
+        }
+
+        public void Draw(SpriteBatch batch)
+        {
+            ThreadAffinity.AssertMainThread();
+            for (int i = 0; i < plateBoxes.Length; i++)
+            {
+                plateBoxes[i].HudMovableDraw(batch);
+            }
+
+            for (int i = 0; i < hudElements.Length; i++)
+            {
+                hudElements[i].HudMovableDraw(batch);
+            }
+
+            for (int i = 0; i < dialogueBoxes.Length; i++)
+            {
+                dialogueBoxes[i].HudMovableDraw(batch);
+            }
+
+            sizeChanger.Draw(batch);
         }
     }
 }

@@ -98,5 +98,13 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
 
         public bool HasSpell(Spell aSpell) => knownSpells.Contains(aSpell);
+
+        public bool TryGetSpell(string spellName, out Spell spell)
+        {
+            spell = null;
+            if (string.IsNullOrWhiteSpace(spellName)) return false;
+            spell = knownSpells.Find(x => x.Name == spellName);
+            return spell != null;
+        }
     }
 }

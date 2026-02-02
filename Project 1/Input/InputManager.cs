@@ -277,10 +277,23 @@ namespace Project_1.Input
             {
                 CreateClickEvent(InputManager.ClickType.Left);
             }
+            else if (GetMouseRelease(oldMouseState.LeftButton, newMouseState.LeftButton))
+            {
+                CreateReleaseEvent(null, InputManager.ClickType.Left);
+            }
 
             if (GetMousePress(oldMouseState.RightButton, newMouseState.RightButton))
             {
                 CreateClickEvent(InputManager.ClickType.Right);
+            }
+            else if (GetMouseRelease(oldMouseState.RightButton, newMouseState.RightButton))
+            {
+                CreateReleaseEvent(null, InputManager.ClickType.Right);
+            }
+
+            if (GetMouseRelease(oldMouseState.MiddleButton, newMouseState.MiddleButton))
+            {
+                CreateReleaseEvent(null, InputManager.ClickType.Middle);
             }
         }
 
@@ -396,6 +409,15 @@ namespace Project_1.Input
         {
 
             if (aOldMouseButton != ButtonState.Pressed && aNewMouseButton == ButtonState.Pressed)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public static bool GetMouseRelease(ButtonState aOldMouseButton, ButtonState aNewMouseButton)
+        {
+            if (aOldMouseButton == ButtonState.Pressed && aNewMouseButton != ButtonState.Pressed)
             {
                 return true;
             }

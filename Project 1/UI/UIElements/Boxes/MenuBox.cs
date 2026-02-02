@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.UIElements.Boxes
 {
-    internal class MenuBox : Box
+    internal class MenuBox : Box //TODO: Move this
     {
         
 

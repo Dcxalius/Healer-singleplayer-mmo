@@ -42,7 +42,7 @@ namespace Project_1.UI.LoadingMenu
 
         void LoadSave()
         {
-            Mailboxes.Main.Publish(new LoadSaveRequested(save));
+            Mailboxes.Main.Publish(new LoadSaveRequested(save?.Name));
         }
 
         public void SetSave(Save aSave)

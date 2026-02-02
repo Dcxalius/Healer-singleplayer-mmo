@@ -102,6 +102,11 @@ namespace Project_1
                     HUDManager.BuildDrawLists();
                 }
             }
+            if (StateManager.CurrentState != StateManager.States.Game)
+            {
+                ParticleManager.Update();
+                FloatingTextManager.Update();
+            }
             SaveManager.ProcessPendingScreenshots();
 
             base.Update(gameTime);

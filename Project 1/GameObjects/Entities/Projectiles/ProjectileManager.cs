@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Concurrent;
+using Project_1.GameObjects;
 using Project_1.Managers;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,9 @@ namespace Project_1.GameObjects.Entities.Projectiles
     {
         static List<Projectile> projectiles;
         static readonly ConcurrentQueue<Projectile> pendingAdds = new ConcurrentQueue<Projectile>();
-        static volatile Projectile[] renderProjectiles = Array.Empty<Projectile>();
+        static readonly RenderCache<WorldObjectRenderSnapshot> renderProjectiles = new RenderCache<WorldObjectRenderSnapshot>();
+        static readonly HashSet<int> knownProjectileIds = new HashSet<int>();
+        static readonly HashSet<int> currentProjectileIds = new HashSet<int>();
         static bool initialized;
 
         public static void Init()
@@ -55,17 +58,40 @@ namespace Project_1.GameObjects.Entities.Projectiles
         public static void Draw(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();
-            Projectile[] snapshot = renderProjectiles;
-            for (int i = 0; i < snapshot.Length; i++)
+            renderProjectiles.ApplyUpdates();
+            foreach (WorldObjectRenderSnapshot snapshot in renderProjectiles.Values)
             {
-                snapshot[i].Draw(aBatch);
+                snapshot.Draw(aBatch);
             }
         }
 
         internal static void BuildRenderSnapshot()
         {
             ThreadAffinity.AssertSimThread();
-            renderProjectiles = projectiles.ToArray();
+            currentProjectileIds.Clear();
+            for (int i = 0; i < projectiles.Count; i++)
+            {
+                WorldObjectRenderSnapshot snapshot = projectiles[i].BuildRenderSnapshot();
+                renderProjectiles.EnqueueUpdate(snapshot);
+                currentProjectileIds.Add(snapshot.RenderId);
+            }
+            PublishRemovals();
+        }
+
+        static void PublishRemovals()
+        {
+            foreach (int id in knownProjectileIds)
+            {
+                if (!currentProjectileIds.Contains(id))
+                {
+                    renderProjectiles.EnqueueRemove(id);
+                }
+            }
+            knownProjectileIds.Clear();
+            foreach (int id in currentProjectileIds)
+            {
+                knownProjectileIds.Add(id);
+            }
         }
     }
 }

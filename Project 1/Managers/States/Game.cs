@@ -21,6 +21,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using Project_1.Input;
+using Project_1.Camera;
 
 namespace Project_1.Managers.States
 {
@@ -90,16 +91,30 @@ namespace Project_1.Managers.States
             EffectParameterCollection epc = e.Parameters;
             epc["minLength"].SetValue(500f);
             epc["maxBrightness"].SetValue(200f);
-            epc["cameraWorldPos"].SetValue(new Vector2(Camera.Camera.WorldRectangle.Location.X, Camera.Camera.WorldRectangle.Location.Y));
+            Vector2 cameraTopLeft = Camera.Camera.CentreInWorldSpace.ToVector2()
+                - Camera.Camera.CentrePointInScreenSpace.ToVector2() / Camera.Camera.Scale;
+            epc["cameraWorldPos"].SetValue(cameraTopLeft);
+            EffectParameter mapOriginParam = epc["transparentMapOriginTile"];
+            if (mapOriginParam != null)
+            {
+                mapOriginParam.SetValue(TileRenderCache.GetTransparencyOriginTile());
+            }
+            EffectParameter cameraScaleParam = epc["cameraScale"];
+            if (cameraScaleParam != null)
+            {
+                cameraScaleParam.SetValue(Camera.Camera.Scale);
+            }
             EffectParameter cameraSizeParam = epc["cameraSize"];
             if (cameraSizeParam != null)
             {
                 cameraSizeParam.SetValue(new Vector2(Camera.Camera.WorldRectangle.Size.X, Camera.Camera.WorldRectangle.Size.Y));
             }
+            ObjectManager.PartyLightSnapshot lightSnapshot = ObjectManager.RenderLightSnapshot;
+            WorldSpace[] partyPositions = lightSnapshot.Positions;
             Vector2[] v = new Vector2[5];
             for (int i = 0; i < v.Length; i++)
             {
-                v[i] = ObjectManager.Player.Party.GetPositions[i];
+                v[i] = i < partyPositions.Length ? partyPositions[i] : Vector2.Zero;
             }
             //epc["tileTransparent"].SetValue(TileManager.GetTransparent(ObjectManager.Player.FeetPosition));
             epc["lightPos"].SetValue(v);

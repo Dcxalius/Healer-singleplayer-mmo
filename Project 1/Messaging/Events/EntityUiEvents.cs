@@ -5,9 +5,54 @@ using Project_1.GameObjects.Spells;
 using System.Collections.Generic;
 using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.GameObjects.Entities.Friendlies.Npcs;
+using Microsoft.Xna.Framework;
 
 namespace Project_1.Messaging.Events
 {
+    internal readonly struct EntityUiSnapshot
+    {
+        public EntityUiSnapshot(
+            int renderId,
+            string name,
+            Relation.RelationToPlayer relationToPlayer,
+            Color relationColor,
+            int level,
+            double currentHealth,
+            double maxHealth,
+            float currentResource,
+            float maxResource,
+            Color resourceColor,
+            WorldSpace feetPosition,
+            int worldHeight)
+        {
+            RenderId = renderId;
+            Name = name;
+            RelationToPlayer = relationToPlayer;
+            RelationColor = relationColor;
+            Level = level;
+            CurrentHealth = currentHealth;
+            MaxHealth = maxHealth;
+            CurrentResource = currentResource;
+            MaxResource = maxResource;
+            ResourceColor = resourceColor;
+            FeetPosition = feetPosition;
+            WorldHeight = worldHeight;
+        }
+
+        public int RenderId { get; }
+        public string Name { get; }
+        public Relation.RelationToPlayer RelationToPlayer { get; }
+        public Color RelationColor { get; }
+        public int Level { get; }
+        public double CurrentHealth { get; }
+        public double MaxHealth { get; }
+        public float CurrentResource { get; }
+        public float MaxResource { get; }
+        public Color ResourceColor { get; }
+        public WorldSpace FeetPosition { get; }
+        public int WorldHeight { get; }
+    }
+
     internal readonly struct EquipmentSlotChanged
     {
         public EquipmentSlotChanged(Friendly friendly, Equipment.Slot slot, GameObjects.Unit.Equipment equipment)
@@ -54,50 +99,54 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct TargetChanged
     {
-        public TargetChanged(Entity owner, Entity target)
+        public TargetChanged(Relation.RelationToPlayer ownerRelation, EntityUiSnapshot? targetSnapshot)
         {
-            Owner = owner;
-            Target = target;
+            OwnerRelation = ownerRelation;
+            TargetSnapshot = targetSnapshot;
         }
-        public Entity Owner { get; }
-        public Entity Target { get; }
+
+        public Relation.RelationToPlayer OwnerRelation { get; }
+        public EntityUiSnapshot? TargetSnapshot { get; }
     }
 
     internal readonly struct TargetRequested
     {
-        public TargetRequested(Entity target)
+        public TargetRequested(int? targetRenderId)
         {
-            Target = target;
+            TargetRenderId = targetRenderId;
         }
 
-        public Entity Target { get; }
+        public int? TargetRenderId { get; }
     }
 
     internal readonly struct PlateRefreshRequested
     {
-        public PlateRefreshRequested(Entity entity)
+        public PlateRefreshRequested(EntityUiSnapshot snapshot)
         {
-            Entity = entity;
+            Snapshot = snapshot;
         }
-        public Entity Entity { get; }
+
+        public EntityUiSnapshot Snapshot { get; }
     }
 
     internal readonly struct NamePlateAdded
     {
-        public NamePlateAdded(Entity entity)
+        public NamePlateAdded(EntityUiSnapshot snapshot)
         {
-            Entity = entity;
+            Snapshot = snapshot;
         }
-        public Entity Entity { get; }
+
+        public EntityUiSnapshot Snapshot { get; }
     }
 
     internal readonly struct NamePlateRemoved
     {
-        public NamePlateRemoved(Entity entity)
+        public NamePlateRemoved(int renderId)
         {
-            Entity = entity;
+            RenderId = renderId;
         }
-        public Entity Entity { get; }
+
+        public int RenderId { get; }
     }
 
     internal readonly struct InventoryAssigned

@@ -63,8 +63,10 @@ namespace Project_1.UI.HUD.Managers
         public static Action PlatesInvalidated;
         static volatile UiDrawList uiDrawList;
         static volatile PlateDrawList plateDrawList;
+        static volatile HudMoveDrawList hudMoveDrawList;
         static bool uiDrawListDirty = true;
         static bool plateDrawListDirty = true;
+        static bool hudMoveDrawListDirty = true;
         static bool hudMoving;
         static bool initialized;
 
@@ -151,7 +153,7 @@ namespace Project_1.UI.HUD.Managers
             });
 
             Mailboxes.Ui.Subscribe<InventorySlotChanged>(e => RefreshInventorySlot(e.BagIndex, e.SlotIndex, e.Inventory));
-            Mailboxes.Ui.Subscribe<CastChannelStarted>(e => ChannelSpell(e.Spell));
+            Mailboxes.Ui.Subscribe<CastChannelStarted>(e => ChannelSpell(e.SpellGfxPath, e.DurationMs));
             Mailboxes.Ui.Subscribe<CastChannelProgress>(e => UpdateChannelSpell(e.Progress01));
             Mailboxes.Ui.Subscribe<CastChannelCancelled>(_ => CancelChannel());
             Mailboxes.Ui.Subscribe<CastChannelFinished>(_ => FinishChannel());
@@ -177,25 +179,26 @@ namespace Project_1.UI.HUD.Managers
             });
             Mailboxes.Ui.Subscribe<TargetChanged>(e =>
             {
-                plateBoxHandler.SetNewTarget(e.Owner, e.Target);
+                plateBoxHandler.SetNewTarget(e.OwnerRelation, e.TargetSnapshot);
                 InvalidateUi();
                 InvalidatePlates();
             });
             Mailboxes.Ui.Subscribe<PlateRefreshRequested>(e =>
             {
-                plateBoxHandler.RefreshPlates(e.Entity);
+                plateBoxHandler.RefreshPlates(e.Snapshot);
+                namePlateHandler.RefreshNamePlate(e.Snapshot);
                 InvalidateUi();
                 InvalidatePlates();
             });
             Mailboxes.Ui.Subscribe<NamePlateAdded>(e =>
             {
-                namePlateHandler.AddNamePlate(e.Entity);
+                namePlateHandler.AddNamePlate(e.Snapshot);
                 InvalidateUi();
                 InvalidatePlates();
             });
             Mailboxes.Ui.Subscribe<NamePlateRemoved>(e =>
             {
-                namePlateHandler.RemoveNamePlate(e.Entity);
+                namePlateHandler.RemoveNamePlate(e.RenderId);
                 InvalidateUi();
                 InvalidatePlates();
             });
@@ -630,10 +633,10 @@ namespace Project_1.UI.HUD.Managers
             playerCastBar.Value = aNewVal;
             InvalidateUi();
         }
-        public static void ChannelSpell(Spell aSpell)
+        public static void ChannelSpell(GfxPath spellGfxPath, double castDurationMs)
         {
             AssertUiThreadOrMainFallback();
-            playerCastBar.CastSpell(aSpell);
+            playerCastBar.CastSpell(spellGfxPath, castDurationMs);
             InvalidateUi();
         }
 
@@ -694,12 +697,14 @@ namespace Project_1.UI.HUD.Managers
         {
             AssertUiThreadOrMainFallback();
             uiDrawListDirty = true;
+            hudMoveDrawListDirty = true;
             UiInvalidated?.Invoke();
         }
         public static void InvalidatePlates()
         {
             AssertUiThreadOrMainFallback();
             plateDrawListDirty = true;
+            hudMoveDrawListDirty = true;
             PlatesInvalidated?.Invoke();
         }
 
@@ -719,6 +724,14 @@ namespace Project_1.UI.HUD.Managers
                 return plateDrawList;
             }
         }
+        internal static HudMoveDrawList HudMoveDrawListSnapshot
+        {
+            get
+            {
+                ThreadAffinity.AssertMainThread();
+                return hudMoveDrawList;
+            }
+        }
 
         internal static void BuildDrawLists()
         {
@@ -733,6 +746,12 @@ namespace Project_1.UI.HUD.Managers
             {
                 plateDrawList = new PlateDrawList(namePlateHandler.GetDrawList(), plateBoxHandler.GetDrawList());
                 plateDrawListDirty = false;
+            }
+
+            if (hudMoveDrawListDirty)
+            {
+                hudMoveDrawList = new HudMoveDrawList(plateBoxHandler.GetDrawList(), hudElements.ToArray(), dialogueBoxes.ToArray(), sizeChanger);
+                hudMoveDrawListDirty = false;
             }
         }
 

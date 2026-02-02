@@ -7,6 +7,7 @@ using Project_1.UI.HUD.Managers;
 using Project_1.UI.OptionMenu;
 using Project_1.UI.PauseMenu;
 using Project_1.UI.UIElements.Boxes;
+using Project_1.UI.UIElements;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,12 +23,15 @@ namespace Project_1.Managers.States
         PauseBox pauseBox;
         Textures.Texture pauseBackground;
         List<DialogueBox> dialogueBoxes;
+        volatile UiElementDrawList drawList;
+        volatile bool drawListDirty = true;
 
         public PauseMenu() : base()
         {
             dialogueBoxes = new List<DialogueBox>();
             pauseBox = new PauseBox();
             pauseBackground = new Textures.Texture(new GfxPath(GfxType.UI, "PauseBackground"));
+            BuildDrawList();
         }
 
         public override void Update()
@@ -43,9 +47,19 @@ namespace Project_1.Managers.States
 
         }
 
-        public override void PopUp(DialogueBox aBox) => dialogueBoxes.Add(aBox);
+        public override void PopUp(DialogueBox aBox)
+        {
+            dialogueBoxes.Add(aBox);
+            drawListDirty = true;
+            MarkUiDirty();
+        }
 
-        public override void RemovePopUp(DialogueBox aBox) => Debug.Assert(dialogueBoxes.Remove(aBox));
+        public override void RemovePopUp(DialogueBox aBox)
+        {
+            Debug.Assert(dialogueBoxes.Remove(aBox));
+            drawListDirty = true;
+            MarkUiDirty();
+        }
 
         public override bool Release(ReleaseEvent aReleaseEvent) => false;
 
@@ -53,7 +67,7 @@ namespace Project_1.Managers.States
 
         public override void OnEnter()
         {
-            
+            MarkUiDirty();
         }
 
         public override void OnLeave()
@@ -63,18 +77,13 @@ namespace Project_1.Managers.States
 
         public override RenderTarget2D Draw()
         {
+            if (!renderDirty || drawList == null) return renderTarget;
+            renderDirty = false;
             PrepRender(Color.Purple);
 
             spriteBatch.Draw(StateManager.FinalGameFrame, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f); //draw game
             pauseBackground.Draw(spriteBatch, Vector2.Zero); //draw gray screen overlay
-            lock (HUDManager.UiLock)
-            {
-                pauseBox.Draw(spriteBatch); //draw pause menu
-                for (int i = 0; i < dialogueBoxes.Count; i++)
-                {
-                    dialogueBoxes[i].Draw(spriteBatch);
-                }
-            }
+            drawList?.Draw(spriteBatch);
 
             CleanRender();
             return renderTarget;
@@ -128,6 +137,11 @@ namespace Project_1.Managers.States
             {
                 dialogueBoxes[i].Update();
             }
+            if (drawListDirty)
+            {
+                drawListDirty = false;
+                BuildDrawList();
+            }
         }
 
         internal void HandleEscapePressed()
@@ -136,6 +150,18 @@ namespace Project_1.Managers.States
             {
                 StateManager.RequestStateChange(StateManager.States.Game);
             }
+        }
+
+        void BuildDrawList()
+        {
+            UIElement[] elements = new UIElement[dialogueBoxes.Count + 1];
+            elements[0] = pauseBox;
+            for (int i = 0; i < dialogueBoxes.Count; i++)
+            {
+                elements[i + 1] = dialogueBoxes[i];
+            }
+            drawList = new UiElementDrawList(elements);
+            MarkUiDirty();
         }
 
     }

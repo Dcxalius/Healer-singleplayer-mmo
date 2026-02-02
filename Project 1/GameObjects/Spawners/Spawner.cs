@@ -94,6 +94,22 @@ namespace Project_1.GameObjects.Spawners
             return spawn.SavedMobData;
         }
 
+        public SpawnerTimerSaveData GetTimerData()
+        {
+            return new SpawnerTimerSaveData
+            {
+                NextSpawnTime = nextSpawnTime,
+                TimeSinceLastDeath = timeSinceLastDeath
+            };
+        }
+
+        public void ApplyTimerData(SpawnerTimerSaveData data)
+        {
+            if (data == null) return;
+            nextSpawnTime = data.NextSpawnTime;
+            timeSinceLastDeath = data.TimeSinceLastDeath;
+        }
+
         void Spawn()
         {
             if (timeSinceLastDeath + nextSpawnTime > TimeManager.TotalFrameTime) return;
@@ -133,6 +149,18 @@ namespace Project_1.GameObjects.Spawners
             return true;
         }
 
+        internal bool TryGetSpawnByRenderId(int renderId, out Entity entity)
+        {
+            if (spawn != null && spawn.RenderId == renderId)
+            {
+                entity = spawn;
+                return true;
+            }
+
+            entity = null;
+            return false;
+        }
+
         internal void RefreshPlates()
         {
             if (spawn == null) return;
@@ -158,6 +186,13 @@ namespace Project_1.GameObjects.Spawners
             if (spawn == null) return;
 
             spawn.Draw(aBatch);
+        }
+
+        internal SpawnerRenderSnapshot BuildRenderSnapshot()
+        {
+            ThreadAffinity.AssertSimThread();
+            if (spawn == null) return SpawnerRenderSnapshot.Empty;
+            return new SpawnerRenderSnapshot(spawn.BuildRenderSnapshot(), true);
         }
     }
 }

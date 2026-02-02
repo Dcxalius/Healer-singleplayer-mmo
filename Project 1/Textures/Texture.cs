@@ -19,6 +19,28 @@ namespace Project_1.Textures
     {
         protected Texture2D gfx;
         protected GfxPath gfxPath;
+
+        internal readonly struct TextureRenderSnapshot
+        {
+            public TextureRenderSnapshot(GfxPath path, Rectangle? visible, Color color, float rotation, Vector2 offset, SpriteEffects flip, Point size)
+            {
+                Path = path;
+                Visible = visible;
+                Color = color;
+                Rotation = rotation;
+                Offset = offset;
+                Flip = flip;
+                Size = size;
+            }
+
+            public GfxPath Path { get; }
+            public Rectangle? Visible { get; }
+            public Color Color { get; }
+            public float Rotation { get; }
+            public Vector2 Offset { get; }
+            public SpriteEffects Flip { get; }
+            public Point Size { get; }
+        }
         
         //TODO: public WorldSpace Size { get => size; }
         //public Point ScaledSize { get => (size.ToVector2() * Camera.Camera.Scale).ToPoint(); }
@@ -38,22 +60,7 @@ namespace Project_1.Textures
 
         public static Color AvgColor(GfxPath aPath) //TODO: Move this?
         {
-            ThreadAffinity.AssertMainThread();
-            Texture2D gfx = TextureManager.GetTexture(aPath);
-            
-            Point bounds = gfx.Bounds.Size;
-            Color[] c = new Color[bounds.X * bounds.Y];
-            gfx.GetData(c);
-            Color c2 = c[0];
-            for (int i = 1; i < c.Length; i++)
-            {
-                c2.R = (byte)((c2.R + c[i].R) / 2);
-                c2.G = (byte)((c2.G + c[i].G) / 2);
-                c2.B = (byte)((c2.B + c[i].B) / 2);
-            }
-            c2.A = 255;
-            return c2;
-            
+            return TextureManager.GetAvgColor(aPath);
         }
 
         protected Vector2 offset;
@@ -176,6 +183,27 @@ namespace Project_1.Textures
             {
                 size = gfx.Bounds.Size;
             }
+        }
+
+        internal TextureRenderSnapshot BuildRenderSnapshot()
+        {
+            ThreadAffinity.AssertSimThread();
+            return new TextureRenderSnapshot(gfxPath, visible, color, rotation, offset, flip, size);
+        }
+
+        internal static void DrawSnapshot(SpriteBatch aBatch, in TextureRenderSnapshot snapshot, WorldSpace worldPos, float feetPosY)
+        {
+            ThreadAffinity.AssertMainThread();
+            if (snapshot.Path == null || snapshot.Path.Name == null) return;
+
+            Texture2D texture = TextureManager.GetTexture(snapshot.Path);
+            Point size = snapshot.Size == Point.Zero ? texture.Bounds.Size : snapshot.Size;
+            Point scaledSize = new Point((int)Math.Ceiling(size.X * Camera.Camera.Scale), (int)Math.Ceiling(size.Y * Camera.Camera.Scale));
+            Rectangle dest = new Rectangle(worldPos.ToAbsoltueScreenPosition(), scaledSize);
+            if (!Camera.Camera.ScreenspaceBoundsCheck(dest)) return;
+
+            float depth = (feetPosY - Camera.Camera.WorldRectangle.Top) / (Camera.Camera.WorldRectangle.Bottom - Camera.Camera.WorldRectangle.Top);
+            aBatch.Draw(texture, dest, snapshot.Visible, snapshot.Color, snapshot.Rotation, snapshot.Offset, snapshot.Flip, depth);
         }
     }
 }

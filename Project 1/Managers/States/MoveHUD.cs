@@ -7,6 +7,7 @@ using Project_1.UI;
 using Project_1.UI.HUD;
 using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements.Boxes;
+using Project_1.UI.UIElements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,7 @@ namespace Project_1.Managers.States
         MoveHUDBox MoveHUDBox;
         RenderTarget2D cleanGame;
         bool needsCleanGame;
+        volatile UiElementDrawList moveHudDrawList;
 
 
         public MoveHUD() : base()
@@ -70,6 +72,8 @@ namespace Project_1.Managers.States
 
         public override RenderTarget2D Draw()
         {
+            if (!renderDirty && !needsCleanGame) return renderTarget;
+            renderDirty = false;
             PrepRender(Color.White, SpriteSortMode.Immediate);
             if (cleanGame == null || needsCleanGame)
             {
@@ -79,11 +83,8 @@ namespace Project_1.Managers.States
 
             spriteBatch.Draw(cleanGame, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f); //draw game
             pauseBackground.Draw(spriteBatch, Vector2.Zero); //draw gray screen overlay
-            lock (HUDManager.UiLock)
-            {
-                HUDManager.HudMoveableDraw(spriteBatch);
-                MoveHUDBox.Draw(spriteBatch);
-            }
+            HUDManager.HudMoveDrawListSnapshot?.Draw(spriteBatch);
+            moveHudDrawList?.Draw(spriteBatch);
 
             CleanRender();
             return renderTarget;
@@ -97,6 +98,8 @@ namespace Project_1.Managers.States
         {
             MoveHUDBox.Update();
             HUDManager.HudMovableUpdate();
+            moveHudDrawList = new UiElementDrawList(new UIElement[] { MoveHUDBox });
+            MarkUiDirty();
         }
 
         internal void UiOnEnter()
@@ -107,6 +110,8 @@ namespace Project_1.Managers.States
                 HUDManager.SetHudMoveable(true);
                 HUDManager.InvalidateUi();
             }
+            moveHudDrawList = new UiElementDrawList(new UIElement[] { MoveHUDBox });
+            MarkUiDirty();
         }
 
         internal void UiOnLeave()
@@ -117,6 +122,8 @@ namespace Project_1.Managers.States
                 HUDManager.ResetHudMoveable();
                 HUDManager.InvalidateUi();
             }
+            moveHudDrawList = null;
+            MarkUiDirty();
         }
 
     }

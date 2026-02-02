@@ -15,7 +15,14 @@ namespace Project_1.Input
         static readonly HashSet<Keys> previous = new HashSet<Keys>();
         static Keys[] lastDownKeys = Array.Empty<Keys>();
 
-        public static Keys[] DownKeys => lastDownKeys;
+        public static Keys[] DownKeys
+        {
+            get
+            {
+                ThreadAffinity.AssertUiThread();
+                return lastDownKeys;
+            }
+        }
 
         public static void Update(KeyboardSnapshot snapshot)
         {

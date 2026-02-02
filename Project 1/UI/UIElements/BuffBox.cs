@@ -23,7 +23,7 @@ namespace Project_1.UI.UIElements
         FillDirection fillDirection;
         List<Buff> buffs;
 
-        Entity owner;
+        int? ownerRenderId;
 
 
         RelativeScreenPosition StartPosition
@@ -46,17 +46,18 @@ namespace Project_1.UI.UIElements
 
         public BuffBox(Entity aOwner, FillDirection aDir, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(UITexture.Null, aPos, aSize)
         {
-            owner = aOwner;
+            ownerRenderId = aOwner?.RenderId;
             fillDirection = aDir;
             buffs = new List<Buff>();
             AddChildren(buffs);
             capturesClick = false;
         }
-        public bool IsThisMine(Entity aOwner) => aOwner == owner;
+        public bool IsThisMine(Entity aOwner) => aOwner != null && ownerRenderId.HasValue && ownerRenderId.Value == aOwner.RenderId;
+        public bool IsThisMine(int renderId) => ownerRenderId.HasValue && ownerRenderId.Value == renderId;
 
         public void AssignBox(Entity aOwner)
         {
-            owner = aOwner;
+            ownerRenderId = aOwner?.RenderId;
             if (aOwner == null)
             {
                 ClearBuffs();
@@ -65,6 +66,13 @@ namespace Project_1.UI.UIElements
             }
             SetAllBuffs(aOwner.GetAllBuffs());
             Visible = true;
+        }
+
+        public void AssignBox(int? aOwnerRenderId)
+        {
+            ownerRenderId = aOwnerRenderId;
+            ClearBuffs();
+            Visible = aOwnerRenderId.HasValue;
         }
 
         void ClearBuffs()

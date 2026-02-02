@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spawners.Pathing;
@@ -22,6 +21,7 @@ namespace Project_1.GameObjects.Spawners
 
         [JsonProperty]
         int id;
+        public int Id => id;
 
         [JsonProperty("MobNames", Order = 1)]
         string[] MobName
@@ -60,9 +60,15 @@ namespace Project_1.GameObjects.Spawners
             }
             set
             {
-                for (int i = 0; i < unitsToFindMatchFor.Count; i++)
+                if (value == null)
                 {
-                    SavedMobData savedMobData = unitsToFindMatchFor.FirstOrDefault(x => x.SpawnerID == i);
+                    return;
+                }
+
+                List<SavedMobData> units = unitsToFindMatchFor ?? new List<SavedMobData>();
+                for (int i = 0; i < value.Length; i++)
+                {
+                    SavedMobData savedMobData = units.FirstOrDefault(x => x != null && x.SpawnerID == i);
                     if (savedMobData != null)
                     {
                         spawners.Add(new Spawner(id, i, value[i], debugMinSpawnTimer, debugMaxSpawnTimer, mobData, savedMobData));
@@ -70,12 +76,34 @@ namespace Project_1.GameObjects.Spawners
                     }
                     spawners.Add(new Spawner(id, i, value[i], debugMinSpawnTimer, debugMaxSpawnTimer, mobData));
                 }
+
+                ApplySpawnerTimerData();
+            }
+        }
+
+        [JsonProperty("SpawnerTimers", Order = 3)]
+        SpawnerTimerSaveData[] SpawnerTimers
+        {
+            get
+            {
+                SpawnerTimerSaveData[] data = new SpawnerTimerSaveData[spawners.Count];
+                for (int i = 0; i < spawners.Count; i++)
+                {
+                    data[i] = spawners[i].GetTimerData();
+                }
+                return data;
+            }
+            set
+            {
+                pendingSpawnerTimers = value ?? Array.Empty<SpawnerTimerSaveData>();
+                ApplySpawnerTimerData();
             }
         }
 
 
 
         MobData[] mobData;
+        SpawnerTimerSaveData[] pendingSpawnerTimers = Array.Empty<SpawnerTimerSaveData>();
 
         const double debugMinSpawnTimer = 5000; //TODO: Change this
         const double debugMaxSpawnTimer = 10000;
@@ -123,7 +151,7 @@ namespace Project_1.GameObjects.Spawners
 
         public SpawnZone(int aId, SavedMobData[] aUnits)
         {
-            unitsToFindMatchFor = aUnits.ToList();
+            unitsToFindMatchFor = aUnits?.ToList() ?? new List<SavedMobData>();
             id = aId;
             spawners = new List<Spawner>();
         }
@@ -131,8 +159,21 @@ namespace Project_1.GameObjects.Spawners
         internal void ApplySaveData(SpawnZoneSaveData data)
         {
             if (data == null) return;
+            pendingSpawnerTimers = data.SpawnerTimers ?? Array.Empty<SpawnerTimerSaveData>();
             MobName = data.MobNames ?? Array.Empty<string>();
             MobPathings = data.Pathing ?? Array.Empty<MobPathing>();
+        }
+
+        void ApplySpawnerTimerData()
+        {
+            if (pendingSpawnerTimers == null || pendingSpawnerTimers.Length == 0) return;
+            if (spawners == null || spawners.Count == 0) return;
+
+            int count = Math.Min(spawners.Count, pendingSpawnerTimers.Length);
+            for (int i = 0; i < count; i++)
+            {
+                spawners[i].ApplyTimerData(pendingSpawnerTimers[i]);
+            }
         }
 
         //public void AddMobToSpawn(MobData aData) => AddMobsToSpawn(new MobData[] { aData });
@@ -184,6 +225,17 @@ namespace Project_1.GameObjects.Spawners
             return false;
         }
 
+        internal bool TryGetSpawnByRenderId(int renderId, out Entity entity)
+        {
+            for (int i = 0; i < spawners.Count; i++)
+            {
+                if (spawners[i].TryGetSpawnByRenderId(renderId, out entity)) return true;
+            }
+
+            entity = null;
+            return false;
+        }
+
         internal void RefreshPlates()
         {
             for (int i = 0; i < spawners.Count; i++)
@@ -202,19 +254,20 @@ namespace Project_1.GameObjects.Spawners
             return savedMobData.ToArray();
         }
 
-        internal void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
-        {
-            for (int i = 0; i < spawners.Count; i++) spawners[i].MinimapDraw(aBatch, aOrigin, aMinimapOffset, aMinimapSize);
-        }
-
         internal void AppendMinimapDots(List<MinimapDotSnapshot> dots)
         {
             for (int i = 0; i < spawners.Count; i++) spawners[i].AppendMinimapDots(dots);
         }
 
-        internal void Draw(SpriteBatch aBatch)
+        internal SpawnZoneRenderSnapshot BuildRenderSnapshot()
         {
-            for (int i = 0; i < spawners.Count; i++) spawners[i].Draw(aBatch);
+            ThreadAffinity.AssertSimThread();
+            SpawnerRenderSnapshot[] snapshots = new SpawnerRenderSnapshot[spawners.Count];
+            for (int i = 0; i < spawners.Count; i++)
+            {
+                snapshots[i] = spawners[i].BuildRenderSnapshot();
+            }
+            return new SpawnZoneRenderSnapshot(id, snapshots);
         }
 
         

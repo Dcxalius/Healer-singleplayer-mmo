@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,12 @@ namespace Project_1.UI.HUD.PlateBoxes
         {
             Name = aEntity.Name;
             gfx.Color = aEntity.RelationColor;
+        }
+
+        public void Refresh(in EntityUiSnapshot snapshot)
+        {
+            Name = snapshot.Name;
+            gfx.Color = snapshot.RelationColor;
         }
     }
 }

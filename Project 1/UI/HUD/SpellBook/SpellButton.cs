@@ -82,6 +82,7 @@ namespace Project_1.UI.HUD.SpellBook
         {
             base.ReleaseOnMe(aRelease);
 
+            if (aRelease.Creator == null) return;
             if (aRelease.Creator.GetType() != typeof(SpellBookSpell)) return;
 
             AssignSpell((aRelease.Creator as SpellBookSpell).SpellData);
@@ -91,7 +92,7 @@ namespace Project_1.UI.HUD.SpellBook
         {
             if (spellData == null) return;
 
-            Mailboxes.Main.Publish(new SpellCastRequested(spellData));
+            Mailboxes.Main.Publish(new SpellCastRequested(spellData.Name));
 
         }
 

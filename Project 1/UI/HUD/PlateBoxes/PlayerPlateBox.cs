@@ -45,11 +45,26 @@ namespace Project_1.UI.HUD.PlateBoxes
             levelCircle.Refresh(aEntity);
         }
 
+        public void SetData(in EntityUiSnapshot snapshot)
+        {
+            name.Refresh(snapshot);
+            resource.SetTarget(snapshot);
+            health.Refresh(snapshot);
+            levelCircle.Refresh(snapshot);
+        }
+
         public override void Refresh(Entity aEntity)
         {
             health.Refresh(aEntity);
             resource.Refresh(aEntity);
             levelCircle.Refresh(aEntity);
+        }
+
+        public void Refresh(in EntityUiSnapshot snapshot)
+        {
+            health.Refresh(snapshot);
+            resource.Refresh(snapshot);
+            levelCircle.Refresh(snapshot);
         }
 
         public override void ClickedOnAndReleasedOnMe()

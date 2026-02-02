@@ -53,20 +53,20 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct PartyMemberInviteRequested
     {
-        public PartyMemberInviteRequested(GuildMemberEntity member)
+        public PartyMemberInviteRequested(int memberRenderId)
         {
-            Member = member;
+            MemberRenderId = memberRenderId;
         }
-        public GuildMemberEntity Member { get; }
+        public int MemberRenderId { get; }
     }
 
     internal readonly struct PartyMemberKickRequested
     {
-        public PartyMemberKickRequested(GuildMemberEntity member)
+        public PartyMemberKickRequested(int memberRenderId)
         {
-            Member = member;
+            MemberRenderId = memberRenderId;
         }
-        public GuildMemberEntity Member { get; }
+        public int MemberRenderId { get; }
     }
 
     internal readonly struct GuildMembersSet

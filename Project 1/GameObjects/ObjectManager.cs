@@ -23,9 +23,12 @@ using Project_1.GameObjects.Entities.Corspes;
 using Project_1.GameObjects.Entities.Projectiles;
 using Project_1.GameObjects.Unit;
 using Project_1.UI.HUD.Managers;
+using Project_1.Particles;
+using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.Entities.Friendlies.Npcs;
+using Microsoft.Xna.Framework;
 
 namespace Project_1.GameObjects
 {
@@ -34,10 +37,16 @@ namespace Project_1.GameObjects
         public const float DistanceOfCircleAroundPlayer = 700;
         public static Player Player { get => player; }
 
-        static volatile Entity[] renderAll = Array.Empty<Entity>();
-        static volatile Entity[] renderEntities = Array.Empty<Entity>();
-        static volatile Npc[] renderNpcs = Array.Empty<Npc>();
-        static volatile Player renderPlayer;
+        static readonly RenderCache<EntityRenderSnapshot> renderPlayers = new RenderCache<EntityRenderSnapshot>();
+        static readonly RenderCache<EntityRenderSnapshot> renderEntities = new RenderCache<EntityRenderSnapshot>();
+        static readonly RenderCache<EntityRenderSnapshot> renderNpcs = new RenderCache<EntityRenderSnapshot>();
+        static readonly HashSet<int> knownPlayerIds = new HashSet<int>();
+        static readonly HashSet<int> currentPlayerIds = new HashSet<int>();
+        static readonly HashSet<int> knownEntityIds = new HashSet<int>();
+        static readonly HashSet<int> currentEntityIds = new HashSet<int>();
+        static readonly HashSet<int> knownNpcIds = new HashSet<int>();
+        static readonly HashSet<int> currentNpcIds = new HashSet<int>();
+        static volatile PartyLightSnapshot renderLightSnapshot = PartyLightSnapshot.Empty;
 
         static List<Entity> entities;
         static List<GuildMember> guild;
@@ -56,11 +65,106 @@ namespace Project_1.GameObjects
             if (entities == null || entities.Count == 0) return Array.Empty<Entity>();
             return entities.ToArray();
         }
+
+        public static bool TryGetEntityByRenderId(int renderId, out Entity entity)
+        {
+            ThreadAffinity.AssertSimThread();
+            entity = null;
+            if (renderId <= 0) return false;
+
+            if (player != null && player.RenderId == renderId)
+            {
+                entity = player;
+                return true;
+            }
+
+            for (int i = 0; i < entities.Count; i++)
+            {
+                if (entities[i].RenderId != renderId) continue;
+                entity = entities[i];
+                return true;
+            }
+
+            for (int i = 0; i < guild.Count; i++)
+            {
+                if (guild[i].RenderId != renderId) continue;
+                entity = guild[i];
+                return true;
+            }
+
+            for (int i = 0; i < npcs.Count; i++)
+            {
+                if (npcs[i].RenderId != renderId) continue;
+                entity = npcs[i];
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool TryGetGuildMemberByRenderId(int renderId, out GuildMember member)
+        {
+            ThreadAffinity.AssertSimThread();
+            member = null;
+            if (renderId <= 0) return false;
+
+            for (int i = 0; i < guild.Count; i++)
+            {
+                if (guild[i].RenderId != renderId) continue;
+                member = guild[i];
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool TryGetFriendlyByRenderId(int renderId, out Friendly friendly)
+        {
+            ThreadAffinity.AssertSimThread();
+            friendly = null;
+            if (renderId <= 0) return false;
+
+            if (player != null && player.RenderId == renderId)
+            {
+                friendly = player;
+                return true;
+            }
+
+            for (int i = 0; i < guild.Count; i++)
+            {
+                if (guild[i].RenderId != renderId) continue;
+                friendly = guild[i];
+                return true;
+            }
+
+            for (int i = 0; i < npcs.Count; i++)
+            {
+                if (npcs[i].RenderId != renderId) continue;
+                friendly = npcs[i];
+                return true;
+            }
+
+            return false;
+        }
         static GuildMember GetClosestGuildMember() => entities.MinBy(x => x.DistanceTo(player.FeetPosition)) as GuildMember;
         static GuildMember[] GuildMembersInWorld => guild.Where(x => entities.Contains(x)).ToArray();
 
         static Player player = null;
         static bool initialized;
+
+        public sealed class PartyLightSnapshot
+        {
+            public static readonly PartyLightSnapshot Empty = new PartyLightSnapshot(Array.Empty<WorldSpace>(), Point.Zero);
+
+            public PartyLightSnapshot(WorldSpace[] positions, Point originTile)
+            {
+                Positions = positions ?? Array.Empty<WorldSpace>();
+                OriginTile = originTile;
+            }
+
+            public WorldSpace[] Positions { get; }
+            public Point OriginTile { get; }
+        }
 
         static List<Entity> All
         {
@@ -176,6 +280,10 @@ namespace Project_1.GameObjects
             npcs.Clear();
             CorpseManager.Reset();
             FloatingTextManager.Reset();
+            ParticleManager.Reset();
+            renderPlayers.RequestClear();
+            renderEntities.RequestClear();
+            renderNpcs.RequestClear();
             if (player != null) player.Delete();
         }
 
@@ -222,7 +330,7 @@ namespace Project_1.GameObjects
             while (tiles.Length == 0)
             {
 
-                tiles = TileManager.GetTilesAroundPosition(Player.FeetPosition, start);
+                tiles = TileQuery.GetTilesAroundPosition(Player.FeetPosition, start);
                 start -= step;
                 Debug.Assert(start > 0);
             }
@@ -264,41 +372,106 @@ namespace Project_1.GameObjects
         public static void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
         {
             ThreadAffinity.AssertMainThread();
-            Entity[] all = renderAll;
-            for (int i = 0; i < all.Length; i++)
+            ApplyRenderUpdates();
+            foreach (EntityRenderSnapshot snapshot in renderPlayers.Values)
             {
-                all[i].MinimapDraw(aBatch, aOrigin, aMinimapOffset, aMinimapSize);
+                snapshot.DrawMinimap(aBatch, aOrigin, aMinimapOffset, aMinimapSize);
+            }
+            foreach (EntityRenderSnapshot snapshot in renderEntities.Values)
+            {
+                snapshot.DrawMinimap(aBatch, aOrigin, aMinimapOffset, aMinimapSize);
+            }
+            foreach (EntityRenderSnapshot snapshot in renderNpcs.Values)
+            {
+                snapshot.DrawMinimap(aBatch, aOrigin, aMinimapOffset, aMinimapSize);
             }
         }
 
         public static void Draw(SpriteBatch aSpriteBatch)
         {
             ThreadAffinity.AssertMainThread();
-            Player p = renderPlayer;
-            if (p != null)
+            ApplyRenderUpdates();
+            foreach (EntityRenderSnapshot snapshot in renderPlayers.Values)
             {
-                p.Draw(aSpriteBatch);
+                snapshot.Draw(aSpriteBatch);
             }
-            Entity[] ents = renderEntities;
-            for (int i = 0; i < ents.Length; i++)
+            foreach (EntityRenderSnapshot snapshot in renderEntities.Values)
             {
-                ents[i].Draw(aSpriteBatch);
+                snapshot.Draw(aSpriteBatch);
             }
-
-            Npc[] snapshotNpcs = renderNpcs;
-            for (int i = 0; i < snapshotNpcs.Length; i++)
+            foreach (EntityRenderSnapshot snapshot in renderNpcs.Values)
             {
-                snapshotNpcs[i].Draw(aSpriteBatch);
+                snapshot.Draw(aSpriteBatch);
             }
         }
+
+        public static PartyLightSnapshot RenderLightSnapshot => renderLightSnapshot;
 
         internal static void BuildRenderSnapshot()
         {
             ThreadAffinity.AssertSimThread();
-            renderPlayer = player;
-            renderEntities = entities.ToArray();
-            renderNpcs = npcs.ToArray();
-            renderAll = entities.Union(guild).Concat(npcs).Append(player).Where(x => x != null).ToArray();
+            PublishPlayerSnapshot();
+            PublishEntitySnapshots(entities, renderEntities, knownEntityIds, currentEntityIds);
+            PublishEntitySnapshots(npcs, renderNpcs, knownNpcIds, currentNpcIds);
+        }
+
+        static void ApplyRenderUpdates()
+        {
+            renderPlayers.ApplyUpdates();
+            renderEntities.ApplyUpdates();
+            renderNpcs.ApplyUpdates();
+        }
+
+        static void PublishPlayerSnapshot()
+        {
+            currentPlayerIds.Clear();
+            if (player != null)
+            {
+                EntityRenderSnapshot snapshot = player.BuildRenderSnapshot();
+                renderPlayers.EnqueueUpdate(snapshot);
+                currentPlayerIds.Add(snapshot.RenderId);
+
+                WorldSpace[] positions = player.Party.GetPositions;
+                Point originTile = positions.Length > 0 ? TileManager.GetGridPos(positions[0]) : Point.Zero;
+                renderLightSnapshot = new PartyLightSnapshot(positions, originTile);
+            }
+            else
+            {
+                renderLightSnapshot = PartyLightSnapshot.Empty;
+            }
+
+            PublishRemovals(renderPlayers, knownPlayerIds, currentPlayerIds);
+        }
+
+        static void PublishEntitySnapshots<T>(IList<T> source, RenderCache<EntityRenderSnapshot> cache, HashSet<int> knownIds, HashSet<int> currentIds) where T : Entity
+        {
+            currentIds.Clear();
+            for (int i = 0; i < source.Count; i++)
+            {
+                Entity entity = source[i];
+                if (entity == null) continue;
+                EntityRenderSnapshot snapshot = entity.BuildRenderSnapshot();
+                cache.EnqueueUpdate(snapshot);
+                currentIds.Add(snapshot.RenderId);
+            }
+
+            PublishRemovals(cache, knownIds, currentIds);
+        }
+
+        static void PublishRemovals(RenderCache<EntityRenderSnapshot> cache, HashSet<int> knownIds, HashSet<int> currentIds)
+        {
+            foreach (int id in knownIds)
+            {
+                if (!currentIds.Contains(id))
+                {
+                    cache.EnqueueRemove(id);
+                }
+            }
+            knownIds.Clear();
+            foreach (int id in currentIds)
+            {
+                knownIds.Add(id);
+            }
         }
 
         static void PublishPlayerUiSnapshot()

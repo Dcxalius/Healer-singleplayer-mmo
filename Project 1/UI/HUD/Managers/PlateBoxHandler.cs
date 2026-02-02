@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Managers;
 using System.Diagnostics;
+using Project_1.Messaging.Events;
 using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 
@@ -30,6 +31,7 @@ namespace Project_1.UI.HUD.Managers
 
         public void Save(ref List<(string, RelativeScreenPosition, RelativeScreenPosition)> saveables)
         {
+            AssertUiOrMainThread();
             for (int i = 0; i < plateBoxes.Count; i++)
             {
                 if (!plateBoxes[i].HudMoveable) continue;
@@ -39,6 +41,7 @@ namespace Project_1.UI.HUD.Managers
 
         public void Update()
         {
+            ThreadAffinity.AssertUiThread();
             for (int i = 0; i < plateBoxes.Count; i++)
             {
                 plateBoxes[i].Update();
@@ -47,6 +50,7 @@ namespace Project_1.UI.HUD.Managers
 
         public void HudMovableUpdate()
         {
+            ThreadAffinity.AssertUiThread();
 
             for (int i = 0; i < plateBoxes.Count; i++)
             {
@@ -56,6 +60,7 @@ namespace Project_1.UI.HUD.Managers
 
         public bool Click(ClickEvent aClickEvent)
         { 
+            ThreadAffinity.AssertUiThread();
             for (int i = plateBoxes.Count - 1; i >= 0; i--)
             {
                 if (plateBoxes[i].ClickedOn(aClickEvent)) return true;
@@ -65,6 +70,7 @@ namespace Project_1.UI.HUD.Managers
 
         public void Rescale()
         {
+            AssertUiOrMainThread();
             for (int i = 0; i < plateBoxes.Count; i++)
             {
                 plateBoxes[i].Rescale();
@@ -73,6 +79,7 @@ namespace Project_1.UI.HUD.Managers
 
         public void SetHudMovable(bool aSet)
         {
+            AssertUiOrMainThread();
 
             for (int i = 0; i < plateBoxes.Count; i++)
             {
@@ -83,6 +90,7 @@ namespace Project_1.UI.HUD.Managers
 
         public void ResetHudMovable()
         {
+            AssertUiOrMainThread();
 
             for (int i = 0; i < plateBoxes.Count; i++)
             {
@@ -92,6 +100,7 @@ namespace Project_1.UI.HUD.Managers
 
         public void InitPlateBoxes(List<(string, RelativeScreenPosition, RelativeScreenPosition)> aLoadedSettings)
         {
+            ThreadAffinity.AssertMainThread();
             plateBoxes = new List<UIElement>();
 
             var loaded = aLoadedSettings.Find(x => x.Item1 == typeof(PlayerPlateBox).Name);
@@ -155,44 +164,43 @@ namespace Project_1.UI.HUD.Managers
             playerBuffBox.AssignBox(aPlayer);
         }
 
-        public void RefreshPlates(Entity aEntity)
+        public void RefreshPlates(in EntityUiSnapshot snapshot)
         {
-            switch (aEntity.RelationToPlayer)
+            switch (snapshot.RelationToPlayer)
             {
                 case Relation.RelationToPlayer.Self:
-                    playerPlateBox.Refresh(aEntity);
-                    if (!targetPlateBox.BelongsTo(aEntity)) break;
-                    targetPlateBox.Refresh(aEntity);
+                    playerPlateBox.Refresh(snapshot);
+                    if (!targetPlateBox.BelongsTo(snapshot.RenderId)) break;
+                    targetPlateBox.Refresh(snapshot);
                     HUDManager.InvalidatePlates();
                     break;
                 case Relation.RelationToPlayer.Friendly:
-                    if (targetPlateBox.BelongsTo(aEntity)) targetPlateBox.Refresh(aEntity);
+                    if (targetPlateBox.BelongsTo(snapshot.RenderId)) targetPlateBox.Refresh(snapshot);
                     for (int i = 0; i < partyPlateBoxes.Length; i++)
                     {
-                        if (partyPlateBoxes[i].BelongsTo(null)) break;
-                        if (!partyPlateBoxes[i].BelongsTo(aEntity as GuildMember)) continue;
-                        partyPlateBoxes[i].Refresh(aEntity);
+                        if (!partyPlateBoxes[i].BelongsTo(snapshot.RenderId)) continue;
+                        partyPlateBoxes[i].Refresh(snapshot);
                         HUDManager.InvalidatePlates();
                         break;
                     }
                     break;
                 case Relation.RelationToPlayer.Neutral:
                 case Relation.RelationToPlayer.Hostile:
-                    if (!targetPlateBox.BelongsTo(aEntity)) break;
-                    targetPlateBox.Refresh(aEntity);
+                    if (!targetPlateBox.BelongsTo(snapshot.RenderId)) break;
+                    targetPlateBox.Refresh(snapshot);
                     HUDManager.InvalidatePlates();
                     break;
                 default:
                     break;
             }
         }
-        public void SetNewTarget(Entity aTargeter, Entity aTarget)
+        public void SetNewTarget(Relation.RelationToPlayer aTargeterRelation, EntityUiSnapshot? aTarget)
         {
-            switch (aTargeter.RelationToPlayer)
+            switch (aTargeterRelation)
             {
                 case Relation.RelationToPlayer.Self:
                     targetPlateBox.SetTarget(aTarget);
-                    targetBuffBox.AssignBox(aTarget);
+                    targetBuffBox.AssignBox(aTarget?.RenderId);
                     HUDManager.InvalidatePlates();
                     break;
                 case Relation.RelationToPlayer.Friendly:
@@ -301,6 +309,7 @@ namespace Project_1.UI.HUD.Managers
 
         public void HudMovableDraw(SpriteBatch aBatch)
         {
+            ThreadAffinity.AssertMainThread();
             for (int i = 0; i < plateBoxes.Count; i++)
             {
                 plateBoxes[i].HudMovableDraw(aBatch);
@@ -309,12 +318,23 @@ namespace Project_1.UI.HUD.Managers
 
         public void Draw(SpriteBatch aBatch)
         {
+            ThreadAffinity.AssertMainThread();
             for (int i = 0; i < plateBoxes.Count; i++)
             {
                 plateBoxes[i].Draw(aBatch);
             }
         }
 
-        public UIElement[] GetDrawList() => plateBoxes.ToArray();
+        public UIElement[] GetDrawList()
+        {
+            AssertUiOrMainThread();
+            return plateBoxes.ToArray();
+        }
+
+        static void AssertUiOrMainThread()
+        {
+            if (ThreadAffinity.IsMainThread) return;
+            ThreadAffinity.AssertUiThread();
+        }
     }
 }

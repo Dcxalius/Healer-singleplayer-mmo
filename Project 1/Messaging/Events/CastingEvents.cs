@@ -1,69 +1,48 @@
-﻿using Project_1.GameObjects.Entities;
-using Project_1.GameObjects.Spells;
+﻿using Project_1.Textures;
 
 namespace Project_1.Messaging.Events
 {
     internal readonly struct CastChannelStarted
     {
-        public CastChannelStarted(Entity caster, Spell spell, double startTime, double duration)
+        public CastChannelStarted(int casterRenderId, string spellName, GfxPath spellGfxPath, double durationMs)
         {
-            Caster = caster;
-            Spell = spell;
-            StartTime = startTime;
-            Duration = duration;
+            CasterRenderId = casterRenderId;
+            SpellName = spellName;
+            SpellGfxPath = spellGfxPath;
+            DurationMs = durationMs;
         }
 
-        public Entity Caster { get; }
-        public Spell Spell { get; }
-        public double StartTime { get; }
-        public double Duration { get; }
+        public int CasterRenderId { get; }
+        public string SpellName { get; }
+        public GfxPath SpellGfxPath { get; }
+        public double DurationMs { get; }
     }
 
     internal readonly struct CastChannelProgress
     {
-        public CastChannelProgress(Entity caster, Spell spell, float progress01)
+        public CastChannelProgress(float progress01)
         {
-            Caster = caster;
-            Spell = spell;
             Progress01 = progress01;
         }
 
-        public Entity Caster { get; }
-        public Spell Spell { get; }
         public float Progress01 { get; }
     }
 
     internal readonly struct CastChannelCancelled
     {
-        public CastChannelCancelled(Entity caster, Spell spell)
-        {
-            Caster = caster;
-            Spell = spell;
-        }
-
-        public Entity Caster { get; }
-        public Spell Spell { get; }
     }
 
     internal readonly struct CastChannelFinished
     {
-        public CastChannelFinished(Entity caster, Spell spell)
-        {
-            Caster = caster;
-            Spell = spell;
-        }
-
-        public Entity Caster { get; }
-        public Spell Spell { get; }
     }
 
     internal readonly struct SpellCastRequested
     {
-        public SpellCastRequested(Spell spell)
+        public SpellCastRequested(string spellName)
         {
-            Spell = spell;
+            SpellName = spellName;
         }
 
-        public Spell Spell { get; }
+        public string SpellName { get; }
     }
 }

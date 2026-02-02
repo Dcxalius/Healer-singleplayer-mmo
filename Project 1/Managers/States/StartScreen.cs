@@ -5,6 +5,7 @@ using Project_1.UI;
 using Project_1.UI.StartMenu;
 using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements.Boxes;
+using Project_1.UI.UIElements;
 using System;
 using Project_1.Camera;
 using System.Collections.Generic;
@@ -18,9 +19,11 @@ namespace Project_1.Managers.States
     {
         public override StateManager.States GetStateEnum => StateManager.States.StartScreen;
         MainMenu mainMenu;
+        volatile UiElementDrawList drawList;
         public StartScreen() : base()
         {
             mainMenu = new MainMenu();
+            BuildDrawList();
 
         }
 
@@ -30,13 +33,18 @@ namespace Project_1.Managers.States
 
         public override void Rescale()
         {
-            //throw new NotImplementedException();
+            lock (HUDManager.UiLock)
+            {
+                mainMenu.Rescale();
+            }
+            base.Rescale();
         }
 
         public override bool Scroll(ScrollEvent aScrollEvent) => false;
 
         public override void OnEnter()
         {
+            MarkUiDirty();
         }
 
         public override void OnLeave()
@@ -52,12 +60,11 @@ namespace Project_1.Managers.States
         }
         public override RenderTarget2D Draw()
         {
+            if (!renderDirty || drawList == null) return renderTarget;
+            renderDirty = false;
             PrepRender(Color.White);
 
-            lock (HUDManager.UiLock)
-            {
-                mainMenu.Draw(spriteBatch);
-            }
+            drawList?.Draw(spriteBatch);
 
             CleanRender();
 
@@ -78,6 +85,15 @@ namespace Project_1.Managers.States
         internal bool UiRelease(ReleaseEvent aReleaseEvent) => mainMenu.ReleasedOn(aReleaseEvent);
         internal bool UiScroll(ScrollEvent aScrollEvent) => mainMenu.ScrolledOn(aScrollEvent);
         internal bool UiEscapePressed() => false;
-        internal void UiUpdate() => mainMenu.Update();
+        internal void UiUpdate()
+        {
+            mainMenu.Update();
+        }
+
+        void BuildDrawList()
+        {
+            drawList = new UiElementDrawList(new UIElement[] { mainMenu });
+            MarkUiDirty();
+        }
     }
 }

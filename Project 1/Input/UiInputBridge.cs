@@ -35,25 +35,38 @@ namespace Project_1.Input
         {
             ThreadAffinity.AssertUiThread();
             UiTextInputManager.Clear();
-            if (StateManager.UiClick(clickEvent)) return;
+            if (StateManager.UiClick(clickEvent))
+            {
+                StateManager.UiInvalidate();
+                return;
+            }
             if (HUDManager.Click(clickEvent)) return;
-            Mailboxes.Main.Publish(new WorldClickRequested(clickEvent));
+            Mailboxes.Main.Publish(WorldClickRequested.FromClickEvent(clickEvent));
         }
 
         static void HandleRelease(ReleaseEvent releaseEvent)
         {
             ThreadAffinity.AssertUiThread();
-            if (StateManager.UiRelease(releaseEvent)) return;
+            // Release can change pressed/held visual state even when no UI target captures it.
+            StateManager.UiInvalidate();
+            if (StateManager.UiRelease(releaseEvent))
+            {
+                return;
+            }
             if (HUDManager.Release(releaseEvent)) return;
-            Mailboxes.Main.Publish(new WorldReleaseRequested(releaseEvent));
+            Mailboxes.Main.Publish(WorldReleaseRequested.FromReleaseEvent(releaseEvent));
         }
 
         static void HandleScroll(ScrollEvent scrollEvent)
         {
             ThreadAffinity.AssertUiThread();
-            if (StateManager.UiScroll(scrollEvent)) return;
+            if (StateManager.UiScroll(scrollEvent))
+            {
+                StateManager.UiInvalidate();
+                return;
+            }
             if (HUDManager.Scroll(scrollEvent)) return;
-            Mailboxes.Main.Publish(new WorldScrollRequested(scrollEvent));
+            Mailboxes.Main.Publish(WorldScrollRequested.FromScrollEvent(scrollEvent));
         }
 
         static void HandleKeyboardSnapshot(KeyboardSnapshot snapshot)
@@ -88,7 +101,11 @@ namespace Project_1.Input
         static void HandleEscapePressed(EscapePressed pressed)
         {
             ThreadAffinity.AssertUiThread();
-            if (StateManager.UiEscapePressed()) return;
+            if (StateManager.UiEscapePressed())
+            {
+                StateManager.UiInvalidate();
+                return;
+            }
             Mailboxes.Main.Publish(pressed);
         }
     }

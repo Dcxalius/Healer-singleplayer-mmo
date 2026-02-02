@@ -32,5 +32,11 @@ namespace Project_1.GameObjects.Entities
         {
             texture.Draw(aBatch, aPos.ToAbsoltueScreenPosition().ToVector2(), aFeetPos);
         }
+
+        internal VisualEffectRenderSnapshot BuildRenderSnapshot()
+        {
+            ThreadAffinity.AssertSimThread();
+            return new VisualEffectRenderSnapshot(texture.BuildRenderSnapshot());
+        }
     }
 }

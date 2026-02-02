@@ -8,6 +8,9 @@ namespace Project_1.GameObjects.Unit
 {
     internal class PairReport 
     {
+        public int Count => pairs.Count;
+        public IReadOnlyList<(string Name, double Value)> Lines => pairs;
+
         public string Value
         {
             get

@@ -21,6 +21,7 @@ namespace Project_1.Textures
         const string FALLBACK_FONT = "Gloryse";
         static Dictionary<string, Texture2D>[] texturesDict;
         static Dictionary<string, Point>[] textureSizes;
+        static Dictionary<string, Color>[] avgColors;
         static Dictionary<string, SpriteFont> fontDict;//TODO: Font is not open source so need to be change at some point
 
         static ContentManager contentManager;
@@ -104,6 +105,7 @@ namespace Project_1.Textures
         {
             texturesDict = new Dictionary<string, Texture2D>[(int)GfxType.Count];
             textureSizes = new Dictionary<string, Point>[(int)GfxType.Count];
+            avgColors = new Dictionary<string, Color>[(int)GfxType.Count];
 
             string root = contentManager.RootDirectory + "\\Graphics\\";
             string debug = "Textures loaded: ";
@@ -115,12 +117,14 @@ namespace Project_1.Textures
                 {
                     texturesDict[i] = new Dictionary<string, Texture2D>();
                     textureSizes[i] = new Dictionary<string, Point>();
+                    avgColors[i] = new Dictionary<string, Color>();
                     continue;
                 }
                 string[] dir = Directory.GetFiles(path);
 
                 texturesDict[i] = new Dictionary<string, Texture2D>();
                 textureSizes[i] = new Dictionary<string, Point>();
+                avgColors[i] = new Dictionary<string, Color>();
 
 
                 for (int j = 0; j < dir.Length; j++)
@@ -131,6 +135,7 @@ namespace Project_1.Textures
                     Texture2D texture = contentManager.Load<Texture2D>(filePath);
                     texturesDict[i].Add(textureName, texture);
                     textureSizes[i].Add(textureName, texture.Bounds.Size);
+                    avgColors[i].Add(textureName, ComputeAvgColor(texture));
                     debug += textureName + ", ";
 
                 }
@@ -148,6 +153,7 @@ namespace Project_1.Textures
                         Texture2D texture = contentManager.Load<Texture2D>(filePath);
                         texturesDict[i].Add(textureName, texture);
                         textureSizes[i].Add(textureName, texture.Bounds.Size);
+                        avgColors[i].Add(textureName, ComputeAvgColor(texture));
                         debug += textureName + ", ";
                     }
                     
@@ -156,6 +162,22 @@ namespace Project_1.Textures
             }
 
             DebugManager.Print(debug);
+        }
+
+        static Color ComputeAvgColor(Texture2D texture)
+        {
+            Point bounds = texture.Bounds.Size;
+            Color[] data = new Color[bounds.X * bounds.Y];
+            texture.GetData(data);
+            Color avg = data[0];
+            for (int i = 1; i < data.Length; i++)
+            {
+                avg.R = (byte)((avg.R + data[i].R) / 2);
+                avg.G = (byte)((avg.G + data[i].G) / 2);
+                avg.B = (byte)((avg.B + data[i].B) / 2);
+            }
+            avg.A = 255;
+            return avg;
         }
 
 
@@ -232,6 +254,30 @@ namespace Project_1.Textures
             }
 
             return Point.Zero;
+        }
+
+        public static Color GetAvgColor(GfxPath aGfxPath)
+        {
+            if (aGfxPath == null || aGfxPath.Name == null) return Color.White;
+            if (avgColors == null) return Color.White;
+
+            int typeIndex = (int)aGfxPath.Type;
+            if (typeIndex >= 0 && typeIndex < avgColors.Length)
+            {
+                var dict = avgColors[typeIndex];
+                if (dict != null && dict.TryGetValue(aGfxPath.Name, out var color))
+                {
+                    return color;
+                }
+            }
+
+            var debugDict = avgColors[(int)GfxType.Debug];
+            if (debugDict != null && debugDict.TryGetValue("MissingTexture", out var fallback))
+            {
+                return fallback;
+            }
+
+            return Color.White;
         }
 
     }

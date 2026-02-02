@@ -1,5 +1,7 @@
 ﻿using Project_1.Camera;
 using Project_1.GameObjects.Entities.GroundEffect;
+using Project_1.Managers;
+using Microsoft.Xna.Framework;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -26,6 +28,20 @@ namespace Project_1.GameObjects.Doodads
         {
             if (FeetPosition.DistanceTo(ObjectManager.Player.FeetPosition) >= maximumClickDistance) return false;
             return HitTest(worldPos);
+        }
+
+        internal WorldObjectRenderSnapshot BuildRenderSnapshot()
+        {
+            ThreadAffinity.AssertSimThread();
+            return new WorldObjectRenderSnapshot(
+                RenderId,
+                Position,
+                FeetPosition.Y,
+                Size,
+                gfx.BuildRenderSnapshot(),
+                BuildEffectSnapshot(),
+                true,
+                Color.Black);
         }
     }
 }

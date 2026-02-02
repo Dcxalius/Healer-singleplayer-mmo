@@ -1,4 +1,5 @@
 # Unified Overhaul Plan — Threaded Simulation + Threaded UI + Main-Thread Rendering (Project 1)
+> Agent reminder: whenever you implement or finish plan work, update `Overhaul Progress.md` in the same pass.
 
 ## 1. Goals (what “done” looks like)
 1. Move all world simulation off the MonoGame main thread (fixed-step tick).
@@ -324,4 +325,3 @@
 5. Required change:
    1. Replace per-frame arrays with cached buffers or pooled arrays.
    2. Prefer “write into caller-provided buffer” APIs for frequent access paths.
-

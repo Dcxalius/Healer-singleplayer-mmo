@@ -13,6 +13,7 @@ namespace Project_1.Managers
 
         public static bool IsMainThread => mainThreadId.HasValue && mainThreadId == Environment.CurrentManagedThreadId;
         public static bool IsSimThread => simThreadId.HasValue && simThreadId == Environment.CurrentManagedThreadId;
+        public static bool IsUiThread => uiThreadId.HasValue && uiThreadId == Environment.CurrentManagedThreadId;
 
         public static void InitMainThread()
         {

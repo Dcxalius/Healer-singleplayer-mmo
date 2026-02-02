@@ -60,6 +60,11 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         }
 
+        public bool BelongsTo(int? aRenderId)
+        {
+            return guildMember != null && aRenderId.HasValue && guildMember.RenderId == aRenderId.Value;
+        }
+
         public void SetTarget(GuildMember aGuildMember)
         {
             if (guildMember == null) partyBoxesActive += 1;
@@ -83,7 +88,7 @@ namespace Project_1.UI.HUD.PlateBoxes
         {
             base.ClickedOnAndReleasedOnMe();
 
-            Mailboxes.Main.Publish(new TargetRequested(guildMember));
+            Mailboxes.Main.Publish(new TargetRequested(guildMember?.RenderId));
         }
 
         protected override bool ClickedOnChildren(ClickEvent aClick)
@@ -101,11 +106,11 @@ namespace Project_1.UI.HUD.PlateBoxes
 
             if (aClick.Modifier(InputManager.HoldModifier.Shift))
             {
-                Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.Add, guildMember));
+                Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.Add, guildMember?.RenderId));
             }
             else if (aClick.Modifier(InputManager.HoldModifier.Ctrl))
             {
-                Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.NeedyAdd, guildMember));
+                Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.NeedyAdd, guildMember?.RenderId));
             }
 
             base.ClickedOnMe(aClick);
@@ -117,6 +122,13 @@ namespace Project_1.UI.HUD.PlateBoxes
             health.Refresh(aEntity);
             resource.Refresh(aEntity);
             levelCircle.Refresh(aEntity);
+        }
+
+        public void Refresh(in EntityUiSnapshot snapshot)
+        {
+            health.Refresh(snapshot);
+            resource.Refresh(snapshot);
+            levelCircle.Refresh(snapshot);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
@@ -17,9 +18,15 @@ namespace Project_1.Tiles
         static volatile Color[] pendingTransparencyData;
         static int pendingTransparencyVersion;
         static int appliedTransparencyVersion;
+        static volatile int pendingTransparencyOriginX;
+        static volatile int pendingTransparencyOriginY;
+        static int appliedTransparencyOriginX;
+        static int appliedTransparencyOriginY;
         static bool initialized;
         const int TransparencySize = 65; // matches HLSL in TestDarkness.fx
         static readonly Dictionary<int, Texture2D> minimapTargets = new Dictionary<int, Texture2D>();
+        static readonly ConcurrentQueue<ChunkMinimapSnapshot> pendingMinimapSnapshots = new ConcurrentQueue<ChunkMinimapSnapshot>();
+        static readonly HashSet<int> publishedMinimapIds = new HashSet<int>();
 
         public static void Init()
         {
@@ -41,7 +48,7 @@ namespace Project_1.Tiles
                 return;
             }
 
-            Tile centre = TileManager.GetTileUnder(origin);
+            Tile centre = TileManager.GetTile(origin);
             if (cachedCentreTile != null && cachedCentreTile == centre)
             {
                 return;
@@ -49,12 +56,17 @@ namespace Project_1.Tiles
 
             cachedCentreTile = centre;
             Color[] data = new Color[TransparencySize * TransparencySize];
+            Point centreGrid = TileManager.GetGridPos(origin);
+            pendingTransparencyOriginX = centreGrid.X;
+            pendingTransparencyOriginY = centreGrid.Y;
             for (int x = 0; x < TransparencySize; x++)
             {
                 for (int y = 0; y < TransparencySize; y++)
                 {
-                    WorldSpace samplePos = origin + new WorldSpace(TileManager.TileSize.X * (x - TransparencySize / 2), TileManager.TileSize.Y * (y - TransparencySize / 2));
-                    if (!TileManager.TryGetTileAt(samplePos, out Tile tile) || tile == null)
+                    int gridX = centreGrid.X + (x - TransparencySize / 2);
+                    int gridY = centreGrid.Y + (y - TransparencySize / 2);
+                    Tile tile = TileManager.GetTileAtGrid(new Point(gridX, gridY));
+                    if (tile == null)
                     {
                         data[y * TransparencySize + x] = new Color(0, 0, 0, 0);
                         continue;
@@ -79,9 +91,16 @@ namespace Project_1.Tiles
                 {
                     transparencyMap.SetData(data);
                     appliedTransparencyVersion = pending;
+                    appliedTransparencyOriginX = pendingTransparencyOriginX;
+                    appliedTransparencyOriginY = pendingTransparencyOriginY;
                 }
             }
             return transparencyMap;
+        }
+
+        public static Vector2 GetTransparencyOriginTile()
+        {
+            return new Vector2(appliedTransparencyOriginX, appliedTransparencyOriginY);
         }
 
         static void PublishBlankTransparency()
@@ -91,21 +110,59 @@ namespace Project_1.Tiles
             System.Threading.Interlocked.Increment(ref pendingTransparencyVersion);
         }
 
-        public static Texture2D GetChunkMinimap(Chunk chunk)
+        public static void PublishChunkMinimapSnapshot(Chunk chunk)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (chunk == null) return;
+            if (!publishedMinimapIds.Add(chunk.Id)) return;
+
+            Color[] colors = new Color[Chunk.ChunkSize.X * Chunk.ChunkSize.Y];
+            chunk.FillMinimapColors(colors);
+            pendingMinimapSnapshots.Enqueue(new ChunkMinimapSnapshot(chunk.Id, colors));
+        }
+
+        public static void FlushMinimapSnapshots()
         {
             ThreadAffinity.AssertMainThread();
+            while (pendingMinimapSnapshots.TryDequeue(out ChunkMinimapSnapshot snapshot))
+            {
+                Texture2D rt = GraphicsManager.CreateRenderTarget(Chunk.ChunkSize);
+                rt.SetData(snapshot.Colors);
+                if (minimapTargets.TryGetValue(snapshot.ChunkId, out var existing))
+                {
+                    existing.Dispose();
+                }
+                minimapTargets[snapshot.ChunkId] = rt;
+            }
+        }
 
-            if (minimapTargets.TryGetValue(chunk.Id, out var cached))
+        public static Texture2D GetChunkMinimap(int chunkId)
+        {
+            ThreadAffinity.AssertMainThread();
+            if (minimapTargets.TryGetValue(chunkId, out var cached))
             {
                 return cached;
             }
+            return null;
+        }
 
-            Texture2D rt = GraphicsManager.CreateRenderTarget(Chunk.ChunkSize);
-            Color[] colors = new Color[Chunk.ChunkSize.X * Chunk.ChunkSize.Y];
-            chunk.FillMinimapColors(colors);
-            rt.SetData(colors);
-            minimapTargets[chunk.Id] = rt;
-            return rt;
+        public static void ResetMinimapSnapshotTracking()
+        {
+            ThreadAffinity.AssertSimThread();
+            publishedMinimapIds.Clear();
+            while (pendingMinimapSnapshots.TryDequeue(out _)) { }
+        }
+
+        readonly struct ChunkMinimapSnapshot
+        {
+            public ChunkMinimapSnapshot(int chunkId, Color[] colors)
+            {
+                ChunkId = chunkId;
+                Colors = colors;
+            }
+
+            public int ChunkId { get; }
+            public Color[] Colors { get; }
         }
     }
 }

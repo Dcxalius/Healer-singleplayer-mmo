@@ -104,6 +104,17 @@ namespace Project_1.Managers
             }
         }
 
+        public static bool TryGetSaveByName(string name, out Save save)
+        {
+            lock (savesLock)
+            {
+                save = null;
+                if (string.IsNullOrWhiteSpace(name)) return false;
+                save = saves.Find(x => x.Name == name.ToUpper());
+                return save != null;
+            }
+        }
+
         public static void CreateNewSave(string aName)
         {
             ThreadAffinity.AssertSimThread();

@@ -73,6 +73,23 @@ namespace Project_1.GameObjects.Entities
 
         public PairReport PrimaryStatReport => unitData.BaseStats.StatReport;
 
+        internal EntityUiSnapshot BuildUiSnapshot()
+        {
+            return new EntityUiSnapshot(
+                RenderId,
+                Name,
+                RelationToPlayer,
+                RelationColor,
+                CurrentLevel,
+                CurrentHealth,
+                MaxHealth,
+                CurrentResource,
+                MaxResource,
+                ResourceColor,
+                FeetPosition,
+                WorldRectangle.Height);
+        }
+
 
         bool namePlateRequiresUpdate;
         ParticleBase bloodsplatter;
@@ -192,14 +209,14 @@ namespace Project_1.GameObjects.Entities
         protected void CreateNamePlate()
         {
             hasNamePlate = true;
-            Mailboxes.Ui.Publish(new NamePlateAdded(this));
+            Mailboxes.Ui.Publish(new NamePlateAdded(BuildUiSnapshot()));
 
         }
 
         protected void RemoveNamePlate()
         {
             hasNamePlate = false;
-            Mailboxes.Ui.Publish(new NamePlateRemoved(this));
+            Mailboxes.Ui.Publish(new NamePlateRemoved(RenderId));
         }
 
         protected void FlagForRefresh() => namePlateRequiresUpdate = true;
@@ -207,7 +224,7 @@ namespace Project_1.GameObjects.Entities
         public virtual void RefreshPlates()
         {
             if (!namePlateRequiresUpdate) return;
-            Mailboxes.Ui.Publish(new PlateRefreshRequested(this));
+            Mailboxes.Ui.Publish(new PlateRefreshRequested(BuildUiSnapshot()));
         }
 
         public Item EquipInParticularSlot(Items.SubTypes.Equipment aEquipment, Slot aSlot)
