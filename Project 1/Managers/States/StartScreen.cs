@@ -33,7 +33,14 @@ namespace Project_1.Managers.States
 
         public override void Rescale()
         {
-            lock (HUDManager.UiLock)
+            if (UiThread.IsRunning || SimThread.IsRunning)
+            {
+                lock (HUDManager.UiLock)
+                {
+                    mainMenu.Rescale();
+                }
+            }
+            else
             {
                 mainMenu.Rescale();
             }

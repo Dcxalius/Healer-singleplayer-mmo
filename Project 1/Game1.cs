@@ -71,7 +71,14 @@ namespace Project_1
             }
             else
             {
-                lock (HUDManager.UiLock)
+                if (SimThread.IsRunning)
+                {
+                    lock (HUDManager.UiLock)
+                    {
+                        Mailboxes.Ui.DispatchAll();
+                    }
+                }
+                else
                 {
                     Mailboxes.Ui.DispatchAll();
                 }
@@ -93,7 +100,18 @@ namespace Project_1
             }
             else
             {
-                lock (HUDManager.UiLock)
+                if (SimThread.IsRunning)
+                {
+                    lock (HUDManager.UiLock)
+                    {
+                        Mailboxes.Ui.DispatchAll();
+                        UiTextInputManager.Update();
+                        StateManager.UiUpdate();
+                        HUDManager.Update();
+                        HUDManager.BuildDrawLists();
+                    }
+                }
+                else
                 {
                     Mailboxes.Ui.DispatchAll();
                     UiTextInputManager.Update();

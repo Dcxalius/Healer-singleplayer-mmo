@@ -1,40 +1,59 @@
 ﻿using Project_1.GameObjects.Entities.Friendlies;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
+using Project_1.Messaging.Events;
 
 namespace Project_1.UI.HUD.Windows
 {
     internal class InspectWindow : CharacterWindow
     {
         protected override int BagIndexForItem => -4;
-        public bool BelongsTo(GuildMember aGuildMember) => guildMemberSetTo == aGuildMember; //TODO: Ponder if this is the best way
 
         public static InspectWindow Current { get; private set; }
-        public static GuildMember CurrentTarget { get; private set; }
+        public static int? CurrentTargetRenderId { get; private set; }
 
-        public GuildMember GuildMember => guildMemberSetTo;
-        GuildMember guildMemberSetTo;
+        public int? GuildMemberRenderId => guildMemberRenderId;
+        int? guildMemberRenderId;
 
         public InspectWindow() : base()
         {
             visibleKey = null;
             Current = this;
         }
+
+        public bool BelongsTo(GuildMember aGuildMember)
+        {
+            return aGuildMember != null && guildMemberRenderId.HasValue && guildMemberRenderId.Value == aGuildMember.RenderId;
+        }
+
+        public bool BelongsTo(int aGuildMemberRenderId)
+        {
+            return guildMemberRenderId.HasValue && guildMemberRenderId.Value == aGuildMemberRenderId;
+        }
+
         public override void SetData(Friendly aFriendly)
         {
             base.SetData(aFriendly);
-            guildMemberSetTo = aFriendly as GuildMember;
-            CurrentTarget = guildMemberSetTo;
+            guildMemberRenderId = aFriendly?.RenderId;
+            CurrentTargetRenderId = guildMemberRenderId;
+        }
+
+        public void SetData(int aRenderId)
+        {
+            guildMemberRenderId = aRenderId;
+            CurrentTargetRenderId = aRenderId;
+        }
+
+        public void SetData(in EntityUiSnapshot aSnapshot)
+        {
+            guildMemberRenderId = aSnapshot.RenderId;
+            CurrentTargetRenderId = aSnapshot.RenderId;
+            nameLabel.Text = aSnapshot.Name;
         }
 
         public void RemoveData()
         {
-            guildMemberSetTo = null;
-            CurrentTarget = null;
+            guildMemberRenderId = null;
+            CurrentTargetRenderId = null;
         }
     }
 }

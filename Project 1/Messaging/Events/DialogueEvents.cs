@@ -33,10 +33,10 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct DialogueClosed
     {
-        public DialogueClosed(DialogueBox box)
+        public DialogueClosed(int dialogueBoxId)
         {
-            Box = box;
+            DialogueBoxId = dialogueBoxId;
         }
-        public DialogueBox Box { get; }
+        public int DialogueBoxId { get; }
     }
 }

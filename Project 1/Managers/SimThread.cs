@@ -19,9 +19,10 @@ namespace Project_1.Managers
 
         public static void Start()
         {
+            ThreadAffinity.AssertMainThread();
             if (running) return;
             running = true;
-            Mailboxes.Main.Subscribe<WorkerCallback>(e => e.Action?.Invoke());
+            Mailboxes.Main.Subscribe<WorkerCompletionReady>(e => WorkerPool.RunCompletion(e.CompletionId));
             thread = new Thread(Run)
             {
                 IsBackground = true,
@@ -32,12 +33,14 @@ namespace Project_1.Managers
 
         public static void Stop()
         {
+            ThreadAffinity.AssertMainThread();
             running = false;
             pulse.Set();
         }
 
         public static void PulseAndWait(int timeoutMs = 16)
         {
+            ThreadAffinity.AssertMainThread();
             if (!running) return;
             pulse.Set();
             completed.WaitOne(timeoutMs);

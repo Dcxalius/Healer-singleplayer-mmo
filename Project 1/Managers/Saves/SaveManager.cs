@@ -43,6 +43,7 @@ namespace Project_1.Managers
         {
             get
             {
+                ThreadAffinity.AssertGameThread();
                 lock (savesLock)
                 {
                     return saves.ToArray();
@@ -98,6 +99,7 @@ namespace Project_1.Managers
 
         public static bool NameAlreadyExists(string aName)
         {
+            ThreadAffinity.AssertGameThread();
             lock (savesLock)
             {
                 return saves.Find(x => x.Name == aName.ToUpper()) != null;
@@ -106,6 +108,7 @@ namespace Project_1.Managers
 
         public static bool TryGetSaveByName(string name, out Save save)
         {
+            ThreadAffinity.AssertGameThread();
             lock (savesLock)
             {
                 save = null;
@@ -189,7 +192,8 @@ namespace Project_1.Managers
         {
             ThreadAffinity.AssertSimThread();
             if (payload == null) return;
-            currentSave = payload.Save;
+            if (!TryGetSaveByName(payload.SaveName, out Save save)) return;
+            currentSave = save;
 
             JsonSerializer serializer = JsonSerializer.Create(serializerSettings);
 
@@ -234,6 +238,7 @@ namespace Project_1.Managers
 
         public static void SaveData()
         {
+            ThreadAffinity.AssertSimThread();
             if (currentSave == null) return;
             if (!ThreadingSettings.UseWorkerThreads || !WorkerPool.IsRunning)
             {
@@ -282,6 +287,7 @@ namespace Project_1.Managers
 
         public static void RequestScreenshot(Save save)
         {
+            ThreadAffinity.AssertSimThread();
             if (save == null) return;
             lock (screenshotLock)
             {

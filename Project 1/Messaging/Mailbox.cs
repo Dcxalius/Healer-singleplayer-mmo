@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 
@@ -11,9 +10,10 @@ namespace Project_1.Messaging
     /// </summary>
     internal sealed class Mailbox
     {
-        readonly ConcurrentQueue<object> queue = new ConcurrentQueue<object>();
-        readonly Dictionary<Type, List<Action<object>>> subscribers = new Dictionary<Type, List<Action<object>>>();
-        readonly object subscriberLock = new object();
+        readonly ConcurrentQueue<int> dispatchQueue = new ConcurrentQueue<int>();
+        readonly ConcurrentDictionary<Type, IChannel> channelsByType = new ConcurrentDictionary<Type, IChannel>();
+        readonly ConcurrentDictionary<int, IChannel> channelsById = new ConcurrentDictionary<int, IChannel>();
+        int nextChannelId;
         int pendingCount;
         int peakCount;
         int lastDispatchCount;
@@ -27,9 +27,12 @@ namespace Project_1.Messaging
 
         public string Name { get; }
 
-        public void Publish<T>(T message)
+        public void Publish<T>(in T message)
         {
-            queue.Enqueue(message!);
+            Channel<T> channel = GetOrAddChannel<T>();
+            channel.Enqueue(message);
+            dispatchQueue.Enqueue(channel.Id);
+
             int pending = Interlocked.Increment(ref pendingCount);
             int snapshotPeak;
             while (pending > (snapshotPeak = Volatile.Read(ref peakCount)))
@@ -44,18 +47,7 @@ namespace Project_1.Messaging
         public void Subscribe<T>(Action<T> handler)
         {
             if (handler == null) throw new ArgumentNullException(nameof(handler));
-
-            Action<object> wrapper = msg => handler((T)msg);
-
-            lock (subscriberLock)
-            {
-                if (!subscribers.TryGetValue(typeof(T), out var list))
-                {
-                    list = new List<Action<object>>();
-                    subscribers.Add(typeof(T), list);
-                }
-                list.Add(wrapper);
-            }
+            GetOrAddChannel<T>().Subscribe(handler);
         }
 
         public void DispatchAll()
@@ -63,23 +55,20 @@ namespace Project_1.Messaging
             int processed = 0;
             long startTicks = 0;
             bool any = false;
-            while (queue.TryDequeue(out var msg))
+
+            while (dispatchQueue.TryDequeue(out int channelId))
             {
                 if (!any)
                 {
                     any = true;
                     startTicks = Stopwatch.GetTimestamp();
                 }
-                Interlocked.Decrement(ref pendingCount);
-                if (msg == null) continue;
-                var type = msg.GetType();
-                if (!subscribers.TryGetValue(type, out var list)) continue;
 
+                Interlocked.Decrement(ref pendingCount);
+                if (!channelsById.TryGetValue(channelId, out IChannel channel)) continue;
+                if (!channel.TryDispatchOne(Name, out bool hadSubscribers)) continue;
+                if (!hadSubscribers) continue;
                 processed++;
-                for (int i = 0; i < list.Count; i++)
-                {
-                    list[i](msg);
-                }
             }
 
             if (any)
@@ -99,6 +88,95 @@ namespace Project_1.Messaging
                 Volatile.Read(ref lastDispatchCount),
                 Volatile.Read(ref lastDispatchMs),
                 Interlocked.Read(ref totalDispatched));
+        }
+
+        Channel<T> GetOrAddChannel<T>()
+        {
+            IChannel channel = channelsByType.GetOrAdd(typeof(T), _ =>
+            {
+                int id = Interlocked.Increment(ref nextChannelId);
+                Channel<T> created = new Channel<T>(id);
+                channelsById.TryAdd(id, created);
+                return created;
+            });
+            return (Channel<T>)channel;
+        }
+
+        interface IChannel
+        {
+            bool TryDispatchOne(string mailboxName, out bool hadSubscribers);
+        }
+
+        sealed class Channel<T> : IChannel
+        {
+            readonly ConcurrentQueue<T> queue = new ConcurrentQueue<T>();
+            readonly SubscriberList<T> subscribers = new SubscriberList<T>();
+
+            public Channel(int id)
+            {
+                Id = id;
+            }
+
+            public int Id { get; }
+
+            public void Enqueue(in T message)
+            {
+                queue.Enqueue(message);
+            }
+
+            public void Subscribe(Action<T> handler)
+            {
+                subscribers.Add(handler);
+            }
+
+            public bool TryDispatchOne(string mailboxName, out bool hadSubscribers)
+            {
+                if (!queue.TryDequeue(out T message))
+                {
+                    hadSubscribers = false;
+                    return false;
+                }
+
+                Action<T>[] handlers = subscribers.Snapshot();
+                hadSubscribers = handlers.Length > 0;
+                if (!hadSubscribers) return true;
+
+                for (int i = 0; i < handlers.Length; i++)
+                {
+                    try
+                    {
+                        handlers[i](message);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Mailbox '{mailboxName}' handler for '{typeof(T).Name}' threw and was skipped: {ex}");
+                    }
+                }
+
+                return true;
+            }
+        }
+
+        sealed class SubscriberList<T>
+        {
+            readonly object gate = new object();
+            Action<T>[] handlers = Array.Empty<Action<T>>();
+
+            public void Add(Action<T> handler)
+            {
+                lock (gate)
+                {
+                    Action<T>[] next = new Action<T>[handlers.Length + 1];
+                    Array.Copy(handlers, next, handlers.Length);
+                    next[handlers.Length] = handler;
+                    Volatile.Write(ref handlers, next);
+                }
+            }
+
+            public Action<T>[] Snapshot()
+            {
+                return Volatile.Read(ref handlers);
+            }
         }
     }
 

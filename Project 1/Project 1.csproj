@@ -22,6 +22,9 @@
     <Content Include="Content/Settings/**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content/Data/**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Target Name="BuildMonoGameContent" BeforeTargets="Build">
     <Exec Command="dotnet mgcb --@=&quot;$(MSBuildProjectDirectory)/Content/Content.mgcb&quot; --platform=DesktopGL --outputDir=&quot;$(TargetDir)Content&quot; --intermediateDir=&quot;$(MSBuildProjectDirectory)/Content/obj/DesktopGL/$(TargetFramework)/Content&quot; --workingDir=&quot;$(MSBuildProjectDirectory)/Content&quot; --quiet" />

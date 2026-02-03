@@ -78,6 +78,7 @@ namespace Project_1.GameObjects.Entities
             return new EntityUiSnapshot(
                 RenderId,
                 Name,
+                Class,
                 RelationToPlayer,
                 RelationColor,
                 CurrentLevel,
@@ -202,7 +203,7 @@ namespace Project_1.GameObjects.Entities
             unitData.GainExp(aExpAmount);
 
             if (!(this is Friendly)) return;
-            Mailboxes.Ui.Publish(new ExperienceRefreshed(this as Friendly));
+            Mailboxes.Ui.Publish(new ExperienceRefreshed(RenderId, RelationToPlayer, CurrentLevel, Level.Experience));
         }
 
 

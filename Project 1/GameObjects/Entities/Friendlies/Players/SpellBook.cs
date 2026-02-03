@@ -93,7 +93,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         public void AddSpell(Spell aSpell)
         {
             knownSpells.Add(aSpell);
-            Mailboxes.Ui.Publish(new SpellbookRefreshed(owner as Friendly, knownSpells.ToArray()));
+            Mailboxes.Ui.Publish(new SpellbookRefreshed(owner.RenderId, knownSpells.Select(x => x.Name).ToArray()));
         }
 
 

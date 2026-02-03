@@ -84,7 +84,12 @@ namespace Project_1.GameObjects.Unit.Stats
         public void SetOwner(Entity aEntity)
         {
             owner = aEntity;
-            Mailboxes.Ui.Publish(new StatsRefreshed(owner as Friendly, StatReport));
+            if (owner is not Friendly friendlyOwner) return;
+            Mailboxes.Ui.Publish(new StatsRefreshed(
+                owner.RenderId,
+                owner.RelationToPlayer,
+                CloneReport(StatReport),
+                BuildSecondaryReport(friendlyOwner)));
         }
 
         public bool CheckIfResourceRegened()
@@ -112,8 +117,12 @@ namespace Project_1.GameObjects.Unit.Stats
             fistAttack.AttackPower = GetAttackPower(classData);
 
 
-            if (!(owner is Friendly)) return;
-            Mailboxes.Ui.Publish(new StatsRefreshed(owner as Friendly, StatReport));
+            if (owner is not Friendly friendlyOwner) return;
+            Mailboxes.Ui.Publish(new StatsRefreshed(
+                owner.RenderId,
+                owner.RelationToPlayer,
+                CloneReport(StatReport),
+                BuildSecondaryReport(friendlyOwner)));
         }
 
         public void RefreshEquipmentStats(EquipmentStats aEquipmentStats)
@@ -121,6 +130,31 @@ namespace Project_1.GameObjects.Unit.Stats
             totalPrimaryStats.UpdateEquipmentStats(aEquipmentStats);
             baseArmor = aEquipmentStats.Armor;
             RefreshStats();
+        }
+
+        static PairReport CloneReport(PairReport source)
+        {
+            PairReport clone = new PairReport();
+            if (source == null) return clone;
+            for (int i = 0; i < source.Count; i++)
+            {
+                var line = source.Lines[i];
+                clone.AddLine(line.Name, line.Value);
+            }
+            return clone;
+        }
+
+        static PairReport BuildSecondaryReport(Friendly owner)
+        {
+            PairReport report = new PairReport();
+            if (owner == null) return report;
+
+            report.AddLine("Crit Chance", owner.SecondaryStats.Attack.CriticalChance);
+            report.AddLine("Crit Damage", owner.SecondaryStats.Attack.CriticalDamage);
+            report.AddLine("Hit Chance", owner.SecondaryStats.Attack.BonusHitChance);
+            report.AddLine("Dodge Chance", owner.SecondaryStats.Defense.DodgeChance);
+            report.AddLine("Parry Chance", owner.SecondaryStats.Defense.ParryChance);
+            return report;
         }
     }
 }

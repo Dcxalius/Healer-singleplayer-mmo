@@ -1,0 +1,3 @@
+4,5
+{"ItemName": "Poop", "Weight": 10, "CountRange":{"Item1":1,"Item2":5}, "MaxDrops": 5}
+{"ItemName": "Small Bag", "Weight": 1, "CountRange":{"Item1":1,"Item2":1}, "MaxDrops": 1}

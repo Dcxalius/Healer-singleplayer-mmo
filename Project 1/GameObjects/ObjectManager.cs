@@ -264,7 +264,7 @@ namespace Project_1.GameObjects
             ThreadAffinity.AssertSimThread();
             ObjectFactory.AddGuildMember("xdddd", "Rogue");
             guild = ObjectFactory.GetGuildMemebers();
-            Mailboxes.Ui.Publish(new GuildMemberAdded(guild.Last()));
+            Mailboxes.Ui.Publish(new GuildMemberAdded(guild.Last().BuildUiSnapshot()));
         }
 
         public static void Reset()

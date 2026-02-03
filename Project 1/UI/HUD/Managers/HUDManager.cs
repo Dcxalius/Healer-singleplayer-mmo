@@ -152,29 +152,29 @@ namespace Project_1.UI.HUD.Managers
                 InvalidateUi();
             });
 
-            Mailboxes.Ui.Subscribe<InventorySlotChanged>(e => RefreshInventorySlot(e.BagIndex, e.SlotIndex, e.Inventory));
+            Mailboxes.Ui.Subscribe<InventorySlotChanged>(e => RefreshInventorySlot(e.BagIndex, e.SlotIndex, e.Snapshot));
             Mailboxes.Ui.Subscribe<CastChannelStarted>(e => ChannelSpell(e.SpellGfxPath, e.DurationMs));
             Mailboxes.Ui.Subscribe<CastChannelProgress>(e => UpdateChannelSpell(e.Progress01));
             Mailboxes.Ui.Subscribe<CastChannelCancelled>(_ => CancelChannel());
             Mailboxes.Ui.Subscribe<CastChannelFinished>(_ => FinishChannel());
             Mailboxes.Ui.Subscribe<EquipmentSlotChanged>(e =>
             {
-                windowHandler.RefreshCharacterWindowSlot(e.Slot, e.Equipment, e.Friendly);
+                windowHandler.RefreshCharacterWindowSlot(e.OwnerRenderId, e.OwnerRelation, e.Slot, e.ItemSnapshot);
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<EquipmentSlotsRefreshed>(e =>
             {
-                windowHandler.RefreshAllCharacterWindowSlots(e.Equipment, e.Friendly);
+                windowHandler.RefreshAllCharacterWindowSlots(e.OwnerRenderId, e.OwnerRelation, e.ItemSnapshots);
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<StatsRefreshed>(e =>
             {
-                windowHandler.RefreshCharacterWindowStats(e.Stats, e.Friendly);
+                windowHandler.RefreshCharacterWindowStats(e.OwnerRenderId, e.OwnerRelation, e.PrimaryStats, e.SecondaryStats);
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<ExperienceRefreshed>(e =>
             {
-                windowHandler.RefreshCharacterWindowExpBar(e.Friendly);
+                windowHandler.RefreshCharacterWindowExpBar(e.OwnerRenderId, e.OwnerRelation, e.CurrentLevel, e.CurrentExperience);
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<TargetChanged>(e =>
@@ -202,29 +202,23 @@ namespace Project_1.UI.HUD.Managers
                 InvalidateUi();
                 InvalidatePlates();
             });
-            Mailboxes.Ui.Subscribe<InventoryAssigned>(e => SetInventory(e.Inventory));
+            Mailboxes.Ui.Subscribe<InventoryAssigned>(e => SetInventory(e.Snapshot));
             Mailboxes.Ui.Subscribe<SpellbookRefreshed>(e =>
             {
-                windowHandler.RefreshSpellBook(e.Spells);
+                windowHandler.RefreshSpellBook(BuildSpellsFromNames(e.SpellNames));
                 InvalidateUi();
             });
-            Mailboxes.Ui.Subscribe<SpellbarLoaded>(e => LoadSpellBar(e.Spells));
+            Mailboxes.Ui.Subscribe<SpellbarLoaded>(e => LoadSpellBar(BuildSpellsFromNames(e.SpellNames)));
             Mailboxes.Ui.Subscribe<CharacterWindowSet>(e =>
             {
-                if (e.Owner is Player p)
-                {
-                    windowHandler.SetCharacterWindow(p);
-                }
+                windowHandler.SetCharacterWindow(e.Snapshot);
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<PlayerPlateSet>(e =>
             {
-                if (e.Owner is Player p)
-                {
-                    plateBoxHandler.SetPlayerPlateBox(p);
-                    InvalidateUi();
-                    InvalidatePlates();
-                }
+                plateBoxHandler.SetPlayerPlateBox(e.Snapshot);
+                InvalidateUi();
+                InvalidatePlates();
             });
             Mailboxes.Ui.Subscribe<GoldChanged>(e => RefreshGold(e.Gold));
             Mailboxes.Ui.Subscribe<PlayerUiSnapshot>(e => UiPlayerStateCache.Update(e));
@@ -244,7 +238,7 @@ namespace Project_1.UI.HUD.Managers
             });
             Mailboxes.Ui.Subscribe<BuffAdded>(e =>
             {
-                plateBoxHandler.AddBuff(e.Buff, e.Owner);
+                plateBoxHandler.AddBuff(e.Buff, e.OwnerRenderId);
                 InvalidateUi();
                 InvalidatePlates();
             });
@@ -282,17 +276,17 @@ namespace Project_1.UI.HUD.Managers
             Mailboxes.Ui.Subscribe<DescriptorBoxClear>(_ => SetDescriptorBox(null));
             Mailboxes.Ui.Subscribe<PartyControlCleared>(e =>
             {
-                plateBoxHandler.RemoveWalkerFromControl(e.Members.ToArray());
+                plateBoxHandler.RemoveWalkerFromControl(e.MemberRenderIds);
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<PartyWalkerAdded>(e =>
             {
-                plateBoxHandler.AddGuildMemberToControl(e.Member);
+                plateBoxHandler.AddGuildMemberToControl(e.MemberRenderId);
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<PartyWalkerRemoved>(e =>
             {
-                plateBoxHandler.RemoveWalkerFromControl(new GuildMember[] { e.Member });
+                plateBoxHandler.RemoveWalkerFromControl(new[] { e.MemberRenderId });
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<PartyMemberAdded>(e =>
@@ -302,7 +296,7 @@ namespace Project_1.UI.HUD.Managers
             });
             Mailboxes.Ui.Subscribe<PartyMemberRemoved>(e =>
             {
-                plateBoxHandler.RemoveGuildMemberFromParty(e.Member);
+                plateBoxHandler.RemoveGuildMemberFromParty(e.MemberRenderId);
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<GuildMembersSet>(e =>
@@ -325,14 +319,33 @@ namespace Project_1.UI.HUD.Managers
                 windowHandler.ToggleInspectWindow(e.Member);
                 InvalidateUi();
             });
+            Mailboxes.Ui.Subscribe<LogicWindowOpened>(e =>
+            {
+                windowHandler.OpenLogicWindow(e.MemberRenderId);
+                Mailboxes.Main.Publish(new LogicWindowSnapshotRequested(e.MemberRenderId));
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<LogicWindowSnapshotSet>(e =>
+            {
+                windowHandler.SetLogicWindowSnapshot(e.MemberRenderId, e.Nodes);
+                InvalidateUi();
+            });
             Mailboxes.Ui.Subscribe<CharacterWindowToggled>(_ =>
             {
                 windowHandler.ToggleCharacterWindow();
                 InvalidateUi();
             });
-            Mailboxes.Ui.Subscribe<HeldItemStart>(e => HoldItem(e.Source as Project_1.UI.HUD.Inventory.Item, e.GrabOffset));
+            Mailboxes.Ui.Subscribe<HeldItemStart>(e =>
+            {
+                if (!UIElement.TryResolve(e.SourceUiElementId, out UIElement element)) return;
+                HoldItem(element as Project_1.UI.HUD.Inventory.Item, e.GrabOffset);
+            });
             Mailboxes.Ui.Subscribe<HeldItemEnd>(_ => ReleaseItem());
-            Mailboxes.Ui.Subscribe<HeldSpellStart>(e => HoldSpell(e.Spell, e.GrabOffset));
+            Mailboxes.Ui.Subscribe<HeldSpellStart>(e =>
+            {
+                if (string.IsNullOrWhiteSpace(e.SpellName)) return;
+                HoldSpell(new Spell(e.SpellName), e.GrabOffset);
+            });
             Mailboxes.Ui.Subscribe<HeldSpellEnd>(_ => ReleaseSpell());
             Mailboxes.Ui.Subscribe<HudMovableChanged>(e =>
             {
@@ -346,10 +359,14 @@ namespace Project_1.UI.HUD.Managers
                 else DisableSizeChanges();
                 InvalidateUi();
             });
-            Mailboxes.Ui.Subscribe<HudSizeChangerSet>(e => SetSizeChanger(e.Element));
+            Mailboxes.Ui.Subscribe<HudSizeChangerSet>(e =>
+            {
+                if (!UIElement.TryResolve(e.UiElementId, out UIElement element)) return;
+                SetSizeChanger(element);
+            });
             Mailboxes.Ui.Subscribe<HudSaveRequested>(_ => Save());
             Mailboxes.Ui.Subscribe<DialogueOpened>(AddDialogueBox);
-            Mailboxes.Ui.Subscribe<DialogueClosed>(e => RemoveDialogueBox(e.Box));
+            Mailboxes.Ui.Subscribe<DialogueClosed>(e => RemoveDialogueBox(e.DialogueBoxId));
             Mailboxes.Ui.Subscribe<SaveDataStarted>(_ =>
             {
                 saveStatusIndicator.NotifySaveStarted();
@@ -551,10 +568,12 @@ namespace Project_1.UI.HUD.Managers
             InvalidateUi();
         }
 
-        public static void RemoveDialogueBox(DialogueBox aDialogueBox)
+        public static void RemoveDialogueBox(int dialogueBoxId)
         {
             AssertUiThreadOrMainFallback();
-            dialogueBoxes.Remove(aDialogueBox);
+            DialogueBox toRemove = dialogueBoxes.Find(x => x.UiElementId == dialogueBoxId);
+            if (toRemove == null) return;
+            dialogueBoxes.Remove(toRemove);
             InvalidateUi();
         }
         #endregion
@@ -564,19 +583,19 @@ namespace Project_1.UI.HUD.Managers
 
 
         #region Inventory
-        public static void SetInventory(Items.Inventory aInventory)
+        public static void SetInventory(InventoryUiSnapshot snapshot)
         {
             AssertUiThreadOrMainFallback();
-            inventoryBox.SetInventory(aInventory);
+            inventoryBox.SetInventory(snapshot);
             InvalidateUi();
         }
-        public static void RefreshInventorySlot(int aBag, int aSlot, Items.Inventory aInventory)
+        public static void RefreshInventorySlot(int aBag, int aSlot, InventoryUiSnapshot snapshot)
         {
             AssertUiThreadOrMainFallback();
-            inventoryBox.RefreshSlot(aBag, aSlot, aInventory);
+            inventoryBox.RefreshSlot(aBag, aSlot, snapshot);
             InvalidateUi();
         }
-        public static void RefreshInventorySlot((int, int) aBagAndSlot, Items.Inventory aInventory) => RefreshInventorySlot(aBagAndSlot.Item1, aBagAndSlot.Item2, aInventory);
+        public static void RefreshInventorySlot((int, int) aBagAndSlot, InventoryUiSnapshot snapshot) => RefreshInventorySlot(aBagAndSlot.Item1, aBagAndSlot.Item2, snapshot);
 
         public static void SetDescriptorBox(Item aItem)
         {
@@ -677,6 +696,18 @@ namespace Project_1.UI.HUD.Managers
         static void HandleLootOpened(LootOpened e)
         {
             Loot(e.Snapshot, e.Context);
+        }
+
+        static Spell[] BuildSpellsFromNames(string[] spellNames)
+        {
+            if (spellNames == null) return Array.Empty<Spell>();
+            Spell[] spells = new Spell[spellNames.Length];
+            for (int i = 0; i < spellNames.Length; i++)
+            {
+                if (string.IsNullOrWhiteSpace(spellNames[i])) continue;
+                spells[i] = new Spell(spellNames[i]);
+            }
+            return spells;
         }
 
         public static void HoldItem(Item aItem, AbsoluteScreenPosition aGrabOffset)

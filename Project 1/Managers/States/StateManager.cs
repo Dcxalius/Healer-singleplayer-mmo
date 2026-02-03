@@ -103,6 +103,7 @@ namespace Project_1.Managers.States
             Mailboxes.Main.Subscribe<ShopPurchaseRequested>(HandleShopPurchaseRequested);
             Mailboxes.Main.Subscribe<SpellCastRequested>(HandleSpellCastRequested);
             Mailboxes.Main.Subscribe<TargetRequested>(HandleTargetRequested);
+            Mailboxes.Main.Subscribe<LogicWindowSnapshotRequested>(HandleLogicWindowSnapshotRequested);
             Mailboxes.Main.Subscribe<SaveLoadParsed>(HandleSaveLoadParsed);
             Mailboxes.Main.Subscribe<PartyMemberInviteRequested>(HandlePartyMemberInviteRequested);
             Mailboxes.Main.Subscribe<PartyMemberKickRequested>(HandlePartyMemberKickRequested);
@@ -170,49 +171,55 @@ namespace Project_1.Managers.States
 
         static void ApplyStateChange(States aState)
         {
-            lock (HUDManager.UiLock)
+            States leavingState = currentStateEnum;
+            currentState.OnLeave();
+            previousState = leavingState;
+            switch (aState)
             {
-                States leavingState = currentStateEnum;
-                currentState.OnLeave();
-                previousState = leavingState;
-                switch (aState)
-                {
-                    case States.StartScreen:
-                        currentState = startScreen;
-                        break;
-                    case States.Game:
-                        currentState = game;
-                        break;
-                    case States.PauseMenu:
-                        currentState = pauseMenu;
-                        break;
-                    case States.OptionMenu:
-                        currentState = optionMenu;
-                        break;
-                    case States.MoveHUD:
-                        currentState = moveHUD;
-                        break;
-                    case States.LoadingMenu:
-                        currentState = loadingMenu;
-                        break;
-                    case States.NewGame:
-                        currentState = newGame;
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
-                currentStateEnum = aState;
-                currentState.OnEnter();
-                if (UiThread.IsRunning)
-                {
-                    Mailboxes.Ui.Publish(new StateChanged(leavingState, aState));
-                }
-                else
+                case States.StartScreen:
+                    currentState = startScreen;
+                    break;
+                case States.Game:
+                    currentState = game;
+                    break;
+                case States.PauseMenu:
+                    currentState = pauseMenu;
+                    break;
+                case States.OptionMenu:
+                    currentState = optionMenu;
+                    break;
+                case States.MoveHUD:
+                    currentState = moveHUD;
+                    break;
+                case States.LoadingMenu:
+                    currentState = loadingMenu;
+                    break;
+                case States.NewGame:
+                    currentState = newGame;
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+            currentStateEnum = aState;
+            currentState.OnEnter();
+            if (UiThread.IsRunning)
+            {
+                Mailboxes.Ui.Publish(new StateChanged(leavingState, aState));
+                return;
+            }
+
+            if (SimThread.IsRunning)
+            {
+                lock (HUDManager.UiLock)
                 {
                     UiOnLeave(leavingState);
                     UiOnEnter(aState);
                 }
+                return;
             }
+
+            UiOnLeave(leavingState);
+            UiOnEnter(aState);
         }
 
         public static void RedrawGame()
@@ -491,6 +498,71 @@ namespace Project_1.Managers.States
             }
 
             player.SetTarget(target);
+        }
+
+        static void HandleLogicWindowSnapshotRequested(LogicWindowSnapshotRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (!ObjectManager.TryGetGuildMemberByRenderId(e.MemberRenderId, out GuildMember member))
+            {
+                Mailboxes.Ui.Publish(new LogicWindowSnapshotSet(e.MemberRenderId, Array.Empty<LogicNodeUiSnapshot>()));
+                return;
+            }
+
+            LogicNode root = member.AttackLogic?.RootNode;
+            Mailboxes.Ui.Publish(new LogicWindowSnapshotSet(e.MemberRenderId, BuildLogicNodeSnapshot(root)));
+        }
+
+        static LogicNodeUiSnapshot[] BuildLogicNodeSnapshot(LogicNode root)
+        {
+            if (root == null) return Array.Empty<LogicNodeUiSnapshot>();
+
+            Dictionary<LogicNode, int> ids = new Dictionary<LogicNode, int>();
+            List<LogicNodeUiSnapshot> snapshots = new List<LogicNodeUiSnapshot>();
+            Queue<(LogicNode node, int parentId, int depth)> queue = new Queue<(LogicNode node, int parentId, int depth)>();
+            queue.Enqueue((root, -1, 0));
+
+            while (queue.Count > 0)
+            {
+                (LogicNode node, int parentId, int depth) = queue.Dequeue();
+                if (node == null) continue;
+
+                if (!ids.TryGetValue(node, out int nodeId))
+                {
+                    nodeId = ids.Count;
+                    ids[node] = nodeId;
+                    string resultName = GetLogicNodeName(node);
+                    snapshots.Add(new LogicNodeUiSnapshot(nodeId, parentId, depth, resultName));
+
+                    IReadOnlyList<LogicNode> children = node.Children;
+                    for (int i = 0; i < children.Count; i++)
+                    {
+                        queue.Enqueue((children[i], nodeId, depth + 1));
+                    }
+                    continue;
+                }
+
+                // If the tree reuses node instances, keep an explicit edge for this parent.
+                if (parentId >= 0)
+                {
+                    snapshots.Add(new LogicNodeUiSnapshot(nodeId, parentId, depth, GetLogicNodeName(node)));
+                }
+            }
+
+            return snapshots.ToArray();
+        }
+
+        static string GetLogicNodeName(LogicNode node)
+        {
+            ILogicResult raw = node.RawResult;
+            if (raw == null || raw is Continue) return "Branch";
+            string name = raw.GetType().Name;
+            const string suffix = "Result";
+            if (name.EndsWith(suffix))
+            {
+                name = name.Substring(0, name.Length - suffix.Length);
+            }
+            return name;
         }
 
         static void HandlePartyMemberInviteRequested(PartyMemberInviteRequested e)
@@ -931,6 +1003,7 @@ namespace Project_1.Managers.States
 
         static void HandleUiStateChanged(StateChanged e)
         {
+            ThreadAffinity.AssertUiThread();
             UiOnLeave(e.Previous);
             UiOnEnter(e.Current);
         }

@@ -26,7 +26,7 @@ namespace Project_1.UI.HUD.Inventory
             AddChild(defaultBag);
         }
 
-        public void SetBags(Container[] aBags, AbsoluteScreenPosition aItemSize, AbsoluteScreenPosition aSpacingSize)
+        public void SetBags(Items.Item[] aBags, AbsoluteScreenPosition aItemSize, AbsoluteScreenPosition aSpacingSize)
         {
             bags = new Item[aBags.Length - 1];
             for (int i = 1; i < aBags.Length; i++)

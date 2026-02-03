@@ -29,6 +29,7 @@ namespace Project_1.Managers
 
         public static void Init()
         {
+            ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
             playTime = new GameTime();
@@ -47,12 +48,14 @@ namespace Project_1.Managers
 
         public static void StartPause(Object aPauser)
         {
+            ThreadAffinity.AssertGameThread();
             if (aPauser == null) return;
             pausers.AddOrUpdate(aPauser, 1, (_, count) => count + 1);
         }
 
         public static void StopPause(Object aPauser)
         {
+            ThreadAffinity.AssertGameThread();
             if (aPauser == null) return;
             while (true)
             {
@@ -75,6 +78,7 @@ namespace Project_1.Managers
 
         public static void Load(Save aSave)
         {
+            ThreadAffinity.AssertSimThread();
             playTime.TotalGameTime = aSave.SaveDetails.TimeInSave;
         }
     }

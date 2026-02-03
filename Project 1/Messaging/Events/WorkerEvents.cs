@@ -1,14 +1,12 @@
-using System;
-
 namespace Project_1.Messaging.Events
 {
-    internal readonly struct WorkerCallback
+    internal readonly struct WorkerCompletionReady
     {
-        public WorkerCallback(Action action)
+        public WorkerCompletionReady(int completionId)
         {
-            Action = action;
+            CompletionId = completionId;
         }
 
-        public Action Action { get; }
+        public int CompletionId { get; }
     }
 }

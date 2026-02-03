@@ -55,7 +55,7 @@ namespace Project_1.UI.HUD.SpellBook
 
             if (spellData != null)
             {
-                Mailboxes.Ui.Publish(new HeldSpellStart(spellData, UiMouseStateCache.Absolute - Location));
+                Mailboxes.Ui.Publish(new HeldSpellStart(spellData.Name, UiMouseStateCache.Absolute - Location));
             }
         }
 

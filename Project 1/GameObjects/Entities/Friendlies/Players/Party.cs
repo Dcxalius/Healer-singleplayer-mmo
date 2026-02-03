@@ -68,7 +68,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public void ClearCommand()
         {
-            Mailboxes.Ui.Publish(new PartyControlCleared(commands.ToArray()));
+            Mailboxes.Ui.Publish(new PartyControlCleared(commands.Select(x => x.RenderId).ToArray()));
             commands.Clear();
         }
 
@@ -76,7 +76,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         {
             if (commands.Contains(aGuildMember)) { return; }
 
-            Mailboxes.Ui.Publish(new PartyWalkerAdded(aGuildMember));
+            Mailboxes.Ui.Publish(new PartyWalkerAdded(aGuildMember.RenderId));
             commands.Add(aGuildMember);
         }
 
@@ -91,7 +91,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         {
             if (!commands.Contains(aGuildMember)) { return; }
 
-            Mailboxes.Ui.Publish(new PartyWalkerRemoved(aGuildMember));
+            Mailboxes.Ui.Publish(new PartyWalkerRemoved(aGuildMember.RenderId));
             commands.Remove(aGuildMember);
         }
 
@@ -102,7 +102,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             party.Add(aGuildMember);
             aGuildMember.AddedToParty();
 
-            Mailboxes.Ui.Publish(new PartyMemberAdded(party[party.Count - 1]));
+            Mailboxes.Ui.Publish(new PartyMemberAdded(party[party.Count - 1].BuildUiSnapshot()));
             return true;
         }
 
@@ -112,7 +112,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             Debug.Assert(aGuildMember != null);
             Debug.Assert(IsInParty(aGuildMember));
 
-            Mailboxes.Ui.Publish(new PartyMemberRemoved(aGuildMember));
+            Mailboxes.Ui.Publish(new PartyMemberRemoved(aGuildMember.RenderId));
             party.Remove(aGuildMember);
             aGuildMember.RemovedFromParty();
             return true;

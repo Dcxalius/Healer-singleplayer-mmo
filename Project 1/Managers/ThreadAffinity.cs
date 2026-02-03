@@ -15,6 +15,18 @@ namespace Project_1.Managers
         public static bool IsSimThread => simThreadId.HasValue && simThreadId == Environment.CurrentManagedThreadId;
         public static bool IsUiThread => uiThreadId.HasValue && uiThreadId == Environment.CurrentManagedThreadId;
 
+        public static bool IsGameThread
+        {
+            get
+            {
+                int current = Environment.CurrentManagedThreadId;
+                if (mainThreadId.HasValue && mainThreadId.Value == current) return true;
+                if (simThreadId.HasValue && simThreadId.Value == current) return true;
+                if (uiThreadId.HasValue && uiThreadId.Value == current) return true;
+                return false;
+            }
+        }
+
         public static void InitMainThread()
         {
             if (mainThreadId.HasValue) return;
@@ -53,6 +65,12 @@ namespace Project_1.Managers
             {
                 throw new InvalidOperationException("This operation must run on the UI thread.");
             }
+        }
+
+        public static void AssertGameThread()
+        {
+            if (IsGameThread) return;
+            throw new InvalidOperationException("This operation must run on a registered game thread (main, sim, or UI).");
         }
     }
 }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Project_1.Camera;
 using Project_1.UI.UIElements.Buttons;
 using Project_1.UI.HUD.Guild;
-using Project_1.GameObjects.Entities.Friendlies;
+using Project_1.Messaging.Events;
 
 namespace Project_1.UI.HUD.Windows
 {
@@ -45,9 +45,14 @@ namespace Project_1.UI.HUD.Windows
             roster.SetGuildMemberInviteStatus(aName, aState);
         }
 
-        public void SetRoster(Friendly[] aData)
+        public void SetRoster(EntityUiSnapshot[] aData)
         {
             roster.SetData(aData);
+        }
+
+        public void AddMember(EntityUiSnapshot aData)
+        {
+            roster.AddMember(aData);
         }
     }
 }

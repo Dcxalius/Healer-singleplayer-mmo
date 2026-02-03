@@ -666,8 +666,43 @@ namespace Project_1.Items
             NotifySlotChanged(aBagIndex, aSlotIndex, this);
         }
 
-        void NotifySlotChanged(int bagIndex, int slotIndex, Inventory inventory) => Mailboxes.Ui.Publish(new InventorySlotChanged(bagIndex, slotIndex, inventory));
-        void NotifySlotChanged((int, int) bagAndSlot, Inventory inventory) => NotifySlotChanged(bagAndSlot.Item1, bagAndSlot.Item2, inventory);
+        public InventoryUiSnapshot BuildUiSnapshot()
+        {
+            Item[] bagSnapshots = new Item[bagSlots];
+            for (int i = 1; i < bagSlots; i++)
+            {
+                if (bags[i] == null) continue;
+                bagSnapshots[i] = new Item(bags[i].ID, bags[i].Count);
+            }
+
+            Item[][] itemSnapshots = new Item[bagSlots][];
+            for (int i = 0; i < bagSlots; i++)
+            {
+                if (items[i] == null) continue;
+                itemSnapshots[i] = CloneItemArray(items[i]);
+            }
+
+            return new InventoryUiSnapshot(bagSnapshots, itemSnapshots);
+        }
+
+        static Item[] CloneItemArray(Item[] source)
+        {
+            if (source == null) return null;
+            Item[] copy = new Item[source.Length];
+            for (int i = 0; i < source.Length; i++)
+            {
+                if (source[i] == null) continue;
+                copy[i] = new Item(source[i].ID, source[i].Count);
+            }
+            return copy;
+        }
+
+        void NotifySlotChanged(int bagIndex, int slotIndex) => Mailboxes.Ui.Publish(new InventorySlotChanged(bagIndex, slotIndex, BuildUiSnapshot()));
+        void NotifySlotChanged((int, int) bagAndSlot) => NotifySlotChanged(bagAndSlot.Item1, bagAndSlot.Item2);
+
+        // Temporary overloads to keep call sites compact during migration.
+        void NotifySlotChanged(int bagIndex, int slotIndex, Inventory inventory) => NotifySlotChanged(bagIndex, slotIndex);
+        void NotifySlotChanged((int, int) bagAndSlot, Inventory inventory) => NotifySlotChanged(bagAndSlot);
 
     }
 }

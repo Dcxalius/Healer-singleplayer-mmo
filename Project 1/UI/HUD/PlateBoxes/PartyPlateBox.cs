@@ -19,8 +19,10 @@ namespace Project_1.UI.HUD.PlateBoxes
     internal class PartyPlateBox : PlateBox
     {
         public bool VisibleBorder { get => border.Visible; set => border.Visible = value; }
-        public GuildMember GuildMember => guildMember;
-        GuildMember guildMember;
+        public int? GuildMemberRenderId => guildMemberRenderId;
+        public EntityUiSnapshot? Snapshot => snapshot;
+        int? guildMemberRenderId;
+        EntityUiSnapshot? snapshot;
 
         PlateBoxNameSegment name;
         PlateBoxHealthSegment health;
@@ -56,31 +58,39 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         public bool BelongsTo(GuildMember aGuildMember)
         {
-            return aGuildMember == guildMember;
+            return aGuildMember != null && guildMemberRenderId.HasValue && guildMemberRenderId.Value == aGuildMember.RenderId;
 
         }
 
-        public bool BelongsTo(int? aRenderId)
+        public bool BelongsTo(int aRenderId)
         {
-            return guildMember != null && aRenderId.HasValue && guildMember.RenderId == aRenderId.Value;
+            return guildMemberRenderId.HasValue && guildMemberRenderId.Value == aRenderId;
         }
 
         public void SetTarget(GuildMember aGuildMember)
         {
-            if (guildMember == null) partyBoxesActive += 1;
+            if (aGuildMember == null) return;
+            SetTarget(aGuildMember.BuildUiSnapshot());
+        }
 
-            guildMember = aGuildMember;
+        public void SetTarget(in EntityUiSnapshot aGuildMember)
+        {
+            if (!guildMemberRenderId.HasValue) partyBoxesActive += 1;
+
+            guildMemberRenderId = aGuildMember.RenderId;
+            snapshot = aGuildMember;
             health.SetTarget(aGuildMember);
             resource.SetTarget(aGuildMember);
             name.Refresh(aGuildMember);
+            levelCircle.Refresh(aGuildMember);
             Visible = true;
-
         }
 
         public void RemoveTarget()
         {
-            guildMember = null;
-            partyBoxesActive -= 1;
+            if (guildMemberRenderId.HasValue) partyBoxesActive -= 1;
+            guildMemberRenderId = null;
+            snapshot = null;
             Visible = false;
         }
 
@@ -88,7 +98,7 @@ namespace Project_1.UI.HUD.PlateBoxes
         {
             base.ClickedOnAndReleasedOnMe();
 
-            Mailboxes.Main.Publish(new TargetRequested(guildMember?.RenderId));
+            Mailboxes.Main.Publish(new TargetRequested(guildMemberRenderId));
         }
 
         protected override bool ClickedOnChildren(ClickEvent aClick)
@@ -106,11 +116,11 @@ namespace Project_1.UI.HUD.PlateBoxes
 
             if (aClick.Modifier(InputManager.HoldModifier.Shift))
             {
-                Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.Add, guildMember?.RenderId));
+                Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.Add, guildMemberRenderId));
             }
             else if (aClick.Modifier(InputManager.HoldModifier.Ctrl))
             {
-                Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.NeedyAdd, guildMember?.RenderId));
+                Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.NeedyAdd, guildMemberRenderId));
             }
 
             base.ClickedOnMe(aClick);

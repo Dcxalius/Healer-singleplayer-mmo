@@ -53,17 +53,17 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public Player(PlayerData aPlayerData) : base(aPlayerData)
         {
-            Mailboxes.Ui.Publish(new InventoryAssigned(Inventory));
+            Mailboxes.Ui.Publish(new InventoryAssigned(Inventory.BuildUiSnapshot()));
             party = new Party(this);
             guild = new Guild(this);
             SpellBook.Init(this);
 
             LoadSpellBar(PlayerData.SavedSpellsOnBar);
 
-            Mailboxes.Ui.Publish(new SpellbookRefreshed(this, SpellBook.Spells));
-            Mailboxes.Ui.Publish(new CharacterWindowSet(this));
-            Mailboxes.Ui.Publish(new PlayerPlateSet(this));
-            Mailboxes.Ui.Publish(new GoldChanged(this, Gold));
+            Mailboxes.Ui.Publish(new SpellbookRefreshed(RenderId, SpellBook.Spells.Select(x => x.Name).ToArray()));
+            Mailboxes.Ui.Publish(new CharacterWindowSet(BuildCharacterWindowSnapshot()));
+            Mailboxes.Ui.Publish(new PlayerPlateSet(BuildUiSnapshot()));
+            Mailboxes.Ui.Publish(new GoldChanged(Gold));
         }
 
         public override void Update()
@@ -86,13 +86,13 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
                 indexOfSpellsToAdd[i] = indexOfSpell;
             }
-            Spell[] spellsToAddToBar = new Spell[indexOfSpellsToAdd.Length];
+            string[] spellNamesToAddToBar = new string[indexOfSpellsToAdd.Length];
             for (int i = 0; i < indexOfSpellsToAdd.Length; i++)
             {
                 if (!indexOfSpellsToAdd[i].HasValue) continue;
-                spellsToAddToBar[i] = spells[indexOfSpellsToAdd[i].Value];
+                spellNamesToAddToBar[i] = spells[indexOfSpellsToAdd[i].Value].Name;
             }
-            Mailboxes.Ui.Publish(new SpellbarLoaded(this, spellsToAddToBar));
+            Mailboxes.Ui.Publish(new SpellbarLoaded(RenderId, spellNamesToAddToBar));
         }
 
         public void GetPartyMembersFromGuild()
@@ -123,7 +123,49 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         public void ChangeGold(int aAmount)
         {
             PlayerData.Gold += aAmount;
-            Mailboxes.Ui.Publish(new GoldChanged(this, Gold));
+            Mailboxes.Ui.Publish(new GoldChanged(Gold));
+        }
+
+        CharacterWindowSnapshot BuildCharacterWindowSnapshot()
+        {
+            Items.Item[] equippedItems = new Items.Item[(int)Unit.Equipment.Slot.Count];
+            for (int i = 0; i < equippedItems.Length; i++)
+            {
+                Items.Item equipped = Equipment.EquipedInSlot((Unit.Equipment.Slot)i);
+                if (equipped == null) continue;
+                equippedItems[i] = new Items.Item(equipped.ID, equipped.Count);
+            }
+
+            return new CharacterWindowSnapshot(
+                BuildUiSnapshot(),
+                CloneReport(PrimaryStatReport),
+                BuildSecondaryReport(),
+                CurrentLevel,
+                Level.Experience,
+                equippedItems);
+        }
+
+        PairReport BuildSecondaryReport()
+        {
+            PairReport report = new PairReport();
+            report.AddLine("Crit Chance", SecondaryStats.Attack.CriticalChance);
+            report.AddLine("Crit Damage", SecondaryStats.Attack.CriticalDamage);
+            report.AddLine("Hit Chance", SecondaryStats.Attack.BonusHitChance);
+            report.AddLine("Dodge Chance", SecondaryStats.Defense.DodgeChance);
+            report.AddLine("Parry Chance", SecondaryStats.Defense.ParryChance);
+            return report;
+        }
+
+        static PairReport CloneReport(PairReport source)
+        {
+            PairReport clone = new PairReport();
+            if (source == null) return clone;
+            for (int i = 0; i < source.Count; i++)
+            {
+                var line = source.Lines[i];
+                clone.AddLine(line.Name, line.Value);
+            }
+            return clone;
         }
 
         protected override bool CheckForRelation()

@@ -9,10 +9,12 @@ namespace Project_1.Managers
     internal static class RandomManager
     {
         static Random random;
+        static readonly object randomLock = new object();
         static bool initialized;
 
         public static void Init()
         {
+            ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
             if (DebugManager.Mode(DebugMode.FalseRandom))
@@ -25,17 +27,26 @@ namespace Project_1.Managers
 
         public static int RollInt()
         {
-            return random.Next();
+            lock (randomLock)
+            {
+                return random.Next();
+            }
         }
 
         public static int RollInt(int aMaxSize)  // 0 to max -1
         {
-            return random.Next(aMaxSize);
+            lock (randomLock)
+            {
+                return random.Next(aMaxSize);
+            }
         }
 
         public static int RollInt(int aMinSize, int aMaxSize) // min to max -1
         {
-            return random.Next(aMinSize, aMaxSize);
+            lock (randomLock)
+            {
+                return random.Next(aMinSize, aMaxSize);
+            }
         }
 
         
@@ -55,17 +66,26 @@ namespace Project_1.Managers
 
         public static double RollDouble()
         {
-            return random.NextDouble();
+            lock (randomLock)
+            {
+                return random.NextDouble();
+            }
         }
 
         public static double RollDouble(double aMax)
         {
-            return random.NextDouble() * aMax;
+            lock (randomLock)
+            {
+                return random.NextDouble() * aMax;
+            }
         }
 
         public static double RollDouble(double aMin, double aMax)
         {
-            return aMin + random.NextDouble() * (aMax - aMin);
+            lock (randomLock)
+            {
+                return aMin + random.NextDouble() * (aMax - aMin);
+            }
         }
 
         public static double RollDouble((double, double) aMinMax)

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities.Friendlies;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.UIElements.Boxes;
 using Project_1.UI.UIElements.Buttons;
@@ -53,7 +53,7 @@ namespace Project_1.UI.HUD.Guild
             }
         }
 
-        public void SetData(Friendly[] aData)
+        public void SetData(EntityUiSnapshot[] aData)
         {
             guildMembers.Clear();
             KillAllChildren();
@@ -67,7 +67,7 @@ namespace Project_1.UI.HUD.Guild
             AddChildren(guildMembers);
         }
 
-        public void AddMember(Friendly aData)
+        public void AddMember(EntityUiSnapshot aData)
         {
             AddScrollableElement(new GuildMemberListing(aData, ElementSize.ToAbsoluteScreenPos(Size)));
 

@@ -32,7 +32,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Npcs
             if (!InConversationRange(player.FeetPosition)) return false;
 
             BeginConversation(this);
-            Mailboxes.Ui.Publish(new GossipOpened(gossip));
+            Mailboxes.Ui.Publish(new GossipOpened(new GossipUiSnapshot(gossip.Options, gossip.LinkTree, gossip.StartIndex)));
             return true;
         }
 

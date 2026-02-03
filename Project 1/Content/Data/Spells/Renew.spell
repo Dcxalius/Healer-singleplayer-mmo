@@ -1,0 +1,1 @@
+{"Name": "Renew", "ButtonGfx": "Renew", "HitEffectGfx": "Renew", "Effects": ["Renew"],"AcceptableTargets": [0, 1],"CastTime": 0,"Cooldown": 0, "ResourceCost": 20, "CastDistance": 1000, "TravelType": 2}

@@ -34,7 +34,8 @@ namespace Project_1.GameObjects.Unit.Classes
         protected override void Assert()
         {
             base.Assert();
-            Debug.Assert(gearAllowed.Max() <= Equipment.MainSlotCount && gearAllowed.Length == (int)Items.SubTypes.Equipment.GearType.Count);
+            //gear allowed is a set of ints representing the max item count for each gear type
+            Debug.Assert(gearAllowed.Sum() == Equipment.MainSlotCount && gearAllowed.Length == (int)Items.SubTypes.Equipment.GearType.Count);
         }
     }
 }

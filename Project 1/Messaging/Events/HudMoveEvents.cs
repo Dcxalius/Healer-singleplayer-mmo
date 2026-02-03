@@ -1,6 +1,4 @@
-﻿using Project_1.UI.UIElements;
-
-namespace Project_1.Messaging.Events
+﻿namespace Project_1.Messaging.Events
 {
     internal readonly struct HudMovableChanged
     {
@@ -22,12 +20,12 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct HudSizeChangerSet
     {
-        public HudSizeChangerSet(UIElement element)
+        public HudSizeChangerSet(int uiElementId)
         {
-            Element = element;
+            UiElementId = uiElementId;
         }
 
-        public UIElement Element { get; }
+        public int UiElementId { get; }
     }
 
     internal readonly struct HudSaveRequested

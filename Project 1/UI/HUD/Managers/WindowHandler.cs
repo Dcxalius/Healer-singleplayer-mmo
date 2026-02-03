@@ -14,8 +14,9 @@ using Project_1.UI.HUD.Windows.Logic;
 using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 using Project_1.GameObjects.Entities.Friendlies.Players;
-using Project_1.GameObjects.Entities.Friendlies.Npcs;
 using Project_1.Managers;
+using Project_1.Messaging.Events;
+using Project_1.Items;
 
 namespace Project_1.UI.HUD.Managers
 {
@@ -66,7 +67,7 @@ namespace Project_1.UI.HUD.Managers
             HUDManager.InvalidateUi();
         }
 
-        public void OpenGossipWindow(GossipData aData)
+        public void OpenGossipWindow(in GossipUiSnapshot aData)
         {
             ThreadAffinity.AssertUiThread();
             gossipWindow.OpenWindow();
@@ -92,12 +93,14 @@ namespace Project_1.UI.HUD.Managers
             HUDManager.InvalidateUi();
         }
 
-        public void AddGuildMember(Friendly aData)
+        public void AddGuildMember(EntityUiSnapshot aData)
         {
-            //guildWindow.
+            ThreadAffinity.AssertUiThread();
+            guildWindow.AddMember(aData);
+            HUDManager.InvalidateUi();
         }
 
-        public void SetGuildMembers(Friendly[] aData)
+        public void SetGuildMembers(EntityUiSnapshot[] aData)
         {
             ThreadAffinity.AssertUiThread();
             guildWindow.SetRoster(aData);
@@ -110,10 +113,10 @@ namespace Project_1.UI.HUD.Managers
             guildWindow.SetGuildMemberInviteStatus(aName, aState);
             HUDManager.InvalidateUi();
         }
-        public void SetCharacterWindow(Player aPlayer)
+        public void SetCharacterWindow(CharacterWindowSnapshot snapshot)
         {
             ThreadAffinity.AssertUiThread();
-            characterWindow.SetData(aPlayer);
+            characterWindow.SetData(snapshot);
         }
         public void ToggleCharacterWindow()
         {
@@ -122,71 +125,70 @@ namespace Project_1.UI.HUD.Managers
             HUDManager.InvalidateUi();
         }
 
-        public void RefreshAllCharacterWindowSlots(Equipment aEquipment, Friendly aFriendly)
+        public void RefreshAllCharacterWindowSlots(int ownerRenderId, Relation.RelationToPlayer ownerRelation, Item[] itemSnapshots)
         {
             ThreadAffinity.AssertUiThread();
-            for (int i = 0; i < (int)Equipment.Slot.Count; i++)
+            if (itemSnapshots == null) return;
+            int count = Math.Min(itemSnapshots.Length, (int)Equipment.Slot.Count);
+            for (int i = 0; i < count; i++)
             {
-                RefreshCharacterWindowSlot((Equipment.Slot)i, aEquipment, aFriendly);
+                RefreshCharacterWindowSlot(ownerRenderId, ownerRelation, (Equipment.Slot)i, itemSnapshots[i]);
             }
             HUDManager.InvalidateUi();
         }
 
-        public void RefreshCharacterWindowSlot(Equipment.Slot aSlot, Equipment aEquipment, Friendly aFriendly)
+        public void RefreshCharacterWindowSlot(int ownerRenderId, Relation.RelationToPlayer ownerRelation, Equipment.Slot slot, Item itemSnapshot)
         {
             ThreadAffinity.AssertUiThread();
-            if (aFriendly == null) return;
-            if (aFriendly.RelationToPlayer == Relation.RelationToPlayer.Self)
+            if (ownerRelation == Relation.RelationToPlayer.Self)
             {
-                characterWindow.SetSlot(aSlot, aEquipment);
+                characterWindow.SetSlot(slot, itemSnapshot);
                 HUDManager.InvalidateUi();
                 return;
             }
 
-            if (!inspectWindow.BelongsTo(aFriendly as GuildMember)) return;
+            if (!inspectWindow.BelongsTo(ownerRenderId)) return;
 
-            inspectWindow.SetSlot(aSlot, aEquipment);
+            inspectWindow.SetSlot(slot, itemSnapshot);
             HUDManager.InvalidateUi();
         }
 
-        public void RefreshCharacterWindowStats(PairReport aReport, Friendly aFriendly)
+        public void RefreshCharacterWindowStats(int ownerRenderId, Relation.RelationToPlayer ownerRelation, PairReport primaryReport, PairReport secondaryReport)
         {
             ThreadAffinity.AssertUiThread();
-            if (aFriendly == null) return;
-
-            if (aFriendly.RelationToPlayer == Relation.RelationToPlayer.Self)
+            if (ownerRelation == Relation.RelationToPlayer.Self)
             {
-                characterWindow.SetReportBox(aReport);
+                characterWindow.SetReportBox(primaryReport, secondaryReport);
                 HUDManager.InvalidateUi();
                 return;
             }
-            if (!inspectWindow.BelongsTo(aFriendly as GuildMember)) return;
+            if (!inspectWindow.BelongsTo(ownerRenderId)) return;
 
-            inspectWindow.SetReportBox(aReport);
+            inspectWindow.SetReportBox(primaryReport, secondaryReport);
             HUDManager.InvalidateUi();
         }
 
-        public void RefreshCharacterWindowExpBar(Friendly aFriendly)
+        public void RefreshCharacterWindowExpBar(int ownerRenderId, Relation.RelationToPlayer ownerRelation, int currentLevel, int currentExperience)
         {
             ThreadAffinity.AssertUiThread();
-            if (aFriendly.RelationToPlayer == Relation.RelationToPlayer.Self)
+            if (ownerRelation == Relation.RelationToPlayer.Self)
             {
-                characterWindow.RefreshExp(aFriendly.Level);
+                characterWindow.RefreshExp(currentLevel, currentExperience);
                 HUDManager.InvalidateUi();
                 return;
             }
 
-            if (!inspectWindow.BelongsTo(aFriendly as GuildMember)) return;
+            if (!inspectWindow.BelongsTo(ownerRenderId)) return;
 
-            inspectWindow.RefreshExp(aFriendly.Level);
+            inspectWindow.RefreshExp(currentLevel, currentExperience);
             HUDManager.InvalidateUi();
 
         }
 
-        public GuildMember GetGuildMemberInspectWindowTarget()
+        public int? GetGuildMemberInspectWindowTarget()
         {
             ThreadAffinity.AssertUiThread();
-            return inspectWindow.GuildMember;
+            return inspectWindow.GuildMemberRenderId;
         }
 
         public bool PlayerCharacterPaneOpen
@@ -198,20 +200,35 @@ namespace Project_1.UI.HUD.Managers
             }
         }
 
-        public void ToggleInspectWindow(GuildMember aGuildMember)
+        public void ToggleInspectWindow(in EntityUiSnapshot member)
         {
             ThreadAffinity.AssertUiThread();
-            if (inspectWindow.Visible == true && inspectWindow.BelongsTo(aGuildMember))
+            if (inspectWindow.Visible == true && inspectWindow.BelongsTo(member.RenderId))
             {
                 inspectWindow.ToggleVisibilty();
                 inspectWindow.RemoveData();
                 return;
             }
-            inspectWindow.SetData(aGuildMember);
+            inspectWindow.SetData(member);
             if (inspectWindow.Visible == false)
             {
                 inspectWindow.ToggleVisibilty();
             }
+        }
+
+        public void OpenLogicWindow(int memberRenderId)
+        {
+            ThreadAffinity.AssertUiThread();
+            logicWindow.SetData(memberRenderId);
+            logicWindow.OpenWindow();
+            HUDManager.InvalidateUi();
+        }
+
+        public void SetLogicWindowSnapshot(int memberRenderId, LogicNodeUiSnapshot[] nodes)
+        {
+            ThreadAffinity.AssertUiThread();
+            logicWindow.SetSnapshot(memberRenderId, nodes);
+            HUDManager.InvalidateUi();
         }
 
         public void CloseGuildWindow()

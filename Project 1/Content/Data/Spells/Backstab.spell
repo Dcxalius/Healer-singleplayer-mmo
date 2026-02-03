@@ -1,0 +1,1 @@
+{"Name": "Backstab", "ButtonGfx": "Backstab", "HitEffectGfx": "None", "Effects": ["Backstab"], "AcceptableTargets": [2, 3], "CastTime": 0, "Cooldown": 3, "ResourceCost": 25, "CastDistance": 0, "TravelType": 1}

@@ -39,7 +39,14 @@ namespace Project_1.Managers.States
         }
         public override void Rescale()
         {
-            lock (HUDManager.UiLock)
+            if (UiThread.IsRunning || SimThread.IsRunning)
+            {
+                lock (HUDManager.UiLock)
+                {
+                    pauseBox.Rescale();
+                }
+            }
+            else
             {
                 pauseBox.Rescale();
             }

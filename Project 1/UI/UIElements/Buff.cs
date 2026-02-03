@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
+using Project_1.Managers;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -13,20 +15,28 @@ namespace Project_1.UI.UIElements
 {
     internal class Buff : UIElement , IComparable
     {
-        public double Duration => buff.DurationRemaining;
-        GameObjects.Spells.Buff.Buff buff;
+        public int EffectId => effectId;
+        public double Duration => durationRemainingMs;
+        int effectId;
+        double durationRemainingMs;
         Text xdd;
-        public Buff(GameObjects.Spells.Buff.Buff aBuff, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture(aBuff.GfxPath, Color.White), aPos, aSize)
+        public Buff(in BuffUiSnapshot aBuff, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture(aBuff.GfxPath, Color.White), aPos, aSize)
         {
             xdd = new Text("Gloryse", "xdd", Color.Black);
-            buff = aBuff;
+            effectId = aBuff.EffectId;
+            durationRemainingMs = aBuff.DurationRemainingMs;
             
+        }
+
+        public void Refresh(in BuffUiSnapshot aBuff)
+        {
+            durationRemainingMs = aBuff.DurationRemainingMs;
         }
 
         public override void Update()
         {
             base.Update();
-
+            durationRemainingMs = Math.Max(0, durationRemainingMs - TimeManager.SecondsSinceLastFrame * 1000d);
             xdd.Value = Math.Round(Duration / 1000, 1).ToString();
         }
         public override void Draw(SpriteBatch aBatch)

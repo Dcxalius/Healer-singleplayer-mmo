@@ -11,6 +11,7 @@ using Project_1.UI.HUD.Inventory;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
 using System;
+using Project_1.Messaging.Events;
 
 namespace Project_1.UI.HUD
 {
@@ -109,34 +110,39 @@ namespace Project_1.UI.HUD
             base.Resize(aSize);
         }
 
-        public void SetInventory(Items.Inventory aInventory)
+        public void SetInventory(InventoryUiSnapshot snapshot)
         {
-            bagHolderBox.SetBags(aInventory.GetBags(), itemSizeInBagSpace.ToAbsoluteScreenPos(bagBoxSize.ToAbsoluteScreenPos(Size)), bagBoxSpacing.ToAbsoluteScreenPos(bagBoxSize.ToAbsoluteScreenPos(Size)));
+            bagHolderBox.SetBags(snapshot.BagItems, itemSizeInBagSpace.ToAbsoluteScreenPos(bagBoxSize.ToAbsoluteScreenPos(Size)), bagBoxSpacing.ToAbsoluteScreenPos(bagBoxSize.ToAbsoluteScreenPos(Size)));
 
-            CreateBagBoxes(RelativeSize, aInventory);
+            CreateBagBoxes(RelativeSize, snapshot);
             CalculateSize(RelativePos);
         }
 
-        void CreateBagBoxes(RelativeScreenPosition aSize, Items.Inventory aInventory)
+        void CreateBagBoxes(RelativeScreenPosition aSize, InventoryUiSnapshot snapshot)
         {
             RelativeScreenPosition newBagPos = absBagBoxSpacing.ToRelativeScreenPosition(Size);
 
             bagBox[0].Move(newBagPos);
-            bagBox[0].RefreshBag(aInventory, Items.Inventory.defaultSlots, columnCount);
+            Project_1.Items.Item[] defaultBagItems = null;
+            if (snapshot.ItemsByBag != null && snapshot.ItemsByBag.Length > 0)
+            {
+                defaultBagItems = snapshot.ItemsByBag[0];
+            }
+            bagBox[0].RefreshBag(defaultBagItems, Items.Inventory.defaultSlots, columnCount);
 
             newBagPos.Y += bagBox[0].RelativeSize.Y;
             newBagPos.Y += absBagBoxSpacing.ToRelativeScreenPosition().Y;
 
             for (int i = 1; i < bagBox.Length; i++)
             {
-                if (aInventory.Bags[i] == null)
+                if (snapshot.ItemsByBag == null || snapshot.ItemsByBag.Length <= i || snapshot.ItemsByBag[i] == null)
                 {
                     bagBox[i].Empty();
                     continue;
                 }
 
                 bagBox[i].Move(newBagPos);
-                bagBox[i].RefreshBag(aInventory, aInventory.GetBag(i).SlotCount, columnCount);
+                bagBox[i].RefreshBag(snapshot.ItemsByBag[i], snapshot.ItemsByBag[i].Length, columnCount);
 
                 newBagPos.Y += bagBox[i].RelativeSize.Y + absBagBoxSpacing.ToRelativeScreenPosition().Y;
             }
@@ -144,27 +150,10 @@ namespace Project_1.UI.HUD
 
         public void RefreshGold(int aGoldAmount) => gold.Text = aGoldAmount.ToString();
 
-        public void RefreshSlot(int aBag, int aSlot, Items.Inventory aInventory)
+        public void RefreshSlot(int aBag, int aSlot, InventoryUiSnapshot snapshot)
         {
-            if (aBag >= 0)
-            {
-                bagBox[aBag].RefreshSlot(aSlot, aInventory);
-                return;
-            }
-
-            bagHolderBox.RefreshSlot(aSlot, aInventory);
-            if (aInventory.Bags[aSlot] == null)
-            {
-                bagBox[aSlot].Empty();
-                MoveBags(aSlot, aInventory);
-                CalculateSize(RelativePos);
-                return;
-            }
-
-            bagBox[aSlot].RefreshBag(aInventory, aInventory.Bags[aSlot].SlotCount, columnCount);
-            MoveBags(aSlot, aInventory);
-            CalculateSize(RelativePos);
-            return;
+            // Slot-level refresh now uses the latest immutable snapshot to avoid live inventory refs on UI thread.
+            SetInventory(snapshot);
         }
 
         void MoveBags(int aSlot, Items.Inventory aInventory)

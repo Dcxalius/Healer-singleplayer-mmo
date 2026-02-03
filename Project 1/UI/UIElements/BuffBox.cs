@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.UIElements.Boxes;
 using System;
@@ -86,15 +87,22 @@ namespace Project_1.UI.UIElements
             ClearBuffs();
             for (int i = 0; i < aBuff.Count; i++)
             {
-                buffs.Add(new Buff(aBuff[i], RelativeScreenPosition.Zero, buffSize));
+                buffs.Add(new Buff(new BuffUiSnapshot(aBuff[i].EffectId, aBuff[i].GfxPath, aBuff[i].DurationRemaining), RelativeScreenPosition.Zero, buffSize));
             }
 
             AddChildren(buffs);
             SortBuffs();
         }
 
-        public void AddBuff(GameObjects.Spells.Buff.Buff aBuff)
+        public void AddBuff(in BuffUiSnapshot aBuff)
         {
+            for (int i = 0; i < buffs.Count; i++)
+            {
+                if (buffs[i].EffectId != aBuff.EffectId) continue;
+                buffs[i].Refresh(aBuff);
+                SortBuffs();
+                return;
+            }
             buffs.Add(new Buff(aBuff, RelativeScreenPosition.Zero, buffSize));
             AddChild(buffs.Last());
             SortBuffs();

@@ -1,18 +1,15 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects.Spells;
-using Project_1.Items;
-
 namespace Project_1.Messaging.Events
 {
     internal readonly struct HeldItemStart
     {
-        public HeldItemStart(object source, AbsoluteScreenPosition grabOffset)
+        public HeldItemStart(int sourceUiElementId, AbsoluteScreenPosition grabOffset)
         {
-            Source = source;
+            SourceUiElementId = sourceUiElementId;
             GrabOffset = grabOffset;
         }
-        public object Source { get; }
+        public int SourceUiElementId { get; }
         public AbsoluteScreenPosition GrabOffset { get; }
     }
 
@@ -22,12 +19,12 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct HeldSpellStart
     {
-        public HeldSpellStart(Spell spell, AbsoluteScreenPosition grabOffset)
+        public HeldSpellStart(string spellName, AbsoluteScreenPosition grabOffset)
         {
-            Spell = spell;
+            SpellName = spellName;
             GrabOffset = grabOffset;
         }
-        public Spell Spell { get; }
+        public string SpellName { get; }
         public AbsoluteScreenPosition GrabOffset { get; }
     }
 

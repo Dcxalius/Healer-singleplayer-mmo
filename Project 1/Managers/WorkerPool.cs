@@ -28,6 +28,8 @@ namespace Project_1.Managers
         static long totalEnqueued;
         static long totalCompleted;
         static double lastWorkMs;
+        static readonly ConcurrentDictionary<int, Action> completions = new ConcurrentDictionary<int, Action>();
+        static int nextCompletionId;
 
         public static bool IsRunning => running;
         public static WorkerPoolStats Stats => new WorkerPoolStats(
@@ -39,6 +41,7 @@ namespace Project_1.Managers
 
         public static void Start(int? workerCount = null)
         {
+            ThreadAffinity.AssertMainThread();
             lock (startLock)
             {
                 if (running) return;
@@ -48,6 +51,8 @@ namespace Project_1.Managers
                 totalEnqueued = 0;
                 totalCompleted = 0;
                 lastWorkMs = 0;
+                nextCompletionId = 0;
+                completions.Clear();
 
                 int count = workerCount ?? Math.Max(1, Environment.ProcessorCount - 1);
                 queue = new BlockingCollection<WorkItem>();
@@ -68,6 +73,7 @@ namespace Project_1.Managers
 
         public static void Stop()
         {
+            ThreadAffinity.AssertMainThread();
             lock (startLock)
             {
                 if (!running) return;
@@ -111,9 +117,18 @@ namespace Project_1.Managers
                 T result = work != null ? work() : default;
                 if (onComplete != null)
                 {
-                    Mailboxes.Main.Publish(new WorkerCallback(() => onComplete(result)));
+                    int completionId = Interlocked.Increment(ref nextCompletionId);
+                    completions[completionId] = () => onComplete(result);
+                    Mailboxes.Main.Publish(new WorkerCompletionReady(completionId));
                 }
             });
+        }
+
+        public static void RunCompletion(int completionId)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (!completions.TryRemove(completionId, out Action completion)) return;
+            completion?.Invoke();
         }
 
         static void Run()

@@ -197,7 +197,7 @@ namespace Project_1.GameObjects.Unit
         public void SetOwner(Entity aOwner)
         {
             owner = aOwner;
-            Mailboxes.Ui.Publish(new EquipmentSlotsRefreshed(owner as Friendly, this));
+            Mailboxes.Ui.Publish(new EquipmentSlotsRefreshed(owner.RenderId, owner.RelationToPlayer, BuildItemSnapshots()));
         }
 
         void RefreshStatsFromEquipment()
@@ -456,7 +456,7 @@ namespace Project_1.GameObjects.Unit
             equipped[(int)aSlot] = aEquipment;
             equipmentStats.AddStats(aEquipment.Stats);
             
-            Mailboxes.Ui.Publish(new EquipmentSlotChanged(owner as Friendly, aSlot, this)); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
+            Mailboxes.Ui.Publish(new EquipmentSlotChanged(owner.RenderId, owner.RelationToPlayer, aSlot, BuildItemSnapshot(aSlot))); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
             return previouslyEquiped;
         }
 
@@ -467,7 +467,7 @@ namespace Project_1.GameObjects.Unit
             //if (GearTypeCheck(aEquipment)) return; //I think this is only called when an equipment has type none anyways
             equipped[(int)aSlot] = aEquipment;
             equipmentStats.AddStats(aEquipment.Stats);
-            Mailboxes.Ui.Publish(new EquipmentSlotChanged(owner as Friendly, aSlot, this)); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
+            Mailboxes.Ui.Publish(new EquipmentSlotChanged(owner.RenderId, owner.RelationToPlayer, aSlot, BuildItemSnapshot(aSlot))); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
         }
 
         bool UnableToDualWield(Items.SubTypes.Equipment aEquipment, Slot aSlot)
@@ -501,8 +501,25 @@ namespace Project_1.GameObjects.Unit
             
 
             equipmentStats.RemoveStats(item.Stats);
-            Mailboxes.Ui.Publish(new EquipmentSlotChanged(owner as Friendly, aSlot, this));
+            Mailboxes.Ui.Publish(new EquipmentSlotChanged(owner.RenderId, owner.RelationToPlayer, aSlot, null));
             return item;
+        }
+
+        Items.Item[] BuildItemSnapshots()
+        {
+            Items.Item[] snapshots = new Items.Item[(int)Slot.Count];
+            for (int i = 0; i < snapshots.Length; i++)
+            {
+                snapshots[i] = BuildItemSnapshot((Slot)i);
+            }
+            return snapshots;
+        }
+
+        Items.Item BuildItemSnapshot(Slot slot)
+        {
+            Item source = equipped[(int)slot];
+            if (source == null) return null;
+            return new Item(source.ID, source.Count);
         }
 
         public AttackData GetWeaponAttacks()

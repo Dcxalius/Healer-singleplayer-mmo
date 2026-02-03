@@ -6,33 +6,27 @@ using Project_1.Camera;
 using Project_1.UI.UIElements.Buttons;
 using System;
 using System.Collections.Generic;
-using Project_1.GameObjects.Entities.Friendlies;
-using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 
 namespace Project_1.UI.HUD.Guild
 {
     internal class InviteButton : TwoStateGFXButton
     {
-        GuildMember guildMember;
-        public InviteButton(Friendly aFriendly, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new List<Action>() { }, new GfxPath(GfxType.UI, "Invite"), new List<Action>() { }, new GfxPath(GfxType.UI, "Uninvite"), aPos, aSize, Color.White)
+        int memberRenderId;
+        public InviteButton(int aMemberRenderId, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new List<Action>() { }, new GfxPath(GfxType.UI, "Invite"), new List<Action>() { }, new GfxPath(GfxType.UI, "Uninvite"), aPos, aSize, Color.White)
         {
-            if (aFriendly.GetType() != typeof(GuildMember)) return;
-
-            guildMember = aFriendly as GuildMember;
+            memberRenderId = aMemberRenderId;
             AddAction(new Action(() => Invite()), State.First);
             AddAction(new Action(() => Kick()), State.Second);
         }
 
         void Invite()
         {
-            if (guildMember == null) return;
-            Mailboxes.Main.Publish(new PartyMemberInviteRequested(guildMember.RenderId));
+            Mailboxes.Main.Publish(new PartyMemberInviteRequested(memberRenderId));
         }
 
         void Kick()
         {
-            if (guildMember == null) return;
-            Mailboxes.Main.Publish(new PartyMemberKickRequested(guildMember.RenderId));
+            Mailboxes.Main.Publish(new PartyMemberKickRequested(memberRenderId));
         }
 
     }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.GameObjects.Entities.Friendlies.Npcs;
 using Microsoft.Xna.Framework;
+using Project_1.Textures;
 
 namespace Project_1.Messaging.Events
 {
@@ -14,6 +15,7 @@ namespace Project_1.Messaging.Events
         public EntityUiSnapshot(
             int renderId,
             string name,
+            string className,
             Relation.RelationToPlayer relationToPlayer,
             Color relationColor,
             int level,
@@ -27,6 +29,7 @@ namespace Project_1.Messaging.Events
         {
             RenderId = renderId;
             Name = name;
+            ClassName = className;
             RelationToPlayer = relationToPlayer;
             RelationColor = relationColor;
             Level = level;
@@ -41,6 +44,7 @@ namespace Project_1.Messaging.Events
 
         public int RenderId { get; }
         public string Name { get; }
+        public string ClassName { get; }
         public Relation.RelationToPlayer RelationToPlayer { get; }
         public Color RelationColor { get; }
         public int Level { get; }
@@ -55,46 +59,60 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct EquipmentSlotChanged
     {
-        public EquipmentSlotChanged(Friendly friendly, Equipment.Slot slot, GameObjects.Unit.Equipment equipment)
+        public EquipmentSlotChanged(int ownerRenderId, Relation.RelationToPlayer ownerRelation, Equipment.Slot slot, Items.Item itemSnapshot)
         {
-            Friendly = friendly;
+            OwnerRenderId = ownerRenderId;
+            OwnerRelation = ownerRelation;
             Slot = slot;
-            Equipment = equipment;
+            ItemSnapshot = itemSnapshot;
         }
-        public Friendly Friendly { get; }
+        public int OwnerRenderId { get; }
+        public Relation.RelationToPlayer OwnerRelation { get; }
         public Equipment.Slot Slot { get; }
-        public GameObjects.Unit.Equipment Equipment { get; }
+        public Items.Item ItemSnapshot { get; }
     }
 
     internal readonly struct EquipmentSlotsRefreshed
     {
-        public EquipmentSlotsRefreshed(Friendly friendly, GameObjects.Unit.Equipment equipment)
+        public EquipmentSlotsRefreshed(int ownerRenderId, Relation.RelationToPlayer ownerRelation, Items.Item[] itemSnapshots)
         {
-            Friendly = friendly;
-            Equipment = equipment;
+            OwnerRenderId = ownerRenderId;
+            OwnerRelation = ownerRelation;
+            ItemSnapshots = itemSnapshots;
         }
-        public Friendly Friendly { get; }
-        public GameObjects.Unit.Equipment Equipment { get; }
+        public int OwnerRenderId { get; }
+        public Relation.RelationToPlayer OwnerRelation { get; }
+        public Items.Item[] ItemSnapshots { get; }
     }
 
     internal readonly struct StatsRefreshed
     {
-        public StatsRefreshed(Friendly friendly, PairReport stats)
+        public StatsRefreshed(int ownerRenderId, Relation.RelationToPlayer ownerRelation, PairReport primaryStats, PairReport secondaryStats)
         {
-            Friendly = friendly;
-            Stats = stats;
+            OwnerRenderId = ownerRenderId;
+            OwnerRelation = ownerRelation;
+            PrimaryStats = primaryStats;
+            SecondaryStats = secondaryStats;
         }
-        public Friendly Friendly { get; }
-        public PairReport Stats { get; }
+        public int OwnerRenderId { get; }
+        public Relation.RelationToPlayer OwnerRelation { get; }
+        public PairReport PrimaryStats { get; }
+        public PairReport SecondaryStats { get; }
     }
 
     internal readonly struct ExperienceRefreshed
     {
-        public ExperienceRefreshed(Friendly friendly)
+        public ExperienceRefreshed(int ownerRenderId, Relation.RelationToPlayer ownerRelation, int currentLevel, int currentExperience)
         {
-            Friendly = friendly;
+            OwnerRenderId = ownerRenderId;
+            OwnerRelation = ownerRelation;
+            CurrentLevel = currentLevel;
+            CurrentExperience = currentExperience;
         }
-        public Friendly Friendly { get; }
+        public int OwnerRenderId { get; }
+        public Relation.RelationToPlayer OwnerRelation { get; }
+        public int CurrentLevel { get; }
+        public int CurrentExperience { get; }
     }
 
     internal readonly struct TargetChanged
@@ -151,33 +169,45 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct InventoryAssigned
     {
-        public InventoryAssigned(Items.Inventory inventory)
+        public InventoryAssigned(InventoryUiSnapshot snapshot)
         {
-            Inventory = inventory;
+            Snapshot = snapshot;
         }
-        public Items.Inventory Inventory { get; }
+        public InventoryUiSnapshot Snapshot { get; }
+    }
+
+    internal readonly struct InventoryUiSnapshot
+    {
+        public InventoryUiSnapshot(Items.Item[] bagItems, Items.Item[][] itemsByBag)
+        {
+            BagItems = bagItems;
+            ItemsByBag = itemsByBag;
+        }
+
+        public Items.Item[] BagItems { get; }
+        public Items.Item[][] ItemsByBag { get; }
     }
 
     internal readonly struct SpellbookRefreshed
     {
-        public SpellbookRefreshed(Friendly owner, Spell[] spells)
+        public SpellbookRefreshed(int ownerRenderId, string[] spellNames)
         {
-            Owner = owner;
-            Spells = spells;
+            OwnerRenderId = ownerRenderId;
+            SpellNames = spellNames;
         }
-        public Friendly Owner { get; }
-        public Spell[] Spells { get; }
+        public int OwnerRenderId { get; }
+        public string[] SpellNames { get; }
     }
 
     internal readonly struct SpellbarLoaded
     {
-        public SpellbarLoaded(Friendly owner, Spell[] spells)
+        public SpellbarLoaded(int ownerRenderId, string[] spellNames)
         {
-            Owner = owner;
-            Spells = spells;
+            OwnerRenderId = ownerRenderId;
+            SpellNames = spellNames;
         }
-        public Friendly Owner { get; }
-        public Spell[] Spells { get; }
+        public int OwnerRenderId { get; }
+        public string[] SpellNames { get; }
     }
 
     internal readonly struct SpellbarSnapshotRequested
@@ -196,31 +226,49 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct CharacterWindowSet
     {
-        public CharacterWindowSet(Friendly owner)
+        public CharacterWindowSet(CharacterWindowSnapshot snapshot)
         {
-            Owner = owner;
+            Snapshot = snapshot;
         }
-        public Friendly Owner { get; }
+        public CharacterWindowSnapshot Snapshot { get; }
     }
 
     internal readonly struct PlayerPlateSet
     {
-        public PlayerPlateSet(Friendly owner)
+        public PlayerPlateSet(EntityUiSnapshot snapshot)
         {
-            Owner = owner;
+            Snapshot = snapshot;
         }
-        public Friendly Owner { get; }
+        public EntityUiSnapshot Snapshot { get; }
     }
 
     internal readonly struct GoldChanged
     {
-        public GoldChanged(Friendly owner, int gold)
+        public GoldChanged(int gold)
         {
-            Owner = owner;
             Gold = gold;
         }
-        public Friendly Owner { get; }
         public int Gold { get; }
+    }
+
+    internal readonly struct CharacterWindowSnapshot
+    {
+        public CharacterWindowSnapshot(EntityUiSnapshot ownerSnapshot, PairReport primaryStats, PairReport secondaryStats, int currentLevel, int currentExperience, Items.Item[] equippedItems)
+        {
+            OwnerSnapshot = ownerSnapshot;
+            PrimaryStats = primaryStats;
+            SecondaryStats = secondaryStats;
+            CurrentLevel = currentLevel;
+            CurrentExperience = currentExperience;
+            EquippedItems = equippedItems;
+        }
+
+        public EntityUiSnapshot OwnerSnapshot { get; }
+        public PairReport PrimaryStats { get; }
+        public PairReport SecondaryStats { get; }
+        public int CurrentLevel { get; }
+        public int CurrentExperience { get; }
+        public Items.Item[] EquippedItems { get; }
     }
 
     internal readonly struct PlayerUiSnapshot
@@ -266,22 +314,74 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct BuffAdded
     {
-        public BuffAdded(Entity owner, Project_1.GameObjects.Spells.Buff.Buff buff)
+        public BuffAdded(int ownerRenderId, BuffUiSnapshot buff)
         {
-            Owner = owner;
+            OwnerRenderId = ownerRenderId;
             Buff = buff;
         }
-        public Entity Owner { get; }
-        public Project_1.GameObjects.Spells.Buff.Buff Buff { get; }
+        public int OwnerRenderId { get; }
+        public BuffUiSnapshot Buff { get; }
+    }
+
+    internal readonly struct BuffUiSnapshot
+    {
+        public BuffUiSnapshot(int effectId, GfxPath gfxPath, double durationRemainingMs)
+        {
+            EffectId = effectId;
+            GfxPath = gfxPath;
+            DurationRemainingMs = durationRemainingMs;
+        }
+
+        public int EffectId { get; }
+        public GfxPath GfxPath { get; }
+        public double DurationRemainingMs { get; }
     }
 
     internal readonly struct GossipOpened
     {
-        public GossipOpened(GameObjects.Entities.Friendlies.Npcs.GossipData data)
+        public GossipOpened(GossipUiSnapshot data)
         {
             Data = data;
         }
-        public GameObjects.Entities.Friendlies.Npcs.GossipData Data { get; }
+        public GossipUiSnapshot Data { get; }
+    }
+
+    internal readonly struct GossipUiSnapshot
+    {
+        public GossipUiSnapshot(string[][] options, int[][] linkTree, int startIndex)
+        {
+            Options = CloneJagged(options);
+            LinkTree = CloneJagged(linkTree);
+            StartIndex = startIndex;
+        }
+
+        public string[][] Options { get; }
+        public int[][] LinkTree { get; }
+        public int StartIndex { get; }
+
+        static string[][] CloneJagged(string[][] source)
+        {
+            if (source == null) return null;
+            string[][] clone = new string[source.Length][];
+            for (int i = 0; i < source.Length; i++)
+            {
+                if (source[i] == null) continue;
+                clone[i] = (string[])source[i].Clone();
+            }
+            return clone;
+        }
+
+        static int[][] CloneJagged(int[][] source)
+        {
+            if (source == null) return null;
+            int[][] clone = new int[source.Length][];
+            for (int i = 0; i < source.Length; i++)
+            {
+                if (source[i] == null) continue;
+                clone[i] = (int[])source[i].Clone();
+            }
+            return clone;
+        }
     }
 
     internal readonly struct GossipClosed

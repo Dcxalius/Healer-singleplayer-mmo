@@ -38,12 +38,12 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         void SetRosterWindow()
         {
-            GuildMember.GuildMemberData[] data = new GuildMember.GuildMemberData[guildMembers.Count];
+            EntityUiSnapshot[] data = new EntityUiSnapshot[guildMembers.Count];
             for (int i = 0; i < guildMembers.Count; i++)
             {
-                data[i] = guildMembers[i].CreateGuildMemberData();
+                data[i] = guildMembers[i].BuildUiSnapshot();
             }
-            Mailboxes.Ui.Publish(new GuildMembersSet(guildMembers.ToArray()));
+            Mailboxes.Ui.Publish(new GuildMembersSet(data));
         }
     }
 }

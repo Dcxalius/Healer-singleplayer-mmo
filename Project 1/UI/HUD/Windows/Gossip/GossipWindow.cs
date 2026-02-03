@@ -12,7 +12,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Project_1.GameObjects.Entities.Friendlies.Npcs;
 
 namespace Project_1.UI.HUD.Windows.Gossip
 {
@@ -41,7 +40,7 @@ namespace Project_1.UI.HUD.Windows.Gossip
             return Set;
         }
 
-        public void Set(GossipData aData)
+        public void Set(in GossipUiSnapshot aData)
         {
             ChatGossipOption start = BuildOptions(aData);
             Set(start);
@@ -54,7 +53,7 @@ namespace Project_1.UI.HUD.Windows.Gossip
             AddOptions(aOption.GossipOptions);
         }
 
-        ChatGossipOption BuildOptions(GossipData aData)
+        ChatGossipOption BuildOptions(in GossipUiSnapshot aData)
         {
             string[][] optionsData = aData.Options;
             int[][] links = aData.LinkTree;

@@ -15,6 +15,7 @@ namespace Project_1.GameObjects.Spells.Buff
         protected Entity caster;
 
         protected SpellEffect effect;
+        public int EffectId => effect.Id;
 
         public virtual GfxPath GfxPath { get; }
 

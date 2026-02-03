@@ -18,7 +18,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 
 namespace Project_1.UI.HUD.Inventory
 {
@@ -34,13 +33,13 @@ namespace Project_1.UI.HUD.Inventory
         public int bagIndex; //BagIndex 0 and above is the inventory slots, -1 is for the slots for the bags themselves, -2 is for lootwindow, -3 is for equipped
         public int slotIndex;
 
-        static GuildMember GetInspectTarget()
+        static int? GetInspectTargetRenderId()
         {
             if (!Window.IsWindowOpen(nameof(InspectWindow)))
             {
                 return null;
             }
-            return InspectWindow.CurrentTarget;
+            return InspectWindow.CurrentTargetRenderId;
         }
 
         static bool IsCharacterWindowOpen() => Window.IsWindowOpen(nameof(CharacterWindow));
@@ -267,9 +266,8 @@ namespace Project_1.UI.HUD.Inventory
         {
             if (aItemDroppedOnMe.bagIndex != -4) return false;
 
-            GuildMember inspectTarget = GetInspectTarget();
-            if (inspectTarget == null) return true;
-            int inspectTargetRenderId = inspectTarget.RenderId;
+            int? inspectTargetRenderId = GetInspectTargetRenderId();
+            if (!inspectTargetRenderId.HasValue) return true;
             if (bagIndex == -4)
             {
                 Equipment thisItem = GetActualItem as Equipment;
@@ -279,14 +277,14 @@ namespace Project_1.UI.HUD.Inventory
                 if (!GameObjects.Unit.Equipment.FitsInSlot(droppedItem.type, (GameObjects.Unit.Equipment.Slot)slotIndex)) return true;
                 if (thisItem == null)
                 {
-                    Mailboxes.Main.Publish(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, inspectTargetRenderId));
+                    Mailboxes.Main.Publish(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, inspectTargetRenderId.Value));
                     return true;
                 }
 
                 if (droppedItem.type != thisItem.type) return true;
                 if (droppedItem.type >= Equipment.Type.MainHander) return true;
                 if (thisItem.type >= Equipment.Type.MainHander) return true;
-                Mailboxes.Main.Publish(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, inspectTargetRenderId));
+                Mailboxes.Main.Publish(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, inspectTargetRenderId.Value));
 
                 return true;
             }
@@ -298,13 +296,13 @@ namespace Project_1.UI.HUD.Inventory
 
                 if (thisItem == null)
                 {
-                    Mailboxes.Main.Publish(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, inspectTargetRenderId));
+                    Mailboxes.Main.Publish(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, inspectTargetRenderId.Value));
                     return true;
                 }
 
                 if (!GameObjects.Unit.Equipment.FitsInSlot(thisItem.type, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex)) return true;
 
-                Mailboxes.Main.Publish(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, inspectTargetRenderId));
+                Mailboxes.Main.Publish(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, inspectTargetRenderId.Value));
 
                 return true;
             }
@@ -316,10 +314,10 @@ namespace Project_1.UI.HUD.Inventory
         bool ToGuildMemberCharacterPane(Item aItemDroppedOnMe)
         {
             if (bagIndex != -4) return false;
-            GuildMember inspectTarget = GetInspectTarget();
-            if (inspectTarget != null)
+            int? inspectTargetRenderId = GetInspectTargetRenderId();
+            if (inspectTargetRenderId.HasValue)
             {
-                Mailboxes.Main.Publish(new InventorySwapEquipmentRequested(aItemDroppedOnMe.Index, slotIndex, inspectTarget.RenderId));
+                Mailboxes.Main.Publish(new InventorySwapEquipmentRequested(aItemDroppedOnMe.Index, slotIndex, inspectTargetRenderId.Value));
             }
             //TODO: Handle if trying to drag inbetween sheets.
             return true;
@@ -340,7 +338,7 @@ namespace Project_1.UI.HUD.Inventory
             if (isEmpty == false && holdable)
             {
                 Mailboxes.Ui.Publish(new DescriptorBoxClear());
-                Mailboxes.Ui.Publish(new HeldItemStart(this, UiMouseStateCache.Absolute - Location));
+                Mailboxes.Ui.Publish(new HeldItemStart(UiElementId, UiMouseStateCache.Absolute - Location));
             }
         }
 
@@ -385,9 +383,9 @@ namespace Project_1.UI.HUD.Inventory
                     //TODO: Add refund system instead of direct deletion.
                 }
 
-                GuildMember inspectTarget = GetInspectTarget();
-                if (inspectTarget == null || IsCharacterWindowOpen()) targetRenderId = null;
-                else targetRenderId = inspectTarget.RenderId;
+                int? inspectTargetRenderId = GetInspectTargetRenderId();
+                if (!inspectTargetRenderId.HasValue || IsCharacterWindowOpen()) targetRenderId = null;
+                else targetRenderId = inspectTargetRenderId.Value;
                 Items.Item actual = GetActualItem;
                 if (actual == null) return;
                 switch (actual.ItemType)

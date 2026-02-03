@@ -7,6 +7,7 @@ using Project_1.UI.HUD.Inventory;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Bars;
 using Project_1.UI.UIElements.Boxes;
+using Project_1.Messaging.Events;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -107,9 +108,18 @@ namespace Project_1.UI.HUD.Windows
         {
             owner = aFriendly;
             nameLabel.Text = aFriendly.Name;
-            SetReportBox(aFriendly.PrimaryStatReport);
+            SetReportBox(aFriendly.PrimaryStatReport, BuildSecondaryReport(aFriendly));
             RefreshExp(aFriendly.Level);
             SetAllSlots(aFriendly.Equipment);
+        }
+
+        public virtual void SetData(CharacterWindowSnapshot snapshot)
+        {
+            owner = null;
+            nameLabel.Text = snapshot.OwnerSnapshot.Name;
+            SetReportBox(snapshot.PrimaryStats, snapshot.SecondaryStats);
+            RefreshExp(snapshot.CurrentLevel, snapshot.CurrentExperience);
+            SetAllSlots(snapshot.EquippedItems);
         }
 
         void CreateItems(Equipment.Slot aStart, Equipment.Slot aEnd, RelativeScreenPosition aStartPos, RelativeScreenPosition aChangeInPos)
@@ -133,10 +143,32 @@ namespace Project_1.UI.HUD.Windows
             equiped[(int)aSlot].AssignItem(aEquipment.EquipedInSlot(aSlot));
         }
 
+        public void SetSlot(Equipment.Slot aSlot, Project_1.Items.Item itemSnapshot)
+        {
+            equiped[(int)aSlot].AssignItem(itemSnapshot);
+        }
+
+        void SetAllSlots(Project_1.Items.Item[] items)
+        {
+            if (items == null) return;
+            int count = Math.Min(items.Length, equiped.Length);
+            for (int i = 0; i < count; i++)
+            {
+                equiped[i].AssignItem(items[i]);
+            }
+        }
+
         public void SetReportBox(PairReport aReport)
         {
             primaryReport = aReport ?? new PairReport();
             secondaryReport = BuildSecondaryReport(owner);
+            RefreshStatPage();
+        }
+
+        public void SetReportBox(PairReport primary, PairReport secondary)
+        {
+            primaryReport = primary ?? new PairReport();
+            secondaryReport = secondary ?? new PairReport();
             RefreshStatPage();
         }
 
@@ -206,6 +238,12 @@ namespace Project_1.UI.HUD.Windows
         {
             expBar.MaxValue = Level.ExpToNextLevel(aLevel.CurrentLevel);
             expBar.Value = aLevel.Experience;
+        }
+
+        public void RefreshExp(int currentLevel, int currentExperience)
+        {
+            expBar.MaxValue = Level.ExpToNextLevel(currentLevel);
+            expBar.Value = currentExperience;
         }
     }
 }

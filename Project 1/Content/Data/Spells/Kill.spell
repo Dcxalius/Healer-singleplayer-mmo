@@ -1,0 +1,1 @@
+{"Name": "Kill", "ButtonGfx": "Kill", "HitEffectGfx": "GeneralHeal","Effects": ["Kill"],"AcceptableTargets": [2, 3],"CastTime": 0,"Cooldown": 0, "ResourceCost": 0, "CastDistance": 5000, "TravelType": 1}

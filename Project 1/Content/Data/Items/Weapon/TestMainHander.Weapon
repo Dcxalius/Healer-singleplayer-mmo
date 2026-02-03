@@ -1,0 +1,1 @@
+{"gfxName":"TestMainHandAxe","name":"Axe", "description": "Rly axy", "Slot": 13, "MinAttackDamage": 10, "MaxAttackDamage": 20, "AttackSpeed": 2.0, "id":24, "baseStats": [0, 5, 5, 0, 5], "WeaponType": 8}	

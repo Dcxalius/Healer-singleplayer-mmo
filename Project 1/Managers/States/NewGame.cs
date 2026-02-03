@@ -83,21 +83,15 @@ namespace Project_1.Managers.States
 
         internal void UiOnEnter()
         {
-            lock (HUDManager.UiLock)
-            {
-                RelativeScreenPosition size = RelativeScreenPosition.GetSquareFromY(0.9f);
-                newGameBox = new NewGameBox(new RelativeScreenPosition(0.05f), size);
-            }
+            RelativeScreenPosition size = RelativeScreenPosition.GetSquareFromY(0.9f);
+            newGameBox = new NewGameBox(new RelativeScreenPosition(0.05f), size);
             drawList = new UiElementDrawList(new UIElement[] { newGameBox });
             MarkUiDirty();
         }
 
         internal void UiOnLeave()
         {
-            lock (HUDManager.UiLock)
-            {
-                newGameBox = null;
-            }
+            newGameBox = null;
             drawList = null;
             MarkUiDirty();
         }

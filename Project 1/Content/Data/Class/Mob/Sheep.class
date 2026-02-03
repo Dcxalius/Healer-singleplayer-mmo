@@ -1,0 +1,1 @@
+{"Name": "Sheep", "Resource": 0, "BaseStats":[5, 10, 5, 5, 5], "PerLevelStats":[5, 10, 5, 5, 5], "BaseHp": 50, "PerLevelHp": 15, "BaseHpPer5": 10.0, "FistAttackSpeed": 1.2, "FistMinAttackDamage": 10, "FistMaxAttackDamage": 15, "Speed": 160, "MaxSpeed": 190, "MeleeAttackPowerBonus":1}

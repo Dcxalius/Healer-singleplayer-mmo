@@ -1,54 +1,50 @@
-﻿using GuildMemberEntity = Project_1.GameObjects.Entities.Friendlies.GuildMembers.GuildMember;
-using Project_1.UI.UIElements.Buttons;
-using System.Collections.Generic;
-using Project_1.GameObjects.Entities.Friendlies;
-using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
+﻿using System;
 
 namespace Project_1.Messaging.Events
 {
     internal readonly struct PartyControlCleared
     {
-        public PartyControlCleared(IList<GuildMemberEntity> members)
+        public PartyControlCleared(int[] memberRenderIds)
         {
-            Members = members;
+            MemberRenderIds = memberRenderIds ?? Array.Empty<int>();
         }
-        public IList<GuildMemberEntity> Members { get; }
+        public int[] MemberRenderIds { get; }
     }
 
     internal readonly struct PartyWalkerAdded
     {
-        public PartyWalkerAdded(GuildMemberEntity member)
+        public PartyWalkerAdded(int memberRenderId)
         {
-            Member = member;
+            MemberRenderId = memberRenderId;
         }
-        public GuildMemberEntity Member { get; }
+        public int MemberRenderId { get; }
     }
 
     internal readonly struct PartyWalkerRemoved
     {
-        public PartyWalkerRemoved(GuildMemberEntity member)
+        public PartyWalkerRemoved(int memberRenderId)
         {
-            Member = member;
+            MemberRenderId = memberRenderId;
         }
-        public GuildMemberEntity Member { get; }
+        public int MemberRenderId { get; }
     }
 
     internal readonly struct PartyMemberAdded
     {
-        public PartyMemberAdded(GuildMemberEntity member)
+        public PartyMemberAdded(EntityUiSnapshot member)
         {
             Member = member;
         }
-        public GuildMemberEntity Member { get; }
+        public EntityUiSnapshot Member { get; }
     }
 
     internal readonly struct PartyMemberRemoved
     {
-        public PartyMemberRemoved(GuildMemberEntity member)
+        public PartyMemberRemoved(int memberRenderId)
         {
-            Member = member;
+            MemberRenderId = memberRenderId;
         }
-        public GuildMemberEntity Member { get; }
+        public int MemberRenderId { get; }
     }
 
     internal readonly struct PartyMemberInviteRequested
@@ -71,20 +67,20 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct GuildMembersSet
     {
-        public GuildMembersSet(Friendly[] members)
+        public GuildMembersSet(EntityUiSnapshot[] members)
         {
             Members = members;
         }
-        public Friendly[] Members { get; }
+        public EntityUiSnapshot[] Members { get; }
     }
 
     internal readonly struct GuildMemberAdded
     {
-        public GuildMemberAdded(GuildMemberEntity member)
+        public GuildMemberAdded(EntityUiSnapshot member)
         {
             Member = member;
         }
-        public GuildMemberEntity Member { get; }
+        public EntityUiSnapshot Member { get; }
     }
 
     internal readonly struct PartyCleared

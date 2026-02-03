@@ -1,0 +1,1 @@
+{"gfxName":"TestBow","name":"Bow", "description": "Rly bowy", "Slot": 16, "MinAttackDamage": 10, "MaxAttackDamage": 20, "AttackSpeed": 2.0, "id":23, "baseStats": [0, 5, 5, 0, 5], "WeaponType": 512}	

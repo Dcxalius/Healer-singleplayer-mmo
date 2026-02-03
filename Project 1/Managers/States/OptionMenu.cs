@@ -34,7 +34,14 @@ namespace Project_1.Managers.States
         public override void Rescale()
         {
             base.Rescale();
-            lock (HUDManager.UiLock)
+            if (UiThread.IsRunning || SimThread.IsRunning)
+            {
+                lock (HUDManager.UiLock)
+                {
+                    OptionManager.Rescale();
+                }
+            }
+            else
             {
                 OptionManager.Rescale();
             }
@@ -98,10 +105,7 @@ namespace Project_1.Managers.States
 
         internal void UiOnLeave()
         {
-            lock (HUDManager.UiLock)
-            {
-                OptionManager.ClearButtons();
-            }
+            OptionManager.ClearButtons();
             drawList = null;
             MarkUiDirty();
         }

@@ -22,6 +22,32 @@ namespace Project_1.UI.UIElements
 
     internal abstract class UIElement
     {
+        static int nextUiElementId;
+        static readonly object uiElementRegistryLock = new object();
+        static readonly Dictionary<int, WeakReference<UIElement>> uiElementRegistry = new Dictionary<int, WeakReference<UIElement>>();
+
+        public int UiElementId { get; }
+
+        public static bool TryResolve(int uiElementId, out UIElement element)
+        {
+            element = null;
+            lock (uiElementRegistryLock)
+            {
+                if (!uiElementRegistry.TryGetValue(uiElementId, out WeakReference<UIElement> reference))
+                {
+                    return false;
+                }
+
+                if (reference.TryGetTarget(out element) && element != null)
+                {
+                    return true;
+                }
+
+                uiElementRegistry.Remove(uiElementId);
+                return false;
+            }
+        }
+
         #region Interactibility
         public virtual bool Visible
         {
@@ -199,6 +225,12 @@ namespace Project_1.UI.UIElements
 
         protected UIElement(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) //aPos and aSize should be between 0 and 1
         {
+            UiElementId = Interlocked.Increment(ref nextUiElementId);
+            lock (uiElementRegistryLock)
+            {
+                uiElementRegistry[UiElementId] = new WeakReference<UIElement>(this);
+            }
+
             visible = true;
             gfx = aGfx;
 
@@ -495,7 +527,7 @@ namespace Project_1.UI.UIElements
         {
             heldEvents = null;
             if (parent != null || !hudMoveable || !hudMoving) return;
-            Mailboxes.Ui.Publish(new HudSizeChangerSet(this));
+            Mailboxes.Ui.Publish(new HudSizeChangerSet(UiElementId));
         }
 
         protected virtual void HoldReleaseAwayFromMe() => heldEvents = null;

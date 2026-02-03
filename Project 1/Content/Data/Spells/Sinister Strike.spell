@@ -1,0 +1,1 @@
+{"Name": "Sinister Strike", "ButtonGfx": "Kill", "HitEffectGfx": "None","Effects": ["Sinister Strike"],"AcceptableTargets": [2, 3],"CastTime": 0,"Cooldown": 0, "ResourceCost": 20, "CastDistance": 0, "TravelType": 1}

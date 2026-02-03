@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Project_1.Managers.States
@@ -20,10 +21,10 @@ namespace Project_1.Managers.States
         protected RenderTarget2D uITarget;
         protected RenderTarget2D plateTarget;
         RasterizerState rasterizerState;
-        bool uiDirty = true;
-        bool plateDirty = true;
-        double uiHeartbeatTimer;
-        const double uiHeartbeatSeconds = 1d;
+        volatile bool uiDirty = true;
+        volatile bool plateDirty = true;
+        long uiHeartbeatTicks;
+        static readonly long uiHeartbeatThresholdTicks = TimeSpan.TicksPerSecond;
 
 
 
@@ -52,7 +53,17 @@ namespace Project_1.Managers.States
         {
             ThreadAffinity.AssertMainThread();
             base.Rescale();
-            lock (HUDManager.UiLock)
+            if (UiThread.IsRunning || SimThread.IsRunning)
+            {
+                lock (HUDManager.UiLock)
+                {
+                    HUDManager.Rescale();
+                    MarkUiDirty();
+                    uITarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
+                    plateTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
+                }
+            }
+            else
             {
                 HUDManager.Rescale();
                 MarkUiDirty();
@@ -70,10 +81,8 @@ namespace Project_1.Managers.States
         public override void Update()
         {
             ThreadAffinity.AssertSimThread();
-            lock (HUDManager.UiLock)
-            {
-                uiHeartbeatTimer += TimeManager.SecondsSinceLastFrame;
-            }
+            long deltaTicks = (long)(TimeManager.SecondsSinceLastFrame * TimeSpan.TicksPerSecond);
+            Interlocked.Add(ref uiHeartbeatTicks, deltaTicks);
         }
         protected void UIDraw()
         {
@@ -86,11 +95,15 @@ namespace Project_1.Managers.States
 
             lock (HUDManager.UiLock)
             {
-                if (!uiDirty && !plateDirty && uiHeartbeatTimer < uiHeartbeatSeconds) return;
-                uiHeartbeatTimer = 0;
+                if (!uiDirty && !plateDirty && Interlocked.Read(ref uiHeartbeatTicks) < uiHeartbeatThresholdTicks) return;
+                Interlocked.Exchange(ref uiHeartbeatTicks, 0);
                 redrawPlates = plateDirty;
 
-                HUDManager.BuildDrawLists();
+                if (!UiThread.IsRunning)
+                {
+                    // Single-thread fallback: no UI worker owns draw-list generation.
+                    HUDManager.BuildDrawLists();
+                }
                 uiDrawList = HUDManager.UiDrawListSnapshot;
                 plateDrawList = HUDManager.PlateDrawListSnapshot;
 
@@ -127,20 +140,14 @@ namespace Project_1.Managers.States
 
         internal override void MarkUiDirty()
         {
-            lock (HUDManager.UiLock)
-            {
-                uiDirty = true;
-                uiHeartbeatTimer = 0;
-            }
+            uiDirty = true;
+            Interlocked.Exchange(ref uiHeartbeatTicks, 0);
         }
 
         void MarkPlatesDirty()
         {
-            lock (HUDManager.UiLock)
-            {
-                plateDirty = true;
-                uiHeartbeatTimer = 0;
-            }
+            plateDirty = true;
+            Interlocked.Exchange(ref uiHeartbeatTicks, 0);
         }
 
         public override RenderTarget2D Draw()

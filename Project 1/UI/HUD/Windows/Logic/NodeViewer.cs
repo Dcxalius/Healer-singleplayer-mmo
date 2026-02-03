@@ -1,19 +1,20 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Managers;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.UIElements.Boxes;
-using System.Collections.Generic;
-using System.Linq;
-using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 
 namespace Project_1.UI.HUD.Windows.Logic
 {
     internal class NodeViewer : Box
     {
-        GuildMember currentTarget;
+        int? currentTargetRenderId;
+        LogicNodeUiSnapshot[] nodes = Array.Empty<LogicNodeUiSnapshot>();
         readonly UITexture nodeTexture;
         readonly UITexture linkTexture;
         readonly Text label;
@@ -25,85 +26,81 @@ namespace Project_1.UI.HUD.Windows.Logic
             nodeTexture = new UITexture("WhiteBackground", Color.LightGray);
             linkTexture = new UITexture("WhiteBackground", Color.Black);
             label = new Text("Gloryse");
-           
         }
 
-        public void SetCurrentTarget(GuildMember aGuildMember)
+        public void SetCurrentTarget(int guildMemberRenderId)
         {
-            currentTarget = aGuildMember;
+            currentTargetRenderId = guildMemberRenderId;
+            nodes = Array.Empty<LogicNodeUiSnapshot>();
+        }
+
+        public void SetSnapshot(int memberRenderId, LogicNodeUiSnapshot[] snapshotNodes)
+        {
+            if (!currentTargetRenderId.HasValue || currentTargetRenderId.Value != memberRenderId) return;
+            nodes = snapshotNodes ?? Array.Empty<LogicNodeUiSnapshot>();
         }
 
         public override void Draw(SpriteBatch aBatch)
         {
             base.Draw(aBatch);
 
-            LogicNode root = currentTarget?.AttackLogic?.RootNode;
-            if (root == null) return;
+            if (!currentTargetRenderId.HasValue || nodes.Length == 0) return;
 
-            var positions = BuildLayout(root, out var levels);
+            Dictionary<int, Point> positions = BuildLayout(nodes, out Dictionary<int, List<LogicNodeUiSnapshot>> levels);
             if (positions.Count == 0) return;
 
             GraphicsManager.CaptureScissor(this, AbsolutePos);
-            DrawLinks(aBatch, positions);
-            DrawNodes(aBatch, positions, levels);
+            DrawLinks(aBatch, positions, nodes);
+            DrawNodes(aBatch, positions, levels, nodes);
             GraphicsManager.ReleaseScissor(this);
         }
 
-        Dictionary<LogicNode, Point> BuildLayout(LogicNode root, out Dictionary<int, List<LogicNode>> levels)
+        Dictionary<int, Point> BuildLayout(LogicNodeUiSnapshot[] snapshots, out Dictionary<int, List<LogicNodeUiSnapshot>> levels)
         {
-            levels = new Dictionary<int, List<LogicNode>>();
-            var positions = new Dictionary<LogicNode, Point>();
-            var queue = new Queue<(LogicNode node, int depth)>();
-            var visited = new HashSet<LogicNode>();
-            queue.Enqueue((root, 0));
-
-            while (queue.Count > 0)
+            levels = new Dictionary<int, List<LogicNodeUiSnapshot>>();
+            Dictionary<int, Point> positions = new Dictionary<int, Point>();
+            for (int i = 0; i < snapshots.Length; i++)
             {
-                var (node, depth) = queue.Dequeue();
-                if (!levels.TryGetValue(depth, out var list))
+                LogicNodeUiSnapshot node = snapshots[i];
+                if (!levels.TryGetValue(node.Depth, out List<LogicNodeUiSnapshot> list))
                 {
-                    list = new List<LogicNode>();
-                    levels[depth] = list;
+                    list = new List<LogicNodeUiSnapshot>();
+                    levels[node.Depth] = list;
                 }
-                if (!list.Contains(node))
-                {
-                    list.Add(node);
-                }
-                if (!visited.Add(node)) continue;
-
-                foreach (var child in node.Children)
-                {
-                    queue.Enqueue((child, depth + 1));
-                }
+                list.Add(node);
             }
 
+            if (levels.Count == 0) return positions;
+
             Rectangle bounds = AbsolutePos;
-            int maxDepth = levels.Keys.Count == 0 ? 0 : levels.Keys.Max();
+            int maxDepth = levels.Keys.Max();
             float xStep = bounds.Width / Math.Max(1f, maxDepth + 1.5f);
 
-            foreach (var level in levels)
+            foreach (var level in levels.ToArray())
             {
-                float yStep = bounds.Height / Math.Max(1f, level.Value.Count + 1);
-                for (int i = 0; i < level.Value.Count; i++)
+                List<LogicNodeUiSnapshot> ordered = level.Value.OrderBy(n => n.NodeId).ToList();
+                levels[level.Key] = ordered;
+                float yStep = bounds.Height / Math.Max(1f, ordered.Count + 1);
+                for (int i = 0; i < ordered.Count; i++)
                 {
                     float x = bounds.Left + xStep * (level.Key + 1);
                     float y = bounds.Top + yStep * (i + 1);
-                    positions[level.Value[i]] = new Point((int)x, (int)y);
+                    positions[ordered[i].NodeId] = new Point((int)x, (int)y);
                 }
             }
 
             return positions;
         }
 
-        void DrawLinks(SpriteBatch batch, Dictionary<LogicNode, Point> layout)
+        void DrawLinks(SpriteBatch batch, Dictionary<int, Point> positions, LogicNodeUiSnapshot[] snapshots)
         {
-            foreach (var node in layout.Keys)
+            for (int i = 0; i < snapshots.Length; i++)
             {
-                foreach (var child in node.Children)
-                {
-                    if (!layout.TryGetValue(child, out var childPos)) continue;
-                    DrawLink(batch, layout[node], childPos);
-                }
+                LogicNodeUiSnapshot node = snapshots[i];
+                if (node.ParentNodeId < 0) continue;
+                if (!positions.TryGetValue(node.ParentNodeId, out Point from)) continue;
+                if (!positions.TryGetValue(node.NodeId, out Point to)) continue;
+                DrawLink(batch, from, to);
             }
         }
 
@@ -125,52 +122,37 @@ namespace Project_1.UI.HUD.Windows.Logic
             linkTexture.Draw(batch, vertical, Color.Black);
         }
 
-        void DrawNodes(SpriteBatch batch, Dictionary<LogicNode, Point> layout, Dictionary<int, List<LogicNode>> levels)
+        void DrawNodes(SpriteBatch batch, Dictionary<int, Point> positions, Dictionary<int, List<LogicNodeUiSnapshot>> levels, LogicNodeUiSnapshot[] snapshots)
         {
             Rectangle bounds = AbsolutePos;
-            int maxDepth = levels.Keys.Count == 0 ? 1 : levels.Keys.Max() + 2;
-            int maxPerLevel = levels.Values.Count == 0 ? 1 : levels.Values.Max(l => l.Count);
+            int maxDepth = levels.Count == 0 ? 1 : levels.Keys.Max() + 2;
+            int maxPerLevel = levels.Count == 0 ? 1 : levels.Values.Max(l => l.Count);
 
             int nodeWidth = Math.Max(60, (int)(bounds.Width / Math.Max(3, maxDepth) * 0.65f));
             int nodeHeight = Math.Max(28, (int)(bounds.Height / Math.Max(maxPerLevel + 1, 3) * 0.6f));
 
-            foreach (var kvp in layout)
+            for (int i = 0; i < snapshots.Length; i++)
             {
-                Point centre = kvp.Value;
+                LogicNodeUiSnapshot node = snapshots[i];
+                if (!positions.TryGetValue(node.NodeId, out Point centre)) continue;
                 Rectangle rect = new Rectangle(centre.X - nodeWidth / 2, centre.Y - nodeHeight / 2, nodeWidth, nodeHeight);
-                nodeTexture.Draw(batch, rect, GetNodeColor(kvp.Key));
+                nodeTexture.Draw(batch, rect, GetNodeColor(node.ResultName));
 
                 label.Color = textColor;
-                label.Value = GetLabel(kvp.Key);
+                label.Value = node.ResultName;
                 label.CentredDraw(batch, new AbsoluteScreenPosition(rect.Center));
             }
         }
 
-        static string GetLabel(LogicNode node)
+        static Color GetNodeColor(string resultName)
         {
-            var raw = node.RawResult;
-            if (raw == null || raw is Continue) return "Branch";
-            string name = raw.GetType().Name;
-            const string suffix = "Result";
-            if (name.EndsWith(suffix))
-            {
-                name = name.Substring(0, name.Length - suffix.Length);
-            }
-            return name;
-        }
-
-        static Color GetNodeColor(LogicNode node)
-        {
-            var result = node.RawResult;
-            if (result == null || result is Continue) return Color.DarkSlateGray;
-
-            string name = result.GetType().Name;
-            if (name.Contains("Heal")) return Color.OrangeRed;
-            if (name.Contains("Spell")) return Color.MediumPurple;
-            if (name.Contains("Move")) return Color.SteelBlue;
-            if (name.Contains("Attack")) return Color.LightGreen;
-            if (name.Contains("Target")) return Color.SkyBlue;
-            if (name.Contains("Idle")) return Color.LightGray;
+            if (string.IsNullOrWhiteSpace(resultName) || resultName == "Branch") return Color.DarkSlateGray;
+            if (resultName.Contains("Heal")) return Color.OrangeRed;
+            if (resultName.Contains("Spell")) return Color.MediumPurple;
+            if (resultName.Contains("Move")) return Color.SteelBlue;
+            if (resultName.Contains("Attack")) return Color.LightGreen;
+            if (resultName.Contains("Target")) return Color.SkyBlue;
+            if (resultName.Contains("Idle")) return Color.LightGray;
 
             return Color.DarkSlateBlue;
         }

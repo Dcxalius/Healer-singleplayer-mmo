@@ -1,0 +1,1 @@
+{"Name": "Heal", "ButtonGfx": "Heal", "HitEffectGfx": "GeneralHeal","Effects": ["Heal"],"AcceptableTargets": [0, 1],"CastTime": 2,"Cooldown": 5, "ResourceCost": 30, "CastDistance": 50, "TravelType": 1}

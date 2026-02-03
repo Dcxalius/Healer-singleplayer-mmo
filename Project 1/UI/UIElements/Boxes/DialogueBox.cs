@@ -52,7 +52,7 @@ namespace Project_1.UI.UIElements.Boxes
             switch (aLocation)
             {
                 case LocationOfPopUp.HUDManager:
-                    buttons.First().AddAction(new Action(() => Mailboxes.Ui.Publish(new DialogueClosed(this))));
+                    buttons.First().AddAction(new Action(() => Mailboxes.Ui.Publish(new DialogueClosed(UiElementId))));
                     break;
                 case LocationOfPopUp.StateManager:
                     buttons.First().AddAction(new Action(() => StateManager.RemovePopUp(this)));

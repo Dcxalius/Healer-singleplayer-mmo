@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities.Friendlies;
+using Project_1.Messaging.Events;
+using Project_1.Messaging;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
@@ -12,54 +13,57 @@ using System.Linq;
 using System.Runtime.Remoting;
 using System.Text;
 using System.Threading.Tasks;
-using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
-using Project_1.GameObjects.Entities.Friendlies.Players;
-
 namespace Project_1.UI.HUD.Guild
 {
     internal class GuildMemberListing : Box, IComparable //TODO: Should this be button?
     {
-        Friendly friendly;
+        EntityUiSnapshot data;
         Label name;
         Label level;
         Label @class;
         OpenInventory openInventory;
         OpenInspectWindow openInspectWindow;
         InviteButton invite;
+        Button nodeViewer;
 
         RelativeScreenPosition buttonSize;
         RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
         RelativeScreenPosition buttonPos;
-        RelativeScreenPosition changeInY;
+        RelativeScreenPosition changeInX;
 
         RelativeScreenPosition GetButtonPos
         {
             get
             {
-                buttonPos += changeInY;
+                buttonPos += changeInX;
                 return buttonPos;
             }
         }
 
 
-        public GuildMemberListing(Friendly aFriendly, AbsoluteScreenPosition aSizeForButtonScaling) : base(new UITexture("WhiteBackground", Color.Pink), RelativeScreenPosition.One, RelativeScreenPosition.One) //TODO: Make this sortable
+        public GuildMemberListing(EntityUiSnapshot aData, AbsoluteScreenPosition aSizeForButtonScaling) : base(new UITexture("WhiteBackground", Color.Pink), RelativeScreenPosition.One, RelativeScreenPosition.One) //TODO: Make this sortable
         {
-            friendly = aFriendly;
+            data = aData;
 
             spacing = RelativeScreenPosition.GetSquareFromX(0.005f, aSizeForButtonScaling);
             buttonSize = RelativeScreenPosition.GetSquareFromY(1 - spacing.Y * 2, aSizeForButtonScaling);
             buttonPos = new RelativeScreenPosition(1, spacing.Y);
-            changeInY = new RelativeScreenPosition(-buttonSize.X - spacing.X, 0);
+            changeInX = new RelativeScreenPosition(-buttonSize.X - spacing.X, 0);
 
-            openInspectWindow = new OpenInspectWindow(friendly, GetButtonPos, buttonSize);
+            openInspectWindow = new OpenInspectWindow(aData, GetButtonPos, buttonSize);
             openInventory = new OpenInventory(GetButtonPos, buttonSize);
+            if (aData.RelationToPlayer != GameObjects.Unit.Relation.RelationToPlayer.Self)
+            {
+                invite = new InviteButton(aData.RenderId, GetButtonPos, buttonSize);
+                nodeViewer = new Button(new List<Action> { NodeViewerOpener }, GetButtonPos, buttonSize, Color.LightGray);
+            }
 
             float labelPosX = (buttonPos.X - spacing.X - spacing.X) / 3;
             RelativeScreenPosition labelSize = new RelativeScreenPosition(labelPosX, 1);
 
-            name = new Label(aFriendly.Name, new RelativeScreenPosition(spacing.X, 0), labelSize, Label.TextAllignment.CentreLeft);
-            level = new Label(aFriendly.CurrentLevel.ToString(), new RelativeScreenPosition(spacing.X + labelPosX, 0), labelSize, Label.TextAllignment.Centred);
-            @class = new Label(aFriendly.Class, new RelativeScreenPosition(spacing.X + labelPosX * 2, 0), labelSize, Label.TextAllignment.CentreRight);
+            name = new Label(aData.Name, new RelativeScreenPosition(spacing.X, 0), labelSize, Label.TextAllignment.CentreLeft);
+            level = new Label(aData.Level.ToString(), new RelativeScreenPosition(spacing.X + labelPosX, 0), labelSize, Label.TextAllignment.Centred);
+            @class = new Label(aData.ClassName, new RelativeScreenPosition(spacing.X + labelPosX * 2, 0), labelSize, Label.TextAllignment.CentreRight);
 
             AddChild(name);
             AddChild(level);
@@ -67,11 +71,16 @@ namespace Project_1.UI.HUD.Guild
             AddChild(openInspectWindow);
             AddChild(openInventory);
 
-            if (aFriendly.GetType() != typeof(Player))
+            if (aData.RelationToPlayer != GameObjects.Unit.Relation.RelationToPlayer.Self)
             {
-                invite = new InviteButton(aFriendly, GetButtonPos, buttonSize);
                 AddChild(invite);
+                AddChild(nodeViewer);
             }
+        }
+
+        void NodeViewerOpener()
+        {
+            Mailboxes.Ui.Publish(new LogicWindowOpened(data.RenderId));
         }
 
         public void SetInviteButtonState(TwoStateGFXButton.State aState)
@@ -80,11 +89,12 @@ namespace Project_1.UI.HUD.Guild
             invite.state = aState;
         }
 
-        public void RefreshData(GuildMember.GuildMemberData aGuildMember)
+        public void RefreshData(in EntityUiSnapshot aGuildMember)
         {
+            data = aGuildMember;
             name.Text = aGuildMember.Name;
-            level.Text = aGuildMember.Level;
-            @class.Text = aGuildMember.Class;
+            level.Text = aGuildMember.Level.ToString();
+            @class.Text = aGuildMember.ClassName;
         }
 
         public bool BelongsTo(string aName)

@@ -74,20 +74,14 @@ namespace Project_1.Managers.States
 
         internal void UiOnEnter()
         {
-            lock (HUDManager.UiLock)
-            {
-                loadingBox.Setup(SaveManager.Saves);
-            }
+            loadingBox.Setup(SaveManager.Saves);
             drawList = new UiElementDrawList(new UIElement[] { loadingBox });
             MarkUiDirty();
         }
 
         internal void UiOnLeave()
         {
-            lock (HUDManager.UiLock)
-            {
-                loadingBox.Reset();
-            }
+            loadingBox.Reset();
             drawList = null;
             MarkUiDirty();
         }

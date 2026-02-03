@@ -1,0 +1,3 @@
+{"ID": 0, "Name":"Grass", "Walkable":true, "DragCoeficient":0.6, "Transparent":true}
+{"ID": 1, "Name":"Dirt", "Walkable":true, "DragCoeficient":0.7, "Transparent":true}
+{"ID": 2, "Name":"Wall", "Walkable":false, "DragCoeficient":0, "Transparent":false}

@@ -686,6 +686,19 @@
 /build:Graphics/SpellImage/Hand.png
 #end
 
+#begin Graphics/SpellImage/Backstab.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Graphics/SpellImage/Backstab.png
+#end
+
 #begin Graphics/SpellImage/Heal.png
 /importer:TextureImporter
 /processor:TextureProcessor

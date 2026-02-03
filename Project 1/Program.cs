@@ -18,11 +18,12 @@ internal static class Program
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Unhandled exception:");
-            Console.WriteLine(ex);
-            Console.WriteLine();
-            Console.WriteLine("Press any key to exit...");
-            Console.Read();
+            //Console.WriteLine("Unhandled exception:");
+            //Console.WriteLine(ex);
+            //Console.WriteLine();
+            //Console.WriteLine("Press any key to exit...");
+            //Console.Read();
+            throw;
             return 1;
         }
     }

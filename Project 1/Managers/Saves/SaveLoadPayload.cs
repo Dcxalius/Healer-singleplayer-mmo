@@ -1,18 +1,17 @@
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json.Linq;
-using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.Managers.Saves
 {
     internal sealed class SaveLoadPayload
     {
-        SaveLoadPayload(Save save)
+        SaveLoadPayload(string saveName)
         {
-            Save = save;
+            SaveName = saveName;
         }
 
-        public Save Save { get; }
+        public string SaveName { get; }
         public JToken CameraPosition { get; private set; }
         public JToken PlayerData { get; private set; }
         public List<JToken> GuildData { get; private set; }
@@ -23,7 +22,8 @@ namespace Project_1.Managers.Saves
 
         public static SaveLoadPayload Parse(Save save)
         {
-            SaveLoadPayload payload = new SaveLoadPayload(save);
+            if (save == null) return null;
+            SaveLoadPayload payload = new SaveLoadPayload(save.Name);
             payload.CameraPosition = ReadToken(save.CameraPosition);
             payload.PlayerData = ReadToken(Path.Combine(save.Units, "PlayerData.unit"));
             payload.GuildData = ReadTokens(save.Guild);

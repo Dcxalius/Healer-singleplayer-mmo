@@ -104,24 +104,18 @@ namespace Project_1.Managers.States
 
         internal void UiOnEnter()
         {
-            lock (HUDManager.UiLock)
-            {
-                needsCleanGame = true;
-                HUDManager.SetHudMoveable(true);
-                HUDManager.InvalidateUi();
-            }
+            needsCleanGame = true;
+            HUDManager.SetHudMoveable(true);
+            HUDManager.InvalidateUi();
             moveHudDrawList = new UiElementDrawList(new UIElement[] { MoveHUDBox });
             MarkUiDirty();
         }
 
         internal void UiOnLeave()
         {
-            lock (HUDManager.UiLock)
-            {
-                StateManager.RedrawGame();
-                HUDManager.ResetHudMoveable();
-                HUDManager.InvalidateUi();
-            }
+            StateManager.RedrawGame();
+            HUDManager.ResetHudMoveable();
+            HUDManager.InvalidateUi();
             moveHudDrawList = null;
             MarkUiDirty();
         }

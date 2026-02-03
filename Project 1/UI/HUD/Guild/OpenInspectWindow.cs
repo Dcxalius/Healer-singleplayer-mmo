@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.Textures;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
@@ -10,24 +9,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Project_1.GameObjects.Entities.Friendlies;
-using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
-
 namespace Project_1.UI.HUD.Guild
 {
     internal class OpenInspectWindow : GFXButton
     {
-        static void OpenWindow(Friendly aFriendly)
+        static void OpenWindow(EntityUiSnapshot member)
         {
-            if (aFriendly.RelationToPlayer == GameObjects.Unit.Relation.RelationToPlayer.Self)
+            if (member.RelationToPlayer == GameObjects.Unit.Relation.RelationToPlayer.Self)
             {
                 Mailboxes.Ui.Publish(new CharacterWindowToggled());
                 return;
             }
-            Mailboxes.Ui.Publish(new InspectWindowToggled(aFriendly as GuildMember));
+            Mailboxes.Ui.Publish(new InspectWindowToggled(member));
         }
 
-        public OpenInspectWindow(Friendly aFriendly, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new List<Action>() { new Action(() => OpenWindow(aFriendly)) }, new GfxPath(GfxType.Item, "TestDagger"), aPos, aSize, Color.White)
+        public OpenInspectWindow(EntityUiSnapshot aSnapshot, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new List<Action>() { new Action(() => OpenWindow(aSnapshot)) }, new GfxPath(GfxType.Item, "TestDagger"), aPos, aSize, Color.White)
         {
 
         }
