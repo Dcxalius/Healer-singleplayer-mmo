@@ -31,6 +31,7 @@ namespace Project_1.DebugTools
 
         protected virtual void Draw(SpriteBatch aBatch, WorldSpace aPos)
         {
+            ThreadAffinity.AssertMainThread();
             EnsureTexture();
             aBatch.Draw(texture, aPos.ToAbsoltueScreenPosition().ToVector2(), null, Color.White, 0f, Vector2.Zero, size, SpriteEffects.None, 1f);
 
@@ -38,6 +39,7 @@ namespace Project_1.DebugTools
 
         protected virtual void Draw(SpriteBatch aBatch, Rectangle aRect)
         {
+            ThreadAffinity.AssertMainThread();
             EnsureTexture();
             aBatch.Draw(texture, Camera.Camera.WorldRectToScreenRect(aRect), null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
         }

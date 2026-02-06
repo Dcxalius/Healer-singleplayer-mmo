@@ -5,6 +5,8 @@ using Project_1.Camera;
 using Project_1.GameObjects.Spawners;
 using Project_1.Input;
 using Project_1.Managers.States;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.Particles;
 using Project_1.Tiles;
 using Project_1.UI;
@@ -268,6 +270,7 @@ namespace Project_1.Managers
 
             Camera.Camera.SetWindowSize(new Camera.AbsoluteScreenPosition(aSize));
             StateManager.Rescale();
+            Mailboxes.Ui.Publish(new HudRescaleRequested(aSize));
             unCaptueredScissorRect = graphicsDeviceManager.GraphicsDevice.ScissorRectangle;
             graphicsDeviceManager.GraphicsDevice.ScissorRectangle = unCaptueredScissorRect;
         }

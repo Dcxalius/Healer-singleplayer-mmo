@@ -33,17 +33,6 @@ namespace Project_1.Managers.States
 
         public override void Rescale()
         {
-            if (UiThread.IsRunning || SimThread.IsRunning)
-            {
-                lock (HUDManager.UiLock)
-                {
-                    mainMenu.Rescale();
-                }
-            }
-            else
-            {
-                mainMenu.Rescale();
-            }
             base.Rescale();
         }
 
@@ -101,6 +90,13 @@ namespace Project_1.Managers.States
         {
             drawList = new UiElementDrawList(new UIElement[] { mainMenu });
             MarkUiDirty();
+        }
+
+        internal void UiRescale()
+        {
+            if (mainMenu == null) return;
+            mainMenu.Rescale();
+            BuildDrawList();
         }
     }
 }

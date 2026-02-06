@@ -131,6 +131,7 @@ namespace Project_1.Managers.States
             Mailboxes.Main.Subscribe<KeyBindSnapshot>(e => KeyBindStateCache.Update(e));
             Mailboxes.Main.Subscribe<MouseSnapshot>(e => MouseStateCache.Update(e));
             Mailboxes.Main.Subscribe<EscapePressed>(_ => HandleEscapePressed());
+            Mailboxes.Ui.Subscribe<HudRescaleRequested>(e => UiRescale(e.WindowSize));
         }
 
         public static void Update()
@@ -451,6 +452,45 @@ namespace Project_1.Managers.States
                     break;
                 case States.NewGame:
                     newGame.UiOnEnter();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        internal static void UiRescale(Point windowSize)
+        {
+            if (UiThread.IsRunning)
+            {
+                ThreadAffinity.AssertUiThread();
+            }
+            else
+            {
+                ThreadAffinity.AssertMainThread();
+            }
+
+            HUDManager.Rescale();
+            HUDManager.InvalidateUi();
+            HUDManager.InvalidatePlates();
+            switch (currentStateEnum)
+            {
+                case States.StartScreen:
+                    startScreen.UiRescale();
+                    break;
+                case States.PauseMenu:
+                    pauseMenu.UiRescale();
+                    break;
+                case States.OptionMenu:
+                    optionMenu.UiRescale();
+                    break;
+                case States.LoadingMenu:
+                    loadingMenu.UiRescale();
+                    break;
+                case States.NewGame:
+                    newGame.UiRescale();
+                    break;
+                case States.MoveHUD:
+                    moveHUD.UiRescale();
                     break;
                 default:
                     break;

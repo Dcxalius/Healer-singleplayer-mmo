@@ -37,7 +37,7 @@ namespace Project_1.Textures
 
         void CreateAnimationFrames(int aDeadFrameCount)
         {
-            Point sheetSize = TextureManager.GetTextureSize(gfxPath);
+            Point sheetSize = TextureCatalog.GetSize(gfxPath);
             if (size == Point.Zero || sheetSize == Point.Zero)
             {
                 Point fallbackSize = size == Point.Zero ? new Point(1, 1) : size;

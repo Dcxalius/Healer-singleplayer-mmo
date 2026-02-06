@@ -14,7 +14,7 @@ namespace Project_1.Textures
     {
         public RandomlyGeneratedTexture(bool aFreelyRandomized, Point aVisibleSize, GfxPath aPath) : base(aPath, aVisibleSize)
         {
-            Point sheetSize = TextureManager.GetTextureSize(aPath);
+            Point sheetSize = TextureCatalog.GetSize(aPath);
             if (sheetSize == Point.Zero)
             {
                 sheetSize = aVisibleSize;

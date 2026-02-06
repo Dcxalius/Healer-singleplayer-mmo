@@ -35,11 +35,13 @@ namespace Project_1.Textures
 
         public virtual void Draw(SpriteBatch aBatch, Rectangle aPosRectangle)
         {
+            ThreadAffinity.AssertMainThread();
             Draw(aBatch, aPosRectangle, Color);
         }
 
         public virtual void Draw(SpriteBatch aBatch, Rectangle aPosRectangle, Color aColor)
         {
+            ThreadAffinity.AssertMainThread();
             EnsureLoaded();
             if (gfx == null) return;
             if (Camera.Camera.ScreenspaceBoundsCheck(aPosRectangle))

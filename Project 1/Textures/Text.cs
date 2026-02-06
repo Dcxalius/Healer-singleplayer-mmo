@@ -86,6 +86,7 @@ namespace Project_1.Textures
 
         void Draw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, Vector2 aOffset)
         {
+            ThreadAffinity.AssertMainThread();
             if (textToDisplay == null) return;
 
             aBatch.DrawString(font, textToDisplay, aPos.ToVector2(), color, 0f, aOffset, scale, SpriteEffects.None, 1f);

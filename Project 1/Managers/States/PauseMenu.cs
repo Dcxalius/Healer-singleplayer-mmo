@@ -39,17 +39,6 @@ namespace Project_1.Managers.States
         }
         public override void Rescale()
         {
-            if (UiThread.IsRunning || SimThread.IsRunning)
-            {
-                lock (HUDManager.UiLock)
-                {
-                    pauseBox.Rescale();
-                }
-            }
-            else
-            {
-                pauseBox.Rescale();
-            }
             base.Rescale();
 
         }
@@ -169,6 +158,17 @@ namespace Project_1.Managers.States
             }
             drawList = new UiElementDrawList(elements);
             MarkUiDirty();
+        }
+
+        internal void UiRescale()
+        {
+            pauseBox?.Rescale();
+            for (int i = 0; i < dialogueBoxes.Count; i++)
+            {
+                dialogueBoxes[i].Rescale();
+            }
+            drawListDirty = true;
+            BuildDrawList();
         }
 
     }

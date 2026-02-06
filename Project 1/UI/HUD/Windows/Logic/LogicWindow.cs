@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.Camera;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
 using System;
@@ -15,7 +16,7 @@ namespace Project_1.UI.HUD.Windows.Logic
         ScenarioBox scenarioBox;
         public LogicWindow() : base(new UITexture("WhiteBackground", Color.CadetBlue))
         {
-            nodeViewer = new NodeViewer();
+            nodeViewer = new NodeViewer(new RelativeScreenPosition(0.01f, 0.01f), new RelativeScreenPosition(0.98f, 0.48f));
             scenarioBox = new ScenarioBox();
             AddChild(nodeViewer);
             AddChild(scenarioBox);

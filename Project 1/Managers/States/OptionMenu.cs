@@ -34,17 +34,6 @@ namespace Project_1.Managers.States
         public override void Rescale()
         {
             base.Rescale();
-            if (UiThread.IsRunning || SimThread.IsRunning)
-            {
-                lock (HUDManager.UiLock)
-                {
-                    OptionManager.Rescale();
-                }
-            }
-            else
-            {
-                OptionManager.Rescale();
-            }
         }
 
         public override void OnEnter()
@@ -107,6 +96,15 @@ namespace Project_1.Managers.States
         {
             OptionManager.ClearButtons();
             drawList = null;
+            MarkUiDirty();
+        }
+
+        internal void UiRescale()
+        {
+            OptionManager.Rescale();
+            drawList = new UiElementDrawList(OptionManager.BuildDrawList());
+            OptionManager.ConsumeDrawListDirty();
+            OptionManager.ConsumeRenderDirty();
             MarkUiDirty();
         }
     }

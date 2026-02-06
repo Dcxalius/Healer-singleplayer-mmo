@@ -95,5 +95,15 @@ namespace Project_1.Managers.States
             drawList = null;
             MarkUiDirty();
         }
+
+        internal void UiRescale()
+        {
+            newGameBox?.Rescale();
+            if (newGameBox != null)
+            {
+                drawList = new UiElementDrawList(new UIElement[] { newGameBox });
+            }
+            MarkUiDirty();
+        }
     }
 }

@@ -53,23 +53,9 @@ namespace Project_1.Managers.States
         {
             ThreadAffinity.AssertMainThread();
             base.Rescale();
-            if (UiThread.IsRunning || SimThread.IsRunning)
-            {
-                lock (HUDManager.UiLock)
-                {
-                    HUDManager.Rescale();
-                    MarkUiDirty();
-                    uITarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
-                    plateTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
-                }
-            }
-            else
-            {
-                HUDManager.Rescale();
-                MarkUiDirty();
-                uITarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
-                plateTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
-            }
+            uITarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
+            plateTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
+            MarkUiDirty();
 
         }
 

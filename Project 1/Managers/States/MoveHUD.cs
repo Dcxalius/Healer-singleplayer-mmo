@@ -120,5 +120,12 @@ namespace Project_1.Managers.States
             MarkUiDirty();
         }
 
+        internal void UiRescale()
+        {
+            MoveHUDBox?.Rescale();
+            moveHudDrawList = new UiElementDrawList(new UIElement[] { MoveHUDBox });
+            MarkUiDirty();
+        }
+
     }
 }

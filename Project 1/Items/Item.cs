@@ -36,7 +36,7 @@ namespace Project_1.Items
         public ItemData.ItemType ItemType => itemData.Type;
 
         [JsonIgnore]
-        public string Name => itemData.Name;
+        public virtual string Name => itemData.Name;
         [JsonIgnore]
         public string Description => itemData.Description;
         [JsonIgnore]

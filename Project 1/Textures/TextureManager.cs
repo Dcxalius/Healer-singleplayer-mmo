@@ -39,6 +39,7 @@ namespace Project_1.Textures
             EnsureContentRoot();
             InitArrays();
             InitFonts();
+            TextureCatalog.Init(textureSizes, avgColors);
             textOutline = contentManager.Load<Effect>("Effects\\TextOutline");
             //textOutline.Parameters["texelSize"].SetValue()
         }
@@ -206,6 +207,7 @@ namespace Project_1.Textures
 
         public static Texture2D GetTexture(GfxPath aGfxPath)
         {
+            ThreadAffinity.AssertMainThread();
             // Basic safety checks
             if (texturesDict == null)
                 throw new InvalidOperationException("TextureManager: texturesDict is null. InitArrays() / static ctor did not run.");
@@ -235,49 +237,14 @@ namespace Project_1.Textures
 
         public static Point GetTextureSize(GfxPath aGfxPath)
         {
-            if (aGfxPath == null || aGfxPath.Name == null) return Point.Zero;
-            if (textureSizes == null) return Point.Zero;
-
-            int typeIndex = (int)aGfxPath.Type;
-            if (typeIndex < 0 || typeIndex >= textureSizes.Length) return Point.Zero;
-
-            var dict = textureSizes[typeIndex];
-            if (dict != null && dict.TryGetValue(aGfxPath.Name, out var size))
-            {
-                return size;
-            }
-
-            var debugDict = textureSizes[(int)GfxType.Debug];
-            if (debugDict != null && debugDict.TryGetValue("MissingTexture", out size))
-            {
-                return size;
-            }
-
-            return Point.Zero;
+            ThreadAffinity.AssertMainThread();
+            return TextureCatalog.GetSize(aGfxPath);
         }
 
         public static Color GetAvgColor(GfxPath aGfxPath)
         {
-            if (aGfxPath == null || aGfxPath.Name == null) return Color.White;
-            if (avgColors == null) return Color.White;
-
-            int typeIndex = (int)aGfxPath.Type;
-            if (typeIndex >= 0 && typeIndex < avgColors.Length)
-            {
-                var dict = avgColors[typeIndex];
-                if (dict != null && dict.TryGetValue(aGfxPath.Name, out var color))
-                {
-                    return color;
-                }
-            }
-
-            var debugDict = avgColors[(int)GfxType.Debug];
-            if (debugDict != null && debugDict.TryGetValue("MissingTexture", out var fallback))
-            {
-                return fallback;
-            }
-
-            return Color.White;
+            ThreadAffinity.AssertMainThread();
+            return TextureCatalog.GetAvgColor(aGfxPath);
         }
 
     }

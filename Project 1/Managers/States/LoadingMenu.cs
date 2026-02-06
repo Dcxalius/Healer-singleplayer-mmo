@@ -85,5 +85,12 @@ namespace Project_1.Managers.States
             drawList = null;
             MarkUiDirty();
         }
+
+        internal void UiRescale()
+        {
+            loadingBox?.Rescale();
+            drawList = new UiElementDrawList(new UIElement[] { loadingBox });
+            MarkUiDirty();
+        }
     }
 }

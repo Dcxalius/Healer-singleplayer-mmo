@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Project_1.GameObjects.Unit;
+using Project_1.GameObjects.Unit.Stats;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,7 +42,7 @@ namespace Project_1.Items.SubTypes
         }
 
         [JsonIgnore]
-        public Attack Attack => (itemData as WeaponData).Attack;
+        public GameObjects.Unit.Attack Attack => (itemData as WeaponData).Attack;
 
         public WeaponData WeaponData => itemData as WeaponData;
 

@@ -60,7 +60,7 @@ namespace Project_1.Textures
 
         public static Color AvgColor(GfxPath aPath) //TODO: Move this?
         {
-            return TextureManager.GetAvgColor(aPath);
+            return TextureCatalog.GetAvgColor(aPath);
         }
 
         protected Vector2 offset;
@@ -95,7 +95,7 @@ namespace Project_1.Textures
             {
                 if (aSize == Point.Zero)
                 {
-                    size = TextureManager.GetTextureSize(aPath);
+                    size = TextureCatalog.GetSize(aPath);
                 }
                 else
                 {
@@ -136,6 +136,7 @@ namespace Project_1.Textures
 
         void FinalDraw(SpriteBatch aBatch, Rectangle aPos, Color aColor, Vector2 aOffset, float aFeetPosY)
         {
+            ThreadAffinity.AssertMainThread();
             if (gfx == null)
             {
                 EnsureLoaded();
@@ -168,7 +169,7 @@ namespace Project_1.Textures
                 gfx = null;
                 if (size == Point.Zero)
                 {
-                    size = TextureManager.GetTextureSize(aPath);
+                    size = TextureCatalog.GetSize(aPath);
                 }
             }
         }

@@ -1,6 +1,6 @@
 # Overhaul Progress
 
-Last updated: 2026-02-03
+Last updated: 2026-02-06
 
 ## In Progress
 - None.
@@ -43,3 +43,6 @@ Last updated: 2026-02-03
 - State-transition lock cleanup: removed redundant `HUDManager.UiLock` usage inside UI state enter/leave paths (`MoveHUD`, `OptionMenu`, `LoadingMenu`, `NewGame`) and narrowed `StateManager.ApplyStateChange` locking to the no-UI-thread fallback path.
 - Non-transition lock trim: `GameState` dirty/heartbeat signaling is now lock-free (`Interlocked` + volatile flags), removing extra `HUDManager.UiLock` contention from sim heartbeat and invalidation callbacks.
 - Lock-scope reduction pass: fallback/main-thread paths now only take `HUDManager.UiLock` when another worker thread can contend (`SimThread`/`UiThread` running), reducing lock usage in pure single-thread fallback for `Game1` update dispatch and state/menu rescale paths.
+- UI-thread rescale routing: main thread now publishes `HudRescaleRequested` on window size changes, UI thread handles HUD/menu rescale, and GPU-only resize stays on main thread (state rescale split accordingly).
+- Texture metadata catalog: non-main thread texture size/avg color lookups now use `TextureCatalog`, and `TextureManager` accessors assert main-thread usage.
+- GPU-affinity asserts: `Texture`/`UITexture`/`Text` draw paths and debug shape draws now assert main-thread usage.

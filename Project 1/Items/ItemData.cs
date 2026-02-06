@@ -43,11 +43,16 @@ namespace Project_1.Items
         public ItemType Type => itemType;
         ItemType itemType;
 
+        public int RequiredLevel => Math.Min(itemLevel - 5, 60);
+
+        public int ItemLevel => itemLevel;
+        int itemLevel;
+
         public int Cost => cost;
         int cost;
 
         [JsonConstructor]
-        public ItemData(int id, string gfxName, string name, string description, int maxStack, ItemType itemType, Item.Quality quality, int cost)
+        public ItemData(int id, string gfxName, string name, string description, int maxStack, ItemType itemType, Item.Quality quality, int cost, int itemLevel = 1)
         {
             this.id = id;
             gfx = new GfxPath(GfxType.Item, gfxName);
@@ -57,6 +62,7 @@ namespace Project_1.Items
             this.itemType = itemType;
             this.quality = quality;
             this.cost = cost;
+            this.itemLevel = itemLevel;
             Assert();
         }
 

@@ -31,4 +31,14 @@
     internal readonly struct HudSaveRequested
     {
     }
+
+    internal readonly struct HudRescaleRequested
+    {
+        public HudRescaleRequested(Microsoft.Xna.Framework.Point windowSize)
+        {
+            WindowSize = windowSize;
+        }
+
+        public Microsoft.Xna.Framework.Point WindowSize { get; }
+    }
 }
