@@ -19,6 +19,7 @@ namespace Project_1.GameObjects.Entities.GroundEffect
 
         public override void Draw(SpriteBatch aBatch, WorldObject aOwner)
         {
+            Project_1.Managers.ThreadAffinity.AssertMainThread();
             if (aOwner is not Entity) return;
 
             Entity entityOwner = aOwner as Entity;

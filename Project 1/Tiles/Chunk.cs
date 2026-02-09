@@ -241,6 +241,7 @@ namespace Project_1.Tiles
 
         public void Draw(SpriteBatch aBatch)
         {
+            ThreadAffinity.AssertMainThread();
             int minI = 0;
             int minJ = 0;
             int maxJ = tiles.GetLength(1);

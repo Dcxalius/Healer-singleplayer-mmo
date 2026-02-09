@@ -91,6 +91,7 @@ namespace Project_1.Particles
 
         public void Draw(SpriteBatch aBatch)
         {
+            ThreadAffinity.AssertMainThread();
             if (!Camera.Camera.WorldspaceBoundsCheck(pos)) return;
             
             aBatch.Draw(particleBase.Texture, pos.ToAbsoltueScreenPosition().ToVector2(), null, GetOpacityColor(color, opacity), rotation, Vector2.Zero, 1f, SpriteEffects.None, (layerFeetY + 1) / (Camera.Camera.WorldRectangle.Bottom)); //TODO: Make this use the layerDepth

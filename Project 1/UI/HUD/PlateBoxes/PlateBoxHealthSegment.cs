@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.UIElements.Bars;
@@ -28,22 +27,10 @@ namespace Project_1.UI.HUD.PlateBoxes
 
 
 
-        public override void Refresh(Entity aEntity)
-        {
-            healthBar.MaxValue = (float)aEntity.MaxHealth;
-            healthBar.Value = (float)aEntity.CurrentHealth;
-        }
-
-        public void Refresh(in EntityUiSnapshot snapshot)
+        public override void Refresh(in EntityUiSnapshot snapshot)
         {
             healthBar.MaxValue = (float)snapshot.MaxHealth;
             healthBar.Value = (float)snapshot.CurrentHealth;
-        }
-
-        public void SetTarget(Entity aEntity)
-        {
-            healthBar.MaxValue = (float)aEntity.MaxHealth;
-            healthBar.Value = (float)aEntity.CurrentHealth;
         }
 
         public void SetTarget(in EntityUiSnapshot snapshot)
@@ -55,6 +42,7 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         public override void Draw(SpriteBatch aBatch)
         {
+            Project_1.Managers.ThreadAffinity.AssertMainThread();
             base.Draw(aBatch);
         }
     }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
@@ -25,11 +24,6 @@ namespace Project_1.UI.HUD.PlateBoxes
             AddChild(numberLabel);
         }
 
-        public void Refresh(Entity aEntity)
-        {
-            numberLabel.Text = aEntity.CurrentLevel.ToString();
-        }
-
         public void Refresh(in EntityUiSnapshot snapshot)
         {
             numberLabel.Text = snapshot.Level.ToString();
@@ -47,6 +41,7 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         public override void Draw(SpriteBatch aBatch)
         {
+            Project_1.Managers.ThreadAffinity.AssertMainThread();
             base.Draw(aBatch);
         }
     }

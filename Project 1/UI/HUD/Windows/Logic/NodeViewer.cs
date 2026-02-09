@@ -42,6 +42,7 @@ namespace Project_1.UI.HUD.Windows.Logic
 
         public override void Draw(SpriteBatch aBatch)
         {
+            Project_1.Managers.ThreadAffinity.AssertMainThread();
             base.Draw(aBatch);
 
             if (!currentTargetRenderId.HasValue || nodes.Length == 0) return;

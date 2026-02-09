@@ -86,6 +86,7 @@ namespace Project_1.UI.UIElements.Buttons
 
         public override void Draw(SpriteBatch aBatch)
         {
+            Project_1.Managers.ThreadAffinity.AssertMainThread();
             base.Draw(aBatch);
 
             if (state == State.First)

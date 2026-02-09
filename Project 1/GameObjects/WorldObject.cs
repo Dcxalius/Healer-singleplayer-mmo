@@ -26,6 +26,7 @@ namespace Project_1.GameObjects
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch aBatch)
         {
+            Project_1.Managers.ThreadAffinity.AssertMainThread();
             for (int i = 0; i < groundEffects.Count; i++)
             {
                 groundEffects[i].Draw(aBatch, this);

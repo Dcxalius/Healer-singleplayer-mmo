@@ -428,7 +428,9 @@ namespace Project_1.UI.HUD.Inventory
 
             if (!Visible) return;
             if (!holdable) return;
-            Mailboxes.Ui.Publish(new DescriptorBoxSet(GetActualItem));
+            Items.Item actualItem = GetActualItem;
+            if (actualItem == null) return;
+            Mailboxes.Ui.Publish(new DescriptorBoxSet(ItemDescriptorSnapshot.FromItem(actualItem)));
         }
 
         protected override void OnDeHover()
@@ -452,6 +454,7 @@ namespace Project_1.UI.HUD.Inventory
 
         public override void Draw(SpriteBatch aBatch)
         {
+            Project_1.Managers.ThreadAffinity.AssertMainThread();
 
             base.Draw(aBatch);
             itemCount.CentreRightDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Location + AbsolutePos.Size) - new AbsoluteScreenPosition(0, (int)itemCount.Offset.Y / 2));

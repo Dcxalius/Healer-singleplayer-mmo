@@ -60,6 +60,7 @@ namespace Project_1.Tiles.Collisions
 
         public void Draw(SpriteBatch aBatch)
         {
+            ThreadAffinity.AssertMainThread();
             EnsureDebugTextures();
             switch (type)
             {

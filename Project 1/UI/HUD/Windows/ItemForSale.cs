@@ -67,7 +67,7 @@ namespace Project_1.UI.HUD.Windows
 
             if (!Visible) return;
             if (itemForSale == null) return;
-            Mailboxes.Ui.Publish(new DescriptorBoxSet(itemForSale, RelativePositionOnScreen.ToAbsoluteScreenPos()));
+            Mailboxes.Ui.Publish(new DescriptorBoxSet(ItemDescriptorSnapshot.FromItem(itemForSale), RelativePositionOnScreen.ToAbsoluteScreenPos()));
         }
 
         protected override void OnDeHover()

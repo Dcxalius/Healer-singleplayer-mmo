@@ -75,6 +75,7 @@ namespace Project_1.UI.UIElements
 
         public override void Draw(SpriteBatch aBatch)
         {
+            Project_1.Managers.ThreadAffinity.AssertMainThread();
             if (!Visible) return;
             base.Draw(aBatch);
         }

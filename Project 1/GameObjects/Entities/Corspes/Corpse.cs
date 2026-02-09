@@ -190,6 +190,7 @@ namespace Project_1.GameObjects.Entities.Corspes
 
         public override void Draw(SpriteBatch aBatch)
         {
+            Project_1.Managers.ThreadAffinity.AssertMainThread();
             Debug.Assert(gfx != null);
             //gfx.Draw(aBatch, Camera.Camera.WorldPosToCameraSpace(Position), Position.Y);
             if (isDespawning)

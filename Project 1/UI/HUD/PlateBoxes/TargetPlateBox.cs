@@ -1,10 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
-using Project_1.GameObjects;
-using Project_1.GameObjects.Entities;
-using Project_1.GameObjects.Entities.Friendlies.Players;
-using Project_1.GameObjects.Unit;
 using Project_1.Input;
 using Project_1.Managers.States;
 using Project_1.Messaging.Events;
@@ -43,43 +39,14 @@ namespace Project_1.UI.HUD.PlateBoxes
         }
 
 
-        public override void Refresh(Entity aEntity)
-        {
-            healthSegment.Refresh(aEntity);
-            levelCircle.Refresh(aEntity);
-            resourceSegment.Refresh(aEntity);
-        }
-
-        public void Refresh(in EntityUiSnapshot snapshot)
+        public override void Refresh(in EntityUiSnapshot snapshot)
         {
             healthSegment.Refresh(snapshot);
             levelCircle.Refresh(snapshot);
             resourceSegment.Refresh(snapshot);
         }
 
-        public bool BelongsTo(Entity aEntity)
-        {
-            return aEntity != null && targetRenderId.HasValue && targetRenderId.Value == aEntity.RenderId;
-
-        }
         public bool BelongsTo(int? aRenderId) => targetRenderId.HasValue && aRenderId.HasValue && targetRenderId.Value == aRenderId.Value;
-
-        public void SetTarget(Entity aTarget) 
-        {
-            targetRenderId = aTarget?.RenderId;
-            if (aTarget == null)
-            {
-                nameSegment.Name = null;
-                Visible = false;
-                return;
-            }
-
-            nameSegment.Refresh(aTarget);
-            healthSegment.SetTarget(aTarget);
-            levelCircle.Refresh(aTarget);
-            resourceSegment.SetTarget(aTarget);
-            Visible = true;
-        }
 
         public void SetTarget(EntityUiSnapshot? aTarget)
         {
@@ -103,6 +70,7 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         public override void Draw(SpriteBatch aBatch)
         {
+            Project_1.Managers.ThreadAffinity.AssertMainThread();
             if (!targetRenderId.HasValue) return;
 
             base.Draw(aBatch);

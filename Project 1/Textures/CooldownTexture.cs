@@ -94,6 +94,7 @@ namespace Project_1.Textures
 
         public override void Draw(SpriteBatch aBatch, Rectangle aPosition, Color aColor)
         {
+            ThreadAffinity.AssertMainThread();
             switch (cdType)
             {
                 case CooldownGfxType.SweepRight:

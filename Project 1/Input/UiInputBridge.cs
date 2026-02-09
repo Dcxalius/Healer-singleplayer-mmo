@@ -94,8 +94,24 @@ namespace Project_1.Input
         static void HandleMouseSnapshot(MouseSnapshot snapshot)
         {
             ThreadAffinity.AssertUiThread();
-            UiMouseStateCache.Update(snapshot);
+            bool changed = UiMouseStateCache.Update(snapshot);
             Mailboxes.Main.Publish(snapshot);
+            if (!changed) return;
+            // TODO: Ponder whether this is the right approach.
+            // Current (invalidate on mouse move/scroll):
+            // + Ensures hover/drag visuals stay responsive.
+            // + Simple and predictable (no extra state).
+            // - Redraws every frame while mouse is moving.
+            // Suggested (gate by hover/drag/hit-test or pixel threshold):
+            // + Reduces redraws during continuous movement.
+            // + Could skip work when no UI can visually change.
+            // - Requires extra state/caching and careful hit-test tracking.
+            if (StateManager.CurrentState == StateManager.States.Game || StateManager.CurrentState == StateManager.States.MoveHUD)
+            {
+                HUDManager.InvalidateUi();
+                return;
+            }
+            StateManager.UiInvalidate();
         }
 
         static void HandleEscapePressed(EscapePressed pressed)

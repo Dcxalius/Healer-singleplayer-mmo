@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
+using Project_1.Managers;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,7 @@ namespace Project_1.GameObjects.Entities.GroundEffect
         }
         protected void Draw(SpriteBatch aBatch, Rectangle aDrawRect, Color aColor, float aOrder)
         {
+            ThreadAffinity.AssertMainThread();
             //gfx.Draw(aBatch, aFeetPos.ToAbsoltueScreenPosition(), aColor, gfx.size.ToVector2() / 2, aFeetPos.Y - aOrder); //TODO: Make this actually use rects to draw
             gfx.Draw(aBatch, aDrawRect, aColor, new Vector2(0, -gfx.size.Y / 2), aOrder);
 

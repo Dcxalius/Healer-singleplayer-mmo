@@ -45,6 +45,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
         public override void Draw(SpriteBatch aBatch)
         {
+            Project_1.Managers.ThreadAffinity.AssertMainThread();
             base.Draw(aBatch);
 
             text.CentredDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Center));

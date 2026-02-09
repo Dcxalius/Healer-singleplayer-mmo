@@ -104,6 +104,7 @@ namespace Project_1.UI.HUD.SpellBook
 
         public override void Draw(SpriteBatch aBatch)
         {
+            Project_1.Managers.ThreadAffinity.AssertMainThread();
             base.Draw(aBatch);
 
             if (spellData == null)

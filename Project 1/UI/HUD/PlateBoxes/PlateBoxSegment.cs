@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
 using System;
@@ -41,10 +41,11 @@ namespace Project_1.UI.HUD.PlateBoxes
         }
 
 
-        public abstract void Refresh(Entity aEntity);
+        public abstract void Refresh(in EntityUiSnapshot snapshot);
 
         public override void Draw(SpriteBatch aBatch)
         {
+            Project_1.Managers.ThreadAffinity.AssertMainThread();
             base.Draw(aBatch);
 
             text.CentredDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Center));

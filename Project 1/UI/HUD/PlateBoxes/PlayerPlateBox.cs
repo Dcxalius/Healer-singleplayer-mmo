@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities;
 using Project_1.Input;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
@@ -37,14 +36,6 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         }
 
-        public void SetData(Entity aEntity)
-        {
-            name.Refresh(aEntity);
-            resource.SetTarget(aEntity);
-            health.Refresh(aEntity);
-            levelCircle.Refresh(aEntity);
-        }
-
         public void SetData(in EntityUiSnapshot snapshot)
         {
             name.Refresh(snapshot);
@@ -53,14 +44,7 @@ namespace Project_1.UI.HUD.PlateBoxes
             levelCircle.Refresh(snapshot);
         }
 
-        public override void Refresh(Entity aEntity)
-        {
-            health.Refresh(aEntity);
-            resource.Refresh(aEntity);
-            levelCircle.Refresh(aEntity);
-        }
-
-        public void Refresh(in EntityUiSnapshot snapshot)
+        public override void Refresh(in EntityUiSnapshot snapshot)
         {
             health.Refresh(snapshot);
             resource.Refresh(snapshot);

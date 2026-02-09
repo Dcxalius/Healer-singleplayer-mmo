@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
-using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.Spells;
 using Project_1.Input;
 using Project_1.Items;
@@ -266,14 +264,14 @@ namespace Project_1.UI.HUD.Managers
             {
                 if (e.Position.HasValue)
                 {
-                    SetDescriptorBox(e.Item, e.Position.Value.ToRelativeScreenPosition());
+                    SetDescriptorBox(e.Snapshot, e.Position.Value.ToRelativeScreenPosition());
                 }
                 else
                 {
-                    SetDescriptorBox(e.Item, UiMouseStateCache.Relative);
+                    SetDescriptorBox(e.Snapshot, UiMouseStateCache.Relative);
                 }
             });
-            Mailboxes.Ui.Subscribe<DescriptorBoxClear>(_ => SetDescriptorBox(null));
+            Mailboxes.Ui.Subscribe<DescriptorBoxClear>(_ => ClearDescriptorBox());
             Mailboxes.Ui.Subscribe<PartyControlCleared>(e =>
             {
                 plateBoxHandler.RemoveWalkerFromControl(e.MemberRenderIds);
@@ -597,16 +595,17 @@ namespace Project_1.UI.HUD.Managers
         }
         public static void RefreshInventorySlot((int, int) aBagAndSlot, InventoryUiSnapshot snapshot) => RefreshInventorySlot(aBagAndSlot.Item1, aBagAndSlot.Item2, snapshot);
 
-        public static void SetDescriptorBox(Item aItem)
+        public static void SetDescriptorBox(in ItemDescriptorSnapshot snapshot, RelativeScreenPosition aPos)
         {
             AssertUiThreadOrMainFallback();
-            descriptorBox.SetToItem(aItem);
+            descriptorBox.SetToSnapshot(snapshot, aPos);
             InvalidateUi();
         }
-        public static void SetDescriptorBox(Items.Item aItem, RelativeScreenPosition aPos)
+
+        public static void ClearDescriptorBox()
         {
             AssertUiThreadOrMainFallback();
-            descriptorBox.SetToItem(aItem, aPos);
+            descriptorBox.Clear();
             InvalidateUi();
         }
 

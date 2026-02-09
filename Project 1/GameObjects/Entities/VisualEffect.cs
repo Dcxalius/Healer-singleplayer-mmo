@@ -30,6 +30,7 @@ namespace Project_1.GameObjects.Entities
 
         public void Draw(SpriteBatch aBatch, WorldSpace aPos, float aFeetPos)
         {
+            ThreadAffinity.AssertMainThread();
             texture.Draw(aBatch, aPos.ToAbsoltueScreenPosition().ToVector2(), aFeetPos);
         }
 

@@ -44,12 +44,14 @@ namespace Project_1.Textures
 
         public override void Draw(SpriteBatch aBatch, Rectangle aPosRectangle)
         {
+            ThreadAffinity.AssertMainThread();
             EnsureTexture();
             base.Draw(aBatch, aPosRectangle);
         }
 
         public override void Draw(SpriteBatch aBatch, Rectangle aPosRectangle, Color aColor)
         {
+            ThreadAffinity.AssertMainThread();
             EnsureTexture();
             base.Draw(aBatch, aPosRectangle, aColor);
         }

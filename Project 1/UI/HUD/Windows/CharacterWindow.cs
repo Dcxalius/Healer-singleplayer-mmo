@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.GameObjects.Unit;
 using Project_1.Textures;
 using Project_1.UI.HUD.Inventory;
@@ -56,7 +55,6 @@ namespace Project_1.UI.HUD.Windows
 
         PairReport primaryReport = new PairReport();
         PairReport secondaryReport = new PairReport();
-        Friendly owner;
 
         const int StatRowsPerPage = 5;
         static readonly Point StatPageSize = new Point(1, StatRowsPerPage);
@@ -104,18 +102,8 @@ namespace Project_1.UI.HUD.Windows
             AddChild(expBar);
         }
 
-        public virtual void SetData(Friendly aFriendly)
-        {
-            owner = aFriendly;
-            nameLabel.Text = aFriendly.Name;
-            SetReportBox(aFriendly.PrimaryStatReport, BuildSecondaryReport(aFriendly));
-            RefreshExp(aFriendly.Level);
-            SetAllSlots(aFriendly.Equipment);
-        }
-
         public virtual void SetData(CharacterWindowSnapshot snapshot)
         {
-            owner = null;
             nameLabel.Text = snapshot.OwnerSnapshot.Name;
             SetReportBox(snapshot.PrimaryStats, snapshot.SecondaryStats);
             RefreshExp(snapshot.CurrentLevel, snapshot.CurrentExperience);
@@ -156,13 +144,6 @@ namespace Project_1.UI.HUD.Windows
             {
                 equiped[i].AssignItem(items[i]);
             }
-        }
-
-        public void SetReportBox(PairReport aReport)
-        {
-            primaryReport = aReport ?? new PairReport();
-            secondaryReport = BuildSecondaryReport(owner);
-            RefreshStatPage();
         }
 
         public void SetReportBox(PairReport primary, PairReport secondary)
@@ -219,25 +200,6 @@ namespace Project_1.UI.HUD.Windows
             }
 
             return aValue.ToString("0.##", CultureInfo.InvariantCulture);
-        }
-
-        static PairReport BuildSecondaryReport(Friendly aFriendly) //TODO: I think the future implementation of secondary stats will be that the user self can set what stats to show per class through the option menu
-        {
-            PairReport report = new PairReport();
-            if (aFriendly == null) return report;
-
-            report.AddLine("Crit Chance", aFriendly.SecondaryStats.Attack.CriticalChance);
-            report.AddLine("Crit Damage", aFriendly.SecondaryStats.Attack.CriticalDamage);
-            report.AddLine("Hit Chance", aFriendly.SecondaryStats.Attack.BonusHitChance);
-            report.AddLine("Dodge Chance", aFriendly.SecondaryStats.Defense.DodgeChance);
-            report.AddLine("Parry Chance", aFriendly.SecondaryStats.Defense.ParryChance);
-            return report;
-        }
-
-        public void RefreshExp(Level aLevel)
-        {
-            expBar.MaxValue = Level.ExpToNextLevel(aLevel.CurrentLevel);
-            expBar.Value = aLevel.Experience;
         }
 
         public void RefreshExp(int currentLevel, int currentExperience)

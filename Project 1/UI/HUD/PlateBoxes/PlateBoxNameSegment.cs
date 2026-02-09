@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
-using Project_1.GameObjects;
-using Project_1.GameObjects.Entities;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
 using System;
@@ -26,13 +24,7 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         }
 
-        public override void Refresh(Entity aEntity)
-        {
-            Name = aEntity.Name;
-            gfx.Color = aEntity.RelationColor;
-        }
-
-        public void Refresh(in EntityUiSnapshot snapshot)
+        public override void Refresh(in EntityUiSnapshot snapshot)
         {
             Name = snapshot.Name;
             gfx.Color = snapshot.RelationColor;

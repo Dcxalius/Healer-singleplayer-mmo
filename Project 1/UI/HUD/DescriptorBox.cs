@@ -1,12 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
-using Project_1.GameObjects;
 using Project_1.Input;
-using Project_1.Items.SubTypes;
 using Project_1.Managers;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
-using Project_1.UI.HUD.Inventory;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
 using System;
@@ -53,37 +51,12 @@ namespace Project_1.UI.HUD
             AlwaysFullyOnScreen = true;
         }
 
-        public void SetToItem(Item aItem)
+        public void SetToSnapshot(in ItemDescriptorSnapshot snapshot, RelativeScreenPosition aPos)
         {
-
-            if (aItem == null)
-            {
-                ResetDescriptor();
-                return;
-            }
-
-            Items.Item item = aItem.GetActualItem;
-
-            if (item == null)
-            {
-                ResetDescriptor();
-                return;
-            }
-
-            SetToItem(item, aItem.RelativePositionOnScreen);
-        }
-
-        public void SetToItem(Items.Item aItem, RelativeScreenPosition aPos) //TODO: Should this be public?
-        {
-            if (aItem == null)
-            {
-                ResetDescriptor();
-                return;
-            }
             Visible = true;
             spacingInWorld = RelativeScreenPosition.GetSquareFromX(0.005f);
 
-            SetText(aItem, out float ySize, out int spacingNeeded);
+            SetText(snapshot, out float ySize, out int spacingNeeded);
             
             Resize(new RelativeScreenPosition(xMax, ySize / Camera.Camera.ScreenRectangle.Height) + spacingInWorld.OnlyX * 2 + spacingInWorld.OnlyY * spacingNeeded);
             Move(aPos - spacingFromItem - RelativeSize);
@@ -117,22 +90,27 @@ namespace Project_1.UI.HUD
 
         }
 
-        void SetText(Items.Item aItem, out float ySize, out int spacingNeeded)
+        public void Clear()
+        {
+            ResetDescriptor();
+        }
+
+        void SetText(in ItemDescriptorSnapshot snapshot, out float ySize, out int spacingNeeded)
         {
             ySize = 0;
             spacingNeeded = 1;
-            itemName.Text = aItem.Name;
+            itemName.Text = snapshot.Name;
             ySize += itemName.UnderlyingTextOffset.Y;
 
             spacingNeeded += 1;
-            itemDescription.Text = aItem.Description;
+            itemDescription.Text = snapshot.Description;
             ySize += itemDescription.UnderlyingTextOffset.Y;
 
             spacingNeeded += 1;
 
-            if (aItem.ItemType == Items.ItemData.ItemType.Equipment || aItem.ItemType == Items.ItemData.ItemType.Weapon)
+            if (snapshot.HasStatReport)
             {
-                itemStats.Text = (aItem as Equipment).StatReport.Value;
+                itemStats.Text = snapshot.StatReport;
                 spacingNeeded += 1;
                 ySize += itemStats.UnderlyingTextOffset.Y;
 
@@ -140,10 +118,10 @@ namespace Project_1.UI.HUD
             else { itemStats.Text = null; }
 
             goldImage.Visible = false;
-            if (aItem.Cost > 0)
+            if (snapshot.HasSellPrice)
             {
                 goldImage.Visible = true;
-                itemSellPrice.Text = aItem.SellPrice.ToString();
+                itemSellPrice.Text = snapshot.SellPrice.ToString();
                 spacingNeeded += 1;
                 ySize += itemSellPrice.UnderlyingTextOffset.Y;
 

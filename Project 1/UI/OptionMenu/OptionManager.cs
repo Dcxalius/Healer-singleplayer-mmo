@@ -215,6 +215,7 @@ namespace Project_1.UI.OptionMenu
 
         public static void Draw(SpriteBatch aBatch)
         {
+            ThreadAffinity.AssertMainThread();
             for (int i = 0; i < optionScreenPermanents.Count; i++)
             {
                 optionScreenPermanents[i].Draw(aBatch);

@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Input;
+using Project_1.Managers;
 using Project_1.Textures;
 using System;
 using System.Collections.Generic;
@@ -38,6 +39,7 @@ namespace Project_1.UI.HUD.Inventory
 
         public void Draw(SpriteBatch aBatch)
         {
+            ThreadAffinity.AssertMainThread();
             if (heldItem == null)
             {
                 return;

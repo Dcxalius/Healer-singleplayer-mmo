@@ -139,6 +139,7 @@ namespace Project_1.Managers.States
 
         void DrawList(SpriteBatch aBatch)
         {
+            ThreadAffinity.AssertMainThread();
             TileManager.Draw(aBatch);
 
             ProjectileManager.Draw(aBatch);

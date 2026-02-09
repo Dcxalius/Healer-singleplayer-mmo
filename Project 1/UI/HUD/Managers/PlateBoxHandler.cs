@@ -1,5 +1,4 @@
-﻿using Project_1.GameObjects.Entities;
-using Project_1.GameObjects.Unit;
+﻿using Project_1.GameObjects.Unit;
 using Project_1.Camera;
 using Project_1.Input;
 using Project_1.UI.HUD.PlateBoxes;
@@ -13,7 +12,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Managers;
 using System.Diagnostics;
 using Project_1.Messaging.Events;
-using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.UI.HUD.Managers
@@ -158,12 +156,6 @@ namespace Project_1.UI.HUD.Managers
             }
         }
 
-        public void SetPlayerPlateBox(Entity aPlayer)
-        {
-            playerPlateBox.SetData(aPlayer);
-            playerBuffBox.AssignBox(aPlayer);
-        }
-
         public void SetPlayerPlateBox(in EntityUiSnapshot playerSnapshot)
         {
             playerPlateBox.SetData(playerSnapshot);
@@ -220,12 +212,6 @@ namespace Project_1.UI.HUD.Managers
 
         }
 
-        public void AddGuildMemberToParty(GuildMember aGuildMember)
-        {
-            if (aGuildMember == null) return;
-            AddGuildMemberToParty(aGuildMember.BuildUiSnapshot());
-        }
-
         public void AddGuildMemberToParty(in EntityUiSnapshot aGuildMember)
         {
             if (PartyPlateBox.PartyBoxesActive >= Party.maxPartySize)
@@ -237,12 +223,6 @@ namespace Project_1.UI.HUD.Managers
             partyPlateBoxes[PartyPlateBox.PartyBoxesActive].SetTarget(aGuildMember);
             partyBuffBoxes[PartyPlateBox.PartyBoxesActive - 1].AssignBox(aGuildMember.RenderId);
             HUDManager.InvalidatePlates();
-        }
-
-        public void RemoveGuildMemberFromParty(GuildMember aGuildMember)
-        {
-            if (aGuildMember == null) return;
-            RemoveGuildMemberFromParty(aGuildMember.RenderId);
         }
 
         public void RemoveGuildMemberFromParty(int memberRenderId)
@@ -284,12 +264,6 @@ namespace Project_1.UI.HUD.Managers
             HUDManager.InvalidatePlates();
         }
 
-        public int FindGuildMemberPartyIndex(GuildMember aGuildMember)
-        {
-            if (aGuildMember == null) return -1;
-            return FindGuildMemberPartyIndex(aGuildMember.RenderId);
-        }
-
         int FindGuildMemberPartyIndex(int aGuildMemberRenderId)
         {
             for (int i = 0; i < partyPlateBoxes.Length; i++)
@@ -304,20 +278,6 @@ namespace Project_1.UI.HUD.Managers
             return -1;
         }
 
-        public void AddGuildMemberToControl(GuildMember[] aGuildMembers)
-        {
-            for (int i = 0; i < aGuildMembers.Length; i++)
-            {
-                AddGuildMemberToControl(aGuildMembers[i]);
-            }
-        }
-
-        public void AddGuildMemberToControl(GuildMember aGuildMember)
-        {
-            if (aGuildMember == null) return;
-            AddGuildMemberToControl(aGuildMember.RenderId);
-        }
-
         public void AddGuildMemberToControl(int memberRenderId)
         {
             int index = FindGuildMemberPartyIndex(memberRenderId);
@@ -327,20 +287,6 @@ namespace Project_1.UI.HUD.Managers
             partyPlateBoxes[index].VisibleBorder = false;
             HUDManager.InvalidatePlates();
         }
-        public void RemoveWalkerFromControl(GuildMember[] aGuildMembers)
-        {
-            for (int i = 0; i < aGuildMembers.Length; i++)
-            {
-                RemoveWalkerFromControl(aGuildMembers[i]);
-            }
-        }
-
-        public void RemoveWalkerFromControl(GuildMember aGuildmember)
-        {
-            if (aGuildmember == null) return;
-            RemoveWalkerFromControl(aGuildmember.RenderId);
-        }
-
         public void RemoveWalkerFromControl(int[] memberRenderIds)
         {
             if (memberRenderIds == null) return;

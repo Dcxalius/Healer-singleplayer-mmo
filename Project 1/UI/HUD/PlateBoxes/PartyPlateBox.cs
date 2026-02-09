@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities;
 using Project_1.Input;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
@@ -12,7 +11,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 
 namespace Project_1.UI.HUD.PlateBoxes
 {
@@ -56,21 +54,9 @@ namespace Project_1.UI.HUD.PlateBoxes
         }
 
 
-        public bool BelongsTo(GuildMember aGuildMember)
-        {
-            return aGuildMember != null && guildMemberRenderId.HasValue && guildMemberRenderId.Value == aGuildMember.RenderId;
-
-        }
-
         public bool BelongsTo(int aRenderId)
         {
             return guildMemberRenderId.HasValue && guildMemberRenderId.Value == aRenderId;
-        }
-
-        public void SetTarget(GuildMember aGuildMember)
-        {
-            if (aGuildMember == null) return;
-            SetTarget(aGuildMember.BuildUiSnapshot());
         }
 
         public void SetTarget(in EntityUiSnapshot aGuildMember)
@@ -126,15 +112,7 @@ namespace Project_1.UI.HUD.PlateBoxes
             base.ClickedOnMe(aClick);
         }
 
-        public override void Refresh(Entity aEntity)
-        {
-            //name.Name = aEntity.Name;
-            health.Refresh(aEntity);
-            resource.Refresh(aEntity);
-            levelCircle.Refresh(aEntity);
-        }
-
-        public void Refresh(in EntityUiSnapshot snapshot)
+        public override void Refresh(in EntityUiSnapshot snapshot)
         {
             health.Refresh(snapshot);
             resource.Refresh(snapshot);

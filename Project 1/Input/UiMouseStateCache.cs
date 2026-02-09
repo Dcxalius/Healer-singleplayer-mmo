@@ -50,13 +50,16 @@ namespace Project_1.Input
             }
         }
 
-        public static void Update(MouseSnapshot snapshot)
+        public static bool Update(MouseSnapshot snapshot)
         {
             ThreadAffinity.AssertUiThread();
+            bool moved = snapshot.Absolute != absolute || snapshot.Relative.X != relative.X || snapshot.Relative.Y != relative.Y;
+            bool scrolled = snapshot.ScrollDelta != scrollDelta;
             absolute = snapshot.Absolute;
             relative = snapshot.Relative;
             scrollWheelValue = snapshot.ScrollWheelValue;
             scrollDelta = snapshot.ScrollDelta;
+            return moved || scrolled;
         }
 
         static void AssertUiOrMainThread()

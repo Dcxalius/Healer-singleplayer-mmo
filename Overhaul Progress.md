@@ -1,6 +1,6 @@
 # Overhaul Progress
 
-Last updated: 2026-02-06
+Last updated: 2026-02-09
 
 ## In Progress
 - None.
@@ -46,3 +46,10 @@ Last updated: 2026-02-06
 - UI-thread rescale routing: main thread now publishes `HudRescaleRequested` on window size changes, UI thread handles HUD/menu rescale, and GPU-only resize stays on main thread (state rescale split accordingly).
 - Texture metadata catalog: non-main thread texture size/avg color lookups now use `TextureCatalog`, and `TextureManager` accessors assert main-thread usage.
 - GPU-affinity asserts: `Texture`/`UITexture`/`Text` draw paths and debug shape draws now assert main-thread usage.
+- GPU-affinity asserts (cont.): added main-thread guards to particle, hitbox, and visual-effect draw paths.
+- GPU-affinity sweep: added main-thread guards to misc draw entry points (game draw list, option menu draw, entity/spawner minimap draws, tile/chunk draws, cooldown texture, assignable image, ground effects).
+- GPU-affinity sweep (cont.): added main-thread guards to held item/spell drawing and world/ground-effect draw entry points.
+- GPU-affinity sweep (cont.): added main-thread guards across UI widget draw overrides, node viewer/minimap draw, and corpse draw.
+- UI invalidation: mouse snapshot updates now invalidate the active UI surface on position/scroll change (HUD for game/move-hud, state UI otherwise).
+- UI snapshot hardening: removed plate-box refresh/set APIs that accepted live `Entity`/`GuildMember` objects; character/inspect windows now consume snapshots only.
+- UI snapshot hardening: descriptor tooltip events now carry `ItemDescriptorSnapshot` (no live `Item` references), and descriptor box renders from immutable snapshot text payloads.

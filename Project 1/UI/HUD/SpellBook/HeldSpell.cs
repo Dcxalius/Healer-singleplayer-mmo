@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Project_1.GameObjects.Entities.Friendlies.Players;
+using Project_1.Managers;
 
 namespace Project_1.UI.HUD.SpellBook
 {
@@ -40,6 +41,7 @@ namespace Project_1.UI.HUD.SpellBook
 
         public void Draw(SpriteBatch aBatch)
         {
+            ThreadAffinity.AssertMainThread();
             if (heldSpell == null) return;
             Rectangle pos = new Rectangle(UiMouseStateCache.Absolute - grabOffset, size);
 

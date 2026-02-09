@@ -63,8 +63,8 @@ namespace Project_1.Items.SubTypes
         }
 
         [JsonIgnore]
-        public (string name, (PrimaryStats.PrimaryStat stat, int value)[] stats) Suffix => suffix;
-        (string name, (PrimaryStats.PrimaryStat stat, int value)[] stats) suffix;
+        public (string name, (EquipmentData.StatBonuses stat, int value)[] stats) Suffix => suffix;
+        (string name, (EquipmentData.StatBonuses stat, int value)[] stats) suffix;
             
         
 
@@ -102,6 +102,7 @@ namespace Project_1.Items.SubTypes
         Equipment(int id, int hash) : this(ItemFactory.GetItemData<EquipmentData>(id))
         {
             this.hash = hash;
+            if (ItemQuality != Quality.Uncommon) return;
             suffix = EquipmentData.Suffix(hash);
         }
 
@@ -109,12 +110,14 @@ namespace Project_1.Items.SubTypes
         public Equipment(LootData aLoot) : base(aLoot)
         {
             hash = RandomManager.RollInt();
+            if (ItemQuality != Quality.Uncommon) return;
             suffix = EquipmentData.Suffix(hash);
         }
 
         public Equipment(EquipmentData aData) : base(aData, 1)
         {
             hash = RandomManager.RollInt();
+            if (ItemQuality != Quality.Uncommon) return;
             suffix = EquipmentData.Suffix(hash);
         }
     }

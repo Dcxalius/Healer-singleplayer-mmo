@@ -88,7 +88,7 @@ namespace Project_1.Tiles
 
         public void Draw(SpriteBatch aBatch)
         {
-            
+            ThreadAffinity.AssertMainThread();
             gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2());
 
             //xText.LeftAllignedDraw(aBatch, new WorldSpace(Position - Size.ToVector2() / 2).ToAbsoltueScreenPosition());

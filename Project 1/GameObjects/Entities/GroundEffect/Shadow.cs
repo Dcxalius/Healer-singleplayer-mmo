@@ -20,6 +20,7 @@ namespace Project_1.GameObjects.Entities.GroundEffect
 
         public override void Draw(SpriteBatch aBatch, WorldObject aOwner)
         {
+            Project_1.Managers.ThreadAffinity.AssertMainThread();
             Color shadowColor = Color.Black;
             if (aOwner.GetType() == typeof(GuildMember))
             {

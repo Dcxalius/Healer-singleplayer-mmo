@@ -53,6 +53,7 @@ namespace Project_1.UI.UIElements.Bars
 
         public override void Draw(SpriteBatch aBatch)
         {
+            Project_1.Managers.ThreadAffinity.AssertMainThread();
             if (spellTexture == null) return;
             base.Draw(aBatch);
             spellTexture.Draw(aBatch, new Rectangle(AbsolutePos.Location, new Point(AbsolutePos.Size.Y)));

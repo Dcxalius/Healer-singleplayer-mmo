@@ -170,6 +170,7 @@ namespace Project_1.GameObjects.Spawners
 
         internal void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
         {
+            ThreadAffinity.AssertMainThread();
             if (spawn == null) return;
 
             spawn.MinimapDraw(aBatch, aOrigin, aMinimapOffset, aMinimapSize);
@@ -183,6 +184,7 @@ namespace Project_1.GameObjects.Spawners
 
         internal void Draw(SpriteBatch aBatch)
         {
+            ThreadAffinity.AssertMainThread();
             if (spawn == null) return;
 
             spawn.Draw(aBatch);
