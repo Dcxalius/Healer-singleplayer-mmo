@@ -6,7 +6,7 @@ namespace Project_1.Messaging.Events
 {
     internal readonly struct WorldClickRequested
     {
-        public WorldClickRequested(RelativeScreenPosition relativePos, InputManager.ClickType button, byte modifiersMask)
+        public WorldClickRequested(RelativeScreenPosition relativePos, ClickKind button, byte modifiersMask)
         {
             RelativePos = relativePos;
             Button = button;
@@ -14,7 +14,7 @@ namespace Project_1.Messaging.Events
         }
 
         public RelativeScreenPosition RelativePos { get; }
-        public InputManager.ClickType Button { get; }
+        public ClickKind Button { get; }
         public byte ModifiersMask { get; }
 
         public bool NoModifiers() => ModifiersMask == 0;
@@ -32,7 +32,7 @@ namespace Project_1.Messaging.Events
 
         public static WorldClickRequested FromClickEvent(ClickEvent clickEvent)
         {
-            return new WorldClickRequested(clickEvent.RelativePos, clickEvent.ButtonPressed, BuildModifiersMask(clickEvent.ModifiersSnapshot));
+            return new WorldClickRequested(clickEvent.RelativePos, clickEvent.ButtonPressed.ToClickKind(), BuildModifiersMask(clickEvent.ModifiersSnapshot));
         }
 
         static byte BuildModifiersMask(bool[] modifiers)
@@ -57,7 +57,7 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct WorldReleaseRequested
     {
-        public WorldReleaseRequested(RelativeScreenPosition relativePos, InputManager.ClickType button, byte modifiersMask)
+        public WorldReleaseRequested(RelativeScreenPosition relativePos, ClickKind button, byte modifiersMask)
         {
             RelativePos = relativePos;
             Button = button;
@@ -65,7 +65,7 @@ namespace Project_1.Messaging.Events
         }
 
         public RelativeScreenPosition RelativePos { get; }
-        public InputManager.ClickType Button { get; }
+        public ClickKind Button { get; }
         public byte ModifiersMask { get; }
 
         public bool[] ToModifiersArray()
@@ -79,7 +79,7 @@ namespace Project_1.Messaging.Events
 
         public static WorldReleaseRequested FromReleaseEvent(ReleaseEvent releaseEvent)
         {
-            return new WorldReleaseRequested(releaseEvent.RelativePos, releaseEvent.ButtonPressed, BuildModifiersMask(releaseEvent));
+            return new WorldReleaseRequested(releaseEvent.RelativePos, releaseEvent.ButtonPressed.ToClickKind(), BuildModifiersMask(releaseEvent));
         }
 
         static byte BuildModifiersMask(ReleaseEvent releaseEvent)
@@ -196,13 +196,13 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct InteractRequested
     {
-        public InteractRequested(int targetRenderId, InputManager.ClickType button)
+        public InteractRequested(int targetRenderId, ClickKind button)
         {
             TargetRenderId = targetRenderId;
             Button = button;
         }
 
         public int TargetRenderId { get; }
-        public InputManager.ClickType Button { get; }
+        public ClickKind Button { get; }
     }
 }

@@ -55,7 +55,7 @@ namespace Project_1.UI.HUD.SpellBook
 
             if (spellData != null)
             {
-                Mailboxes.Ui.Publish(new HeldSpellStart(spellData.Name, UiMouseStateCache.Absolute - Location));
+                Mailboxes.PublishUiEvent(new HeldSpellStart(spellData.Name, UiMouseStateCache.Absolute - Location));
             }
         }
 
@@ -63,13 +63,13 @@ namespace Project_1.UI.HUD.SpellBook
         {
             base.ClickedOnAndReleasedOnMe();
 
-            Mailboxes.Ui.Publish(new HeldSpellEnd());
+            Mailboxes.PublishUiEvent(new HeldSpellEnd());
         }
 
         protected override void HoldReleaseAwayFromMe()
         {
 
-            Mailboxes.Ui.Publish(new HeldSpellEnd());
+            Mailboxes.PublishUiEvent(new HeldSpellEnd());
 
             if (spellData != null)
             {

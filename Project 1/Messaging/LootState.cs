@@ -27,32 +27,34 @@ namespace Project_1.Messaging
                 Current = null;
                 CurrentContextId = 0;
                 closedFromEmpty = true;
-                Mailboxes.Ui.Publish(new LootClosed(contextId));
+                Mailboxes.PublishUiEvent(new LootClosed(contextId));
             }
         }
 
-        public static Item[] Open(LootDrop drop)
+        public static ItemUiSnapshot[] Open(LootDrop drop)
         {
             ThreadAffinity.AssertSimThread();
             if (drop?.Drop != null)
             {
                 Item[] cloned = new Item[drop.Drop.Length];
+                ItemUiSnapshot[] snapshots = new ItemUiSnapshot[drop.Drop.Length];
                 for (int i = 0; i < drop.Drop.Length; i++)
                 {
                     Item it = drop.Drop[i];
                     if (it == null) continue;
                     cloned[i] = new Item(it.ID, it.Count);
+                    snapshots[i] = ItemUiSnapshot.FromItem(it);
                 }
                 drop.SetDrop(cloned);
                 Current = drop;
                 CurrentContextId = drop.Id;
                 closedFromEmpty = false;
-                return cloned;
+                return snapshots;
             }
             Current = drop;
             CurrentContextId = drop?.Id ?? 0;
             closedFromEmpty = false;
-            return drop?.Drop;
+            return null;
         }
 
         public static LootContext BuildContext(LootDrop drop)
@@ -86,16 +88,16 @@ namespace Project_1.Messaging
             if (takeAmount >= existing.Count)
             {
                 Current.Drop[slot] = null;
-                Mailboxes.Ui.Publish(new LootSlotRemoved(slot));
+                Mailboxes.PublishUiEvent(new LootSlotRemoved(slot));
                 return existing;
             }
 
             existing.Count -= takeAmount;
-            Mailboxes.Ui.Publish(new LootSlotChanged(slot, new Item(existing.ID, existing.Count), takeAmount));
+            Mailboxes.PublishUiEvent(new LootSlotChanged(slot, ItemUiSnapshot.FromItem(existing), takeAmount));
             if (Current.Drop.Where(x => x != null).Count() == 0 && !closedFromEmpty)
             {
                 closedFromEmpty = true;
-                Mailboxes.Ui.Publish(new LootClosed(CurrentContextId));
+                Mailboxes.PublishUiEvent(new LootClosed(CurrentContextId));
                 Current = null;
                 CurrentContextId = 0;
             }

@@ -23,7 +23,7 @@ namespace Project_1.UI.PauseMenu
 
         public override void ClickedOnAndReleasedOnMe()
         {
-            Mailboxes.Main.Publish(new ResetToMainMenuRequested());
+            Mailboxes.PublishSimCommand(new ResetToMainMenuRequested());
             base.ClickedOnAndReleasedOnMe();
         }
     }

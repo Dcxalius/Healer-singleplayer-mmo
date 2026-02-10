@@ -1,27 +1,26 @@
-using Project_1.Managers.States;
 using Project_1.Managers.Saves;
 namespace Project_1.Messaging.Events
 {
     internal readonly struct StateChanged
     {
-        public StateChanged(StateManager.States previous, StateManager.States current)
+        public StateChanged(StateKind previous, StateKind current)
         {
             Previous = previous;
             Current = current;
         }
 
-        public StateManager.States Previous { get; }
-        public StateManager.States Current { get; }
+        public StateKind Previous { get; }
+        public StateKind Current { get; }
     }
 
     internal readonly struct StateChangeRequested
     {
-        public StateChangeRequested(StateManager.States state)
+        public StateChangeRequested(StateKind state)
         {
             State = state;
         }
 
-        public StateManager.States State { get; }
+        public StateKind State { get; }
     }
 
     internal readonly struct ResetToMainMenuRequested

@@ -264,7 +264,7 @@ namespace Project_1.GameObjects
             ThreadAffinity.AssertSimThread();
             ObjectFactory.AddGuildMember("xdddd", "Rogue");
             guild = ObjectFactory.GetGuildMemebers();
-            Mailboxes.Ui.Publish(new GuildMemberAdded(guild.Last().BuildUiSnapshot()));
+            Mailboxes.PublishUiEvent(new GuildMemberAdded(guild.Last().BuildUiSnapshot()));
         }
 
         public static void Reset()
@@ -274,7 +274,7 @@ namespace Project_1.GameObjects
             {
                 guild[i].Delete();
             }
-            Mailboxes.Ui.Publish(new PartyCleared());
+            Mailboxes.PublishUiEvent(new PartyCleared());
             entities.Clear();
             guild.Clear();
             npcs.Clear();
@@ -478,12 +478,12 @@ namespace Project_1.GameObjects
         {
             if (player == null)
             {
-                Mailboxes.Ui.Publish(new PlayerUiSnapshot(false, false, 0, true, 1, WorldSpace.Zero, false, WorldSpace.Zero));
+                Mailboxes.PublishUiEvent(new PlayerUiSnapshot(false, false, 0, true, 1, WorldSpace.Zero, false, WorldSpace.Zero));
                 return;
             }
 
             Entity target = player.Target;
-            Mailboxes.Ui.Publish(new PlayerUiSnapshot(
+            Mailboxes.PublishUiEvent(new PlayerUiSnapshot(
                 true,
                 player.InCombatOrPartyInCombat,
                 player.Gold,

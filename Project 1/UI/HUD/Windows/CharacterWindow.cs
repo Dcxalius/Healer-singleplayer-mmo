@@ -53,8 +53,8 @@ namespace Project_1.UI.HUD.Windows
 
         protected virtual int BagIndexForItem => -3;
 
-        PairReport primaryReport = new PairReport();
-        PairReport secondaryReport = new PairReport();
+        StatReportSnapshot primaryReport = StatReportSnapshot.Empty;
+        StatReportSnapshot secondaryReport = StatReportSnapshot.Empty;
 
         const int StatRowsPerPage = 5;
         static readonly Point StatPageSize = new Point(1, StatRowsPerPage);
@@ -131,12 +131,12 @@ namespace Project_1.UI.HUD.Windows
             equiped[(int)aSlot].AssignItem(aEquipment.EquipedInSlot(aSlot));
         }
 
-        public void SetSlot(Equipment.Slot aSlot, Project_1.Items.Item itemSnapshot)
+        public void SetSlot(Equipment.Slot aSlot, ItemUiSnapshot itemSnapshot)
         {
             equiped[(int)aSlot].AssignItem(itemSnapshot);
         }
 
-        void SetAllSlots(Project_1.Items.Item[] items)
+        void SetAllSlots(ItemUiSnapshot[] items)
         {
             if (items == null) return;
             int count = Math.Min(items.Length, equiped.Length);
@@ -146,24 +146,19 @@ namespace Project_1.UI.HUD.Windows
             }
         }
 
-        public void SetReportBox(PairReport primary, PairReport secondary)
+        public void SetReportBox(StatReportSnapshot primary, StatReportSnapshot secondary)
         {
-            primaryReport = primary ?? new PairReport();
-            secondaryReport = secondary ?? new PairReport();
+            primaryReport = primary;
+            secondaryReport = secondary;
             RefreshStatPage();
         }
 
         void RefreshStatPage()
         {
             int currentPage = statPageBox.CurrentPage;
-            int pageCount = ReportHasAnyLine(secondaryReport) ? 2 : 1;
+            int pageCount = secondaryReport.Count > 0 ? 2 : 1;
             statPageBox.Reset(pageCount * statPageBox.ItemsPerPage);
             statPageBox.SetPage(Math.Min(currentPage, pageCount - 1));
-        }
-
-        static bool ReportHasAnyLine(PairReport aReport)
-        {
-            return aReport != null && aReport.Count > 0;
         }
 
         void BindStatLine(UIElement aElement, int aIndex)
@@ -173,14 +168,14 @@ namespace Project_1.UI.HUD.Windows
 
             int page = aIndex / statPageBox.ItemsPerPage;
             int lineOnPage = aIndex % statPageBox.ItemsPerPage;
-            PairReport report = page == 0 ? primaryReport : secondaryReport;
-            if (report == null || lineOnPage >= report.Count)
+            StatReportSnapshot report = page == 0 ? primaryReport : secondaryReport;
+            if (lineOnPage >= report.Count)
             {
                 line.Clear();
                 return;
             }
 
-            (string Name, double Value) pair = report.Lines[lineOnPage];
+            StatLineSnapshot pair = report.Lines[lineOnPage];
             line.Set(FormatValue(pair.Value), pair.Name);
         }
 

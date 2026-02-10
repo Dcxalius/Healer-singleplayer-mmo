@@ -32,11 +32,12 @@ namespace Project_1.UI.HUD.Inventory
             }
         }
 
-        public Loot(int aSlotIndex, Items.Item aItem, GfxPath aPath) : base(new UITexture("GrayBackground", Color.AliceBlue), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
+        public Loot(int aSlotIndex, ItemUiSnapshot snapshot, GfxPath aPath) : base(new UITexture("GrayBackground", Color.AliceBlue), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
         {
             slotIndex = aSlotIndex;
-            if (aItem == null) return;
-            item = new Item(-2, aSlotIndex, true, aItem, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
+            if (!snapshot.HasValue) return;
+            Items.Item aItem = snapshot.ToItem();
+            item = new Item(-2, aSlotIndex, true, snapshot, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
             itemName = new Label(aItem.Name, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreLeft, aItem.ItemQualityColor);
             AddChild(item);
             AddChild(itemName);
@@ -71,22 +72,23 @@ namespace Project_1.UI.HUD.Inventory
             Resize(RelativeScreenPosition.Zero);
         }
 
-        public void UpdateItem(Items.Item aItem)
+        public void UpdateItem(ItemUiSnapshot snapshot)
         {
-            if (aItem == null)
+            if (!snapshot.HasValue)
             {
                 Hide();
                 return;
             }
+            Items.Item aItem = snapshot.ToItem();
 
             if (item == null)
             {
                 // recreate if previously hidden
-                item = new Item(-2, slotIndex, true, aItem, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
+                item = new Item(-2, slotIndex, true, snapshot, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
                 AddChild(item);
             }
 
-            item.AssignItem(aItem);
+            item.AssignItem(snapshot);
             if (itemName == null)
             {
                 itemName = new Label(aItem.Name, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreLeft, aItem.ItemQualityColor);
@@ -105,7 +107,7 @@ namespace Project_1.UI.HUD.Inventory
             if (heldEvents.ClickThatCreated != InputManager.ClickType.Right) return;
 
 
-            Mailboxes.Main.Publish(new LootItemRequested(item.slotIndex, null));
+            Mailboxes.PublishSimCommand(new LootItemRequested(item.slotIndex, null));
 
             base.ClickedOnAndReleasedOnMe();
         }

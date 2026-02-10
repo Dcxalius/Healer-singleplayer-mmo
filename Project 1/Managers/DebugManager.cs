@@ -8,6 +8,7 @@ using Project_1.Items;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
+using Project_1.UI;
 using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements.Boxes;
 using System;
@@ -54,7 +55,22 @@ namespace Project_1.Managers
         static Text dispatchText;
         static Text workerText;
         static Text screenshotText;
+        static Text simThreadText;
+        static Text uiThreadText;
         static AbsoluteScreenPosition debugTextOrigin;
+        const int QueueWarningThreshold = 128;
+        const double ThreadFrameWarningMs = 25d;
+        const double WarningCooldownMs = 2000d;
+        static double nextQueueWarningMs;
+        static double nextFailureWarningMs;
+        static double nextThreadWarningMs;
+        static long lastMainFailureCount;
+        static long lastUiFailureCount;
+        static long lastSimFailureCount;
+        static long lastSimOverrunCount;
+        static long lastUiOverrunCount;
+        static long lastSimTimeoutCount;
+        static long lastUiTimeoutCount;
 
 
         public static bool Mode(DebugMode aMode) => modes[(int)aMode];
@@ -101,6 +117,8 @@ namespace Project_1.Managers
             dispatchText = new Text("Gloryse", Color.Chartreuse);
             workerText = new Text("Gloryse", Color.Chartreuse);
             screenshotText = new Text("Gloryse", Color.Chartreuse);
+            simThreadText = new Text("Gloryse", Color.Chartreuse);
+            uiThreadText = new Text("Gloryse", Color.Chartreuse);
             debugTextOrigin = new AbsoluteScreenPosition(12, 12);
         }
 
@@ -131,12 +149,66 @@ namespace Project_1.Managers
             var mainStats = Mailboxes.MainStats;
             var uiStats = Mailboxes.UiStats;
             var simStats = Mailboxes.SimStats;
-            mailboxText.Value = $"Q M:{mainStats.Pending} U:{uiStats.Pending} S:{simStats.Pending}";
-            dispatchText.Value = $"D M:{mainStats.LastDispatchCount}/{mainStats.LastDispatchMs:0.0}ms U:{uiStats.LastDispatchCount}/{uiStats.LastDispatchMs:0.0}ms S:{simStats.LastDispatchCount}/{simStats.LastDispatchMs:0.0}ms";
+            mailboxText.Value = $"Q M:{mainStats.Pending}/{mainStats.Peak} U:{uiStats.Pending}/{uiStats.Peak} S:{simStats.Pending}/{simStats.Peak}";
+            dispatchText.Value = $"D M:{mainStats.LastDispatchCount}/{mainStats.LastDispatchMs:0.0}ms P:{mainStats.TotalPublished} F:{mainStats.TotalHandlerFailures} U:{uiStats.LastDispatchCount}/{uiStats.LastDispatchMs:0.0}ms P:{uiStats.TotalPublished} F:{uiStats.TotalHandlerFailures} S:{simStats.LastDispatchCount}/{simStats.LastDispatchMs:0.0}ms P:{simStats.TotalPublished} F:{simStats.TotalHandlerFailures}";
             var workerStats = WorkerPool.Stats;
             workerText.Value = $"W {workerStats.Pending}/{workerStats.Peak} last:{workerStats.LastWorkMs:0.0}ms";
             var screenshotStats = SaveManager.ScreenshotQueueStats;
             screenshotText.Value = $"S {screenshotStats.Pending}/{screenshotStats.Peak} last:{screenshotStats.LastScreenshotMs:0.0}ms";
+            var simThreadStats = SimThread.Stats;
+            simThreadText.Value = $"TSim last/avg/max:{simThreadStats.LastFrameMs:0.0}/{simThreadStats.AvgFrameMs:0.0}/{simThreadStats.MaxFrameMs:0.0}ms ov:{simThreadStats.OverrunCount} to:{simThreadStats.WaitTimeouts}";
+            var uiThreadStats = UiThread.Stats;
+            uiThreadText.Value = $"TUI  last/avg/max:{uiThreadStats.LastFrameMs:0.0}/{uiThreadStats.AvgFrameMs:0.0}/{uiThreadStats.MaxFrameMs:0.0}ms ov:{uiThreadStats.OverrunCount} to:{uiThreadStats.WaitTimeouts}";
+
+            EmitDiagnosticsWarnings(mainStats, uiStats, simStats, simThreadStats, uiThreadStats);
+        }
+
+        static void EmitDiagnosticsWarnings(
+            in MailboxStats mainStats,
+            in MailboxStats uiStats,
+            in MailboxStats simStats,
+            in SimThreadStats simThreadStats,
+            in UiThreadStats uiThreadStats)
+        {
+            if (!modes[(int)DebugMode.Print]) return;
+
+            double nowMs = TimeManager.InstanceTotalFrameTimeAsTimeSpan.TotalMilliseconds;
+
+            if ((mainStats.Pending >= QueueWarningThreshold || uiStats.Pending >= QueueWarningThreshold || simStats.Pending >= QueueWarningThreshold) &&
+                nowMs >= nextQueueWarningMs)
+            {
+                Print($"WARN mailbox backlog M:{mainStats.Pending}/{mainStats.Peak} U:{uiStats.Pending}/{uiStats.Peak} S:{simStats.Pending}/{simStats.Peak}");
+                nextQueueWarningMs = nowMs + WarningCooldownMs;
+            }
+
+            long deltaMainFailures = mainStats.TotalHandlerFailures - lastMainFailureCount;
+            long deltaUiFailures = uiStats.TotalHandlerFailures - lastUiFailureCount;
+            long deltaSimFailures = simStats.TotalHandlerFailures - lastSimFailureCount;
+            bool hasNewFailures = deltaMainFailures > 0 || deltaUiFailures > 0 || deltaSimFailures > 0;
+            if (hasNewFailures && nowMs >= nextFailureWarningMs)
+            {
+                Print($"WARN mailbox handler failures +M:{Math.Max(0, deltaMainFailures)} +U:{Math.Max(0, deltaUiFailures)} +S:{Math.Max(0, deltaSimFailures)} totals M:{mainStats.TotalHandlerFailures} U:{uiStats.TotalHandlerFailures} S:{simStats.TotalHandlerFailures}");
+                nextFailureWarningMs = nowMs + WarningCooldownMs;
+            }
+            lastMainFailureCount = mainStats.TotalHandlerFailures;
+            lastUiFailureCount = uiStats.TotalHandlerFailures;
+            lastSimFailureCount = simStats.TotalHandlerFailures;
+
+            long deltaSimOverruns = simThreadStats.OverrunCount - lastSimOverrunCount;
+            long deltaUiOverruns = uiThreadStats.OverrunCount - lastUiOverrunCount;
+            long deltaSimTimeouts = simThreadStats.WaitTimeouts - lastSimTimeoutCount;
+            long deltaUiTimeouts = uiThreadStats.WaitTimeouts - lastUiTimeoutCount;
+            bool hasThreadIssues = deltaSimOverruns > 0 || deltaUiOverruns > 0 || deltaSimTimeouts > 0 || deltaUiTimeouts > 0;
+            bool slowFrame = simThreadStats.LastFrameMs >= ThreadFrameWarningMs || uiThreadStats.LastFrameMs >= ThreadFrameWarningMs;
+            if ((hasThreadIssues || slowFrame) && nowMs >= nextThreadWarningMs)
+            {
+                Print($"WARN thread timing sim {simThreadStats.LastFrameMs:0.0}/{simThreadStats.AvgFrameMs:0.0}/{simThreadStats.MaxFrameMs:0.0}ms (+ov:{Math.Max(0, deltaSimOverruns)} +to:{Math.Max(0, deltaSimTimeouts)}) ui {uiThreadStats.LastFrameMs:0.0}/{uiThreadStats.AvgFrameMs:0.0}/{uiThreadStats.MaxFrameMs:0.0}ms (+ov:{Math.Max(0, deltaUiOverruns)} +to:{Math.Max(0, deltaUiTimeouts)})");
+                nextThreadWarningMs = nowMs + WarningCooldownMs;
+            }
+            lastSimOverrunCount = simThreadStats.OverrunCount;
+            lastUiOverrunCount = uiThreadStats.OverrunCount;
+            lastSimTimeoutCount = simThreadStats.WaitTimeouts;
+            lastUiTimeoutCount = uiThreadStats.WaitTimeouts;
         }
 
         public static void AddDebugShape(DebugShape aShape)
@@ -184,11 +256,11 @@ namespace Project_1.Managers
         {
             if (!KeyBindStateCache.GetPress(KeyBindManager.KeyListner.DebugTestGear)) return;
             RelativeScreenPosition dialogueBoxSize = new RelativeScreenPosition(0.2f);
-            Mailboxes.Ui.Publish(new Messaging.Events.DialogueOpened(
+            Mailboxes.PublishUiEvent(new Messaging.Events.DialogueOpened(
                 "Hello Cheater!\n\nxdd",
                 Color.White,
-                DialogueBox.LocationOfPopUp.HUDManager,
-                DialogueBox.PausesGame.Pauses,
+                DialogueBox.LocationOfPopUp.HUDManager.ToDialoguePopupLocation(),
+                DialogueBox.PausesGame.Pauses.ToDialoguePauseKind(),
                 null,
                 new GfxPath(GfxType.UI, "GrayBackground"),
                 new RelativeScreenPosition(0.5f) - dialogueBoxSize / 2,
@@ -285,6 +357,10 @@ namespace Project_1.Managers
                 workerText.TopLeftDraw(aBatch, workerPos);
                 AbsoluteScreenPosition screenshotPos = workerPos + new AbsoluteScreenPosition(0, (int)Math.Ceiling(workerText.Offset.Y) + 2);
                 screenshotText.TopLeftDraw(aBatch, screenshotPos);
+                AbsoluteScreenPosition simThreadPos = screenshotPos + new AbsoluteScreenPosition(0, (int)Math.Ceiling(screenshotText.Offset.Y) + 2);
+                simThreadText.TopLeftDraw(aBatch, simThreadPos);
+                AbsoluteScreenPosition uiThreadPos = simThreadPos + new AbsoluteScreenPosition(0, (int)Math.Ceiling(simThreadText.Offset.Y) + 2);
+                uiThreadText.TopLeftDraw(aBatch, uiThreadPos);
             }
         }
     }

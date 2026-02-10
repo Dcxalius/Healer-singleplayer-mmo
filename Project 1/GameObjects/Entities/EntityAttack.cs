@@ -32,19 +32,19 @@ namespace Project_1.GameObjects.Entities
         public void SetTarget(Entity aEntity)
         {
             target = aEntity;
-            Mailboxes.Ui.Publish(new TargetChanged(RelationToPlayer, target?.BuildUiSnapshot()));
+            Mailboxes.PublishUiEvent(new TargetChanged(RelationToPlayer.ToRelationToPlayerKind(), target?.BuildUiSnapshot()));
             if (target == null) return;
             List<Project_1.GameObjects.Spells.Buff.Buff> buffs = target.GetAllBuffs();
             for (int i = 0; i < buffs.Count; i++)
             {
-                Mailboxes.Ui.Publish(new BuffAdded(target.RenderId, new BuffUiSnapshot(buffs[i].EffectId, buffs[i].GfxPath, buffs[i].DurationRemaining)));
+                Mailboxes.PublishUiEvent(new BuffAdded(target.RenderId, new BuffUiSnapshot(buffs[i].EffectId, buffs[i].GfxPath, buffs[i].DurationRemaining)));
             }
         }
 
         public void RemoveTarget()
         {
             target = null;
-            Mailboxes.Ui.Publish(new TargetChanged(RelationToPlayer, null));
+            Mailboxes.PublishUiEvent(new TargetChanged(RelationToPlayer.ToRelationToPlayerKind(), null));
         }
 
 

@@ -1,13 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.Textures;
-using Project_1.UI.UIElements.Boxes;
 
 namespace Project_1.Messaging.Events
 {
     internal readonly struct DialogueOpened
     {
-        public DialogueOpened(string text, Color textColor, DialogueBox.LocationOfPopUp location, DialogueBox.PausesGame pauses, string title, GfxPath background, RelativeScreenPosition pos, RelativeScreenPosition size, string closeText)
+        public DialogueOpened(string text, Color textColor, DialoguePopupLocation location, DialoguePauseKind pauses, string title, GfxPath background, RelativeScreenPosition pos, RelativeScreenPosition size, string closeText)
         {
             Text = text;
             TextColor = textColor;
@@ -22,8 +21,8 @@ namespace Project_1.Messaging.Events
 
         public string Text { get; }
         public Color TextColor { get; }
-        public DialogueBox.LocationOfPopUp Location { get; }
-        public DialogueBox.PausesGame Pauses { get; }
+        public DialoguePopupLocation Location { get; }
+        public DialoguePauseKind Pauses { get; }
         public string Title { get; }
         public GfxPath Background { get; }
         public RelativeScreenPosition Pos { get; }

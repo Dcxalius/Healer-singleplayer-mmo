@@ -141,7 +141,7 @@ namespace Project_1.UI.HUD.Managers
             });
             Mailboxes.Ui.Subscribe<LootSlotRemoved>(e =>
             {
-                lootBox.RefreshSlot(e.Slot, null);
+                lootBox.RefreshSlot(e.Slot, ItemUiSnapshot.Empty);
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<LootClosed>(e =>
@@ -222,16 +222,7 @@ namespace Project_1.UI.HUD.Managers
             Mailboxes.Ui.Subscribe<PlayerUiSnapshot>(e => UiPlayerStateCache.Update(e));
             Mailboxes.Ui.Subscribe<GuildInviteStatusUpdated>(e =>
             {
-                var memberNames = e.MemberNames as System.Collections.Generic.List<string>
-                    ?? new System.Collections.Generic.List<string>(e.MemberNames);
-                var statuses = new System.Collections.Generic.List<Project_1.UI.UIElements.Buttons.TwoStateGFXButton.State>(e.Statuses.Count);
-                for (int i = 0; i < e.Statuses.Count; i++)
-                {
-                    statuses.Add(e.Statuses[i] == InviteStatus.Accepted
-                        ? Project_1.UI.UIElements.Buttons.TwoStateGFXButton.State.Second
-                        : Project_1.UI.UIElements.Buttons.TwoStateGFXButton.State.First);
-                }
-                windowHandler.SetGuildMemberInviteStatus(memberNames, statuses);
+                windowHandler.SetGuildMemberInviteStatus(e.MemberNames, e.Statuses);
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<BuffAdded>(e =>
@@ -320,7 +311,7 @@ namespace Project_1.UI.HUD.Managers
             Mailboxes.Ui.Subscribe<LogicWindowOpened>(e =>
             {
                 windowHandler.OpenLogicWindow(e.MemberRenderId);
-                Mailboxes.Main.Publish(new LogicWindowSnapshotRequested(e.MemberRenderId));
+                Mailboxes.PublishSimCommand(new LogicWindowSnapshotRequested(e.MemberRenderId));
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<LogicWindowSnapshotSet>(e =>
@@ -561,7 +552,7 @@ namespace Project_1.UI.HUD.Managers
         {
             AssertUiThreadOrMainFallback();
             UITexture background = e.Background == null ? UITexture.Null : new UITexture(e.Background, Color.White);
-            DialogueBox box = new DialogueBox(e.Text, e.TextColor, e.Location, e.Pauses, new List<Action>(), background, e.Pos, e.Size, e.CloseText);
+            DialogueBox box = new DialogueBox(e.Text, e.TextColor, e.Location.ToDialogueBoxLocation(), e.Pauses.ToDialogueBoxPause(), new List<Action>(), background, e.Pos, e.Size, e.CloseText);
             dialogueBoxes.Add(box);
             InvalidateUi();
         }
@@ -679,13 +670,13 @@ namespace Project_1.UI.HUD.Managers
         #endregion
 
         #region Loot
-        public static void Loot(Items.Item[] snapshot, LootContext context)
+        public static void Loot(ItemUiSnapshot[] snapshot, LootContext context)
         {
             AssertUiThreadOrMainFallback();
             lootBox.Loot(context, snapshot);
             InvalidateUi();
         }
-        public static void RefreshLootSlot(int slot, Items.Item snapshot)
+        public static void RefreshLootSlot(int slot, ItemUiSnapshot snapshot)
         {
             AssertUiThreadOrMainFallback();
             lootBox.RefreshSlot(slot, snapshot);

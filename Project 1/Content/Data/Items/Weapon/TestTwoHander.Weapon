@@ -1,1 +1,1 @@
-{"gfxName":"TestTwoHander","name":"ZweiHander", "description": "Rly big", "Slot": 15, "MinAttackDamage": 20, "MaxAttackDamage": 40, "AttackSpeed": 3.0, "id":27, "baseStats": [0, 5, 5, 0, 5], "Armor": 10, "WeaponType": 4}	
+{"gfxName":"TestTwoHander","name":"ZweiHander","description":"Rly big","Slot":15,"AttackSpeed":3.0,"DamageRangeFactor":0.8,"id":27,"WeaponType":4,"Quality":2,"Cost":250,"ItemLevel":13}

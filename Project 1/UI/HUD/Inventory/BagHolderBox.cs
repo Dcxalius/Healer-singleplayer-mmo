@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Items;
 using Project_1.Items.SubTypes;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.HUD;
 using Project_1.UI.UIElements.Boxes;
@@ -26,7 +27,7 @@ namespace Project_1.UI.HUD.Inventory
             AddChild(defaultBag);
         }
 
-        public void SetBags(Items.Item[] aBags, AbsoluteScreenPosition aItemSize, AbsoluteScreenPosition aSpacingSize)
+        public void SetBags(ItemUiSnapshot[] aBags, AbsoluteScreenPosition aItemSize, AbsoluteScreenPosition aSpacingSize)
         {
             bags = new Item[aBags.Length - 1];
             for (int i = 1; i < aBags.Length; i++)
@@ -34,7 +35,7 @@ namespace Project_1.UI.HUD.Inventory
                 RelativeScreenPosition pos = new RelativeScreenPosition(i * (aItemSize.ToRelativeScreenPosition(Size).X + aSpacingSize.ToRelativeScreenPosition(Size).X) + aSpacingSize.ToRelativeScreenPosition(Size).X, aSpacingSize.ToRelativeScreenPosition(Size).Y);
                 RelativeScreenPosition size = aItemSize.ToRelativeScreenPosition(Size);
 
-                if (aBags[i] == null)
+                if (!aBags[i].HasValue)
                 {
                     bags[i - 1] = new Item(-1, i, true, (Items.Item)null, pos, size);
                 }

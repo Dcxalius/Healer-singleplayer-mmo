@@ -166,13 +166,13 @@ namespace Project_1.UI.HUD.Managers
         {
             switch (snapshot.RelationToPlayer)
             {
-                case Relation.RelationToPlayer.Self:
+                case RelationToPlayerKind.Self:
                     playerPlateBox.Refresh(snapshot);
                     if (!targetPlateBox.BelongsTo(snapshot.RenderId)) break;
                     targetPlateBox.Refresh(snapshot);
                     HUDManager.InvalidatePlates();
                     break;
-                case Relation.RelationToPlayer.Friendly:
+                case RelationToPlayerKind.Friendly:
                     if (targetPlateBox.BelongsTo(snapshot.RenderId)) targetPlateBox.Refresh(snapshot);
                     for (int i = 0; i < partyPlateBoxes.Length; i++)
                     {
@@ -182,8 +182,8 @@ namespace Project_1.UI.HUD.Managers
                         break;
                     }
                     break;
-                case Relation.RelationToPlayer.Neutral:
-                case Relation.RelationToPlayer.Hostile:
+                case RelationToPlayerKind.Neutral:
+                case RelationToPlayerKind.Hostile:
                     if (!targetPlateBox.BelongsTo(snapshot.RenderId)) break;
                     targetPlateBox.Refresh(snapshot);
                     HUDManager.InvalidatePlates();
@@ -192,18 +192,18 @@ namespace Project_1.UI.HUD.Managers
                     break;
             }
         }
-        public void SetNewTarget(Relation.RelationToPlayer aTargeterRelation, EntityUiSnapshot? aTarget)
+        public void SetNewTarget(RelationToPlayerKind aTargeterRelation, EntityUiSnapshot? aTarget)
         {
             switch (aTargeterRelation)
             {
-                case Relation.RelationToPlayer.Self:
+                case RelationToPlayerKind.Self:
                     targetPlateBox.SetTarget(aTarget);
                     targetBuffBox.AssignBox(aTarget?.RenderId);
                     HUDManager.InvalidatePlates();
                     break;
-                case Relation.RelationToPlayer.Friendly:
-                case Relation.RelationToPlayer.Neutral:
-                case Relation.RelationToPlayer.Hostile:
+                case RelationToPlayerKind.Friendly:
+                case RelationToPlayerKind.Neutral:
+                case RelationToPlayerKind.Hostile:
                     break;
                 default:
                     throw new NotImplementedException();

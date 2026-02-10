@@ -93,45 +93,56 @@ namespace Project_1.Managers.States
             currentStateEnum = States.StartScreen;
 
             Mailboxes.Ui.Subscribe<StateChanged>(HandleUiStateChanged);
-            Mailboxes.Main.Subscribe<StateChangeRequested>(e => SetState(e.State));
-            Mailboxes.Main.Subscribe<ResetToMainMenuRequested>(_ => HandleResetToMainMenuRequested());
-            Mailboxes.Main.Subscribe<CreateNewPlayerRequested>(HandleCreateNewPlayerRequested);
-            Mailboxes.Main.Subscribe<SaveDataRequested>(_ => HandleSaveDataRequested());
-            Mailboxes.Main.Subscribe<LoadSaveRequested>(HandleLoadSaveRequested);
-            Mailboxes.Main.Subscribe<ContinueLastSaveRequested>(_ => HandleContinueLastSaveRequested());
-            Mailboxes.Main.Subscribe<NewGameRequested>(_ => HandleNewGameRequested());
-            Mailboxes.Main.Subscribe<ShopPurchaseRequested>(HandleShopPurchaseRequested);
-            Mailboxes.Main.Subscribe<SpellCastRequested>(HandleSpellCastRequested);
-            Mailboxes.Main.Subscribe<TargetRequested>(HandleTargetRequested);
-            Mailboxes.Main.Subscribe<LogicWindowSnapshotRequested>(HandleLogicWindowSnapshotRequested);
-            Mailboxes.Main.Subscribe<SaveLoadParsed>(HandleSaveLoadParsed);
-            Mailboxes.Main.Subscribe<PartyMemberInviteRequested>(HandlePartyMemberInviteRequested);
-            Mailboxes.Main.Subscribe<PartyMemberKickRequested>(HandlePartyMemberKickRequested);
-            Mailboxes.Main.Subscribe<InventorySwapItemsRequested>(HandleInventorySwapItemsRequested);
-            Mailboxes.Main.Subscribe<InventorySwapEquipmentRequested>(HandleInventorySwapEquipmentRequested);
-            Mailboxes.Main.Subscribe<InventoryEquipBagRequested>(HandleInventoryEquipBagRequested);
-            Mailboxes.Main.Subscribe<InventoryUnequipBagRequested>(HandleInventoryUnequipBagRequested);
-            Mailboxes.Main.Subscribe<InventorySwapBagsRequested>(HandleInventorySwapBagsRequested);
-            Mailboxes.Main.Subscribe<InventorySwapBagSlotsRequested>(HandleInventorySwapBagSlotsRequested);
-            Mailboxes.Main.Subscribe<LootItemRequested>(HandleLootItemRequested);
-            Mailboxes.Main.Subscribe<InventoryEquipRequested>(HandleInventoryEquipRequested);
-            Mailboxes.Main.Subscribe<InventoryConsumeRequested>(HandleInventoryConsumeRequested);
-            Mailboxes.Main.Subscribe<EquipmentSwapRequested>(HandleEquipmentSwapRequested);
-            Mailboxes.Main.Subscribe<EquipmentMoveToInventoryRequested>(HandleEquipmentMoveToInventoryRequested);
-            Mailboxes.Main.Subscribe<WorldClickRequested>(HandleWorldClickRequested);
-            Mailboxes.Main.Subscribe<WorldReleaseRequested>(HandleWorldReleaseRequested);
-            Mailboxes.Main.Subscribe<WorldScrollRequested>(HandleWorldScrollRequested);
-            Mailboxes.Main.Subscribe<PlayerMovementRequested>(HandlePlayerMovementRequested);
-            Mailboxes.Main.Subscribe<MoveOrderRequested>(HandleMoveOrderRequested);
-            Mailboxes.Main.Subscribe<PartyTargetOrderRequested>(HandlePartyTargetOrderRequested);
-            Mailboxes.Main.Subscribe<TargetClearedRequested>(_ => HandleTargetClearedRequested());
-            Mailboxes.Main.Subscribe<PartyCommandRequested>(HandlePartyCommandRequested);
-            Mailboxes.Main.Subscribe<InteractRequested>(HandleInteractRequested);
-            Mailboxes.Main.Subscribe<KeyboardSnapshot>(e => KeyboardStateCache.Update(e));
-            Mailboxes.Main.Subscribe<KeyBindSnapshot>(e => KeyBindStateCache.Update(e));
-            Mailboxes.Main.Subscribe<MouseSnapshot>(e => MouseStateCache.Update(e));
-            Mailboxes.Main.Subscribe<EscapePressed>(_ => HandleEscapePressed());
+            SubscribeSimCommand<StateChangeRequested>(e => SetState(e.State.ToStateManagerState()));
+            SubscribeSimCommand<ResetToMainMenuRequested>(_ => HandleResetToMainMenuRequested());
+            SubscribeSimCommand<CreateNewPlayerRequested>(HandleCreateNewPlayerRequested);
+            SubscribeSimCommand<SaveDataRequested>(_ => HandleSaveDataRequested());
+            SubscribeSimCommand<LoadSaveRequested>(HandleLoadSaveRequested);
+            SubscribeSimCommand<ContinueLastSaveRequested>(_ => HandleContinueLastSaveRequested());
+            SubscribeSimCommand<NewGameRequested>(_ => HandleNewGameRequested());
+            SubscribeSimCommand<ShopPurchaseRequested>(HandleShopPurchaseRequested);
+            SubscribeSimCommand<SpellCastRequested>(HandleSpellCastRequested);
+            SubscribeSimCommand<TargetRequested>(HandleTargetRequested);
+            SubscribeSimCommand<LogicWindowSnapshotRequested>(HandleLogicWindowSnapshotRequested);
+            SubscribeSimCommand<SaveLoadParsed>(HandleSaveLoadParsed);
+            SubscribeSimCommand<PartyMemberInviteRequested>(HandlePartyMemberInviteRequested);
+            SubscribeSimCommand<PartyMemberKickRequested>(HandlePartyMemberKickRequested);
+            SubscribeSimCommand<InventorySwapItemsRequested>(HandleInventorySwapItemsRequested);
+            SubscribeSimCommand<InventorySwapEquipmentRequested>(HandleInventorySwapEquipmentRequested);
+            SubscribeSimCommand<InventoryEquipBagRequested>(HandleInventoryEquipBagRequested);
+            SubscribeSimCommand<InventoryUnequipBagRequested>(HandleInventoryUnequipBagRequested);
+            SubscribeSimCommand<InventorySwapBagsRequested>(HandleInventorySwapBagsRequested);
+            SubscribeSimCommand<InventorySwapBagSlotsRequested>(HandleInventorySwapBagSlotsRequested);
+            SubscribeSimCommand<LootItemRequested>(HandleLootItemRequested);
+            SubscribeSimCommand<InventoryEquipRequested>(HandleInventoryEquipRequested);
+            SubscribeSimCommand<InventoryConsumeRequested>(HandleInventoryConsumeRequested);
+            SubscribeSimCommand<EquipmentSwapRequested>(HandleEquipmentSwapRequested);
+            SubscribeSimCommand<EquipmentMoveToInventoryRequested>(HandleEquipmentMoveToInventoryRequested);
+            SubscribeSimCommand<WorldClickRequested>(HandleWorldClickRequested);
+            SubscribeSimCommand<WorldReleaseRequested>(HandleWorldReleaseRequested);
+            SubscribeSimCommand<WorldScrollRequested>(HandleWorldScrollRequested);
+            SubscribeSimCommand<PlayerMovementRequested>(HandlePlayerMovementRequested);
+            SubscribeSimCommand<MoveOrderRequested>(HandleMoveOrderRequested);
+            SubscribeSimCommand<PartyTargetOrderRequested>(HandlePartyTargetOrderRequested);
+            SubscribeSimCommand<TargetClearedRequested>(_ => HandleTargetClearedRequested());
+            SubscribeSimCommand<PartyCommandRequested>(HandlePartyCommandRequested);
+            SubscribeSimCommand<InteractRequested>(HandleInteractRequested);
+            SubscribeSimMailbox<KeyboardSnapshot>(e => KeyboardStateCache.Update(e));
+            SubscribeSimMailbox<KeyBindSnapshot>(e => KeyBindStateCache.Update(e));
+            SubscribeSimMailbox<MouseSnapshot>(e => MouseStateCache.Update(e));
+            SubscribeSimMailbox<EscapePressed>(_ => HandleEscapePressed());
             Mailboxes.Ui.Subscribe<HudRescaleRequested>(e => UiRescale(e.WindowSize));
+        }
+
+        static void SubscribeSimCommand<T>(Action<T> handler)
+        {
+            Mailboxes.RegisterSimCommandType<T>();
+            SubscribeSimMailbox(handler);
+        }
+
+        static void SubscribeSimMailbox<T>(Action<T> handler)
+        {
+            Mailboxes.Sim.Subscribe(handler);
         }
 
         public static void Update()
@@ -160,7 +171,7 @@ namespace Project_1.Managers.States
                 SetState(aState);
                 return;
             }
-            Mailboxes.Main.Publish(new StateChangeRequested(aState));
+            Mailboxes.PublishSimCommand(new StateChangeRequested(aState.ToStateKind()));
         }
 
         static void ApplyPendingStateChange()
@@ -205,7 +216,7 @@ namespace Project_1.Managers.States
             currentState.OnEnter();
             if (UiThread.IsRunning)
             {
-                Mailboxes.Ui.Publish(new StateChanged(leavingState, aState));
+                Mailboxes.PublishUiEvent(new StateChanged(leavingState.ToStateKind(), aState.ToStateKind()));
                 return;
             }
 
@@ -545,12 +556,12 @@ namespace Project_1.Managers.States
             ThreadAffinity.AssertSimThread();
             if (!ObjectManager.TryGetGuildMemberByRenderId(e.MemberRenderId, out GuildMember member))
             {
-                Mailboxes.Ui.Publish(new LogicWindowSnapshotSet(e.MemberRenderId, Array.Empty<LogicNodeUiSnapshot>()));
+                Mailboxes.PublishUiEvent(new LogicWindowSnapshotSet(e.MemberRenderId, Array.Empty<LogicNodeUiSnapshot>()));
                 return;
             }
 
             LogicNode root = member.AttackLogic?.RootNode;
-            Mailboxes.Ui.Publish(new LogicWindowSnapshotSet(e.MemberRenderId, BuildLogicNodeSnapshot(root)));
+            Mailboxes.PublishUiEvent(new LogicWindowSnapshotSet(e.MemberRenderId, BuildLogicNodeSnapshot(root)));
         }
 
         static LogicNodeUiSnapshot[] BuildLogicNodeSnapshot(LogicNode root)
@@ -694,7 +705,7 @@ namespace Project_1.Managers.States
         static void HandleWorldReleaseRequested(WorldReleaseRequested e)
         {
             ThreadAffinity.AssertSimThread();
-            ReleaseEvent releaseEvent = new ReleaseEvent(null, e.RelativePos, e.Button, e.ToModifiersArray());
+            ReleaseEvent releaseEvent = new ReleaseEvent(null, e.RelativePos, e.Button.ToInputClickType(), e.ToModifiersArray());
             Release(releaseEvent);
         }
 
@@ -724,13 +735,13 @@ namespace Project_1.Managers.States
 
             if (CorpseManager.TryGetCorpseAt(worldPos, out Corpse corpse))
             {
-                Mailboxes.Main.Publish(new InteractRequested(corpse.RenderId, clickEvent.Button));
+                Mailboxes.PublishSimCommand(new InteractRequested(corpse.RenderId, clickEvent.Button));
                 return;
             }
 
             if (DoodadManager.TryGetDoodadAt(worldPos, out Doodad doodad))
             {
-                Mailboxes.Main.Publish(new InteractRequested(doodad.RenderId, clickEvent.Button));
+                Mailboxes.PublishSimCommand(new InteractRequested(doodad.RenderId, clickEvent.Button));
                 return;
             }
 
@@ -740,52 +751,52 @@ namespace Project_1.Managers.States
         static void HandleEntityWorldClick(Entity entity, in WorldClickRequested clickEvent)
         {
             bool noModifiers = clickEvent.NoModifiers();
-            bool rightClick = clickEvent.Button == InputManager.ClickType.Right;
+            bool rightClick = clickEvent.Button == ClickKind.Right;
 
             if (noModifiers)
             {
-                Mailboxes.Main.Publish(new TargetRequested(entity.RenderId));
+                Mailboxes.PublishSimCommand(new TargetRequested(entity.RenderId));
                 if (rightClick)
                 {
-                    Mailboxes.Main.Publish(new PartyTargetOrderRequested(entity.RenderId));
+                    Mailboxes.PublishSimCommand(new PartyTargetOrderRequested(entity.RenderId));
                 }
             }
             else if (entity is GuildMember member)
             {
                 if (clickEvent.Modifier(InputManager.HoldModifier.Shift))
                 {
-                    Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.Add, member.RenderId));
+                    Mailboxes.PublishSimCommand(new PartyCommandRequested(PartyCommandAction.Add, member.RenderId));
                 }
                 else if (clickEvent.Modifier(InputManager.HoldModifier.Ctrl))
                 {
-                    Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.NeedyAdd, member.RenderId));
+                    Mailboxes.PublishSimCommand(new PartyCommandRequested(PartyCommandAction.NeedyAdd, member.RenderId));
                 }
             }
 
             if (entity is Npc npc)
             {
-                Mailboxes.Main.Publish(new InteractRequested(npc.RenderId, clickEvent.Button));
+                Mailboxes.PublishSimCommand(new InteractRequested(npc.RenderId, clickEvent.Button));
             }
         }
 
         static void HandleGroundWorldClick(WorldSpace worldPos, in WorldClickRequested clickEvent)
         {
-            if (clickEvent.Button == InputManager.ClickType.Left)
+            if (clickEvent.Button == ClickKind.Left)
             {
                 if (clickEvent.ModifiersOr(new InputManager.HoldModifier[] { InputManager.HoldModifier.Shift, InputManager.HoldModifier.Ctrl }))
                 {
-                    Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.Clear, null));
+                    Mailboxes.PublishSimCommand(new PartyCommandRequested(PartyCommandAction.Clear, null));
                     return;
                 }
 
-                Mailboxes.Main.Publish(new TargetClearedRequested());
+                Mailboxes.PublishSimCommand(new TargetClearedRequested());
                 return;
             }
 
-            if (clickEvent.Button == InputManager.ClickType.Right)
+            if (clickEvent.Button == ClickKind.Right)
             {
                 bool append = clickEvent.Modifier(InputManager.HoldModifier.Shift);
-                Mailboxes.Main.Publish(new MoveOrderRequested(worldPos, append));
+                Mailboxes.PublishSimCommand(new MoveOrderRequested(worldPos, append));
             }
         }
 
@@ -854,7 +865,7 @@ namespace Project_1.Managers.States
             ThreadAffinity.AssertSimThread();
             if (CorpseManager.TryGetCorpseByRenderId(e.TargetRenderId, out Corpse corpse))
             {
-                if (e.Button != InputManager.ClickType.Right) return;
+                if (e.Button != ClickKind.Right) return;
                 corpse.TryOpenLoot();
                 return;
             }
@@ -1044,8 +1055,8 @@ namespace Project_1.Managers.States
         static void HandleUiStateChanged(StateChanged e)
         {
             ThreadAffinity.AssertUiThread();
-            UiOnLeave(e.Previous);
-            UiOnEnter(e.Current);
+            UiOnLeave(e.Previous.ToStateManagerState());
+            UiOnEnter(e.Current.ToStateManagerState());
         }
     }
 }

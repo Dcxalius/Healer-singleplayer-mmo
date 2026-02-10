@@ -119,7 +119,7 @@ namespace Project_1.Managers
                 {
                     int completionId = Interlocked.Increment(ref nextCompletionId);
                     completions[completionId] = () => onComplete(result);
-                    Mailboxes.Main.Publish(new WorkerCompletionReady(completionId));
+                    Mailboxes.PublishSimCommand(new WorkerCompletionReady(completionId));
                 }
             });
         }

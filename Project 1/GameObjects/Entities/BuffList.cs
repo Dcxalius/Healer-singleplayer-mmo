@@ -40,14 +40,14 @@ namespace Project_1.GameObjects.Entities
                 if (buffs[i] == aBuff)
                 {
                     buffs[i].Recast();
-                    Mailboxes.Ui.Publish(new BuffAdded(aOwner.RenderId, BuildSnapshot(buffs[i])));
+                    Mailboxes.PublishUiEvent(new BuffAdded(aOwner.RenderId, BuildSnapshot(buffs[i])));
                     return;
                 }
             }
 
             buffs.Add(aBuff);
             aBuff.OnApplied(aOwner);
-            Mailboxes.Ui.Publish(new BuffAdded(aOwner.RenderId, BuildSnapshot(buffs.Last())));
+            Mailboxes.PublishUiEvent(new BuffAdded(aOwner.RenderId, BuildSnapshot(buffs.Last())));
         }
 
         static BuffUiSnapshot BuildSnapshot(Buff buff)

@@ -15,12 +15,12 @@ namespace Project_1.UI.HUD.Guild
     {
         static void OpenWindow(EntityUiSnapshot member)
         {
-            if (member.RelationToPlayer == GameObjects.Unit.Relation.RelationToPlayer.Self)
+            if (member.RelationToPlayer == RelationToPlayerKind.Self)
             {
-                Mailboxes.Ui.Publish(new CharacterWindowToggled());
+                Mailboxes.PublishUiEvent(new CharacterWindowToggled());
                 return;
             }
-            Mailboxes.Ui.Publish(new InspectWindowToggled(member));
+            Mailboxes.PublishUiEvent(new InspectWindowToggled(member));
         }
 
         public OpenInspectWindow(EntityUiSnapshot aSnapshot, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new List<Action>() { new Action(() => OpenWindow(aSnapshot)) }, new GfxPath(GfxType.Item, "TestDagger"), aPos, aSize, Color.White)

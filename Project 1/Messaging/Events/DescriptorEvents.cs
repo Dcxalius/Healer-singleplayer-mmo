@@ -1,5 +1,6 @@
 ﻿using Project_1.Items;
 using Project_1.Items.SubTypes;
+using Project_1.Camera;
 using System;
 
 namespace Project_1.Messaging.Events
@@ -41,13 +42,13 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct DescriptorBoxSet
     {
-        public DescriptorBoxSet(ItemDescriptorSnapshot snapshot, Camera.AbsoluteScreenPosition? pos = null)
+        public DescriptorBoxSet(ItemDescriptorSnapshot snapshot, AbsoluteScreenPosition? pos = null)
         {
             Snapshot = snapshot;
             Position = pos;
         }
         public ItemDescriptorSnapshot Snapshot { get; }
-        public Camera.AbsoluteScreenPosition? Position { get; }
+        public AbsoluteScreenPosition? Position { get; }
     }
 
     internal readonly struct DescriptorBoxClear

@@ -84,7 +84,7 @@ namespace Project_1.UI.HUD.PlateBoxes
         {
             base.ClickedOnAndReleasedOnMe();
 
-            Mailboxes.Main.Publish(new TargetRequested(guildMemberRenderId));
+            Mailboxes.PublishSimCommand(new TargetRequested(guildMemberRenderId));
         }
 
         protected override bool ClickedOnChildren(ClickEvent aClick)
@@ -102,11 +102,11 @@ namespace Project_1.UI.HUD.PlateBoxes
 
             if (aClick.Modifier(InputManager.HoldModifier.Shift))
             {
-                Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.Add, guildMemberRenderId));
+                Mailboxes.PublishSimCommand(new PartyCommandRequested(PartyCommandAction.Add, guildMemberRenderId));
             }
             else if (aClick.Modifier(InputManager.HoldModifier.Ctrl))
             {
-                Mailboxes.Main.Publish(new PartyCommandRequested(PartyCommandAction.NeedyAdd, guildMemberRenderId));
+                Mailboxes.PublishSimCommand(new PartyCommandRequested(PartyCommandAction.NeedyAdd, guildMemberRenderId));
             }
 
             base.ClickedOnMe(aClick);

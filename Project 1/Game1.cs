@@ -47,7 +47,7 @@ namespace Project_1
 
             if (DebugManager.Mode(DebugMode.InstantlyContinue))
             {
-                Mailboxes.Main.Publish(new Messaging.Events.ContinueLastSaveRequested());
+                Mailboxes.PublishSimCommand(new Messaging.Events.ContinueLastSaveRequested());
             }
             base.Initialize();
         }
@@ -90,8 +90,10 @@ namespace Project_1
             else
             {
                 Mailboxes.Main.DispatchAll();
+                Mailboxes.Sim.DispatchAll();
                 StateManager.Update();
                 Mailboxes.Main.DispatchAll();
+                Mailboxes.Sim.DispatchAll();
                 DebugManager.Update();
             }
             if (UiThread.IsRunning)

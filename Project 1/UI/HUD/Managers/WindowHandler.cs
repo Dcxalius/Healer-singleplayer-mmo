@@ -104,10 +104,19 @@ namespace Project_1.UI.HUD.Managers
             HUDManager.InvalidateUi();
         }
 
-        public void SetGuildMemberInviteStatus(List<string> aName, List<TwoStateGFXButton.State> aState)
+        public void SetGuildMemberInviteStatus(string[] names, InviteStatus[] statuses)
         {
             ThreadAffinity.AssertUiThread();
-            guildWindow.SetGuildMemberInviteStatus(aName, aState);
+            List<string> memberNames = names == null ? new List<string>() : new List<string>(names);
+            int statusCount = statuses?.Length ?? 0;
+            var buttonStates = new List<TwoStateGFXButton.State>(statusCount);
+            for (int i = 0; i < statusCount; i++)
+            {
+                buttonStates.Add(statuses[i] == InviteStatus.Accepted
+                    ? TwoStateGFXButton.State.Second
+                    : TwoStateGFXButton.State.First);
+            }
+            guildWindow.SetGuildMemberInviteStatus(memberNames, buttonStates);
             HUDManager.InvalidateUi();
         }
         public void SetCharacterWindow(CharacterWindowSnapshot snapshot)
@@ -122,38 +131,38 @@ namespace Project_1.UI.HUD.Managers
             HUDManager.InvalidateUi();
         }
 
-        public void RefreshAllCharacterWindowSlots(int ownerRenderId, Relation.RelationToPlayer ownerRelation, Item[] itemSnapshots)
+        public void RefreshAllCharacterWindowSlots(int ownerRenderId, RelationToPlayerKind ownerRelation, ItemUiSnapshot[] itemSnapshots)
         {
             ThreadAffinity.AssertUiThread();
             if (itemSnapshots == null) return;
-            int count = Math.Min(itemSnapshots.Length, (int)Equipment.Slot.Count);
+            int count = Math.Min(itemSnapshots.Length, (int)EquipmentSlotKind.Count);
             for (int i = 0; i < count; i++)
             {
-                RefreshCharacterWindowSlot(ownerRenderId, ownerRelation, (Equipment.Slot)i, itemSnapshots[i]);
+                RefreshCharacterWindowSlot(ownerRenderId, ownerRelation, (EquipmentSlotKind)i, itemSnapshots[i]);
             }
             HUDManager.InvalidateUi();
         }
 
-        public void RefreshCharacterWindowSlot(int ownerRenderId, Relation.RelationToPlayer ownerRelation, Equipment.Slot slot, Item itemSnapshot)
+        public void RefreshCharacterWindowSlot(int ownerRenderId, RelationToPlayerKind ownerRelation, EquipmentSlotKind slot, ItemUiSnapshot itemSnapshot)
         {
             ThreadAffinity.AssertUiThread();
-            if (ownerRelation == Relation.RelationToPlayer.Self)
+            if (ownerRelation == RelationToPlayerKind.Self)
             {
-                characterWindow.SetSlot(slot, itemSnapshot);
+                characterWindow.SetSlot(slot.ToEquipmentSlot(), itemSnapshot);
                 HUDManager.InvalidateUi();
                 return;
             }
 
             if (!inspectWindow.BelongsTo(ownerRenderId)) return;
 
-            inspectWindow.SetSlot(slot, itemSnapshot);
+            inspectWindow.SetSlot(slot.ToEquipmentSlot(), itemSnapshot);
             HUDManager.InvalidateUi();
         }
 
-        public void RefreshCharacterWindowStats(int ownerRenderId, Relation.RelationToPlayer ownerRelation, PairReport primaryReport, PairReport secondaryReport)
+        public void RefreshCharacterWindowStats(int ownerRenderId, RelationToPlayerKind ownerRelation, StatReportSnapshot primaryReport, StatReportSnapshot secondaryReport)
         {
             ThreadAffinity.AssertUiThread();
-            if (ownerRelation == Relation.RelationToPlayer.Self)
+            if (ownerRelation == RelationToPlayerKind.Self)
             {
                 characterWindow.SetReportBox(primaryReport, secondaryReport);
                 HUDManager.InvalidateUi();
@@ -165,10 +174,10 @@ namespace Project_1.UI.HUD.Managers
             HUDManager.InvalidateUi();
         }
 
-        public void RefreshCharacterWindowExpBar(int ownerRenderId, Relation.RelationToPlayer ownerRelation, int currentLevel, int currentExperience)
+        public void RefreshCharacterWindowExpBar(int ownerRenderId, RelationToPlayerKind ownerRelation, int currentLevel, int currentExperience)
         {
             ThreadAffinity.AssertUiThread();
-            if (ownerRelation == Relation.RelationToPlayer.Self)
+            if (ownerRelation == RelationToPlayerKind.Self)
             {
                 characterWindow.RefreshExp(currentLevel, currentExperience);
                 HUDManager.InvalidateUi();

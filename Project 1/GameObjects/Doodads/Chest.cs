@@ -27,7 +27,7 @@ namespace Project_1.GameObjects.Doodads
 
             var snapshot = LootState.Open(lootDrop);
             var context = LootState.BuildContext(lootDrop);
-            Mailboxes.Ui.Publish(new LootOpened(snapshot, context));
+            Mailboxes.PublishUiEvent(new LootOpened(snapshot, context));
             return true;
         }
     }

@@ -668,14 +668,14 @@ namespace Project_1.Items
 
         public InventoryUiSnapshot BuildUiSnapshot()
         {
-            Item[] bagSnapshots = new Item[bagSlots];
+            ItemUiSnapshot[] bagSnapshots = new ItemUiSnapshot[bagSlots];
             for (int i = 1; i < bagSlots; i++)
             {
                 if (bags[i] == null) continue;
-                bagSnapshots[i] = new Item(bags[i].ID, bags[i].Count);
+                bagSnapshots[i] = ItemUiSnapshot.FromItem(bags[i]);
             }
 
-            Item[][] itemSnapshots = new Item[bagSlots][];
+            ItemUiSnapshot[][] itemSnapshots = new ItemUiSnapshot[bagSlots][];
             for (int i = 0; i < bagSlots; i++)
             {
                 if (items[i] == null) continue;
@@ -685,19 +685,19 @@ namespace Project_1.Items
             return new InventoryUiSnapshot(bagSnapshots, itemSnapshots);
         }
 
-        static Item[] CloneItemArray(Item[] source)
+        static ItemUiSnapshot[] CloneItemArray(Item[] source)
         {
             if (source == null) return null;
-            Item[] copy = new Item[source.Length];
+            ItemUiSnapshot[] copy = new ItemUiSnapshot[source.Length];
             for (int i = 0; i < source.Length; i++)
             {
                 if (source[i] == null) continue;
-                copy[i] = new Item(source[i].ID, source[i].Count);
+                copy[i] = ItemUiSnapshot.FromItem(source[i]);
             }
             return copy;
         }
 
-        void NotifySlotChanged(int bagIndex, int slotIndex) => Mailboxes.Ui.Publish(new InventorySlotChanged(bagIndex, slotIndex, BuildUiSnapshot()));
+        void NotifySlotChanged(int bagIndex, int slotIndex) => Mailboxes.PublishUiEvent(new InventorySlotChanged(bagIndex, slotIndex, BuildUiSnapshot()));
         void NotifySlotChanged((int, int) bagAndSlot) => NotifySlotChanged(bagAndSlot.Item1, bagAndSlot.Item2);
 
         // Temporary overloads to keep call sites compact during migration.

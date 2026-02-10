@@ -101,19 +101,63 @@ namespace Project_1.GameObjects.Unit
 
                 if (typeof(T) == typeof(int))
                 {
-                    var secondaryStatsInt = equipped[i].EquipmentData.SecondayStatsInt;
-                    var single = secondaryStatsInt.Single(x => x.SecondaryStat == aSecondaryStat);
-                    if (single == null) continue;
+                    var secondaryStatsInt = equipped[i].SecondaryStatsInt;
+                    if (secondaryStatsInt == null)
+                    {
+                        continue;
+                    }
 
-                    returnable = (T)(object)(single.Value + (int)(object)returnable);
+                    int value = (int)(object)returnable;
+                    for (int j = 0; j < secondaryStatsInt.Length; j++)
+                    {
+                        if (secondaryStatsInt[j].SecondaryStat != aSecondaryStat)
+                        {
+                            continue;
+                        }
+
+                        value += secondaryStatsInt[j].Value;
+                    }
+
+                    returnable = (T)(object)value;
                 }
-                else if (typeof(T) == typeof(float))
+                else if (typeof(T) == typeof(float) || typeof(T) == typeof(double))
                 {
-                    var secondaryStatsFloat = equipped[i].EquipmentData.SecondayStatsFloat;
-                    var single = secondaryStatsFloat.Single(x => x.SecondaryStat == aSecondaryStat);
-                    if (single == null) continue;
+                    var secondaryStatsFloat = equipped[i].SecondaryStatsFloat;
+                    if (secondaryStatsFloat == null)
+                    {
+                        continue;
+                    }
 
-                    returnable = (T)(object)(single.Value + (float)(object)returnable);
+                    if (typeof(T) == typeof(float))
+                    {
+                        float value = (float)(object)returnable;
+                        for (int j = 0; j < secondaryStatsFloat.Length; j++)
+                        {
+                            if (secondaryStatsFloat[j].SecondaryStat != aSecondaryStat)
+                            {
+                                continue;
+                            }
+
+                            value += secondaryStatsFloat[j].Value;
+                        }
+
+                        returnable = (T)(object)value;
+                    }
+                    else
+                    {
+                        double value = (double)(object)returnable;
+                        for (int j = 0; j < secondaryStatsFloat.Length; j++)
+                        {
+                            if (secondaryStatsFloat[j].SecondaryStat != aSecondaryStat)
+                            {
+                                continue;
+                            }
+
+                            value += secondaryStatsFloat[j].Value;
+                        }
+
+                        returnable = (T)(object)value;
+                    }
                 }
                 else
                 {
@@ -197,7 +241,7 @@ namespace Project_1.GameObjects.Unit
         public void SetOwner(Entity aOwner)
         {
             owner = aOwner;
-            Mailboxes.Ui.Publish(new EquipmentSlotsRefreshed(owner.RenderId, owner.RelationToPlayer, BuildItemSnapshots()));
+            Mailboxes.PublishUiEvent(new EquipmentSlotsRefreshed(owner.RenderId, owner.RelationToPlayer.ToRelationToPlayerKind(), BuildItemSnapshots()));
         }
 
         void RefreshStatsFromEquipment()
@@ -456,7 +500,7 @@ namespace Project_1.GameObjects.Unit
             equipped[(int)aSlot] = aEquipment;
             equipmentStats.AddStats(aEquipment.Stats);
             
-            Mailboxes.Ui.Publish(new EquipmentSlotChanged(owner.RenderId, owner.RelationToPlayer, aSlot, BuildItemSnapshot(aSlot))); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
+            Mailboxes.PublishUiEvent(new EquipmentSlotChanged(owner.RenderId, owner.RelationToPlayer.ToRelationToPlayerKind(), aSlot.ToEquipmentSlotKind(), BuildItemSnapshot(aSlot))); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
             return previouslyEquiped;
         }
 
@@ -467,7 +511,7 @@ namespace Project_1.GameObjects.Unit
             //if (GearTypeCheck(aEquipment)) return; //I think this is only called when an equipment has type none anyways
             equipped[(int)aSlot] = aEquipment;
             equipmentStats.AddStats(aEquipment.Stats);
-            Mailboxes.Ui.Publish(new EquipmentSlotChanged(owner.RenderId, owner.RelationToPlayer, aSlot, BuildItemSnapshot(aSlot))); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
+            Mailboxes.PublishUiEvent(new EquipmentSlotChanged(owner.RenderId, owner.RelationToPlayer.ToRelationToPlayerKind(), aSlot.ToEquipmentSlotKind(), BuildItemSnapshot(aSlot))); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
         }
 
         bool UnableToDualWield(Items.SubTypes.Equipment aEquipment, Slot aSlot)
@@ -501,13 +545,13 @@ namespace Project_1.GameObjects.Unit
             
 
             equipmentStats.RemoveStats(item.Stats);
-            Mailboxes.Ui.Publish(new EquipmentSlotChanged(owner.RenderId, owner.RelationToPlayer, aSlot, null));
+            Mailboxes.PublishUiEvent(new EquipmentSlotChanged(owner.RenderId, owner.RelationToPlayer.ToRelationToPlayerKind(), aSlot.ToEquipmentSlotKind(), ItemUiSnapshot.Empty));
             return item;
         }
 
-        Items.Item[] BuildItemSnapshots()
+        ItemUiSnapshot[] BuildItemSnapshots()
         {
-            Items.Item[] snapshots = new Items.Item[(int)Slot.Count];
+            ItemUiSnapshot[] snapshots = new ItemUiSnapshot[(int)Slot.Count];
             for (int i = 0; i < snapshots.Length; i++)
             {
                 snapshots[i] = BuildItemSnapshot((Slot)i);
@@ -515,11 +559,11 @@ namespace Project_1.GameObjects.Unit
             return snapshots;
         }
 
-        Items.Item BuildItemSnapshot(Slot slot)
+        ItemUiSnapshot BuildItemSnapshot(Slot slot)
         {
             Item source = equipped[(int)slot];
-            if (source == null) return null;
-            return new Item(source.ID, source.Count);
+            if (source == null) return ItemUiSnapshot.Empty;
+            return ItemUiSnapshot.FromItem(source);
         }
 
         public AttackData GetWeaponAttacks()

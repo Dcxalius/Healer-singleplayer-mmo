@@ -85,10 +85,10 @@ namespace Project_1.GameObjects.Unit.Stats
         {
             owner = aEntity;
             if (owner is not Friendly friendlyOwner) return;
-            Mailboxes.Ui.Publish(new StatsRefreshed(
+            Mailboxes.PublishUiEvent(new StatsRefreshed(
                 owner.RenderId,
-                owner.RelationToPlayer,
-                CloneReport(StatReport),
+                owner.RelationToPlayer.ToRelationToPlayerKind(),
+                StatReportSnapshot.FromPairReport(StatReport),
                 BuildSecondaryReport(friendlyOwner)));
         }
 
@@ -118,10 +118,10 @@ namespace Project_1.GameObjects.Unit.Stats
 
 
             if (owner is not Friendly friendlyOwner) return;
-            Mailboxes.Ui.Publish(new StatsRefreshed(
+            Mailboxes.PublishUiEvent(new StatsRefreshed(
                 owner.RenderId,
-                owner.RelationToPlayer,
-                CloneReport(StatReport),
+                owner.RelationToPlayer.ToRelationToPlayerKind(),
+                StatReportSnapshot.FromPairReport(StatReport),
                 BuildSecondaryReport(friendlyOwner)));
         }
 
@@ -132,29 +132,17 @@ namespace Project_1.GameObjects.Unit.Stats
             RefreshStats();
         }
 
-        static PairReport CloneReport(PairReport source)
-        {
-            PairReport clone = new PairReport();
-            if (source == null) return clone;
-            for (int i = 0; i < source.Count; i++)
-            {
-                var line = source.Lines[i];
-                clone.AddLine(line.Name, line.Value);
-            }
-            return clone;
-        }
-
-        static PairReport BuildSecondaryReport(Friendly owner)
+        static StatReportSnapshot BuildSecondaryReport(Friendly owner)
         {
             PairReport report = new PairReport();
-            if (owner == null) return report;
+            if (owner == null) return StatReportSnapshot.Empty;
 
             report.AddLine("Crit Chance", owner.SecondaryStats.Attack.CriticalChance);
             report.AddLine("Crit Damage", owner.SecondaryStats.Attack.CriticalDamage);
             report.AddLine("Hit Chance", owner.SecondaryStats.Attack.BonusHitChance);
             report.AddLine("Dodge Chance", owner.SecondaryStats.Defense.DodgeChance);
             report.AddLine("Parry Chance", owner.SecondaryStats.Defense.ParryChance);
-            return report;
+            return StatReportSnapshot.FromPairReport(report);
         }
     }
 }

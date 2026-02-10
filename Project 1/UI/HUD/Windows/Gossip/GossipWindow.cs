@@ -95,7 +95,7 @@ namespace Project_1.UI.HUD.Windows.Gossip
         void CloseAndOpenShop(ShopGossipOption aSO)
         {
             CloseWindow();
-            Mailboxes.Ui.Publish(new ShopOpened(aSO.ItemIDsInShop));
+            Mailboxes.PublishUiEvent(new ShopOpened(aSO.ItemIDsInShop));
         }
 
         public void SetIntro(string aIntro) => introduction.Text = aIntro;

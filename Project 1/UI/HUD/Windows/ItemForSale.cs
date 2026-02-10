@@ -67,14 +67,14 @@ namespace Project_1.UI.HUD.Windows
 
             if (!Visible) return;
             if (itemForSale == null) return;
-            Mailboxes.Ui.Publish(new DescriptorBoxSet(ItemDescriptorSnapshot.FromItem(itemForSale), RelativePositionOnScreen.ToAbsoluteScreenPos()));
+            Mailboxes.PublishUiEvent(new DescriptorBoxSet(ItemDescriptorSnapshot.FromItem(itemForSale), RelativePositionOnScreen.ToAbsoluteScreenPos()));
         }
 
         protected override void OnDeHover()
         {
             base.OnDeHover();
 
-            Mailboxes.Ui.Publish(new DescriptorBoxClear());
+            Mailboxes.PublishUiEvent(new DescriptorBoxClear());
         }
 
         public override void ClickedOnAndReleasedOnMe()
@@ -88,7 +88,7 @@ namespace Project_1.UI.HUD.Windows
             if (!UiPlayerStateCache.Valid) return;
             if (itemForSale.Cost > UiPlayerStateCache.Gold) return; //TODO: Print error msg
 
-            Mailboxes.Main.Publish(new ShopPurchaseRequested(itemForSale.ID, itemForSale.Count));
+            Mailboxes.PublishSimCommand(new ShopPurchaseRequested(itemForSale.ID, itemForSale.Count));
         }
 
         public void Set(int aItemID)

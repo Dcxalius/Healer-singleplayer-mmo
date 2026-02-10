@@ -1,6 +1,6 @@
 # Overhaul Progress
 
-Last updated: 2026-02-09
+Last updated: 2026-02-10
 
 ## In Progress
 - None.
@@ -53,3 +53,12 @@ Last updated: 2026-02-09
 - UI invalidation: mouse snapshot updates now invalidate the active UI surface on position/scroll change (HUD for game/move-hud, state UI otherwise).
 - UI snapshot hardening: removed plate-box refresh/set APIs that accepted live `Entity`/`GuildMember` objects; character/inspect windows now consume snapshots only.
 - UI snapshot hardening: descriptor tooltip events now carry `ItemDescriptorSnapshot` (no live `Item` references), and descriptor box renders from immutable snapshot text payloads.
+- Payload hardening sweep (non-`GfxPath`): converted mailbox item/stat payloads to immutable snapshots (`ItemUiSnapshot`, `StatReportSnapshot`), replaced invite `IList` payloads with arrays, and made `SaveLoadPayload` immutable (constructor-only token arrays).
+- Mailbox diagnostics (phase start): added mailbox counters for total published/dequeued, dispatch misses, no-subscriber deliveries, handler invocations/failures; debug overlay now shows queue peak plus publish/failure totals per mailbox.
+- Thread-loop diagnostics: added `SimThreadStats`/`UiThreadStats` (last/avg/max frame ms, overrun count at 16ms budget, pulse wait timeouts), and surfaced both in debug overlay.
+- Diagnostics threshold alerts: added non-spam warning logs (cooldown-based) for mailbox backlog, mailbox handler-failure deltas, and sim/UI thread overrun/timeout timing issues.
+- Command-routing migration (phase 1 of mailbox ownership cleanup): gameplay command subscriptions in `StateManager` now subscribe on `Mailboxes.Sim`, with a temporary `Main->Sim` forwarding shim for existing publishers; `SimThread` now drains both `Main` and `Sim` each pulse.
+- Command-routing migration (phase 2): gameplay/state command publishers were switched from `Mailboxes.Main.Publish(...)` to `Mailboxes.Sim.Publish(...)` across UI/input/save/state call sites; single-thread fallback now drains `Mailboxes.Sim` in `Game1.Update`.
+- Command-routing migration (phase 3 cleanup): removed temporary `Main->Sim` forwarding shim in `StateManager`; gameplay command handlers are now subscribed only on `Mailboxes.Sim` (with `Main` reserved for worker completion traffic).
+- Mailbox ownership cleanup (worker completion): `WorkerCompletionReady` now publishes/subscribes on `Mailboxes.Sim`, and `SimThread` no longer drains `Mailboxes.Main` each pulse.
+- Payload hardening sweep (non-`GfxPath`, continuation): event payload enums are now messaging-local (`StateKind`, `ClickKind`, `RelationToPlayerKind`, `EquipmentSlotKind`, dialogue enums) with explicit boundary conversions, reducing direct cross-layer type coupling in mailbox contracts.

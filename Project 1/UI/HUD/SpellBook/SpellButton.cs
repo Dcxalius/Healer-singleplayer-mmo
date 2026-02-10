@@ -92,7 +92,7 @@ namespace Project_1.UI.HUD.SpellBook
         {
             if (spellData == null) return;
 
-            Mailboxes.Main.Publish(new SpellCastRequested(spellData.Name));
+            Mailboxes.PublishSimCommand(new SpellCastRequested(spellData.Name));
 
         }
 

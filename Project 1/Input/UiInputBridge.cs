@@ -17,7 +17,7 @@ namespace Project_1.Input
             ThreadAffinity.AssertUiThread();
             bool[] heldModifiers = UiKeyboardStateCache.GetHoldModifiers();
             ReleaseEvent releaseEvent = new ReleaseEvent(creator, UiMouseStateCache.Relative, clickType, heldModifiers);
-            Mailboxes.Ui.Publish(releaseEvent);
+            Mailboxes.PublishUiEvent(releaseEvent);
         }
 
         public static void Init()
@@ -41,7 +41,7 @@ namespace Project_1.Input
                 return;
             }
             if (HUDManager.Click(clickEvent)) return;
-            Mailboxes.Main.Publish(WorldClickRequested.FromClickEvent(clickEvent));
+            Mailboxes.PublishSimCommand(WorldClickRequested.FromClickEvent(clickEvent));
         }
 
         static void HandleRelease(ReleaseEvent releaseEvent)
@@ -54,7 +54,7 @@ namespace Project_1.Input
                 return;
             }
             if (HUDManager.Release(releaseEvent)) return;
-            Mailboxes.Main.Publish(WorldReleaseRequested.FromReleaseEvent(releaseEvent));
+            Mailboxes.PublishSimCommand(WorldReleaseRequested.FromReleaseEvent(releaseEvent));
         }
 
         static void HandleScroll(ScrollEvent scrollEvent)
@@ -66,24 +66,24 @@ namespace Project_1.Input
                 return;
             }
             if (HUDManager.Scroll(scrollEvent)) return;
-            Mailboxes.Main.Publish(WorldScrollRequested.FromScrollEvent(scrollEvent));
+            Mailboxes.PublishSimCommand(WorldScrollRequested.FromScrollEvent(scrollEvent));
         }
 
         static void HandleKeyboardSnapshot(KeyboardSnapshot snapshot)
         {
             ThreadAffinity.AssertUiThread();
             UiKeyboardStateCache.Update(snapshot);
-            Mailboxes.Main.Publish(snapshot);
+            Mailboxes.PublishSimCommand(snapshot);
         }
 
         static void HandleKeyBindSnapshot(KeyBindSnapshot snapshot)
         {
             ThreadAffinity.AssertUiThread();
             UiKeyBindStateCache.Update(snapshot);
-            Mailboxes.Main.Publish(snapshot);
+            Mailboxes.PublishSimCommand(snapshot);
             if (!UiTextInputManager.IsActive)
             {
-                Mailboxes.Main.Publish(new PlayerMovementRequested(
+                Mailboxes.PublishSimCommand(new PlayerMovementRequested(
                     UiKeyBindStateCache.GetHold(KeyBindManager.KeyListner.MoveCharacterLeft),
                     UiKeyBindStateCache.GetHold(KeyBindManager.KeyListner.MoveCharacterRight),
                     UiKeyBindStateCache.GetHold(KeyBindManager.KeyListner.MoveCharacterUp),
@@ -95,7 +95,7 @@ namespace Project_1.Input
         {
             ThreadAffinity.AssertUiThread();
             bool changed = UiMouseStateCache.Update(snapshot);
-            Mailboxes.Main.Publish(snapshot);
+            Mailboxes.PublishSimCommand(snapshot);
             if (!changed) return;
             // TODO: Ponder whether this is the right approach.
             // Current (invalidate on mouse move/scroll):
@@ -122,7 +122,7 @@ namespace Project_1.Input
                 StateManager.UiInvalidate();
                 return;
             }
-            Mailboxes.Main.Publish(pressed);
+            Mailboxes.PublishSimCommand(pressed);
         }
     }
 }

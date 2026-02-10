@@ -1,10 +1,4 @@
 ﻿using Project_1.Camera;
-using Project_1.GameObjects.Entities;
-using Project_1.GameObjects.Unit;
-using Project_1.GameObjects.Spells;
-using System.Collections.Generic;
-using Project_1.GameObjects.Entities.Friendlies;
-using Project_1.GameObjects.Entities.Friendlies.Npcs;
 using Microsoft.Xna.Framework;
 using Project_1.Textures;
 
@@ -16,7 +10,7 @@ namespace Project_1.Messaging.Events
             int renderId,
             string name,
             string className,
-            Relation.RelationToPlayer relationToPlayer,
+            RelationToPlayerKind relationToPlayer,
             Color relationColor,
             int level,
             double currentHealth,
@@ -45,7 +39,7 @@ namespace Project_1.Messaging.Events
         public int RenderId { get; }
         public string Name { get; }
         public string ClassName { get; }
-        public Relation.RelationToPlayer RelationToPlayer { get; }
+        public RelationToPlayerKind RelationToPlayer { get; }
         public Color RelationColor { get; }
         public int Level { get; }
         public double CurrentHealth { get; }
@@ -59,7 +53,7 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct EquipmentSlotChanged
     {
-        public EquipmentSlotChanged(int ownerRenderId, Relation.RelationToPlayer ownerRelation, Equipment.Slot slot, Items.Item itemSnapshot)
+        public EquipmentSlotChanged(int ownerRenderId, RelationToPlayerKind ownerRelation, EquipmentSlotKind slot, ItemUiSnapshot itemSnapshot)
         {
             OwnerRenderId = ownerRenderId;
             OwnerRelation = ownerRelation;
@@ -67,27 +61,27 @@ namespace Project_1.Messaging.Events
             ItemSnapshot = itemSnapshot;
         }
         public int OwnerRenderId { get; }
-        public Relation.RelationToPlayer OwnerRelation { get; }
-        public Equipment.Slot Slot { get; }
-        public Items.Item ItemSnapshot { get; }
+        public RelationToPlayerKind OwnerRelation { get; }
+        public EquipmentSlotKind Slot { get; }
+        public ItemUiSnapshot ItemSnapshot { get; }
     }
 
     internal readonly struct EquipmentSlotsRefreshed
     {
-        public EquipmentSlotsRefreshed(int ownerRenderId, Relation.RelationToPlayer ownerRelation, Items.Item[] itemSnapshots)
+        public EquipmentSlotsRefreshed(int ownerRenderId, RelationToPlayerKind ownerRelation, ItemUiSnapshot[] itemSnapshots)
         {
             OwnerRenderId = ownerRenderId;
             OwnerRelation = ownerRelation;
             ItemSnapshots = itemSnapshots;
         }
         public int OwnerRenderId { get; }
-        public Relation.RelationToPlayer OwnerRelation { get; }
-        public Items.Item[] ItemSnapshots { get; }
+        public RelationToPlayerKind OwnerRelation { get; }
+        public ItemUiSnapshot[] ItemSnapshots { get; }
     }
 
     internal readonly struct StatsRefreshed
     {
-        public StatsRefreshed(int ownerRenderId, Relation.RelationToPlayer ownerRelation, PairReport primaryStats, PairReport secondaryStats)
+        public StatsRefreshed(int ownerRenderId, RelationToPlayerKind ownerRelation, StatReportSnapshot primaryStats, StatReportSnapshot secondaryStats)
         {
             OwnerRenderId = ownerRenderId;
             OwnerRelation = ownerRelation;
@@ -95,14 +89,14 @@ namespace Project_1.Messaging.Events
             SecondaryStats = secondaryStats;
         }
         public int OwnerRenderId { get; }
-        public Relation.RelationToPlayer OwnerRelation { get; }
-        public PairReport PrimaryStats { get; }
-        public PairReport SecondaryStats { get; }
+        public RelationToPlayerKind OwnerRelation { get; }
+        public StatReportSnapshot PrimaryStats { get; }
+        public StatReportSnapshot SecondaryStats { get; }
     }
 
     internal readonly struct ExperienceRefreshed
     {
-        public ExperienceRefreshed(int ownerRenderId, Relation.RelationToPlayer ownerRelation, int currentLevel, int currentExperience)
+        public ExperienceRefreshed(int ownerRenderId, RelationToPlayerKind ownerRelation, int currentLevel, int currentExperience)
         {
             OwnerRenderId = ownerRenderId;
             OwnerRelation = ownerRelation;
@@ -110,20 +104,20 @@ namespace Project_1.Messaging.Events
             CurrentExperience = currentExperience;
         }
         public int OwnerRenderId { get; }
-        public Relation.RelationToPlayer OwnerRelation { get; }
+        public RelationToPlayerKind OwnerRelation { get; }
         public int CurrentLevel { get; }
         public int CurrentExperience { get; }
     }
 
     internal readonly struct TargetChanged
     {
-        public TargetChanged(Relation.RelationToPlayer ownerRelation, EntityUiSnapshot? targetSnapshot)
+        public TargetChanged(RelationToPlayerKind ownerRelation, EntityUiSnapshot? targetSnapshot)
         {
             OwnerRelation = ownerRelation;
             TargetSnapshot = targetSnapshot;
         }
 
-        public Relation.RelationToPlayer OwnerRelation { get; }
+        public RelationToPlayerKind OwnerRelation { get; }
         public EntityUiSnapshot? TargetSnapshot { get; }
     }
 
@@ -178,14 +172,14 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct InventoryUiSnapshot
     {
-        public InventoryUiSnapshot(Items.Item[] bagItems, Items.Item[][] itemsByBag)
+        public InventoryUiSnapshot(ItemUiSnapshot[] bagItems, ItemUiSnapshot[][] itemsByBag)
         {
             BagItems = bagItems;
             ItemsByBag = itemsByBag;
         }
 
-        public Items.Item[] BagItems { get; }
-        public Items.Item[][] ItemsByBag { get; }
+        public ItemUiSnapshot[] BagItems { get; }
+        public ItemUiSnapshot[][] ItemsByBag { get; }
     }
 
     internal readonly struct SpellbookRefreshed
@@ -253,7 +247,7 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct CharacterWindowSnapshot
     {
-        public CharacterWindowSnapshot(EntityUiSnapshot ownerSnapshot, PairReport primaryStats, PairReport secondaryStats, int currentLevel, int currentExperience, Items.Item[] equippedItems)
+        public CharacterWindowSnapshot(EntityUiSnapshot ownerSnapshot, StatReportSnapshot primaryStats, StatReportSnapshot secondaryStats, int currentLevel, int currentExperience, ItemUiSnapshot[] equippedItems)
         {
             OwnerSnapshot = ownerSnapshot;
             PrimaryStats = primaryStats;
@@ -264,11 +258,11 @@ namespace Project_1.Messaging.Events
         }
 
         public EntityUiSnapshot OwnerSnapshot { get; }
-        public PairReport PrimaryStats { get; }
-        public PairReport SecondaryStats { get; }
+        public StatReportSnapshot PrimaryStats { get; }
+        public StatReportSnapshot SecondaryStats { get; }
         public int CurrentLevel { get; }
         public int CurrentExperience { get; }
-        public Items.Item[] EquippedItems { get; }
+        public ItemUiSnapshot[] EquippedItems { get; }
     }
 
     internal readonly struct PlayerUiSnapshot
@@ -303,13 +297,13 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct GuildInviteStatusUpdated
     {
-        public GuildInviteStatusUpdated(IList<string> memberNames, IList<InviteStatus> statuses)
+        public GuildInviteStatusUpdated(string[] memberNames, InviteStatus[] statuses)
         {
-            MemberNames = memberNames;
-            Statuses = statuses;
+            MemberNames = memberNames ?? System.Array.Empty<string>();
+            Statuses = statuses ?? System.Array.Empty<InviteStatus>();
         }
-        public IList<string> MemberNames { get; }
-        public IList<InviteStatus> Statuses { get; }
+        public string[] MemberNames { get; }
+        public InviteStatus[] Statuses { get; }
     }
 
     internal readonly struct BuffAdded

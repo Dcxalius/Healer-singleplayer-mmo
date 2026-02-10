@@ -21,7 +21,7 @@ namespace Project_1.UI.PauseMenu
 
         public override void ClickedOnAndReleasedOnMe()
         {
-            Mailboxes.Main.Publish(new LoadSaveRequested(SaveManager.CurrentSave?.Name));
+            Mailboxes.PublishSimCommand(new LoadSaveRequested(SaveManager.CurrentSave?.Name));
 
             base.ClickedOnAndReleasedOnMe();
 

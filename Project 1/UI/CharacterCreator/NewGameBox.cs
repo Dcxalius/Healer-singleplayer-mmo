@@ -53,7 +53,7 @@ namespace Project_1.UI.CharacterCreator
         void CreateNewCharacter()
         {
             string name = inputBox.Input;
-            Mailboxes.Main.Publish(new CreateNewPlayerRequested(name, ClassSelectButton.ClassName));
+            Mailboxes.PublishSimCommand(new CreateNewPlayerRequested(name, ClassSelectButton.ClassName));
         }
     }
 }

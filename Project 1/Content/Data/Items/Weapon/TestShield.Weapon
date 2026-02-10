@@ -1,1 +1,1 @@
-{"gfxName":"TestShield","name":"Shield", "description": "Protec", "Slot": 14, "id":26, "baseStats": [0, 5, 5, 0, 5], "Armor": 1000, "WeaponType": 8192}	
+{"gfxName":"TestShield","name":"Shield","description":"Protec","Slot":14,"AttackSpeed":1.5,"DamageRangeFactor":0.8,"id":26,"WeaponType":8192,"Quality":2,"Cost":235,"ItemLevel":12}

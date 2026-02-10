@@ -32,7 +32,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Npcs
             if (!InConversationRange(player.FeetPosition)) return false;
 
             BeginConversation(this);
-            Mailboxes.Ui.Publish(new GossipOpened(new GossipUiSnapshot(gossip.Options, gossip.LinkTree, gossip.StartIndex)));
+            Mailboxes.PublishUiEvent(new GossipOpened(new GossipUiSnapshot(gossip.Options, gossip.LinkTree, gossip.StartIndex)));
             return true;
         }
 
@@ -67,8 +67,8 @@ namespace Project_1.GameObjects.Entities.Friendlies.Npcs
         {
             if (activeConversation == null) return;
             activeConversation = null;
-            Mailboxes.Ui.Publish(new GossipClosed());
-            Mailboxes.Ui.Publish(new ShopClosed());
+            Mailboxes.PublishUiEvent(new GossipClosed());
+            Mailboxes.PublishUiEvent(new ShopClosed());
         }
     }
 }

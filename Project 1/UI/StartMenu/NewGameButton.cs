@@ -22,7 +22,7 @@ namespace Project_1.UI.StartMenu
         {
             base.ClickedOnAndReleasedOnMe();
 
-            Mailboxes.Main.Publish(new NewGameRequested());
+            Mailboxes.PublishSimCommand(new NewGameRequested());
         }
     }
 }

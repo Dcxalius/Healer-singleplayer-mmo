@@ -61,6 +61,11 @@ namespace Project_1.UI.HUD.Inventory
             AssignItem(aItem);
         }
 
+        public Item(int aBagIndex, int aSlotIndex, bool aHoldable, ItemUiSnapshot itemSnapshot, RelativeScreenPosition aPos, RelativeScreenPosition aSize)
+            : this(aBagIndex, aSlotIndex, aHoldable, itemSnapshot.ToItem(), aPos, aSize)
+        {
+        }
+
         public Item(int aBagIndex, int aSlotIndex, bool aHoldable, Color aBackgroundColor, GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPath, aPos, aSize, aBackgroundColor) //TODO: Change this so a nulled path isn't required and figure out what to do with colors.
         {
             bagIndex = aBagIndex;
@@ -81,12 +86,17 @@ namespace Project_1.UI.HUD.Inventory
                 return;
             }
 
-            snapshot = ItemFactory.CreateItem(aItem.ID, aItem.Count);
+            snapshot = aItem;
             imageOnButton.SetImage(aItem.GfxPath);
             isEmpty = false;
             Color = aItem.ItemQualityColor;
             if (aItem.MaxStack == 1) return;
             itemCount.Value = aItem.Count.ToString();
+        }
+
+        public void AssignItem(in ItemUiSnapshot snapshot)
+        {
+            AssignItem(snapshot.ToItem());
         }
 
         public void RemoveItem()
@@ -164,7 +174,7 @@ namespace Project_1.UI.HUD.Inventory
                 Items.Item i = GetActualItem;
                 if (i == null)
                 {
-                    Mailboxes.Main.Publish(new InventoryUnequipBagRequested(aItemDroppedOnMe.slotIndex, Index));
+                    Mailboxes.PublishSimCommand(new InventoryUnequipBagRequested(aItemDroppedOnMe.slotIndex, Index));
                     return true;
                 }
                 //Swap bags if dropped on bag no?
@@ -173,7 +183,7 @@ namespace Project_1.UI.HUD.Inventory
 
             if (bagIndex == -1) //Onto bagrack
             {
-                Mailboxes.Main.Publish(new InventorySwapBagSlotsRequested(aItemDroppedOnMe.slotIndex, slotIndex));
+                Mailboxes.PublishSimCommand(new InventorySwapBagSlotsRequested(aItemDroppedOnMe.slotIndex, slotIndex));
                 return true;
             }
 
@@ -189,7 +199,7 @@ namespace Project_1.UI.HUD.Inventory
             Items.Item droppedItem = aItemDroppedOnMe.GetActualItem;
             if (droppedItem == null || droppedItem.ItemType != ItemData.ItemType.Container) return true; //Dropped is not bag
 
-            Mailboxes.Main.Publish(new InventorySwapBagsRequested(aItemDroppedOnMe.Index, slotIndex));
+            Mailboxes.PublishSimCommand(new InventorySwapBagsRequested(aItemDroppedOnMe.Index, slotIndex));
             return true;
         }
 
@@ -197,7 +207,7 @@ namespace Project_1.UI.HUD.Inventory
         {
             if (aItemDroppedOnMe.bagIndex != -2) return false;
 
-            Mailboxes.Main.Publish(new LootItemRequested(aItemDroppedOnMe.slotIndex, Index));
+            Mailboxes.PublishSimCommand(new LootItemRequested(aItemDroppedOnMe.slotIndex, Index));
             return true;
         }
 
@@ -219,14 +229,14 @@ namespace Project_1.UI.HUD.Inventory
                 if (!GameObjects.Unit.Equipment.FitsInSlot(droppedItem.type, (GameObjects.Unit.Equipment.Slot)slotIndex)) return true;
                 if (thisItem == null)
                 {
-                    Mailboxes.Main.Publish(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, null));
+                    Mailboxes.PublishSimCommand(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, null));
                     return true;
                 }
 
                 if (droppedItem.type != thisItem.type) return true;
                 if (droppedItem.type >= Equipment.Type.MainHander) return true;
                 if (thisItem.type >= Equipment.Type.MainHander) return true;
-                Mailboxes.Main.Publish(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, null));
+                Mailboxes.PublishSimCommand(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, null));
 
                 return true;
             }
@@ -238,13 +248,13 @@ namespace Project_1.UI.HUD.Inventory
 
                 if (thisItem == null)
                 {
-                    Mailboxes.Main.Publish(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, null));
+                    Mailboxes.PublishSimCommand(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, null));
                     return true;
                 }
 
                 if (!GameObjects.Unit.Equipment.FitsInSlot(thisItem.type, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex)) return true;
 
-                Mailboxes.Main.Publish(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, null));
+                Mailboxes.PublishSimCommand(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, null));
 
                 return true;
             }
@@ -257,7 +267,7 @@ namespace Project_1.UI.HUD.Inventory
         bool ToCharacterPane(Item aItemDroppedOnMe)
         {
             if (bagIndex != -3) return false;
-            Mailboxes.Main.Publish(new InventorySwapEquipmentRequested(aItemDroppedOnMe.Index, slotIndex, null));
+            Mailboxes.PublishSimCommand(new InventorySwapEquipmentRequested(aItemDroppedOnMe.Index, slotIndex, null));
             //TODO: Handle if trying to drag inbetween sheets.
             return true;
         }
@@ -277,14 +287,14 @@ namespace Project_1.UI.HUD.Inventory
                 if (!GameObjects.Unit.Equipment.FitsInSlot(droppedItem.type, (GameObjects.Unit.Equipment.Slot)slotIndex)) return true;
                 if (thisItem == null)
                 {
-                    Mailboxes.Main.Publish(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, inspectTargetRenderId.Value));
+                    Mailboxes.PublishSimCommand(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, inspectTargetRenderId.Value));
                     return true;
                 }
 
                 if (droppedItem.type != thisItem.type) return true;
                 if (droppedItem.type >= Equipment.Type.MainHander) return true;
                 if (thisItem.type >= Equipment.Type.MainHander) return true;
-                Mailboxes.Main.Publish(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, inspectTargetRenderId.Value));
+                Mailboxes.PublishSimCommand(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, inspectTargetRenderId.Value));
 
                 return true;
             }
@@ -296,13 +306,13 @@ namespace Project_1.UI.HUD.Inventory
 
                 if (thisItem == null)
                 {
-                    Mailboxes.Main.Publish(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, inspectTargetRenderId.Value));
+                    Mailboxes.PublishSimCommand(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, inspectTargetRenderId.Value));
                     return true;
                 }
 
                 if (!GameObjects.Unit.Equipment.FitsInSlot(thisItem.type, (GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex)) return true;
 
-                Mailboxes.Main.Publish(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, inspectTargetRenderId.Value));
+                Mailboxes.PublishSimCommand(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, inspectTargetRenderId.Value));
 
                 return true;
             }
@@ -317,7 +327,7 @@ namespace Project_1.UI.HUD.Inventory
             int? inspectTargetRenderId = GetInspectTargetRenderId();
             if (inspectTargetRenderId.HasValue)
             {
-                Mailboxes.Main.Publish(new InventorySwapEquipmentRequested(aItemDroppedOnMe.Index, slotIndex, inspectTargetRenderId.Value));
+                Mailboxes.PublishSimCommand(new InventorySwapEquipmentRequested(aItemDroppedOnMe.Index, slotIndex, inspectTargetRenderId.Value));
             }
             //TODO: Handle if trying to drag inbetween sheets.
             return true;
@@ -325,7 +335,7 @@ namespace Project_1.UI.HUD.Inventory
 
         bool InventoryToInventory(Item aItemDroppedOnMe)
         {
-            Mailboxes.Main.Publish(new InventorySwapItemsRequested(aItemDroppedOnMe.Index, Index));
+            Mailboxes.PublishSimCommand(new InventorySwapItemsRequested(aItemDroppedOnMe.Index, Index));
             return true;
         }
 
@@ -337,8 +347,8 @@ namespace Project_1.UI.HUD.Inventory
 
             if (isEmpty == false && holdable)
             {
-                Mailboxes.Ui.Publish(new DescriptorBoxClear());
-                Mailboxes.Ui.Publish(new HeldItemStart(UiElementId, UiMouseStateCache.Absolute - Location));
+                Mailboxes.PublishUiEvent(new DescriptorBoxClear());
+                Mailboxes.PublishUiEvent(new HeldItemStart(UiElementId, UiMouseStateCache.Absolute - Location));
             }
         }
 
@@ -351,8 +361,8 @@ namespace Project_1.UI.HUD.Inventory
 
             if (isEmpty == false && holdable && heldEvents.ClickThatCreated == InputManager.ClickType.Left)
             {
-                Mailboxes.Ui.Publish(new DescriptorBoxClear());
-                Mailboxes.Ui.Publish(new HeldItemEnd());
+                Mailboxes.PublishUiEvent(new DescriptorBoxClear());
+                Mailboxes.PublishUiEvent(new HeldItemEnd());
             }
 
             base.ClickedOnAndReleasedOnMe();
@@ -365,8 +375,8 @@ namespace Project_1.UI.HUD.Inventory
             if (isEmpty == false && holdable && heldEvents.ClickThatCreated == InputManager.ClickType.Left)
             {
                 UiInputBridge.PublishRelease(this, heldEvents.ClickThatCreated);
-                Mailboxes.Ui.Publish(new DescriptorBoxClear());
-                Mailboxes.Ui.Publish(new HeldItemEnd());
+                Mailboxes.PublishUiEvent(new DescriptorBoxClear());
+                Mailboxes.PublishUiEvent(new HeldItemEnd());
             }
             base.HoldReleaseAwayFromMe();
 
@@ -393,16 +403,16 @@ namespace Project_1.UI.HUD.Inventory
                     case ItemData.ItemType.NotSet:
                         throw new NotImplementedException();
                     case ItemData.ItemType.Container:
-                        Mailboxes.Main.Publish(new InventoryEquipBagRequested(Index));
+                        Mailboxes.PublishSimCommand(new InventoryEquipBagRequested(Index));
                         return;
                     case ItemData.ItemType.Trash:
                         return;
                     case ItemData.ItemType.Consumable:
-                        Mailboxes.Main.Publish(new InventoryConsumeRequested(Index, targetRenderId));
+                        Mailboxes.PublishSimCommand(new InventoryConsumeRequested(Index, targetRenderId));
                         return;
                     case ItemData.ItemType.Equipment:
                     case ItemData.ItemType.Weapon:
-                        Mailboxes.Main.Publish(new InventoryEquipRequested(Index, targetRenderId));
+                        Mailboxes.PublishSimCommand(new InventoryEquipRequested(Index, targetRenderId));
                         return;
                     default:
                         throw new NotImplementedException();
@@ -411,13 +421,13 @@ namespace Project_1.UI.HUD.Inventory
 
             if (bagIndex == -1)
             {
-                Mailboxes.Main.Publish(new InventoryUnequipBagRequested(slotIndex, null));
+                Mailboxes.PublishSimCommand(new InventoryUnequipBagRequested(slotIndex, null));
                 return;
             }
 
             if (bagIndex == -2)
             {
-                Mailboxes.Main.Publish(new LootItemRequested(slotIndex, null));
+                Mailboxes.PublishSimCommand(new LootItemRequested(slotIndex, null));
                 return;
             }
         }
@@ -430,7 +440,7 @@ namespace Project_1.UI.HUD.Inventory
             if (!holdable) return;
             Items.Item actualItem = GetActualItem;
             if (actualItem == null) return;
-            Mailboxes.Ui.Publish(new DescriptorBoxSet(ItemDescriptorSnapshot.FromItem(actualItem)));
+            Mailboxes.PublishUiEvent(new DescriptorBoxSet(ItemDescriptorSnapshot.FromItem(actualItem)));
         }
 
         protected override void OnDeHover()
@@ -443,7 +453,7 @@ namespace Project_1.UI.HUD.Inventory
         protected void HideDescriptorBox()
         {
             if (!holdable) return;
-            Mailboxes.Ui.Publish(new DescriptorBoxClear());
+            Mailboxes.PublishUiEvent(new DescriptorBoxClear());
         }
 
         public override void Rescale()

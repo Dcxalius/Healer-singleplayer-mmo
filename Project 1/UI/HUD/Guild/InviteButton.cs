@@ -21,12 +21,12 @@ namespace Project_1.UI.HUD.Guild
 
         void Invite()
         {
-            Mailboxes.Main.Publish(new PartyMemberInviteRequested(memberRenderId));
+            Mailboxes.PublishSimCommand(new PartyMemberInviteRequested(memberRenderId));
         }
 
         void Kick()
         {
-            Mailboxes.Main.Publish(new PartyMemberKickRequested(memberRenderId));
+            Mailboxes.PublishSimCommand(new PartyMemberKickRequested(memberRenderId));
         }
 
     }

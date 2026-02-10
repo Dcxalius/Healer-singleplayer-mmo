@@ -305,7 +305,7 @@ namespace Project_1.Input
 
             ClickEvent clickEvent = new ClickEvent(GetMousePosRelative(), aTypeOfClick, heldModifiers);
 
-            Mailboxes.Ui.Publish(clickEvent);
+            Mailboxes.PublishUiEvent(clickEvent);
         }
 
         public static void CreateReleaseEvent(UIElement aCreator, InputManager.ClickType aTypeOfRelease)
@@ -313,7 +313,7 @@ namespace Project_1.Input
             bool[] heldModifiers = CheckHoldModifiers();
 
             ReleaseEvent releaseEvent = new ReleaseEvent(aCreator, GetMousePosRelative(), aTypeOfRelease, heldModifiers);
-            Mailboxes.Ui.Publish(releaseEvent);
+            Mailboxes.PublishUiEvent(releaseEvent);
         }
 
         static void CreateScrollEvent()
@@ -325,21 +325,21 @@ namespace Project_1.Input
 
             ScrollEvent scrollEvent = new ScrollEvent(GetMousePosRelative(), amount, direction, heldModifiers);
 
-            Mailboxes.Ui.Publish(scrollEvent);
+            Mailboxes.PublishUiEvent(scrollEvent);
         }
 
         static void PublishEscapePressed()
         {
             if (!oldKeyboardState.IsKeyDown(Keys.Escape) && newKeyboardState.IsKeyDown(Keys.Escape))
             {
-                Mailboxes.Ui.Publish(new EscapePressed());
+                Mailboxes.PublishUiEvent(new EscapePressed());
             }
         }
 
         static void PublishKeyboardSnapshots()
         {
             Keys[] downKeys = newKeyboardState.GetPressedKeys();
-            Mailboxes.Ui.Publish(new KeyboardSnapshot(downKeys));
+            Mailboxes.PublishUiEvent(new KeyboardSnapshot(downKeys));
 
             int count = (int)KeyBindManager.KeyListner.Count;
             bool[] pressed = new bool[count];
@@ -356,14 +356,14 @@ namespace Project_1.Input
                 }
             }
 
-            Mailboxes.Ui.Publish(new KeyBindSnapshot(pressed, held, released));
+            Mailboxes.PublishUiEvent(new KeyBindSnapshot(pressed, held, released));
         }
 
         static void PublishMouseSnapshot()
         {
             AbsoluteScreenPosition absolute = GetMousePosAbsolute();
             RelativeScreenPosition relative = GetMousePosRelative();
-            Mailboxes.Ui.Publish(new MouseSnapshot(absolute, relative, scrollWheelValue, scrollDelta));
+            Mailboxes.PublishUiEvent(new MouseSnapshot(absolute, relative, scrollWheelValue, scrollDelta));
         }
 
         public static bool[] CheckHoldModifiers()

@@ -123,7 +123,7 @@ namespace Project_1.UI.HUD
             RelativeScreenPosition newBagPos = absBagBoxSpacing.ToRelativeScreenPosition(Size);
 
             bagBox[0].Move(newBagPos);
-            Project_1.Items.Item[] defaultBagItems = null;
+            ItemUiSnapshot[] defaultBagItems = null;
             if (snapshot.ItemsByBag != null && snapshot.ItemsByBag.Length > 0)
             {
                 defaultBagItems = snapshot.ItemsByBag[0];

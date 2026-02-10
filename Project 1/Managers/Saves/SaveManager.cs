@@ -183,7 +183,7 @@ namespace Project_1.Managers
 
             WorkerPool.Enqueue(() => SaveLoadPayload.Parse(save), payload =>
             {
-                Mailboxes.Main.Publish(new SaveLoadParsed(payload));
+                Mailboxes.PublishSimCommand(new SaveLoadParsed(payload));
             });
             return true;
         }
@@ -204,10 +204,10 @@ namespace Project_1.Managers
             }
 
             List<Chunk> chunks = new List<Chunk>();
-            if (payload.TileChunks != null)
+            if (payload.TileChunks != null && payload.TileChunks.Length > 0)
             {
-                chunks = new List<Chunk>(payload.TileChunks.Count);
-                for (int i = 0; i < payload.TileChunks.Count; i++)
+                chunks = new List<Chunk>(payload.TileChunks.Length);
+                for (int i = 0; i < payload.TileChunks.Length; i++)
                 {
                     Chunk chunk = payload.TileChunks[i].ToObject<Chunk>(serializer);
                     if (chunk != null) chunks.Add(chunk);
@@ -217,9 +217,9 @@ namespace Project_1.Managers
 
             PlayerData playerData = payload.PlayerData != null ? payload.PlayerData.ToObject<PlayerData>(serializer) : null;
             List<UnitData> guildData = new List<UnitData>();
-            if (payload.GuildData != null)
+            if (payload.GuildData != null && payload.GuildData.Length > 0)
             {
-                for (int i = 0; i < payload.GuildData.Count; i++)
+                for (int i = 0; i < payload.GuildData.Length; i++)
                 {
                     UnitData unit = payload.GuildData[i].ToObject<UnitData>(serializer);
                     if (unit != null) guildData.Add(unit);
@@ -234,7 +234,7 @@ namespace Project_1.Managers
             TimeManager.Load(currentSave);
         }
 
-        public static void SaveHUD() => Mailboxes.Ui.Publish(new HudSaveRequested());
+        public static void SaveHUD() => Mailboxes.PublishUiEvent(new HudSaveRequested());
 
         public static void SaveData()
         {
@@ -242,19 +242,19 @@ namespace Project_1.Managers
             if (currentSave == null) return;
             if (!ThreadingSettings.UseWorkerThreads || !WorkerPool.IsRunning)
             {
-                Mailboxes.Ui.Publish(new SaveDataStarted());
+                Mailboxes.PublishUiEvent(new SaveDataStarted());
                 try
                 {
                     currentSave.SaveData();
                 }
                 finally
                 {
-                    Mailboxes.Ui.Publish(new SaveDataFinished());
+                    Mailboxes.PublishUiEvent(new SaveDataFinished());
                 }
                 return;
             }
 
-            Mailboxes.Ui.Publish(new SaveDataStarted());
+            Mailboxes.PublishUiEvent(new SaveDataStarted());
             SaveWritePayload payload = SaveWritePayload.Capture(currentSave);
             RequestScreenshot(currentSave);
             WorkerPool.Enqueue(() =>
@@ -265,7 +265,7 @@ namespace Project_1.Managers
                 }
                 finally
                 {
-                    Mailboxes.Ui.Publish(new SaveDataFinished());
+                    Mailboxes.PublishUiEvent(new SaveDataFinished());
                 }
             });
         }

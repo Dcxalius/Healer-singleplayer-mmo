@@ -38,42 +38,104 @@ namespace Project_1.Items.SubTypes
             ("of Intellect", new[] { StatBonuses.Intellect }),
             ("of Stamina", new[] { StatBonuses.Stamina }),
             ("of Spirit", new[] { StatBonuses.Spirit }),
-            ("of Frozen Wrath", new[] { StatBonuses.SpellDamageOneSchool }),
-            ("of Fiery Wrath", new[] { StatBonuses.SpellDamageOneSchool }),
-            ("of Arcane Wrath", new[] { StatBonuses.SpellDamageOneSchool }),
-            ("of Nature's Wrath", new[] { StatBonuses.SpellDamageOneSchool }),
-            ("of Shadow Wrath", new[] { StatBonuses.SpellDamageOneSchool })
+            ("of Frozen Wrath", new[] { StatBonuses.FrostSpellDamage }),
+            ("of Fiery Wrath", new[] { StatBonuses.FireSpellDamage}),
+            ("of Arcane Wrath", new[] { StatBonuses.ArcaneSpellDamage}),
+            ("of Nature's Wrath", new[] { StatBonuses.NatureSpellDamage}),
+            ("of Shadow Wrath", new[] { StatBonuses.ShadowSpellDamage }),
+            ("of Holy Wrath", new[] {StatBonuses.HolySpellDamage} ),
+            ("of Frozen Protection", new[] { StatBonuses.FrostResist }),
+            ("of Fiery Protection", new[] { StatBonuses.FireResist }),
+            ("of Arcane Protection", new[] { StatBonuses.ArcaneResist }),
+            ("of Nature's Protection", new[] { StatBonuses.NatureResist }),
+            ("of Shadow Protection", new[] { StatBonuses.ShadowResist }),
+            ("of Holy Protection", new[] { StatBonuses.HolyResist })
         };
 
         public enum StatBonuses
         {
-            BonusArmor = 22,
-            AttackPowerVsDemonsBeastsUndead = 76,
-            RangedAttackPower = 92,
-            SpellHealing = 100,
-            AttackPower = 115,
-            BlockingValue = 150,
-            SpellDamageOneSchool = 159,
-            SpellDamageAllSpells = 192,
-            MagicResistOneSchool = 230,
-            PrimaryStat = 230,
-            Agility = 230,
-            Strength = 230,
-            Stamina = 230,
-            Intellect = 230,
-            Spirit = 230,
-            Defense = 345,
-            RegenPer5Sec = 550,
-            WeaponSkillOther = 550,
-            WeaponSkillDaggers = 720,
-            DamageShield = 720,
-            ChanceToBlock = 1300,
-            ChanceToHit = 2200,
-            ChanceToHitWithAllSpells = 2500,
-            ChanceToDodge = 2500,
-            ChanceToCritWithAllSpells = 2600,
-            ChanceToCrit = 3200,
-            ChanceToParry = 3600
+            BonusArmor,
+            AttackPowerVsDemonsBeastsUndead,
+            RangedAttackPower,
+            SpellHealing,
+            AttackPower,
+            BlockingValue,
+            FrostSpellDamage,
+            FireSpellDamage,
+            ArcaneSpellDamage,
+            NatureSpellDamage,
+            ShadowSpellDamage,
+            HolySpellDamage,
+            SpellDamageAllSpells,
+            FireResist,
+            FrostResist,
+            ArcaneResist,
+            NatureResist,
+            ShadowResist,
+            HolyResist,
+            Agility,
+            Strength,
+            Stamina,
+            Intellect,
+            Spirit,
+            Defense,
+            HpRegenPer5Sec,
+            ManaRegenPer5Sec,
+            WeaponSkillOther,
+            WeaponSkillDaggers,
+            ShieldThorns,
+            ChanceToBlock,
+            ChanceToHit,
+            ChanceToHitWithAllSpells,
+            ChanceToDodge,
+            ChanceToCritWithAllSpells,
+            ChanceToCrit,
+            ChanceToParry
+        }
+
+        public static string GetStatBonusDisplayName(StatBonuses aStatBonus)
+        {
+            return aStatBonus switch
+            {
+                StatBonuses.BonusArmor => "Bonus Armor",
+                StatBonuses.AttackPowerVsDemonsBeastsUndead => "Attack Power vs Demons/Beasts/Undead",
+                StatBonuses.RangedAttackPower => "Ranged Attack Power",
+                StatBonuses.SpellHealing => "Spell Healing",
+                StatBonuses.AttackPower => "Attack Power",
+                StatBonuses.BlockingValue => "Blocking Value",
+                StatBonuses.FrostSpellDamage => "Frost Spelldamage",
+                StatBonuses.FireSpellDamage => "Fire Spelldamage",
+                StatBonuses.ArcaneSpellDamage => "Arcane Spelldamage",
+                StatBonuses.NatureSpellDamage => "Nature Spelldamage",
+                StatBonuses.ShadowSpellDamage => "Shadow Spelldamage",
+                StatBonuses.HolySpellDamage => "Holy Spelldamage",
+                StatBonuses.SpellDamageAllSpells => "Spelldamage",
+                StatBonuses.FireResist => "Fire Resist",
+                StatBonuses.FrostResist => "Frost Resist",
+                StatBonuses.ArcaneResist => "Arcane Resist",
+                StatBonuses.NatureResist => "Nature Resist",
+                StatBonuses.ShadowResist => "Shadow Resist",
+                StatBonuses.HolyResist => "Holy Resist",
+                StatBonuses.Agility => "Agility",
+                StatBonuses.Strength => "Strength",
+                StatBonuses.Stamina => "Stamina",
+                StatBonuses.Intellect => "Intellect",
+                StatBonuses.Spirit => "Spirit",
+                StatBonuses.Defense => "Defense",
+                StatBonuses.HpRegenPer5Sec => "HP/5",
+                StatBonuses.ManaRegenPer5Sec => "Mana/5",
+                StatBonuses.WeaponSkillOther => "Weapon Skill", //TODO: Break this out to all weapons, both here and in the enum
+                StatBonuses.WeaponSkillDaggers => "Dagger Skill",
+                StatBonuses.ShieldThorns => "Refelect",
+                StatBonuses.ChanceToBlock => "Chance To Block",
+                StatBonuses.ChanceToHit => "Chance To Hit",
+                StatBonuses.ChanceToHitWithAllSpells => "Spell Hit Chance",
+                StatBonuses.ChanceToDodge => "Chance To Dodge",
+                StatBonuses.ChanceToCritWithAllSpells => "Spell Crit Chance",
+                StatBonuses.ChanceToCrit => "Chance To Crit",
+                StatBonuses.ChanceToParry => "Chance To Parry",
+                _ => aStatBonus.ToString()
+            };
         }
 
         [JsonIgnore]
@@ -105,27 +167,60 @@ namespace Project_1.Items.SubTypes
         public Equipment.Type Slot => slot;
         Equipment.Type slot;
 
-        public EquipmentData(int id, string gfxName, string name, string description, Equipment.Type slot, ItemType itemType, int armor, int[] baseStats, Item.Quality quality, int cost, GearType material, SecondayStatBonus<int>[] secondaryStatsInt, SecondayStatBonus<float>[] secondaryStatsFloat, int itemLevel = 1)
+        public EquipmentData(int id, string gfxName, string name, string description, Equipment.Type slot, ItemType itemType, Item.Quality quality, int cost, GearType material, SecondayStatBonus<int>[] secondaryStatsInt, SecondayStatBonus<float>[] secondaryStatsFloat, int itemLevel = 1)
             : base(id, gfxName, name, description, 1, itemType, quality, cost, itemLevel)
         {
             this.slot = slot;
-            this.baseStats = new EquipmentStats(baseStats, armor);
+            int calculatedArmor = itemType == ItemType.Equipment
+                ? CalculateArmorFromFormula(slot, material, quality, itemLevel)
+                : 0;
+            SetBaseStats(Array.Empty<int>(), calculatedArmor);
             this.material = material;
-            this.secondaryStatsInt = secondaryStatsInt;
-            this.secondaryStatsFloat = secondaryStatsFloat;
+            // TODO: Rare/epic itemization currently has no template-level load path for these arrays.
+            // Keep template secondary stats empty while green suffix stats are sourced from Equipment instances.
+            this.secondaryStatsInt = Array.Empty<SecondayStatBonus<int>>();
+            this.secondaryStatsFloat = Array.Empty<SecondayStatBonus<float>>();
         }
 
         [JsonConstructor]
-        public EquipmentData(int id, string gfxName, string name, string description, Equipment.Type slot, int armor, int[] baseStats, Item.Quality quality, int cost, GearType material, SecondayStatBonus<int>[] secondaryStatsInt, SecondayStatBonus<float>[] secondayStatFloat, int itemLevel = 1)
-            : this(id, gfxName, name, description, slot, ItemType.Equipment, armor, baseStats, quality, cost, material, secondaryStatsInt, secondayStatFloat, itemLevel)
+        public EquipmentData(int id, string gfxName, string name, string description, Equipment.Type slot, Item.Quality quality, int cost, GearType material, SecondayStatBonus<int>[] secondaryStatsInt, SecondayStatBonus<float>[] secondayStatFloat, int itemLevel = 1)
+            : this(id, gfxName, name, description, slot, ItemType.Equipment, quality, cost, material, secondaryStatsInt, secondayStatFloat, itemLevel)
         {
+        }
+
+        protected void SetBaseStats(int[] aBaseStats, int aArmor)
+        {
+            baseStats = new EquipmentStats(NormalizePrimaryStats(aBaseStats), Math.Max(0, aArmor));
+        }
+
+        static int[] NormalizePrimaryStats(int[] aBaseStats)
+        {
+            int expectedLength = (int)PrimaryStats.PrimaryStat.Count;
+            int[] normalized = new int[expectedLength];
+            if (aBaseStats == null)
+            {
+                return normalized;
+            }
+
+            int copyLength = Math.Min(expectedLength, aBaseStats.Length);
+            Array.Copy(aBaseStats, normalized, copyLength);
+            return normalized;
         }
 
         public (string name, (StatBonuses stat, int value)[] stats) Suffix(int aHash)
         {
             double availablePoweredBudget = GetAvailableSuffixPoweredBudget();
-            var template = GetSuffixTemplate(aHash, availablePoweredBudget, out int selectableTemplateCount);
-            int[] statValues = CalculateSuffixStatValues(aHash, template.stats, availablePoweredBudget, selectableTemplateCount);
+            var selected = SelectSuffixTemplateIndex(aHash, availablePoweredBudget);
+            if (selected.templateIndex < 0)
+            {
+                return (string.Empty, Array.Empty<(StatBonuses stat, int value)>());
+            }
+
+            var template = suffixTemplates[selected.templateIndex];
+            int selectableTemplateCount = selected.selectableTemplateCount;
+            int[] statValues = selected.isForcedMinimumFallback
+                ? new[] { 1 }
+                : CalculateSuffixStatValues(aHash, template.stats, availablePoweredBudget, selectableTemplateCount);
             var statLines = new (StatBonuses stat, int value)[template.stats.Length];
             for (int i = 0; i < template.stats.Length; i++)
             {
@@ -143,10 +238,22 @@ namespace Project_1.Items.SubTypes
         public int SuffixStatValue(int aStatIndex, int aHash)
         {
             double availablePoweredBudget = GetAvailableSuffixPoweredBudget();
-            var template = GetSuffixTemplate(aHash, availablePoweredBudget, out int selectableTemplateCount);
+            var selected = SelectSuffixTemplateIndex(aHash, availablePoweredBudget);
+            if (selected.templateIndex < 0)
+            {
+                return 0;
+            }
+
+            var template = suffixTemplates[selected.templateIndex];
+            int selectableTemplateCount = selected.selectableTemplateCount;
             if ((uint)aStatIndex >= (uint)template.stats.Length)
             {
                 throw new ArgumentOutOfRangeException(nameof(aStatIndex), aStatIndex, "Invalid suffix stat index.");
+            }
+
+            if (selected.isForcedMinimumFallback)
+            {
+                return aStatIndex == 0 ? 1 : 0;
             }
 
             return CalculateSuffixStatValues(aHash, template.stats, availablePoweredBudget, selectableTemplateCount)[aStatIndex];
@@ -235,7 +342,7 @@ namespace Project_1.Items.SubTypes
 
             for (int i = 0; i < aStatModifiers.Length; i++)
             {
-                if (aStatModifiers[i] <= 0)
+                if (GetStatModifierValue(aStatModifiers[i]) <= 0)
                 {
                     throw new ArgumentException("Each stat modifier must be greater than 0.", nameof(aStatModifiers));
                 }
@@ -248,7 +355,7 @@ namespace Project_1.Items.SubTypes
 
             for (int i = 0; i < aStatModifiers.Length; i++)
             {
-                statValues[i] = weightedStatValue / (double)aStatModifiers[i];
+                statValues[i] = weightedStatValue / GetStatModifierValue(aStatModifiers[i]);
             }
 
             return statValues;
@@ -322,7 +429,7 @@ namespace Project_1.Items.SubTypes
 
         static void AddStatContribution(ref double aPoweredStatSum, double aStatValue, StatBonuses aStatModifier)
         {
-            AddStatContribution(ref aPoweredStatSum, aStatValue, (double)aStatModifier);
+            AddStatContribution(ref aPoweredStatSum, aStatValue, GetStatModifierValue(aStatModifier));
         }
 
         static void AddStatContribution(ref double aPoweredStatSum, double aStatValue, double aStatModifier)
@@ -357,6 +464,51 @@ namespace Project_1.Items.SubTypes
             };
         }
 
+        static double GetStatModifierValue(StatBonuses aStatBonus)
+        {
+            return aStatBonus switch
+            {
+                StatBonuses.BonusArmor => 22,
+                StatBonuses.AttackPowerVsDemonsBeastsUndead => 76,
+                StatBonuses.RangedAttackPower => 92,
+                StatBonuses.SpellHealing => 100,
+                StatBonuses.AttackPower => 115,
+                StatBonuses.BlockingValue => 150,
+                StatBonuses.FrostSpellDamage => 159,
+                StatBonuses.FireSpellDamage => 159,
+                StatBonuses.ArcaneSpellDamage => 159,
+                StatBonuses.NatureSpellDamage => 159,
+                StatBonuses.ShadowSpellDamage => 159,
+                StatBonuses.HolySpellDamage => 159,
+                StatBonuses.SpellDamageAllSpells => 192,
+                StatBonuses.FireResist => 230,
+                StatBonuses.FrostResist => 230,
+                StatBonuses.ArcaneResist => 230,
+                StatBonuses.NatureResist => 230,
+                StatBonuses.ShadowResist => 230,
+                StatBonuses.HolyResist => 230,
+                StatBonuses.Agility => 230,
+                StatBonuses.Strength => 230,
+                StatBonuses.Stamina => 230,
+                StatBonuses.Intellect => 230,
+                StatBonuses.Spirit => 230,
+                StatBonuses.Defense => 345,
+                StatBonuses.HpRegenPer5Sec => 550,
+                StatBonuses.ManaRegenPer5Sec => 550,
+                StatBonuses.WeaponSkillOther => 550,
+                StatBonuses.WeaponSkillDaggers => 720,
+                StatBonuses.ShieldThorns => 720,
+                StatBonuses.ChanceToBlock => 1300,
+                StatBonuses.ChanceToHit => 2200,
+                StatBonuses.ChanceToHitWithAllSpells => 2500,
+                StatBonuses.ChanceToDodge => 2500,
+                StatBonuses.ChanceToCritWithAllSpells => 2600,
+                StatBonuses.ChanceToCrit => 3200,
+                StatBonuses.ChanceToParry => 3600,
+                _ => throw new ArgumentOutOfRangeException(nameof(aStatBonus), aStatBonus, "Unhandled stat bonus type."),
+            };
+        }
+
         static int PositiveModulo(int aValue, int aModulus)
         {
             int result = aValue % aModulus;
@@ -368,11 +520,63 @@ namespace Project_1.Items.SubTypes
             return result;
         }
 
-        (string name, StatBonuses[] stats) GetSuffixTemplate(int aHash, double aAvailablePoweredBudget, out int aSelectableTemplateCount)
+        static int CalculateArmorFromFormula(Equipment.Type aSlot, GearType aMaterial, Item.Quality aQuality, int aItemLevel)
         {
-            var selected = SelectSuffixTemplateIndex(aHash, aAvailablePoweredBudget);
-            aSelectableTemplateCount = selected.selectableTemplateCount;
-            return suffixTemplates[selected.templateIndex];
+            double slotModifier = GetArmorSlotModifier(aSlot);
+            if (slotModifier <= 0)
+            {
+                return 0;
+            }
+
+            double baseArmor = GetArmorClassBase(aSlot, aMaterial, aItemLevel);
+            double qualityMultiplier = GetArmorQualityMultiplier(aQuality);
+            return Math.Max(0, (int)Math.Round(baseArmor * slotModifier * qualityMultiplier, MidpointRounding.AwayFromZero));
+        }
+
+        static double GetArmorClassBase(Equipment.Type aSlot, GearType aMaterial, int aItemLevel)
+        {
+            // Cloaks are treated as cloth for armor in this model.
+            if (aSlot == Equipment.Type.Back)
+            {
+                return 1.19 * aItemLevel + 5.1;
+            }
+
+            return aMaterial switch
+            {
+                GearType.Cloth => 1.19 * aItemLevel + 5.1,
+                GearType.Leather => 2.22 * aItemLevel + 10,
+                GearType.Mail => 4.9 * aItemLevel + 29,
+                GearType.Plate => 9.0 * aItemLevel + 23,
+                _ => 0
+            };
+        }
+
+        static double GetArmorSlotModifier(Equipment.Type aSlot)
+        {
+            return aSlot switch
+            {
+                Equipment.Type.Chest => 1.00,
+                Equipment.Type.Legs => 0.875,
+                Equipment.Type.Head => 0.8125,
+                Equipment.Type.Shoulders => 0.75,
+                Equipment.Type.Feet => 0.6875,
+                Equipment.Type.Hands => 0.625,
+                Equipment.Type.Belt => 0.5625,
+                Equipment.Type.Wrist => 0.4375,
+                Equipment.Type.Back => 0.48,
+                _ => 0
+            };
+        }
+
+        static double GetArmorQualityMultiplier(Item.Quality aQuality)
+        {
+            return aQuality switch
+            {
+                Item.Quality.Rare => 1.1,
+                Item.Quality.Epic => 1.2,
+                Item.Quality.Legendary => 1.2,
+                _ => 1.0
+            };
         }
 
         int[] CalculateSuffixStatValues(int aHash, ReadOnlySpan<StatBonuses> aSuffixStats, double aAvailablePoweredBudget, int aSelectableTemplateCount)
@@ -393,7 +597,7 @@ namespace Project_1.Items.SubTypes
             int variableCount = 0;
             for (int i = 0; i < statCount; i++)
             {
-                double rawStatValue = weightedStatValue / (double)aSuffixStats[i];
+                double rawStatValue = weightedStatValue / GetStatModifierValue(aSuffixStats[i]);
                 lowRoll[i] = (int)Math.Floor(rawStatValue);
                 highRoll[i] = rawStatValue > lowRoll[i] ? lowRoll[i] + 1 : lowRoll[i];
                 statValues[i] = lowRoll[i];
@@ -454,16 +658,23 @@ namespace Project_1.Items.SubTypes
             return RequiredPoweredSumArgument(this) - ComputePoweredStatSum(this);
         }
 
-        (int templateIndex, int selectableTemplateCount) SelectSuffixTemplateIndex(int aHash, double aAvailablePoweredBudget)
+        (int templateIndex, int selectableTemplateCount, bool isForcedMinimumFallback) SelectSuffixTemplateIndex(int aHash, double aAvailablePoweredBudget)
         {
             int[] rollableTemplates = GetRollableSuffixTemplateIndices(aAvailablePoweredBudget);
             if (rollableTemplates.Length == 0)
             {
-                return (FindLowestBudgetTemplateIndex(), 1);
+                int[] minimumFallbackTemplates = GetMinimumFallbackSuffixTemplateIndices();
+                if (minimumFallbackTemplates.Length == 0)
+                {
+                    return (-1, 0, false);
+                }
+
+                int selectedFallbackIndex = (int)(unchecked((uint)aHash) % (uint)minimumFallbackTemplates.Length);
+                return (minimumFallbackTemplates[selectedFallbackIndex], minimumFallbackTemplates.Length, true);
             }
 
             int selectedIndex = (int)(unchecked((uint)aHash) % (uint)rollableTemplates.Length);
-            return (rollableTemplates[selectedIndex], rollableTemplates.Length);
+            return (rollableTemplates[selectedIndex], rollableTemplates.Length, false);
         }
 
         int[] GetRollableSuffixTemplateIndices(double aAvailablePoweredBudget)
@@ -491,21 +702,64 @@ namespace Project_1.Items.SubTypes
             return result;
         }
 
-        int FindLowestBudgetTemplateIndex()
+        int[] GetMinimumFallbackSuffixTemplateIndices()
         {
-            int lowestIndex = 0;
-            double lowestRequiredBudget = double.MaxValue;
+            int[] templateIndices = new int[suffixTemplates.Length];
+            int count = 0;
             for (int i = 0; i < suffixTemplates.Length; i++)
             {
-                double requiredBudget = GetMinimumRequiredPoweredBudget(suffixTemplates[i].stats);
-                if (requiredBudget < lowestRequiredBudget)
+                if (!IsMinimumFallbackTemplate(suffixTemplates[i].stats))
                 {
-                    lowestRequiredBudget = requiredBudget;
-                    lowestIndex = i;
+                    continue;
                 }
+
+                templateIndices[count] = i;
+                count++;
             }
 
-            return lowestIndex;
+            if (count == 0)
+            {
+                return Array.Empty<int>();
+            }
+
+            int[] result = new int[count];
+            Array.Copy(templateIndices, result, count);
+            return result;
+        }
+
+        static bool IsMinimumFallbackTemplate(ReadOnlySpan<StatBonuses> aSuffixStats)
+        {
+            if (aSuffixStats.Length != 1)
+            {
+                return false;
+            }
+
+            return IsAllowedMinimumFallbackStat(aSuffixStats[0]);
+        }
+
+        static bool IsAllowedMinimumFallbackStat(StatBonuses aStatBonus)
+        {
+            return aStatBonus switch
+            {
+                StatBonuses.Agility or
+                StatBonuses.Strength or
+                StatBonuses.Stamina or
+                StatBonuses.Intellect or
+                StatBonuses.Spirit or
+                StatBonuses.FrostSpellDamage or
+                StatBonuses.FireSpellDamage or
+                StatBonuses.ArcaneSpellDamage or
+                StatBonuses.NatureSpellDamage or
+                StatBonuses.ShadowSpellDamage or
+                StatBonuses.HolySpellDamage or
+                StatBonuses.FrostResist or
+                StatBonuses.FireResist or
+                StatBonuses.ArcaneResist or
+                StatBonuses.NatureResist or
+                StatBonuses.ShadowResist or
+                StatBonuses.HolyResist => true,
+                _ => false
+            };
         }
 
         static bool IsTemplateRollable(ReadOnlySpan<StatBonuses> aSuffixStats, double aAvailablePoweredBudget)
@@ -524,7 +778,7 @@ namespace Project_1.Items.SubTypes
             double weightedStatValue = Math.Pow(perStatPoweredBudget, ItemValuePower);
             for (int i = 0; i < aSuffixStats.Length; i++)
             {
-                double rawStatValue = weightedStatValue / (double)aSuffixStats[i];
+                double rawStatValue = weightedStatValue / GetStatModifierValue(aSuffixStats[i]);
                 if (rawStatValue < MinimumRollableSuffixValue)
                 {
                     return false;
@@ -539,7 +793,7 @@ namespace Project_1.Items.SubTypes
             double requiredBudget = 0;
             for (int i = 0; i < aSuffixStats.Length; i++)
             {
-                double weightedMinimum = MinimumRollableSuffixValue * (double)aSuffixStats[i];
+                double weightedMinimum = MinimumRollableSuffixValue * GetStatModifierValue(aSuffixStats[i]);
                 requiredBudget += Math.Pow(weightedMinimum, StatTermPower);
             }
 

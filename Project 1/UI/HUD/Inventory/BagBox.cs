@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Items;
 using Project_1.Managers;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.HUD;
 using Project_1.UI.UIElements.Boxes;
@@ -44,7 +45,7 @@ namespace Project_1.UI.HUD.Inventory
             AddChildren(slots);
         }
 
-        void GetBagContent(Project_1.Items.Item[] itemSnapshots, int aSlotCount, int aColumnCount)
+        void GetBagContent(ItemUiSnapshot[] itemSnapshots, int aSlotCount, int aColumnCount)
         {
             if (aSlotCount == 0)
             {
@@ -105,7 +106,7 @@ namespace Project_1.UI.HUD.Inventory
             }
         }
 
-        void SetItems(Project_1.Items.Item[] itemSnapshots, int aColumnCount, AbsoluteScreenPosition aItemSize, AbsoluteScreenPosition aSpacing)
+        void SetItems(ItemUiSnapshot[] itemSnapshots, int aColumnCount, AbsoluteScreenPosition aItemSize, AbsoluteScreenPosition aSpacing)
         {
             RelativeScreenPosition itemSize = aItemSize.ToRelativeScreenPosition(Size);
             RelativeScreenPosition spacing = aSpacing.ToRelativeScreenPosition(Size);
@@ -115,7 +116,7 @@ namespace Project_1.UI.HUD.Inventory
                 float x = spacing.X + (i % aColumnCount) * ((1 - spacing.X) / (float)aColumnCount);
                 float y = spacing.Y + (itemSize.Y + spacing.Y) * (float)Math.Floor((double)i / aColumnCount);
                 RelativeScreenPosition pos = new RelativeScreenPosition(x, y);
-                if (itemSnapshots != null && i < itemSnapshots.Length && itemSnapshots[i] != null)
+                if (itemSnapshots != null && i < itemSnapshots.Length && itemSnapshots[i].HasValue)
                 {
                     slots[i] = new Item(bagNr, i, true, itemSnapshots[i], pos, itemSize);
                 }
@@ -143,7 +144,7 @@ namespace Project_1.UI.HUD.Inventory
             GetBagContent(aInventory, aSlotCount, aColumnCount);
         }
 
-        public void RefreshBag(Project_1.Items.Item[] itemSnapshots, int aSlotCount, int aColumnCount)
+        public void RefreshBag(ItemUiSnapshot[] itemSnapshots, int aSlotCount, int aColumnCount)
         {
             KillAllChildren();
             GetBagContent(itemSnapshots, aSlotCount, aColumnCount);

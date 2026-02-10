@@ -19,6 +19,12 @@ namespace Project_1.Messaging
         int lastDispatchCount;
         double lastDispatchMs;
         long totalDispatched;
+        long totalPublished;
+        long totalDispatchDequeued;
+        long totalDispatchMisses;
+        long totalWithoutSubscribers;
+        long totalHandlerInvocations;
+        long totalHandlerFailures;
 
         public Mailbox(string name)
         {
@@ -32,6 +38,7 @@ namespace Project_1.Messaging
             Channel<T> channel = GetOrAddChannel<T>();
             channel.Enqueue(message);
             dispatchQueue.Enqueue(channel.Id);
+            Interlocked.Increment(ref totalPublished);
 
             int pending = Interlocked.Increment(ref pendingCount);
             int snapshotPeak;
@@ -65,9 +72,30 @@ namespace Project_1.Messaging
                 }
 
                 Interlocked.Decrement(ref pendingCount);
-                if (!channelsById.TryGetValue(channelId, out IChannel channel)) continue;
-                if (!channel.TryDispatchOne(Name, out bool hadSubscribers)) continue;
-                if (!hadSubscribers) continue;
+                Interlocked.Increment(ref totalDispatchDequeued);
+                if (!channelsById.TryGetValue(channelId, out IChannel channel))
+                {
+                    Interlocked.Increment(ref totalDispatchMisses);
+                    continue;
+                }
+                if (!channel.TryDispatchOne(Name, out bool hadSubscribers, out int handlerInvocations, out int handlerFailures))
+                {
+                    Interlocked.Increment(ref totalDispatchMisses);
+                    continue;
+                }
+                if (!hadSubscribers)
+                {
+                    Interlocked.Increment(ref totalWithoutSubscribers);
+                    continue;
+                }
+                if (handlerInvocations > 0)
+                {
+                    Interlocked.Add(ref totalHandlerInvocations, handlerInvocations);
+                }
+                if (handlerFailures > 0)
+                {
+                    Interlocked.Add(ref totalHandlerFailures, handlerFailures);
+                }
                 processed++;
             }
 
@@ -87,7 +115,13 @@ namespace Project_1.Messaging
                 Volatile.Read(ref peakCount),
                 Volatile.Read(ref lastDispatchCount),
                 Volatile.Read(ref lastDispatchMs),
-                Interlocked.Read(ref totalDispatched));
+                Interlocked.Read(ref totalDispatched),
+                Interlocked.Read(ref totalPublished),
+                Interlocked.Read(ref totalDispatchDequeued),
+                Interlocked.Read(ref totalDispatchMisses),
+                Interlocked.Read(ref totalWithoutSubscribers),
+                Interlocked.Read(ref totalHandlerInvocations),
+                Interlocked.Read(ref totalHandlerFailures));
         }
 
         Channel<T> GetOrAddChannel<T>()
@@ -104,7 +138,7 @@ namespace Project_1.Messaging
 
         interface IChannel
         {
-            bool TryDispatchOne(string mailboxName, out bool hadSubscribers);
+            bool TryDispatchOne(string mailboxName, out bool hadSubscribers, out int handlerInvocations, out int handlerFailures);
         }
 
         sealed class Channel<T> : IChannel
@@ -129,18 +163,26 @@ namespace Project_1.Messaging
                 subscribers.Add(handler);
             }
 
-            public bool TryDispatchOne(string mailboxName, out bool hadSubscribers)
+            public bool TryDispatchOne(string mailboxName, out bool hadSubscribers, out int handlerInvocations, out int handlerFailures)
             {
                 if (!queue.TryDequeue(out T message))
                 {
                     hadSubscribers = false;
+                    handlerInvocations = 0;
+                    handlerFailures = 0;
                     return false;
                 }
 
                 Action<T>[] handlers = subscribers.Snapshot();
                 hadSubscribers = handlers.Length > 0;
-                if (!hadSubscribers) return true;
+                if (!hadSubscribers)
+                {
+                    handlerInvocations = 0;
+                    handlerFailures = 0;
+                    return true;
+                }
 
+                int failures = 0;
                 for (int i = 0; i < handlers.Length; i++)
                 {
                     try
@@ -149,10 +191,13 @@ namespace Project_1.Messaging
                     }
                     catch (Exception ex)
                     {
+                        failures++;
                         Debug.WriteLine($"Mailbox '{mailboxName}' handler for '{typeof(T).Name}' threw and was skipped: {ex}");
                     }
                 }
 
+                handlerInvocations = handlers.Length;
+                handlerFailures = failures;
                 return true;
             }
         }
@@ -182,7 +227,19 @@ namespace Project_1.Messaging
 
     internal readonly struct MailboxStats
     {
-        public MailboxStats(string name, int pending, int peak, int lastDispatchCount, double lastDispatchMs, long totalDispatched)
+        public MailboxStats(
+            string name,
+            int pending,
+            int peak,
+            int lastDispatchCount,
+            double lastDispatchMs,
+            long totalDispatched,
+            long totalPublished,
+            long totalDispatchDequeued,
+            long totalDispatchMisses,
+            long totalWithoutSubscribers,
+            long totalHandlerInvocations,
+            long totalHandlerFailures)
         {
             Name = name;
             Pending = pending;
@@ -190,6 +247,12 @@ namespace Project_1.Messaging
             LastDispatchCount = lastDispatchCount;
             LastDispatchMs = lastDispatchMs;
             TotalDispatched = totalDispatched;
+            TotalPublished = totalPublished;
+            TotalDispatchDequeued = totalDispatchDequeued;
+            TotalDispatchMisses = totalDispatchMisses;
+            TotalWithoutSubscribers = totalWithoutSubscribers;
+            TotalHandlerInvocations = totalHandlerInvocations;
+            TotalHandlerFailures = totalHandlerFailures;
         }
 
         public string Name { get; }
@@ -198,5 +261,11 @@ namespace Project_1.Messaging
         public int LastDispatchCount { get; }
         public double LastDispatchMs { get; }
         public long TotalDispatched { get; }
+        public long TotalPublished { get; }
+        public long TotalDispatchDequeued { get; }
+        public long TotalDispatchMisses { get; }
+        public long TotalWithoutSubscribers { get; }
+        public long TotalHandlerInvocations { get; }
+        public long TotalHandlerFailures { get; }
     }
 }

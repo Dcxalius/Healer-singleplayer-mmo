@@ -52,7 +52,7 @@ namespace Project_1.UI.HUD.Guild
 
             openInspectWindow = new OpenInspectWindow(aData, GetButtonPos, buttonSize);
             openInventory = new OpenInventory(GetButtonPos, buttonSize);
-            if (aData.RelationToPlayer != GameObjects.Unit.Relation.RelationToPlayer.Self)
+            if (aData.RelationToPlayer != RelationToPlayerKind.Self)
             {
                 invite = new InviteButton(aData.RenderId, GetButtonPos, buttonSize);
                 nodeViewer = new Button(new List<Action> { NodeViewerOpener }, GetButtonPos, buttonSize, Color.LightGray);
@@ -71,7 +71,7 @@ namespace Project_1.UI.HUD.Guild
             AddChild(openInspectWindow);
             AddChild(openInventory);
 
-            if (aData.RelationToPlayer != GameObjects.Unit.Relation.RelationToPlayer.Self)
+            if (aData.RelationToPlayer != RelationToPlayerKind.Self)
             {
                 AddChild(invite);
                 AddChild(nodeViewer);
@@ -80,7 +80,7 @@ namespace Project_1.UI.HUD.Guild
 
         void NodeViewerOpener()
         {
-            Mailboxes.Ui.Publish(new LogicWindowOpened(data.RenderId));
+            Mailboxes.PublishUiEvent(new LogicWindowOpened(data.RenderId));
         }
 
         public void SetInviteButtonState(TwoStateGFXButton.State aState)

@@ -1,16 +1,15 @@
 ﻿using Project_1.Camera;
-using Project_1.Items;
 
 namespace Project_1.Messaging.Events
 {
     internal readonly struct LootOpened
     {
-        public LootOpened(Item[] snapshot, LootContext context)
+        public LootOpened(ItemUiSnapshot[] snapshot, LootContext context)
         {
             Snapshot = snapshot;
             Context = context;
         }
-        public Item[] Snapshot { get; }
+        public ItemUiSnapshot[] Snapshot { get; }
         public LootContext Context { get; }
     }
 
@@ -40,14 +39,14 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct LootSlotChanged
     {
-        public LootSlotChanged(int slot, Item itemSnapshot, int amountRemoved)
+        public LootSlotChanged(int slot, ItemUiSnapshot itemSnapshot, int amountRemoved)
         {
             Slot = slot;
             ItemSnapshot = itemSnapshot;
             AmountRemoved = amountRemoved;
         }
         public int Slot { get; }
-        public Item ItemSnapshot { get; }
+        public ItemUiSnapshot ItemSnapshot { get; }
         public int AmountRemoved { get; }
     }
 

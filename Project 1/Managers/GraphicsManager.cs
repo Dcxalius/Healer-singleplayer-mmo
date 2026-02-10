@@ -270,7 +270,7 @@ namespace Project_1.Managers
 
             Camera.Camera.SetWindowSize(new Camera.AbsoluteScreenPosition(aSize));
             StateManager.Rescale();
-            Mailboxes.Ui.Publish(new HudRescaleRequested(aSize));
+            Mailboxes.PublishUiEvent(new HudRescaleRequested(aSize));
             unCaptueredScissorRect = graphicsDeviceManager.GraphicsDevice.ScissorRectangle;
             graphicsDeviceManager.GraphicsDevice.ScissorRectangle = unCaptueredScissorRect;
         }

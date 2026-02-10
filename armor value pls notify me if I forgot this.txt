@@ -1,0 +1,62 @@
+Classic-era armor formula (works well for “baseline” armor on gray/white/green)
+1) Pick armor class base (treating green/uncommon as the baseline)
+
+Let ilvl be item level.
+
+Cloth: Base = 1.19*ilvl + 5.1
+
+Leather: Base = 2.22*ilvl + 10
+
+Mail: Base = 4.9*ilvl + 29
+
+Plate: Base = 9.0*ilvl + 23
+
+(Shields use a separate formula; omitted since you asked armor items.)
+
+2) Multiply by slot modifier
+
+Armor = Base * SlotMod
+
+Slot mods:
+
+Chest: 1.00 (16/16)
+
+Legs: 0.875 (14/16)
+
+Head: 0.8125 (13/16)
+
+Shoulders: 0.75 (12/16)
+
+Feet: 0.6875 (11/16)
+
+Hands: 0.625 (10/16)
+
+Waist: 0.5625 (9/16)
+
+Wrist: 0.4375 (7/16)
+
+Back (cloak): 0.48 (12/25) (cloaks are treated as cloth for armor purposes in this model)
+
+3) Quality handling for gray/white/green
+
+This model treats the above as the green/uncommon baseline. It explicitly documents multipliers upward for rare/epic, but not separate downward multipliers for poor/common—so for a practical “formula from slot+ilvl” for gray/white/green, use:
+
+QualityMult(thrash) = 1.0
+
+QualityMult(common) = 1.0
+
+QualityMult(uncommon) = 1.0
+
+QualityMult(Rare) = 1.1
+
+QualityMult(Epic) = 1.2
+
+and compute:
+Armor = Base(ilvl, armorClass) * SlotMod(slot) * QualityMult
+
+Important caveat: many gray/white items are simply below the maximum/baseline budget, so the formula is best interpreted as a typical/max baseline for that ilvl+slot rather than guaranteed exact armor for every specific item. (The same sources note armor is “inherent” and items can deviate.)
+
+GreenShieldArmor =385​⋅ilvl+133
+Blue: Blue = GreenShieldArmor * 1.122
+
+Purple: Epic = Blue * 1.280 (so Epic = GreenShieldArmor * 1.436)

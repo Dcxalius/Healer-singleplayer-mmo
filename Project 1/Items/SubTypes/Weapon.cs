@@ -51,13 +51,17 @@ namespace Project_1.Items.SubTypes
 
 
         [JsonConstructor]
-        Weapon(int id) : this(ItemFactory.GetItemData<WeaponData>(id)) { }
+        Weapon(int id, int hash) : this(ItemFactory.GetItemData<WeaponData>(id), hash) { }
 
         public Weapon(LootData aLoot) : base(aLoot)
         {
         }
 
         public Weapon(WeaponData aData) : base(aData)
+        {
+        }
+
+        public Weapon(WeaponData aData, int hash) : base(aData, hash)
         {
         }
     }

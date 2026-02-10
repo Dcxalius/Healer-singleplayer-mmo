@@ -53,17 +53,17 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public Player(PlayerData aPlayerData) : base(aPlayerData)
         {
-            Mailboxes.Ui.Publish(new InventoryAssigned(Inventory.BuildUiSnapshot()));
+            Mailboxes.PublishUiEvent(new InventoryAssigned(Inventory.BuildUiSnapshot()));
             party = new Party(this);
             guild = new Guild(this);
             SpellBook.Init(this);
 
             LoadSpellBar(PlayerData.SavedSpellsOnBar);
 
-            Mailboxes.Ui.Publish(new SpellbookRefreshed(RenderId, SpellBook.Spells.Select(x => x.Name).ToArray()));
-            Mailboxes.Ui.Publish(new CharacterWindowSet(BuildCharacterWindowSnapshot()));
-            Mailboxes.Ui.Publish(new PlayerPlateSet(BuildUiSnapshot()));
-            Mailboxes.Ui.Publish(new GoldChanged(Gold));
+            Mailboxes.PublishUiEvent(new SpellbookRefreshed(RenderId, SpellBook.Spells.Select(x => x.Name).ToArray()));
+            Mailboxes.PublishUiEvent(new CharacterWindowSet(BuildCharacterWindowSnapshot()));
+            Mailboxes.PublishUiEvent(new PlayerPlateSet(BuildUiSnapshot()));
+            Mailboxes.PublishUiEvent(new GoldChanged(Gold));
         }
 
         public override void Update()
@@ -92,7 +92,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
                 if (!indexOfSpellsToAdd[i].HasValue) continue;
                 spellNamesToAddToBar[i] = spells[indexOfSpellsToAdd[i].Value].Name;
             }
-            Mailboxes.Ui.Publish(new SpellbarLoaded(RenderId, spellNamesToAddToBar));
+            Mailboxes.PublishUiEvent(new SpellbarLoaded(RenderId, spellNamesToAddToBar));
         }
 
         public void GetPartyMembersFromGuild()
@@ -103,9 +103,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
                 GuildMember guildMember = guild.GetGuildMemberByName(partyMembers[i]);
                 ObjectManager.SpawnGuildMemberToParty(guildMember, guildMember.FeetPosition);
             }
-
-
-            Mailboxes.Ui.Publish(new GuildInviteStatusUpdated(partyMembers.ToList(), Enumerable.Repeat(InviteStatus.Accepted, partyMembers.Length).ToList()));
+            Mailboxes.PublishUiEvent(new GuildInviteStatusUpdated(partyMembers, Enumerable.Repeat(InviteStatus.Accepted, partyMembers.Length).ToArray()));
         }
 
         public void ApplyMoveInput(bool left, bool right, bool up, bool down)
@@ -123,29 +121,29 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         public void ChangeGold(int aAmount)
         {
             PlayerData.Gold += aAmount;
-            Mailboxes.Ui.Publish(new GoldChanged(Gold));
+            Mailboxes.PublishUiEvent(new GoldChanged(Gold));
         }
 
         CharacterWindowSnapshot BuildCharacterWindowSnapshot()
         {
-            Items.Item[] equippedItems = new Items.Item[(int)Unit.Equipment.Slot.Count];
+            ItemUiSnapshot[] equippedItems = new ItemUiSnapshot[(int)Unit.Equipment.Slot.Count];
             for (int i = 0; i < equippedItems.Length; i++)
             {
                 Items.Item equipped = Equipment.EquipedInSlot((Unit.Equipment.Slot)i);
                 if (equipped == null) continue;
-                equippedItems[i] = new Items.Item(equipped.ID, equipped.Count);
+                equippedItems[i] = ItemUiSnapshot.FromItem(equipped);
             }
 
             return new CharacterWindowSnapshot(
                 BuildUiSnapshot(),
-                CloneReport(PrimaryStatReport),
+                StatReportSnapshot.FromPairReport(PrimaryStatReport),
                 BuildSecondaryReport(),
                 CurrentLevel,
                 Level.Experience,
                 equippedItems);
         }
 
-        PairReport BuildSecondaryReport()
+        StatReportSnapshot BuildSecondaryReport()
         {
             PairReport report = new PairReport();
             report.AddLine("Crit Chance", SecondaryStats.Attack.CriticalChance);
@@ -153,19 +151,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             report.AddLine("Hit Chance", SecondaryStats.Attack.BonusHitChance);
             report.AddLine("Dodge Chance", SecondaryStats.Defense.DodgeChance);
             report.AddLine("Parry Chance", SecondaryStats.Defense.ParryChance);
-            return report;
-        }
-
-        static PairReport CloneReport(PairReport source)
-        {
-            PairReport clone = new PairReport();
-            if (source == null) return clone;
-            for (int i = 0; i < source.Count; i++)
-            {
-                var line = source.Lines[i];
-                clone.AddLine(line.Name, line.Value);
-            }
-            return clone;
+            return StatReportSnapshot.FromPairReport(report);
         }
 
         protected override bool CheckForRelation()

@@ -527,7 +527,7 @@ namespace Project_1.UI.UIElements
         {
             heldEvents = null;
             if (parent != null || !hudMoveable || !hudMoving) return;
-            Mailboxes.Ui.Publish(new HudSizeChangerSet(UiElementId));
+            Mailboxes.PublishUiEvent(new HudSizeChangerSet(UiElementId));
         }
 
         protected virtual void HoldReleaseAwayFromMe() => heldEvents = null;

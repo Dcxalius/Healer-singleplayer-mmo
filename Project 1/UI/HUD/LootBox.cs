@@ -35,16 +35,16 @@ namespace Project_1.UI.HUD
             hudMoveable = false;
         }
 
-        public void RefreshSlot(int slot, Items.Item snapshot)
+        public void RefreshSlot(int slot, ItemUiSnapshot snapshot)
         {
             if (loot == null) return;
             if (slot < 0 || slot >= loot.Length) return;
             loot[slot]?.UpdateItem(snapshot);
         }
 
-        public void Loot(LootContext lootContext, Items.Item[] snapshot)
+        public void Loot(LootContext lootContext, ItemUiSnapshot[] snapshot)
         {
-            if (snapshot == null || snapshot.Length == 0 || snapshot.All(item => item == null))
+            if (snapshot == null || snapshot.Length == 0 || snapshot.All(item => !item.HasValue))
             {
                 return;
             }
@@ -55,20 +55,21 @@ namespace Project_1.UI.HUD
             CreateLoot(snapshot);
         }
 
-        void CreateLoot(Items.Item[] snapshot)
+        void CreateLoot(ItemUiSnapshot[] snapshot)
         {
             loot = new Loot[snapshot.Length];
             List<int> indexToHide = new List<int>(); //TODO: Make this not hideous
             for (int i = 0; i < loot.Length; i++)
             {
-                Items.Item snap = snapshot[i];
-                if (snap != null)
+                ItemUiSnapshot snap = snapshot[i];
+                if (snap.HasValue)
                 {
-                    loot[i] = new Loot(i, snap, snap.GfxPath);
+                    Items.Item item = snap.ToItem();
+                    loot[i] = new Loot(i, snap, item.GfxPath);
                 }
                 else
                 {
-                    loot[i] = new Loot(i, null, new GfxPath(GfxType.Debug, null));
+                    loot[i] = new Loot(i, ItemUiSnapshot.Empty, new GfxPath(GfxType.Debug, null));
                     indexToHide.Add(i);
                 }
             }

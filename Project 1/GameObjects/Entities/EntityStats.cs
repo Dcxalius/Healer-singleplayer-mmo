@@ -79,7 +79,7 @@ namespace Project_1.GameObjects.Entities
                 RenderId,
                 Name,
                 Class,
-                RelationToPlayer,
+                RelationToPlayer.ToRelationToPlayerKind(),
                 RelationColor,
                 CurrentLevel,
                 CurrentHealth,
@@ -203,21 +203,21 @@ namespace Project_1.GameObjects.Entities
             unitData.GainExp(aExpAmount);
 
             if (!(this is Friendly)) return;
-            Mailboxes.Ui.Publish(new ExperienceRefreshed(RenderId, RelationToPlayer, CurrentLevel, Level.Experience));
+            Mailboxes.PublishUiEvent(new ExperienceRefreshed(RenderId, RelationToPlayer.ToRelationToPlayerKind(), CurrentLevel, Level.Experience));
         }
 
 
         protected void CreateNamePlate()
         {
             hasNamePlate = true;
-            Mailboxes.Ui.Publish(new NamePlateAdded(BuildUiSnapshot()));
+            Mailboxes.PublishUiEvent(new NamePlateAdded(BuildUiSnapshot()));
 
         }
 
         protected void RemoveNamePlate()
         {
             hasNamePlate = false;
-            Mailboxes.Ui.Publish(new NamePlateRemoved(RenderId));
+            Mailboxes.PublishUiEvent(new NamePlateRemoved(RenderId));
         }
 
         protected void FlagForRefresh() => namePlateRequiresUpdate = true;
@@ -225,7 +225,7 @@ namespace Project_1.GameObjects.Entities
         public virtual void RefreshPlates()
         {
             if (!namePlateRequiresUpdate) return;
-            Mailboxes.Ui.Publish(new PlateRefreshRequested(BuildUiSnapshot()));
+            Mailboxes.PublishUiEvent(new PlateRefreshRequested(BuildUiSnapshot()));
         }
 
         public Item EquipInParticularSlot(Items.SubTypes.Equipment aEquipment, Slot aSlot)
