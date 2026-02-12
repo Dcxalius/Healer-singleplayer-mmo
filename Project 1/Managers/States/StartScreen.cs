@@ -19,10 +19,13 @@ namespace Project_1.Managers.States
     {
         public override StateManager.States GetStateEnum => StateManager.States.StartScreen;
         MainMenu mainMenu;
+        readonly UiElementDrawList drawListA = new UiElementDrawList();
+        readonly UiElementDrawList drawListB = new UiElementDrawList();
         volatile UiElementDrawList drawList;
         public StartScreen() : base()
         {
             mainMenu = new MainMenu();
+            drawList = drawListA;
             BuildDrawList();
 
         }
@@ -88,7 +91,9 @@ namespace Project_1.Managers.States
 
         void BuildDrawList()
         {
-            drawList = new UiElementDrawList(new UIElement[] { mainMenu });
+            UiElementDrawList buildTarget = ReferenceEquals(drawList, drawListA) ? drawListB : drawListA;
+            buildTarget.SetSingle(mainMenu);
+            drawList = buildTarget;
             MarkUiDirty();
         }
 

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Managers;
 using GfxTexture = Project_1.Textures.Texture;
+using System;
 
 namespace Project_1.Tiles
 {
@@ -73,7 +74,10 @@ namespace Project_1.Tiles
             var minimapTexture = TileRenderCache.GetChunkMinimap(id);
             if (minimapTexture == null) return;
 
-            var drawPos = (new AbsoluteScreenPosition((position - origin).ToPoint()) / Tile.Size) + minimapOffset + minimapSize / 2;
+            int tileX = (int)MathF.Floor((position.X - origin.X) / Tile.Size.X);
+            int tileY = (int)MathF.Floor((position.Y - origin.Y) / Tile.Size.Y);
+            Point minimapCentre = (minimapOffset + minimapSize / 2).ToPoint();
+            var drawPos = new AbsoluteScreenPosition(minimapCentre + new Point(tileX, tileY));
             batch.Draw(minimapTexture, drawPos.ToVector2(), Color.White);
         }
     }

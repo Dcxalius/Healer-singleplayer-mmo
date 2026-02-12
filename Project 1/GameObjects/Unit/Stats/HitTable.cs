@@ -26,11 +26,14 @@ namespace Project_1.GameObjects.Unit.Stats
         }
 
         public static HitResult GenerateTable(Unit.Attack aAttack, Entity aAttacker, Entity aTarget)
+            => GenerateTable(aAttack, aAttacker, aTarget, true, true);
+
+        public static HitResult GenerateTable(Unit.Attack aAttack, Entity aAttacker, Entity aTarget, bool aApplyDualWieldPenalty, bool aAllowGlancing)
         {
             //TODO: https://github.com/magey/classic-warrior/issues/5
 
             double[] table = new double[Enum.GetNames<HitResult>().Length];
-            double dualWieldPenalty = aAttacker.IsDualWielding ? 0.19 : 0.0; //TODO: Ignore this if attacking with spell
+            double dualWieldPenalty = aApplyDualWieldPenalty && aAttacker.IsDualWielding ? 0.19 : 0.0;
             int attackerSkillGap = aAttacker.WeaponSkill.GetSkill(aAttack.WeaponType) - aTarget.DefenseSkill;
             int defenderSkillGap = aTarget.DefenseSkill - aAttacker.WeaponSkill.GetSkill(aAttack.WeaponType);
             int attackerSkillGapWithDefenseCapped = aAttacker.WeaponSkill.GetSkill(aAttack.WeaponType) - Math.Min(aTarget.DefenseSkill, aAttacker.CurrentLevel * 5);
@@ -61,7 +64,7 @@ namespace Project_1.GameObjects.Unit.Stats
             }
 
 
-            if (aAttacker.UnitType == UnitType.Player && aTarget.UnitType >= UnitType.Normal)
+            if (aAllowGlancing && aAttacker.UnitType == UnitType.Player && aTarget.UnitType >= UnitType.Normal)
                 table[(int)HitResult.Glancing] = 0.1 + (defenderSkillGapWithAttackCapped > 0 ? defenderSkillGapWithAttackCapped : 0 * 0.02);
             else
                 table[(int)HitResult.Glancing] = 0.0;
@@ -71,10 +74,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
             for (int i = 0; i < table.Length; i++)
             {
-                if (table[i] < 0)
-                {
-                    table[i] = 0;
-                }
+                table[i] = Math.Clamp(table[i], 0.0, 1.0);
             }
 
             //DebugManager.Print(FormatHitTable(table));

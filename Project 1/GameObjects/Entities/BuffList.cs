@@ -23,13 +23,12 @@ namespace Project_1.GameObjects.Entities
         {
             for (int i = buffs.Count - 1; i >= 0; i--)
             {
+                buffs[i].Update(aOwner);
                 if (buffs[i].IsOver)
                 {
                     buffs[i].OnRemoved(aOwner);
                     buffs.RemoveAt(i);
-                    continue;
                 }
-                buffs[i].Update(aOwner);
             }
         }
 

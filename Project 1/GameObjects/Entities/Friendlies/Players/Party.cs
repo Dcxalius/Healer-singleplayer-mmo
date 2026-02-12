@@ -31,18 +31,22 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public bool IsInCombat => party.Any(x => x.InCombat);
 
-        public WorldSpace[] GetPositions
+        public int CopyPositions(WorldSpace[] destination)
         {
-            get
+            Debug.Assert(destination != null);
+            if (destination == null || destination.Length == 0)
             {
-                WorldSpace[] pos = new WorldSpace[5];
-                pos[0] = owner.FeetPosition;
-                for (int i = 0; i < party.Count; i++)
-                {
-                    pos[i+1] = party[i].FeetPosition;
-                }
-                return pos;
+                return 0;
             }
+
+            int count = Math.Min(destination.Length, party.Count + 1);
+            destination[0] = owner.FeetPosition;
+            for (int i = 1; i < count; i++)
+            {
+                destination[i] = party[i - 1].FeetPosition;
+            }
+
+            return count;
         }
 
         public Party(Player aOwner)
@@ -68,7 +72,17 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public void ClearCommand()
         {
-            Mailboxes.PublishUiEvent(new PartyControlCleared(commands.Select(x => x.RenderId).ToArray()));
+            if (commands.Count > PartyControlCleared.MaxMembers)
+            {
+                Debug.Assert(false, $"Expected at most {PartyControlCleared.MaxMembers} command members but found {commands.Count}.");
+            }
+
+            int count = Math.Min(commands.Count, PartyControlCleared.MaxMembers);
+            int renderId0 = count > 0 ? commands[0].RenderId : 0;
+            int renderId1 = count > 1 ? commands[1].RenderId : 0;
+            int renderId2 = count > 2 ? commands[2].RenderId : 0;
+            int renderId3 = count > 3 ? commands[3].RenderId : 0;
+            Mailboxes.PublishUiEvent(new PartyControlCleared(count, renderId0, renderId1, renderId2, renderId3));
             commands.Clear();
         }
 

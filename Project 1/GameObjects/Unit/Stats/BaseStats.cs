@@ -113,6 +113,7 @@ namespace Project_1.GameObjects.Unit.Stats
         {
             health.Refresh(TotalPrimaryStats);
             resource.Refresh(TotalPrimaryStats);
+            owner.RefreshSecondaryStats();
             owner.Equipment.SetMeleeAttackPower = GetAttackPower(classData);
             fistAttack.AttackPower = GetAttackPower(classData);
 

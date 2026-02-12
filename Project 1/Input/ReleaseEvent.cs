@@ -16,19 +16,25 @@ namespace Project_1.Input
         RelativeScreenPosition releasePos;
 
         InputManager.ClickType buttonPressed;
-        protected override bool[] ModifiersHeld => modifierHeld;
-        bool[] modifierHeld;
+        protected override byte ModifiersMask => modifierMask;
+        byte modifierMask;
 
         UIElement creator;
 
         public ReleaseEvent(UIElement aCreator, AbsoluteScreenPosition aPos, InputManager.ClickType aButtonReleased, bool[] aModifiers) : this(aCreator, aPos.ToRelativeScreenPosition(), aButtonReleased, aModifiers) { }
+        public ReleaseEvent(UIElement aCreator, AbsoluteScreenPosition aPos, InputManager.ClickType aButtonReleased, byte modifiersMask) : this(aCreator, aPos.ToRelativeScreenPosition(), aButtonReleased, modifiersMask) { }
 
         public ReleaseEvent(UIElement aCreator, RelativeScreenPosition aClickPos, InputManager.ClickType aButtonReleased, bool[] aModifiers)
+            : this(aCreator, aClickPos, aButtonReleased, BuildModifiersMask(aModifiers))
+        {
+        }
+
+        public ReleaseEvent(UIElement aCreator, RelativeScreenPosition aClickPos, InputManager.ClickType aButtonReleased, byte modifiersMask)
         {
             releasePos = aClickPos;
 
             buttonPressed = aButtonReleased;
-            modifierHeld = aModifiers;
+            modifierMask = modifiersMask;
             creator = aCreator;
         }
     }

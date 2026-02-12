@@ -324,10 +324,26 @@ namespace Project_1.UI.HUD.Managers
             }
         }
 
-        public UIElement[] GetDrawList()
+        public int DrawListCount
+        {
+            get
+            {
+                AssertUiOrMainThread();
+                return plateBoxes?.Count ?? 0;
+            }
+        }
+
+        public int CopyDrawList(UIElement[] destination)
         {
             AssertUiOrMainThread();
-            return plateBoxes.ToArray();
+            if (destination == null || destination.Length == 0 || plateBoxes == null || plateBoxes.Count == 0) return 0;
+
+            int count = Math.Min(destination.Length, plateBoxes.Count);
+            for (int i = 0; i < count; i++)
+            {
+                destination[i] = plateBoxes[i];
+            }
+            return count;
         }
 
         static void AssertUiOrMainThread()

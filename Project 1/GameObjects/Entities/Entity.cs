@@ -90,10 +90,5 @@ namespace Project_1.GameObjects.Entities
             }
         }
        
-        public void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
-        {
-            ThreadAffinity.AssertMainThread();
-            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition((Position - aOrigin).ToPoint()) / (Tile.Size) + aMinimapOffset + aMinimapSize / 2 + new Point(0, 1), new Point(1)), MinimapColor);            
-        }
     }
 }

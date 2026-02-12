@@ -13,15 +13,21 @@ namespace Project_1.GameObjects.Unit.Stats
     {
         public SecondaryStats(UnitData aUnitData)
         {
-            if (aUnitData.ClassData.IsCaster)
-            {
-                spell = new Spell(aUnitData);
-            }
             attack = new Attack(aUnitData);
+            spell = aUnitData.ClassData.IsCaster
+                ? new Spell(aUnitData)
+                : new Spell(attack);
             defense = new Defense(aUnitData);
         }
 
-        public Attack Spell => attack;
+        public void Refresh(UnitData aUnitData)
+        {
+            attack.Refresh(aUnitData);
+            spell.Refresh(aUnitData);
+            defense.Refresh(aUnitData);
+        }
+
+        public Spell Spell => spell;
         Spell spell;
         public Defense Defense => defense;
         Defense defense;

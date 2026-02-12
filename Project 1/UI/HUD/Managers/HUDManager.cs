@@ -5,6 +5,7 @@ using Project_1.GameObjects.Spells;
 using Project_1.Input;
 using Project_1.Items;
 using Project_1.Managers;
+using Project_1.Managers.States;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
@@ -59,9 +60,17 @@ namespace Project_1.UI.HUD.Managers
         public static bool HudMoving => hudMoving;
         public static Action UiInvalidated;
         public static Action PlatesInvalidated;
-        static volatile UiDrawList uiDrawList;
-        static volatile PlateDrawList plateDrawList;
-        static volatile HudMoveDrawList hudMoveDrawList;
+        static readonly UiDrawList uiDrawListA = new UiDrawList();
+        static readonly UiDrawList uiDrawListB = new UiDrawList();
+        static volatile UiDrawList uiDrawList = uiDrawListA;
+        static readonly PlateDrawList plateDrawListA = new PlateDrawList();
+        static readonly PlateDrawList plateDrawListB = new PlateDrawList();
+        static volatile PlateDrawList plateDrawList = plateDrawListA;
+        static readonly HudMoveDrawList hudMoveDrawListA = new HudMoveDrawList();
+        static readonly HudMoveDrawList hudMoveDrawListB = new HudMoveDrawList();
+        static volatile HudMoveDrawList hudMoveDrawList = hudMoveDrawListA;
+        static NamePlate[] plateNameScratch = Array.Empty<NamePlate>();
+        static UIElement[] plateBoxScratch = Array.Empty<UIElement>();
         static bool uiDrawListDirty = true;
         static bool plateDrawListDirty = true;
         static bool hudMoveDrawListDirty = true;
@@ -265,7 +274,10 @@ namespace Project_1.UI.HUD.Managers
             Mailboxes.Ui.Subscribe<DescriptorBoxClear>(_ => ClearDescriptorBox());
             Mailboxes.Ui.Subscribe<PartyControlCleared>(e =>
             {
-                plateBoxHandler.RemoveWalkerFromControl(e.MemberRenderIds);
+                for (int i = 0; i < e.MemberCount; i++)
+                {
+                    plateBoxHandler.RemoveWalkerFromControl(e.GetMemberRenderId(i));
+                }
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<PartyWalkerAdded>(e =>
@@ -275,7 +287,7 @@ namespace Project_1.UI.HUD.Managers
             });
             Mailboxes.Ui.Subscribe<PartyWalkerRemoved>(e =>
             {
-                plateBoxHandler.RemoveWalkerFromControl(new[] { e.MemberRenderId });
+                plateBoxHandler.RemoveWalkerFromControl(e.MemberRenderId);
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<PartyMemberAdded>(e =>
@@ -391,6 +403,7 @@ namespace Project_1.UI.HUD.Managers
         public static void Update()
         {
             AssertUiThreadOrMainFallback();
+            long interactionVersionBefore = UIElement.InteractionVersion;
             namePlateHandler.Update();
             plateBoxHandler.Update();
 
@@ -402,6 +415,12 @@ namespace Project_1.UI.HUD.Managers
             for (int i = 0; i < dialogueBoxes.Count; i++)
             {
                 dialogueBoxes[i].Update();
+            }
+
+            if ((StateManager.CurrentState == StateManager.States.Game || StateManager.CurrentState == StateManager.States.MoveHUD)
+                && UIElement.InteractionVersion != interactionVersionBefore)
+            {
+                InvalidateUi();
             }
 
             BuildDrawLists();
@@ -757,23 +776,56 @@ namespace Project_1.UI.HUD.Managers
         internal static void BuildDrawLists()
         {
             AssertUiOrMainThread();
+            int namePlateCount = 0;
+            int plateBoxCount = 0;
+            if (plateDrawListDirty || hudMoveDrawListDirty)
+            {
+                namePlateCount = namePlateHandler.DrawListCount;
+                EnsureNamePlateScratchCapacity(namePlateCount);
+                namePlateCount = namePlateHandler.CopyDrawList(plateNameScratch);
+
+                plateBoxCount = plateBoxHandler.DrawListCount;
+                EnsurePlateBoxScratchCapacity(plateBoxCount);
+                plateBoxCount = plateBoxHandler.CopyDrawList(plateBoxScratch);
+            }
+
             if (uiDrawListDirty)
             {
-                uiDrawList = new UiDrawList(hudElements.ToArray(), dialogueBoxes.ToArray(), descriptorBox, heldItem, heldSpell);
+                UiDrawList buildTarget = ReferenceEquals(uiDrawList, uiDrawListA) ? uiDrawListB : uiDrawListA;
+                buildTarget.Set(hudElements, dialogueBoxes, descriptorBox, heldItem, heldSpell);
+                uiDrawList = buildTarget;
                 uiDrawListDirty = false;
             }
 
             if (plateDrawListDirty)
             {
-                plateDrawList = new PlateDrawList(namePlateHandler.GetDrawList(), plateBoxHandler.GetDrawList());
+                PlateDrawList buildTarget = ReferenceEquals(plateDrawList, plateDrawListA) ? plateDrawListB : plateDrawListA;
+                buildTarget.Set(plateNameScratch, namePlateCount, plateBoxScratch, plateBoxCount);
+                plateDrawList = buildTarget;
                 plateDrawListDirty = false;
             }
 
             if (hudMoveDrawListDirty)
             {
-                hudMoveDrawList = new HudMoveDrawList(plateBoxHandler.GetDrawList(), hudElements.ToArray(), dialogueBoxes.ToArray(), sizeChanger);
+                HudMoveDrawList buildTarget = ReferenceEquals(hudMoveDrawList, hudMoveDrawListA) ? hudMoveDrawListB : hudMoveDrawListA;
+                buildTarget.Set(plateBoxScratch, plateBoxCount, hudElements, dialogueBoxes, sizeChanger);
+                hudMoveDrawList = buildTarget;
                 hudMoveDrawListDirty = false;
             }
+        }
+
+        static void EnsureNamePlateScratchCapacity(int count)
+        {
+            if (count <= plateNameScratch.Length) return;
+            int capacity = Math.Max(count, Math.Max(8, plateNameScratch.Length * 2));
+            plateNameScratch = new NamePlate[capacity];
+        }
+
+        static void EnsurePlateBoxScratchCapacity(int count)
+        {
+            if (count <= plateBoxScratch.Length) return;
+            int capacity = Math.Max(count, Math.Max(8, plateBoxScratch.Length * 2));
+            plateBoxScratch = new UIElement[capacity];
         }
 
 

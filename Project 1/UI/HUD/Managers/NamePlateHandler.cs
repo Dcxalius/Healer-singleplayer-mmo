@@ -14,6 +14,9 @@ namespace Project_1.UI.HUD.Managers
     internal class NamePlateHandler
     {
         Dictionary<int, NamePlate> namePlates = new Dictionary<int, NamePlate>();
+        readonly List<NamePlate> namePlateScratch = new List<NamePlate>();
+        readonly List<(int, int)> collisionIndexScratch = new List<(int, int)>();
+        readonly List<Rectangle> collisionRectScratch = new List<Rectangle>();
 
         public void AddNamePlate(in EntityUiSnapshot snapshot)
         {
@@ -50,47 +53,48 @@ namespace Project_1.UI.HUD.Managers
                 namePlate.Value.Update();
             }
 
+            namePlateScratch.Clear();
+            foreach (NamePlate plate in namePlates.Values)
+            {
+                namePlateScratch.Add(plate);
+            }
+
+            if (namePlateScratch.Count < 2) return;
+
             int maxPasses = 50;
             int passes = 0;
-            List<Rectangle> collisonRects = new List<Rectangle>();
             do
             {
                 passes++;
-                List<NamePlate> namePlates = this.namePlates.Values.ToList();
+                collisionIndexScratch.Clear();
+                collisionRectScratch.Clear();
 
-
-                List<(int, int)> collisionIndexes = new List<(int, int)>();
-                collisonRects.Clear();
-
-                for (int i = 0; i < namePlates.Count; i++)
+                for (int i = 0; i < namePlateScratch.Count; i++)
                 {
-                    for (int j = 0; j < namePlates.Count; j++)
+                    for (int j = i + 1; j < namePlateScratch.Count; j++)
                     {
-                        if (i == j) continue;
-                        if (collisionIndexes.Contains((j, i))) continue;
-
-                        Rectangle r = Rectangle.Intersect(namePlates[i].AbsolutePos, namePlates[j].AbsolutePos);
-                        //Debug.Assert(namePlates[i].AbsolutePos != namePlates[j].AbsolutePos);
-                        if (namePlates[i].AbsolutePos == namePlates[j].AbsolutePos)
+                        Rectangle r = Rectangle.Intersect(namePlateScratch[i].AbsolutePos, namePlateScratch[j].AbsolutePos);
+                        if (namePlateScratch[i].AbsolutePos == namePlateScratch[j].AbsolutePos)
                         {
-                            namePlates[i].Bump(new AbsoluteScreenPosition(0, -1 - (int)RandomManager.RollDouble() * 3));
-                            r = Rectangle.Intersect(namePlates[i].AbsolutePos, namePlates[j].AbsolutePos);
+                            namePlateScratch[i].Bump(new AbsoluteScreenPosition(0, -1 - (int)RandomManager.RollDouble() * 3));
+                            r = Rectangle.Intersect(namePlateScratch[i].AbsolutePos, namePlateScratch[j].AbsolutePos);
                         }
                         if (r.Size.X != 0 && r.Size.Y != 0)
                         {
-                            collisionIndexes.Add((i, j));
-                            collisonRects.Add(r);
+                            collisionIndexScratch.Add((i, j));
+                            collisionRectScratch.Add(r);
                         }
                     }
                 }
 
-                for (int i = 0; i < collisonRects.Count; i++)
+                for (int i = 0; i < collisionRectScratch.Count; i++)
                 {
-                    UpdateSingleNamePlate(namePlates[collisionIndexes[i].Item1], collisonRects[i]);
-                    UpdateSingleNamePlate(namePlates[collisionIndexes[i].Item2], collisonRects[i]);
+                    (int first, int second) = collisionIndexScratch[i];
+                    UpdateSingleNamePlate(namePlateScratch[first], collisionRectScratch[i]);
+                    UpdateSingleNamePlate(namePlateScratch[second], collisionRectScratch[i]);
                 }
             }
-            while (collisonRects.Count > 0 && passes < maxPasses);
+            while (collisionRectScratch.Count > 0 && passes < maxPasses);
 
             //DebugManager.Print("Passes of nameplatedupdate was: " + passes);
         }
@@ -127,10 +131,28 @@ namespace Project_1.UI.HUD.Managers
             }
         }
 
-        public NamePlate[] GetDrawList()
+        public int DrawListCount
+        {
+            get
+            {
+                AssertUiOrMainThread();
+                return namePlates.Count;
+            }
+        }
+
+        public int CopyDrawList(NamePlate[] destination)
         {
             AssertUiOrMainThread();
-            return namePlates.Values.ToArray();
+            if (destination == null || destination.Length == 0) return 0;
+
+            int max = Math.Min(destination.Length, namePlates.Count);
+            int i = 0;
+            foreach (NamePlate plate in namePlates.Values)
+            {
+                if (i >= max) break;
+                destination[i++] = plate;
+            }
+            return i;
         }
 
         static void AssertUiOrMainThread()

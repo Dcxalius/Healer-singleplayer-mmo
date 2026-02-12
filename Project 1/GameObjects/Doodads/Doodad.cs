@@ -39,7 +39,7 @@ namespace Project_1.GameObjects.Doodads
                 FeetPosition.Y,
                 Size,
                 gfx.BuildRenderSnapshot(),
-                BuildEffectSnapshot(),
+                BuildEffectSnapshotBatch(),
                 true,
                 Color.Black);
         }

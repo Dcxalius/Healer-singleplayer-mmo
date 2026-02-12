@@ -55,9 +55,10 @@ namespace Project_1.GameObjects.Entities.Projectiles
             }
         }
 
-        public static void Draw(SpriteBatch aBatch)
+        internal static void DrawSnapshots(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();
+            // Snapshot-only draw path. Do not read live sim projectile list here.
             renderProjectiles.ApplyUpdates();
             foreach (WorldObjectRenderSnapshot snapshot in renderProjectiles.Values)
             {

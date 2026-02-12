@@ -18,12 +18,15 @@ namespace Project_1.Managers.States
     {
         LoadingBox loadingBox;
         private RasterizerState rasterizerState;
+        readonly UiElementDrawList drawListA = new UiElementDrawList();
+        readonly UiElementDrawList drawListB = new UiElementDrawList();
         volatile UiElementDrawList drawList;
 
         public LoadingMenu() : base()
         {
             loadingBox = new LoadingBox(new Camera.RelativeScreenPosition(0.05f, 0.05f), new Camera.RelativeScreenPosition(0.9f, 0.9f));
             rasterizerState = new RasterizerState() { ScissorTestEnable = true };
+            drawList = drawListA;
 
         }
 
@@ -75,21 +78,27 @@ namespace Project_1.Managers.States
         internal void UiOnEnter()
         {
             loadingBox.Setup(SaveManager.Saves);
-            drawList = new UiElementDrawList(new UIElement[] { loadingBox });
+            UiElementDrawList buildTarget = ReferenceEquals(drawList, drawListA) ? drawListB : drawListA;
+            buildTarget.SetSingle(loadingBox);
+            drawList = buildTarget;
             MarkUiDirty();
         }
 
         internal void UiOnLeave()
         {
             loadingBox.Reset();
-            drawList = null;
+            UiElementDrawList buildTarget = ReferenceEquals(drawList, drawListA) ? drawListB : drawListA;
+            buildTarget.SetSingle(null);
+            drawList = buildTarget;
             MarkUiDirty();
         }
 
         internal void UiRescale()
         {
             loadingBox?.Rescale();
-            drawList = new UiElementDrawList(new UIElement[] { loadingBox });
+            UiElementDrawList buildTarget = ReferenceEquals(drawList, drawListA) ? drawListB : drawListA;
+            buildTarget.SetSingle(loadingBox);
+            drawList = buildTarget;
             MarkUiDirty();
         }
     }

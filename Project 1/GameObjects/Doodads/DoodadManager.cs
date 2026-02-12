@@ -67,9 +67,10 @@ namespace Project_1.GameObjects.Doodads
             return false;
         }
 
-        public static void Draw(SpriteBatch aBatch)
+        internal static void DrawSnapshots(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();
+            // Snapshot-only draw path. Do not read live sim doodad list here.
             renderDoodads.ApplyUpdates();
             foreach (WorldObjectRenderSnapshot snapshot in renderDoodads.Values)
             {

@@ -24,6 +24,23 @@ namespace Project_1.Camera
 
     internal static class Camera
     {
+        sealed class CameraRenderSnapshot
+        {
+            public CameraRenderSnapshot(WorldSpace centreInWorldSpace, AbsoluteScreenPosition windowSize, float scale, Rectangle worldRectangle, AbsoluteScreenPosition centrePointInScreenSpace)
+            {
+                CentreInWorldSpace = centreInWorldSpace;
+                WindowSize = windowSize;
+                Scale = scale;
+                WorldRectangle = worldRectangle;
+                CentrePointInScreenSpace = centrePointInScreenSpace;
+            }
+
+            public WorldSpace CentreInWorldSpace { get; }
+            public AbsoluteScreenPosition WindowSize { get; }
+            public float Scale { get; }
+            public Rectangle WorldRectangle { get; }
+            public AbsoluteScreenPosition CentrePointInScreenSpace { get; }
+        }
 
         public static Rectangle ScreenRectangle { get => new Rectangle(Point.Zero, WindowSize.ToPoint()); }
 
@@ -43,19 +60,37 @@ namespace Project_1.Camera
             set => cameraSettings.Fullscreen = value;
         }
 
-        public static Rectangle WorldRectangle { get => new Rectangle(cameraMover.CentreInWorldSpace.ToPoint() - (CentrePointInScreenSpace / Scale).ToPoint(), (WindowSize / Scale).ToPoint()); }
+        public static Rectangle WorldRectangle
+        {
+            get
+            {
+                if (OnSimulationOwnerThread) return BuildLiveWorldRectangle();
+                return GetRenderSnapshotForRead().WorldRectangle;
+            }
+        }
 
-        public static AbsoluteScreenPosition CentrePointInScreenSpace { get => WindowSize / 2; }
+        public static AbsoluteScreenPosition CentrePointInScreenSpace
+        {
+            get
+            {
+                if (OnSimulationOwnerThread) return BuildLiveCentrePointInScreenSpace();
+                return GetRenderSnapshotForRead().CentrePointInScreenSpace;
+            }
+        }
 
         public readonly static Point devScreenBorder = new Point(1500, 900);
         public static AbsoluteScreenPosition WindowSize
         {
-            get => new AbsoluteScreenPosition(cameraSettings.WindowSize);
+            get
+            {
+                if (OnSimulationOwnerThread) return BuildLiveWindowSize();
+                return GetRenderSnapshotForRead().WindowSize;
+            }
             set => cameraSettings.WindowSize = new AbsoluteScreenPosition(value);
         }
         public static Point WindowSizeAsPoint
         {
-            get => cameraSettings.WindowSize;
+            get => WindowSize.ToPoint();
             set => cameraSettings.WindowSize = value;
         }
 
@@ -70,6 +105,9 @@ namespace Project_1.Camera
         static bool initialized;
         static Rectangle minimapWorldRectangle;
         static volatile bool minimapWorldRectangleValid;
+        static volatile CameraRenderSnapshot renderSnapshot;
+
+        static bool OnSimulationOwnerThread => ThreadAffinity.IsSimThread || (!SimThread.IsRunning && ThreadAffinity.IsMainThread);
 
         public static void Init()
         {
@@ -80,18 +118,20 @@ namespace Project_1.Camera
             ImportSettings();
             cameraMover = new CameraMover();
             cameraSettings.SetCamera();
+            PublishRenderSnapshot();
         }
 
         public static void Update()
         {
             ThreadAffinity.AssertSimThread();
             cameraMover.Move();
+            PublishRenderSnapshot();
         }
 
         internal static void BuildMinimapSnapshot()
         {
             ThreadAffinity.AssertSimThread();
-            minimapWorldRectangle = WorldRectangle;
+            minimapWorldRectangle = BuildLiveWorldRectangle();
             minimapWorldRectangleValid = true;
         }
 
@@ -135,20 +175,46 @@ namespace Project_1.Camera
             string json = File.ReadAllText(aSave.CameraPosition);
             WorldSpace ws = SaveManager.ImportData<WorldSpace>(json);
             cameraMover.CentreInWorldSpace = ws;
+            PublishRenderSnapshot();
             //TODO: Ponder if the bound object should also be saved
         }
         #endregion
 
         #region Zoom
-        public static float Scale { get => scale; }
-        public static float Zoom { get => 1f / scale; }
-        public static WorldSpace CentreInWorldSpace { get => cameraMover.CentreInWorldSpace; internal set => cameraMover.CentreInWorldSpace = value; }
+        public static float Scale
+        {
+            get
+            {
+                if (OnSimulationOwnerThread) return scale;
+                return GetRenderSnapshotForRead().Scale;
+            }
+        }
+        public static float Zoom { get => 1f / Scale; }
+        public static WorldSpace CentreInWorldSpace
+        {
+            get
+            {
+                if (OnSimulationOwnerThread) return cameraMover.CentreInWorldSpace;
+                return GetRenderSnapshotForRead().CentreInWorldSpace;
+            }
+            internal set
+            {
+                ThreadAffinity.AssertSimThread();
+                cameraMover.CentreInWorldSpace = value;
+                PublishRenderSnapshot();
+            }
+        }
 
         internal static void Scroll(ScrollEvent aScrollEvent)
         {
             ThreadAffinity.AssertSimThread();
+            float before = scale;
             ZoomIn(aScrollEvent);
             ZoomOut(aScrollEvent);
+            if (Math.Abs(before - scale) > float.Epsilon)
+            {
+                PublishRenderSnapshot();
+            }
         }
 
         static void ZoomIn(ScrollEvent aScrollEvent)
@@ -188,15 +254,16 @@ namespace Project_1.Camera
             maxScale = scale + 0.4f;
             cameraMover.bindingRectangle = new Rectangle(new Point(0), new Point(aSize.X / 4 * 3, aSize.Y / 4 * 3));
             cameraMover.maxCircleCameraMove = aSize.Y / 3;
-
+            PublishRenderSnapshot();
 
         }
 
 
         public static Rectangle WorldRectToScreenRect(Rectangle aWorldPos)
         {
-            Point topLeft = (cameraMover.CentreInWorldSpace * scale - WindowSize.ToVector2() / 2).ToPoint();
-            Rectangle cameraPos = new Rectangle((aWorldPos.Location.ToVector2() * scale).ToPoint() - topLeft, (aWorldPos.Size.ToVector2() * scale).ToPoint());
+            CameraRenderSnapshot snapshot = GetRenderSnapshotForRead();
+            Point topLeft = (snapshot.CentreInWorldSpace * snapshot.Scale - snapshot.WindowSize.ToVector2() / 2).ToPoint();
+            Rectangle cameraPos = new Rectangle((aWorldPos.Location.ToVector2() * snapshot.Scale).ToPoint() - topLeft, (aWorldPos.Size.ToVector2() * snapshot.Scale).ToPoint());
             return cameraPos;
         }
 
@@ -213,11 +280,69 @@ namespace Project_1.Camera
         {
             ThreadAffinity.AssertMainThread();
             if (!TryGetMinimapWorldRectangle(out Rectangle worldRect)) return;
-            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition(worldRect.Location - aOrigin.ToPoint()) / (Tile.Size) + aMinimapOffset + aMinimapSize / 2, new Point(1, worldRect.Size.Y / Tile.Size.Y)), Color.White);
-            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition(worldRect.Location - aOrigin.ToPoint()) / (Tile.Size) + aMinimapOffset + aMinimapSize / 2, new Point(worldRect.Size.X / Tile.Size.X, 1)), Color.White);
-            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition(worldRect.Location + new Point(worldRect.Size.X, 0) - aOrigin.ToPoint()) / (Tile.Size) + aMinimapOffset + aMinimapSize / 2 - new Point(1,0), new Point(1, worldRect.Size.Y / Tile.Size.Y)), Color.White);
-            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(new AbsoluteScreenPosition(worldRect.Location + new Point(0, worldRect.Size.Y)- aOrigin.ToPoint()) / (Tile.Size) + aMinimapOffset + aMinimapSize / 2, new Point(worldRect.Size.X / Tile.Size.X, 1)), Color.White);
+            int minX = (int)MathF.Floor((worldRect.Left - aOrigin.X) / Tile.Size.X);
+            int minY = (int)MathF.Floor((worldRect.Top - aOrigin.Y) / Tile.Size.Y);
+            int width = Math.Max(1, (int)MathF.Ceiling(worldRect.Width / (float)Tile.Size.X));
+            int height = Math.Max(1, (int)MathF.Ceiling(worldRect.Height / (float)Tile.Size.Y));
 
+            Point minimapCentre = (aMinimapOffset + aMinimapSize / 2).ToPoint();
+            Point topLeft = minimapCentre + new Point(minX, minY);
+            Point topRight = new Point(topLeft.X + width - 1, topLeft.Y);
+            Point bottomLeft = new Point(topLeft.X, topLeft.Y + height - 1);
+
+            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(topLeft, new Point(1, height)), Color.White);
+            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(topLeft, new Point(width, 1)), Color.White);
+            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(topRight, new Point(1, height)), Color.White);
+            UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(bottomLeft, new Point(width, 1)), Color.White);
+
+        }
+
+        static AbsoluteScreenPosition BuildLiveWindowSize()
+        {
+            return cameraSettings == null ? AbsoluteScreenPosition.Zero : new AbsoluteScreenPosition(cameraSettings.WindowSize);
+        }
+
+        static AbsoluteScreenPosition BuildLiveCentrePointInScreenSpace()
+        {
+            return BuildLiveWindowSize() / 2f;
+        }
+
+        static Rectangle BuildLiveWorldRectangle()
+        {
+            AbsoluteScreenPosition windowSize = BuildLiveWindowSize();
+            AbsoluteScreenPosition centrePoint = windowSize / 2f;
+            float safeScale = Math.Abs(scale) < float.Epsilon ? 1f : scale;
+            WorldSpace centre = cameraMover == null ? WorldSpace.Zero : cameraMover.CentreInWorldSpace;
+            return new Rectangle(centre.ToPoint() - (centrePoint / safeScale).ToPoint(), (windowSize / safeScale).ToPoint());
+        }
+
+        static CameraRenderSnapshot BuildRenderSnapshotFromLive()
+        {
+            AbsoluteScreenPosition windowSize = BuildLiveWindowSize();
+            AbsoluteScreenPosition centrePoint = windowSize / 2f;
+            float safeScale = Math.Abs(scale) < float.Epsilon ? 1f : scale;
+            WorldSpace centre = cameraMover == null ? WorldSpace.Zero : cameraMover.CentreInWorldSpace;
+            Rectangle worldRect = new Rectangle(centre.ToPoint() - (centrePoint / safeScale).ToPoint(), (windowSize / safeScale).ToPoint());
+            return new CameraRenderSnapshot(centre, windowSize, safeScale, worldRect, centrePoint);
+        }
+
+        static void PublishRenderSnapshot()
+        {
+            renderSnapshot = BuildRenderSnapshotFromLive();
+        }
+
+        static CameraRenderSnapshot GetRenderSnapshotForRead()
+        {
+            if (OnSimulationOwnerThread)
+            {
+                return BuildRenderSnapshotFromLive();
+            }
+
+            CameraRenderSnapshot snapshot = renderSnapshot;
+            if (snapshot != null) return snapshot;
+
+            // Safety fallback during startup / before first publish.
+            return BuildRenderSnapshotFromLive();
         }
     }
 }

@@ -25,6 +25,14 @@ namespace Project_1.UI.UIElements
         static int nextUiElementId;
         static readonly object uiElementRegistryLock = new object();
         static readonly Dictionary<int, WeakReference<UIElement>> uiElementRegistry = new Dictionary<int, WeakReference<UIElement>>();
+        static long interactionVersion;
+
+        public static long InteractionVersion => Volatile.Read(ref interactionVersion);
+
+        static void TouchInteraction()
+        {
+            Interlocked.Increment(ref interactionVersion);
+        }
 
         public int UiElementId { get; }
 
@@ -55,11 +63,13 @@ namespace Project_1.UI.UIElements
 
             set
             {
+                if (visible == value) return;
                 visible = value;
                 for (int i = 0; i < children.Count; i++)
                 {
                     children[i].Visible = value;
                 }
+                TouchInteraction();
             }
         }
 
@@ -318,20 +328,30 @@ namespace Project_1.UI.UIElements
 
         public void SetHudMoveable(bool aSet)
         {
+            if (hudMoving == aSet) return;
             hudMoving = aSet;
+            if (!hudMoveable) return;
             if (hudMoving)
             {
                 oldPosition = RelativePos;
             }
+            TouchInteraction();
         }
 
         public void ResetHudMoveable()
         {
+            if (!hudMoving) return;
             hudMoving = false;
+            if (!hudMoveable) return;
             Move(oldPosition);
+            TouchInteraction();
         }
 
-        public virtual void ToggleVisibilty() => Visible = !visible;
+        public virtual void ToggleVisibilty()
+        {
+            Visible = !visible;
+            TouchInteraction();
+        }
 
         public virtual void Rescale()
         {
@@ -348,8 +368,14 @@ namespace Project_1.UI.UIElements
         public void Move(RelativeScreenPosition aNewPos)
         {
             aNewPos.Assert();
+            RelativeScreenPosition oldPos = relativePos;
+            if (oldPos == aNewPos) return;
             relativePos = aNewPos;
             MoveBoundsCheck();
+            if (relativePos != oldPos)
+            {
+                TouchInteraction();
+            }
         }
 
         public void Bump(AbsoluteScreenPosition aAmount)
@@ -458,7 +484,9 @@ namespace Project_1.UI.UIElements
         public virtual void Resize(RelativeScreenPosition aSize)
         {
             aSize.Assert();
+            if (relativeSize == aSize) return;
             relativeSize = aSize;
+            TouchInteraction();
         }
 
         public virtual void Resize(AbsoluteScreenPosition aSize) => Resize(aSize.ToRelativeScreenPosition(ParentSize));
@@ -526,11 +554,16 @@ namespace Project_1.UI.UIElements
         public virtual void ClickedOnAndReleasedOnMe()
         {
             heldEvents = null;
+            TouchInteraction();
             if (parent != null || !hudMoveable || !hudMoving) return;
             Mailboxes.PublishUiEvent(new HudSizeChangerSet(UiElementId));
         }
 
-        protected virtual void HoldReleaseAwayFromMe() => heldEvents = null;
+        protected virtual void HoldReleaseAwayFromMe()
+        {
+            heldEvents = null;
+            TouchInteraction();
+        }
         #endregion
 
         #region Hover
@@ -541,6 +574,7 @@ namespace Project_1.UI.UIElements
             {
                 isHovered = true;
                 OnHover();
+                TouchInteraction();
                 return;
             }
 
@@ -548,6 +582,7 @@ namespace Project_1.UI.UIElements
             {
                 isHovered = false;
                 OnDeHover();
+                TouchInteraction();
                 return;
             }
         }
@@ -601,6 +636,7 @@ namespace Project_1.UI.UIElements
         {
             if (!visible && !(hudMoveable && hudMoving)) return;
             heldEvents = new HoldEvent(aClick, this);
+            TouchInteraction();
 
             //DebugManager.Print("Clicked on " + pos);
         }

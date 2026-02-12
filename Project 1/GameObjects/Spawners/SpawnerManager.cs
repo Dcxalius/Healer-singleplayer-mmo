@@ -291,7 +291,7 @@ namespace Project_1.GameObjects.Spawners
             return false;
         }
 
-        public static void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
+        internal static void DrawMinimapSnapshots(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
         {
             ThreadAffinity.AssertMainThread();
             renderSpawnZones.ApplyUpdates();
@@ -310,9 +310,10 @@ namespace Project_1.GameObjects.Spawners
             }
         }
 
-        internal static void Draw(SpriteBatch aBatch)
+        internal static void DrawSnapshots(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();
+            // Snapshot-only draw path. Do not read live sim spawn-zone state here.
             renderSpawnZones.ApplyUpdates();
             foreach (SpawnZoneRenderSnapshot snapshot in renderSpawnZones.Values)
             {

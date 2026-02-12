@@ -49,6 +49,9 @@ namespace Project_1.Items.SubTypes
         [JsonIgnore]
         public HandRequirement handRequirement = HandRequirement.OneHand;
 
+        [JsonIgnore]
+        public string TooltipWeaponCategoryLine => $"{GetHandRequirementDisplayName(type)} {GetWeaponTypeDisplayName(WeaponData.WeaponType)}";
+
 
         [JsonConstructor]
         Weapon(int id, int hash) : this(ItemFactory.GetItemData<WeaponData>(id), hash) { }
@@ -63,6 +66,38 @@ namespace Project_1.Items.SubTypes
 
         public Weapon(WeaponData aData, int hash) : base(aData, hash)
         {
+        }
+
+        static string GetHandRequirementDisplayName(Equipment.Type aSlotType)
+        {
+            return aSlotType switch
+            {
+                Equipment.Type.TwoHander => "Two-handed",
+                Equipment.Type.MainHander => "Main-hand",
+                Equipment.Type.OffHander => "Off-hand",
+                Equipment.Type.Ranged => "Ranged",
+                _ => "One-handed"
+            };
+        }
+
+        static string GetWeaponTypeDisplayName(WeaponType aWeaponType)
+        {
+            return aWeaponType switch
+            {
+                WeaponType.Dagger => "Dagger",
+                WeaponType.Sword or WeaponType.TwoHandedSword => "Sword",
+                WeaponType.Axe or WeaponType.TwoHandedAxe => "Axe",
+                WeaponType.Mace or WeaponType.TwoHandedMace => "Mace",
+                WeaponType.Fist => "Fist Weapon",
+                WeaponType.Staff => "Staff",
+                WeaponType.Bow => "Bow",
+                WeaponType.Gun => "Gun",
+                WeaponType.Thrown => "Thrown",
+                WeaponType.Wand => "Wand",
+                WeaponType.Shield => "Shield",
+                WeaponType.Holdable => "Held Item",
+                _ => "Weapon"
+            };
         }
     }
 }

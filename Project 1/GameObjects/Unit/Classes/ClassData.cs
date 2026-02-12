@@ -146,7 +146,7 @@ namespace Project_1.GameObjects.Unit.Classes
         [JsonConstructor]
         public ClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float baseHpPer5,
             float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed, MeleeAttackPowerBonus meleeAttackPowerBonus, float dodgeScaling, float baseDodge, float meleeCritScaling,
-            Weapon.WeaponType weaponsAllowed, bool canDualWield, bool isCaster, bool canParry)
+            Weapon.WeaponType weaponsAllowed, bool canDualWield, bool isCaster, bool canParry, float spellCritScaling)
         {
             this.name = name;
             this.resource = resource;
@@ -163,6 +163,7 @@ namespace Project_1.GameObjects.Unit.Classes
             this.dodgeScaling = dodgeScaling == 0 ? 0.01f / 20f : dodgeScaling;
             this.baseDodge = baseDodge;
             this.attackCritChanceScaler = meleeCritScaling;
+            this.spellCritChanceScaler = spellCritScaling;
             this.weaponsAllowed = weaponsAllowed;
             this.canDualWield = canDualWield;
             this.isCaster = isCaster;

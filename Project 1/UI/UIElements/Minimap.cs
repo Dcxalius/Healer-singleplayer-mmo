@@ -37,26 +37,33 @@ namespace Project_1.UI.UIElements
             base.Draw(aBatch);
             GraphicsManager.CaptureScissor(this, AbsolutePos);
 
-            if (!MinimapSnapshotManager.TryGetOrigin(out WorldSpace ws))
+            if (!MinimapSnapshotManager.TryGetSnapshot(out MinimapDotSnapshot[] dots, out int dotCount, out WorldSpace ws))
             {
                 GraphicsManager.ReleaseScissor(this);
                 return;
             }
-            TileManager.MinimapDraw(aBatch, ws, Location, Size);
+            TileManager.DrawMinimapSnapshots(aBatch, ws, Location, Size);
             Camera.Camera.MinimapDraw(aBatch, ws, Location, Size);
-            DrawEntities(aBatch, ws);
+            DrawEntities(aBatch, dots, dotCount, ws);
             GraphicsManager.ReleaseScissor(this);
 
         }
 
-        void DrawEntities(SpriteBatch aBatch, WorldSpace origin)
+        void DrawEntities(SpriteBatch aBatch, MinimapDotSnapshot[] dots, int dotCount, WorldSpace origin)
         {
-            MinimapDotSnapshot[] dots = MinimapSnapshotManager.Snapshot;
-            for (int i = 0; i < dots.Length; i++)
+            Point minimapCentre = (Location + Size / 2).ToPoint();
+            for (int i = 0; i < dotCount; i++)
             {
                 MinimapDotSnapshot dot = dots[i];
+                if (dot.IsPlayer)
+                {
+                    minimapDot.Draw(aBatch, new Rectangle(minimapCentre + new Point(0, 1), new Point(1)), dot.Color);
+                    continue;
+                }
+                int tileX = (int)MathF.Floor((dot.Position.X - origin.X) / Tile.Size.X);
+                int tileY = (int)MathF.Floor((dot.Position.Y - origin.Y) / Tile.Size.Y);
                 minimapDot.Draw(aBatch,
-                    new Rectangle(new AbsoluteScreenPosition((dot.Position - origin).ToPoint()) / (Tile.Size) + Location + Size / 2 + new Point(0, 1), new Point(1)),
+                    new Rectangle(minimapCentre + new Point(tileX, tileY + 1), new Point(1)),
                     dot.Color);
             }
         }

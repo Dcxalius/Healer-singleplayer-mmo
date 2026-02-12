@@ -36,18 +36,24 @@ namespace Project_1.Input
         public bool Down => direction == Direction.Down;
         Direction direction;
 
-        protected override bool[] ModifiersHeld => modifierHeld;
-        bool[] modifierHeld;
+        protected override byte ModifiersMask => modifierMask;
+        byte modifierMask;
 
 
         public ScrollEvent(AbsoluteScreenPosition aPos, int aSteps, Direction aDirection, bool[] aModifiers) : this(aPos.ToRelativeScreenPosition(), aSteps, aDirection, aModifiers) { }
+        public ScrollEvent(AbsoluteScreenPosition aPos, int aSteps, Direction aDirection, byte modifiersMask) : this(aPos.ToRelativeScreenPosition(), aSteps, aDirection, modifiersMask) { }
 
         public ScrollEvent(RelativeScreenPosition aPos, int aSteps, Direction aDirection, bool[] aModifiers)
+            : this(aPos, aSteps, aDirection, BuildModifiersMask(aModifiers))
+        {
+        }
+
+        public ScrollEvent(RelativeScreenPosition aPos, int aSteps, Direction aDirection, byte modifiersMask)
         {
             pos = aPos;
             steps = aSteps;
             direction = aDirection;
-            modifierHeld = aModifiers;
+            modifierMask = modifiersMask;
         }
 
 

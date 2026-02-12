@@ -59,7 +59,7 @@ namespace Project_1.GameObjects.Entities.Projectiles
 
             if (Centre.DistanceTo(target.Centre) < Size.X / 2)
             {
-                spell.Trigger(target, caster);
+                spell.Trigger(caster, target);
                 isFinished = true;
             }
 
@@ -90,7 +90,7 @@ namespace Project_1.GameObjects.Entities.Projectiles
                 FeetPosition.Y,
                 Size,
                 gfx.BuildRenderSnapshot(),
-                BuildEffectSnapshot(),
+                BuildEffectSnapshotBatch(),
                 false,
                 Color.Black);
         }

@@ -57,6 +57,7 @@ namespace Project_1.GameObjects.Entities
         }
 
         public SecondaryStats SecondaryStats => unitData.SecondaryStats;
+        internal void RefreshSecondaryStats() => unitData.SecondaryStats.Refresh(unitData);
         public int DefenseSkill => unitData.DefenseSkill;
         public WeaponSkill WeaponSkill => unitData.WeaponSkill;
         public bool IsDualWielding => Equipment.IsDualWielding;

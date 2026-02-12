@@ -227,21 +227,42 @@ namespace Project_1.UI.OptionMenu
             }
         }
 
+        public static int DrawListCount
+        {
+            get
+            {
+                ThreadAffinity.AssertUiThread();
+                return optionScreenPermanents.Count + optionElements[(int)currentScreen].Count;
+            }
+        }
+
+        public static int CopyDrawList(UIElement[] destination)
+        {
+            ThreadAffinity.AssertUiThread();
+            if (destination == null || destination.Length == 0) return 0;
+
+            int max = Math.Min(destination.Length, DrawListCount);
+            int index = 0;
+
+            for (int i = 0; i < optionScreenPermanents.Count && index < max; i++)
+            {
+                destination[index++] = optionScreenPermanents[i];
+            }
+
+            for (int i = optionElements[(int)currentScreen].Count - 1; i >= 0 && index < max; i--)
+            {
+                destination[index++] = optionElements[(int)currentScreen][i];
+            }
+
+            return index;
+        }
+
         public static UIElement[] BuildDrawList()
         {
             ThreadAffinity.AssertUiThread();
-            List<UIElement> drawList = new List<UIElement>(optionScreenPermanents.Count + optionElements[(int)currentScreen].Count);
-            for (int i = 0; i < optionScreenPermanents.Count; i++)
-            {
-                drawList.Add(optionScreenPermanents[i]);
-            }
-
-            for (int i = optionElements[(int)currentScreen].Count - 1; i >= 0; i--)
-            {
-                drawList.Add(optionElements[(int)currentScreen][i]);
-            }
-
-            return drawList.ToArray();
+            UIElement[] drawList = new UIElement[DrawListCount];
+            CopyDrawList(drawList);
+            return drawList;
         }
 
         public static bool ConsumeDrawListDirty()

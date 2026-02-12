@@ -17,6 +17,8 @@ namespace Project_1.GameObjects.Spells
 {
     internal class Spell : IDamager 
     {
+        const double InstantScalarFloor = 0.4;
+        const double FullScalarCastTimeMs = 3500.0;
         [DebuggerStepThrough]
         public static GfxPath GetGfxPath(Spell aSpell)
         {
@@ -74,14 +76,31 @@ namespace Project_1.GameObjects.Spells
                 ProjectileFactory.CreateProjectile(aCaster, aCaster.Centre, this, aTarget);
         }
 
-        public bool Trigger(Entity aTarget, Entity aCaster)
+        public bool Trigger(Entity aCaster, Entity aTarget)
         {
+            double scalar = GetDirectEffectScalarFromCastTime(spellData.CastTime);
             for (int i = 0; i < spellData.Effects.Length; i++)
             {
-                spellData.Effects[i].Trigger(aTarget, aCaster);
+                spellData.Effects[i].Trigger(aCaster, aTarget, scalar);
                 aTarget.AddEffect(new VisualEffect(spellData.HitGfxPath, 1000));
             }
             return true;
+        }
+
+        static double GetDirectEffectScalarFromCastTime(double aCastTimeMs)
+        {
+            if (aCastTimeMs <= 0)
+            {
+                return InstantScalarFloor;
+            }
+
+            if (aCastTimeMs >= FullScalarCastTimeMs)
+            {
+                return 1.0;
+            }
+
+            double ratio = aCastTimeMs / FullScalarCastTimeMs;
+            return InstantScalarFloor + (1.0 - InstantScalarFloor) * ratio;
         }
     }
 }

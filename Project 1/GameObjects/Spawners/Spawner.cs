@@ -168,14 +168,6 @@ namespace Project_1.GameObjects.Spawners
             spawn.RefreshPlates();
         }
 
-        internal void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
-        {
-            ThreadAffinity.AssertMainThread();
-            if (spawn == null) return;
-
-            spawn.MinimapDraw(aBatch, aOrigin, aMinimapOffset, aMinimapSize);
-        }
-
         internal void AppendMinimapDots(List<MinimapDotSnapshot> dots)
         {
             if (spawn == null || dots == null) return;

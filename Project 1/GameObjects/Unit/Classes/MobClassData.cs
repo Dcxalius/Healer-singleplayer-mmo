@@ -11,9 +11,9 @@ namespace Project_1.GameObjects.Unit.Classes
     internal class MobClassData : ClassData
     {
         public MobClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float baseHpPer5, string[] learnableSpells, string[] levelOneSpells,
-            float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed, MeleeAttackPowerBonus meleeAttackPowerBonus, float dodgeScaling, float meleeCritScaling, 
-            Weapon.WeaponType weaponsAllowed, bool canDualWield, bool isCaster, bool canParry) 
-            : base(name, resource, baseStats, perLevelStats, baseHp, perLevelHp, baseHpPer5, fistAttackSpeed, fistMinAttackDamage, fistMaxAttackDamage, speed, maxSpeed, meleeAttackPowerBonus, dodgeScaling, 0.05f, meleeCritScaling, weaponsAllowed, canDualWield, isCaster, canParry)
+            float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed, MeleeAttackPowerBonus meleeAttackPowerBonus, float dodgeScaling, float baseDodge, float meleeCritScaling,
+            Weapon.WeaponType weaponsAllowed, bool canDualWield, bool isCaster, bool canParry, float spellCritScaling)
+            : base(name, resource, baseStats, perLevelStats, baseHp, perLevelHp, baseHpPer5, fistAttackSpeed, fistMinAttackDamage, fistMaxAttackDamage, speed, maxSpeed, meleeAttackPowerBonus, dodgeScaling, baseDodge, meleeCritScaling, weaponsAllowed, canDualWield, isCaster, canParry, spellCritScaling)
         {
             Assert();
         }

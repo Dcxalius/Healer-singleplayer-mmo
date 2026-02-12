@@ -1,4 +1,3 @@
-using System;
 using Project_1.Messaging.Events;
 using Project_1.Managers;
 
@@ -9,9 +8,9 @@ namespace Project_1.Input
     /// </summary>
     internal static class KeyBindStateCache
     {
-        static bool[] pressed = new bool[(int)KeyBindManager.KeyListner.Count];
-        static bool[] held = new bool[(int)KeyBindManager.KeyListner.Count];
-        static bool[] released = new bool[(int)KeyBindManager.KeyListner.Count];
+        static ulong pressedMask;
+        static ulong heldMask;
+        static ulong releasedMask;
         static int snapshotVersion;
         static int lastFrameVersion = -1;
 
@@ -19,9 +18,9 @@ namespace Project_1.Input
         {
             ThreadAffinity.AssertSimThread();
             snapshotVersion++;
-            if (snapshot.Pressed != null) CopyInto(ref pressed, snapshot.Pressed);
-            if (snapshot.Held != null) CopyInto(ref held, snapshot.Held);
-            if (snapshot.Released != null) CopyInto(ref released, snapshot.Released);
+            pressedMask = snapshot.PressedMask;
+            heldMask = snapshot.HeldMask;
+            releasedMask = snapshot.ReleasedMask;
         }
 
         public static void BeginFrame()
@@ -29,8 +28,8 @@ namespace Project_1.Input
             ThreadAffinity.AssertSimThread();
             if (lastFrameVersion == snapshotVersion)
             {
-                if (pressed.Length > 0) Array.Clear(pressed, 0, pressed.Length);
-                if (released.Length > 0) Array.Clear(released, 0, released.Length);
+                pressedMask = 0;
+                releasedMask = 0;
             }
             lastFrameVersion = snapshotVersion;
         }
@@ -38,28 +37,22 @@ namespace Project_1.Input
         public static bool GetPress(KeyBindManager.KeyListner key)
         {
             ThreadAffinity.AssertSimThread();
-            return pressed[(int)key];
+            int index = (int)key;
+            return index >= 0 && index < 64 && ((pressedMask & (1UL << index)) != 0);
         }
 
         public static bool GetHold(KeyBindManager.KeyListner key)
         {
             ThreadAffinity.AssertSimThread();
-            return held[(int)key];
+            int index = (int)key;
+            return index >= 0 && index < 64 && ((heldMask & (1UL << index)) != 0);
         }
 
         public static bool GetRelease(KeyBindManager.KeyListner key)
         {
             ThreadAffinity.AssertSimThread();
-            return released[(int)key];
-        }
-
-        static void CopyInto(ref bool[] destination, bool[] source)
-        {
-            if (destination == null || destination.Length != source.Length)
-            {
-                destination = new bool[source.Length];
-            }
-            Array.Copy(source, destination, source.Length);
+            int index = (int)key;
+            return index >= 0 && index < 64 && ((releasedMask & (1UL << index)) != 0);
         }
     }
 }

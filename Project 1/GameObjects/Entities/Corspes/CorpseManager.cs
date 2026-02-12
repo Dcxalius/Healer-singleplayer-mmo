@@ -121,9 +121,10 @@ namespace Project_1.GameObjects.Entities.Corspes
             for (int i = corpses.Count - 1; i >= 0; i--) corpses[i].Update();
         }
 
-        public static void Draw(SpriteBatch aBatch)
+        internal static void DrawSnapshots(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();
+            // Snapshot-only draw path. Do not read live sim corpse list here.
             renderCorpses.ApplyUpdates();
             foreach (WorldObjectRenderSnapshot snapshot in renderCorpses.Values)
             {

@@ -28,6 +28,8 @@ namespace Project_1.Managers.States
     internal class Game : GameState
     {
         public override StateManager.States GetStateEnum => StateManager.States.Game;
+        readonly Vector2[] lightPositions = new Vector2[ObjectManager.PartyLightSnapshot.MaxLights];
+
         public Game() : base()
         {
             spriteBatch = GraphicsManager.CreateSpriteBatch();
@@ -110,14 +112,13 @@ namespace Project_1.Managers.States
                 cameraSizeParam.SetValue(new Vector2(Camera.Camera.WorldRectangle.Size.X, Camera.Camera.WorldRectangle.Size.Y));
             }
             ObjectManager.PartyLightSnapshot lightSnapshot = ObjectManager.RenderLightSnapshot;
-            WorldSpace[] partyPositions = lightSnapshot.Positions;
-            Vector2[] v = new Vector2[5];
-            for (int i = 0; i < v.Length; i++)
+            int lightCount = Math.Min(lightSnapshot.Count, lightPositions.Length);
+            for (int i = 0; i < lightPositions.Length; i++)
             {
-                v[i] = i < partyPositions.Length ? partyPositions[i] : Vector2.Zero;
+                lightPositions[i] = i < lightCount ? lightSnapshot.GetPosition(i) : Vector2.Zero;
             }
             //epc["tileTransparent"].SetValue(TileManager.GetTransparent(ObjectManager.Player.FeetPosition));
-            epc["lightPos"].SetValue(v);
+            epc["lightPos"].SetValue(lightPositions);
             epc["transparentMap"].SetValue(TileRenderCache.GetTransparencyMapTexture());
             //GraphicsManager.SetTexture(1, TileManager.GetTransparent(ObjectManager.Player.FeetPosition));
             DrawList(spriteBatch);
@@ -140,13 +141,7 @@ namespace Project_1.Managers.States
         void DrawList(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();
-            TileManager.Draw(aBatch);
-
-            ProjectileManager.Draw(aBatch);
-            ObjectManager.Draw(aBatch);
-            DoodadManager.Draw(aBatch);
-            CorpseManager.Draw(aBatch);
-            SpawnerManager.Draw(aBatch);
+            RenderSnapshotManager.DrawGameSnapshots(aBatch);
 
             ParticleManager.Draw(aBatch);
             FloatingTextManager.Draw(aBatch);

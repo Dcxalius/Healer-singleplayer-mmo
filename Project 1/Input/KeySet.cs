@@ -86,11 +86,9 @@ namespace Project_1.Input
         {
             get
             {
-                bool[] currentlyPressedModifiers = InputManager.CheckHoldModifiers();
-
                 for (int i = 0; i < modifierKeys.Length; i++)
                 {
-                    if (modifierKeys[i] != currentlyPressedModifiers[i]) return false;
+                    if (modifierKeys[i] != InputManager.IsHoldModifierHeld((InputManager.HoldModifier)i)) return false;
                 }
                 return true;
             }

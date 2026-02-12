@@ -1,4 +1,5 @@
 ﻿using Project_1.Managers;
+using Project_1.Messaging.Events;
 using System;
 using System.Collections.Concurrent;
 
@@ -53,6 +54,19 @@ namespace Project_1.Messaging
             _ = Main;
             _ = Ui;
             _ = Sim;
+            RegisterDefaultCoalescedTypes();
+        }
+
+        static void RegisterDefaultCoalescedTypes()
+        {
+            Ui.RegisterCoalescedType<KeyboardSnapshot>();
+            Ui.RegisterCoalescedType<KeyBindSnapshot>();
+            Ui.RegisterCoalescedType<MouseSnapshot>();
+
+            Sim.RegisterCoalescedType<KeyboardSnapshot>();
+            Sim.RegisterCoalescedType<KeyBindSnapshot>();
+            Sim.RegisterCoalescedType<MouseSnapshot>();
+            Sim.RegisterCoalescedType<PlayerMovementRequested>();
         }
     }
 }

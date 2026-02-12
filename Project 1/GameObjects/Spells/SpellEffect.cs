@@ -9,6 +9,12 @@ using System.Threading.Tasks;
 
 namespace Project_1.GameObjects.Spells
 {
+    internal enum AbilityStatSource
+    {
+        Spell,
+        Attack
+    }
+
     internal class SpellEffect
     {
         static int GetId => nextId++;
@@ -20,6 +26,8 @@ namespace Project_1.GameObjects.Spells
 
         public bool IsBinary => isBinary;
         bool isBinary;
+
+        public virtual AbilityStatSource StatSource => AbilityStatSource.Spell;
 
         public HashSet<SpellSchool> SpellSchools => spellSchools;
         HashSet<SpellSchool> spellSchools;
@@ -34,7 +42,7 @@ namespace Project_1.GameObjects.Spells
             Debug.Assert(name != null, "No name");
         }
 
-        public virtual bool Trigger(Entity aTarget, Entity aCaster)
+        public virtual bool Trigger(Entity aCaster, Entity aTarget, double aScalar = 1.0)
         {
             
 

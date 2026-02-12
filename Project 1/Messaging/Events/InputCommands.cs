@@ -32,17 +32,7 @@ namespace Project_1.Messaging.Events
 
         public static WorldClickRequested FromClickEvent(ClickEvent clickEvent)
         {
-            return new WorldClickRequested(clickEvent.RelativePos, clickEvent.ButtonPressed.ToClickKind(), BuildModifiersMask(clickEvent.ModifiersSnapshot));
-        }
-
-        static byte BuildModifiersMask(bool[] modifiers)
-        {
-            byte mask = 0;
-            if (modifiers == null) return mask;
-            if (modifiers.Length > (int)InputManager.HoldModifier.Ctrl && modifiers[(int)InputManager.HoldModifier.Ctrl]) mask |= (byte)(1 << (int)InputManager.HoldModifier.Ctrl);
-            if (modifiers.Length > (int)InputManager.HoldModifier.Alt && modifiers[(int)InputManager.HoldModifier.Alt]) mask |= (byte)(1 << (int)InputManager.HoldModifier.Alt);
-            if (modifiers.Length > (int)InputManager.HoldModifier.Shift && modifiers[(int)InputManager.HoldModifier.Shift]) mask |= (byte)(1 << (int)InputManager.HoldModifier.Shift);
-            return mask;
+            return new WorldClickRequested(clickEvent.RelativePos, clickEvent.ButtonPressed.ToClickKind(), clickEvent.ModifierMask);
         }
 
         static bool[] ToModifiersArray(byte mask)
@@ -79,16 +69,7 @@ namespace Project_1.Messaging.Events
 
         public static WorldReleaseRequested FromReleaseEvent(ReleaseEvent releaseEvent)
         {
-            return new WorldReleaseRequested(releaseEvent.RelativePos, releaseEvent.ButtonPressed.ToClickKind(), BuildModifiersMask(releaseEvent));
-        }
-
-        static byte BuildModifiersMask(ReleaseEvent releaseEvent)
-        {
-            byte mask = 0;
-            if (releaseEvent.Modifier(InputManager.HoldModifier.Ctrl)) mask |= (byte)(1 << (int)InputManager.HoldModifier.Ctrl);
-            if (releaseEvent.Modifier(InputManager.HoldModifier.Alt)) mask |= (byte)(1 << (int)InputManager.HoldModifier.Alt);
-            if (releaseEvent.Modifier(InputManager.HoldModifier.Shift)) mask |= (byte)(1 << (int)InputManager.HoldModifier.Shift);
-            return mask;
+            return new WorldReleaseRequested(releaseEvent.RelativePos, releaseEvent.ButtonPressed.ToClickKind(), releaseEvent.ModifierMask);
         }
     }
 
@@ -120,16 +101,7 @@ namespace Project_1.Messaging.Events
 
         public static WorldScrollRequested FromScrollEvent(ScrollEvent scrollEvent)
         {
-            return new WorldScrollRequested(scrollEvent.RelativePos, scrollEvent.Steps, scrollEvent.Up, BuildModifiersMask(scrollEvent));
-        }
-
-        static byte BuildModifiersMask(ScrollEvent scrollEvent)
-        {
-            byte mask = 0;
-            if (scrollEvent.Modifier(InputManager.HoldModifier.Ctrl)) mask |= (byte)(1 << (int)InputManager.HoldModifier.Ctrl);
-            if (scrollEvent.Modifier(InputManager.HoldModifier.Alt)) mask |= (byte)(1 << (int)InputManager.HoldModifier.Alt);
-            if (scrollEvent.Modifier(InputManager.HoldModifier.Shift)) mask |= (byte)(1 << (int)InputManager.HoldModifier.Shift);
-            return mask;
+            return new WorldScrollRequested(scrollEvent.RelativePos, scrollEvent.Steps, scrollEvent.Up, scrollEvent.ModifierMask);
         }
     }
 
@@ -204,5 +176,12 @@ namespace Project_1.Messaging.Events
 
         public int TargetRenderId { get; }
         public ClickKind Button { get; }
+    }
+
+    /// <summary>
+    /// Published to sim only after UI had a chance to consume Escape.
+    /// </summary>
+    internal readonly struct EscapeRequested
+    {
     }
 }

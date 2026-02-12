@@ -61,12 +61,20 @@ namespace Project_1.Managers
         const int QueueWarningThreshold = 128;
         const double ThreadFrameWarningMs = 25d;
         const double WarningCooldownMs = 2000d;
+        const long CoalescedWarningDeltaThreshold = 64;
         static double nextQueueWarningMs;
         static double nextFailureWarningMs;
+        static double nextCoalesceWarningMs;
         static double nextThreadWarningMs;
         static long lastMainFailureCount;
         static long lastUiFailureCount;
         static long lastSimFailureCount;
+        static long lastMainCoalescedCount;
+        static long lastUiCoalescedCount;
+        static long lastSimCoalescedCount;
+        static long lastMainDroppedCount;
+        static long lastUiDroppedCount;
+        static long lastSimDroppedCount;
         static long lastSimOverrunCount;
         static long lastUiOverrunCount;
         static long lastSimTimeoutCount;
@@ -150,7 +158,7 @@ namespace Project_1.Managers
             var uiStats = Mailboxes.UiStats;
             var simStats = Mailboxes.SimStats;
             mailboxText.Value = $"Q M:{mainStats.Pending}/{mainStats.Peak} U:{uiStats.Pending}/{uiStats.Peak} S:{simStats.Pending}/{simStats.Peak}";
-            dispatchText.Value = $"D M:{mainStats.LastDispatchCount}/{mainStats.LastDispatchMs:0.0}ms P:{mainStats.TotalPublished} F:{mainStats.TotalHandlerFailures} U:{uiStats.LastDispatchCount}/{uiStats.LastDispatchMs:0.0}ms P:{uiStats.TotalPublished} F:{uiStats.TotalHandlerFailures} S:{simStats.LastDispatchCount}/{simStats.LastDispatchMs:0.0}ms P:{simStats.TotalPublished} F:{simStats.TotalHandlerFailures}";
+            dispatchText.Value = $"D M:{mainStats.LastDispatchCount}/{mainStats.LastDispatchMs:0.0}ms P:{mainStats.TotalPublished} F:{mainStats.TotalHandlerFailures} C:{mainStats.TotalCoalesced} X:{mainStats.TotalDropped} U:{uiStats.LastDispatchCount}/{uiStats.LastDispatchMs:0.0}ms P:{uiStats.TotalPublished} F:{uiStats.TotalHandlerFailures} C:{uiStats.TotalCoalesced} X:{uiStats.TotalDropped} S:{simStats.LastDispatchCount}/{simStats.LastDispatchMs:0.0}ms P:{simStats.TotalPublished} F:{simStats.TotalHandlerFailures} C:{simStats.TotalCoalesced} X:{simStats.TotalDropped}";
             var workerStats = WorkerPool.Stats;
             workerText.Value = $"W {workerStats.Pending}/{workerStats.Peak} last:{workerStats.LastWorkMs:0.0}ms";
             var screenshotStats = SaveManager.ScreenshotQueueStats;
@@ -193,6 +201,30 @@ namespace Project_1.Managers
             lastMainFailureCount = mainStats.TotalHandlerFailures;
             lastUiFailureCount = uiStats.TotalHandlerFailures;
             lastSimFailureCount = simStats.TotalHandlerFailures;
+
+            long deltaMainCoalesced = mainStats.TotalCoalesced - lastMainCoalescedCount;
+            long deltaUiCoalesced = uiStats.TotalCoalesced - lastUiCoalescedCount;
+            long deltaSimCoalesced = simStats.TotalCoalesced - lastSimCoalescedCount;
+            long deltaMainDropped = mainStats.TotalDropped - lastMainDroppedCount;
+            long deltaUiDropped = uiStats.TotalDropped - lastUiDroppedCount;
+            long deltaSimDropped = simStats.TotalDropped - lastSimDroppedCount;
+            bool coalescedSpike = deltaMainCoalesced >= CoalescedWarningDeltaThreshold ||
+                                  deltaUiCoalesced >= CoalescedWarningDeltaThreshold ||
+                                  deltaSimCoalesced >= CoalescedWarningDeltaThreshold ||
+                                  deltaMainDropped >= CoalescedWarningDeltaThreshold ||
+                                  deltaUiDropped >= CoalescedWarningDeltaThreshold ||
+                                  deltaSimDropped >= CoalescedWarningDeltaThreshold;
+            if (coalescedSpike && nowMs >= nextCoalesceWarningMs)
+            {
+                Print($"WARN mailbox coalesced/dropped +M:{Math.Max(0, deltaMainCoalesced)}/{Math.Max(0, deltaMainDropped)} +U:{Math.Max(0, deltaUiCoalesced)}/{Math.Max(0, deltaUiDropped)} +S:{Math.Max(0, deltaSimCoalesced)}/{Math.Max(0, deltaSimDropped)} totals M:{mainStats.TotalCoalesced}/{mainStats.TotalDropped} U:{uiStats.TotalCoalesced}/{uiStats.TotalDropped} S:{simStats.TotalCoalesced}/{simStats.TotalDropped}");
+                nextCoalesceWarningMs = nowMs + WarningCooldownMs;
+            }
+            lastMainCoalescedCount = mainStats.TotalCoalesced;
+            lastUiCoalescedCount = uiStats.TotalCoalesced;
+            lastSimCoalescedCount = simStats.TotalCoalesced;
+            lastMainDroppedCount = mainStats.TotalDropped;
+            lastUiDroppedCount = uiStats.TotalDropped;
+            lastSimDroppedCount = simStats.TotalDropped;
 
             long deltaSimOverruns = simThreadStats.OverrunCount - lastSimOverrunCount;
             long deltaUiOverruns = uiThreadStats.OverrunCount - lastUiOverrunCount;

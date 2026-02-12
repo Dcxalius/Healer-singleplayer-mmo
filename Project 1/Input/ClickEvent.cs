@@ -11,25 +11,31 @@ namespace Project_1.Input
         public RelativeScreenPosition RelativePos { get => clickPos; }
         public AbsoluteScreenPosition AbsolutePos { get => AbsoluteScreenPosition.FromRelativeScreenPosition(clickPos); }
         public InputManager.ClickType ButtonPressed { get => buttonPressed; }
-        public bool[] ModifiersSnapshot => (bool[])modifierHeld.Clone();
+        public bool[] ModifiersSnapshot => ToModifiersArray(modifierMask);
 
         RelativeScreenPosition clickPos;
 
         InputManager.ClickType buttonPressed;
 
-        protected override bool[] ModifiersHeld => modifierHeld;
-        bool[] modifierHeld;
+        protected override byte ModifiersMask => modifierMask;
+        byte modifierMask;
 
 
         public ClickEvent(AbsoluteScreenPosition aPos, InputManager.ClickType aButtonPressed, bool[] aModifiers) : this(aPos.ToRelativeScreenPosition(), aButtonPressed, aModifiers) { }
+        public ClickEvent(AbsoluteScreenPosition aPos, InputManager.ClickType aButtonPressed, byte modifiersMask) : this(aPos.ToRelativeScreenPosition(), aButtonPressed, modifiersMask) { }
 
         public ClickEvent(RelativeScreenPosition aClickPos, InputManager.ClickType aButtonPressed, bool[] aModifiers)
+            : this(aClickPos, aButtonPressed, BuildModifiersMask(aModifiers))
+        {
+        }
+
+        public ClickEvent(RelativeScreenPosition aClickPos, InputManager.ClickType aButtonPressed, byte modifiersMask)
         {
             clickPos = aClickPos;
             //DebugManager.Print("Click: " + clickPos);
 
             buttonPressed = aButtonPressed;
-            modifierHeld = aModifiers;
+            modifierMask = modifiersMask;
         }
 
 

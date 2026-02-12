@@ -47,6 +47,9 @@ namespace Project_1.GameObjects
         static readonly HashSet<int> knownNpcIds = new HashSet<int>();
         static readonly HashSet<int> currentNpcIds = new HashSet<int>();
         static volatile PartyLightSnapshot renderLightSnapshot = PartyLightSnapshot.Empty;
+        static readonly WorldSpace[] partyLightScratch = new WorldSpace[PartyLightSnapshot.MaxLights];
+        static readonly List<Entity> allScratch = new List<Entity>();
+        static readonly HashSet<Entity> allScratchSet = new HashSet<Entity>();
 
         static List<Entity> entities;
         static List<GuildMember> guild;
@@ -154,27 +157,77 @@ namespace Project_1.GameObjects
 
         public sealed class PartyLightSnapshot
         {
-            public static readonly PartyLightSnapshot Empty = new PartyLightSnapshot(Array.Empty<WorldSpace>(), Point.Zero);
+            public const int MaxLights = 5;
+            public static readonly PartyLightSnapshot Empty = new PartyLightSnapshot(0, WorldSpace.Zero, WorldSpace.Zero, WorldSpace.Zero, WorldSpace.Zero, WorldSpace.Zero, Point.Zero);
 
-            public PartyLightSnapshot(WorldSpace[] positions, Point originTile)
+            public PartyLightSnapshot(int count, WorldSpace position0, WorldSpace position1, WorldSpace position2, WorldSpace position3, WorldSpace position4, Point originTile)
             {
-                Positions = positions ?? Array.Empty<WorldSpace>();
+                Count = Math.Clamp(count, 0, MaxLights);
+                Position0 = position0;
+                Position1 = position1;
+                Position2 = position2;
+                Position3 = position3;
+                Position4 = position4;
                 OriginTile = originTile;
             }
 
-            public WorldSpace[] Positions { get; }
+            public int Count { get; }
+            public WorldSpace Position0 { get; }
+            public WorldSpace Position1 { get; }
+            public WorldSpace Position2 { get; }
+            public WorldSpace Position3 { get; }
+            public WorldSpace Position4 { get; }
             public Point OriginTile { get; }
+
+            public WorldSpace GetPosition(int index)
+            {
+                return index switch
+                {
+                    0 => Position0,
+                    1 => Position1,
+                    2 => Position2,
+                    3 => Position3,
+                    4 => Position4,
+                    _ => throw new ArgumentOutOfRangeException(nameof(index)),
+                };
+            }
         }
 
-        static List<Entity> All
+        static List<Entity> BuildAllScratch()
         {
-            get
+            allScratch.Clear();
+            allScratchSet.Clear();
+
+            for (int i = 0; i < entities.Count; i++)
             {
-                var r = entities.Union(guild).ToList();
-                r.AddRange(npcs);
-                r.Add(player);
-                return r;
+                Entity entity = entities[i];
+                if (entity == null) continue;
+                allScratch.Add(entity);
+                allScratchSet.Add(entity);
             }
+
+            // Match the old entities.Union(guild) behavior: dedupe guild members against entities.
+            for (int i = 0; i < guild.Count; i++)
+            {
+                GuildMember member = guild[i];
+                if (member == null) continue;
+                if (!allScratchSet.Add(member)) continue;
+                allScratch.Add(member);
+            }
+
+            for (int i = 0; i < npcs.Count; i++)
+            {
+                Npc npc = npcs[i];
+                if (npc == null) continue;
+                allScratch.Add(npc);
+            }
+
+            if (player != null)
+            {
+                allScratch.Add(player);
+            }
+
+            return allScratch;
         }
 
         public static void Init()
@@ -190,9 +243,10 @@ namespace Project_1.GameObjects
         public static void Update()
         {
             ThreadAffinity.AssertSimThread();
-            for (int i = All.Count - 1; i >= 0; i--)
+            List<Entity> all = BuildAllScratch();
+            for (int i = all.Count - 1; i >= 0; i--)
             {
-                All[i].Update();
+                all[i].Update();
             }
 
             LootState.Update();
@@ -200,9 +254,9 @@ namespace Project_1.GameObjects
 
             if (TimeManager.TotalFrameTime % 2000 < 1) //TODO: This can cause issues at lower framerate
             {
-                for (int i = 0; i < All.Count; i++)
+                for (int i = 0; i < all.Count; i++)
                 {
-                    All[i].ServerTick();
+                    all[i].ServerTick();
                 }
             }
         }
@@ -210,9 +264,10 @@ namespace Project_1.GameObjects
         public static void RefreshPlates()
         {
             ThreadAffinity.AssertSimThread();
-            for (int i = 0; i < All.Count; i++)
+            List<Entity> all = BuildAllScratch();
+            for (int i = 0; i < all.Count; i++)
             {
-                All[i].RefreshPlates();
+                all[i].RefreshPlates();
             }
         }
 
@@ -369,7 +424,7 @@ namespace Project_1.GameObjects
         }
         #endregion
 
-        public static void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
+        internal static void DrawMinimapSnapshots(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
         {
             ThreadAffinity.AssertMainThread();
             ApplyRenderUpdates();
@@ -387,9 +442,10 @@ namespace Project_1.GameObjects
             }
         }
 
-        public static void Draw(SpriteBatch aSpriteBatch)
+        internal static void DrawSnapshots(SpriteBatch aSpriteBatch)
         {
             ThreadAffinity.AssertMainThread();
+            // Snapshot-only draw path. Do not read live sim lists here.
             ApplyRenderUpdates();
             foreach (EntityRenderSnapshot snapshot in renderPlayers.Values)
             {
@@ -431,9 +487,14 @@ namespace Project_1.GameObjects
                 renderPlayers.EnqueueUpdate(snapshot);
                 currentPlayerIds.Add(snapshot.RenderId);
 
-                WorldSpace[] positions = player.Party.GetPositions;
-                Point originTile = positions.Length > 0 ? TileManager.GetGridPos(positions[0]) : Point.Zero;
-                renderLightSnapshot = new PartyLightSnapshot(positions, originTile);
+                int count = player.Party.CopyPositions(partyLightScratch);
+                WorldSpace position0 = count > 0 ? partyLightScratch[0] : WorldSpace.Zero;
+                WorldSpace position1 = count > 1 ? partyLightScratch[1] : WorldSpace.Zero;
+                WorldSpace position2 = count > 2 ? partyLightScratch[2] : WorldSpace.Zero;
+                WorldSpace position3 = count > 3 ? partyLightScratch[3] : WorldSpace.Zero;
+                WorldSpace position4 = count > 4 ? partyLightScratch[4] : WorldSpace.Zero;
+                Point originTile = count > 0 ? TileManager.GetGridPos(position0) : Point.Zero;
+                renderLightSnapshot = new PartyLightSnapshot(count, position0, position1, position2, position3, position4, originTile);
             }
             else
             {
@@ -500,7 +561,7 @@ namespace Project_1.GameObjects
             if (dots == null) return;
             if (player != null)
             {
-                dots.Add(new MinimapDotSnapshot(player.FeetPosition, player.MinimapColor));
+                dots.Add(new MinimapDotSnapshot(player.FeetPosition, player.MinimapColor, true));
             }
             for (int i = 0; i < entities.Count; i++)
             {

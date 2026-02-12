@@ -8,34 +8,37 @@ namespace Project_1.Input
     /// </summary>
     internal static class UiKeyBindStateCache
     {
-        static bool[] pressed = new bool[(int)KeyBindManager.KeyListner.Count];
-        static bool[] held = new bool[(int)KeyBindManager.KeyListner.Count];
-        static bool[] released = new bool[(int)KeyBindManager.KeyListner.Count];
+        static ulong pressedMask;
+        static ulong heldMask;
+        static ulong releasedMask;
 
         public static void Update(KeyBindSnapshot snapshot)
         {
             ThreadAffinity.AssertUiThread();
-            if (snapshot.Pressed != null) pressed = snapshot.Pressed;
-            if (snapshot.Held != null) held = snapshot.Held;
-            if (snapshot.Released != null) released = snapshot.Released;
+            pressedMask = snapshot.PressedMask;
+            heldMask = snapshot.HeldMask;
+            releasedMask = snapshot.ReleasedMask;
         }
 
         public static bool GetPress(KeyBindManager.KeyListner key)
         {
             ThreadAffinity.AssertUiThread();
-            return pressed[(int)key];
+            int index = (int)key;
+            return index >= 0 && index < 64 && ((pressedMask & (1UL << index)) != 0);
         }
 
         public static bool GetHold(KeyBindManager.KeyListner key)
         {
             ThreadAffinity.AssertUiThread();
-            return held[(int)key];
+            int index = (int)key;
+            return index >= 0 && index < 64 && ((heldMask & (1UL << index)) != 0);
         }
 
         public static bool GetRelease(KeyBindManager.KeyListner key)
         {
             ThreadAffinity.AssertUiThread();
-            return released[(int)key];
+            int index = (int)key;
+            return index >= 0 && index < 64 && ((releasedMask & (1UL << index)) != 0);
         }
     }
 }

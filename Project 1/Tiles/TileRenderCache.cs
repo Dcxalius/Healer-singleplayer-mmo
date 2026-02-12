@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,11 +16,13 @@ namespace Project_1.Tiles
     {
         static Tile cachedCentreTile;
         static Texture2D transparencyMap;
-        static volatile Color[] pendingTransparencyData;
+        static readonly object transparencyLock = new object();
+        static Color[] pendingTransparencyData;
+        static Color[] transparencyWorkData;
         static int pendingTransparencyVersion;
         static int appliedTransparencyVersion;
-        static volatile int pendingTransparencyOriginX;
-        static volatile int pendingTransparencyOriginY;
+        static int pendingTransparencyOriginX;
+        static int pendingTransparencyOriginY;
         static int appliedTransparencyOriginX;
         static int appliedTransparencyOriginY;
         static bool initialized;
@@ -33,8 +36,12 @@ namespace Project_1.Tiles
             ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
+            EnsureTransparencyBuffers();
             transparencyMap = GraphicsManager.CreateNewTexture(new Point(TransparencySize));
-            transparencyMap.SetData(new Color[TransparencySize * TransparencySize]);
+            lock (transparencyLock)
+            {
+                transparencyMap.SetData(pendingTransparencyData);
+            }
         }
 
         public static void BuildTransparencySnapshot(WorldSpace origin)
@@ -55,10 +62,9 @@ namespace Project_1.Tiles
             }
 
             cachedCentreTile = centre;
-            Color[] data = new Color[TransparencySize * TransparencySize];
+            EnsureTransparencyBuffers();
+            Color[] data = transparencyWorkData;
             Point centreGrid = TileManager.GetGridPos(origin);
-            pendingTransparencyOriginX = centreGrid.X;
-            pendingTransparencyOriginY = centreGrid.Y;
             for (int x = 0; x < TransparencySize; x++)
             {
                 for (int y = 0; y < TransparencySize; y++)
@@ -75,22 +81,19 @@ namespace Project_1.Tiles
                 }
             }
 
-            pendingTransparencyData = data;
-            System.Threading.Interlocked.Increment(ref pendingTransparencyVersion);
+            PublishTransparencyBuffer(centreGrid.X, centreGrid.Y);
         }
 
         public static Texture2D GetTransparencyMapTexture()
         {
             ThreadAffinity.AssertMainThread();
             if (!initialized) Init();
-            int pending = System.Threading.Volatile.Read(ref pendingTransparencyVersion);
-            if (pending != appliedTransparencyVersion)
+            lock (transparencyLock)
             {
-                Color[] data = pendingTransparencyData;
-                if (data != null)
+                if (pendingTransparencyVersion != appliedTransparencyVersion)
                 {
-                    transparencyMap.SetData(data);
-                    appliedTransparencyVersion = pending;
+                    transparencyMap.SetData(pendingTransparencyData);
+                    appliedTransparencyVersion = pendingTransparencyVersion;
                     appliedTransparencyOriginX = pendingTransparencyOriginX;
                     appliedTransparencyOriginY = pendingTransparencyOriginY;
                 }
@@ -105,9 +108,32 @@ namespace Project_1.Tiles
 
         static void PublishBlankTransparency()
         {
-            Color[] data = new Color[TransparencySize * TransparencySize];
-            pendingTransparencyData = data;
-            System.Threading.Interlocked.Increment(ref pendingTransparencyVersion);
+            EnsureTransparencyBuffers();
+            Array.Clear(transparencyWorkData, 0, transparencyWorkData.Length);
+            PublishTransparencyBuffer(0, 0);
+        }
+
+        static void EnsureTransparencyBuffers()
+        {
+            if (pendingTransparencyData != null && transparencyWorkData != null) return;
+            lock (transparencyLock)
+            {
+                if (pendingTransparencyData == null) pendingTransparencyData = new Color[TransparencySize * TransparencySize];
+                if (transparencyWorkData == null) transparencyWorkData = new Color[TransparencySize * TransparencySize];
+            }
+        }
+
+        static void PublishTransparencyBuffer(int originX, int originY)
+        {
+            lock (transparencyLock)
+            {
+                Color[] swap = pendingTransparencyData;
+                pendingTransparencyData = transparencyWorkData;
+                transparencyWorkData = swap;
+                pendingTransparencyOriginX = originX;
+                pendingTransparencyOriginY = originY;
+                pendingTransparencyVersion++;
+            }
         }
 
         public static void PublishChunkMinimapSnapshot(Chunk chunk)

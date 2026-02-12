@@ -256,6 +256,7 @@ namespace Project_1.Items.SubTypes
                 EquipmentData.StatBonuses.NatureSpellDamage => "NatureSpellDamage",
                 EquipmentData.StatBonuses.ShadowSpellDamage => "ShadowSpellDamage",
                 EquipmentData.StatBonuses.HolySpellDamage => "HolySpellDamage",
+                EquipmentData.StatBonuses.SpellHealing => "HealingSpellDamage",
                 EquipmentData.StatBonuses.FrostResist => "FrostResist",
                 EquipmentData.StatBonuses.FireResist => "FireResist",
                 EquipmentData.StatBonuses.ArcaneResist => "ArcaneResist",

@@ -19,9 +19,12 @@ namespace Project_1.Managers.States
     internal class NewGame : State
     {
         NewGameBox newGameBox;
+        readonly UiElementDrawList drawListA = new UiElementDrawList();
+        readonly UiElementDrawList drawListB = new UiElementDrawList();
         volatile UiElementDrawList drawList;
         public NewGame() : base() 
         {
+            drawList = drawListA;
         }
         public override StateManager.States GetStateEnum => StateManager.States.NewGame;
 
@@ -85,24 +88,27 @@ namespace Project_1.Managers.States
         {
             RelativeScreenPosition size = RelativeScreenPosition.GetSquareFromY(0.9f);
             newGameBox = new NewGameBox(new RelativeScreenPosition(0.05f), size);
-            drawList = new UiElementDrawList(new UIElement[] { newGameBox });
+            UiElementDrawList buildTarget = ReferenceEquals(drawList, drawListA) ? drawListB : drawListA;
+            buildTarget.SetSingle(newGameBox);
+            drawList = buildTarget;
             MarkUiDirty();
         }
 
         internal void UiOnLeave()
         {
             newGameBox = null;
-            drawList = null;
+            UiElementDrawList buildTarget = ReferenceEquals(drawList, drawListA) ? drawListB : drawListA;
+            buildTarget.SetSingle(null);
+            drawList = buildTarget;
             MarkUiDirty();
         }
 
         internal void UiRescale()
         {
             newGameBox?.Rescale();
-            if (newGameBox != null)
-            {
-                drawList = new UiElementDrawList(new UIElement[] { newGameBox });
-            }
+            UiElementDrawList buildTarget = ReferenceEquals(drawList, drawListA) ? drawListB : drawListA;
+            buildTarget.SetSingle(newGameBox);
+            drawList = buildTarget;
             MarkUiDirty();
         }
     }

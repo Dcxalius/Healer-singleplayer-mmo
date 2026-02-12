@@ -84,7 +84,7 @@ namespace Project_1.GameObjects.Entities.Corspes
                 FeetPosition.Y,
                 Size,
                 gfx.BuildRenderSnapshot(),
-                BuildEffectSnapshot(),
+                BuildEffectSnapshotBatch(),
                 false,
                 Color.Black);
         }

@@ -18,10 +18,13 @@ namespace Project_1.Managers.States
     internal class OptionMenu : State
     {
         public override StateManager.States GetStateEnum => StateManager.States.OptionMenu;
+        readonly UiElementDrawList drawListA = new UiElementDrawList();
+        readonly UiElementDrawList drawListB = new UiElementDrawList();
+        UIElement[] drawListScratch = Array.Empty<UIElement>();
         volatile UiElementDrawList drawList;
         public OptionMenu() : base()
         {
-
+            drawList = drawListA;
         }
 
         public override void Update()
@@ -75,8 +78,7 @@ namespace Project_1.Managers.States
             OptionManager.Update();
             if (drawList == null || OptionManager.ConsumeDrawListDirty())
             {
-                drawList = new UiElementDrawList(OptionManager.BuildDrawList());
-                MarkUiDirty();
+                BuildDrawList();
             }
             if (OptionManager.ConsumeRenderDirty() || UiTextInputManager.IsActive)
             {
@@ -86,7 +88,7 @@ namespace Project_1.Managers.States
 
         internal void UiOnEnter()
         {
-            drawList = new UiElementDrawList(OptionManager.BuildDrawList());
+            BuildDrawList();
             OptionManager.ConsumeDrawListDirty();
             OptionManager.ConsumeRenderDirty();
             MarkUiDirty();
@@ -95,17 +97,37 @@ namespace Project_1.Managers.States
         internal void UiOnLeave()
         {
             OptionManager.ClearButtons();
-            drawList = null;
+            UiElementDrawList buildTarget = ReferenceEquals(drawList, drawListA) ? drawListB : drawListA;
+            buildTarget.SetSingle(null);
+            drawList = buildTarget;
             MarkUiDirty();
         }
 
         internal void UiRescale()
         {
             OptionManager.Rescale();
-            drawList = new UiElementDrawList(OptionManager.BuildDrawList());
+            BuildDrawList();
             OptionManager.ConsumeDrawListDirty();
             OptionManager.ConsumeRenderDirty();
             MarkUiDirty();
+        }
+
+        void BuildDrawList()
+        {
+            int count = OptionManager.DrawListCount;
+            EnsureDrawListScratchCapacity(count);
+            int copied = OptionManager.CopyDrawList(drawListScratch);
+            UiElementDrawList buildTarget = ReferenceEquals(drawList, drawListA) ? drawListB : drawListA;
+            buildTarget.Set(drawListScratch, copied);
+            drawList = buildTarget;
+            MarkUiDirty();
+        }
+
+        void EnsureDrawListScratchCapacity(int count)
+        {
+            if (count <= drawListScratch.Length) return;
+            int capacity = Math.Max(count, Math.Max(8, drawListScratch.Length * 2));
+            drawListScratch = new UIElement[capacity];
         }
     }
 }

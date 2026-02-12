@@ -16,11 +16,14 @@ namespace Project_1.GameObjects.Unit.Stats
         Frost,
         Holy,
         Nature,
-        Shadow
+        Shadow,
+        Healing
     }
 
     internal struct SpellStats 
     {
+        const double BASE_CRIT_CHANCE = 0.05;
+        const double BASE_CRIT_DAMAGE = 1.5;
         public static (string, Type)[] SecondaryStatsAsStrings => new (string, Type)[]
         {
             ("SpellDamage", typeof(int)),
@@ -63,7 +66,6 @@ namespace Project_1.GameObjects.Unit.Stats
 
             return returnable;
         }
-        public static (int[], double[]) EmptyStats => (new int[2] { 0, 0}, new double[6] { 0, 0, 0, 0, 0, 0 });
         public SpellSchool SpellSchool => spellSchool;
         SpellSchool spellSchool;
         public int SpellDamageValue => spellDamage;
@@ -86,21 +88,21 @@ namespace Project_1.GameObjects.Unit.Stats
         public void Refresh(UnitData aUnitData)
         {
             spellDamage = aUnitData.Equipment.GetSecondaryStat<int>(spellSchool.ToString() + "SpellDamage");
-            critChance = aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellCritChance");
-            critDamage = aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellCritDamage");
+            critChance = Math.Clamp(BASE_CRIT_CHANCE + aUnitData.BaseStats.TotalPrimaryStats.Intellect * aUnitData.ClassData.SpellCritChanceScaler + aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellCritChance"), 0d, 1d);
+            critDamage = BASE_CRIT_DAMAGE + aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellCritDamage");
             flatPenetration = aUnitData.Equipment.GetSecondaryStat<int>(spellSchool.ToString() + "SpellFlatPenetration");
-            percentPenetration = aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellPercentPenetration");
-            haste = aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellHaste");
-            vampirism = aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellVampirism");
-            bonusHitChance = aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellBonusHitChance");
+            percentPenetration = Math.Clamp(aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellPercentPenetration"), 0d, 1d);
+            haste = Math.Clamp(aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellHaste"), 0d, 1d);
+            vampirism = Math.Clamp(aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellVampirism"), 0d, 1d);
+            bonusHitChance = Math.Clamp(aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellBonusHitChance"), 0d, 1d);
         }
 
         public SpellStats(SpellSchool aSchool) 
         {
             spellSchool = aSchool;
             spellDamage = 0;
-            critChance = 0;
-            critDamage = 0;
+            critChance = BASE_CRIT_CHANCE;
+            critDamage = BASE_CRIT_DAMAGE;
             flatPenetration = 0;
             percentPenetration = 0;
             haste = 0;

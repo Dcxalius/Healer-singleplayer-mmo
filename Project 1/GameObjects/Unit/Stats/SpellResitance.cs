@@ -29,7 +29,31 @@ namespace Project_1.GameObjects.Unit.Stats
         }
 
         public int GetResitance(SpellSchool aSchool) => baseResitance + (resitanceBySchool.TryGetValue(aSchool, out int schoolResitance) ? schoolResitance : 0);
-        public int GetResitance(HashSet<SpellSchool> aSchools) => baseResitance + aSchools.Select(school => resitanceBySchool.TryGetValue(school, out int schoolResitance) ? (int)(schoolResitance / aSchools.Count()) : 0).Sum();
+        public int GetResitance(HashSet<SpellSchool> aSchools)
+        {
+            if (aSchools == null || aSchools.Count == 0)
+            {
+                return baseResitance;
+            }
+
+            SpellSchool[] effectiveSchools = aSchools
+                .Where(school => school != SpellSchool.Base)
+                .Distinct()
+                .ToArray();
+
+            if (effectiveSchools.Length == 0)
+            {
+                return baseResitance;
+            }
+
+            int schoolResistance = 0;
+            for (int i = 0; i < effectiveSchools.Length; i++)
+            {
+                schoolResistance += resitanceBySchool.TryGetValue(effectiveSchools[i], out int currentSchoolResitance) ? currentSchoolResitance : 0;
+            }
+
+            return baseResitance + schoolResistance / effectiveSchools.Length;
+        }
         public SpellResitance(int aBaseResitance, Dictionary<SpellSchool, int> aResitanceBySchool)
         {
             baseResitance = aBaseResitance;
@@ -74,8 +98,8 @@ namespace Project_1.GameObjects.Unit.Stats
             int totalResistance = aTarget.SecondaryStats.Defense.SpellResistance.GetResitance(spellSchools);
             double resistReduction = 1.0 - (0.75 * Math.Clamp((double)totalResistance / cap, 0, 1));
 
-            float totalHit = levelHit * (float)resistReduction + aCaster.SecondaryStats.Spell.BonusHitChance;
-            return totalHit;
+            float totalHit = levelHit * (float)resistReduction + (float)aCaster.SecondaryStats.Spell.BonusHitChanceForSchools(spellSchools);
+            return Math.Clamp(totalHit, 0.01f, 0.99f);
         }
 
         public static double CalculateDamageReductionNonBinary(Entity aTarget, Entity aCaster, SpellSchool aResist) => CalculateDamageReductionNonBinary(aTarget, aCaster, new HashSet<SpellSchool> { aResist });
@@ -85,10 +109,11 @@ namespace Project_1.GameObjects.Unit.Stats
             int levelDifference = aTarget.Level.CurrentLevel - aCaster.Level.CurrentLevel;
             int cap = aTarget.Level.CurrentLevel * 5;
 
-            int flatPenetration = Math.Min(aCaster.SecondaryStats.Spell.FlatPenetration, aTarget.SecondaryStats.Defense.SpellResistance.GetResitance(aResist));
-            int percentPenetration = (int)(aTarget.SecondaryStats.Defense.SpellResistance.GetResitance(aResist) * aCaster.SecondaryStats.Spell.PercentPenetration);
+            int totalResistance = aTarget.SecondaryStats.Defense.SpellResistance.GetResitance(aResist);
+            int flatPenetration = Math.Min(aCaster.SecondaryStats.Spell.FlatPenetrationForSchools(aResist), totalResistance);
+            int percentPenetration = (int)(totalResistance * aCaster.SecondaryStats.Spell.PercentPenetrationForSchools(aResist));
 
-            int effectiveResistance = aTarget.SecondaryStats.Defense.SpellResistance.GetResitance(aResist) + Math.Max(levelDifference * 5, 0) - flatPenetration - percentPenetration;
+            int effectiveResistance = totalResistance + Math.Max(levelDifference * 5, 0) - flatPenetration - percentPenetration;
             if (aTarget.UnitType >= UnitType.Normal && levelDifference > 0)
             {
                 effectiveResistance += (2 / 15 * aCaster.Level.CurrentLevel * levelDifference);

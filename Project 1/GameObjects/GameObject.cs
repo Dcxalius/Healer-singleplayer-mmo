@@ -97,16 +97,30 @@ namespace Project_1.GameObjects
             }
         }
 
-        protected VisualEffectRenderSnapshot[] BuildEffectSnapshot()
+        protected VisualEffectSnapshotBatch BuildEffectSnapshotBatch()
         {
             ThreadAffinity.AssertSimThread();
-            if (effects == null || effects.Count == 0) return Array.Empty<VisualEffectRenderSnapshot>();
-            VisualEffectRenderSnapshot[] snapshots = new VisualEffectRenderSnapshot[effects.Count];
-            for (int i = 0; i < effects.Count; i++)
+            if (effects == null || effects.Count == 0) return VisualEffectSnapshotBatch.Empty;
+
+            int count = effects.Count;
+            VisualEffectRenderSnapshot effect0 = effects[0].BuildRenderSnapshot();
+            if (count == 1)
             {
-                snapshots[i] = effects[i].BuildRenderSnapshot();
+                return new VisualEffectSnapshotBatch(1, effect0, default, null);
             }
-            return snapshots;
+
+            VisualEffectRenderSnapshot effect1 = effects[1].BuildRenderSnapshot();
+            if (count == 2)
+            {
+                return new VisualEffectSnapshotBatch(2, effect0, effect1, null);
+            }
+
+            VisualEffectRenderSnapshot[] overflow = new VisualEffectRenderSnapshot[count - 2];
+            for (int i = 2; i < count; i++)
+            {
+                overflow[i - 2] = effects[i].BuildRenderSnapshot();
+            }
+            return new VisualEffectSnapshotBatch(count, effect0, effect1, overflow);
         }
     }
 }

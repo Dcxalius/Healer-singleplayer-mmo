@@ -23,7 +23,7 @@ namespace Project_1.GameObjects.Entities
                 FeetPosition.Y,
                 Size,
                 gfx.BuildRenderSnapshot(),
-                BuildEffectSnapshot(),
+                BuildEffectSnapshotBatch(),
                 isSelected,
                 RelationColor,
                 MinimapColor,

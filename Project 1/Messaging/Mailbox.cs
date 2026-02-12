@@ -13,6 +13,7 @@ namespace Project_1.Messaging
         readonly ConcurrentQueue<int> dispatchQueue = new ConcurrentQueue<int>();
         readonly ConcurrentDictionary<Type, IChannel> channelsByType = new ConcurrentDictionary<Type, IChannel>();
         readonly ConcurrentDictionary<int, IChannel> channelsById = new ConcurrentDictionary<int, IChannel>();
+        readonly ConcurrentDictionary<Type, byte> coalescedTypes = new ConcurrentDictionary<Type, byte>();
         int nextChannelId;
         int pendingCount;
         int peakCount;
@@ -25,6 +26,8 @@ namespace Project_1.Messaging
         long totalWithoutSubscribers;
         long totalHandlerInvocations;
         long totalHandlerFailures;
+        long totalCoalesced;
+        long totalDropped;
 
         public Mailbox(string name)
         {
@@ -33,22 +36,39 @@ namespace Project_1.Messaging
 
         public string Name { get; }
 
+        public void RegisterCoalescedType<T>()
+        {
+            Type messageType = typeof(T);
+            if (!coalescedTypes.TryAdd(messageType, 0)) return;
+            if (channelsByType.ContainsKey(messageType))
+            {
+                throw new InvalidOperationException($"Mailbox '{Name}' coalesced type '{messageType.Name}' must be registered before first publish/subscribe.");
+            }
+        }
+
         public void Publish<T>(in T message)
         {
             Channel<T> channel = GetOrAddChannel<T>();
-            channel.Enqueue(message);
-            dispatchQueue.Enqueue(channel.Id);
-            Interlocked.Increment(ref totalPublished);
-
-            int pending = Interlocked.Increment(ref pendingCount);
-            int snapshotPeak;
-            while (pending > (snapshotPeak = Volatile.Read(ref peakCount)))
+            channel.Enqueue(message, out bool enqueueDispatchToken, out bool replacedPendingMessage);
+            if (enqueueDispatchToken)
             {
-                if (Interlocked.CompareExchange(ref peakCount, pending, snapshotPeak) == snapshotPeak)
+                dispatchQueue.Enqueue(channel.Id);
+                int pending = Interlocked.Increment(ref pendingCount);
+                int snapshotPeak;
+                while (pending > (snapshotPeak = Volatile.Read(ref peakCount)))
                 {
-                    break;
+                    if (Interlocked.CompareExchange(ref peakCount, pending, snapshotPeak) == snapshotPeak)
+                    {
+                        break;
+                    }
                 }
             }
+            else if (replacedPendingMessage)
+            {
+                Interlocked.Increment(ref totalCoalesced);
+                Interlocked.Increment(ref totalDropped);
+            }
+            Interlocked.Increment(ref totalPublished);
         }
 
         public void Subscribe<T>(Action<T> handler)
@@ -121,7 +141,9 @@ namespace Project_1.Messaging
                 Interlocked.Read(ref totalDispatchMisses),
                 Interlocked.Read(ref totalWithoutSubscribers),
                 Interlocked.Read(ref totalHandlerInvocations),
-                Interlocked.Read(ref totalHandlerFailures));
+                Interlocked.Read(ref totalHandlerFailures),
+                Interlocked.Read(ref totalCoalesced),
+                Interlocked.Read(ref totalDropped));
         }
 
         Channel<T> GetOrAddChannel<T>()
@@ -129,7 +151,8 @@ namespace Project_1.Messaging
             IChannel channel = channelsByType.GetOrAdd(typeof(T), _ =>
             {
                 int id = Interlocked.Increment(ref nextChannelId);
-                Channel<T> created = new Channel<T>(id);
+                bool coalesced = coalescedTypes.ContainsKey(typeof(T));
+                Channel<T> created = new Channel<T>(id, coalesced);
                 channelsById.TryAdd(id, created);
                 return created;
             });
@@ -145,17 +168,36 @@ namespace Project_1.Messaging
         {
             readonly ConcurrentQueue<T> queue = new ConcurrentQueue<T>();
             readonly SubscriberList<T> subscribers = new SubscriberList<T>();
+            readonly bool coalesced;
+            readonly object coalescedGate = new object();
+            bool hasPendingCoalescedMessage;
+            T latestCoalescedMessage;
 
-            public Channel(int id)
+            public Channel(int id, bool coalesced)
             {
                 Id = id;
+                this.coalesced = coalesced;
             }
 
             public int Id { get; }
 
-            public void Enqueue(in T message)
+            public void Enqueue(in T message, out bool enqueueDispatchToken, out bool replacedPendingMessage)
             {
-                queue.Enqueue(message);
+                if (!coalesced)
+                {
+                    queue.Enqueue(message);
+                    enqueueDispatchToken = true;
+                    replacedPendingMessage = false;
+                    return;
+                }
+
+                lock (coalescedGate)
+                {
+                    replacedPendingMessage = hasPendingCoalescedMessage;
+                    latestCoalescedMessage = message;
+                    hasPendingCoalescedMessage = true;
+                    enqueueDispatchToken = !replacedPendingMessage;
+                }
             }
 
             public void Subscribe(Action<T> handler)
@@ -165,7 +207,7 @@ namespace Project_1.Messaging
 
             public bool TryDispatchOne(string mailboxName, out bool hadSubscribers, out int handlerInvocations, out int handlerFailures)
             {
-                if (!queue.TryDequeue(out T message))
+                if (!TryDequeueMessage(out T message))
                 {
                     hadSubscribers = false;
                     handlerInvocations = 0;
@@ -199,6 +241,28 @@ namespace Project_1.Messaging
                 handlerInvocations = handlers.Length;
                 handlerFailures = failures;
                 return true;
+            }
+
+            bool TryDequeueMessage(out T message)
+            {
+                if (!coalesced)
+                {
+                    return queue.TryDequeue(out message);
+                }
+
+                lock (coalescedGate)
+                {
+                    if (!hasPendingCoalescedMessage)
+                    {
+                        message = default;
+                        return false;
+                    }
+
+                    message = latestCoalescedMessage;
+                    latestCoalescedMessage = default;
+                    hasPendingCoalescedMessage = false;
+                    return true;
+                }
             }
         }
 
@@ -239,7 +303,9 @@ namespace Project_1.Messaging
             long totalDispatchMisses,
             long totalWithoutSubscribers,
             long totalHandlerInvocations,
-            long totalHandlerFailures)
+            long totalHandlerFailures,
+            long totalCoalesced,
+            long totalDropped)
         {
             Name = name;
             Pending = pending;
@@ -253,6 +319,8 @@ namespace Project_1.Messaging
             TotalWithoutSubscribers = totalWithoutSubscribers;
             TotalHandlerInvocations = totalHandlerInvocations;
             TotalHandlerFailures = totalHandlerFailures;
+            TotalCoalesced = totalCoalesced;
+            TotalDropped = totalDropped;
         }
 
         public string Name { get; }
@@ -267,5 +335,7 @@ namespace Project_1.Messaging
         public long TotalWithoutSubscribers { get; }
         public long TotalHandlerInvocations { get; }
         public long TotalHandlerFailures { get; }
+        public long TotalCoalesced { get; }
+        public long TotalDropped { get; }
     }
 }

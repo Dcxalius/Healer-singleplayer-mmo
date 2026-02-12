@@ -23,6 +23,8 @@ namespace Project_1.Managers.States
         PauseBox pauseBox;
         Textures.Texture pauseBackground;
         List<DialogueBox> dialogueBoxes;
+        readonly UiElementDrawList drawListA = new UiElementDrawList();
+        readonly UiElementDrawList drawListB = new UiElementDrawList();
         volatile UiElementDrawList drawList;
         volatile bool drawListDirty = true;
 
@@ -31,6 +33,7 @@ namespace Project_1.Managers.States
             dialogueBoxes = new List<DialogueBox>();
             pauseBox = new PauseBox();
             pauseBackground = new Textures.Texture(new GfxPath(GfxType.UI, "PauseBackground"));
+            drawList = drawListA;
             BuildDrawList();
         }
 
@@ -150,13 +153,9 @@ namespace Project_1.Managers.States
 
         void BuildDrawList()
         {
-            UIElement[] elements = new UIElement[dialogueBoxes.Count + 1];
-            elements[0] = pauseBox;
-            for (int i = 0; i < dialogueBoxes.Count; i++)
-            {
-                elements[i + 1] = dialogueBoxes[i];
-            }
-            drawList = new UiElementDrawList(elements);
+            UiElementDrawList buildTarget = ReferenceEquals(drawList, drawListA) ? drawListB : drawListA;
+            buildTarget.Set(pauseBox, dialogueBoxes);
+            drawList = buildTarget;
             MarkUiDirty();
         }
 

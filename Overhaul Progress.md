@@ -1,13 +1,12 @@
 # Overhaul Progress
 
-Last updated: 2026-02-10
+Last updated: 2026-02-12
 
 ## In Progress
 - None.
 
 ## Finished — waiting on other implementation
-- Render snapshots for entities/world objects/spawners/projectiles/corpses/doodads + VisualEffect snapshots.
-- UI/input escape routing via UI-first event, with sim state change on Escape.
+- None.
 
 ## Finished
 - Texture render snapshots (sim builds, main draws).
@@ -55,6 +54,7 @@ Last updated: 2026-02-10
 - UI snapshot hardening: descriptor tooltip events now carry `ItemDescriptorSnapshot` (no live `Item` references), and descriptor box renders from immutable snapshot text payloads.
 - Payload hardening sweep (non-`GfxPath`): converted mailbox item/stat payloads to immutable snapshots (`ItemUiSnapshot`, `StatReportSnapshot`), replaced invite `IList` payloads with arrays, and made `SaveLoadPayload` immutable (constructor-only token arrays).
 - Mailbox diagnostics (phase start): added mailbox counters for total published/dequeued, dispatch misses, no-subscriber deliveries, handler invocations/failures; debug overlay now shows queue peak plus publish/failure totals per mailbox.
+- Mailbox diagnostics (phase follow-up): added opt-in typed mailbox coalescing (registered for keyboard/keybind/mouse snapshots and movement intent), plus `TotalCoalesced`/`TotalDropped` counters and overlay/threshold warning output for coalesced/dropped spikes.
 - Thread-loop diagnostics: added `SimThreadStats`/`UiThreadStats` (last/avg/max frame ms, overrun count at 16ms budget, pulse wait timeouts), and surfaced both in debug overlay.
 - Diagnostics threshold alerts: added non-spam warning logs (cooldown-based) for mailbox backlog, mailbox handler-failure deltas, and sim/UI thread overrun/timeout timing issues.
 - Command-routing migration (phase 1 of mailbox ownership cleanup): gameplay command subscriptions in `StateManager` now subscribe on `Mailboxes.Sim`, with a temporary `Main->Sim` forwarding shim for existing publishers; `SimThread` now drains both `Main` and `Sim` each pulse.
@@ -62,3 +62,24 @@ Last updated: 2026-02-10
 - Command-routing migration (phase 3 cleanup): removed temporary `Main->Sim` forwarding shim in `StateManager`; gameplay command handlers are now subscribed only on `Mailboxes.Sim` (with `Main` reserved for worker completion traffic).
 - Mailbox ownership cleanup (worker completion): `WorkerCompletionReady` now publishes/subscribes on `Mailboxes.Sim`, and `SimThread` no longer drains `Mailboxes.Main` each pulse.
 - Payload hardening sweep (non-`GfxPath`, continuation): event payload enums are now messaging-local (`StateKind`, `ClickKind`, `RelationToPlayerKind`, `EquipmentSlotKind`, dialogue enums) with explicit boundary conversions, reducing direct cross-layer type coupling in mailbox contracts.
+- Snapshot draw cutover: `Game.Draw` world pass now renders through `RenderSnapshotManager.DrawGameSnapshots(...)`, consolidating tile/entity/world-object/spawner/projectile draw onto the snapshot pipeline boundary.
+- Escape routing finalized: Escape is now explicitly split into UI event (`EscapePressed`) and sim command (`EscapeRequested`) so UI-first consumption is enforced before any sim state transition.
+- Render boundary hardening: added explicit `DrawSnapshots(...)` world-manager entrypoints and routed `RenderSnapshotManager` through them; legacy manager `Draw(...)` methods now exist only as `[Obsolete]` wrappers.
+- Camera snapshot hardening: non-sim camera reads now use immutable `CameraRenderSnapshot` data, while sim-owner updates publish snapshots each frame (and on resize/load/zoom), reducing live cross-thread camera-state races.
+- Hot-allocation sweep (plan §11): removed per-frame light-position array allocations in `Game.Draw`, replaced party position snapshotting with fixed-count copy/snapshot fields, removed per-tick `Chunk[,]` allocation in `TileManager.Update`, and replaced `PartyControlCleared` array payload with fixed render-id fields.
+- Hot-allocation sweep (plan §11, cont.): removed repeated `ObjectManager` aggregate-list allocations by reusing a scratch list for update/server-tick/plate refresh, and removed per-snapshot `Chunk[]` allocation in `TileManager.BuildRenderSnapshot` via a reusable sorted chunk scratch list.
+- Hot-allocation sweep (plan §11, cont.): minimap snapshot publishing now uses double-buffered reusable storage (`MinimapSnapshotManager`) with a count-based read API (`TryGetSnapshot`), removing per-frame `List`+`ToArray` churn in minimap dots.
+- Hot-allocation sweep (plan §11, cont.): `HUDManager` UI/hud-move draw-list rebuilds now use double-buffered reusable `UiDrawList`/`HudMoveDrawList` snapshots (copy+grow buffers) instead of `hudElements.ToArray()` / `dialogueBoxes.ToArray()` on invalidation.
+- Hot-allocation sweep (plan §11, cont.): plate draw-list rebuild path is now non-alloc at rebuild time; `HUDManager` uses double-buffered reusable `PlateDrawList` snapshots plus scratch capture via new `NamePlateHandler.CopyDrawList(...)` / `PlateBoxHandler.CopyDrawList(...)` APIs.
+- Hot-allocation sweep (plan §11, cont.): `NamePlateHandler.Update()` now reuses scratch collections for collision resolution and iterates unique pairs directly (`j = i + 1`), removing per-update `ToList`/temporary list allocations and reverse-pair containment checks.
+- Hot-allocation sweep (plan §11, cont.): keybind snapshot path no longer allocates per frame; `InputManager.PublishKeyboardSnapshots()` now publishes bitmask-based `KeyBindSnapshot`, and `UiKeyBindStateCache` / `KeyBindStateCache` consume masks directly (no bool-array snapshots/copies).
+- Hot-allocation sweep (plan §11, cont.): removed high-frequency modifier-array churn in key evaluation by switching `KeySet` modifier checks to `InputManager.IsHoldModifierHeld(...)` (no `CheckHoldModifiers()` allocations in keybind polling loops).
+- Hot-allocation sweep (plan §11, cont.): tile transparency snapshot publishing now reuses double buffers in `TileRenderCache` and swaps under lock, removing per-update `Color[]` allocations for transparency maps.
+- Hot-allocation sweep (plan §11, cont.): common visual-effect snapshot builds are now non-alloc for 0/1/2 active effects via `VisualEffectSnapshotBatch` inline storage (`GameObject.BuildEffectSnapshotBatch()`), with array fallback only when an object has more than two simultaneous effects.
+- Hot-allocation sweep (plan §11, cont.): click/release/scroll modifier payloads are now mask-based (`Modifiable` + event constructors + `InputManager` event creation), removing per-event `bool[]` allocations on pointer input.
+- Hot-allocation sweep (plan §11, cont.): removed unused legacy array-return draw-list APIs (`NamePlateHandler.GetDrawList()`, `PlateBoxHandler.GetDrawList()`) after the non-alloc copy/counted draw-list path became the only call site.
+- Render-boundary hardening (follow-up): minimap rendering now targets explicit snapshot entrypoints (`DrawMinimapSnapshots`) and legacy draw/minimap wrappers are guarded (`[Obsolete]` + debug asserts) to fail fast if live-object paths are accidentally reintroduced.
+- Render-boundary hardening (closeout): removed the remaining legacy draw/minimap wrapper methods entirely (`ObjectManager`/`TileManager`/`SpawnerManager` draw wrappers; legacy manager draw wrappers; legacy live-object minimap methods on `Entity`/`Chunk`/`Spawner`), leaving snapshot entrypoints as the only API.
+- UI invalidation refinement: moved away from raw mouse-delta invalidation by tracking `UIElement` interaction-version changes (hover/press/release/move/resize/visibility), then invalidating HUD/state surfaces only when interaction state actually changes; click/release/scroll now invalidate only when UI/HUD consumes input.
+- UI invalidation refinement (tuning): reduced interaction-version false positives by guarding no-op visibility toggles, ignoring HUD-move state flips for non-moveable widgets, and only bumping interaction version when clamped moves actually change final position.
+- State UI draw-list allocation sweep: converted non-game states (`StartScreen`/`PauseMenu`/`LoadingMenu`/`NewGame`/`MoveHUD`/`OptionMenu`) to reusable double-buffered `UiElementDrawList` snapshots, and added count-based draw-list copy APIs in `OptionManager` to avoid per-update list/array recreation.

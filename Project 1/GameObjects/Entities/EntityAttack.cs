@@ -218,17 +218,26 @@ namespace Project_1.GameObjects.Entities
 
         public void RecieveSpellAttack(Entity aCaster, SpellEffect aSpellEffect, Damage aDamageTaken)
         {
+            if (aSpellEffect.StatSource == AbilityStatSource.Attack)
+            {
+                Unit.Attack attackSource = GetAttackSourceForAttackStatSpell(aCaster);
+                HitTable.HitResult hitResult = HitTable.GenerateTable(attackSource, aCaster, this, false, false);
+                RecieveAttack(hitResult, aCaster, attackSource, aDamageTaken);
+                return;
+            }
+
             string resultString = "";
             var damageType = aDamageTaken.Types;
             int leveldiff = CurrentLevel - aCaster.CurrentLevel;
             float levelHit = MathF.Max(0.01f, leveldiff >= 3 ? 0.96f - leveldiff * 0.01f : 0.83f - (leveldiff - 3) * 0.11f);
-            float totalHit = MathF.Min(0.99f, levelHit + aCaster.SecondaryStats.Spell.BonusHitChance);
+            float totalHit = MathF.Min(0.99f, levelHit + (float)aCaster.SecondaryStats.Spell.BonusHitChanceForSchools(aSpellEffect.SpellSchools));
 
             bool isCrit = false;
-            if (RandomManager.RollDouble() <= aCaster.SecondaryStats.Spell.CriticalChance)
+            if (RandomManager.RollDouble() <= aCaster.SecondaryStats.Spell.CriticalChanceForSchools(aSpellEffect.SpellSchools))
             {
                 isCrit = true;
-                aDamageTaken.ApplyCriticalStrike(aCaster, this);
+                double critMultiplier = Math.Max(aCaster.SecondaryStats.Spell.CriticalDamageForSchools(aSpellEffect.SpellSchools) - SecondaryStats.Defense.CriticalDamageReduction, 0);
+                aDamageTaken.ApplyCriticalStrike(critMultiplier);
             }
 
             if (aSpellEffect.IsBinary)
@@ -331,6 +340,17 @@ namespace Project_1.GameObjects.Entities
                 PublishSpellResistEvent(aCaster, aSpellEffect, true);
                 PublishSpellResistedByTargetEvent(aCaster, aSpellEffect, true);
             }
+        }
+
+        static Unit.Attack GetAttackSourceForAttackStatSpell(Entity aCaster)
+        {
+            Unit.Attack attack = aCaster.unitData.AttackData.MainHandAttack ?? aCaster.unitData.AttackData.OffHandAttack;
+            if (attack != null)
+            {
+                return attack;
+            }
+
+            throw new InvalidOperationException("No attack source available for attack-sourced spell.");
         }
 
         //TODO: aCauseName should probably not be a string, but rather some kind of reference to the spell/ability/item that caused the damage

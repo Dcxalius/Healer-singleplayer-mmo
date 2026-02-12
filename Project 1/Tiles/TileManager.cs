@@ -72,6 +72,8 @@ namespace Project_1.Tiles
         static readonly ReaderWriterLockSlim chunkLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
         static readonly ConcurrentDictionary<int, int[,]> generatedChunkIds = new ConcurrentDictionary<int, int[,]>();
         static readonly HashSet<int> pendingChunkGenerations = new HashSet<int>();
+        static readonly List<Chunk> chunkSnapshotScratch = new List<Chunk>();
+        static readonly ChunkIdComparer chunkIdComparer = new ChunkIdComparer();
 
         public static CollisionManager CollisionManager;
 
@@ -79,6 +81,17 @@ namespace Project_1.Tiles
         static PathFinder pathFinder = new PathFinder();
 
         static bool initialized;
+
+        sealed class ChunkIdComparer : IComparer<Chunk>
+        {
+            public int Compare(Chunk x, Chunk y)
+            {
+                if (ReferenceEquals(x, y)) return 0;
+                if (x == null) return -1;
+                if (y == null) return 1;
+                return x.Id.CompareTo(y.Id);
+            }
+        }
 
         public static void Init()
         {
@@ -98,29 +111,25 @@ namespace Project_1.Tiles
             chunkLock.EnterWriteLock();
             try
             {
-                Chunk[,] surroundingChunks = new Chunk[surroundingChunkCheckSize, surroundingChunkCheckSize]; // consider removing if this ever becomes a perf concern
                 Chunk centreChunk = GetChunkUnder(ObjectManager.Player.FeetPosition);
                 Point centreChunkPos = Chunk.GetChunkPosition(centreChunk.Id);
-                surroundingChunks[surroundingChunkCheckSize / 2, surroundingChunkCheckSize / 2] = centreChunk;
                 int queuedPrefetch = 0;
                 int immediateRadius = surroundingChunkCheckSize / 2;
                 int prefetchRadius = immediateRadius + 1;
 
-                for (int i = 0; i < surroundingChunks.GetLength(0); i++)
+                for (int x = -immediateRadius; x <= immediateRadius; x++)
                 {
-                    for (int j = 0; j < surroundingChunks.GetLength(1); j++)
+                    for (int y = -immediateRadius; y <= immediateRadius; y++)
                     {
-                        if (i == surroundingChunkCheckSize / 2 && j == surroundingChunkCheckSize / 2) continue;
-                        int newId = Chunk.GetChunkId(centreChunkPos + new Point(i - surroundingChunkCheckSize / 2, j - surroundingChunkCheckSize / 2));
-                        surroundingChunks[i, j] = GetChunk(newId);
+                        if (x == 0 && y == 0) continue;
+                        int newId = Chunk.GetChunkId(centreChunkPos + new Point(x, y));
+                        if (chunks.ContainsKey(newId)) continue;
 
-                        if (surroundingChunks[i, j] != null) continue;
                         if (!generatedChunkIds.TryRemove(newId, out int[,] tileIds))
                         {
                             tileIds = Chunk.GenerateTileIds(newId);
                         }
-                        surroundingChunks[i, j] = new Chunk(tileIds, newId);
-                        chunks[newId] = surroundingChunks[i, j];
+                        chunks[newId] = new Chunk(tileIds, newId);
                     }
                 }
 
@@ -249,7 +258,7 @@ namespace Project_1.Tiles
 
         }
 
-        public static void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aSize)
+        internal static void DrawMinimapSnapshots(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aSize)
         {
             ThreadAffinity.AssertMainThread();
             TileRenderCache.FlushMinimapSnapshots();
@@ -261,10 +270,10 @@ namespace Project_1.Tiles
             }
 
         }
-
-        public static void Draw(SpriteBatch aBatch)
+        internal static void DrawSnapshots(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();
+            // Snapshot-only draw path. Do not read live sim chunk data here.
             renderChunks.ApplyUpdates();
             foreach (ChunkRenderSnapshot chunk in renderChunks.Values)
             {
@@ -278,12 +287,19 @@ namespace Project_1.Tiles
             //TODO: Should this really sort?
             //Also shouldn't it just send the ChunkSize / Minimap surrounding the player?
             ThreadAffinity.AssertSimThread();
-            Chunk[] chunkSnapshot = chunks.Values.OrderBy(chunk => chunk.Id).ToArray();
-            currentChunkIds.Clear();
-            for (int i = 0; i < chunkSnapshot.Length; i++)
+            chunkSnapshotScratch.Clear();
+            foreach (Chunk chunk in chunks.Values)
             {
-                TileRenderCache.PublishChunkMinimapSnapshot(chunkSnapshot[i]);
-                ChunkRenderSnapshot snapshot = chunkSnapshot[i].BuildRenderSnapshot();
+                if (chunk == null) continue;
+                chunkSnapshotScratch.Add(chunk);
+            }
+            chunkSnapshotScratch.Sort(chunkIdComparer);
+            currentChunkIds.Clear();
+            for (int i = 0; i < chunkSnapshotScratch.Count; i++)
+            {
+                Chunk chunk = chunkSnapshotScratch[i];
+                TileRenderCache.PublishChunkMinimapSnapshot(chunk);
+                ChunkRenderSnapshot snapshot = chunk.BuildRenderSnapshot();
                 renderChunks.EnqueueUpdate(snapshot);
                 currentChunkIds.Add(snapshot.RenderId);
             }

@@ -15,16 +15,16 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct KeyBindSnapshot
     {
-        public KeyBindSnapshot(bool[] pressed, bool[] held, bool[] released)
+        public KeyBindSnapshot(ulong pressedMask, ulong heldMask, ulong releasedMask)
         {
-            Pressed = pressed;
-            Held = held;
-            Released = released;
+            PressedMask = pressedMask;
+            HeldMask = heldMask;
+            ReleasedMask = releasedMask;
         }
 
-        public bool[] Pressed { get; }
-        public bool[] Held { get; }
-        public bool[] Released { get; }
+        public ulong PressedMask { get; }
+        public ulong HeldMask { get; }
+        public ulong ReleasedMask { get; }
     }
 
     internal readonly struct MouseSnapshot

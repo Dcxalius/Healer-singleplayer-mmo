@@ -230,15 +230,6 @@ namespace Project_1.Tiles
             return renderSnapshot;
         }
 
-        public void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
-        {
-            ThreadAffinity.AssertMainThread();
-            var minimapTexture = TileRenderCache.GetChunkMinimap(id);
-            if (minimapTexture == null) return;
-
-            aBatch.Draw(minimapTexture, ( new AbsoluteScreenPosition((Position - aOrigin).ToPoint()) / (TileSize) + aMinimapOffset + aMinimapSize / 2).ToVector2(), Color.White);
-        }
-
         public void Draw(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();

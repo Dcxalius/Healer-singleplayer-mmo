@@ -165,6 +165,7 @@ namespace Project_1.Input
         static MouseState oldMouseState;
         static int scrollDelta;
         static int scrollWheelValue;
+        const int KeyBindMaskBitCount = sizeof(ulong) * 8;
 
         static bool isFocused;
 
@@ -299,31 +300,31 @@ namespace Project_1.Input
 
         static void CreateClickEvent(InputManager.ClickType aTypeOfClick)
         {
-            bool[] heldModifiers = CheckHoldModifiers();
+            byte modifiersMask = GetHoldModifierMask();
 
             inputToWriteTo = null;
 
-            ClickEvent clickEvent = new ClickEvent(GetMousePosRelative(), aTypeOfClick, heldModifiers);
+            ClickEvent clickEvent = new ClickEvent(GetMousePosRelative(), aTypeOfClick, modifiersMask);
 
             Mailboxes.PublishUiEvent(clickEvent);
         }
 
         public static void CreateReleaseEvent(UIElement aCreator, InputManager.ClickType aTypeOfRelease)
         {
-            bool[] heldModifiers = CheckHoldModifiers();
+            byte modifiersMask = GetHoldModifierMask();
 
-            ReleaseEvent releaseEvent = new ReleaseEvent(aCreator, GetMousePosRelative(), aTypeOfRelease, heldModifiers);
+            ReleaseEvent releaseEvent = new ReleaseEvent(aCreator, GetMousePosRelative(), aTypeOfRelease, modifiersMask);
             Mailboxes.PublishUiEvent(releaseEvent);
         }
 
         static void CreateScrollEvent()
         {
-            bool[] heldModifiers = CheckHoldModifiers();
+            byte modifiersMask = GetHoldModifierMask();
 
             int amount = Math.Abs(oldMouseState.ScrollWheelValue - newMouseState.ScrollWheelValue) / 120;
             ScrollEvent.Direction direction = oldMouseState.ScrollWheelValue > newMouseState.ScrollWheelValue ? ScrollEvent.Direction.Up : ScrollEvent.Direction.Down;
 
-            ScrollEvent scrollEvent = new ScrollEvent(GetMousePosRelative(), amount, direction, heldModifiers);
+            ScrollEvent scrollEvent = new ScrollEvent(GetMousePosRelative(), amount, direction, modifiersMask);
 
             Mailboxes.PublishUiEvent(scrollEvent);
         }
@@ -342,21 +343,24 @@ namespace Project_1.Input
             Mailboxes.PublishUiEvent(new KeyboardSnapshot(downKeys));
 
             int count = (int)KeyBindManager.KeyListner.Count;
-            bool[] pressed = new bool[count];
-            bool[] held = new bool[count];
-            bool[] released = new bool[count];
+            Debug.Assert(count <= KeyBindMaskBitCount, $"KeyBindSnapshot currently supports up to {KeyBindMaskBitCount} key listeners.");
+            ulong pressedMask = 0;
+            ulong heldMask = 0;
+            ulong releasedMask = 0;
             if (!UiTextInputManager.IsActive)
             {
-                for (int i = 0; i < count; i++)
+                int max = Math.Min(count, KeyBindMaskBitCount);
+                for (int i = 0; i < max; i++)
                 {
                     KeyBindManager.KeyListner key = (KeyBindManager.KeyListner)i;
-                    pressed[i] = KeyBindManager.GetPress(key);
-                    held[i] = KeyBindManager.GetHold(key);
-                    released[i] = KeyBindManager.GetRelease(key);
+                    ulong bit = 1UL << i;
+                    if (KeyBindManager.GetPress(key)) pressedMask |= bit;
+                    if (KeyBindManager.GetHold(key)) heldMask |= bit;
+                    if (KeyBindManager.GetRelease(key)) releasedMask |= bit;
                 }
             }
 
-            Mailboxes.PublishUiEvent(new KeyBindSnapshot(pressed, held, released));
+            Mailboxes.PublishUiEvent(new KeyBindSnapshot(pressedMask, heldMask, releasedMask));
         }
 
         static void PublishMouseSnapshot()
@@ -369,10 +373,32 @@ namespace Project_1.Input
         public static bool[] CheckHoldModifiers()
         {
             bool[] heldModifiers = new bool[(int)HoldModifier.Count];
-            heldModifiers[(int)HoldModifier.Ctrl] = GetHold(Keys.LeftControl) || GetHold(Keys.RightControl);
-            heldModifiers[(int)HoldModifier.Alt] = GetHold(Keys.LeftAlt) || GetHold(Keys.RightAlt);
-            heldModifiers[(int)HoldModifier.Shift] = GetHold(Keys.LeftShift) || GetHold(Keys.RightShift);
+            heldModifiers[(int)HoldModifier.Ctrl] = IsHoldModifierHeld(HoldModifier.Ctrl);
+            heldModifiers[(int)HoldModifier.Alt] = IsHoldModifierHeld(HoldModifier.Alt);
+            heldModifiers[(int)HoldModifier.Shift] = IsHoldModifierHeld(HoldModifier.Shift);
             return heldModifiers;
+        }
+
+        public static bool IsHoldModifierHeld(HoldModifier modifier)
+        {
+            ThreadAffinity.AssertMainThread();
+            return modifier switch
+            {
+                HoldModifier.Ctrl => GetHold(Keys.LeftControl) || GetHold(Keys.RightControl),
+                HoldModifier.Alt => GetHold(Keys.LeftAlt) || GetHold(Keys.RightAlt),
+                HoldModifier.Shift => GetHold(Keys.LeftShift) || GetHold(Keys.RightShift),
+                _ => false
+            };
+        }
+
+        public static byte GetHoldModifierMask()
+        {
+            ThreadAffinity.AssertMainThread();
+            byte mask = 0;
+            if (IsHoldModifierHeld(HoldModifier.Ctrl)) mask |= (byte)(1 << (int)HoldModifier.Ctrl);
+            if (IsHoldModifierHeld(HoldModifier.Alt)) mask |= (byte)(1 << (int)HoldModifier.Alt);
+            if (IsHoldModifierHeld(HoldModifier.Shift)) mask |= (byte)(1 << (int)HoldModifier.Shift);
+            return mask;
         }
 
         public static AbsoluteScreenPosition GetMousePosAbsolute()

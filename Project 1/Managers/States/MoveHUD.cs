@@ -24,6 +24,8 @@ namespace Project_1.Managers.States
         MoveHUDBox MoveHUDBox;
         RenderTarget2D cleanGame;
         bool needsCleanGame;
+        readonly UiElementDrawList moveHudDrawListA = new UiElementDrawList();
+        readonly UiElementDrawList moveHudDrawListB = new UiElementDrawList();
         volatile UiElementDrawList moveHudDrawList;
 
 
@@ -31,6 +33,7 @@ namespace Project_1.Managers.States
         {
             pauseBackground = new Textures.Texture(new GfxPath(GfxType.UI, "PauseBackground"));
             MoveHUDBox = new MoveHUDBox();
+            moveHudDrawList = moveHudDrawListA;
         }
 
         public override void OnEnter()
@@ -98,7 +101,9 @@ namespace Project_1.Managers.States
         {
             MoveHUDBox.Update();
             HUDManager.HudMovableUpdate();
-            moveHudDrawList = new UiElementDrawList(new UIElement[] { MoveHUDBox });
+            UiElementDrawList buildTarget = ReferenceEquals(moveHudDrawList, moveHudDrawListA) ? moveHudDrawListB : moveHudDrawListA;
+            buildTarget.SetSingle(MoveHUDBox);
+            moveHudDrawList = buildTarget;
             MarkUiDirty();
         }
 
@@ -107,7 +112,9 @@ namespace Project_1.Managers.States
             needsCleanGame = true;
             HUDManager.SetHudMoveable(true);
             HUDManager.InvalidateUi();
-            moveHudDrawList = new UiElementDrawList(new UIElement[] { MoveHUDBox });
+            UiElementDrawList buildTarget = ReferenceEquals(moveHudDrawList, moveHudDrawListA) ? moveHudDrawListB : moveHudDrawListA;
+            buildTarget.SetSingle(MoveHUDBox);
+            moveHudDrawList = buildTarget;
             MarkUiDirty();
         }
 
@@ -116,14 +123,18 @@ namespace Project_1.Managers.States
             StateManager.RedrawGame();
             HUDManager.ResetHudMoveable();
             HUDManager.InvalidateUi();
-            moveHudDrawList = null;
+            UiElementDrawList buildTarget = ReferenceEquals(moveHudDrawList, moveHudDrawListA) ? moveHudDrawListB : moveHudDrawListA;
+            buildTarget.SetSingle(null);
+            moveHudDrawList = buildTarget;
             MarkUiDirty();
         }
 
         internal void UiRescale()
         {
             MoveHUDBox?.Rescale();
-            moveHudDrawList = new UiElementDrawList(new UIElement[] { MoveHUDBox });
+            UiElementDrawList buildTarget = ReferenceEquals(moveHudDrawList, moveHudDrawListA) ? moveHudDrawListB : moveHudDrawListA;
+            buildTarget.SetSingle(MoveHUDBox);
+            moveHudDrawList = buildTarget;
             MarkUiDirty();
         }
 

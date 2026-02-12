@@ -15,7 +15,7 @@ namespace Project_1.GameObjects
         readonly float feetPosY;
         readonly Point size;
         readonly GfxTexture.TextureRenderSnapshot texture;
-        readonly VisualEffectRenderSnapshot[] effects;
+        readonly VisualEffectSnapshotBatch effects;
         readonly bool drawShadow;
         readonly Color shadowColor;
 
@@ -29,7 +29,7 @@ namespace Project_1.GameObjects
             float feetPosY,
             Point size,
             GfxTexture.TextureRenderSnapshot texture,
-            VisualEffectRenderSnapshot[] effects,
+            VisualEffectSnapshotBatch effects,
             bool drawShadow,
             Color shadowColor)
         {
@@ -38,7 +38,7 @@ namespace Project_1.GameObjects
             this.feetPosY = feetPosY;
             this.size = size;
             this.texture = texture;
-            this.effects = effects ?? System.Array.Empty<VisualEffectRenderSnapshot>();
+            this.effects = effects;
             this.drawShadow = drawShadow;
             this.shadowColor = shadowColor;
         }
@@ -55,11 +55,7 @@ namespace Project_1.GameObjects
             }
 
             GfxTexture.DrawSnapshot(batch, texture, position, feetPosY);
-
-            for (int i = 0; i < effects.Length; i++)
-            {
-                effects[i].Draw(batch, position, feetPosY + 0.01f);
-            }
+            effects.Draw(batch, position, feetPosY + 0.01f);
         }
 
         static Point ScaledSize(Point rawSize)

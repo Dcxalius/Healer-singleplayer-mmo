@@ -40,20 +40,27 @@ namespace Project_1.Input
                 StateManager.UiInvalidate();
                 return;
             }
-            if (HUDManager.Click(clickEvent)) return;
+            if (HUDManager.Click(clickEvent))
+            {
+                HUDManager.InvalidateUi();
+                return;
+            }
             Mailboxes.PublishSimCommand(WorldClickRequested.FromClickEvent(clickEvent));
         }
 
         static void HandleRelease(ReleaseEvent releaseEvent)
         {
             ThreadAffinity.AssertUiThread();
-            // Release can change pressed/held visual state even when no UI target captures it.
-            StateManager.UiInvalidate();
             if (StateManager.UiRelease(releaseEvent))
             {
+                StateManager.UiInvalidate();
                 return;
             }
-            if (HUDManager.Release(releaseEvent)) return;
+            if (HUDManager.Release(releaseEvent))
+            {
+                HUDManager.InvalidateUi();
+                return;
+            }
             Mailboxes.PublishSimCommand(WorldReleaseRequested.FromReleaseEvent(releaseEvent));
         }
 
@@ -65,7 +72,11 @@ namespace Project_1.Input
                 StateManager.UiInvalidate();
                 return;
             }
-            if (HUDManager.Scroll(scrollEvent)) return;
+            if (HUDManager.Scroll(scrollEvent))
+            {
+                HUDManager.InvalidateUi();
+                return;
+            }
             Mailboxes.PublishSimCommand(WorldScrollRequested.FromScrollEvent(scrollEvent));
         }
 
@@ -94,27 +105,11 @@ namespace Project_1.Input
         static void HandleMouseSnapshot(MouseSnapshot snapshot)
         {
             ThreadAffinity.AssertUiThread();
-            bool changed = UiMouseStateCache.Update(snapshot);
+            UiMouseStateCache.Update(snapshot);
             Mailboxes.PublishSimCommand(snapshot);
-            if (!changed) return;
-            // TODO: Ponder whether this is the right approach.
-            // Current (invalidate on mouse move/scroll):
-            // + Ensures hover/drag visuals stay responsive.
-            // + Simple and predictable (no extra state).
-            // - Redraws every frame while mouse is moving.
-            // Suggested (gate by hover/drag/hit-test or pixel threshold):
-            // + Reduces redraws during continuous movement.
-            // + Could skip work when no UI can visually change.
-            // - Requires extra state/caching and careful hit-test tracking.
-            if (StateManager.CurrentState == StateManager.States.Game || StateManager.CurrentState == StateManager.States.MoveHUD)
-            {
-                HUDManager.InvalidateUi();
-                return;
-            }
-            StateManager.UiInvalidate();
         }
 
-        static void HandleEscapePressed(EscapePressed pressed)
+        static void HandleEscapePressed(EscapePressed _)
         {
             ThreadAffinity.AssertUiThread();
             if (StateManager.UiEscapePressed())
@@ -122,7 +117,7 @@ namespace Project_1.Input
                 StateManager.UiInvalidate();
                 return;
             }
-            Mailboxes.PublishSimCommand(pressed);
+            Mailboxes.PublishSimCommand(new EscapeRequested());
         }
     }
 }

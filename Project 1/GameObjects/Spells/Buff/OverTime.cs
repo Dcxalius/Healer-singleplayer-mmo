@@ -30,6 +30,8 @@ namespace Project_1.GameObjects.Spells.Buff
         public GfxPath HitGfxPath { get => hitEffectPath; }
         GfxPath hitEffectPath;
 
+        public int TickCount => tickRate <= 0 ? 1 : Math.Max(1, (int)Math.Floor(duration / tickRate));
+
 
         [JsonConstructor]
         public OverTime(string name, string gfxName, string hitEffectGfx, string[] effectNames, double duration, double tickRate, bool isBinary, HashSet<SpellSchool> spellSchools) : base(name, isBinary, spellSchools)
@@ -48,9 +50,10 @@ namespace Project_1.GameObjects.Spells.Buff
             Debug.Assert(this.duration > this.tickRate);
         }
 
-        public override bool Trigger(Entity aCaster, Entity aTarget)
+        public override bool Trigger(Entity aCaster, Entity aTarget, double aScalar = 1.0)
         {
-            Periodic periodic = new Periodic(aCaster, this);
+            double perTickScalar = 1.0 / TickCount;
+            Periodic periodic = new Periodic(aCaster, this, perTickScalar);
             aTarget.AddBuff(periodic);
             return true;
         }

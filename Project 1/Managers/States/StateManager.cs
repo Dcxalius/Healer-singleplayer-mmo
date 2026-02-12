@@ -24,6 +24,7 @@ using Project_1.UI.HUD.Managers;
 using Project_1.UI.OptionMenu;
 using Project_1.UI.PauseMenu;
 using Project_1.UI.UIElements.Boxes;
+using Project_1.UI.UIElements;
 using Project_1.Tiles;
 using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
@@ -130,7 +131,7 @@ namespace Project_1.Managers.States
             SubscribeSimMailbox<KeyboardSnapshot>(e => KeyboardStateCache.Update(e));
             SubscribeSimMailbox<KeyBindSnapshot>(e => KeyBindStateCache.Update(e));
             SubscribeSimMailbox<MouseSnapshot>(e => MouseStateCache.Update(e));
-            SubscribeSimMailbox<EscapePressed>(_ => HandleEscapePressed());
+            SubscribeSimCommand<EscapeRequested>(_ => HandleEscapePressed());
             Mailboxes.Ui.Subscribe<HudRescaleRequested>(e => UiRescale(e.WindowSize));
         }
 
@@ -381,6 +382,7 @@ namespace Project_1.Managers.States
         internal static void UiUpdate()
         {
             ThreadAffinity.AssertUiThread();
+            long interactionVersionBefore = UIElement.InteractionVersion;
             switch (currentStateEnum)
             {
                 case States.StartScreen:
@@ -403,6 +405,13 @@ namespace Project_1.Managers.States
                     break;
                 default:
                     break;
+            }
+
+            if (currentStateEnum != States.Game
+                && currentStateEnum != States.MoveHUD
+                && UIElement.InteractionVersion != interactionVersionBefore)
+            {
+                currentState?.MarkUiDirty();
             }
         }
 

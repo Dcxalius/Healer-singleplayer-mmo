@@ -6,6 +6,7 @@ using GfxTexture = Project_1.Textures.Texture;
 using Project_1.UI.UIElements;
 using Project_1.Tiles;
 using Project_1.Textures;
+using Project_1.GameObjects;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -16,7 +17,7 @@ namespace Project_1.GameObjects.Entities
         readonly float feetPosY;
         readonly Point size;
         readonly GfxTexture.TextureRenderSnapshot texture;
-        readonly VisualEffectRenderSnapshot[] effects;
+        readonly VisualEffectSnapshotBatch effects;
         readonly bool selected;
         readonly Color relationColor;
         readonly Color minimapColor;
@@ -36,7 +37,7 @@ namespace Project_1.GameObjects.Entities
             float feetPosY,
             Point size,
             GfxTexture.TextureRenderSnapshot texture,
-            VisualEffectRenderSnapshot[] effects,
+            VisualEffectSnapshotBatch effects,
             bool selected,
             Color relationColor,
             Color minimapColor,
@@ -47,7 +48,7 @@ namespace Project_1.GameObjects.Entities
             this.feetPosY = feetPosY;
             this.size = size;
             this.texture = texture;
-            this.effects = effects ?? System.Array.Empty<VisualEffectRenderSnapshot>();
+            this.effects = effects;
             this.selected = selected;
             this.relationColor = relationColor;
             this.minimapColor = minimapColor;
@@ -70,11 +71,7 @@ namespace Project_1.GameObjects.Entities
             }
 
             GfxTexture.DrawSnapshot(batch, texture, position, feetPosY);
-
-            for (int i = 0; i < effects.Length; i++)
-            {
-                effects[i].Draw(batch, position, feetPosY + 0.01f);
-            }
+            effects.Draw(batch, position, feetPosY + 0.01f);
         }
 
         public void DrawMinimap(SpriteBatch batch, WorldSpace origin, AbsoluteScreenPosition minimapOffset, AbsoluteScreenPosition minimapSize)

@@ -12,16 +12,17 @@ namespace Project_1.GameObjects.Spells.Buff
     internal class Periodic : Buff
     {
         int tickCounter;
+        readonly double tickScalar;
 
         public override GfxPath GfxPath => OverTime.GfxPath;
         OverTime OverTime { get => effect as OverTime; }
 
         public override double Duration => OverTime.Duration;
 
-        public Periodic(Entity aCaster, OverTime aOverTime) : base(aCaster, aOverTime)
+        public Periodic(Entity aCaster, OverTime aOverTime, double aTickScalar) : base(aCaster, aOverTime)
         {
             tickCounter = 0;
-
+            tickScalar = aTickScalar;
         }
 
         public override void Recast()
@@ -34,11 +35,12 @@ namespace Project_1.GameObjects.Spells.Buff
         public override void Update(Entity aEntity)
         {
             base.Update(aEntity);
-            if (createTime + OverTime.TickRate * (tickCounter + 1) < TimeManager.TotalFrameTime)
+            while (tickCounter < OverTime.TickCount && createTime + OverTime.TickRate * (tickCounter + 1) <= TimeManager.TotalFrameTime)
             {
-                tickCounter++;
-                OverTime.Effects[Math.Min(OverTime.Effects.Length - 1, tickCounter)].Trigger(caster, aEntity);
+                int effectIndex = Math.Min(OverTime.Effects.Length - 1, tickCounter);
+                OverTime.Effects[effectIndex].Trigger(caster, aEntity, tickScalar);
                 aEntity.AddEffect(new VisualEffect(OverTime.HitGfxPath, 500));
+                tickCounter++;
             }
         }
     }

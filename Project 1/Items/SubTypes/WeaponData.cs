@@ -35,6 +35,12 @@ namespace Project_1.Items.SubTypes
         public double DamageRangeFactor => damageRangeFactor;
         double damageRangeFactor;
 
+        public float MinAttackDamage => minAttackDamage;
+        float minAttackDamage;
+
+        public float MaxAttackDamage => maxAttackDamage;
+        float maxAttackDamage;
+
         [JsonConstructor]
         public WeaponData(
             int id,
@@ -63,6 +69,8 @@ namespace Project_1.Items.SubTypes
         {
             if (!HasWeaponDamage(weaponType))
             {
+                minAttackDamage = 0;
+                maxAttackDamage = 0;
                 return new Attack(0, 0, 1, weaponType);
             }
 
@@ -79,8 +87,8 @@ namespace Project_1.Items.SubTypes
             double expectedDps = ComputeExpectedDps(ItemLevel, Quality, weaponType);
             double averageHit = expectedDps * attackSpeed;
 
-            float minAttackDamage = (float)(averageHit * damageRangeFactor);
-            float maxAttackDamage = (float)(averageHit * (2 - damageRangeFactor));
+            minAttackDamage = (float)(averageHit * damageRangeFactor);
+            maxAttackDamage = (float)(averageHit * (2 - damageRangeFactor));
 
             return new Attack(minAttackDamage, maxAttackDamage, attackSpeed, weaponType);
         }
