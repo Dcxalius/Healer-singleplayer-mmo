@@ -252,7 +252,7 @@ namespace Project_1.UI.HUD.Managers
             });
             Mailboxes.Ui.Subscribe<ShopOpened>(e =>
             {
-                windowHandler.OpenShopWindow(e.ItemIds);
+                windowHandler.OpenShopWindow(e.ItemIds, e.ShopkeeperName);
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<ShopClosed>(_ =>

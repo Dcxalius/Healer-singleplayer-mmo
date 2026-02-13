@@ -106,6 +106,7 @@ namespace Project_1.Items.SubTypes
             suffix = ItemQuality == Quality.Uncommon
                 ? EquipmentData.Suffix(hash)
                 : EmptySuffix();
+            ValidateSuffixOrThrow();
             RefreshDerivedStatsFromSuffix();
         }
 
@@ -121,6 +122,7 @@ namespace Project_1.Items.SubTypes
             suffix = ItemQuality == Quality.Uncommon
                 ? EquipmentData.Suffix(hash)
                 : EmptySuffix();
+            ValidateSuffixOrThrow();
             RefreshDerivedStatsFromSuffix();
         }
 
@@ -130,12 +132,33 @@ namespace Project_1.Items.SubTypes
             suffix = ItemQuality == Quality.Uncommon
                 ? EquipmentData.Suffix(hash)
                 : EmptySuffix();
+            ValidateSuffixOrThrow();
             RefreshDerivedStatsFromSuffix();
         }
 
         static (string name, (EquipmentData.StatBonuses stat, int value)[] stats) EmptySuffix()
         {
             return (string.Empty, Array.Empty<(EquipmentData.StatBonuses stat, int value)>());
+        }
+
+        void ValidateSuffixOrThrow()
+        {
+            if (ItemQuality != Quality.Uncommon)
+            {
+                if (!string.IsNullOrEmpty(suffix.name) || (suffix.stats != null && suffix.stats.Length > 0))
+                {
+                    throw new InvalidOperationException($"Non-uncommon item '{EquipmentData.Name}' cannot have a suffix.");
+                }
+
+                return;
+            }
+
+            if (!EquipmentData.IsValidSuffixDefinition(suffix, out string suffixError))
+            {
+                throw new InvalidOperationException($"Invalid suffix on '{EquipmentData.Name}': {suffixError}");
+            }
+
+            EquipmentData.AssertSuffixDeterminism(hash);
         }
 
         void RefreshDerivedStatsFromSuffix()
@@ -256,6 +279,7 @@ namespace Project_1.Items.SubTypes
                 EquipmentData.StatBonuses.NatureSpellDamage => "NatureSpellDamage",
                 EquipmentData.StatBonuses.ShadowSpellDamage => "ShadowSpellDamage",
                 EquipmentData.StatBonuses.HolySpellDamage => "HolySpellDamage",
+                EquipmentData.StatBonuses.AttackPower => "AttackPower",
                 EquipmentData.StatBonuses.SpellHealing => "HealingSpellDamage",
                 EquipmentData.StatBonuses.FrostResist => "FrostResist",
                 EquipmentData.StatBonuses.FireResist => "FireResist",

@@ -232,18 +232,22 @@ namespace Project_1.Tiles
             }
         }
 
-        public static Path GetPath(WorldSpace aStartPosition, WorldSpace aTargetPosition, WorldSpace aSize) => GeneratePathThreadSafe(aStartPosition, aTargetPosition, aSize);
-
         public static void RequestPath(WorldSpace aStartPosition, WorldSpace aTargetPosition, WorldSpace aSize, Action<Path> onComplete)
         {
+            ThreadAffinity.AssertSimThread();
             if (onComplete == null) return;
+            void Complete(Path path)
+            {
+                ThreadAffinity.AssertSimThread();
+                onComplete(path);
+            }
             if (!WorkerPool.IsRunning)
             {
-                onComplete(GeneratePathThreadSafe(aStartPosition, aTargetPosition, aSize));
+                Complete(GeneratePathThreadSafe(aStartPosition, aTargetPosition, aSize));
                 return;
             }
 
-            WorkerPool.Enqueue(() => GeneratePathThreadSafe(aStartPosition, aTargetPosition, aSize), onComplete);
+            WorkerPool.Enqueue(() => GeneratePathThreadSafe(aStartPosition, aTargetPosition, aSize), Complete);
         }
 
         public static void SaveData(Save aSave)

@@ -11,7 +11,6 @@ using Project_1.UI.HUD.Managers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
 namespace Project_1.GameObjects.Unit
 {
@@ -46,6 +45,8 @@ namespace Project_1.GameObjects.Unit
         int[] gearTypeEquiped;
 
         Items.SubTypes.Equipment[] equipped;
+        Dictionary<string, int> aggregatedSecondaryStatsInt;
+        Dictionary<string, double> aggregatedSecondaryStatsFloat;
 
         public int GetBaseSpellPower
         {
@@ -91,80 +92,30 @@ namespace Project_1.GameObjects.Unit
 
         public T GetSecondaryStat<T>(string aSecondaryStat)
         {
-            T returnable = default;
-            for (int i = 0; i < equipped.Length; i++)
+            if (string.IsNullOrWhiteSpace(aSecondaryStat))
             {
-                if (equipped[i] == null)
-                {
-                    continue;
-                }
-
-                if (typeof(T) == typeof(int))
-                {
-                    var secondaryStatsInt = equipped[i].SecondaryStatsInt;
-                    if (secondaryStatsInt == null)
-                    {
-                        continue;
-                    }
-
-                    int value = (int)(object)returnable;
-                    for (int j = 0; j < secondaryStatsInt.Length; j++)
-                    {
-                        if (secondaryStatsInt[j].SecondaryStat != aSecondaryStat)
-                        {
-                            continue;
-                        }
-
-                        value += secondaryStatsInt[j].Value;
-                    }
-
-                    returnable = (T)(object)value;
-                }
-                else if (typeof(T) == typeof(float) || typeof(T) == typeof(double))
-                {
-                    var secondaryStatsFloat = equipped[i].SecondaryStatsFloat;
-                    if (secondaryStatsFloat == null)
-                    {
-                        continue;
-                    }
-
-                    if (typeof(T) == typeof(float))
-                    {
-                        float value = (float)(object)returnable;
-                        for (int j = 0; j < secondaryStatsFloat.Length; j++)
-                        {
-                            if (secondaryStatsFloat[j].SecondaryStat != aSecondaryStat)
-                            {
-                                continue;
-                            }
-
-                            value += secondaryStatsFloat[j].Value;
-                        }
-
-                        returnable = (T)(object)value;
-                    }
-                    else
-                    {
-                        double value = (double)(object)returnable;
-                        for (int j = 0; j < secondaryStatsFloat.Length; j++)
-                        {
-                            if (secondaryStatsFloat[j].SecondaryStat != aSecondaryStat)
-                            {
-                                continue;
-                            }
-
-                            value += secondaryStatsFloat[j].Value;
-                        }
-
-                        returnable = (T)(object)value;
-                    }
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
+                return default;
             }
-            return returnable;
+
+            if (typeof(T) == typeof(int))
+            {
+                aggregatedSecondaryStatsInt.TryGetValue(aSecondaryStat, out int intValue);
+                return (T)(object)intValue;
+            }
+
+            if (typeof(T) == typeof(float))
+            {
+                aggregatedSecondaryStatsFloat.TryGetValue(aSecondaryStat, out double floatValue);
+                return (T)(object)(float)floatValue;
+            }
+
+            if (typeof(T) == typeof(double))
+            {
+                aggregatedSecondaryStatsFloat.TryGetValue(aSecondaryStat, out double doubleValue);
+                return (T)(object)doubleValue;
+            }
+
+            throw new NotImplementedException();
         }
 
         public int GetArmor => equipmentStats.Armor;
@@ -209,6 +160,8 @@ namespace Project_1.GameObjects.Unit
             equipped = new Items.SubTypes.Equipment[(int)Slot.Count];
             gearAllowed = aGearAllowed;
             gearTypeEquiped = new int[(int)Items.SubTypes.Equipment.GearType.Count];
+            aggregatedSecondaryStatsInt = new Dictionary<string, int>(StringComparer.Ordinal);
+            aggregatedSecondaryStatsFloat = new Dictionary<string, double>(StringComparer.Ordinal);
             RefreshStatsFromEquipment();
         }
 
@@ -225,12 +178,7 @@ namespace Project_1.GameObjects.Unit
                 Items.SubTypes.Equipment equipment = ItemFactory.CreateItem(ItemFactory.GetItemData(aItemsEquiped[i].Value), 1) as Items.SubTypes.Equipment;
                 equipped[i] = equipment;
 
-                Items.SubTypes.Equipment.GearType type = equipment.EquipmentData.Material;
-
-                Debug.Assert(type != Items.SubTypes.Equipment.GearType.Count);
-                if (type == Items.SubTypes.Equipment.GearType.Cloth || type == Items.SubTypes.Equipment.GearType.None) continue;
-                
-                gearTypeEquiped[(int)type]++;
+                IncrementGearTypeCount(equipment);
             }
 
             RefreshStatsFromEquipment();
@@ -248,6 +196,9 @@ namespace Project_1.GameObjects.Unit
         {
             int[] totalStats = new int[(int)PrimaryStats.PrimaryStat.Count];
             int armor = 0;
+            var rebuiltSecondaryInt = new Dictionary<string, int>(StringComparer.Ordinal);
+            var rebuiltSecondaryFloat = new Dictionary<string, double>(StringComparer.Ordinal);
+
             for(int i = 0; i < equipped.Length; i++)
             {
                 if (equipped[i] == null) continue;
@@ -256,8 +207,107 @@ namespace Project_1.GameObjects.Unit
                     totalStats[j] += equipped[i].Stats.Stats[j];
                 }
                 armor += equipped[i].Stats.Armor;
+
+                AddSecondaryStats(rebuiltSecondaryInt, equipped[i].SecondaryStatsInt);
+                AddSecondaryStats(rebuiltSecondaryFloat, equipped[i].SecondaryStatsFloat);
             }
+
             equipmentStats = new EquipmentStats(totalStats, armor);
+            aggregatedSecondaryStatsInt = rebuiltSecondaryInt;
+            aggregatedSecondaryStatsFloat = rebuiltSecondaryFloat;
+        }
+
+        static void AddSecondaryStats(Dictionary<string, int> aTarget, SecondayStatBonus<int>[] aSource)
+        {
+            if (aSource == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < aSource.Length; i++)
+            {
+                if (string.IsNullOrWhiteSpace(aSource[i].SecondaryStat))
+                {
+                    continue;
+                }
+
+                if (aTarget.TryGetValue(aSource[i].SecondaryStat, out int current))
+                {
+                    aTarget[aSource[i].SecondaryStat] = current + aSource[i].Value;
+                }
+                else
+                {
+                    aTarget[aSource[i].SecondaryStat] = aSource[i].Value;
+                }
+            }
+        }
+
+        static void AddSecondaryStats(Dictionary<string, double> aTarget, SecondayStatBonus<float>[] aSource)
+        {
+            if (aSource == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < aSource.Length; i++)
+            {
+                if (string.IsNullOrWhiteSpace(aSource[i].SecondaryStat))
+                {
+                    continue;
+                }
+
+                if (aTarget.TryGetValue(aSource[i].SecondaryStat, out double current))
+                {
+                    aTarget[aSource[i].SecondaryStat] = current + aSource[i].Value;
+                }
+                else
+                {
+                    aTarget[aSource[i].SecondaryStat] = aSource[i].Value;
+                }
+            }
+        }
+
+        static bool IsTrackedGearType(Items.SubTypes.Equipment.GearType aGearType)
+        {
+            return aGearType == Items.SubTypes.Equipment.GearType.Leather
+                || aGearType == Items.SubTypes.Equipment.GearType.Mail
+                || aGearType == Items.SubTypes.Equipment.GearType.Plate;
+        }
+
+        void IncrementGearTypeCount(Items.SubTypes.Equipment aEquipment)
+        {
+            if (aEquipment == null)
+            {
+                return;
+            }
+
+            Items.SubTypes.Equipment.GearType material = aEquipment.EquipmentData.Material;
+            if (!IsTrackedGearType(material))
+            {
+                return;
+            }
+
+            gearTypeEquiped[(int)material]++;
+        }
+
+        void DecrementGearTypeCount(Items.SubTypes.Equipment aEquipment)
+        {
+            if (aEquipment == null)
+            {
+                return;
+            }
+
+            Items.SubTypes.Equipment.GearType material = aEquipment.EquipmentData.Material;
+            if (!IsTrackedGearType(material))
+            {
+                return;
+            }
+
+            int materialIndex = (int)material;
+            if (gearTypeEquiped[materialIndex] > 0)
+            {
+                gearTypeEquiped[materialIndex]--;
+            }
         }
 
         static public Slot EquipmentTypeToSlot(Items.SubTypes.Equipment.Type aType)
@@ -484,21 +534,18 @@ namespace Project_1.GameObjects.Unit
 
         Item SwapItem(Items.SubTypes.Equipment aEquipment, Slot aSlot)
         {
-            if (!GearTypeCheck(aEquipment)) return aEquipment;
             if (UnableToDualWield(aEquipment, aSlot)) return aEquipment;
             Items.SubTypes.Equipment previouslyEquiped = equipped[(int)aSlot];
+            if (!GearTypeCheck(aEquipment, previouslyEquiped)) return aEquipment;
 
             if (previouslyEquiped != null)
             {
-                Items.SubTypes.Equipment.GearType material = aEquipment.EquipmentData.Material;
-
-                if (material != Items.SubTypes.Equipment.GearType.None && material != Items.SubTypes.Equipment.GearType.Cloth) gearTypeEquiped[(int)material]--;
-                
-                equipmentStats.RemoveStats(previouslyEquiped.Stats);
+                DecrementGearTypeCount(previouslyEquiped);
             }
 
             equipped[(int)aSlot] = aEquipment;
-            equipmentStats.AddStats(aEquipment.Stats);
+            IncrementGearTypeCount(aEquipment);
+            RefreshStatsFromEquipment();
             
             Mailboxes.PublishUiEvent(new EquipmentSlotChanged(owner.RenderId, owner.RelationToPlayer.ToRelationToPlayerKind(), aSlot.ToEquipmentSlotKind(), BuildItemSnapshot(aSlot))); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
             return previouslyEquiped;
@@ -508,9 +555,10 @@ namespace Project_1.GameObjects.Unit
         {
             Debug.Assert(equipped[(int)aSlot] == null);
 
-            //if (GearTypeCheck(aEquipment)) return; //I think this is only called when an equipment has type none anyways
+            // This path is currently used by weapon/ring/trinket slots where tracked armor-material caps do not apply.
             equipped[(int)aSlot] = aEquipment;
-            equipmentStats.AddStats(aEquipment.Stats);
+            IncrementGearTypeCount(aEquipment);
+            RefreshStatsFromEquipment();
             Mailboxes.PublishUiEvent(new EquipmentSlotChanged(owner.RenderId, owner.RelationToPlayer.ToRelationToPlayerKind(), aSlot.ToEquipmentSlotKind(), BuildItemSnapshot(aSlot))); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
         }
 
@@ -523,15 +571,22 @@ namespace Project_1.GameObjects.Unit
             return true;
         }
 
-        bool GearTypeCheck(Items.SubTypes.Equipment aEquipment)
+        bool GearTypeCheck(Items.SubTypes.Equipment aEquipment, Items.SubTypes.Equipment aCurrentlyEquipped)
         {
-            int material = (int)aEquipment.EquipmentData.Material;
+            Items.SubTypes.Equipment.GearType material = aEquipment.EquipmentData.Material;
+            if (!IsTrackedGearType(material))
+            {
+                return true;
+            }
 
-            if (material == (int)Items.SubTypes.Equipment.GearType.None || material == (int)Items.SubTypes.Equipment.GearType.Cloth) return true;
-            
-            if (gearAllowed[material] <= gearTypeEquiped[material]) return false; //TODO: Print an error message
+            int materialIndex = (int)material;
+            int alreadyEquippedCount = gearTypeEquiped[materialIndex];
+            if (aCurrentlyEquipped != null && aCurrentlyEquipped.EquipmentData.Material == material)
+            {
+                alreadyEquippedCount--;
+            }
 
-            gearTypeEquiped[material]++;
+            if (gearAllowed[materialIndex] <= alreadyEquippedCount) return false; //TODO: Print an error message
 
             return true;
         }
@@ -542,9 +597,8 @@ namespace Project_1.GameObjects.Unit
             Items.SubTypes.Equipment item = equipped[(int)aSlot];
             if (item == null) return null;
             equipped[(int)aSlot] = null;
-            
-
-            equipmentStats.RemoveStats(item.Stats);
+            DecrementGearTypeCount(item);
+            RefreshStatsFromEquipment();
             Mailboxes.PublishUiEvent(new EquipmentSlotChanged(owner.RenderId, owner.RelationToPlayer.ToRelationToPlayerKind(), aSlot.ToEquipmentSlotKind(), ItemUiSnapshot.Empty));
             return item;
         }

@@ -24,6 +24,12 @@ namespace Project_1.UI
         static long totalFrameTicks;
         static long lastFrameTicks;
         static long maxFrameTicks;
+        static long totalDispatchTicks;
+        static long totalUiUpdateTicks;
+        static long totalBuildTicks;
+        static long lastDispatchTicks;
+        static long lastUiUpdateTicks;
+        static long lastBuildTicks;
         static long overrunCount;
         static long waitTimeouts;
 
@@ -35,13 +41,22 @@ namespace Project_1.UI
                 long frames = Interlocked.Read(ref totalFrames);
                 long totalTicks = Interlocked.Read(ref totalFrameTicks);
                 double avgMs = frames == 0 ? 0d : TicksToMs((double)totalTicks / frames);
+                long dispatchTicks = Interlocked.Read(ref totalDispatchTicks);
+                long uiUpdateTicks = Interlocked.Read(ref totalUiUpdateTicks);
+                long buildTicks = Interlocked.Read(ref totalBuildTicks);
                 return new UiThreadStats(
                     frames,
                     Interlocked.Read(ref overrunCount),
                     Interlocked.Read(ref waitTimeouts),
                     TicksToMs(Volatile.Read(ref lastFrameTicks)),
                     avgMs,
-                    TicksToMs(Volatile.Read(ref maxFrameTicks)));
+                    TicksToMs(Volatile.Read(ref maxFrameTicks)),
+                    TicksToMs(Volatile.Read(ref lastDispatchTicks)),
+                    TicksToMs(Volatile.Read(ref lastUiUpdateTicks)),
+                    TicksToMs(Volatile.Read(ref lastBuildTicks)),
+                    frames == 0 ? 0d : TicksToMs((double)dispatchTicks / frames),
+                    frames == 0 ? 0d : TicksToMs((double)uiUpdateTicks / frames),
+                    frames == 0 ? 0d : TicksToMs((double)buildTicks / frames));
             }
         }
 
@@ -99,21 +114,37 @@ namespace Project_1.UI
                 long startTicks = Stopwatch.GetTimestamp();
                 bool doUpdate = updateRequested;
                 updateRequested = false;
+                long dispatchTicks = 0;
+                long uiUpdateTicks = 0;
+                long buildTicks = 0;
                 lock (HUDManager.UiLock)
                 {
+                    long phaseStart = Stopwatch.GetTimestamp();
                     Mailboxes.Ui.DispatchAll();
+                    long afterDispatch = Stopwatch.GetTimestamp();
+                    dispatchTicks = afterDispatch - phaseStart;
                     if (doUpdate)
                     {
                         UiTextInputManager.Update();
                         StateManager.UiUpdate();
                         HUDManager.Update();
                     }
+                    long afterUiUpdate = Stopwatch.GetTimestamp();
+                    uiUpdateTicks = afterUiUpdate - afterDispatch;
                     HUDManager.BuildDrawLists();
+                    long afterBuild = Stopwatch.GetTimestamp();
+                    buildTicks = afterBuild - afterUiUpdate;
                 }
                 long elapsedTicks = Stopwatch.GetTimestamp() - startTicks;
                 Volatile.Write(ref lastFrameTicks, elapsedTicks);
+                Volatile.Write(ref lastDispatchTicks, dispatchTicks);
+                Volatile.Write(ref lastUiUpdateTicks, uiUpdateTicks);
+                Volatile.Write(ref lastBuildTicks, buildTicks);
                 Interlocked.Increment(ref totalFrames);
                 Interlocked.Add(ref totalFrameTicks, elapsedTicks);
+                Interlocked.Add(ref totalDispatchTicks, dispatchTicks);
+                Interlocked.Add(ref totalUiUpdateTicks, uiUpdateTicks);
+                Interlocked.Add(ref totalBuildTicks, buildTicks);
                 if (elapsedTicks > frameBudgetTicks)
                 {
                     Interlocked.Increment(ref overrunCount);
@@ -143,7 +174,19 @@ namespace Project_1.UI
 
     internal readonly struct UiThreadStats
     {
-        public UiThreadStats(long totalFrames, long overrunCount, long waitTimeouts, double lastFrameMs, double avgFrameMs, double maxFrameMs)
+        public UiThreadStats(
+            long totalFrames,
+            long overrunCount,
+            long waitTimeouts,
+            double lastFrameMs,
+            double avgFrameMs,
+            double maxFrameMs,
+            double lastDispatchMs,
+            double lastUiUpdateMs,
+            double lastBuildMs,
+            double avgDispatchMs,
+            double avgUiUpdateMs,
+            double avgBuildMs)
         {
             TotalFrames = totalFrames;
             OverrunCount = overrunCount;
@@ -151,6 +194,12 @@ namespace Project_1.UI
             LastFrameMs = lastFrameMs;
             AvgFrameMs = avgFrameMs;
             MaxFrameMs = maxFrameMs;
+            LastDispatchMs = lastDispatchMs;
+            LastUiUpdateMs = lastUiUpdateMs;
+            LastBuildMs = lastBuildMs;
+            AvgDispatchMs = avgDispatchMs;
+            AvgUiUpdateMs = avgUiUpdateMs;
+            AvgBuildMs = avgBuildMs;
         }
 
         public long TotalFrames { get; }
@@ -159,5 +208,11 @@ namespace Project_1.UI
         public double LastFrameMs { get; }
         public double AvgFrameMs { get; }
         public double MaxFrameMs { get; }
+        public double LastDispatchMs { get; }
+        public double LastUiUpdateMs { get; }
+        public double LastBuildMs { get; }
+        public double AvgDispatchMs { get; }
+        public double AvgUiUpdateMs { get; }
+        public double AvgBuildMs { get; }
     }
 }

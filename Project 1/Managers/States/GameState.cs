@@ -49,13 +49,14 @@ namespace Project_1.Managers.States
         public override bool Release(ReleaseEvent aReleaseEvent) => false;
 
 
-        public override void Rescale() //TODO: This is wrong, this should rescale everything
+        public override void Rescale()
         {
             ThreadAffinity.AssertMainThread();
             base.Rescale();
             uITarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
             plateTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
             MarkUiDirty();
+            MarkPlatesDirty();
 
         }
 
@@ -126,14 +127,31 @@ namespace Project_1.Managers.States
 
         internal override void MarkUiDirty()
         {
+            AssertUiInvalidationThread();
             uiDirty = true;
             Interlocked.Exchange(ref uiHeartbeatTicks, 0);
         }
 
         void MarkPlatesDirty()
         {
+            AssertUiInvalidationThread();
             plateDirty = true;
             Interlocked.Exchange(ref uiHeartbeatTicks, 0);
+        }
+
+        static void AssertUiInvalidationThread()
+        {
+            if (ThreadAffinity.IsSimThread)
+            {
+                throw new InvalidOperationException("UI/plate invalidation cannot run on the simulation thread.");
+            }
+
+            if (ThreadAffinity.IsMainThread || ThreadAffinity.IsUiThread)
+            {
+                return;
+            }
+
+            throw new InvalidOperationException("UI/plate invalidation must run on the main or UI thread.");
         }
 
         public override RenderTarget2D Draw()

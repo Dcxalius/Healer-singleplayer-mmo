@@ -114,5 +114,31 @@ namespace Project_1.GameObjects.Unit.Stats
             spellSchool = aSchool;
             Refresh(unitData);
         }
+
+        internal static SpellStats CreateForValidation(
+            SpellSchool aSchool,
+            int aSpellDamage = 0,
+            double aCritChance = BASE_CRIT_CHANCE,
+            double aCritDamage = BASE_CRIT_DAMAGE,
+            int aFlatPenetration = 0,
+            double aPercentPenetration = 0,
+            double aHaste = 0,
+            double aVampirism = 0,
+            double aBonusHitChance = 0)
+        {
+            SpellStats stats = new SpellStats(aSchool)
+            {
+                spellDamage = aSpellDamage,
+                critChance = aCritChance,
+                critDamage = aCritDamage,
+                flatPenetration = aFlatPenetration,
+                percentPenetration = aPercentPenetration,
+                haste = aHaste,
+                vampirism = aVampirism,
+                bonusHitChance = aBonusHitChance
+            };
+
+            return stats;
+        }
     }
 }

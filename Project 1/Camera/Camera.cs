@@ -18,6 +18,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Security.Permissions;
+using System.Threading;
 
 namespace Project_1.Camera
 {
@@ -106,6 +107,8 @@ namespace Project_1.Camera
         static Rectangle minimapWorldRectangle;
         static volatile bool minimapWorldRectangleValid;
         static volatile CameraRenderSnapshot renderSnapshot;
+        static volatile CameraRenderSnapshot renderFrameSnapshot;
+        static int renderFrameSnapshotActive;
 
         static bool OnSimulationOwnerThread => ThreadAffinity.IsSimThread || (!SimThread.IsRunning && ThreadAffinity.IsMainThread);
 
@@ -338,11 +341,57 @@ namespace Project_1.Camera
                 return BuildRenderSnapshotFromLive();
             }
 
+            if (ThreadAffinity.IsMainThread && Volatile.Read(ref renderFrameSnapshotActive) == 1)
+            {
+                CameraRenderSnapshot frameSnapshot = renderFrameSnapshot;
+                if (frameSnapshot != null) return frameSnapshot;
+            }
+
             CameraRenderSnapshot snapshot = renderSnapshot;
             if (snapshot != null) return snapshot;
 
             // Safety fallback during startup / before first publish.
             return BuildRenderSnapshotFromLive();
+        }
+
+        internal static void BeginMainThreadRenderFrame()
+        {
+            ThreadAffinity.AssertMainThread();
+            if (OnSimulationOwnerThread) return;
+
+            CameraRenderSnapshot snapshot = renderSnapshot;
+            if (snapshot == null)
+            {
+                snapshot = BuildRenderSnapshotFromLive();
+            }
+            renderFrameSnapshot = snapshot;
+            Volatile.Write(ref renderFrameSnapshotActive, 1);
+        }
+
+        internal static void EndMainThreadRenderFrame()
+        {
+            ThreadAffinity.AssertMainThread();
+            if (OnSimulationOwnerThread) return;
+
+            Volatile.Write(ref renderFrameSnapshotActive, 0);
+            renderFrameSnapshot = null;
+        }
+
+        internal static AbsoluteScreenPosition WorldToAbsoluteScreenPosition(WorldSpace world)
+        {
+            CameraRenderSnapshot snapshot = GetRenderSnapshotForRead();
+            WorldSpace topLeft = snapshot.CentreInWorldSpace * snapshot.Scale - new WorldSpace(snapshot.WindowSize.ToVector2() / 2);
+            return new AbsoluteScreenPosition(
+                (int)Math.Floor(world.X * snapshot.Scale - topLeft.X),
+                (int)Math.Floor(world.Y * snapshot.Scale - topLeft.Y));
+        }
+
+        internal static WorldSpace AbsoluteScreenToWorld(AbsoluteScreenPosition screenPos)
+        {
+            CameraRenderSnapshot snapshot = GetRenderSnapshotForRead();
+            WorldSpace vectorInScreen = (WorldSpace)(snapshot.CentrePointInScreenSpace - screenPos).ToVector2();
+            float zoom = 1f / snapshot.Scale;
+            return (WorldSpace)(snapshot.CentreInWorldSpace - vectorInScreen * zoom);
         }
     }
 }

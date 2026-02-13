@@ -88,6 +88,7 @@ namespace Project_1.Managers.States
 
         internal void UiOnEnter()
         {
+            OptionManager.RefreshOptionScreens();
             BuildDrawList();
             OptionManager.ConsumeDrawListDirty();
             OptionManager.ConsumeRenderDirty();

@@ -11,7 +11,6 @@ namespace Project_1.Input
         public RelativeScreenPosition RelativePos { get => clickPos; }
         public AbsoluteScreenPosition AbsolutePos { get => AbsoluteScreenPosition.FromRelativeScreenPosition(clickPos); }
         public InputManager.ClickType ButtonPressed { get => buttonPressed; }
-        public bool[] ModifiersSnapshot => ToModifiersArray(modifierMask);
 
         RelativeScreenPosition clickPos;
 

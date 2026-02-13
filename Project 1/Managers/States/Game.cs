@@ -22,6 +22,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Project_1.Input;
 using Project_1.Camera;
+using System.Diagnostics;
 
 namespace Project_1.Managers.States
 {
@@ -74,22 +75,30 @@ namespace Project_1.Managers.States
         }
 
         public RenderTarget2D CleanGameDraw()
-        {            
+        {
+            long frameStartTicks = Stopwatch.GetTimestamp();
             UpdateVfx();
-            PrepRender(Color.White, SpriteSortMode.Immediate);
+            PrepRender(Color.White, SpriteSortMode.Immediate, samplerState: SamplerState.PointClamp);
 
+            long worldStartTicks = Stopwatch.GetTimestamp();
             DrawList(spriteBatch);
+            long worldDrawTicks = Stopwatch.GetTimestamp() - worldStartTicks;
 
             CleanRender();
+            long totalTicks = Stopwatch.GetTimestamp() - frameStartTicks;
+            MainRenderTelemetry.RecordFrame(totalTicks, 0, worldDrawTicks, 0);
             return renderTarget;
         }
 
         public override RenderTarget2D Draw()
         {
+            long frameStartTicks = Stopwatch.GetTimestamp();
             UpdateVfx();
+            long uiBuildStartTicks = Stopwatch.GetTimestamp();
             UIDraw();
+            long uiBuildTicks = Stopwatch.GetTimestamp() - uiBuildStartTicks;
             Effect e = EffectManager.GetEffect("TestDarkness");
-            PrepRender(Color.White, SpriteSortMode.FrontToBack, effect: e);
+            PrepRender(Color.White, SpriteSortMode.FrontToBack, samplerState: SamplerState.PointClamp, effect: e);
             EffectParameterCollection epc = e.Parameters;
             epc["minLength"].SetValue(500f);
             epc["maxBrightness"].SetValue(200f);
@@ -121,13 +130,19 @@ namespace Project_1.Managers.States
             epc["lightPos"].SetValue(lightPositions);
             epc["transparentMap"].SetValue(TileRenderCache.GetTransparencyMapTexture());
             //GraphicsManager.SetTexture(1, TileManager.GetTransparent(ObjectManager.Player.FeetPosition));
+            long worldStartTicks = Stopwatch.GetTimestamp();
             DrawList(spriteBatch);
+            long worldDrawTicks = Stopwatch.GetTimestamp() - worldStartTicks;
+            long compositeStartTicks = Stopwatch.GetTimestamp();
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred);
             spriteBatch.Draw(plateTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
             spriteBatch.Draw(uITarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+            long uiCompositeTicks = Stopwatch.GetTimestamp() - compositeStartTicks;
 
             CleanRender();
+            long totalTicks = Stopwatch.GetTimestamp() - frameStartTicks;
+            MainRenderTelemetry.RecordFrame(totalTicks, uiBuildTicks, worldDrawTicks, uiCompositeTicks);
             return renderTarget;
         }
 

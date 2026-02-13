@@ -18,6 +18,7 @@ using Project_1.Camera;
 using System.Diagnostics;
 using Project_1.UI.HUD.Managers;
 using Project_1.GameObjects.Unit;
+using Project_1.GameObjects.Unit.Stats;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
@@ -75,7 +76,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         void LoadSpellBar(string[] aSpellOnBar)
         {
             if (aSpellOnBar == null) return;
-            Spell[] spells = SpellBook.Spells;
+            Project_1.GameObjects.Spells.Spell[] spells = SpellBook.Spells;
             int?[] indexOfSpellsToAdd = new int?[aSpellOnBar.Length];
             for (int i = 0; i < aSpellOnBar.Length; i++)
             {
@@ -136,7 +137,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
             return new CharacterWindowSnapshot(
                 BuildUiSnapshot(),
-                StatReportSnapshot.FromPairReport(PrimaryStatReport),
+                StatReportSnapshot.FromPairReport(PrimaryStatReport, default, StatLineCategoryResolver.ResolveCharacter),
                 BuildSecondaryReport(),
                 CurrentLevel,
                 Level.Experience,
@@ -146,12 +147,87 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         StatReportSnapshot BuildSecondaryReport()
         {
             PairReport report = new PairReport();
+            SpellReportDetailsSnapshot spellDetails = BuildSpellReportDetails();
+            report.AddLine("Attack Power", BuildTotalAttackPower());
             report.AddLine("Crit Chance", SecondaryStats.Attack.CriticalChance);
             report.AddLine("Crit Damage", SecondaryStats.Attack.CriticalDamage);
             report.AddLine("Hit Chance", SecondaryStats.Attack.BonusHitChance);
+            report.AddLine("Spell Damage", SecondaryStats.Spell.SpellDamageForSchool(SpellSchool.Base));
+            report.AddLine("Spell Crit Chance", SecondaryStats.Spell.CriticalChanceForSchool(SpellSchool.Base));
+            report.AddLine("Spell Crit Damage", SecondaryStats.Spell.CriticalDamageForSchool(SpellSchool.Base));
+            report.AddLine("Spell Hit Chance", SecondaryStats.Spell.BonusHitChanceForSchool(SpellSchool.Base));
             report.AddLine("Dodge Chance", SecondaryStats.Defense.DodgeChance);
             report.AddLine("Parry Chance", SecondaryStats.Defense.ParryChance);
-            return StatReportSnapshot.FromPairReport(report);
+            return StatReportSnapshot.FromPairReport(report, spellDetails, StatLineCategoryResolver.ResolveCharacter);
+        }
+
+        int BuildTotalAttackPower()
+        {
+            int strength = 0;
+            int agility = 0;
+            var lines = PrimaryStatReport?.Lines;
+            if (lines != null)
+            {
+                for (int i = 0; i < lines.Count; i++)
+                {
+                    if (lines[i].Name == "Strength")
+                    {
+                        strength = (int)Math.Round(lines[i].Value, MidpointRounding.AwayFromZero);
+                    }
+                    else if (lines[i].Name == "Agility")
+                    {
+                        agility = (int)Math.Round(lines[i].Value, MidpointRounding.AwayFromZero);
+                    }
+                }
+            }
+
+            int fromStrength = ClassData.MeleeAttackBonus == Project_1.GameObjects.Unit.Classes.ClassData.MeleeAttackPowerBonus.Strength ? strength * 2 : strength;
+            int fromAgility = ClassData.MeleeAttackBonus == Project_1.GameObjects.Unit.Classes.ClassData.MeleeAttackPowerBonus.Agility ? agility : 0;
+            int fromEquipment = Equipment.GetSecondaryStat<int>("AttackPower");
+            return fromStrength + fromAgility + fromEquipment;
+        }
+
+        SpellReportDetailsSnapshot BuildSpellReportDetails()
+        {
+            List<SpellSchoolBonusSnapshot> damageBonuses = new List<SpellSchoolBonusSnapshot>();
+            List<SpellSchoolBonusSnapshot> critChanceBonuses = new List<SpellSchoolBonusSnapshot>();
+            List<SpellSchoolBonusSnapshot> hitChanceBonuses = new List<SpellSchoolBonusSnapshot>();
+
+            int baseSpellDamage = SecondaryStats.Spell.SpellDamageForSchool(SpellSchool.Base);
+            double baseSpellCritChance = SecondaryStats.Spell.CriticalChanceForSchool(SpellSchool.Base);
+            double baseSpellHitChance = SecondaryStats.Spell.BonusHitChanceForSchool(SpellSchool.Base);
+
+            foreach (SpellSchool school in Enum.GetValues(typeof(SpellSchool)))
+            {
+                if (school == SpellSchool.Base)
+                {
+                    continue;
+                }
+
+                int schoolDamageBonus = SecondaryStats.Spell.SpellDamageForSchool(school) - baseSpellDamage;
+                double schoolCritBonus = SecondaryStats.Spell.CriticalChanceForSchool(school) - baseSpellCritChance;
+                double schoolHitBonus = SecondaryStats.Spell.BonusHitChanceForSchool(school) - baseSpellHitChance;
+
+                if (schoolDamageBonus != 0)
+                {
+                    damageBonuses.Add(new SpellSchoolBonusSnapshot(school.ToString(), schoolDamageBonus));
+                }
+
+                if (Math.Abs(schoolCritBonus) > 0.000001d)
+                {
+                    critChanceBonuses.Add(new SpellSchoolBonusSnapshot(school.ToString(), schoolCritBonus));
+                }
+
+                if (Math.Abs(schoolHitBonus) > 0.000001d)
+                {
+                    hitChanceBonuses.Add(new SpellSchoolBonusSnapshot(school.ToString(), schoolHitBonus));
+                }
+            }
+
+            return new SpellReportDetailsSnapshot(
+                damageBonuses.ToArray(),
+                critChanceBonuses.ToArray(),
+                hitChanceBonuses.ToArray());
         }
 
         protected override bool CheckForRelation()

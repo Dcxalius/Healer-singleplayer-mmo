@@ -56,11 +56,11 @@ namespace Project_1.UI.HUD.Managers
             aHudElements.Add(logicWindow);
         }
 
-        public void OpenShopWindow(int[] itemIds)
+        public void OpenShopWindow(int[] itemIds, string shopkeeperName)
         {
             ThreadAffinity.AssertUiThread();
             shopWindow.OpenWindow();
-            shopWindow.OpenShop(itemIds);
+            shopWindow.OpenShop(itemIds, shopkeeperName);
             HUDManager.InvalidateUi();
         }
 

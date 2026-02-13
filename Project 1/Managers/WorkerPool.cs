@@ -11,12 +11,14 @@ namespace Project_1.Managers
     {
         sealed class WorkItem
         {
-            public WorkItem(Action action)
+            public WorkItem(Action action, long enqueueTicks)
             {
                 Action = action;
+                EnqueueTicks = enqueueTicks;
             }
 
             public Action Action { get; }
+            public long EnqueueTicks { get; }
         }
 
         static readonly object startLock = new object();
@@ -28,16 +30,40 @@ namespace Project_1.Managers
         static long totalEnqueued;
         static long totalCompleted;
         static double lastWorkMs;
+        static long totalQueueWaitTicks;
+        static long totalWorkTicks;
+        static long totalLatencyTicks;
+        static long lastQueueWaitTicks;
+        static long lastWorkTicks;
+        static long lastLatencyTicks;
+        static long maxQueueWaitTicks;
+        static long maxWorkTicks;
+        static long maxLatencyTicks;
         static readonly ConcurrentDictionary<int, Action> completions = new ConcurrentDictionary<int, Action>();
         static int nextCompletionId;
 
         public static bool IsRunning => running;
-        public static WorkerPoolStats Stats => new WorkerPoolStats(
-            System.Threading.Volatile.Read(ref pendingCount),
-            System.Threading.Volatile.Read(ref peakCount),
-            System.Threading.Interlocked.Read(ref totalEnqueued),
-            System.Threading.Interlocked.Read(ref totalCompleted),
-            System.Threading.Volatile.Read(ref lastWorkMs));
+        public static WorkerPoolStats Stats
+        {
+            get
+            {
+                long completed = System.Threading.Interlocked.Read(ref totalCompleted);
+                return new WorkerPoolStats(
+                    System.Threading.Volatile.Read(ref pendingCount),
+                    System.Threading.Volatile.Read(ref peakCount),
+                    System.Threading.Interlocked.Read(ref totalEnqueued),
+                    completed,
+                    TicksToMs(System.Threading.Volatile.Read(ref lastQueueWaitTicks)),
+                    TicksToMs(System.Threading.Volatile.Read(ref lastWorkTicks)),
+                    TicksToMs(System.Threading.Volatile.Read(ref lastLatencyTicks)),
+                    completed == 0 ? 0d : TicksToMs((double)System.Threading.Interlocked.Read(ref totalQueueWaitTicks) / completed),
+                    completed == 0 ? 0d : TicksToMs((double)System.Threading.Interlocked.Read(ref totalWorkTicks) / completed),
+                    completed == 0 ? 0d : TicksToMs((double)System.Threading.Interlocked.Read(ref totalLatencyTicks) / completed),
+                    TicksToMs(System.Threading.Volatile.Read(ref maxQueueWaitTicks)),
+                    TicksToMs(System.Threading.Volatile.Read(ref maxWorkTicks)),
+                    TicksToMs(System.Threading.Volatile.Read(ref maxLatencyTicks)));
+            }
+        }
 
         public static void Start(int? workerCount = null)
         {
@@ -51,6 +77,15 @@ namespace Project_1.Managers
                 totalEnqueued = 0;
                 totalCompleted = 0;
                 lastWorkMs = 0;
+                totalQueueWaitTicks = 0;
+                totalWorkTicks = 0;
+                totalLatencyTicks = 0;
+                lastQueueWaitTicks = 0;
+                lastWorkTicks = 0;
+                lastLatencyTicks = 0;
+                maxQueueWaitTicks = 0;
+                maxWorkTicks = 0;
+                maxLatencyTicks = 0;
                 nextCompletionId = 0;
                 completions.Clear();
 
@@ -97,7 +132,7 @@ namespace Project_1.Managers
                 return;
             }
 
-            queue.Add(new WorkItem(work));
+            queue.Add(new WorkItem(work, System.Diagnostics.Stopwatch.GetTimestamp()));
             int pending = System.Threading.Interlocked.Increment(ref pendingCount);
             System.Threading.Interlocked.Increment(ref totalEnqueued);
             int snapshotPeak;
@@ -139,8 +174,23 @@ namespace Project_1.Managers
                 {
                     System.Threading.Interlocked.Decrement(ref pendingCount);
                     long startTicks = System.Diagnostics.Stopwatch.GetTimestamp();
+                    long queueWaitTicks = Math.Max(0, startTicks - item.EnqueueTicks);
                     item.Action?.Invoke();
-                    double elapsedMs = (System.Diagnostics.Stopwatch.GetTimestamp() - startTicks) * 1000d / System.Diagnostics.Stopwatch.Frequency;
+                    long endTicks = System.Diagnostics.Stopwatch.GetTimestamp();
+                    long workTicks = Math.Max(0, endTicks - startTicks);
+                    long latencyTicks = Math.Max(0, endTicks - item.EnqueueTicks);
+
+                    System.Threading.Volatile.Write(ref lastQueueWaitTicks, queueWaitTicks);
+                    System.Threading.Volatile.Write(ref lastWorkTicks, workTicks);
+                    System.Threading.Volatile.Write(ref lastLatencyTicks, latencyTicks);
+                    System.Threading.Interlocked.Add(ref totalQueueWaitTicks, queueWaitTicks);
+                    System.Threading.Interlocked.Add(ref totalWorkTicks, workTicks);
+                    System.Threading.Interlocked.Add(ref totalLatencyTicks, latencyTicks);
+                    UpdateMax(ref maxQueueWaitTicks, queueWaitTicks);
+                    UpdateMax(ref maxWorkTicks, workTicks);
+                    UpdateMax(ref maxLatencyTicks, latencyTicks);
+
+                    double elapsedMs = TicksToMs(workTicks);
                     System.Threading.Volatile.Write(ref lastWorkMs, elapsedMs);
                     System.Threading.Interlocked.Increment(ref totalCompleted);
                 }
@@ -150,23 +200,69 @@ namespace Project_1.Managers
                 }
             }
         }
+
+        static void UpdateMax(ref long target, long value)
+        {
+            long snapshot;
+            while (value > (snapshot = System.Threading.Volatile.Read(ref target)))
+            {
+                if (System.Threading.Interlocked.CompareExchange(ref target, value, snapshot) == snapshot)
+                {
+                    break;
+                }
+            }
+        }
+
+        static double TicksToMs(double ticks)
+        {
+            return ticks * 1000d / System.Diagnostics.Stopwatch.Frequency;
+        }
     }
 
     internal readonly struct WorkerPoolStats
     {
-        public WorkerPoolStats(int pending, int peak, long totalEnqueued, long totalCompleted, double lastWorkMs)
+        public WorkerPoolStats(
+            int pending,
+            int peak,
+            long totalEnqueued,
+            long totalCompleted,
+            double lastQueueWaitMs,
+            double lastWorkMs,
+            double lastLatencyMs,
+            double avgQueueWaitMs,
+            double avgWorkMs,
+            double avgLatencyMs,
+            double maxQueueWaitMs,
+            double maxWorkMs,
+            double maxLatencyMs)
         {
             Pending = pending;
             Peak = peak;
             TotalEnqueued = totalEnqueued;
             TotalCompleted = totalCompleted;
+            LastQueueWaitMs = lastQueueWaitMs;
             LastWorkMs = lastWorkMs;
+            LastLatencyMs = lastLatencyMs;
+            AvgQueueWaitMs = avgQueueWaitMs;
+            AvgWorkMs = avgWorkMs;
+            AvgLatencyMs = avgLatencyMs;
+            MaxQueueWaitMs = maxQueueWaitMs;
+            MaxWorkMs = maxWorkMs;
+            MaxLatencyMs = maxLatencyMs;
         }
 
         public int Pending { get; }
         public int Peak { get; }
         public long TotalEnqueued { get; }
         public long TotalCompleted { get; }
+        public double LastQueueWaitMs { get; }
         public double LastWorkMs { get; }
+        public double LastLatencyMs { get; }
+        public double AvgQueueWaitMs { get; }
+        public double AvgWorkMs { get; }
+        public double AvgLatencyMs { get; }
+        public double MaxQueueWaitMs { get; }
+        public double MaxWorkMs { get; }
+        public double MaxLatencyMs { get; }
     }
 }

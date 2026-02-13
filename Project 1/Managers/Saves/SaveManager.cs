@@ -32,6 +32,7 @@ namespace Project_1.Managers
         public static string HudSettings => System.IO.Path.Combine(Settings, "Hud.set");
         public static string CameraSettings => System.IO.Path.Combine(Settings, "Camera.set");
         public static string KeyBindSettings => System.IO.Path.Combine(Settings, "KeyBind.set");
+        public static string DebugSettings => System.IO.Path.Combine(Settings, "Debug.set");
 
 
 
@@ -39,6 +40,7 @@ namespace Project_1.Managers
         public static string DefaultHudSettings => System.IO.Path.Combine(DefaultSettings, "Hud.def");
         public static string DefaultCameraSettings => System.IO.Path.Combine(DefaultSettings, "Camera.def");
         public static string DefaultKeyBindSettings => System.IO.Path.Combine(DefaultSettings, "KeyBind.def");
+        public static string DefaultDebugSettings => System.IO.Path.Combine(DefaultSettings, "Debug.def");
         public static Save[] Saves
         {
             get

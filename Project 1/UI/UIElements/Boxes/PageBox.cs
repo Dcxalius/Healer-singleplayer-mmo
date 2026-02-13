@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.Textures;
+using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Buttons;
 using System;
 using System.Collections.Generic;
@@ -18,10 +19,12 @@ namespace Project_1.UI.UIElements.Boxes
 
         readonly GFXButton leftArrow;
         readonly GFXButton rightArrow;
+        readonly Label pageTitle;
         readonly Point pageDimensions;
         readonly int itemsPerPage;
         Action<UIElement, int> bindPageElement;
         Action<UIElement> clearPageElement;
+        Func<int, string> pageTitleProvider;
         UIElement[] pageElements;
 
         int currentPage;
@@ -39,13 +42,22 @@ namespace Project_1.UI.UIElements.Boxes
 
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.05f, Size);
             RelativeScreenPosition arrowSize = new RelativeScreenPosition(0.1f, 0.05f);
+            pageTitle = new Label(null, new RelativeScreenPosition(0f, 0f), new RelativeScreenPosition(1f, 0.1f), Label.TextAllignment.Centred, Color.Black);
             rightArrow = new GFXButton(new List<Action> { PressRightArrow }, new GfxPath(GfxType.UI, "RightArrow"), RelativeScreenPosition.One - spacing - arrowSize, arrowSize, Color.White);
             leftArrow = new GFXButton(new List<Action> { PressLeftArrow }, new GfxPath(GfxType.UI, "LeftArrow"), RelativeScreenPosition.One.OnlyY + spacing.OnlyX - spacing.OnlyY - arrowSize.OnlyY, arrowSize, Color.White);
+            pageTitleProvider = DefaultPageTitle;
 
+            AddChild(pageTitle);
             AddChild(rightArrow);
             AddChild(leftArrow);
 
             Reset(0);
+        }
+
+        public void SetPageTitleProvider(Func<int, string> aProvider)
+        {
+            pageTitleProvider = aProvider ?? DefaultPageTitle;
+            UpdatePageTitle();
         }
 
         public void SetPageElements(UIElement[] aElements, Action<UIElement, int> aBindPageElement, Action<UIElement> aClearPageElement = null)
@@ -64,6 +76,10 @@ namespace Project_1.UI.UIElements.Boxes
                 AddChild(pageElements[i]);
             }
 
+            // Keep title visible above page content.
+            KillChild(pageTitle);
+            AddChild(pageTitle);
+
             // Keep arrows on top and clickable.
             KillChild(leftArrow);
             KillChild(rightArrow);
@@ -80,6 +96,7 @@ namespace Project_1.UI.UIElements.Boxes
             currentPage = 0;
             UpdateArrowVisiblity();
             PopulateCurrentPage();
+            UpdatePageTitle();
         }
 
         public void SetPage(int aPage)
@@ -92,6 +109,7 @@ namespace Project_1.UI.UIElements.Boxes
             currentPage = targetPage;
             UpdateArrowVisiblity();
             PopulateCurrentPage();
+            UpdatePageTitle();
         }
 
         public void RefreshCurrentPage()
@@ -143,5 +161,12 @@ namespace Project_1.UI.UIElements.Boxes
                 pageElement.Visible = false;
             }
         }
+
+        void UpdatePageTitle()
+        {
+            pageTitle.Text = pageTitleProvider?.Invoke(currentPage) ?? DefaultPageTitle(currentPage);
+        }
+
+        static string DefaultPageTitle(int aPageIndex) => $"Page {aPageIndex + 1}";
     }
 }

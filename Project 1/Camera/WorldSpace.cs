@@ -47,21 +47,13 @@ namespace Project_1.Camera
 
         public AbsoluteScreenPosition ToAbsoltueScreenPosition()
         {
-            WorldSpace topLeft = Camera.CentreInWorldSpace * Camera.Scale - new WorldSpace(Camera.WindowSize.ToVector2() / 2); //TODO: This is wrong, no way its Centre*Scale
-
-            //return new AbsoluteScreenPosition((int)Math.Round(this.X * Camera.Scale - topLeft.X, MidpointRounding.ToPositiveInfinity), (int)Math.Round(this.Y * Camera.Scale - topLeft.Y, MidpointRounding.ToPositiveInfinity));
-            return new AbsoluteScreenPosition((int)Math.Floor(this.X * Camera.Scale - topLeft.X), (int)Math.Floor(this.Y * Camera.Scale - topLeft.Y));
+            return Camera.WorldToAbsoluteScreenPosition(this);
         }
         public static WorldSpace FromRelativeScreenSpace(RelativeScreenPosition aScreenSpace) => FromAbsoluteScreenSpace(aScreenSpace.ToAbsoluteScreenPos());
 
         public static WorldSpace FromAbsoluteScreenSpace(AbsoluteScreenPosition aScreenSpace)
         {
-
-            WorldSpace vectorInScreen = (WorldSpace)(Camera.CentrePointInScreenSpace - aScreenSpace).ToVector2();
-
-            WorldSpace vectorInWorld = (WorldSpace)(Camera.CentreInWorldSpace - vectorInScreen * Camera.Zoom);
-
-            return vectorInWorld;
+            return Camera.AbsoluteScreenToWorld(aScreenSpace);
         }
 
         public static implicit operator Vector2(WorldSpace ws) => ws.position; 

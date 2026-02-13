@@ -31,6 +31,20 @@ namespace Project_1.GameObjects.Unit.Stats
             spellDamage = new HashSet<SpellStats> { new SpellStats(SpellSchool.Base) };
         }
 
+        internal Spell(IEnumerable<SpellStats> aSpellStats)
+        {
+            if (aSpellStats == null)
+            {
+                throw new ArgumentNullException(nameof(aSpellStats));
+            }
+
+            spellDamage = new HashSet<SpellStats>(aSpellStats);
+            if (!spellDamage.Any(x => x.SpellSchool == SpellSchool.Base))
+            {
+                spellDamage.Add(new SpellStats(SpellSchool.Base));
+            }
+        }
+
         public void Refresh(UnitData unitData)
         {
             if (useAttackFallback)

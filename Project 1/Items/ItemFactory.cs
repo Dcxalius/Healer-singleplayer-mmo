@@ -91,6 +91,18 @@ namespace Project_1.Items
             return itemData.Single(data => data.Name == a); //TODO: Add handling for if multiple items have the same name.
         }
 
+        public static ItemData[] GetAllItemDataSnapshot()
+        {
+            if (itemData == null || itemData.Length == 0)
+            {
+                return Array.Empty<ItemData>();
+            }
+
+            ItemData[] snapshot = new ItemData[itemData.Length];
+            Array.Copy(itemData, snapshot, itemData.Length);
+            return snapshot;
+        }
+
         public static Item CreateItem(ItemData aData, int aCount = 1)
         {
             switch (aData.Type)

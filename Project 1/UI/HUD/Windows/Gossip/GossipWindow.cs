@@ -19,6 +19,7 @@ namespace Project_1.UI.HUD.Windows.Gossip
     {
         Label introduction;
         ScrollableBox options;
+        string activeSpeakerName = string.Empty;
 
         public GossipWindow() : base(new UITexture("WhiteBackground", Color.AntiqueWhite))
         {
@@ -42,6 +43,7 @@ namespace Project_1.UI.HUD.Windows.Gossip
 
         public void Set(in GossipUiSnapshot aData)
         {
+            activeSpeakerName = aData.SpeakerName ?? string.Empty;
             ChatGossipOption start = BuildOptions(aData);
             Set(start);
         }
@@ -95,7 +97,7 @@ namespace Project_1.UI.HUD.Windows.Gossip
         void CloseAndOpenShop(ShopGossipOption aSO)
         {
             CloseWindow();
-            Mailboxes.PublishUiEvent(new ShopOpened(aSO.ItemIDsInShop));
+            Mailboxes.PublishUiEvent(new ShopOpened(aSO.ItemIDsInShop, activeSpeakerName));
         }
 
         public void SetIntro(string aIntro) => introduction.Text = aIntro;

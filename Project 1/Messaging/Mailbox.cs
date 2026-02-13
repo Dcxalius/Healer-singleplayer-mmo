@@ -10,7 +10,7 @@ namespace Project_1.Messaging
     /// </summary>
     internal sealed class Mailbox
     {
-        readonly ConcurrentQueue<int> dispatchQueue = new ConcurrentQueue<int>();
+        readonly ConcurrentQueue<DispatchToken> dispatchQueue = new ConcurrentQueue<DispatchToken>();
         readonly ConcurrentDictionary<Type, IChannel> channelsByType = new ConcurrentDictionary<Type, IChannel>();
         readonly ConcurrentDictionary<int, IChannel> channelsById = new ConcurrentDictionary<int, IChannel>();
         readonly ConcurrentDictionary<Type, byte> coalescedTypes = new ConcurrentDictionary<Type, byte>();
@@ -28,6 +28,9 @@ namespace Project_1.Messaging
         long totalHandlerFailures;
         long totalCoalesced;
         long totalDropped;
+        long totalMessageAgeTicks;
+        long maxMessageAgeTicks;
+        long lastOldestMessageAgeTicks;
 
         public Mailbox(string name)
         {
@@ -52,7 +55,7 @@ namespace Project_1.Messaging
             channel.Enqueue(message, out bool enqueueDispatchToken, out bool replacedPendingMessage);
             if (enqueueDispatchToken)
             {
-                dispatchQueue.Enqueue(channel.Id);
+                dispatchQueue.Enqueue(new DispatchToken(channel.Id, Stopwatch.GetTimestamp()));
                 int pending = Interlocked.Increment(ref pendingCount);
                 int snapshotPeak;
                 while (pending > (snapshotPeak = Volatile.Read(ref peakCount)))
@@ -81,9 +84,10 @@ namespace Project_1.Messaging
         {
             int processed = 0;
             long startTicks = 0;
+            long oldestMessageAgeTicks = 0;
             bool any = false;
 
-            while (dispatchQueue.TryDequeue(out int channelId))
+            while (dispatchQueue.TryDequeue(out DispatchToken token))
             {
                 if (!any)
                 {
@@ -91,9 +95,16 @@ namespace Project_1.Messaging
                     startTicks = Stopwatch.GetTimestamp();
                 }
 
+                long messageAgeTicks = Math.Max(0, Stopwatch.GetTimestamp() - token.EnqueueTicks);
+                if (messageAgeTicks > oldestMessageAgeTicks)
+                {
+                    oldestMessageAgeTicks = messageAgeTicks;
+                }
+                Interlocked.Add(ref totalMessageAgeTicks, messageAgeTicks);
+                UpdateMax(ref maxMessageAgeTicks, messageAgeTicks);
                 Interlocked.Decrement(ref pendingCount);
                 Interlocked.Increment(ref totalDispatchDequeued);
-                if (!channelsById.TryGetValue(channelId, out IChannel channel))
+                if (!channelsById.TryGetValue(token.ChannelId, out IChannel channel))
                 {
                     Interlocked.Increment(ref totalDispatchMisses);
                     continue;
@@ -124,6 +135,7 @@ namespace Project_1.Messaging
                 double elapsedMs = (Stopwatch.GetTimestamp() - startTicks) * 1000d / Stopwatch.Frequency;
                 Volatile.Write(ref lastDispatchCount, processed);
                 Volatile.Write(ref lastDispatchMs, elapsedMs);
+                Volatile.Write(ref lastOldestMessageAgeTicks, oldestMessageAgeTicks);
                 Interlocked.Add(ref totalDispatched, processed);
             }
         }
@@ -143,7 +155,10 @@ namespace Project_1.Messaging
                 Interlocked.Read(ref totalHandlerInvocations),
                 Interlocked.Read(ref totalHandlerFailures),
                 Interlocked.Read(ref totalCoalesced),
-                Interlocked.Read(ref totalDropped));
+                Interlocked.Read(ref totalDropped),
+                TicksToMs(Volatile.Read(ref lastOldestMessageAgeTicks)),
+                ComputeAverageMessageAgeMs(),
+                TicksToMs(Volatile.Read(ref maxMessageAgeTicks)));
         }
 
         Channel<T> GetOrAddChannel<T>()
@@ -157,6 +172,31 @@ namespace Project_1.Messaging
                 return created;
             });
             return (Channel<T>)channel;
+        }
+
+        double ComputeAverageMessageAgeMs()
+        {
+            long dequeued = Interlocked.Read(ref totalDispatchDequeued);
+            if (dequeued <= 0) return 0d;
+            long totalAge = Interlocked.Read(ref totalMessageAgeTicks);
+            return TicksToMs((double)totalAge / dequeued);
+        }
+
+        static double TicksToMs(double ticks)
+        {
+            return ticks * 1000d / Stopwatch.Frequency;
+        }
+
+        static void UpdateMax(ref long target, long value)
+        {
+            long snapshot;
+            while (value > (snapshot = Volatile.Read(ref target)))
+            {
+                if (Interlocked.CompareExchange(ref target, value, snapshot) == snapshot)
+                {
+                    break;
+                }
+            }
         }
 
         interface IChannel
@@ -289,6 +329,18 @@ namespace Project_1.Messaging
         }
     }
 
+    readonly struct DispatchToken
+    {
+        public DispatchToken(int channelId, long enqueueTicks)
+        {
+            ChannelId = channelId;
+            EnqueueTicks = enqueueTicks;
+        }
+
+        public int ChannelId { get; }
+        public long EnqueueTicks { get; }
+    }
+
     internal readonly struct MailboxStats
     {
         public MailboxStats(
@@ -305,7 +357,10 @@ namespace Project_1.Messaging
             long totalHandlerInvocations,
             long totalHandlerFailures,
             long totalCoalesced,
-            long totalDropped)
+            long totalDropped,
+            double lastOldestMessageAgeMs,
+            double avgMessageAgeMs,
+            double maxMessageAgeMs)
         {
             Name = name;
             Pending = pending;
@@ -321,6 +376,9 @@ namespace Project_1.Messaging
             TotalHandlerFailures = totalHandlerFailures;
             TotalCoalesced = totalCoalesced;
             TotalDropped = totalDropped;
+            LastOldestMessageAgeMs = lastOldestMessageAgeMs;
+            AvgMessageAgeMs = avgMessageAgeMs;
+            MaxMessageAgeMs = maxMessageAgeMs;
         }
 
         public string Name { get; }
@@ -337,5 +395,8 @@ namespace Project_1.Messaging
         public long TotalHandlerFailures { get; }
         public long TotalCoalesced { get; }
         public long TotalDropped { get; }
+        public double LastOldestMessageAgeMs { get; }
+        public double AvgMessageAgeMs { get; }
+        public double MaxMessageAgeMs { get; }
     }
 }

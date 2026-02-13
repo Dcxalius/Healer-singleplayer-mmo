@@ -19,6 +19,7 @@ namespace Project_1.UI.HUD.Windows
         readonly PageBox pageBox;
         ItemForSale[] itemsForSale;
         int[] itemIDsInShop = Array.Empty<int>();
+        string shopkeeperName = string.Empty;
         public ShopWindow() : base(new UITexture("WhiteBackground", Color.Lime))
         {
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.05f, Size);
@@ -59,16 +60,30 @@ namespace Project_1.UI.HUD.Windows
             itemForSale?.Clear();
         }
 
-        public void OpenShop(int[] itemIds)
+        public void OpenShop(int[] itemIds, string aShopkeeperName)
         {
             itemIDsInShop = itemIds ?? Array.Empty<int>();
+            shopkeeperName = aShopkeeperName ?? string.Empty;
+            pageBox.SetPageTitleProvider(GetPageTitle);
             pageBox.Reset(itemIDsInShop.Length);
         }
 
         public void ClearShop()
         {
             itemIDsInShop = Array.Empty<int>();
+            shopkeeperName = string.Empty;
+            pageBox.SetPageTitleProvider(null);
             pageBox.Reset(0);
+        }
+
+        string GetPageTitle(int aPageIndex)
+        {
+            if (string.IsNullOrWhiteSpace(shopkeeperName))
+            {
+                return $"Page {aPageIndex + 1}";
+            }
+
+            return shopkeeperName;
         }
     }
 }

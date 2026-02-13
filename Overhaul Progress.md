@@ -1,6 +1,6 @@
 # Overhaul Progress
 
-Last updated: 2026-02-12
+Last updated: 2026-02-13
 
 ## In Progress
 - None.
@@ -56,6 +56,11 @@ Last updated: 2026-02-12
 - Mailbox diagnostics (phase start): added mailbox counters for total published/dequeued, dispatch misses, no-subscriber deliveries, handler invocations/failures; debug overlay now shows queue peak plus publish/failure totals per mailbox.
 - Mailbox diagnostics (phase follow-up): added opt-in typed mailbox coalescing (registered for keyboard/keybind/mouse snapshots and movement intent), plus `TotalCoalesced`/`TotalDropped` counters and overlay/threshold warning output for coalesced/dropped spikes.
 - Thread-loop diagnostics: added `SimThreadStats`/`UiThreadStats` (last/avg/max frame ms, overrun count at 16ms budget, pulse wait timeouts), and surfaced both in debug overlay.
+- UI timing telemetry checkpoint: `UiThreadStats` now includes dispatch/update/build breakdown (last + avg ms), and debug overlay/thread-warning output now surfaces those component timings.
+- Sim/render sync telemetry checkpoint: `SimThreadStats` now tracks drift and catch-up steps; `RenderSnapshotManager` now tracks snapshot age/reuse (`stale` draw streak). Both are surfaced in debug overlay and warning logs.
+- Diagnostics sweep (continuation): added mailbox oldest-message-age telemetry (last/avg/max), worker queue/work/latency telemetry (last/avg/max), and main render frame-phase telemetry (`MainRenderTelemetry`: total + UI-build/world-draw/UI-composite last/avg/max), with baseline warning thresholds wired into `DebugManager`.
+- Sim fixed-step decoupling: `SimThread` now runs a self-clocked fixed-step accumulator loop (with catch-up cap) instead of being pulsed by `Game1.Update`; main-thread update no longer blocks on `SimThread.PulseAndWait()`.
+- Sim loop cleanup (post-decouple): removed obsolete sim pulse/wait timeout plumbing (`SimThread.PulseAndWait`, sim wait-timeout counters/stats), and trimmed thread diagnostics to keep sim overrun/drift/catch-up while retaining UI wait-timeout visibility.
 - Diagnostics threshold alerts: added non-spam warning logs (cooldown-based) for mailbox backlog, mailbox handler-failure deltas, and sim/UI thread overrun/timeout timing issues.
 - Command-routing migration (phase 1 of mailbox ownership cleanup): gameplay command subscriptions in `StateManager` now subscribe on `Mailboxes.Sim`, with a temporary `Main->Sim` forwarding shim for existing publishers; `SimThread` now drains both `Main` and `Sim` each pulse.
 - Command-routing migration (phase 2): gameplay/state command publishers were switched from `Mailboxes.Main.Publish(...)` to `Mailboxes.Sim.Publish(...)` across UI/input/save/state call sites; single-thread fallback now drains `Mailboxes.Sim` in `Game1.Update`.
@@ -77,6 +82,13 @@ Last updated: 2026-02-12
 - Hot-allocation sweep (plan §11, cont.): tile transparency snapshot publishing now reuses double buffers in `TileRenderCache` and swaps under lock, removing per-update `Color[]` allocations for transparency maps.
 - Hot-allocation sweep (plan §11, cont.): common visual-effect snapshot builds are now non-alloc for 0/1/2 active effects via `VisualEffectSnapshotBatch` inline storage (`GameObject.BuildEffectSnapshotBatch()`), with array fallback only when an object has more than two simultaneous effects.
 - Hot-allocation sweep (plan §11, cont.): click/release/scroll modifier payloads are now mask-based (`Modifiable` + event constructors + `InputManager` event creation), removing per-event `bool[]` allocations on pointer input.
+- Hot-allocation sweep (plan §11, cont.): world-command routing now stays mask-based end-to-end (`WorldReleaseRequested`/`WorldScrollRequested` -> `ReleaseEvent`/`ScrollEvent`), and sim click routing no longer allocates temporary modifier arrays for shift/ctrl checks.
+- Pathfinding API hardening: removed legacy sync `TileManager.GetPath(...)`; pathing now goes through `RequestPath(...)` only, with explicit sim-thread assertions on request and callback application to prevent blocking/off-thread misuse.
+- UI cadence cleanup: when `UiThread` is enabled, `Game1.Update` now performs a single deterministic `UiThread.PulseAndWait(true)` tick per frame (removed the earlier extra pulse/wait pass).
+- Rescale correctness pass: `GameState.Rescale()` now rebuilds and dirties both UI and plate surfaces, `StateManager.Rescale()` now resizes all states (`Game`/`MoveHUD`/`OptionMenu`/`PauseMenu`/`StartScreen`/`LoadingMenu`/`NewGame`), and `MoveHUD.Rescale()` now refreshes its cached clean-game target after resize.
+- Fallback lock-scope cleanup: `Game1.Update` no longer performs an extra UI-dispatch-only lock pass when sim is running without `UiThread`; that path now uses a single lock block for dispatch+UI update/build, while pure single-thread mode keeps pre-sim UI dispatch.
+- State transition/UI-owner hardening: when either sim or UI worker is active, state transitions now route UI enter/leave via `StateChanged` mailbox delivery (no direct sim-thread UI state mutation), and UI-facing `StateManager` entry points now use explicit UI-owner-thread asserts (UI thread when active, main thread fallback otherwise).
+- GameState invalidation hardening: `MarkUiDirty`/plate invalidation callbacks now assert they run only on main/UI threads and fail fast if invoked on sim, tightening ownership around HUD invalidation event flow.
 - Hot-allocation sweep (plan §11, cont.): removed unused legacy array-return draw-list APIs (`NamePlateHandler.GetDrawList()`, `PlateBoxHandler.GetDrawList()`) after the non-alloc copy/counted draw-list path became the only call site.
 - Render-boundary hardening (follow-up): minimap rendering now targets explicit snapshot entrypoints (`DrawMinimapSnapshots`) and legacy draw/minimap wrappers are guarded (`[Obsolete]` + debug asserts) to fail fast if live-object paths are accidentally reintroduced.
 - Render-boundary hardening (closeout): removed the remaining legacy draw/minimap wrapper methods entirely (`ObjectManager`/`TileManager`/`SpawnerManager` draw wrappers; legacy manager draw wrappers; legacy live-object minimap methods on `Entity`/`Chunk`/`Spawner`), leaving snapshot entrypoints as the only API.

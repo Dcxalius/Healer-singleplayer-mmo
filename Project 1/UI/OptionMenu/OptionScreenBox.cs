@@ -15,15 +15,18 @@ namespace Project_1.UI.OptionMenu
     {
         VideoOptionsButton videoOptionsButton;
         KeybindingsOptionButton keybindingsOptionButton;
+        DebugOptionsButton debugOptionsButton;
 
         public OptionScreenBox(int aCountOfButtons, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, aPos, aSize)
         {
             RelativeScreenPosition buttonSize = new RelativeScreenPosition(1f / aCountOfButtons, 1);
             videoOptionsButton = new VideoOptionsButton(new RelativeScreenPosition(0), buttonSize);
             keybindingsOptionButton = new KeybindingsOptionButton(new RelativeScreenPosition(buttonSize.X, 0), buttonSize);
+            debugOptionsButton = new DebugOptionsButton(new RelativeScreenPosition(buttonSize.X * 2, 0), buttonSize);
 
             AddChild(videoOptionsButton);  
             AddChild(keybindingsOptionButton);
+            AddChild(debugOptionsButton);
 
             Debug.Assert(ChildCount == aCountOfButtons, "Missing buttons in optionpagebox");
         }

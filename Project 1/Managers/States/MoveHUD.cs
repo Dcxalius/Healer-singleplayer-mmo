@@ -69,8 +69,8 @@ namespace Project_1.Managers.States
 
         public override void Rescale()
         {
-            renderTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
             base.Rescale();
+            needsCleanGame = true;
         }
 
         public override RenderTarget2D Draw()

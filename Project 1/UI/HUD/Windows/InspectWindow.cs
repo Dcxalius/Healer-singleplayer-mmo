@@ -33,6 +33,7 @@ namespace Project_1.UI.HUD.Windows
         {
             guildMemberRenderId = aSnapshot.RenderId;
             CurrentTargetRenderId = aSnapshot.RenderId;
+            SetOwnerContext(aSnapshot);
             nameLabel.Text = aSnapshot.Name;
         }
 

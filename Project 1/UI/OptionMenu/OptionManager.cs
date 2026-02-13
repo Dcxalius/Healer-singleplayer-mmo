@@ -20,6 +20,7 @@ namespace Project_1.UI.OptionMenu
         {
             Video,
             Keybindings,
+            Debug,
             Count
         }
         public static bool ChangesMade
@@ -63,8 +64,7 @@ namespace Project_1.UI.OptionMenu
             drawListDirty = true;
             renderDirty = true;
             InitPermanents();
-            InitVideo();
-            InitKeybindings();
+            RefreshOptionScreens();
         }
 
         static void InitPermanents()
@@ -120,6 +120,24 @@ namespace Project_1.UI.OptionMenu
             optionElements[(int)OptionScreen.Keybindings] = new List<UIElement>();
             optionElements[(int)OptionScreen.Keybindings].Add(new KeybindingsList(new RelativeScreenPosition(0.3f, 0.1f), new RelativeScreenPosition(0.4f, 0.8f)));
 
+        }
+
+        static void InitDebug()
+        {
+            optionElements[(int)OptionScreen.Debug] = new List<UIElement>
+            {
+                new DebugOptionsPanel(new RelativeScreenPosition(0.1f, 0.1f), new RelativeScreenPosition(0.55f, 0.78f))
+            };
+        }
+
+        public static void RefreshOptionScreens()
+        {
+            ThreadAffinity.AssertUiThread();
+            InitVideo();
+            InitKeybindings();
+            InitDebug();
+            drawListDirty = true;
+            renderDirty = true;
         }
 
         public static void SetScreen(OptionScreen aNewScreen)

@@ -67,27 +67,14 @@ namespace Project_1
             InputManager.Update();
             if (UiThread.IsRunning)
             {
-                UiThread.PulseAndWait(false);
+                UiThread.PulseAndWait(true);
             }
-            else
+            else if (!SimThread.IsRunning)
             {
-                if (SimThread.IsRunning)
-                {
-                    lock (HUDManager.UiLock)
-                    {
-                        Mailboxes.Ui.DispatchAll();
-                    }
-                }
-                else
-                {
-                    Mailboxes.Ui.DispatchAll();
-                }
+                // Single-thread mode: process UI input before sim update.
+                Mailboxes.Ui.DispatchAll();
             }
-            if (SimThread.IsRunning)
-            {
-                SimThread.PulseAndWait();
-            }
-            else
+            if (!SimThread.IsRunning)
             {
                 Mailboxes.Main.DispatchAll();
                 Mailboxes.Sim.DispatchAll();
@@ -96,11 +83,7 @@ namespace Project_1
                 Mailboxes.Sim.DispatchAll();
                 DebugManager.Update();
             }
-            if (UiThread.IsRunning)
-            {
-                UiThread.PulseAndWait(true);
-            }
-            else
+            if (!UiThread.IsRunning)
             {
                 if (SimThread.IsRunning)
                 {
@@ -135,13 +118,20 @@ namespace Project_1
         protected override void Draw(GameTime gameTime)
         {
             ThreadAffinity.AssertMainThread();
-            GraphicsDevice.Clear(Color.HotPink);
+            Camera.Camera.BeginMainThreadRenderFrame();
+            try
+            {
+                GraphicsDevice.Clear(Color.HotPink);
 
-            EffectManager.EffectDraw();
-            StateManager.Draw();
-            
+                EffectManager.EffectDraw();
+                StateManager.Draw();
 
-            base.Draw(gameTime);
+                base.Draw(gameTime);
+            }
+            finally
+            {
+                Camera.Camera.EndMainThreadRenderFrame();
+            }
         }
 
         static void InitializeMainThreadSystems()
@@ -150,9 +140,9 @@ namespace Project_1
             ThreadAffinity.AssertMainThread();
             Mailboxes.InitMainThread();
             GraphicsManager.Init();
+            SaveManager.Init();
             DebugManager.Init();
             ThreadingSettings.Init();
-            SaveManager.Init();
             RandomManager.Init();
             TimeManager.Init();
             Camera.Camera.Init();

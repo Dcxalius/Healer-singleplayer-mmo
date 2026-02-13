@@ -19,29 +19,10 @@ namespace Project_1.Messaging.Events
 
         public bool NoModifiers() => ModifiersMask == 0;
         public bool Modifier(InputManager.HoldModifier modifier) => (ModifiersMask & (1 << (int)modifier)) != 0;
-        public bool ModifiersOr(InputManager.HoldModifier[] modifiers)
-        {
-            for (int i = 0; i < modifiers.Length; i++)
-            {
-                if (Modifier(modifiers[i])) return true;
-            }
-            return false;
-        }
-
-        public bool[] ToModifiersArray() => ToModifiersArray(ModifiersMask);
 
         public static WorldClickRequested FromClickEvent(ClickEvent clickEvent)
         {
             return new WorldClickRequested(clickEvent.RelativePos, clickEvent.ButtonPressed.ToClickKind(), clickEvent.ModifierMask);
-        }
-
-        static bool[] ToModifiersArray(byte mask)
-        {
-            bool[] modifiers = new bool[(int)InputManager.HoldModifier.Count];
-            modifiers[(int)InputManager.HoldModifier.Ctrl] = (mask & (1 << (int)InputManager.HoldModifier.Ctrl)) != 0;
-            modifiers[(int)InputManager.HoldModifier.Alt] = (mask & (1 << (int)InputManager.HoldModifier.Alt)) != 0;
-            modifiers[(int)InputManager.HoldModifier.Shift] = (mask & (1 << (int)InputManager.HoldModifier.Shift)) != 0;
-            return modifiers;
         }
     }
 
@@ -57,15 +38,6 @@ namespace Project_1.Messaging.Events
         public RelativeScreenPosition RelativePos { get; }
         public ClickKind Button { get; }
         public byte ModifiersMask { get; }
-
-        public bool[] ToModifiersArray()
-        {
-            bool[] modifiers = new bool[(int)InputManager.HoldModifier.Count];
-            modifiers[(int)InputManager.HoldModifier.Ctrl] = (ModifiersMask & (1 << (int)InputManager.HoldModifier.Ctrl)) != 0;
-            modifiers[(int)InputManager.HoldModifier.Alt] = (ModifiersMask & (1 << (int)InputManager.HoldModifier.Alt)) != 0;
-            modifiers[(int)InputManager.HoldModifier.Shift] = (ModifiersMask & (1 << (int)InputManager.HoldModifier.Shift)) != 0;
-            return modifiers;
-        }
 
         public static WorldReleaseRequested FromReleaseEvent(ReleaseEvent releaseEvent)
         {
@@ -89,15 +61,6 @@ namespace Project_1.Messaging.Events
         public byte ModifiersMask { get; }
 
         public bool Down => !Up;
-
-        public bool[] ToModifiersArray()
-        {
-            bool[] modifiers = new bool[(int)InputManager.HoldModifier.Count];
-            modifiers[(int)InputManager.HoldModifier.Ctrl] = (ModifiersMask & (1 << (int)InputManager.HoldModifier.Ctrl)) != 0;
-            modifiers[(int)InputManager.HoldModifier.Alt] = (ModifiersMask & (1 << (int)InputManager.HoldModifier.Alt)) != 0;
-            modifiers[(int)InputManager.HoldModifier.Shift] = (ModifiersMask & (1 << (int)InputManager.HoldModifier.Shift)) != 0;
-            return modifiers;
-        }
 
         public static WorldScrollRequested FromScrollEvent(ScrollEvent scrollEvent)
         {

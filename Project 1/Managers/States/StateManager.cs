@@ -215,19 +215,9 @@ namespace Project_1.Managers.States
             }
             currentStateEnum = aState;
             currentState.OnEnter();
-            if (UiThread.IsRunning)
+            if (UiThread.IsRunning || SimThread.IsRunning)
             {
                 Mailboxes.PublishUiEvent(new StateChanged(leavingState.ToStateKind(), aState.ToStateKind()));
-                return;
-            }
-
-            if (SimThread.IsRunning)
-            {
-                lock (HUDManager.UiLock)
-                {
-                    UiOnLeave(leavingState);
-                    UiOnEnter(aState);
-                }
                 return;
             }
 
@@ -265,9 +255,12 @@ namespace Project_1.Managers.States
             ThreadAffinity.AssertMainThread();
             if (currentState == null) return;
             game.Rescale();
+            moveHUD.Rescale();
             optionMenu.Rescale();
             pauseMenu.Rescale();
             startScreen.Rescale();
+            loadingMenu.Rescale();
+            newGame.Rescale();
         }
         public static void Draw()
         {
@@ -285,9 +278,20 @@ namespace Project_1.Managers.States
         }
         public static States CurrentState => currentStateEnum;
 
+        static void AssertUiOwnerThread()
+        {
+            if (UiThread.IsRunning)
+            {
+                ThreadAffinity.AssertUiThread();
+                return;
+            }
+
+            ThreadAffinity.AssertMainThread();
+        }
+
         internal static bool UiClick(ClickEvent aClick)
         {
-            ThreadAffinity.AssertUiThread();
+            AssertUiOwnerThread();
             switch (currentStateEnum)
             {
                 case States.StartScreen:
@@ -309,7 +313,7 @@ namespace Project_1.Managers.States
 
         internal static bool UiRelease(ReleaseEvent aRelease)
         {
-            ThreadAffinity.AssertUiThread();
+            AssertUiOwnerThread();
             switch (currentStateEnum)
             {
                 case States.StartScreen:
@@ -331,7 +335,7 @@ namespace Project_1.Managers.States
 
         internal static bool UiScroll(ScrollEvent aScroll)
         {
-            ThreadAffinity.AssertUiThread();
+            AssertUiOwnerThread();
             switch (currentStateEnum)
             {
                 case States.StartScreen:
@@ -353,7 +357,7 @@ namespace Project_1.Managers.States
 
         internal static bool UiEscapePressed()
         {
-            ThreadAffinity.AssertUiThread();
+            AssertUiOwnerThread();
             switch (currentStateEnum)
             {
                 case States.StartScreen:
@@ -375,13 +379,13 @@ namespace Project_1.Managers.States
 
         internal static void UiInvalidate()
         {
-            ThreadAffinity.AssertUiThread();
+            AssertUiOwnerThread();
             currentState?.MarkUiDirty();
         }
 
         internal static void UiUpdate()
         {
-            ThreadAffinity.AssertUiThread();
+            AssertUiOwnerThread();
             long interactionVersionBefore = UIElement.InteractionVersion;
             switch (currentStateEnum)
             {
@@ -433,7 +437,7 @@ namespace Project_1.Managers.States
 
         internal static void UiOnLeave(States state)
         {
-            ThreadAffinity.AssertUiThread();
+            AssertUiOwnerThread();
             switch (state)
             {
                 case States.Game:
@@ -458,7 +462,7 @@ namespace Project_1.Managers.States
 
         internal static void UiOnEnter(States state)
         {
-            ThreadAffinity.AssertUiThread();
+            AssertUiOwnerThread();
             switch (state)
             {
                 case States.MoveHUD:
@@ -480,14 +484,7 @@ namespace Project_1.Managers.States
 
         internal static void UiRescale(Point windowSize)
         {
-            if (UiThread.IsRunning)
-            {
-                ThreadAffinity.AssertUiThread();
-            }
-            else
-            {
-                ThreadAffinity.AssertMainThread();
-            }
+            AssertUiOwnerThread();
 
             HUDManager.Rescale();
             HUDManager.InvalidateUi();
@@ -714,7 +711,7 @@ namespace Project_1.Managers.States
         static void HandleWorldReleaseRequested(WorldReleaseRequested e)
         {
             ThreadAffinity.AssertSimThread();
-            ReleaseEvent releaseEvent = new ReleaseEvent(null, e.RelativePos, e.Button.ToInputClickType(), e.ToModifiersArray());
+            ReleaseEvent releaseEvent = new ReleaseEvent(null, e.RelativePos, e.Button.ToInputClickType(), e.ModifiersMask);
             Release(releaseEvent);
         }
 
@@ -722,7 +719,7 @@ namespace Project_1.Managers.States
         {
             ThreadAffinity.AssertSimThread();
             ScrollEvent.Direction direction = e.Up ? ScrollEvent.Direction.Up : ScrollEvent.Direction.Down;
-            ScrollEvent scrollEvent = new ScrollEvent(e.RelativePos, e.Steps, direction, e.ToModifiersArray());
+            ScrollEvent scrollEvent = new ScrollEvent(e.RelativePos, e.Steps, direction, e.ModifiersMask);
             Scroll(scrollEvent);
         }
 
@@ -792,7 +789,7 @@ namespace Project_1.Managers.States
         {
             if (clickEvent.Button == ClickKind.Left)
             {
-                if (clickEvent.ModifiersOr(new InputManager.HoldModifier[] { InputManager.HoldModifier.Shift, InputManager.HoldModifier.Ctrl }))
+                if (clickEvent.Modifier(InputManager.HoldModifier.Shift) || clickEvent.Modifier(InputManager.HoldModifier.Ctrl))
                 {
                     Mailboxes.PublishSimCommand(new PartyCommandRequested(PartyCommandAction.Clear, null));
                     return;
@@ -1063,7 +1060,7 @@ namespace Project_1.Managers.States
 
         static void HandleUiStateChanged(StateChanged e)
         {
-            ThreadAffinity.AssertUiThread();
+            AssertUiOwnerThread();
             UiOnLeave(e.Previous.ToStateManagerState());
             UiOnEnter(e.Current.ToStateManagerState());
         }

@@ -47,13 +47,5 @@ namespace Project_1.Input
             return mask;
         }
 
-        protected static bool[] ToModifiersArray(byte modifiersMask)
-        {
-            bool[] modifiers = new bool[(int)InputManager.HoldModifier.Count];
-            modifiers[(int)InputManager.HoldModifier.Ctrl] = (modifiersMask & (1 << (int)InputManager.HoldModifier.Ctrl)) != 0;
-            modifiers[(int)InputManager.HoldModifier.Alt] = (modifiersMask & (1 << (int)InputManager.HoldModifier.Alt)) != 0;
-            modifiers[(int)InputManager.HoldModifier.Shift] = (modifiersMask & (1 << (int)InputManager.HoldModifier.Shift)) != 0;
-            return modifiers;
-        }
     }
 }

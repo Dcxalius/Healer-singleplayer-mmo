@@ -2,6 +2,7 @@
 using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Unit.Stats;
 using System;
+using System.Diagnostics;
 using static Project_1.Items.SubTypes.Equipment;
 
 namespace Project_1.Items.SubTypes
@@ -38,6 +39,7 @@ namespace Project_1.Items.SubTypes
             ("of Intellect", new[] { StatBonuses.Intellect }),
             ("of Stamina", new[] { StatBonuses.Stamina }),
             ("of Spirit", new[] { StatBonuses.Spirit }),
+            ("of Power", new[] { StatBonuses.AttackPower }),
             ("of Frozen Wrath", new[] { StatBonuses.FrostSpellDamage }),
             ("of Fiery Wrath", new[] { StatBonuses.FireSpellDamage}),
             ("of Arcane Wrath", new[] { StatBonuses.ArcaneSpellDamage}),
@@ -51,6 +53,11 @@ namespace Project_1.Items.SubTypes
             ("of Shadow Protection", new[] { StatBonuses.ShadowResist }),
             ("of Holy Protection", new[] { StatBonuses.HolyResist })
         };
+
+        static EquipmentData()
+        {
+            ValidateSuffixTemplates();
+        }
 
         public enum StatBonuses
         {
@@ -91,6 +98,47 @@ namespace Project_1.Items.SubTypes
             ChanceToCritWithAllSpells,
             ChanceToCrit,
             ChanceToParry
+        }
+
+        public static bool IsValidSuffixDefinition((string name, (StatBonuses stat, int value)[] stats) aSuffix, out string aError)
+        {
+            if (string.IsNullOrWhiteSpace(aSuffix.name))
+            {
+                aError = "Suffix name is empty.";
+                return false;
+            }
+
+            int templateIndex = FindSuffixTemplateIndexByName(aSuffix.name);
+            if (templateIndex < 0)
+            {
+                aError = $"Unknown suffix template name '{aSuffix.name}'.";
+                return false;
+            }
+
+            ReadOnlySpan<StatBonuses> templateStats = suffixTemplates[templateIndex].stats;
+            if (aSuffix.stats == null || aSuffix.stats.Length != templateStats.Length)
+            {
+                aError = $"Suffix stat count mismatch for '{aSuffix.name}'.";
+                return false;
+            }
+
+            for (int i = 0; i < templateStats.Length; i++)
+            {
+                if (aSuffix.stats[i].stat != templateStats[i])
+                {
+                    aError = $"Suffix stat mismatch for '{aSuffix.name}' at index {i}. Expected {templateStats[i]}, got {aSuffix.stats[i].stat}.";
+                    return false;
+                }
+
+                if (aSuffix.stats[i].value <= 0)
+                {
+                    aError = $"Suffix stat '{aSuffix.stats[i].stat}' on '{aSuffix.name}' rolled non-positive value {aSuffix.stats[i].value}.";
+                    return false;
+                }
+            }
+
+            aError = string.Empty;
+            return true;
         }
 
         public static string GetStatBonusDisplayName(StatBonuses aStatBonus)
@@ -227,7 +275,13 @@ namespace Project_1.Items.SubTypes
                 statLines[i] = (template.stats[i], statValues[i]);
             }
 
-            return (template.name, statLines);
+            var generatedSuffix = (template.name, statLines);
+            if (!IsValidSuffixDefinition(generatedSuffix, out string suffixError))
+            {
+                throw new InvalidOperationException($"Generated invalid suffix: {suffixError}");
+            }
+
+            return generatedSuffix;
         }
 
         public int SuffixID(int aHash)
@@ -256,7 +310,166 @@ namespace Project_1.Items.SubTypes
                 return aStatIndex == 0 ? 1 : 0;
             }
 
-            return CalculateSuffixStatValues(aHash, template.stats, availablePoweredBudget, selectableTemplateCount)[aStatIndex];
+            int value = CalculateSuffixStatValues(aHash, template.stats, availablePoweredBudget, selectableTemplateCount)[aStatIndex];
+            if (value <= 0)
+            {
+                throw new InvalidOperationException($"Suffix stat '{template.stats[aStatIndex]}' rolled invalid value {value}.");
+            }
+
+            return value;
+        }
+
+        [Conditional("DEBUG")]
+        public void AssertSuffixDeterminism(int aHash)
+        {
+            var first = Suffix(aHash);
+            var second = Suffix(aHash);
+            if (!SuffixesEqual(first, second))
+            {
+                throw new InvalidOperationException("Suffix generation is non-deterministic for the same hash.");
+            }
+
+            int suffixId = SuffixID(aHash);
+            if (suffixId >= 0)
+            {
+                string expectedName = suffixTemplates[suffixId].name;
+                if (!string.Equals(first.name, expectedName, StringComparison.Ordinal))
+                {
+                    throw new InvalidOperationException($"Suffix ID/name mismatch for hash {aHash}. Expected '{expectedName}', got '{first.name}'.");
+                }
+            }
+
+            for (int i = 0; i < first.stats.Length; i++)
+            {
+                int expectedValue = SuffixStatValue(i, aHash);
+                if (first.stats[i].value != expectedValue)
+                {
+                    throw new InvalidOperationException($"Suffix stat value mismatch for hash {aHash} at index {i}. Expected {expectedValue}, got {first.stats[i].value}.");
+                }
+            }
+        }
+
+        static bool SuffixesEqual(
+            (string name, (StatBonuses stat, int value)[] stats) aLeft,
+            (string name, (StatBonuses stat, int value)[] stats) aRight)
+        {
+            if (!string.Equals(aLeft.name, aRight.name, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            if ((aLeft.stats?.Length ?? 0) != (aRight.stats?.Length ?? 0))
+            {
+                return false;
+            }
+
+            for (int i = 0; i < aLeft.stats.Length; i++)
+            {
+                if (aLeft.stats[i].stat != aRight.stats[i].stat || aLeft.stats[i].value != aRight.stats[i].value)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        static int FindSuffixTemplateIndexByName(string aSuffixName)
+        {
+            for (int i = 0; i < suffixTemplates.Length; i++)
+            {
+                if (string.Equals(suffixTemplates[i].name, aSuffixName, StringComparison.Ordinal))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        static void ValidateSuffixTemplates()
+        {
+            for (int i = 0; i < suffixTemplates.Length; i++)
+            {
+                string name = suffixTemplates[i].name;
+                ReadOnlySpan<StatBonuses> stats = suffixTemplates[i].stats;
+
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    throw new InvalidOperationException($"Suffix template at index {i} has an empty name.");
+                }
+
+                if (stats.Length == 0)
+                {
+                    throw new InvalidOperationException($"Suffix template '{name}' has no stats.");
+                }
+
+                for (int statIndex = 0; statIndex < stats.Length; statIndex++)
+                {
+                    for (int checkIndex = statIndex + 1; checkIndex < stats.Length; checkIndex++)
+                    {
+                        if (stats[statIndex] == stats[checkIndex])
+                        {
+                            throw new InvalidOperationException($"Suffix template '{name}' repeats stat '{stats[statIndex]}'.");
+                        }
+                    }
+                }
+
+                if (stats.Length == 1)
+                {
+                    string canonicalSingleName = GetCanonicalSingleStatSuffixName(stats[0]);
+                    if (canonicalSingleName != null && !string.Equals(name, canonicalSingleName, StringComparison.Ordinal))
+                    {
+                        throw new InvalidOperationException($"Suffix template '{name}' should be named '{canonicalSingleName}' for stat '{stats[0]}'.");
+                    }
+                }
+
+                if (name.StartsWith("of the ", StringComparison.Ordinal))
+                {
+                    for (int statIndex = 0; statIndex < stats.Length; statIndex++)
+                    {
+                        if (!IsPrimaryStatBonus(stats[statIndex]))
+                        {
+                            throw new InvalidOperationException($"Suffix template '{name}' uses non-primary stat '{stats[statIndex]}' in an 'of the' family.");
+                        }
+                    }
+                }
+            }
+        }
+
+        static bool IsPrimaryStatBonus(StatBonuses aStatBonus)
+        {
+            return aStatBonus is StatBonuses.Agility
+                or StatBonuses.Strength
+                or StatBonuses.Stamina
+                or StatBonuses.Intellect
+                or StatBonuses.Spirit;
+        }
+
+        static string GetCanonicalSingleStatSuffixName(StatBonuses aStatBonus)
+        {
+            return aStatBonus switch
+            {
+                StatBonuses.Agility => "of Agility",
+                StatBonuses.Strength => "of Strength",
+                StatBonuses.Intellect => "of Intellect",
+                StatBonuses.Stamina => "of Stamina",
+                StatBonuses.Spirit => "of Spirit",
+                StatBonuses.AttackPower => "of Power",
+                StatBonuses.FrostSpellDamage => "of Frozen Wrath",
+                StatBonuses.FireSpellDamage => "of Fiery Wrath",
+                StatBonuses.ArcaneSpellDamage => "of Arcane Wrath",
+                StatBonuses.NatureSpellDamage => "of Nature's Wrath",
+                StatBonuses.ShadowSpellDamage => "of Shadow Wrath",
+                StatBonuses.HolySpellDamage => "of Holy Wrath",
+                StatBonuses.FrostResist => "of Frozen Protection",
+                StatBonuses.FireResist => "of Fiery Protection",
+                StatBonuses.ArcaneResist => "of Arcane Protection",
+                StatBonuses.NatureResist => "of Nature's Protection",
+                StatBonuses.ShadowResist => "of Shadow Protection",
+                StatBonuses.HolyResist => "of Holy Protection",
+                _ => null
+            };
         }
 
         public static double ComputeItemValue(EquipmentData aEquipmentData)
@@ -611,6 +824,7 @@ namespace Project_1.Items.SubTypes
 
             if (variableCount == 0)
             {
+                EnsurePositiveSuffixValues(statValues, aSuffixStats);
                 return statValues;
             }
 
@@ -636,6 +850,7 @@ namespace Project_1.Items.SubTypes
             double selectedPoweredBudget = ComputePoweredStatSum(statValues, aSuffixStats);
             if (selectedPoweredBudget <= aAvailablePoweredBudget)
             {
+                EnsurePositiveSuffixValues(statValues, aSuffixStats);
                 return statValues;
             }
 
@@ -650,7 +865,19 @@ namespace Project_1.Items.SubTypes
                 }
             }
 
+            EnsurePositiveSuffixValues(statValues, aSuffixStats);
             return statValues;
+        }
+
+        static void EnsurePositiveSuffixValues(ReadOnlySpan<int> aStatValues, ReadOnlySpan<StatBonuses> aSuffixStats)
+        {
+            for (int i = 0; i < aStatValues.Length; i++)
+            {
+                if (aStatValues[i] <= 0)
+                {
+                    throw new InvalidOperationException($"Suffix stat '{aSuffixStats[i]}' rolled invalid value {aStatValues[i]}.");
+                }
+            }
         }
 
         double GetAvailableSuffixPoweredBudget()

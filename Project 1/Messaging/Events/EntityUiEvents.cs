@@ -342,16 +342,18 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct GossipUiSnapshot
     {
-        public GossipUiSnapshot(string[][] options, int[][] linkTree, int startIndex)
+        public GossipUiSnapshot(string[][] options, int[][] linkTree, int startIndex, string speakerName)
         {
             Options = CloneJagged(options);
             LinkTree = CloneJagged(linkTree);
             StartIndex = startIndex;
+            SpeakerName = speakerName;
         }
 
         public string[][] Options { get; }
         public int[][] LinkTree { get; }
         public int StartIndex { get; }
+        public string SpeakerName { get; }
 
         static string[][] CloneJagged(string[][] source)
         {
