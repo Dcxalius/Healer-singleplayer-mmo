@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Newtonsoft.Json;
 using Project_1.GameObjects.Spells;
+using Project_1.Managers;
 using Project_1.Items.SubTypes;
 using System;
 using System.Collections.Generic;
@@ -26,8 +27,10 @@ namespace Project_1.Items
 
         public static void Init()
         {
+            ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
+            EquipmentData.Init();
             //itemData = new Dictionary<int, ItemData>();
             List<ItemData> itemList = new List<ItemData>();
 

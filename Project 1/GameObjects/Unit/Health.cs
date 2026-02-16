@@ -11,6 +11,10 @@ namespace Project_1.GameObjects.Unit
 {
     internal class Health
     {
+        const double ServerTickSeconds = 2.0;
+        const double Hp5WindowSeconds = 5.0;
+        const double Hp5ToTickMultiplier = ServerTickSeconds / Hp5WindowSeconds;
+
         public double MaxHealth 
         { 
             get => maxHealth;
@@ -44,9 +48,6 @@ namespace Project_1.GameObjects.Unit
 
         double baseMaxHealth;
 
-        double baseHealthPer5;
-        double healthPer5;
-
         public Health(ClassData aClassData, BasePrimaryStats aPrimaryStats, int aLevel, double aCurrentHp) 
         {
             Debug.Assert(aCurrentHp > 0);
@@ -55,11 +56,21 @@ namespace Project_1.GameObjects.Unit
             baseMaxHealth = aClassData.BaseHealth + aClassData.PerLevelHp * (aLevel - 1);
             maxHealth = baseMaxHealth + aPrimaryStats.Stamina * 10;
             CurrentHealth = aCurrentHp;
-            baseHealthPer5 = aClassData.HpPer5;
-            healthPer5 = aClassData.HpPer5 + aPrimaryStats.Spirit.Hp5Bonus;
         }
 
-        public void HealthRegenTick() => CurrentHealth += healthPer5;
+        public bool HealthRegenTick(bool aInCombat, double aHp5, double aSpiritHp5)
+        {
+            double hp5Total = aHp5 + (aInCombat ? 0d : aSpiritHp5);
+            double regen = hp5Total * Hp5ToTickMultiplier;
+            if (regen <= 0d)
+            {
+                return false;
+            }
+
+            double previousHealth = CurrentHealth;
+            CurrentHealth += regen;
+            return CurrentHealth > previousHealth;
+        }
 
         public void UpdateStamina(int aStamina)
         {
@@ -70,7 +81,6 @@ namespace Project_1.GameObjects.Unit
         public void Refresh(TotalPrimaryStats aPrimaryStats)
         {
             MaxHealth = baseMaxHealth + aPrimaryStats.Stamina * 10;
-            healthPer5 = baseHealthPer5 + aPrimaryStats.Spirit.Hp5Bonus;
         }
 
         internal void LevelUp(double aPerLevelHp, int aStamina)

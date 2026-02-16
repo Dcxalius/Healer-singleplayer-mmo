@@ -22,8 +22,8 @@ namespace Project_1.GameObjects.Unit.Classes
         public string[] LevelOneSpells => levelOneSpells;
         string[] levelOneSpells;
 
-        public FriendlyClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float baseHpPer5, float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed, MeleeAttackPowerBonus meleeAttackPowerBonus, float dodgeScaling, float baseDodge, float meleeCritScaling, Weapon.WeaponType weaponsAllowed, string[] learnableSpells, string[] levelOneSpells, int[] gearAllowed, bool canDualWield, bool isCaster, bool canParry, float spellCritScaling)
-            : base(name, resource, baseStats, perLevelStats, baseHp, perLevelHp, baseHpPer5, fistAttackSpeed, fistMinAttackDamage, fistMaxAttackDamage, speed, maxSpeed, meleeAttackPowerBonus, dodgeScaling, baseDodge, meleeCritScaling, weaponsAllowed, canDualWield, isCaster, canParry, spellCritScaling)
+        public FriendlyClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float spiritHp5Constant, float spiritHp5Scaling, float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed, MeleeAttackPowerBonus meleeAttackPowerBonus, float agilityDodgeScaling, float baseDodge, float meleeCritScaling, Weapon.WeaponType weaponsAllowed, string[] learnableSpells, string[] levelOneSpells, int[] gearAllowed, bool canDualWield, bool isCaster, bool canParry, float spellCritScaling)
+            : base(name, resource, baseStats, perLevelStats, baseHp, perLevelHp, spiritHp5Constant, spiritHp5Scaling, fistAttackSpeed, fistMinAttackDamage, fistMaxAttackDamage, speed, maxSpeed, meleeAttackPowerBonus, agilityDodgeScaling, baseDodge, meleeCritScaling, weaponsAllowed, canDualWield, isCaster, canParry, spellCritScaling)
         {
             this.gearAllowed = gearAllowed;
             this.learnableSpells = learnableSpells;

@@ -58,6 +58,8 @@ namespace Project_1.Managers
 
         public static Save CurrentSave => currentSave;
         static volatile Save currentSave;
+        static int nextLoadRequestId;
+        static int currentLoadRequestId;
         static bool initialized;
 
         public static void Init()
@@ -139,19 +141,6 @@ namespace Project_1.Managers
             System.IO.Directory.CreateDirectory(saveFolder);
         }
 
-        //public static void LoadData(string aName) => LoadData(saves[aName]);
-
-        public static void ContinueLastSave()
-        {
-            ThreadAffinity.AssertSimThread();
-            Save save;
-            lock (savesLock)
-            {
-                save = saves.First();
-            }
-            LoadData(save);
-        }
-
         public static bool RequestContinueLastSave()
         {
             ThreadAffinity.AssertSimThread();
@@ -164,37 +153,42 @@ namespace Project_1.Managers
             return RequestLoadData(save);
         }
 
-
-        public static void LoadData(Save aSave)
-        {
-            ThreadAffinity.AssertSimThread();
-            currentSave = aSave;
-            currentSave.LoadData();
-        }
-
         public static bool RequestLoadData(Save save)
         {
             ThreadAffinity.AssertSimThread();
             if (save == null) return false;
             currentSave = save;
+            int requestId = System.Threading.Interlocked.Increment(ref nextLoadRequestId);
+            System.Threading.Volatile.Write(ref currentLoadRequestId, requestId);
             if (!ThreadingSettings.UseWorkerThreads || !WorkerPool.IsRunning)
             {
-                save.LoadData();
-                return false;
+                SaveLoadPayload payload = SaveLoadPayload.Parse(save);
+                Mailboxes.PublishSimCommand(new SaveLoadParsed(payload, requestId));
+                return true;
             }
 
             WorkerPool.Enqueue(() => SaveLoadPayload.Parse(save), payload =>
             {
-                Mailboxes.PublishSimCommand(new SaveLoadParsed(payload));
+                Mailboxes.PublishSimCommand(new SaveLoadParsed(payload, requestId));
             });
             return true;
         }
 
-        public static void ApplyLoadPayload(SaveLoadPayload payload)
+        public static bool ApplyLoadPayload(SaveLoadPayload payload, int requestId)
         {
             ThreadAffinity.AssertSimThread();
-            if (payload == null) return;
-            if (!TryGetSaveByName(payload.SaveName, out Save save)) return;
+            if (payload == null) return false;
+            if (requestId != System.Threading.Volatile.Read(ref currentLoadRequestId))
+            {
+                // Stale async load completion. A newer load request has already replaced this token.
+                return false;
+            }
+            if (currentSave != null && !string.Equals(currentSave.Name, payload.SaveName, StringComparison.OrdinalIgnoreCase))
+            {
+                // Defensive check: payload must still match the actively requested save.
+                return false;
+            }
+            if (!TryGetSaveByName(payload.SaveName, out Save save)) return false;
             currentSave = save;
 
             JsonSerializer serializer = JsonSerializer.Create(serializerSettings);
@@ -234,9 +228,8 @@ namespace Project_1.Managers
             CorpseManager.LoadFromTokens(payload.Corpses, serializer);
             SpawnerManager.LoadFromTokens(payload.SpawnZones, payload.SavedMobs, serializer);
             TimeManager.Load(currentSave);
+            return true;
         }
-
-        public static void SaveHUD() => Mailboxes.PublishUiEvent(new HudSaveRequested());
 
         public static void SaveData()
         {

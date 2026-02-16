@@ -28,10 +28,6 @@
         public int UiElementId { get; }
     }
 
-    internal readonly struct HudSaveRequested
-    {
-    }
-
     internal readonly struct HudRescaleRequested
     {
         public HudRescaleRequested(Microsoft.Xna.Framework.Point windowSize)

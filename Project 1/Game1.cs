@@ -134,6 +134,19 @@ namespace Project_1
             }
         }
 
+        protected override void EndRun()
+        {
+            ThreadAffinity.AssertMainThread();
+
+            // Deterministic thread shutdown order:
+            // 1) stop UI producer, 2) stop worker jobs, 3) stop sim loop.
+            UiThread.Stop();
+            WorkerPool.Stop();
+            SimThread.Stop();
+
+            base.EndRun();
+        }
+
         static void InitializeMainThreadSystems()
         {
             ThreadAffinity.InitMainThread();

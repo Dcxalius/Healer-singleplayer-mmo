@@ -110,6 +110,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void ApplyDamageReduction(Entity aAttacker, Entity aDefender, IDamager aDamager)
         {
+            SpellResitance defenderSpellResitance = aDefender.SecondaryStats.Defense.SpellResistance;
            
             foreach (var (k, v) in value)
             {
@@ -125,27 +126,27 @@ namespace Project_1.GameObjects.Unit.Stats
                         
 
                         if (!aDamager.BinarySpell)
-                            value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Arcane);
+                            value[k] *= defenderSpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Arcane);
                         break;
                     case Stats.DamageType.Fire:
                         if (!aDamager.BinarySpell)
-                            value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Fire);
+                            value[k] *= defenderSpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Fire);
                         break;
                     case DamageType.Frost:
                         if (!aDamager.BinarySpell)
-                            value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Frost);
+                            value[k] *= defenderSpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Frost);
                         break;
                     case DamageType.Holy:
                         if (!aDamager.BinarySpell)
-                            value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Holy);
+                            value[k] *= defenderSpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Holy);
                         break;
                     case DamageType.Nature:
                         if (!aDamager.BinarySpell)
-                            value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Nature);
+                            value[k] *= defenderSpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Nature);
                         break;
                     case DamageType.Shadow:
                         if (!aDamager.BinarySpell)
-                            value[k] *= SpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Shadow);
+                            value[k] *= defenderSpellResitance.CalculateDamageReductionNonBinary(aDefender, aAttacker, SpellSchool.Shadow);
                         break;
                     case DamageType.True:
                         break;

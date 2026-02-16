@@ -20,6 +20,7 @@ namespace Project_1.UI.OptionMenu
         {
             Video,
             Keybindings,
+            Chat,
             Debug,
             Count
         }
@@ -130,11 +131,20 @@ namespace Project_1.UI.OptionMenu
             };
         }
 
+        static void InitChat()
+        {
+            optionElements[(int)OptionScreen.Chat] = new List<UIElement>
+            {
+                new ChatOptionsPanel(new RelativeScreenPosition(0.1f, 0.1f), new RelativeScreenPosition(0.55f, 0.78f))
+            };
+        }
+
         public static void RefreshOptionScreens()
         {
             ThreadAffinity.AssertUiThread();
             InitVideo();
             InitKeybindings();
+            InitChat();
             InitDebug();
             drawListDirty = true;
             renderDirty = true;

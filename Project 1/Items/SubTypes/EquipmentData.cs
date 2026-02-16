@@ -53,9 +53,12 @@ namespace Project_1.Items.SubTypes
             ("of Shadow Protection", new[] { StatBonuses.ShadowResist }),
             ("of Holy Protection", new[] { StatBonuses.HolyResist })
         };
+        static bool initialized;
 
-        static EquipmentData()
+        public static void Init()
         {
+            if (initialized) return;
+            initialized = true;
             ValidateSuffixTemplates();
         }
 

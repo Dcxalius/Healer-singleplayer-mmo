@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.Managers;
 using Project_1.Managers.States;
 using Project_1.Textures;
 using Project_1.UI.HUD.Managers;
@@ -26,7 +25,7 @@ namespace Project_1.UI.HUD
         static RelativeScreenPosition BButtonPos => RelativeScreenPosition.One - Spacing - ButtonSize;
 
         DescriptCheckBox sizeChangeCheckBox;
-        public MoveHUDBox() : base("HUD Changer", Color.White, LocationOfPopUp.StateManager, PausesGame.NoPause, new List<Action> { () => Mailboxes.PublishUiEvent(new HudMovableChanged(false)), SaveManager.SaveHUD }, new List<Action> { () => Mailboxes.PublishUiEvent(new HudMovableChanged(true)) },
+        public MoveHUDBox() : base("HUD Changer", Color.White, LocationOfPopUp.StateManager, PausesGame.NoPause, new List<Action> { () => Mailboxes.PublishUiEvent(new HudMovableChanged(false)), HUDManager.Save }, new List<Action> { () => Mailboxes.PublishUiEvent(new HudMovableChanged(true)) },
             new UITexture("WhiteBackground", Color.Black), Pos, statSize, AButtonPos, BButtonPos, ButtonSize, Color.Gray, "Confirm", "Reset", Color.White)
         {
             Dragable = true;

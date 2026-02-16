@@ -57,7 +57,9 @@ namespace Project_1.GameObjects.Unit.Stats
         public SpellResitance(int aBaseResitance, Dictionary<SpellSchool, int> aResitanceBySchool)
         {
             baseResitance = aBaseResitance;
-            resitanceBySchool = aResitanceBySchool;
+            resitanceBySchool = aResitanceBySchool != null
+                ? new Dictionary<SpellSchool, int>(aResitanceBySchool)
+                : new Dictionary<SpellSchool, int>();
         }
         public SpellResitance(int aBaseResitance) : this(aBaseResitance, new Dictionary<SpellSchool, int>())
         {
@@ -77,6 +79,29 @@ namespace Project_1.GameObjects.Unit.Stats
             }
         }
 
+        public void SetValues(int aBaseResitance, Dictionary<SpellSchool, int> aResitanceBySchool)
+        {
+            baseResitance = aBaseResitance;
+            if (resitanceBySchool == null)
+            {
+                resitanceBySchool = new Dictionary<SpellSchool, int>();
+            }
+            else
+            {
+                resitanceBySchool.Clear();
+            }
+
+            if (aResitanceBySchool == null)
+            {
+                return;
+            }
+
+            foreach (var kvp in aResitanceBySchool)
+            {
+                resitanceBySchool[kvp.Key] = kvp.Value;
+            }
+        }
+
         public static SpellSchool DamageToSpellType(DamageType type) => type switch
         {
             DamageType.Arcane => SpellSchool.Arcane,
@@ -88,28 +113,28 @@ namespace Project_1.GameObjects.Unit.Stats
             _ => SpellSchool.Base,
         };
 
-        public static double CalculateResistanceChanceBinary(Entity aTarget, Entity aCaster, HashSet<SpellSchool> spellSchools)
+        public double CalculateResistanceChanceBinary(Entity aTarget, Entity aCaster, HashSet<SpellSchool> spellSchools)
         {
             // Hit chance=BaseHitChance*(100%-75%*ResistanceScore/Cap)+SpellHitBonus
             int leveldiff = aTarget.CurrentLevel - aCaster.CurrentLevel;
             float levelHit = MathF.Max(0.01f, leveldiff >= 3 ? 0.96f - leveldiff * 0.01f : 0.83f - (leveldiff - 3) * 0.11f);
 
             int cap = aCaster.Level.CurrentLevel * 5;
-            int totalResistance = aTarget.SecondaryStats.Defense.SpellResistance.GetResitance(spellSchools);
+            int totalResistance = GetResitance(spellSchools);
             double resistReduction = 1.0 - (0.75 * Math.Clamp((double)totalResistance / cap, 0, 1));
 
             float totalHit = levelHit * (float)resistReduction + (float)aCaster.SecondaryStats.Spell.BonusHitChanceForSchools(spellSchools);
             return Math.Clamp(totalHit, 0.01f, 0.99f);
         }
 
-        public static double CalculateDamageReductionNonBinary(Entity aTarget, Entity aCaster, SpellSchool aResist) => CalculateDamageReductionNonBinary(aTarget, aCaster, new HashSet<SpellSchool> { aResist });
-        public static double CalculateDamageReductionNonBinary(Entity aTarget, Entity aCaster, HashSet<SpellSchool> aResist)
+        public double CalculateDamageReductionNonBinary(Entity aTarget, Entity aCaster, SpellSchool aResist) => CalculateDamageReductionNonBinary(aTarget, aCaster, new HashSet<SpellSchool> { aResist });
+        public double CalculateDamageReductionNonBinary(Entity aTarget, Entity aCaster, HashSet<SpellSchool> aResist)
         {
             // effective resistance rating = Rb + max((Lt - Lc) * 5, 0) - min(P, Rb)
             int levelDifference = aTarget.Level.CurrentLevel - aCaster.Level.CurrentLevel;
             int cap = aTarget.Level.CurrentLevel * 5;
 
-            int totalResistance = aTarget.SecondaryStats.Defense.SpellResistance.GetResitance(aResist);
+            int totalResistance = GetResitance(aResist);
             int flatPenetration = Math.Min(aCaster.SecondaryStats.Spell.FlatPenetrationForSchools(aResist), totalResistance);
             int percentPenetration = (int)(totalResistance * aCaster.SecondaryStats.Spell.PercentPenetrationForSchools(aResist));
 

@@ -76,7 +76,7 @@ namespace Project_1.GameObjects.Unit.Resources
 
             return false;
         }
-        public override void TickRegen() { }
+        public override void TickRegen(bool aInCombat) { }
 
         public override void CastSpell(float aCost)
         {

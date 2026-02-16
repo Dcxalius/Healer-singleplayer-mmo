@@ -18,6 +18,7 @@ namespace Project_1.UI.UIElements.Boxes
     {
         public enum ValidInputs
         {
+            Any,
             Letters,
             Digits,
             UpperCaseLetters,
@@ -49,6 +50,9 @@ namespace Project_1.UI.UIElements.Boxes
 
         public bool ValidInput(Keys aKey)
         {
+            if (validInputs == null || validInputs.Length == 0) return false;
+            if (validInputs.Contains(ValidInputs.Any)) return true;
+
             for (int i = 0; i < validInputs.Length; i++)
             {
                 switch (validInputs[i])
@@ -56,18 +60,34 @@ namespace Project_1.UI.UIElements.Boxes
                     case ValidInputs.Letters: //TODO: Should this be settable or should the two bellow be merged to this one
                     case ValidInputs.UpperCaseLetters:
                     case ValidInputs.LowerCaseLetters:
-                        if (aKey < Keys.A || aKey > Keys.Z) return false;
+                        if (aKey >= Keys.A && aKey <= Keys.Z) return true;
                         break;
                     case ValidInputs.Digits:
-                        if (aKey < Keys.D0 || aKey > Keys.D9) return false;
+                        if ((aKey >= Keys.D0 && aKey <= Keys.D9) || (aKey >= Keys.NumPad0 && aKey <= Keys.NumPad9)) return true;
                         break;
                     case ValidInputs.Symbols:
-                        throw new NotImplementedException();
+                        if (aKey == Keys.Space
+                            || aKey == Keys.OemMinus
+                            || aKey == Keys.OemPlus
+                            || aKey == Keys.OemOpenBrackets
+                            || aKey == Keys.OemCloseBrackets
+                            || aKey == Keys.OemPipe
+                            || aKey == Keys.OemSemicolon
+                            || aKey == Keys.OemQuotes
+                            || aKey == Keys.OemComma
+                            || aKey == Keys.OemPeriod
+                            || aKey == Keys.OemQuestion
+                            || aKey == Keys.OemTilde
+                            || aKey == Keys.OemBackslash)
+                        {
+                            return true;
+                        }
+                        break;
                     default:
                         throw new NotImplementedException();
                 }
             }
-            return true;
+            return false;
         }
 
         //TODO: Change names v (they are a bit messy)

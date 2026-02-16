@@ -72,8 +72,11 @@ namespace Project_1.GameObjects.Unit.Classes
         public int PerLevelHp => perLevelHp;
         readonly int perLevelHp;
 
-        public float HpPer5 => baseHpPer5;
-        readonly float baseHpPer5;
+        public float SpiritHp5Constant => spiritHp5Constant;
+        readonly float spiritHp5Constant;
+
+        public float SpiritHp5Scaling => spiritHp5Scaling;
+        readonly float spiritHp5Scaling;
 
         public float FistAttackSpeed => fistAttackSpeed;
         readonly float fistAttackSpeed;
@@ -90,8 +93,8 @@ namespace Project_1.GameObjects.Unit.Classes
         public MeleeAttackPowerBonus MeleeAttackBonus => meleeAttackPowerBonus;
         MeleeAttackPowerBonus meleeAttackPowerBonus;
 
-        public float DodgeScaling => dodgeScaling;
-        float dodgeScaling;
+        // Backward-compatible alias. Prefer AgilityDodgeChanceScaler.
+        public float DodgeScaling => agilityDodgeChanceScaler;
 
         public bool CanDualWield => canDualWield;
         bool canDualWield;
@@ -126,8 +129,9 @@ namespace Project_1.GameObjects.Unit.Classes
         //Rogues receive 1% Dodge for every 14.5 points of Agility.
         //Hunters receive 1% Dodge for every 26 points of Agility.
 
-        public float DodgeChanceScaler => dodgeChanceScaler;
-        float dodgeChanceScaler = 0f;
+        public float DodgeChanceScaler => agilityDodgeChanceScaler;
+        public float AgilityDodgeChanceScaler => agilityDodgeChanceScaler;
+        float agilityDodgeChanceScaler;
 
         public float BaseDodge => baseDodge;
         float baseDodge;
@@ -144,9 +148,11 @@ namespace Project_1.GameObjects.Unit.Classes
         //Warrior	0.0%	    20
 
         [JsonConstructor]
-        public ClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float baseHpPer5,
-            float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed, MeleeAttackPowerBonus meleeAttackPowerBonus, float dodgeScaling, float baseDodge, float meleeCritScaling,
-            Weapon.WeaponType weaponsAllowed, bool canDualWield, bool isCaster, bool canParry, float spellCritScaling)
+        public ClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp,
+            float spiritHp5Constant, float spiritHp5Scaling,
+            float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed, MeleeAttackPowerBonus meleeAttackPowerBonus,
+            float agilityDodgeScaling = float.NaN, float baseDodge = 0f, float meleeCritScaling = 0f,
+            Weapon.WeaponType weaponsAllowed = Weapon.WeaponType.None, bool canDualWield = false, bool isCaster = false, bool canParry = false, float spellCritScaling = 0f, float dodgeScaling = float.NaN)
         {
             this.name = name;
             this.resource = resource;
@@ -154,13 +160,18 @@ namespace Project_1.GameObjects.Unit.Classes
             this.perLevelStats = new PrimaryStats(perLevelStats);
             this.baseHp = baseHp;
             this.perLevelHp = perLevelHp;
-            this.baseHpPer5 = baseHpPer5;
+            this.spiritHp5Constant = spiritHp5Constant;
+            this.spiritHp5Scaling = spiritHp5Scaling;
             this.fistMinAttackDamage = fistMinAttackDamage;
             this.fistMaxAttackDamage = fistMaxAttackDamage;
             this.fistAttackSpeed = fistAttackSpeed;
             this.meleeAttackPowerBonus = meleeAttackPowerBonus;
             movementData = new Movement(speed, maxSpeed);
-            this.dodgeScaling = dodgeScaling == 0 ? 0.01f / 20f : dodgeScaling;
+            this.agilityDodgeChanceScaler = !float.IsNaN(agilityDodgeScaling)
+                ? agilityDodgeScaling
+                : !float.IsNaN(dodgeScaling)
+                    ? dodgeScaling
+                    : 0.01f / 20f;
             this.baseDodge = baseDodge;
             this.attackCritChanceScaler = meleeCritScaling;
             this.spellCritChanceScaler = spellCritScaling;
@@ -174,7 +185,7 @@ namespace Project_1.GameObjects.Unit.Classes
 
         protected virtual void Assert()
         {
-            Debug.Assert(name != null && baseHp > 0 && perLevelHp > 0 && baseStats != null && perLevelStats != null && baseHpPer5 > 0 && fistMinAttackDamage > 0 && fistAttackSpeed > 0);
+            Debug.Assert(name != null && baseHp > 0 && perLevelHp > 0 && baseStats != null && perLevelStats != null && fistMinAttackDamage > 0 && fistAttackSpeed > 0);
         }
     }
 }

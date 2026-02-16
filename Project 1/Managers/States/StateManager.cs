@@ -128,6 +128,7 @@ namespace Project_1.Managers.States
             SubscribeSimCommand<TargetClearedRequested>(_ => HandleTargetClearedRequested());
             SubscribeSimCommand<PartyCommandRequested>(HandlePartyCommandRequested);
             SubscribeSimCommand<InteractRequested>(HandleInteractRequested);
+            SubscribeSimCommand<ChatCommandRequested>(HandleChatCommandRequested);
             SubscribeSimMailbox<KeyboardSnapshot>(e => KeyboardStateCache.Update(e));
             SubscribeSimMailbox<KeyBindSnapshot>(e => KeyBindStateCache.Update(e));
             SubscribeSimMailbox<MouseSnapshot>(e => MouseStateCache.Update(e));
@@ -537,6 +538,36 @@ namespace Project_1.Managers.States
             player.StartCast(spell);
         }
 
+        static void HandleChatCommandRequested(ChatCommandRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            string raw = (e.CommandText ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(raw)) return;
+
+            if (raw[0] == '/')
+            {
+                raw = raw.Length == 1 ? string.Empty : raw.Substring(1);
+            }
+
+            if (string.IsNullOrWhiteSpace(raw)) return;
+
+            string[] args = raw.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            string command = args[0].ToLowerInvariant();
+
+            switch (command)
+            {
+                case "help":
+                    Mailboxes.PublishUiEvent(new ChatMessagePosted(ChatMessageType.System, "Commands: /help, /clear"));
+                    break;
+                case "clear":
+                    Mailboxes.PublishUiEvent(new ChatCleared());
+                    break;
+                default:
+                    Mailboxes.PublishUiEvent(new ChatMessagePosted(ChatMessageType.System, $"Unknown command: /{command}"));
+                    break;
+            }
+        }
+
         static void HandleTargetRequested(TargetRequested e)
         {
             ThreadAffinity.AssertSimThread();
@@ -662,27 +693,15 @@ namespace Project_1.Managers.States
         {
             ThreadAffinity.AssertSimThread();
             if (!SaveManager.TryGetSaveByName(e.SaveName, out Save save)) return;
-            bool async = SaveManager.RequestLoadData(save);
-            if (async)
-            {
-                SetState(States.LoadingMenu);
-                return;
-            }
-            SetState(States.Game);
-            RedrawGame();
+            if (!SaveManager.RequestLoadData(save)) return;
+            SetState(States.LoadingMenu);
         }
 
         static void HandleContinueLastSaveRequested()
         {
             ThreadAffinity.AssertSimThread();
-            bool async = SaveManager.RequestContinueLastSave();
-            if (async)
-            {
-                SetState(States.LoadingMenu);
-                return;
-            }
-            SetState(States.Game);
-            RedrawGame();
+            if (!SaveManager.RequestContinueLastSave()) return;
+            SetState(States.LoadingMenu);
         }
 
         static void HandleNewGameRequested()
@@ -696,7 +715,7 @@ namespace Project_1.Managers.States
         {
             ThreadAffinity.AssertSimThread();
             if (e.Payload == null) return;
-            SaveManager.ApplyLoadPayload(e.Payload);
+            if (!SaveManager.ApplyLoadPayload(e.Payload, e.RequestId)) return;
             SetState(States.Game);
             RedrawGame();
         }

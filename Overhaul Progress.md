@@ -1,12 +1,12 @@
 # Overhaul Progress
 
-Last updated: 2026-02-13
+Last updated: 2026-02-16
 
 ## In Progress
 - None.
 
 ## Finished — waiting on other implementation
-- None.
+- Shutdown diagnostics on exit/startup are deferred until logging is reworked (current console closes too quickly for reliable readback).
 
 ## Finished
 - Texture render snapshots (sim builds, main draws).
@@ -89,6 +89,17 @@ Last updated: 2026-02-13
 - Fallback lock-scope cleanup: `Game1.Update` no longer performs an extra UI-dispatch-only lock pass when sim is running without `UiThread`; that path now uses a single lock block for dispatch+UI update/build, while pure single-thread mode keeps pre-sim UI dispatch.
 - State transition/UI-owner hardening: when either sim or UI worker is active, state transitions now route UI enter/leave via `StateChanged` mailbox delivery (no direct sim-thread UI state mutation), and UI-facing `StateManager` entry points now use explicit UI-owner-thread asserts (UI thread when active, main thread fallback otherwise).
 - GameState invalidation hardening: `MarkUiDirty`/plate invalidation callbacks now assert they run only on main/UI threads and fail fast if invoked on sim, tightening ownership around HUD invalidation event flow.
+- UiThread lifecycle hardening: `UiThread.Stop()` now resets pending update intent, pulses, joins the worker thread, and clears the thread handle (matching sim-thread shutdown safety expectations).
+- Static-init determinism closeout: removed the remaining static constructor (`EquipmentData`), added explicit `EquipmentData.Init()` validation, and wired it into `ItemFactory.Init()` on main thread.
+- App shutdown lifecycle wiring: `Game1.EndRun()` now performs deterministic threaded shutdown (`UiThread.Stop()` -> `WorkerPool.Stop()` -> `SimThread.Stop()`) on main thread to avoid lingering worker/sim/ui threads on exit.
+- Save/load path unification: both worker-enabled and no-worker modes now parse/apply `SaveLoadPayload` through `SaveManager.ApplyLoadPayload(...)`, removing the legacy direct `Save.LoadData()` fallback and keeping load behavior consistent across threading modes.
+- Save-load API cleanup: removed now-unused `Save.LoadData()` to enforce a single load entry path through `SaveManager` payload parse/apply flow.
+- SaveManager API surface cleanup: removed redundant sync load helpers (`SaveManager.LoadData(Save)` and `ContinueLastSave()`), leaving request-driven load entry points (`RequestLoadData` / `RequestContinueLastSave`) as the canonical path.
+- Save-load stale completion guard: `ApplyLoadPayload` now ignores payloads whose save name no longer matches the currently requested load target (`currentSave`), preventing late async completions from overwriting a newer save selection.
+- Save-load stale completion guard (tokenized): load requests now carry a monotonically increasing request id into `SaveLoadParsed`; sim applies payloads only when the id matches the latest request, and only then transitions to `Game`, preventing stale async completions from forcing a wrong-state switch.
+- UiThread API cleanup: removed unused `UiThread.Pulse(...)`; main-thread/UI coordination now uses the single `PulseAndWait(...)` path only.
+- Mailbox dead-path cleanup: removed unused HUD-save mailbox route (`SaveManager.SaveHUD` + `HudSaveRequested` + HUD subscription) and switched `MoveHUDBox` confirm action to call `HUDManager.Save` directly.
+- Load-state flow unification: `StateManager` load request handlers now always route through `LoadingMenu`, and both worker/non-worker save loads now complete via `SaveLoadParsed` before transitioning to `Game` (removed direct request-handler game transition branch).
 - Hot-allocation sweep (plan §11, cont.): removed unused legacy array-return draw-list APIs (`NamePlateHandler.GetDrawList()`, `PlateBoxHandler.GetDrawList()`) after the non-alloc copy/counted draw-list path became the only call site.
 - Render-boundary hardening (follow-up): minimap rendering now targets explicit snapshot entrypoints (`DrawMinimapSnapshots`) and legacy draw/minimap wrappers are guarded (`[Obsolete]` + debug asserts) to fail fast if live-object paths are accidentally reintroduced.
 - Render-boundary hardening (closeout): removed the remaining legacy draw/minimap wrapper methods entirely (`ObjectManager`/`TileManager`/`SpawnerManager` draw wrappers; legacy manager draw wrappers; legacy live-object minimap methods on `Entity`/`Chunk`/`Spawner`), leaving snapshot entrypoints as the only API.

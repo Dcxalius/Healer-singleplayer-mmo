@@ -56,10 +56,8 @@ namespace Project_1.Input
 
                 if (!activeInput.ValidInput(key)) continue;
 
-                string keyName = key.ToString();
-                char s = keyName[keyName.Length - 1];
                 bool shiftHeld = UiKeyboardStateCache.GetHold(Keys.LeftShift) || UiKeyboardStateCache.GetHold(Keys.RightShift);
-                if (!shiftHeld) s = char.ToLower(s);
+                if (!TryConvertToCharacter(key, shiftHeld, out char s)) continue;
 
                 if (!activeInput.WriteTo(s, cursorPosition)) continue;
                 cursorPosition++;
@@ -97,6 +95,93 @@ namespace Project_1.Input
             if (cursorPosition < 0) cursorPosition = 0;
             int max = activeInput.Input.Length;
             if (cursorPosition > max) cursorPosition = max;
+        }
+
+        static bool TryConvertToCharacter(Keys key, bool shiftHeld, out char character)
+        {
+            character = '\0';
+
+            if (key >= Keys.A && key <= Keys.Z)
+            {
+                char baseChar = (char)('a' + (key - Keys.A));
+                character = shiftHeld ? char.ToUpper(baseChar) : baseChar;
+                return true;
+            }
+
+            if (key >= Keys.D0 && key <= Keys.D9)
+            {
+                int digit = key - Keys.D0;
+                character = shiftHeld
+                    ? digit switch
+                    {
+                        0 => ')',
+                        1 => '!',
+                        2 => '@',
+                        3 => '#',
+                        4 => '$',
+                        5 => '%',
+                        6 => '^',
+                        7 => '&',
+                        8 => '*',
+                        9 => '(',
+                        _ => '\0'
+                    }
+                    : (char)('0' + digit);
+                return character != '\0';
+            }
+
+            if (key >= Keys.NumPad0 && key <= Keys.NumPad9)
+            {
+                int digit = key - Keys.NumPad0;
+                character = (char)('0' + digit);
+                return true;
+            }
+
+            switch (key)
+            {
+                case Keys.Space:
+                    character = ' ';
+                    return true;
+                case Keys.OemMinus:
+                    character = shiftHeld ? '_' : '-';
+                    return true;
+                case Keys.OemPlus:
+                    character = shiftHeld ? '+' : '=';
+                    return true;
+                case Keys.OemOpenBrackets:
+                    character = shiftHeld ? '{' : '[';
+                    return true;
+                case Keys.OemCloseBrackets:
+                    character = shiftHeld ? '}' : ']';
+                    return true;
+                case Keys.OemPipe:
+                case Keys.OemBackslash:
+                    character = shiftHeld ? '|' : '\\';
+                    return true;
+                case Keys.OemSemicolon:
+                    character = shiftHeld ? ':' : ';';
+                    return true;
+                case Keys.OemQuotes:
+                    character = shiftHeld ? '"' : '\'';
+                    return true;
+                case Keys.OemComma:
+                    character = shiftHeld ? '<' : ',';
+                    return true;
+                case Keys.OemPeriod:
+                    character = shiftHeld ? '>' : '.';
+                    return true;
+                case Keys.OemQuestion:
+                    character = shiftHeld ? '?' : '/';
+                    return true;
+                case Keys.OemTilde:
+                    character = shiftHeld ? '~' : '`';
+                    return true;
+                case Keys.Decimal:
+                    character = '.';
+                    return true;
+                default:
+                    return false;
+            }
         }
     }
 }

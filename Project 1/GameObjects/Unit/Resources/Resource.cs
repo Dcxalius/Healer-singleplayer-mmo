@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Unit.Stats;
 using System;
 using System.Collections.Generic;
@@ -51,7 +52,9 @@ namespace Project_1.GameObjects.Unit.Resources
 
         public abstract void Update();
 
-        public abstract void TickRegen();
+        public abstract void TickRegen(bool aInCombat);
+
+        public virtual void SetOwner(Entity aOwner) { }
 
         public virtual void CastSpell(float aCost)
         {

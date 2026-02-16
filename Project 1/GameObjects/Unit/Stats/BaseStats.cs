@@ -73,7 +73,8 @@ namespace Project_1.GameObjects.Unit.Stats
                     resource = new Energy(aCurrentResource);
                     break;
                 case Resource.ResourceType.Rage:
-                    throw new NotImplementedException();
+                    resource = new Rage(aCurrentResource);
+                    break;
                 case Resource.ResourceType.None:
                     resource = new None();
                     break;
@@ -89,6 +90,7 @@ namespace Project_1.GameObjects.Unit.Stats
         public void SetOwner(Entity aEntity)
         {
             owner = aEntity;
+            resource.SetOwner(aEntity);
             owner.Equipment.SetMeleeAttackPower = GetAttackPower(classData);
             fistAttack.AttackPower = GetAttackPower(classData);
             if (owner is not Friendly friendlyOwner) return;

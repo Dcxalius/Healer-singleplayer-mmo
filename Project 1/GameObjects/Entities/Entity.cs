@@ -83,9 +83,8 @@ namespace Project_1.GameObjects.Entities
         public void ServerTick() //"Server tick"
         {
             ThreadAffinity.AssertSimThread();
-            if (!InCombat)
+            if (unitData.Tick(InCombat))
             {
-                unitData.Tick();
                 FlagForRefresh();
             }
         }

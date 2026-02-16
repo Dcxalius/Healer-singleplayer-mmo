@@ -22,6 +22,6 @@ namespace Project_1.GameObjects.Unit.Resources
         public override void Refresh(TotalPrimaryStats aStats) { }
         public override void Update() { }
 
-        public override void TickRegen() { }
+        public override void TickRegen(bool aInCombat) { }
     }
 }

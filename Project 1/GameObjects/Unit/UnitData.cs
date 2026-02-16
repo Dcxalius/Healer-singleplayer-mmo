@@ -276,10 +276,17 @@ namespace Project_1.GameObjects.Unit
         //    Resource.Update();
         //}
 
-        public void Tick()
+        public bool Tick(bool aInCombat)
         {
-            Health.HealthRegenTick();
-            Resource.TickRegen();
+            bool healthChanged = Health.HealthRegenTick(aInCombat, SecondaryStats.Defense.Hp5, SecondaryStats.Defense.SpiritHp5);
+            float previousResource = Resource.Value;
+            Resource.TickRegen(aInCombat);
+            if (Resource.Value != previousResource)
+            {
+                healthChanged = true;
+            }
+
+            return healthChanged;
         }
 
         public void GainExp(int aExpAmount)

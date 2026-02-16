@@ -11,6 +11,7 @@ using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI;
 using Project_1.UI.HUD;
+using Project_1.UI.HUD.Chat;
 using Project_1.UI.HUD.Inventory;
 using Project_1.UI.HUD.SpellBook;
 using Project_1.UI.HUD.Windows.Logic;
@@ -46,6 +47,7 @@ namespace Project_1.UI.HUD.Managers
 
         static Minimap minimap;
         static SaveStatusIndicator saveStatusIndicator;
+        static ChatPanel chatPanel;
 
 
         static HeldItem heldItem;
@@ -54,6 +56,10 @@ namespace Project_1.UI.HUD.Managers
         static List<DialogueBox> dialogueBoxes;
 
         static SizeChanger sizeChanger;
+
+        static bool hasSelfExpSnapshot;
+        static int lastSelfLevel;
+        static int lastSelfExperience;
 
         static List<(string, RelativeScreenPosition, RelativeScreenPosition)> LoadedSettings;
 
@@ -142,7 +148,33 @@ namespace Project_1.UI.HUD.Managers
             saveStatusIndicator = new SaveStatusIndicator(savePos, saveSize);
             hudElements.Add(saveStatusIndicator);
 
+            RelativeScreenPosition chatDefaultPos = new RelativeScreenPosition(0.02f, 0.70f);
+            RelativeScreenPosition chatDefaultSize = new RelativeScreenPosition(0.36f, 0.26f);
+            var chatLoaded = LoadedSettings.Find(x => x.Item1 == typeof(ChatPanel).Name);
+            if (!string.IsNullOrWhiteSpace(chatLoaded.Item1))
+            {
+                chatDefaultPos = chatLoaded.Item2;
+                chatDefaultSize = chatLoaded.Item3;
+            }
+            chatPanel = new ChatPanel(chatDefaultPos, chatDefaultSize);
+            hudElements.Add(chatPanel);
+
             Mailboxes.Ui.Subscribe<LootOpened>(HandleLootOpened);
+            Mailboxes.Ui.Subscribe<ChatMessagePosted>(e =>
+            {
+                chatPanel.AddMessage(e.Type, e.Message);
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<ChatFiltersChanged>(_ =>
+            {
+                chatPanel.RefreshFilters();
+                InvalidateUi();
+            });
+            Mailboxes.Ui.Subscribe<ChatCleared>(_ =>
+            {
+                chatPanel.ClearMessages();
+                InvalidateUi();
+            });
             Mailboxes.Ui.Subscribe<LootSlotChanged>(e =>
             {
                 lootBox.RefreshSlot(e.Slot, e.ItemSnapshot);
@@ -182,6 +214,10 @@ namespace Project_1.UI.HUD.Managers
             Mailboxes.Ui.Subscribe<ExperienceRefreshed>(e =>
             {
                 windowHandler.RefreshCharacterWindowExpBar(e.OwnerRenderId, e.OwnerRelation, e.CurrentLevel, e.CurrentExperience);
+                if (e.OwnerRelation == RelationToPlayerKind.Self)
+                {
+                    HandleSelfExperienceForChat(e.CurrentLevel, e.CurrentExperience);
+                }
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<TargetChanged>(e =>
@@ -293,11 +329,13 @@ namespace Project_1.UI.HUD.Managers
             Mailboxes.Ui.Subscribe<PartyMemberAdded>(e =>
             {
                 plateBoxHandler.AddGuildMemberToParty(e.Member);
+                chatPanel.AddMessage(ChatMessageType.Party, $"{e.Member.Name} joined the party.");
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<PartyMemberRemoved>(e =>
             {
                 plateBoxHandler.RemoveGuildMemberFromParty(e.MemberRenderId);
+                chatPanel.AddMessage(ChatMessageType.Party, "A party member left the party.");
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<GuildMembersSet>(e =>
@@ -308,6 +346,7 @@ namespace Project_1.UI.HUD.Managers
             Mailboxes.Ui.Subscribe<GuildMemberAdded>(e =>
             {
                 windowHandler.AddGuildMember(e.Member);
+                chatPanel.AddMessage(ChatMessageType.Guild, $"{e.Member.Name} came online.");
                 InvalidateUi();
             });
             Mailboxes.Ui.Subscribe<PartyCleared>(_ =>
@@ -365,7 +404,6 @@ namespace Project_1.UI.HUD.Managers
                 if (!UIElement.TryResolve(e.UiElementId, out UIElement element)) return;
                 SetSizeChanger(element);
             });
-            Mailboxes.Ui.Subscribe<HudSaveRequested>(_ => Save());
             Mailboxes.Ui.Subscribe<DialogueOpened>(AddDialogueBox);
             Mailboxes.Ui.Subscribe<DialogueClosed>(e => RemoveDialogueBox(e.DialogueBoxId));
             Mailboxes.Ui.Subscribe<SaveDataStarted>(_ =>
@@ -705,6 +743,46 @@ namespace Project_1.UI.HUD.Managers
         static void HandleLootOpened(LootOpened e)
         {
             Loot(e.Snapshot, e.Context);
+            int count = 0;
+            if (e.Snapshot != null)
+            {
+                for (int i = 0; i < e.Snapshot.Length; i++)
+                {
+                    if (e.Snapshot[i].HasValue) count++;
+                }
+            }
+
+            if (count > 0)
+            {
+                chatPanel.AddMessage(ChatMessageType.Loot, $"Loot available: {count} item{(count == 1 ? "" : "s")}.");
+            }
+        }
+
+        static void HandleSelfExperienceForChat(int aCurrentLevel, int aCurrentExperience)
+        {
+            if (!hasSelfExpSnapshot)
+            {
+                hasSelfExpSnapshot = true;
+                lastSelfLevel = aCurrentLevel;
+                lastSelfExperience = aCurrentExperience;
+                return;
+            }
+
+            if (aCurrentLevel > lastSelfLevel)
+            {
+                chatPanel.AddMessage(ChatMessageType.Experience, $"Level up! You are now level {aCurrentLevel}.");
+            }
+            else if (aCurrentLevel == lastSelfLevel)
+            {
+                int delta = aCurrentExperience - lastSelfExperience;
+                if (delta > 0)
+                {
+                    chatPanel.AddMessage(ChatMessageType.Experience, $"+{delta} experience.");
+                }
+            }
+
+            lastSelfLevel = aCurrentLevel;
+            lastSelfExperience = aCurrentExperience;
         }
 
         static Spell[] BuildSpellsFromNames(string[] spellNames)

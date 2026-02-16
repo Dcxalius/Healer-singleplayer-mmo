@@ -64,6 +64,7 @@ namespace Project_1.UI
         {
             ThreadAffinity.AssertMainThread();
             if (running) return;
+            updateRequested = false;
             running = true;
             thread = new Thread(Run)
             {
@@ -77,15 +78,14 @@ namespace Project_1.UI
         {
             ThreadAffinity.AssertMainThread();
             running = false;
+            updateRequested = false;
             pulse.Set();
-        }
-
-        public static void Pulse(bool updateHud)
-        {
-            ThreadAffinity.AssertMainThread();
-            if (!running) return;
-            updateRequested |= updateHud;
-            pulse.Set();
+            Thread uiThread = thread;
+            if (uiThread != null && uiThread.IsAlive)
+            {
+                uiThread.Join();
+            }
+            thread = null;
         }
 
         public static void PulseAndWait(bool updateHud, int timeoutMs = 16)

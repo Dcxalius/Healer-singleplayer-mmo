@@ -115,18 +115,6 @@ namespace Project_1.Managers.Saves
             //TimeManager.Save(this); //Done through savedetails atm
         }
 
-        public void LoadData()
-        {
-            ThreadAffinity.AssertSimThread();
-
-            Camera.Camera.LoadPosition(this);
-            TileManager.Load(this); 
-            ObjectManager.Load(this);
-            CorpseManager.Load(this);
-            SpawnerManager.Load(this);
-            TimeManager.Load(this);
-        }
-
         public void ClearFolder(string aPath)
         {
             foreach (string filePath in Directory.GetFiles(aPath))

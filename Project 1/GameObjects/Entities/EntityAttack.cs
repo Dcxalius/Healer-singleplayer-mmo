@@ -130,7 +130,7 @@ namespace Project_1.GameObjects.Entities
             }
             aggroTablesIAmOn.Remove(aNonfriendly);
         }
-        public void RecieveAttack(HitTable.HitResult aHitResult, Entity aAttacker, Unit.Attack aDamagingThing, Damage aDamageTaken)
+        public void RecieveAttack(HitTable.HitResult aHitResult, Entity aAttacker, Unit.Attack aDamagingThing, Damage aDamageTaken) //TODO: Events need to be checked, all attacks should fire an attack event, and then hit/miss/dodge/parry/block/glancing/crit/crushing events should be fired based on the result, and then a damage event should be fired if damage is actually taken, and then a death event should be fired if the attack killed the target. Also need to make sure that procs can subscribe to the correct events and that the events contain all necessary information for procs to determine whether they should proc or not
         {
             string resultString = "";
             Color resultColor = Color.White;
@@ -242,7 +242,7 @@ namespace Project_1.GameObjects.Entities
 
             if (aSpellEffect.IsBinary)
             {
-                totalHit = (float)SpellResitance.CalculateResistanceChanceBinary(this, aCaster, aSpellEffect.SpellSchools);
+                totalHit = (float)SecondaryStats.Defense.SpellResistance.CalculateResistanceChanceBinary(this, aCaster, aSpellEffect.SpellSchools);
 
                 if (RandomManager.RollDouble() > totalHit)
                 {
@@ -296,7 +296,7 @@ namespace Project_1.GameObjects.Entities
                     default:
                         //TODO: Implement spell color on damage text
                         float damageBeforeResist = (float)(aDamageTaken[damageType[i]]);
-                        double resistance = SpellResitance.CalculateDamageReductionNonBinary(this, aCaster, SpellResitance.DamageToSpellType(damageType[i]));
+                        double resistance = SecondaryStats.Defense.SpellResistance.CalculateDamageReductionNonBinary(this, aCaster, SpellResitance.DamageToSpellType(damageType[i]));
                         string preFix = "";
                         string suffix = "";
                         if (resistance == 0)

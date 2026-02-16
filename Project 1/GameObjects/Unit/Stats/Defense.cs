@@ -11,8 +11,11 @@ namespace Project_1.GameObjects.Unit.Stats
     {
         public Armor Armor => armor;
         Armor armor;
-        public double HealthRegen => healthRegen;
-        double healthRegen = 0;
+        public double Hp5 => hp5;
+        double hp5 = 0;
+        public double SpiritHp5 => spiritHp5;
+        double spiritHp5 = 0;
+        public double HealthRegen => hp5 + spiritHp5;
         public double DodgeChance => dodgeChance;
         double dodgeChance = 0;//Base dodge + (Agility / Agility to Dodge ratio) + Talent bonuses + Race Bonuses + Item Bonuses
         public double ParryChance => parryChance;
@@ -26,19 +29,54 @@ namespace Project_1.GameObjects.Unit.Stats
         public double CriticalDamageReduction => criticalDamageReduction;
         double criticalDamageReduction = 0;
         public SpellResitance SpellResistance => spellResitance;
-        SpellResitance spellResitance = new SpellResitance();
+        SpellResitance spellResitance;
 
         public Defense(UnitData aUnitData)
         {
             armor = new Armor(aUnitData.Equipment.GetArmor);
-
-
+            spellResitance = new SpellResitance();
+            Refresh(aUnitData);
         }
 
         public void Refresh(UnitData aUnitData)
         {
-            armor.Value = aUnitData.Equipment.GetArmor;
+            armor.Value = aUnitData.Equipment.GetArmor + aUnitData.BaseStats.TotalPrimaryStats.Agility * 2;
+            dodgeChance = Math.Clamp(
+                aUnitData.ClassData.BaseDodge
+                + aUnitData.BaseStats.TotalPrimaryStats.Agility * aUnitData.ClassData.AgilityDodgeChanceScaler
+                + aUnitData.Equipment.GetSecondaryStat<double>("DodgeChance"),
+                0d,
+                1d);
 
+            parryChance = aUnitData.ClassData.CanParry
+                ? Math.Clamp(0.05d + aUnitData.Equipment.GetSecondaryStat<double>("ParryChance"), 0d, 1d)
+                : 0d;
+
+            blockChance = Math.Clamp(aUnitData.Equipment.HasShield ? 0.05d + aUnitData.Equipment.GetSecondaryStat<double>("BlockChance") : 0d, 0d, 1d);
+
+            blockValue = aUnitData.Equipment.HasShield ? aUnitData.Equipment.GetSecondaryStat<double>("BlockValue") + (aUnitData.BaseStats.TotalPrimaryStats.Strength / 2) : 0d;
+            hp5 = aUnitData.Equipment.GetSecondaryStat<double>("Hp5")
+                + aUnitData.Equipment.GetSecondaryStat<int>("Hp5");
+            spiritHp5 = aUnitData.ClassData.SpiritHp5Constant
+                + aUnitData.BaseStats.TotalPrimaryStats.Spirit * aUnitData.ClassData.SpiritHp5Scaling
+                + aUnitData.Equipment.GetSecondaryStat<double>("SpiritHp5")
+                + aUnitData.Equipment.GetSecondaryStat<int>("SpiritHp5");
+            RefreshSpellResitance(aUnitData);
+        }
+
+        void RefreshSpellResitance(UnitData aUnitData)
+        {
+            Dictionary<SpellSchool, int> resitanceBySchool = new Dictionary<SpellSchool, int>
+            {
+                [SpellSchool.Arcane] = aUnitData.Equipment.GetSecondaryStat<int>("ArcaneResist"),
+                [SpellSchool.Fire] = aUnitData.Equipment.GetSecondaryStat<int>("FireResist"),
+                [SpellSchool.Frost] = aUnitData.Equipment.GetSecondaryStat<int>("FrostResist"),
+                [SpellSchool.Holy] = aUnitData.Equipment.GetSecondaryStat<int>("HolyResist"),
+                [SpellSchool.Nature] = aUnitData.Equipment.GetSecondaryStat<int>("NatureResist"),
+                [SpellSchool.Shadow] = aUnitData.Equipment.GetSecondaryStat<int>("ShadowResist")
+            };
+
+            spellResitance.SetValues(0, resitanceBySchool);
         }
         public static double CalculateEHP(double playerHealth, double armorDamageReduction)
         {

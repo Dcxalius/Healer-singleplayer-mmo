@@ -59,7 +59,7 @@ namespace Project_1.GameObjects.Unit.Resources
             base.CastSpell(aCost);
         }
 
-        public override void TickRegen()
+        public override void TickRegen(bool aInCombat)
         {
             Value += regenValue;
         }
