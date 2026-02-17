@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Project_1.Camera;
 using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Spells.Buff;
+using Project_1.Managers;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -15,10 +17,28 @@ namespace Project_1.GameObjects.Entities
         SpellCast spellCast;
         BuffList buffList;
 
-        public bool StartCast(Spell aSpell) => spellCast.StartCast(aSpell);
+        public bool StartCast(Spell aSpell)
+        {
+            ThreadAffinity.AssertSimThread();
+            return spellCast.StartCast(aSpell);
+        }
 
-        public void AddBuff(Buff aBuff) => buffList.AddBuff(aBuff, this);
+        public bool StartCastAt(Spell aSpell, WorldSpace aTargetPosition)
+        {
+            ThreadAffinity.AssertSimThread();
+            return spellCast.StartCastAt(aSpell, aTargetPosition);
+        }
 
-        public List<Buff> GetAllBuffs() => buffList.GetAllBuffs();
+        public void AddBuff(Buff aBuff)
+        {
+            ThreadAffinity.AssertSimThread();
+            buffList.AddBuff(aBuff, this);
+        }
+
+        public List<Buff> GetAllBuffs()
+        {
+            ThreadAffinity.AssertSimThread();
+            return buffList.GetAllBuffs();
+        }
     }
 }

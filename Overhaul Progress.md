@@ -1,6 +1,6 @@
 # Overhaul Progress
 
-Last updated: 2026-02-16
+Last updated: 2026-02-17
 
 ## In Progress
 - None.
@@ -106,3 +106,11 @@ Last updated: 2026-02-16
 - UI invalidation refinement: moved away from raw mouse-delta invalidation by tracking `UIElement` interaction-version changes (hover/press/release/move/resize/visibility), then invalidating HUD/state surfaces only when interaction state actually changes; click/release/scroll now invalidate only when UI/HUD consumes input.
 - UI invalidation refinement (tuning): reduced interaction-version false positives by guarding no-op visibility toggles, ignoring HUD-move state flips for non-moveable widgets, and only bumping interaction version when clamped moves actually change final position.
 - State UI draw-list allocation sweep: converted non-game states (`StartScreen`/`PauseMenu`/`LoadingMenu`/`NewGame`/`MoveHUD`/`OptionMenu`) to reusable double-buffered `UiElementDrawList` snapshots, and added count-based draw-list copy APIs in `OptionManager` to avoid per-update list/array recreation.
+- Input ownership cleanup: removed legacy main-thread text-editing path from `InputManager` (`InputBox` mutation/write cursor state), leaving `UiTextInputManager` as the single text-input owner on UI thread; key polling suppression now keys off `UiTextInputManager.IsActive`; raw input release publishing no longer depends on `UIElement` in `InputManager`; removed unused `CheckHoldModifiers()` allocation path.
+- Sim-affinity assert sweep (gameplay core): added explicit `ThreadAffinity.AssertSimThread()` guards across sim-owned player/party/guild/spellbook/guild-member entry points (construct/update/order/mutation/report methods) to fail fast on cross-thread gameplay state access.
+- Sim-affinity assert sweep (inventory/equipment): added explicit `ThreadAffinity.AssertSimThread()` guards to inventory mutation/build paths and unit equipment mutation/snapshot-refresh paths (equip/swap/remove/loot/assign/item-snapshot updates) to enforce sim ownership of gameplay item state.
+- Sim-affinity assert sweep (combat/spell chain): added explicit `ThreadAffinity.AssertSimThread()` guards through aggro/spell execution paths (`AggroTable`, `Spell`, `SpellEffect`, `Instant`, `OverTime`, `Buff`, `Periodic`) so combat casting/tick flows fail fast on cross-thread access.
+- Sim-affinity assert sweep (unit/resource math): added explicit `ThreadAffinity.AssertSimThread()` guards to sim-owned unit/resource/combat helpers (`Level`, `Health`, `Unit.Attack`, `Resource` + `Mana`/`Energy`/`Rage`, `HitTable`, `Stats.Attack`, `Damage`) to catch off-thread stat/resource mutation and combat-resolution calls.
+- Sim-affinity assert sweep (unit ownership layer): added explicit `ThreadAffinity.AssertSimThread()` guards in the stat ownership chain (`UnitData.InitializeWeaponSkill`/`Tick`/`GainExp`, `BaseStats` runtime mutators/refresh, `SecondaryStats.Refresh`, `Defense.Refresh`) to enforce sim-only updates across stat/resource orchestration.
+- Sim-affinity assert sweep (unit-stat helpers): added explicit `ThreadAffinity.AssertSimThread()` guards to `WeaponSkill` runtime APIs (`SetOwner`, `LevelUpSkill`, `GetSkill`, `UpdateBonus`) and base stat helper mutators (`BasePrimaryStats.LevelUp`, `TotalPrimaryStats.UpdateBaseStats`/`UpdateEquipmentStats`) to close remaining mutable unit-stat helper paths.
+- Sim-affinity assert sweep (object/spawner factory+load entry points): tightened load/factory ownership asserts across `ObjectFactory`, `ObjectManager`, and `SpawnerManager` (sim asserts for runtime load/save/create paths; game-thread asserts for immutable class/mob/gossip lookups used by gameplay/UI) to harden factory/load boundaries.

@@ -21,7 +21,6 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Collections.Concurrent;
 using System.Threading;
-using static Project_1.GameObjects.Spells.AoE.AreaOfEffectData;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.Tiles

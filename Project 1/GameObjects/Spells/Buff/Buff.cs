@@ -12,6 +12,7 @@ namespace Project_1.GameObjects.Spells.Buff
 {
     class Buff
     {
+        static void AssertSimThread() => ThreadAffinity.AssertSimThread();
         protected Entity caster;
 
         protected SpellEffect effect;
@@ -30,6 +31,7 @@ namespace Project_1.GameObjects.Spells.Buff
 
         public Buff(Entity aCaster, SpellEffect aEffet)
         {
+            AssertSimThread();
             effect = aEffet;
             caster = aCaster;
             createTime = TimeManager.TotalFrameTime;
@@ -37,20 +39,24 @@ namespace Project_1.GameObjects.Spells.Buff
 
         public virtual void Recast()
         {
+            AssertSimThread();
             createTime = TimeManager.TotalFrameTime;
         }
 
         public virtual void Update(Entity aEntity)
         {
+            AssertSimThread();
 
         }
 
         public virtual void OnApplied(Entity aOwner)
         {
+            AssertSimThread();
         }
 
         public virtual void OnRemoved(Entity aOwner)
         {
+            AssertSimThread();
         }
 
         public static bool operator ==(Buff aBuff, Buff bBuff)

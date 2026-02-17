@@ -1,0 +1,1 @@
+{"Name": "Circle of Healing", "ButtonGfx": "CircleOfHealing", "HitEffectGfx": "CircleOfHealing", "Effects": ["Circle of Healing"], "AcceptableTargets": [0, 1], "CastTime": 0, "Cooldown": 8, "ResourceCost": 45, "CastDistance": 40, "TravelType": 1, "SpellSchools": [7], "RequiresGroundTarget": true, "GroundTargetWidth": 120, "GroundTargetHeight": 120, "GroundTargetShape": 0}

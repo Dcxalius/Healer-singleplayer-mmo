@@ -1,4 +1,5 @@
 ﻿using Project_1.GameObjects.Entities;
+using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace Project_1.GameObjects.Unit.Stats
 {
     internal class Defense
     {
+        static void AssertSimThread() => ThreadAffinity.AssertSimThread();
         public Armor Armor => armor;
         Armor armor;
         public double Hp5 => hp5;
@@ -40,6 +42,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void Refresh(UnitData aUnitData)
         {
+            AssertSimThread();
             armor.Value = aUnitData.Equipment.GetArmor + aUnitData.BaseStats.TotalPrimaryStats.Agility * 2;
             dodgeChance = Math.Clamp(
                 aUnitData.ClassData.BaseDodge
@@ -66,6 +69,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         void RefreshSpellResitance(UnitData aUnitData)
         {
+            AssertSimThread();
             Dictionary<SpellSchool, int> resitanceBySchool = new Dictionary<SpellSchool, int>
             {
                 [SpellSchool.Arcane] = aUnitData.Equipment.GetSecondaryStat<int>("ArcaneResist"),

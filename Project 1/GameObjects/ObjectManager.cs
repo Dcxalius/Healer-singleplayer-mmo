@@ -69,6 +69,14 @@ namespace Project_1.GameObjects
             return entities.ToArray();
         }
 
+        public static Entity[] GetAllEntitiesSnapshot()
+        {
+            ThreadAffinity.AssertSimThread();
+            List<Entity> all = BuildAllScratch();
+            if (all == null || all.Count == 0) return Array.Empty<Entity>();
+            return all.ToArray();
+        }
+
         public static bool TryGetEntityByRenderId(int renderId, out Entity entity)
         {
             ThreadAffinity.AssertSimThread();
@@ -143,6 +151,35 @@ namespace Project_1.GameObjects
             for (int i = 0; i < npcs.Count; i++)
             {
                 if (npcs[i].RenderId != renderId) continue;
+                friendly = npcs[i];
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool TryGetFriendlyByName(string name, out Friendly friendly)
+        {
+            ThreadAffinity.AssertSimThread();
+            friendly = null;
+            if (string.IsNullOrWhiteSpace(name)) return false;
+
+            if (player != null && string.Equals(player.Name, name, StringComparison.OrdinalIgnoreCase))
+            {
+                friendly = player;
+                return true;
+            }
+
+            for (int i = 0; i < guild.Count; i++)
+            {
+                if (!string.Equals(guild[i].Name, name, StringComparison.OrdinalIgnoreCase)) continue;
+                friendly = guild[i];
+                return true;
+            }
+
+            for (int i = 0; i < npcs.Count; i++)
+            {
+                if (!string.Equals(npcs[i].Name, name, StringComparison.OrdinalIgnoreCase)) continue;
                 friendly = npcs[i];
                 return true;
             }
@@ -279,7 +316,11 @@ namespace Project_1.GameObjects
             ObjectFactory.PlayerData = player.PlayerData;
             Camera.Camera.BindCamera(player);
         }
-        public static void RemoveEntity(Entity aObject) => entities.Remove(aObject);
+        public static void RemoveEntity(Entity aObject)
+        {
+            ThreadAffinity.AssertSimThread();
+            entities.Remove(aObject);
+        }
 
         
 
@@ -301,6 +342,7 @@ namespace Project_1.GameObjects
 
         public static void LoadFromFactoryData()
         {
+            ThreadAffinity.AssertSimThread();
             Reset();
             guild.AddRange(ObjectFactory.GetGuildMemebers());
 

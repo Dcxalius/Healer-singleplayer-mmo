@@ -5,152 +5,209 @@ using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.Tiles;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Project_1.GameObjects.Spells.AoE.AreaOfEffectData;
 
 namespace Project_1.GameObjects.Entities
 {
     internal class SpellCast //Should this be part of enitity instead?
     {
-        Entity owner;
+        readonly Entity owner;
 
-        public bool OffGlobalCooldown { get => lastCastSpell + globalCooldown < TimeManager.TotalFrameTime; }
-        public double RatioOfGlobalCooldownDone { get => Math.Min((TimeManager.TotalFrameTime - lastCastSpell) / globalCooldown, 1); }
+        public bool OffGlobalCooldown => lastCastSpell + globalCooldown < TimeManager.TotalFrameTime;
+        public double RatioOfGlobalCooldownDone => Math.Min((TimeManager.TotalFrameTime - lastCastSpell) / globalCooldown, 1);
+
         const double globalCooldown = 1500;
         double lastCastSpell;
         Spell channeledSpell;
-        WorldSpace channeledSpellStartPosition;
         Entity channelTarget;
+        WorldSpace channelGroundTarget;
+        bool channelUsesGroundTarget;
         double startCastTime;
 
         public SpellCast(Entity aOwner)
         {
+            ThreadAffinity.AssertSimThread();
             owner = aOwner;
         }
+
         bool CastSpeedCheck()
         {
             const float graceSpeedWindow = 0.1f;
-            if (owner.Momentum.ToVector2().Length() > graceSpeedWindow)
-            {
-                return false;
-            }
-            return true;
+            return owner.Momentum.ToVector2().Length() <= graceSpeedWindow;
         }
+
         public void UpdateSpellChannel()
         {
+            ThreadAffinity.AssertSimThread();
             if (channeledSpell == null) return;
             if (!CastSpeedCheck())
             {
                 CancelChannel();
-
                 return;
             }
 
             if (FinishChannel()) return;
-
             Mailboxes.PublishUiEvent(new CastChannelProgress((float)((TimeManager.TotalFrameTime - startCastTime) / channeledSpell.CastTime)));
         }
 
         void CancelChannel()
         {
             Mailboxes.PublishUiEvent(new CastChannelCancelled());
-            channelTarget = null;
-            channeledSpell = null;
-            channeledSpellStartPosition = WorldSpace.Zero;
+            ClearChannelState();
         }
 
         bool FinishChannel()
         {
-            if (channeledSpell.CastTime < TimeManager.TotalFrameTime - startCastTime)
+            if (channeledSpell == null) return true;
+            if (channeledSpell.CastTime >= TimeManager.TotalFrameTime - startCastTime) return false;
+
+            const float graceWidth = 5f;
+            if (channelUsesGroundTarget)
             {
-                const float graceWidth = 5;
-                if (channeledSpell.CastDistance + graceWidth < (channelTarget.FeetPosition - owner.FeetPosition).ToVector2().Length())
+                if (!ValidateGroundTarget(channeledSpell, channelGroundTarget, graceWidth))
                 {
                     CancelChannel();
                     return true;
-
                 }
 
-                CastSpell(channeledSpell, channelTarget);
-
-                Mailboxes.PublishUiEvent(new CastChannelFinished());
-                channeledSpell = null;
-                channelTarget = null;
-                channeledSpellStartPosition = WorldSpace.Zero;
-                return true;
+                CastSpellAt(channeledSpell, channelGroundTarget);
             }
-            return false;
-        }
+            else
+            {
+                Entity target = channelTarget ?? owner;
+                if (!ValidateEntityTarget(channeledSpell, target, graceWidth))
+                {
+                    CancelChannel();
+                    return true;
+                }
 
-        bool StartChannel(Spell aSpell)
-        {
-            if (ChannelChecks(aSpell)) return false; 
+                CastSpell(channeledSpell, target);
+            }
 
-            channelTarget = owner.Target;
-            if (channelTarget == null) channelTarget = owner; 
-            
-            lastCastSpell = TimeManager.TotalFrameTime;
-            channeledSpellStartPosition = owner.FeetPosition;
-            channeledSpell = aSpell;
-            startCastTime = TimeManager.TotalFrameTime;
-            
-            Mailboxes.PublishUiEvent(new CastChannelStarted(owner.RenderId, channeledSpell.Name, channeledSpell.GfxPath, channeledSpell.CastTime));
-            Mailboxes.PublishUiEvent(new CastChannelProgress(0));
-            
+            Mailboxes.PublishUiEvent(new CastChannelFinished());
+            ClearChannelState();
             return true;
         }
 
-        bool ChannelChecks(Spell aSpell)
+        void ClearChannelState()
+        {
+            channeledSpell = null;
+            channelTarget = null;
+            channelGroundTarget = WorldSpace.Zero;
+            channelUsesGroundTarget = false;
+            startCastTime = 0;
+        }
+
+        bool CanStartChannel(Spell aSpell)
         {
             if (channeledSpell != null) return false;
             if (aSpell == null) return false;
-            if (aSpell.CastTime == 0) return false;
+            if (aSpell.CastTime <= 0) return false;
             if (!aSpell.OffCooldown) return false;
-            if (CastSpeedCheck()) return false;
+            if (!CastSpeedCheck()) return false;
+            return true;
+        }
+
+        bool StartChannelOnEntity(Spell aSpell, Entity aTarget)
+        {
+            if (!CanStartChannel(aSpell)) return false;
+            channelTarget = aTarget ?? owner;
+            channelGroundTarget = WorldSpace.Zero;
+            channelUsesGroundTarget = false;
+            return BeginChannel(aSpell);
+        }
+
+        bool StartChannelAtGround(Spell aSpell, WorldSpace aTargetPosition)
+        {
+            if (!CanStartChannel(aSpell)) return false;
+            channelTarget = null;
+            channelGroundTarget = aTargetPosition;
+            channelUsesGroundTarget = true;
+            return BeginChannel(aSpell);
+        }
+
+        bool BeginChannel(Spell aSpell)
+        {
+            lastCastSpell = TimeManager.TotalFrameTime;
+            channeledSpell = aSpell;
+            startCastTime = TimeManager.TotalFrameTime;
+            Mailboxes.PublishUiEvent(new CastChannelStarted(owner.RenderId, channeledSpell.Name, channeledSpell.GfxPath, channeledSpell.CastTime));
+            Mailboxes.PublishUiEvent(new CastChannelProgress(0));
             return true;
         }
 
         public bool StartCast(Spell aSpell)
         {
+            ThreadAffinity.AssertSimThread();
             if (aSpell == null) return false;
-            //if (!spellBook.HasSpell(aSpell)) return false;
-            if (!owner.Resource.isCastable(aSpell.ResourceCost)) return false;
-            if (!OffGlobalCooldown) return false;
-            if (!aSpell.OffCooldown) return false;
+            if (aSpell.RequiresGroundTarget) return false;
+            if (!CommonCastChecks(aSpell)) return false;
 
-            if (owner.Target != null)
-            {
-                float d = (owner.Target.FeetPosition - owner.FeetPosition).ToVector2().Length();
-                if (d > aSpell.CastDistance) return false;
-
-                if (!aSpell.Targetable(owner.Target.RelationToPlayer)) return false;
-                if (!TileManager.CheckLineOfSight(owner, owner.Target.FeetPosition)) return false;
-            }
-            else
-            {
-                if (!aSpell.Targetable(owner.RelationToPlayer)) return false;
-
-            }
-
+            Entity target = owner.Target ?? owner;
+            if (!ValidateEntityTarget(aSpell, target, 0f)) return false;
 
             if (aSpell.CastTime > 0)
             {
-                StartChannel(aSpell);
-                return true;
+                return StartChannelOnEntity(aSpell, target);
             }
+
             lastCastSpell = TimeManager.TotalFrameTime;
-            return CastSpell(aSpell, owner.Target);
+            return CastSpell(aSpell, target);
+        }
+
+        public bool StartCastAt(Spell aSpell, WorldSpace aTargetPosition)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (aSpell == null) return false;
+            if (!aSpell.RequiresGroundTarget) return StartCast(aSpell);
+            if (!CommonCastChecks(aSpell)) return false;
+            if (!ValidateGroundTarget(aSpell, aTargetPosition, 0f)) return false;
+
+            if (aSpell.CastTime > 0)
+            {
+                return StartChannelAtGround(aSpell, aTargetPosition);
+            }
+
+            lastCastSpell = TimeManager.TotalFrameTime;
+            return CastSpellAt(aSpell, aTargetPosition);
+        }
+
+        bool CommonCastChecks(Spell aSpell)
+        {
+            if (!owner.Resource.isCastable(aSpell.ResourceCost)) return false;
+            if (!OffGlobalCooldown) return false;
+            if (!aSpell.OffCooldown) return false;
+            return true;
+        }
+
+        bool ValidateEntityTarget(Spell aSpell, Entity aTarget, float graceDistance)
+        {
+            if (aTarget == null) return false;
+            float d = (aTarget.FeetPosition - owner.FeetPosition).ToVector2().Length();
+            if (d > aSpell.CastDistance + graceDistance) return false;
+            if (!aSpell.Targetable(aTarget.RelationToPlayer)) return false;
+            if (!TileManager.CheckLineOfSight(owner, aTarget.FeetPosition)) return false;
+            return true;
+        }
+
+        bool ValidateGroundTarget(Spell aSpell, WorldSpace aTargetPosition, float graceDistance)
+        {
+            float d = (aTargetPosition - owner.FeetPosition).ToVector2().Length();
+            if (d > aSpell.CastDistance + graceDistance) return false;
+            if (!TileManager.CheckLineOfSight(owner, aTargetPosition)) return false;
+            return true;
         }
 
         bool CastSpell(Spell aSpell, Entity aTarget)
         {
-
             if (!aSpell.Cast(aTarget, owner)) return false;
             owner.Resource.CastSpell(aSpell.ResourceCost);
+            return true;
+        }
 
+        bool CastSpellAt(Spell aSpell, WorldSpace aTargetPosition)
+        {
+            if (!aSpell.CastAt(aTargetPosition, owner)) return false;
+            owner.Resource.CastSpell(aSpell.ResourceCost);
             return true;
         }
     }

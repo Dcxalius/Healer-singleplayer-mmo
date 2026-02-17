@@ -55,6 +55,7 @@ namespace Project_1.GameObjects.Spells
 
         public override bool Trigger(Entity aCaster, Entity aTarget, double aScalar = 1.0)
         {
+            ThreadAffinity.AssertSimThread();
             if (type == Type.Attack)
             {
                 double finalValue = RandomValue;
@@ -81,6 +82,7 @@ namespace Project_1.GameObjects.Spells
 
         int GetSpellPower(Entity aCaster)
         {
+            ThreadAffinity.AssertSimThread();
             if (type == Type.Heal)
             {
                 if (SpellSchools != null && SpellSchools.Count > 0)

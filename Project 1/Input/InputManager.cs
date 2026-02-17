@@ -7,8 +7,6 @@ using Project_1.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.UI;
-using Project_1.UI.UIElements;
-using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -38,20 +36,6 @@ namespace Project_1.Input
         }
 
         public static bool IsModifier(Keys aKey) => aKey == Keys.LeftShift || aKey == Keys.RightShift || aKey == Keys.LeftAlt || aKey == Keys.RightAlt || aKey == Keys.LeftControl || aKey == Keys.RightControl;
-
-        public static bool WritingToLabel => inputToWriteTo != null;
-        public static InputBox InputToWriteTo 
-        {
-            get => inputToWriteTo; 
-            set 
-            { 
-                inputToWriteTo = value; 
-                cursorPosition = inputToWriteTo == null ? 0 : inputToWriteTo.Input.Length; 
-            }
-        }
-        static InputBox inputToWriteTo;
-        public static int CursorPosition => cursorPosition;
-        static int cursorPosition;
 
         public static bool LeftPress
         {
@@ -182,76 +166,9 @@ namespace Project_1.Input
             PublishEscapePressed();
             UpdateScrollWheel();
             CheckButtonPress();
-            WriteToLabel();
             PublishKeyboardSnapshots();
             PublishMouseSnapshot();
         }
-
-        private static void WriteToLabel()
-        {
-            if (!WritingToLabel) return;
-
-            Keys[] keys = newKeyboardState.GetPressedKeys();
-            for (int i = 0; i < keys.Length; i++)
-            {
-                if (keys[i] == Keys.None) continue;
-                if (oldKeyboardState.GetPressedKeys().Contains(keys[i])) continue; //TODO: Add a condition to check if its being hold long enough and then start spamming it with increasing frequency
-                if (Remove(keys[i])) continue;
-                if (keys[i] == Keys.Enter)
-                {
-                    InputToWriteTo.Enter();
-                    InputToWriteTo = null;
-                    return;
-                }
-                CursorMovement(keys[i]);
-
-                if (!IllegalCharacter(keys[i])) continue;
-                
-                char s = keys[i].ToString().Last();
-                
-                if (!(newKeyboardState.IsKeyDown(Keys.LeftShift) || newKeyboardState.IsKeyDown(Keys.RightShift))) s = char.ToLower(s);
-
-                if (!InputToWriteTo.WriteTo(s, cursorPosition)) continue;
-                cursorPosition++;
-            }
-            
-        }
-
-        static bool Remove(Keys aPressedKey) //TODO: Change name and make less ugly
-        {
-            if (aPressedKey != Keys.Back && aPressedKey != Keys.Delete) return false;
-            bool ctrlPress = newKeyboardState.IsKeyDown(Keys.LeftControl) || newKeyboardState.IsKeyDown(Keys.RightControl);
-            if (aPressedKey == Keys.Delete)
-            {
-                InputToWriteTo.Delete(ctrlPress, cursorPosition);
-                CursorBoundsCheck();
-                return true;
-            }
-            int l = InputToWriteTo.Input.Length;
-            InputToWriteTo.Backstep(ctrlPress, cursorPosition);
-
-            if (ctrlPress) cursorPosition -= l - InputToWriteTo.Input.Length;
-            else cursorPosition--;
-            CursorBoundsCheck();
-
-            return true;
-        }
-
-        static void CursorMovement(Keys aPressedKey)
-        {
-            if (aPressedKey != Keys.Left && aPressedKey != Keys.Right) return;
-            if (aPressedKey == Keys.Left) cursorPosition--;
-            if (aPressedKey == Keys.Right) cursorPosition++;
-            CursorBoundsCheck();
-        }
-
-        static void CursorBoundsCheck()
-        {
-            if (cursorPosition < 0) cursorPosition = 0;
-            if (cursorPosition > inputToWriteTo.Input.Length) cursorPosition = inputToWriteTo.Input.Length;
-        }
-
-        static bool IllegalCharacter(Keys aPressedKey) => inputToWriteTo.ValidInput(aPressedKey);
 
         static void UpdateStates()
         {
@@ -280,7 +197,7 @@ namespace Project_1.Input
             }
             else if (GetMouseRelease(oldMouseState.LeftButton, newMouseState.LeftButton))
             {
-                CreateReleaseEvent(null, InputManager.ClickType.Left);
+                CreateReleaseEvent(InputManager.ClickType.Left);
             }
 
             if (GetMousePress(oldMouseState.RightButton, newMouseState.RightButton))
@@ -289,31 +206,28 @@ namespace Project_1.Input
             }
             else if (GetMouseRelease(oldMouseState.RightButton, newMouseState.RightButton))
             {
-                CreateReleaseEvent(null, InputManager.ClickType.Right);
+                CreateReleaseEvent(InputManager.ClickType.Right);
             }
 
             if (GetMouseRelease(oldMouseState.MiddleButton, newMouseState.MiddleButton))
             {
-                CreateReleaseEvent(null, InputManager.ClickType.Middle);
+                CreateReleaseEvent(InputManager.ClickType.Middle);
             }
         }
 
         static void CreateClickEvent(InputManager.ClickType aTypeOfClick)
         {
             byte modifiersMask = GetHoldModifierMask();
-
-            inputToWriteTo = null;
-
             ClickEvent clickEvent = new ClickEvent(GetMousePosRelative(), aTypeOfClick, modifiersMask);
 
             Mailboxes.PublishUiEvent(clickEvent);
         }
 
-        public static void CreateReleaseEvent(UIElement aCreator, InputManager.ClickType aTypeOfRelease)
+        public static void CreateReleaseEvent(InputManager.ClickType aTypeOfRelease)
         {
             byte modifiersMask = GetHoldModifierMask();
 
-            ReleaseEvent releaseEvent = new ReleaseEvent(aCreator, GetMousePosRelative(), aTypeOfRelease, modifiersMask);
+            ReleaseEvent releaseEvent = new ReleaseEvent(null, GetMousePosRelative(), aTypeOfRelease, modifiersMask);
             Mailboxes.PublishUiEvent(releaseEvent);
         }
 
@@ -368,15 +282,6 @@ namespace Project_1.Input
             AbsoluteScreenPosition absolute = GetMousePosAbsolute();
             RelativeScreenPosition relative = GetMousePosRelative();
             Mailboxes.PublishUiEvent(new MouseSnapshot(absolute, relative, scrollWheelValue, scrollDelta));
-        }
-
-        public static bool[] CheckHoldModifiers()
-        {
-            bool[] heldModifiers = new bool[(int)HoldModifier.Count];
-            heldModifiers[(int)HoldModifier.Ctrl] = IsHoldModifierHeld(HoldModifier.Ctrl);
-            heldModifiers[(int)HoldModifier.Alt] = IsHoldModifierHeld(HoldModifier.Alt);
-            heldModifiers[(int)HoldModifier.Shift] = IsHoldModifierHeld(HoldModifier.Shift);
-            return heldModifiers;
         }
 
         public static bool IsHoldModifierHeld(HoldModifier modifier)
@@ -454,7 +359,7 @@ namespace Project_1.Input
         public static bool GetPress(Keys key)
         {
             ThreadAffinity.AssertMainThread();
-            if (WritingToLabel) { return false; }
+            if (UiTextInputManager.IsActive) { return false; }
 
             if (!oldKeyboardState.IsKeyDown(key) && newKeyboardState.IsKeyDown(key))
             {
@@ -467,7 +372,7 @@ namespace Project_1.Input
         public static bool GetHold(Keys key)
         {
             ThreadAffinity.AssertMainThread();
-            if (WritingToLabel) { return false; }
+            if (UiTextInputManager.IsActive) { return false; }
             if (oldKeyboardState.IsKeyDown(key) || newKeyboardState.IsKeyDown(key))
             {
                 return true;
@@ -479,7 +384,7 @@ namespace Project_1.Input
         public static bool GetRelease(Keys key)
         {
             ThreadAffinity.AssertMainThread();
-            if (WritingToLabel) { return false; }
+            if (UiTextInputManager.IsActive) { return false; }
             if (oldKeyboardState.IsKeyDown(key) && !newKeyboardState.IsKeyDown(key))
             {
                 return true;

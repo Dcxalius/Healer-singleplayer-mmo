@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using static Project_1.GameObjects.Unit.Equipment;
 using Project_1.GameObjects.Entities.Friendlies;
 using System.Globalization;
+using Project_1.Managers;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -57,7 +58,11 @@ namespace Project_1.GameObjects.Entities
         }
 
         public SecondaryStats SecondaryStats => unitData.SecondaryStats;
-        internal void RefreshSecondaryStats() => unitData.SecondaryStats.Refresh(unitData);
+        internal void RefreshSecondaryStats()
+        {
+            ThreadAffinity.AssertSimThread();
+            unitData.SecondaryStats.Refresh(unitData);
+        }
         public int DefenseSkill => unitData.DefenseSkill;
         public WeaponSkill WeaponSkill => unitData.WeaponSkill;
         public bool IsDualWielding => Equipment.IsDualWielding;
@@ -118,6 +123,7 @@ namespace Project_1.GameObjects.Entities
         }
         protected virtual void Death()
         {
+            ThreadAffinity.AssertSimThread();
             Events.Clear();
             for (int i = 0; i < aggroTablesIAmOn.Count; i++)
             {
@@ -133,6 +139,7 @@ namespace Project_1.GameObjects.Entities
 
         public bool ResourceGain(Entity aEntity, float aValue, Resource.ResourceType aResourceType)
         {
+            ThreadAffinity.AssertSimThread();
             if (aResourceType != ResourceType) return false;
 
             if (MaxResource == CurrentResource) return false;
@@ -156,6 +163,7 @@ namespace Project_1.GameObjects.Entities
 
         public virtual bool TakeHealing(Entity aHealer, float aHealingTaken)
         {
+            ThreadAffinity.AssertSimThread();
             if (FullHealth) return false;
 
             double value = CalculateHealing(aHealingTaken);
@@ -201,6 +209,7 @@ namespace Project_1.GameObjects.Entities
 
         public void GainExperience(int aExpAmount)
         {
+            ThreadAffinity.AssertSimThread();
             unitData.GainExp(aExpAmount);
 
             if (!(this is Friendly)) return;
@@ -210,6 +219,7 @@ namespace Project_1.GameObjects.Entities
 
         protected void CreateNamePlate()
         {
+            ThreadAffinity.AssertSimThread();
             hasNamePlate = true;
             Mailboxes.PublishUiEvent(new NamePlateAdded(BuildUiSnapshot()));
 
@@ -217,6 +227,7 @@ namespace Project_1.GameObjects.Entities
 
         protected void RemoveNamePlate()
         {
+            ThreadAffinity.AssertSimThread();
             hasNamePlate = false;
             Mailboxes.PublishUiEvent(new NamePlateRemoved(RenderId));
         }
@@ -225,12 +236,14 @@ namespace Project_1.GameObjects.Entities
 
         public virtual void RefreshPlates()
         {
+            ThreadAffinity.AssertSimThread();
             if (!namePlateRequiresUpdate) return;
             Mailboxes.PublishUiEvent(new PlateRefreshRequested(BuildUiSnapshot()));
         }
 
         public Item EquipInParticularSlot(Items.SubTypes.Equipment aEquipment, Slot aSlot)
         {
+            ThreadAffinity.AssertSimThread();
             Item item = Equipment.EquipInParticularSlot(aEquipment, aSlot);
             unitData.BaseStats.RefreshEquipmentStats(Equipment.EquipmentStats);
             FlagForRefresh();
@@ -238,6 +251,7 @@ namespace Project_1.GameObjects.Entities
         }
         public Item Equip(Items.SubTypes.Equipment aEquipment)
         {
+            ThreadAffinity.AssertSimThread();
             Item item = Equipment.Equip(aEquipment);
             unitData.BaseStats.RefreshEquipmentStats(Equipment.EquipmentStats);
             FlagForRefresh();
@@ -247,6 +261,7 @@ namespace Project_1.GameObjects.Entities
 
         public (Item, Item) EquipTwoHander(Items.SubTypes.Equipment aEquipment)
         {
+            ThreadAffinity.AssertSimThread();
             (Item, Item) returnable = Equipment.EquipTwoHander(aEquipment);
             unitData.BaseStats.RefreshEquipmentStats(Equipment.EquipmentStats);
             FlagForRefresh();

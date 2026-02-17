@@ -15,7 +15,14 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 {
     internal class SpellBook
     {
-        public Spell[] Spells { get => knownSpells.ToArray(); }
+        public Spell[] Spells
+        {
+            get
+            {
+                ThreadAffinity.AssertSimThread();
+                return knownSpells.ToArray();
+            }
+        }
         List<Spell> knownSpells;
         List<Spell> learnableSpells;
         Entity owner;
@@ -24,6 +31,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         {
             get
             {
+                ThreadAffinity.AssertSimThread();
                 string[] returnable = new string[knownSpells.Count];
                 for (int i = 0; i < returnable.Length; i++)
                 {
@@ -36,6 +44,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public SpellBook(string[] aSpellsAlreadyLearnt)
         {
+            ThreadAffinity.AssertSimThread();
             loadedSpells = aSpellsAlreadyLearnt;
             knownSpells = new List<Spell>();
         }
@@ -48,6 +57,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public void Init(Entity aEntity)
         {
+            ThreadAffinity.AssertSimThread();
             if (aEntity.RelationToPlayer != Relation.RelationToPlayer.Self) return;
             owner = aEntity as Friendly;
             aEntity = aEntity as Friendly;
@@ -80,6 +90,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public void LearnSpell(string aSpellName)
         {
+            ThreadAffinity.AssertSimThread();
             Spell s = learnableSpells.Find(x => x.Name == aSpellName);
             if (s == null)
             {
@@ -92,15 +103,21 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public void AddSpell(Spell aSpell)
         {
+            ThreadAffinity.AssertSimThread();
             knownSpells.Add(aSpell);
             Mailboxes.PublishUiEvent(new SpellbookRefreshed(owner.RenderId, knownSpells.Select(x => x.Name).ToArray()));
         }
 
 
-        public bool HasSpell(Spell aSpell) => knownSpells.Contains(aSpell);
+        public bool HasSpell(Spell aSpell)
+        {
+            ThreadAffinity.AssertSimThread();
+            return knownSpells.Contains(aSpell);
+        }
 
         public bool TryGetSpell(string spellName, out Spell spell)
         {
+            ThreadAffinity.AssertSimThread();
             spell = null;
             if (string.IsNullOrWhiteSpace(spellName)) return false;
             spell = knownSpells.Find(x => x.Name == spellName);

@@ -52,6 +52,7 @@ namespace Project_1.GameObjects.Spells.Buff
 
         public override bool Trigger(Entity aCaster, Entity aTarget, double aScalar = 1.0)
         {
+            ThreadAffinity.AssertSimThread();
             double perTickScalar = 1.0 / TickCount;
             Periodic periodic = new Periodic(aCaster, this, perTickScalar);
             aTarget.AddBuff(periodic);

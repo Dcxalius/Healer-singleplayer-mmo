@@ -19,6 +19,8 @@ namespace Project_1.Items
 {
     internal class Inventory
     {
+        static void AssertSimThread() => ThreadAffinity.AssertSimThread();
+
         public const int bagSlots = 5;
         public const int defaultSlots = 32;
 
@@ -127,11 +129,13 @@ namespace Project_1.Items
 
         public bool ConsumeItem((int, int) aBagAndSlotIndex, Friendly aFriendly)
         {
+            AssertSimThread();
             return ConsumeItem(aBagAndSlotIndex.Item1, aBagAndSlotIndex.Item2, aFriendly);
         }
 
         public bool ConsumeItem(int aBagIndex, int aSlotIndex, Friendly aFriendly)
         {
+            AssertSimThread();
             Debug.Assert(items[aBagIndex][aSlotIndex].ItemType == ItemData.ItemType.Consumable, "Tried to consume nonconcumable.");
 
             if (!(items[aBagIndex][aSlotIndex] as Consumable).Use(aFriendly)) return false;
@@ -158,6 +162,7 @@ namespace Project_1.Items
 
         public bool EquipBag(Container aBag)
         {
+            AssertSimThread();
             DebugManager.Print("Depricated Method used");
             for (int i = 1; i < bags.Length; i++)
             {
@@ -174,6 +179,7 @@ namespace Project_1.Items
 
         public bool EquipBag((int, int) aBagAndSlot)
         {
+            AssertSimThread();
             Debug.Assert(items[aBagAndSlot.Item1][aBagAndSlot.Item2].ItemType == ItemData.ItemType.Container);
             for (int i = 1; i < bags.Length; i++)
             {
@@ -196,6 +202,7 @@ namespace Project_1.Items
 
         public void AddBag(Container aBag, int aEmptySlotToAddTo)
         {
+            AssertSimThread();
             Debug.Assert(aEmptySlotToAddTo != 0, "Tried to Add a bag to default bagslot.");
             Debug.Assert(bags[aEmptySlotToAddTo] == null, "Tried to add to occupied slot.");
             bags[aEmptySlotToAddTo] = aBag;
@@ -205,6 +212,7 @@ namespace Project_1.Items
 
         public bool UnequipBag(int aBagSlot)
         {
+            AssertSimThread();
             Debug.Assert(bags[aBagSlot] != null, "Tried to remove nonexistant bag.");
 
             if (items[aBagSlot].All(item => item == null))
@@ -224,6 +232,7 @@ namespace Project_1.Items
 
         public void UnequipBag(int aBag, (int, int) aInventorySlot)
         {
+            AssertSimThread();
             if (items[aBag].Where(item => item == null).Count() != bags[aBag].SlotCount) return;
             items[aInventorySlot.Item1][aInventorySlot.Item2] = bags[aBag];
             bags[aBag] = null;
@@ -235,6 +244,7 @@ namespace Project_1.Items
 
         public void RearrangeBags(int aBagSlot, int aSlotToSwapWith)
         {
+            AssertSimThread();
             Item[] tempItems = items[aBagSlot];
             Container tempBag = bags[aBagSlot];
             items[aBagSlot] = items[aSlotToSwapWith];
@@ -247,6 +257,7 @@ namespace Project_1.Items
 
         public void SwapPlacesOfBags(int aBagSlot, int aSlotToSwapWith)
         {
+            AssertSimThread();
             Debug.Assert(aBagSlot != aSlotToSwapWith, "tried to swap bag with iteself");
             Debug.Assert(bags[aBagSlot] != null, "originator bag was empty");
             if (bags[aSlotToSwapWith] == null)
@@ -278,6 +289,7 @@ namespace Project_1.Items
 
         public void SwapBags((int, int) aSlot, int aSlotToSwapWith)
         {
+            AssertSimThread();
             Debug.Assert(items[aSlot.Item1][aSlot.Item2].ItemType == ItemData.ItemType.Container, "Tried to treat non bag as a bag.");
 
 
@@ -320,6 +332,7 @@ namespace Project_1.Items
 
         public void LootItem(int aLootIndex)
         {
+            AssertSimThread();
             while (true)
             {
                 Item available = LootState.Peek(aLootIndex);
@@ -363,6 +376,7 @@ namespace Project_1.Items
 
         public void LootItem(int aLootIndex, (int, int) aBagAndSlot)
         {
+            AssertSimThread();
             Item available = LootState.Peek(aLootIndex);
             if (available == null) return;
 
@@ -391,6 +405,7 @@ namespace Project_1.Items
 
         public bool AddItem(Item aItem)
         {
+            AssertSimThread();
             int count = aItem.Count;
             for (int i = 0; i < items.Length; i++) //TODO: Break this out to a method
             {
@@ -445,6 +460,7 @@ namespace Project_1.Items
 
         public void AddItem(Item aItem, int aBagIndex, int aSlotIndex)
         {
+            AssertSimThread();
             Debug.Assert(aItem != null);
             Debug.Assert(GetItemInSlot(aBagIndex, aSlotIndex) == null);
 
@@ -453,11 +469,13 @@ namespace Project_1.Items
 
         public void AddItem(Item aItem, (int, int) aBagAndSlotIndex)
         {
+            AssertSimThread();
             AddItem(aItem, aBagAndSlotIndex.Item1, aBagAndSlotIndex.Item2);
         }
 
         public void SwapItems((int, int) aSlot, (int, int) aSlotToSwapWith)
         {
+            AssertSimThread();
             if (items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2] == null)
             {
                 items[aSlotToSwapWith.Item1][aSlotToSwapWith.Item2] = items[aSlot.Item1][aSlot.Item2];
@@ -494,6 +512,7 @@ namespace Project_1.Items
 
         public bool RemoveItem(Item aItem, int aCountToRemove)
         {
+            AssertSimThread();
             int count = aCountToRemove;
             List<(int, int)> itemsToRemoveFrom = new List<(int, int)>();
             for (int i = 0; i < items.GetLength(0); i++)
@@ -527,6 +546,7 @@ namespace Project_1.Items
 
         public void TrimStack(int aBagIndex, int aSlotIndex, int aCount)
         {
+            AssertSimThread();
 
             Debug.Assert(aCount <= items[aBagIndex][aSlotIndex].Count, "Tried to remove to much from item");
             items[aBagIndex][aSlotIndex].Count -= aCount;
@@ -539,11 +559,13 @@ namespace Project_1.Items
 
         public void TrimStack((int, int) aBagAndSlotIndex, int aCount)
         {
+            AssertSimThread();
             TrimStack(aBagAndSlotIndex.Item1, aBagAndSlotIndex.Item2, aCount);
         }
 
         public bool DestroyItem(Item aItem)
         {
+            AssertSimThread();
             for (int i = 0; i < items.Length; i++)
             {
                 for (int j = 0; j < items[i].Length; j++)
@@ -562,6 +584,7 @@ namespace Project_1.Items
 
         public int DestroyItemAtSlot(int aBagIndex, int aSlotIndex)
         {
+            AssertSimThread();
             if (items[aBagIndex][aSlotIndex] == null)
             {
                 DebugManager.Print("Tried to destoy item but couldnt find it.");
@@ -574,6 +597,7 @@ namespace Project_1.Items
 
         void AddItemToInventoryFromInventory(Item aItem, int aInventory)
         {
+            AssertSimThread();
             for (int i = 0; i < items[aInventory].Length; i++)
             {
                 if (items[aInventory][i] == null)
@@ -597,6 +621,7 @@ namespace Project_1.Items
 
         internal void Equip((int, int) aIndex, Friendly aFriendly)
         {
+            AssertSimThread();
             Item item = items[aIndex.Item1][aIndex.Item2];
 
             if (item == null) return;
@@ -626,6 +651,7 @@ namespace Project_1.Items
 
         internal void SwapEquipment((int, int) aIndex, int aEquipmentSlot, Friendly aFriendly)
         {
+            AssertSimThread();
             Item item = items[aIndex.Item1][aIndex.Item2];
 
             if (item == null) return;
@@ -657,17 +683,20 @@ namespace Project_1.Items
 
         public void AssignItem(Item item, (int, int) aBagAndSlotIndex)
         {
+            AssertSimThread();
             AssignItem(item, aBagAndSlotIndex.Item1, aBagAndSlotIndex.Item2);
         }
         
         public void AssignItem(Item aItem, int aBagIndex, int aSlotIndex)
         {
+            AssertSimThread();
             items[aBagIndex][aSlotIndex] = aItem;
             NotifySlotChanged(aBagIndex, aSlotIndex, this);
         }
 
         public InventoryUiSnapshot BuildUiSnapshot()
         {
+            AssertSimThread();
             ItemUiSnapshot[] bagSnapshots = new ItemUiSnapshot[bagSlots];
             for (int i = 1; i < bagSlots; i++)
             {

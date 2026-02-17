@@ -1,6 +1,7 @@
 ﻿using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spawners;
 using Project_1.Items.SubTypes;
+using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace Project_1.GameObjects.Unit.Stats
 {
     internal class SecondaryStats
     {
+        static void AssertSimThread() => ThreadAffinity.AssertSimThread();
         public SecondaryStats(UnitData aUnitData)
         {
             attack = new Attack(aUnitData);
@@ -22,6 +24,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void Refresh(UnitData aUnitData)
         {
+            AssertSimThread();
             attack.Refresh(aUnitData);
             spell.Refresh(aUnitData);
             defense.Refresh(aUnitData);

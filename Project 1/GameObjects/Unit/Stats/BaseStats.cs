@@ -5,6 +5,7 @@ using Project_1.GameObjects.Unit.Resources;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.UI.HUD.Managers;
+using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace Project_1.GameObjects.Unit.Stats
 {
     internal class BaseStats
     {
+        static void AssertSimThread() => ThreadAffinity.AssertSimThread();
         Entity owner;
         public Health Health => health;
         Health health;
@@ -47,6 +49,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public int GetAttackPower(ClassData aClassData)
         {
+            AssertSimThread();
             int baseAttackPower = totalPrimaryStats.Agility.GetMeleeAttackPower(aClassData) + totalPrimaryStats.Strength.GetMeleeAttackPower(aClassData);
             int equipmentAttackPower = owner?.Equipment.GetSecondaryStat<int>("AttackPower") ?? 0;
             return baseAttackPower + equipmentAttackPower;
@@ -89,6 +92,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void SetOwner(Entity aEntity)
         {
+            AssertSimThread();
             owner = aEntity;
             resource.SetOwner(aEntity);
             owner.Equipment.SetMeleeAttackPower = GetAttackPower(classData);
@@ -103,6 +107,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public bool CheckIfResourceRegened()
         {
+            AssertSimThread();
             if (resource.GetType() != typeof(Mana)) return false;
             return (resource as Mana).CheckIfTicked();
         }
@@ -110,6 +115,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void LevelUp()
         {
+            AssertSimThread();
             basePrimaryStats.LevelUp(classData.PerLevelStats);
             totalPrimaryStats.UpdateBaseStats(basePrimaryStats);
             health.LevelUp(classData.PerLevelHp, basePrimaryStats.Stamina);
@@ -120,6 +126,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void RefreshStats()
         {
+            AssertSimThread();
             health.Refresh(TotalPrimaryStats);
             resource.Refresh(TotalPrimaryStats);
             owner.RefreshSecondaryStats();
@@ -137,6 +144,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void RefreshEquipmentStats(EquipmentStats aEquipmentStats)
         {
+            AssertSimThread();
             totalPrimaryStats.UpdateEquipmentStats(aEquipmentStats);
             baseArmor = aEquipmentStats.Armor;
             RefreshStats();

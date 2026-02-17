@@ -21,12 +21,14 @@ namespace Project_1.GameObjects.Spells.Buff
 
         public Periodic(Entity aCaster, OverTime aOverTime, double aTickScalar) : base(aCaster, aOverTime)
         {
+            ThreadAffinity.AssertSimThread();
             tickCounter = 0;
             tickScalar = aTickScalar;
         }
 
         public override void Recast()
         {
+            ThreadAffinity.AssertSimThread();
             base.Recast();
 
             tickCounter = 0;
@@ -34,6 +36,7 @@ namespace Project_1.GameObjects.Spells.Buff
 
         public override void Update(Entity aEntity)
         {
+            ThreadAffinity.AssertSimThread();
             base.Update(aEntity);
             while (tickCounter < OverTime.TickCount && createTime + OverTime.TickRate * (tickCounter + 1) <= TimeManager.TotalFrameTime)
             {

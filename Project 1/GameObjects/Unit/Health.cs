@@ -6,11 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Project_1.GameObjects.Unit.Classes;
 using Project_1.GameObjects.Unit.Stats;
+using Project_1.Managers;
 
 namespace Project_1.GameObjects.Unit
 {
     internal class Health
     {
+        static void AssertSimThread() => ThreadAffinity.AssertSimThread();
         const double ServerTickSeconds = 2.0;
         const double Hp5WindowSeconds = 5.0;
         const double Hp5ToTickMultiplier = ServerTickSeconds / Hp5WindowSeconds;
@@ -60,6 +62,7 @@ namespace Project_1.GameObjects.Unit
 
         public bool HealthRegenTick(bool aInCombat, double aHp5, double aSpiritHp5)
         {
+            AssertSimThread();
             double hp5Total = aHp5 + (aInCombat ? 0d : aSpiritHp5);
             double regen = hp5Total * Hp5ToTickMultiplier;
             if (regen <= 0d)
@@ -74,17 +77,20 @@ namespace Project_1.GameObjects.Unit
 
         public void UpdateStamina(int aStamina)
         {
+            AssertSimThread();
             maxHealth = baseMaxHealth + aStamina * 10;
             if (currentHealth > maxHealth) currentHealth = maxHealth;
         }
 
         public void Refresh(TotalPrimaryStats aPrimaryStats)
         {
+            AssertSimThread();
             MaxHealth = baseMaxHealth + aPrimaryStats.Stamina * 10;
         }
 
         internal void LevelUp(double aPerLevelHp, int aStamina)
         {
+            AssertSimThread();
             baseMaxHealth += aPerLevelHp;
             UpdateStamina(aStamina);
             currentHealth = maxHealth;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 
@@ -14,6 +15,9 @@ namespace Project_1.Messaging
         readonly ConcurrentDictionary<Type, IChannel> channelsByType = new ConcurrentDictionary<Type, IChannel>();
         readonly ConcurrentDictionary<int, IChannel> channelsById = new ConcurrentDictionary<int, IChannel>();
         readonly ConcurrentDictionary<Type, byte> coalescedTypes = new ConcurrentDictionary<Type, byte>();
+        readonly ConcurrentDictionary<Type, long> handlerFailuresByType = new ConcurrentDictionary<Type, long>();
+        readonly ConcurrentDictionary<Type, long> coalescedByType = new ConcurrentDictionary<Type, long>();
+        int handlerFailureTraceBudget = 32;
         int nextChannelId;
         int pendingCount;
         int peakCount;
@@ -70,6 +74,7 @@ namespace Project_1.Messaging
             {
                 Interlocked.Increment(ref totalCoalesced);
                 Interlocked.Increment(ref totalDropped);
+                coalescedByType.AddOrUpdate(typeof(T), 1, static (_, current) => current + 1);
             }
             Interlocked.Increment(ref totalPublished);
         }
@@ -126,6 +131,14 @@ namespace Project_1.Messaging
                 if (handlerFailures > 0)
                 {
                     Interlocked.Add(ref totalHandlerFailures, handlerFailures);
+                    long delta = handlerFailures;
+                    handlerFailuresByType.AddOrUpdate(channel.MessageType, delta, (_, current) => current + delta);
+                    if (Interlocked.Decrement(ref handlerFailureTraceBudget) >= 0)
+                    {
+                        string trace = $"Mailbox '{Name}' counted handlerFail={handlerFailures} type='{channel.MessageType.Name}' handlers={handlerInvocations}.";
+                        Console.WriteLine(trace);
+                        Debug.WriteLine(trace);
+                    }
                 }
                 processed++;
             }
@@ -142,6 +155,8 @@ namespace Project_1.Messaging
 
         public MailboxStats GetStats()
         {
+            (string topHandlerFailureType, long topHandlerFailureCount) = GetTopTypeAndCount(handlerFailuresByType);
+            (string topCoalescedType, long topCoalescedCount) = GetTopTypeAndCount(coalescedByType);
             return new MailboxStats(Name,
                 Volatile.Read(ref pendingCount),
                 Volatile.Read(ref peakCount),
@@ -156,6 +171,10 @@ namespace Project_1.Messaging
                 Interlocked.Read(ref totalHandlerFailures),
                 Interlocked.Read(ref totalCoalesced),
                 Interlocked.Read(ref totalDropped),
+                topHandlerFailureType,
+                topHandlerFailureCount,
+                topCoalescedType,
+                topCoalescedCount,
                 TicksToMs(Volatile.Read(ref lastOldestMessageAgeTicks)),
                 ComputeAverageMessageAgeMs(),
                 TicksToMs(Volatile.Read(ref maxMessageAgeTicks)));
@@ -199,8 +218,24 @@ namespace Project_1.Messaging
             }
         }
 
+        static (string TypeName, long Count) GetTopTypeAndCount(ConcurrentDictionary<Type, long> counts)
+        {
+            string typeName = "-";
+            long maxCount = 0;
+            foreach (KeyValuePair<Type, long> kvp in counts)
+            {
+                long count = kvp.Value;
+                if (count <= maxCount) continue;
+                maxCount = count;
+                typeName = kvp.Key?.Name ?? "?";
+            }
+
+            return (typeName, maxCount);
+        }
+
         interface IChannel
         {
+            Type MessageType { get; }
             bool TryDispatchOne(string mailboxName, out bool hadSubscribers, out int handlerInvocations, out int handlerFailures);
         }
 
@@ -220,6 +255,7 @@ namespace Project_1.Messaging
             }
 
             public int Id { get; }
+            public Type MessageType => typeof(T);
 
             public void Enqueue(in T message, out bool enqueueDispatchToken, out bool replacedPendingMessage)
             {
@@ -274,6 +310,7 @@ namespace Project_1.Messaging
                     catch (Exception ex)
                     {
                         failures++;
+                        Console.WriteLine($"Mailbox '{mailboxName}' handler failure '{typeof(T).Name}': {ex.GetType().Name}: {ex.Message}");
                         Debug.WriteLine($"Mailbox '{mailboxName}' handler for '{typeof(T).Name}' threw and was skipped: {ex}");
                     }
                 }
@@ -358,6 +395,10 @@ namespace Project_1.Messaging
             long totalHandlerFailures,
             long totalCoalesced,
             long totalDropped,
+            string topHandlerFailureType,
+            long topHandlerFailureCount,
+            string topCoalescedType,
+            long topCoalescedCount,
             double lastOldestMessageAgeMs,
             double avgMessageAgeMs,
             double maxMessageAgeMs)
@@ -376,6 +417,10 @@ namespace Project_1.Messaging
             TotalHandlerFailures = totalHandlerFailures;
             TotalCoalesced = totalCoalesced;
             TotalDropped = totalDropped;
+            TopHandlerFailureType = topHandlerFailureType;
+            TopHandlerFailureCount = topHandlerFailureCount;
+            TopCoalescedType = topCoalescedType;
+            TopCoalescedCount = topCoalescedCount;
             LastOldestMessageAgeMs = lastOldestMessageAgeMs;
             AvgMessageAgeMs = avgMessageAgeMs;
             MaxMessageAgeMs = maxMessageAgeMs;
@@ -395,6 +440,10 @@ namespace Project_1.Messaging
         public long TotalHandlerFailures { get; }
         public long TotalCoalesced { get; }
         public long TotalDropped { get; }
+        public string TopHandlerFailureType { get; }
+        public long TopHandlerFailureCount { get; }
+        public string TopCoalescedType { get; }
+        public long TopCoalescedCount { get; }
         public double LastOldestMessageAgeMs { get; }
         public double AvgMessageAgeMs { get; }
         public double MaxMessageAgeMs { get; }

@@ -12,6 +12,7 @@ namespace Project_1.GameObjects.Unit.Resources
 {
     internal class Mana : Resource
     {
+        static void AssertSimThread() => ThreadAffinity.AssertSimThread();
         public override float Value
         {
             get => manaValue;
@@ -62,11 +63,12 @@ namespace Project_1.GameObjects.Unit.Resources
 
         public override void Update()
         {
-            
+            AssertSimThread();
         }
 
         public bool CheckIfTicked()
         {
+            AssertSimThread();
             if (TimeManager.TotalFrameTime - lastCastSpellOrTick > regenTimer)
             {
                 lastCastSpellOrTick = TimeManager.TotalFrameTime;
@@ -76,10 +78,14 @@ namespace Project_1.GameObjects.Unit.Resources
 
             return false;
         }
-        public override void TickRegen(bool aInCombat) { }
+        public override void TickRegen(bool aInCombat)
+        {
+            AssertSimThread();
+        }
 
         public override void CastSpell(float aCost)
         {
+            AssertSimThread();
             lastCastSpellOrTick = TimeManager.TotalFrameTime;
 
             base.CastSpell(aCost);
@@ -87,6 +93,7 @@ namespace Project_1.GameObjects.Unit.Resources
 
         public override void Refresh(TotalPrimaryStats aStats)
         {
+            AssertSimThread();
             CalculateMaxValue(aStats);
         }
 

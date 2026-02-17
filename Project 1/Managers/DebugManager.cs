@@ -39,6 +39,7 @@ namespace Project_1.Managers
         Console,
         TeleportStuckThings,
         LearnKill,
+        ChatCheats,
         Count
     }
 
@@ -180,6 +181,7 @@ namespace Project_1.Managers
             SetMode(DebugMode.Console, true);
             SetMode(DebugMode.TeleportStuckThings, true);
             SetMode(DebugMode.LearnKill, true);
+            SetMode(DebugMode.ChatCheats, false);
 
             ImportSettings();
 
@@ -398,7 +400,7 @@ namespace Project_1.Managers
                                   deltaSimDropped >= CoalescedWarningDeltaThreshold;
             if (coalescedSpike && nowMs >= nextCoalesceWarningMs)
             {
-                Print($"WARN mailbox coalesced/dropped +main:{Math.Max(0, deltaMainCoalesced)}/{Math.Max(0, deltaMainDropped)} +ui:{Math.Max(0, deltaUiCoalesced)}/{Math.Max(0, deltaUiDropped)} +sim:{Math.Max(0, deltaSimCoalesced)}/{Math.Max(0, deltaSimDropped)} totals main:{mainStats.TotalCoalesced}/{mainStats.TotalDropped} ui:{uiStats.TotalCoalesced}/{uiStats.TotalDropped} sim:{simStats.TotalCoalesced}/{simStats.TotalDropped}");
+                Print($"WARN mailbox coalesced/replaced +main:{Math.Max(0, deltaMainCoalesced)}/{Math.Max(0, deltaMainDropped)} +ui:{Math.Max(0, deltaUiCoalesced)}/{Math.Max(0, deltaUiDropped)} +sim:{Math.Max(0, deltaSimCoalesced)}/{Math.Max(0, deltaSimDropped)} totals main:{mainStats.TotalCoalesced}/{mainStats.TotalDropped} ui:{uiStats.TotalCoalesced}/{uiStats.TotalDropped} sim:{simStats.TotalCoalesced}/{simStats.TotalDropped}");
                 nextCoalesceWarningMs = nowMs + WarningCooldownMs;
             }
             lastMainCoalescedCount = mainStats.TotalCoalesced;
@@ -598,8 +600,11 @@ namespace Project_1.Managers
         static string BuildMailboxDispatchText(string aName, in MailboxStats aStats)
         {
             return
-                $"  {aName,-4} last dispatch: {aStats.LastDispatchCount,4} messages in {aStats.LastDispatchMs,6:0.0} ms | oldest age {aStats.LastOldestMessageAgeMs,6:0.0} ms\n" +
-                $"       totals published {aStats.TotalPublished,8}  failures {aStats.TotalHandlerFailures,6}  coalesced {aStats.TotalCoalesced,8}  dropped {aStats.TotalDropped,8}";
+                $"  [{aName}] [lastDispatchMsgs: {aStats.LastDispatchCount}] [lastDispatchMs: {aStats.LastDispatchMs:0.0}] [oldestAgeMs: {aStats.LastOldestMessageAgeMs:0.0}]\n" +
+                $"       [published: {aStats.TotalPublished}] [handled: {aStats.TotalDispatched}]\n" +
+                $"       [exceptions raised: {aStats.TotalHandlerFailures}] [noSub: {aStats.TotalWithoutSubscribers}] [misses: {aStats.TotalDispatchMisses}]\n" +
+                $"       [coalesced: {aStats.TotalCoalesced}] [replaced: {aStats.TotalDropped}]\n" +
+                $"       [topFail: {aStats.TopHandlerFailureType}:{aStats.TopHandlerFailureCount}] [topCoalesced: {aStats.TopCoalescedType}:{aStats.TopCoalescedCount}]";
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Project_1.Managers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,7 @@ namespace Project_1.GameObjects.Unit.Stats
 {
     internal class TotalPrimaryStats : PrimaryStats
     {
+        static void AssertSimThread() => ThreadAffinity.AssertSimThread();
         BasePrimaryStats basePrimaryStats;
         EquipmentStats equipmentStats;
 
@@ -26,16 +28,19 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void UpdateBaseStats(BasePrimaryStats aBaseStats)
         {
+            AssertSimThread();
             SetStats(aBaseStats, equipmentStats);
         }
 
         public void UpdateEquipmentStats(EquipmentStats aEquipmentStats)
         {
+            AssertSimThread();
             SetStats(basePrimaryStats, aEquipmentStats);
         }
 
         void SetStats(BasePrimaryStats aBaseStats, EquipmentStats aEquipmentStats)
         {
+            AssertSimThread();
             int[] stats = new int[] {
                 aBaseStats.Strength + aEquipmentStats.Strength,
                 aBaseStats.Agility + aEquipmentStats.Agility,

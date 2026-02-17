@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.Entities.Friendlies.Npcs;
+using Project_1.Managers;
 
 namespace Project_1.GameObjects.Entities.Friendlies.Npcs
 {
@@ -22,11 +23,13 @@ namespace Project_1.GameObjects.Entities.Friendlies.Npcs
 
         public Npc(UnitData aUnitData) : base(aUnitData)
         {
+            ThreadAffinity.AssertSimThread();
             gossip = ObjectFactory.GetGossip(Name);
         }
 
         public bool TryBeginConversation()
         {
+            ThreadAffinity.AssertSimThread();
             var player = ObjectManager.Player;
             if (player == null) return false;
             if (!InConversationRange(player.FeetPosition)) return false;
@@ -38,6 +41,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Npcs
 
         public override void Update()
         {
+            ThreadAffinity.AssertSimThread();
             base.Update();
             if (activeConversation != this) return;
             var player = ObjectManager.Player;
@@ -58,6 +62,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Npcs
 
         static void BeginConversation(Npc npc)
         {
+            ThreadAffinity.AssertSimThread();
             if (activeConversation == npc) return;
             EndConversation();
             activeConversation = npc;
@@ -65,6 +70,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Npcs
 
         static void EndConversation()
         {
+            ThreadAffinity.AssertSimThread();
             if (activeConversation == null) return;
             activeConversation = null;
             Mailboxes.PublishUiEvent(new GossipClosed());

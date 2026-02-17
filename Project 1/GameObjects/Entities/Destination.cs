@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Project_1.GameObjects.Spells.AoE.AreaOfEffectData;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.GameObjects.Entities
@@ -76,6 +75,7 @@ namespace Project_1.GameObjects.Entities
 
         public void Update()
         {
+            ThreadAffinity.AssertSimThread();
             
             if (owner is Player)
             {
@@ -159,6 +159,7 @@ namespace Project_1.GameObjects.Entities
 
         public WorldSpace GetVelocity(float aAttackRange, float aSpeed, WorldSpace aSize)
         {
+            ThreadAffinity.AssertSimThread();
             if (owner.Target == null)
             {
                 bool xIsBigger = Math.Abs(DirectionToWalk.X) >= Math.Abs(DirectionToWalk.Y);
@@ -191,6 +192,7 @@ namespace Project_1.GameObjects.Entities
 
         public void OverwriteDestination(WorldSpace aDestination)
         {
+            ThreadAffinity.AssertSimThread();
             if (pathRequestInFlight && pendingTarget.HasValue && pendingTarget.Value == aDestination)
             {
                 return;
@@ -223,6 +225,7 @@ namespace Project_1.GameObjects.Entities
 
         public void AddDestination(WorldSpace aDestination)
         {
+            ThreadAffinity.AssertSimThread();
             Path lastPath = null;
             for (int i = paths.Count - 1; i >= 0; i--)
             {

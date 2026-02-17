@@ -1,5 +1,6 @@
 ﻿using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Unit.Stats;
+using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -17,6 +18,7 @@ namespace Project_1.GameObjects.Spells
 
     internal class SpellEffect
     {
+        static void AssertSimThread() => ThreadAffinity.AssertSimThread();
         static int GetId => nextId++;
         static int nextId;
         public int Id { get; private set; }
@@ -34,6 +36,7 @@ namespace Project_1.GameObjects.Spells
 
         public SpellEffect(string aName, bool aIsBinary, HashSet<SpellSchool> aSpellSchools)
         {
+            AssertSimThread();
             spellSchools = aSpellSchools;
             id = GetId;
             name = aName;
@@ -44,7 +47,7 @@ namespace Project_1.GameObjects.Spells
 
         public virtual bool Trigger(Entity aCaster, Entity aTarget, double aScalar = 1.0)
         {
-            
+            AssertSimThread();
 
             return false;
         }

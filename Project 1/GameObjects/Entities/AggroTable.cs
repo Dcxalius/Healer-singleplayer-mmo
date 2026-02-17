@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Project_1.GameObjects.Spells.AoE.AreaOfEffectData;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -22,12 +21,14 @@ namespace Project_1.GameObjects.Entities
 
         public AggroTable(NonFriendly aOwner)
         {
+            ThreadAffinity.AssertSimThread();
             owner = aOwner;
             aggroEntities = new List<AggroEntity>();
         }
 
         public void ClearTable()
         {
+            ThreadAffinity.AssertSimThread();
             for (int i = 0; i < aggroEntities.Count; i++)
             {
                 aggroEntities[i].Entity.RemovedFromAggroTable(owner);
@@ -38,6 +39,7 @@ namespace Project_1.GameObjects.Entities
 
         int Contains(Entity aEntity)
         {
+            ThreadAffinity.AssertSimThread();
             for (int i = 0; i < aggroEntities.Count; i++)
             {
                 AggroEntity entry = aggroEntities[i];
@@ -47,6 +49,7 @@ namespace Project_1.GameObjects.Entities
         }
         public void Update()
         {
+            ThreadAffinity.AssertSimThread();
             AquireTargetThroughAggro();
             CleaningAggroTable();
         }
@@ -117,6 +120,7 @@ namespace Project_1.GameObjects.Entities
 
         public virtual void AddToAggroTable(Entity aEntityToAdd, float aThreatValue)
         {
+            ThreadAffinity.AssertSimThread();
             int i = Contains(aEntityToAdd);
             if (i >= 0)
             {
@@ -140,6 +144,7 @@ namespace Project_1.GameObjects.Entities
 
         public void RemoveFromAggroTable(Entity aEntity)
         {
+            ThreadAffinity.AssertSimThread();
             Debug.Assert(aEntity != null);
             int index = Contains(aEntity);
             Debug.Assert(index >= 0);
@@ -149,6 +154,7 @@ namespace Project_1.GameObjects.Entities
 
         public int[] GetLevelOfAggroTable() 
         {
+            ThreadAffinity.AssertSimThread();
             int[] returnable = new int[aggroEntities.Count];
             for (int i = 0; i < aggroEntities.Count; i++)
             {

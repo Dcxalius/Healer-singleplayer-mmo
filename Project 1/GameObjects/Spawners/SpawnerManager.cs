@@ -128,6 +128,7 @@ namespace Project_1.GameObjects.Spawners
 
         static void ImportZones(Save aSave, SavedMobData[] aUnitData)
         {
+            ThreadAffinity.AssertSimThread();
             string path = aSave.SpawnZones;
 
             string[] files = System.IO.Directory.GetFiles(path);
@@ -221,6 +222,7 @@ namespace Project_1.GameObjects.Spawners
 
         static SavedMobData[] ImportUnitData(Save aSave)
         {
+            ThreadAffinity.AssertSimThread();
             List<SavedMobData> unitData = new List<SavedMobData>();
 
             string path = aSave.InWorld;
@@ -242,14 +244,20 @@ namespace Project_1.GameObjects.Spawners
 
         public static void CreateNewSpawnZone(string[] aMobNames)
         {
+            ThreadAffinity.AssertSimThread();
             SpawnZone spawnZone = new SpawnZone(spawnZones.Count, aMobNames);
             spawnZones.Add(spawnZone);
         }
 
-        public static void CreateNewSpawner(int aId, MobPathing aPathing) => spawnZones[aId].CreateSpawner(aPathing);
+        public static void CreateNewSpawner(int aId, MobPathing aPathing)
+        {
+            ThreadAffinity.AssertSimThread();
+            spawnZones[aId].CreateSpawner(aPathing);
+        }
 
         public static Spawner GetSpawner(int aZoneId, int aSpawnerId)
         {
+            ThreadAffinity.AssertSimThread();
             return spawnZones[aZoneId].GetSpawner(aSpawnerId);
         }
 

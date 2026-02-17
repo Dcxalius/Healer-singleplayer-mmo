@@ -88,6 +88,7 @@ namespace Project_1.GameObjects
 
         public static MobData GetMobData(string aName)
         {
+            ThreadAffinity.AssertGameThread();
             aName = aName.ToUpper();
             if (mobData.ContainsKey(aName))
             {
@@ -111,10 +112,29 @@ namespace Project_1.GameObjects
             return returnable;
         }
 
-        public static ClassData GetPlayerClass(string aName) => playerClassData[aName];
-        public static ClassData GetAllyClass(string aName) => allyClassData[aName];
-        public static ClassData GetMobClass(string aName) => mobClassData[aName];
-        public static GossipData GetGossip(string aName) => gossipData[aName];
+        public static ClassData GetPlayerClass(string aName)
+        {
+            ThreadAffinity.AssertGameThread();
+            return playerClassData[aName];
+        }
+
+        public static ClassData GetAllyClass(string aName)
+        {
+            ThreadAffinity.AssertGameThread();
+            return allyClassData[aName];
+        }
+
+        public static ClassData GetMobClass(string aName)
+        {
+            ThreadAffinity.AssertGameThread();
+            return mobClassData[aName];
+        }
+
+        public static GossipData GetGossip(string aName)
+        {
+            ThreadAffinity.AssertGameThread();
+            return gossipData[aName];
+        }
         public static Npc[] CreateNpcs()
         {
             ThreadAffinity.AssertSimThread();
@@ -128,6 +148,7 @@ namespace Project_1.GameObjects
 
         static void ImportGossipData()
         {
+            ThreadAffinity.AssertMainThread();
             gossipData = new Dictionary<string, GossipData>();
             string path = Game1.ContentManager.RootDirectory + "\\Data\\NpcData\\Gossip\\";
 
@@ -145,6 +166,7 @@ namespace Project_1.GameObjects
 
         static void ImportMobData()
         {
+            ThreadAffinity.AssertMainThread();
             mobData = new Dictionary<string, MobData>();
             string path = Game1.ContentManager.RootDirectory + "\\Data\\MobData\\";
 
@@ -161,6 +183,7 @@ namespace Project_1.GameObjects
 
         static void ImportNpcData()
         {
+            ThreadAffinity.AssertMainThread();
             npcData = new List<UnitData>();
             string path = Game1.ContentManager.RootDirectory + "\\Data\\NpcData\\";
 
@@ -177,12 +200,14 @@ namespace Project_1.GameObjects
 
         static void ImportPlayerData(Save aSave)
         {
+            ThreadAffinity.AssertSimThread();
             string rawData = System.IO.File.ReadAllText(aSave.Units + "\\PlayerData.unit");
             playerData = JsonConvert.DeserializeObject<PlayerData>(rawData);
         }
 
         static void ImportGuildData(Save aSave)
         {
+            ThreadAffinity.AssertSimThread();
             guildData = new List<UnitData>();
 
             string path = aSave.Guild + "\\";
@@ -200,6 +225,7 @@ namespace Project_1.GameObjects
         
         static void ImportClassData()
         {
+            ThreadAffinity.AssertMainThread();
             playerClassData = new Dictionary<string, FriendlyClassData>();
             allyClassData = new Dictionary<string, FriendlyClassData>();
             mobClassData = new Dictionary<string, MobClassData>();
@@ -224,6 +250,7 @@ namespace Project_1.GameObjects
 
         static void AddToClassData(string aRawData, ClassData.Type aType)
         {
+            ThreadAffinity.AssertMainThread();
             switch (aType)
             {
                 case ClassData.Type.Player:
@@ -251,6 +278,7 @@ namespace Project_1.GameObjects
 
         public static void SaveData(Save aSave)
         {
+            ThreadAffinity.AssertSimThread();
 
             SaveManager.ExportData(aSave.Units + "\\" + "PlayerData.unit", playerData);
 

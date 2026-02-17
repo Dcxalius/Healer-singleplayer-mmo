@@ -35,6 +35,7 @@ namespace Project_1.GameObjects.Entities
 
         public NonFriendly(MobPathing aPathing, SavedMobData aUnitData) : base(aUnitData)
         {
+            ThreadAffinity.AssertSimThread();
             aggroTable = new AggroTable(this);
             pathing = aPathing;
             
@@ -42,6 +43,7 @@ namespace Project_1.GameObjects.Entities
 
         public override void Update()
         {
+            ThreadAffinity.AssertSimThread();
             base.Update();
 
             aggroTable.Update();
@@ -61,6 +63,7 @@ namespace Project_1.GameObjects.Entities
         }
         protected override void Death()
         {
+            ThreadAffinity.AssertSimThread();
             int[] averageLevel = aggroTable.GetLevelOfAggroTable(); //TODO: Change this to not be dependant on aggroTable?
 
             int exp = UnitData.Level.ExpReward((int)Math.Round(averageLevel.Average()));
@@ -71,17 +74,20 @@ namespace Project_1.GameObjects.Entities
 
         protected override void ProcessDamage(Entity aCause, string aCauseName, float aDamageTaken, float aThreatMod, DamageType aDamageType, Color aBorderColor, string aPrefix, string aSuffix) //TODO: Determine if this should always be called, even if attack dealt no damage to handle threat. Alternatively, handle base threat elsewhere and only do damage threat here
         {
+            ThreadAffinity.AssertSimThread();
             aggroTable.AddToAggroTable(aCause, aDamageTaken * aThreatMod);
             base.ProcessDamage(aCause, aCauseName, aDamageTaken, aThreatMod, aDamageType, aBorderColor, aPrefix, aSuffix);
         }
 
         public virtual void AddToAggroTable(Entity aEntityToAdd, float aThreatValue)
         {
+            ThreadAffinity.AssertSimThread();
             aggroTable.AddToAggroTable(aEntityToAdd, aThreatValue);
         }
 
         public void RemoveFromAggroTable(Entity aEntity)
         {
+            ThreadAffinity.AssertSimThread();
             aggroTable.RemoveFromAggroTable(aEntity);
         }
 

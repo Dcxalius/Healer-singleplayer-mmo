@@ -26,10 +26,14 @@ namespace Project_1.GameObjects.Unit.Stats
         }
 
         public static HitResult GenerateTable(Unit.Attack aAttack, Entity aAttacker, Entity aTarget)
-            => GenerateTable(aAttack, aAttacker, aTarget, true, true);
+        {
+            ThreadAffinity.AssertSimThread();
+            return GenerateTable(aAttack, aAttacker, aTarget, true, true);
+        }
 
         public static HitResult GenerateTable(Unit.Attack aAttack, Entity aAttacker, Entity aTarget, bool aApplyDualWieldPenalty, bool aAllowGlancing)
         {
+            ThreadAffinity.AssertSimThread();
             //TODO: https://github.com/magey/classic-warrior/issues/5
 
             double[] table = new double[Enum.GetNames<HitResult>().Length];

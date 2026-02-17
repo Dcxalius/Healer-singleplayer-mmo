@@ -54,6 +54,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public Player(PlayerData aPlayerData) : base(aPlayerData)
         {
+            ThreadAffinity.AssertSimThread();
             Mailboxes.PublishUiEvent(new InventoryAssigned(Inventory.BuildUiSnapshot()));
             party = new Party(this);
             guild = new Guild(this);
@@ -69,6 +70,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public override void Update()
         {
+            ThreadAffinity.AssertSimThread();
             Party.Update();
             base.Update();
         }
@@ -98,6 +100,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public void GetPartyMembersFromGuild()
         {
+            ThreadAffinity.AssertSimThread();
             string[] partyMembers = PlayerData.Party;
             for (int i = 0; i < partyMembers.Length; i++)
             {
@@ -109,6 +112,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public void ApplyMoveInput(bool left, bool right, bool up, bool down)
         {
+            ThreadAffinity.AssertSimThread();
             if (HasDestination && LockedMovement) return;
             if (left) velocity.X -= 1;
             if (right) velocity.X += 1;
@@ -121,12 +125,14 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public void ChangeGold(int aAmount)
         {
+            ThreadAffinity.AssertSimThread();
             PlayerData.Gold += aAmount;
             Mailboxes.PublishUiEvent(new GoldChanged(Gold));
         }
 
         CharacterWindowSnapshot BuildCharacterWindowSnapshot()
         {
+            ThreadAffinity.AssertSimThread();
             ItemUiSnapshot[] equippedItems = new ItemUiSnapshot[(int)Unit.Equipment.Slot.Count];
             for (int i = 0; i < equippedItems.Length; i++)
             {
@@ -146,6 +152,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         StatReportSnapshot BuildSecondaryReport()
         {
+            ThreadAffinity.AssertSimThread();
             PairReport report = new PairReport();
             SpellReportDetailsSnapshot spellDetails = BuildSpellReportDetails();
             report.AddLine("Attack Power", BuildTotalAttackPower());
@@ -163,6 +170,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         int BuildTotalAttackPower()
         {
+            ThreadAffinity.AssertSimThread();
             int strength = 0;
             int agility = 0;
             var lines = PrimaryStatReport?.Lines;
@@ -189,6 +197,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         SpellReportDetailsSnapshot BuildSpellReportDetails()
         {
+            ThreadAffinity.AssertSimThread();
             List<SpellSchoolBonusSnapshot> damageBonuses = new List<SpellSchoolBonusSnapshot>();
             List<SpellSchoolBonusSnapshot> critChanceBonuses = new List<SpellSchoolBonusSnapshot>();
             List<SpellSchoolBonusSnapshot> hitChanceBonuses = new List<SpellSchoolBonusSnapshot>();
@@ -246,6 +255,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public override void ExpToParty(int aExpAmount)
         {
+            ThreadAffinity.AssertSimThread();
             party.ExpToParty(aExpAmount);
         }
     }

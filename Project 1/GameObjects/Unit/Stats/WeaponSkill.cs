@@ -8,11 +8,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Project_1.GameObjects.Entities.Friendlies.Players;
+using Project_1.Managers;
 
 namespace Project_1.GameObjects.Unit.Stats
 {
     internal class WeaponSkill
     {
+        static void AssertSimThread() => ThreadAffinity.AssertSimThread();
         Entity entity;
 
         public int[] Skills
@@ -63,11 +65,13 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void SetOwner(Entity aEntity)
         {
+            AssertSimThread();
             entity = aEntity;
         }
 
         public void LevelUpSkill(Weapon.WeaponType aType)
         {
+            AssertSimThread();
             if (!skills.ContainsKey(aType)) throw new Exception("Player does not have skill for weapon type " + aType);
             if (skills[aType] < entity.CurrentLevel * 5) return;
             skills[aType]++;
@@ -75,6 +79,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public int GetSkill(Weapon.WeaponType aType)
         {
+            AssertSimThread();
             if (!skills.TryGetValue(aType, out int returnable)) returnable = 0;
             bonuses.TryGetValue(aType, out int bonus);
             return returnable + bonus;
@@ -82,6 +87,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void UpdateBonus(Equipment aEquipment /* Racials */)
         {
+            AssertSimThread();
             //TOOD
             //Search aEquipment for bonus weaponskill
             //Search racials for same

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Unit.Stats;
+using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 
@@ -8,6 +9,8 @@ namespace Project_1.GameObjects.Unit.Resources
 {
     internal class Rage : Resource
     {
+        static void AssertSimThread() => ThreadAffinity.AssertSimThread();
+
         const float maxRage = 100f;
         const float rageDecayOutOfCombatPerTick = 3f;
         const float ragePerAttackSecond = 2f;
@@ -51,6 +54,7 @@ namespace Project_1.GameObjects.Unit.Resources
 
         public override void SetOwner(Entity aOwner)
         {
+            AssertSimThread();
             ClearSubscriptions();
             owner = aOwner;
             if (owner == null) return;
@@ -61,12 +65,14 @@ namespace Project_1.GameObjects.Unit.Resources
 
         void OnAttackHit(AttackHitEvent aEvent)
         {
+            AssertSimThread();
             if (aEvent.Attacker != owner || aEvent.Attack == null) return;
             GainRage(flatRageOnAttackHit + aEvent.Attack.SecondsPerAttack * ragePerAttackSecond);
         }
 
         void OnHitTaken(HitTakenEvent aEvent)
         {
+            AssertSimThread();
             if (aEvent.Defender != owner || owner.MaxHealth <= 0) return;
 
             float damagePercentOfMaxHealth = (float)Math.Max(0.0, aEvent.Damage.Sum / owner.MaxHealth);
@@ -77,19 +83,27 @@ namespace Project_1.GameObjects.Unit.Resources
 
         void GainRage(float aAmount)
         {
+            AssertSimThread();
             if (aAmount <= 0f) return;
             Value += aAmount;
         }
 
         public override void TickRegen(bool aInCombat)
         {
+            AssertSimThread();
             if (aInCombat) return;
             Value -= rageDecayOutOfCombatPerTick;
         }
 
-        public override void Update() { }
+        public override void Update()
+        {
+            AssertSimThread();
+        }
 
-        public override void Refresh(TotalPrimaryStats aStats) { }
+        public override void Refresh(TotalPrimaryStats aStats)
+        {
+            AssertSimThread();
+        }
 
         void ClearSubscriptions()
         {

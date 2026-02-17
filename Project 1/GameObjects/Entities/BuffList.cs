@@ -1,4 +1,5 @@
 ﻿using Project_1.GameObjects.Spells.Buff;
+using Project_1.Managers;
 using Project_1.UI.HUD.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
@@ -21,6 +22,7 @@ namespace Project_1.GameObjects.Entities
 
         public void Update(Entity aOwner)
         {
+            ThreadAffinity.AssertSimThread();
             for (int i = buffs.Count - 1; i >= 0; i--)
             {
                 buffs[i].Update(aOwner);
@@ -34,6 +36,7 @@ namespace Project_1.GameObjects.Entities
 
         public void AddBuff(Buff aBuff, Entity aOwner)
         {
+            ThreadAffinity.AssertSimThread();
             for (int i = 0; i < buffs.Count; i++)
             {
                 if (buffs[i] == aBuff)
@@ -56,6 +59,7 @@ namespace Project_1.GameObjects.Entities
 
         public List<Buff> GetAllBuffs()
         {
+            ThreadAffinity.AssertSimThread();
             return buffs;
         }
     }

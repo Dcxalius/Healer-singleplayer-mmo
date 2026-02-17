@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Project_1.Managers;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace Project_1.GameObjects.Unit.Stats
 {
     internal class BasePrimaryStats : PrimaryStats
     {
+        static void AssertSimThread() => ThreadAffinity.AssertSimThread();
 
 
 
@@ -26,6 +28,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void LevelUp(PrimaryStats aPerLevel)
         {
+            AssertSimThread();
             for (int i = 0; i < stats.Length; i++)
             {
                 stats[i].Value += aPerLevel.Stats[i];

@@ -11,16 +11,31 @@ namespace Project_1.GameObjects.Unit
 {
     internal class Attack : IDamager
     {
+        static void AssertSimThread() => ThreadAffinity.AssertSimThread();
         public enum Type
         {
             Melee,
             Range
         }
 
-        public float GetAttackDamage => (float)RandomManager.RollDouble(Damage.Item1, Damage.Item2);
+        public float GetAttackDamage
+        {
+            get
+            {
+                AssertSimThread();
+                return (float)RandomManager.RollDouble(Damage.Item1, Damage.Item2);
+            }
+        }
 
 
-        public float AttackPower { set => attackPower = value; }
+        public float AttackPower
+        {
+            set
+            {
+                AssertSimThread();
+                attackPower = value;
+            }
+        }
         float attackPower;
 
         public float SecondsPerAttack => secondsPerAttack;

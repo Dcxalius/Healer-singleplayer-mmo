@@ -10,7 +10,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Project_1.GameObjects.Spells.AoE.AreaOfEffectData;
 
 namespace Project_1.GameObjects.Unit.Stats
 {
@@ -49,6 +48,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void ApplyCriticalStrike(Entity aAttacker, Entity aDefender)
         {
+            ThreadAffinity.AssertSimThread();
             double attackerCrit = aAttacker.SecondaryStats.Attack.CriticalDamage;
             double totalCrit = Math.Max(attackerCrit - aDefender.SecondaryStats.Defense.CriticalDamageReduction, 0);
             foreach (var (k, v) in value)
@@ -59,6 +59,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void ApplyCriticalStrike(double aCriticalMultiplier)
         {
+            ThreadAffinity.AssertSimThread();
             foreach (var (k, v) in value)
             {
                 value[k] *= aCriticalMultiplier;
@@ -67,6 +68,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void ApplyGlancingBlowDamage(Entity aAttackingUnit, Unit.Attack aAttack, Entity aMobData)
         {
+            ThreadAffinity.AssertSimThread();
             int attackerWeaponSkill = Math.Min(aAttackingUnit.WeaponSkill.GetSkill(aAttack.WeaponType), aAttackingUnit.Level.CurrentLevel * 5);
             int mobDefense = aMobData.Level.CurrentLevel * 5;
             int ratingDifference = mobDefense - attackerWeaponSkill;
@@ -101,6 +103,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void ApplyBlocked(Entity aAttacker, Entity aDefender)
         {
+            ThreadAffinity.AssertSimThread();
             foreach (var (k, v) in value)
             {
                 if (v <= 0) continue;
@@ -110,6 +113,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void ApplyDamageReduction(Entity aAttacker, Entity aDefender, IDamager aDamager)
         {
+            ThreadAffinity.AssertSimThread();
             SpellResitance defenderSpellResitance = aDefender.SecondaryStats.Defense.SpellResistance;
            
             foreach (var (k, v) in value)
@@ -158,6 +162,7 @@ namespace Project_1.GameObjects.Unit.Stats
         }
         public void ApplyCrushingDamage(Entity aMobData, Entity aUnitData)
         {
+            ThreadAffinity.AssertSimThread();
             foreach (var (k, v) in value)
             {
                 value[k] *= 1.5;

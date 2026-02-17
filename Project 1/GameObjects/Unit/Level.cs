@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Project_1.Managers;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace Project_1.GameObjects.Unit
 {
     internal class Level
     {
+        static void AssertSimThread() => ThreadAffinity.AssertSimThread();
         public int CurrentLevel => level;
         int level;
 
@@ -34,6 +36,7 @@ namespace Project_1.GameObjects.Unit
 
         public bool GainExp(int aExpAmount)
         {
+            AssertSimThread();
             if (level >= 60 || level <= 0 ) return false;
             experience += aExpAmount;
 
@@ -66,6 +69,7 @@ namespace Project_1.GameObjects.Unit
 
         public int ExpReward(int aLevelOfKiller)
         {
+            AssertSimThread();
             if (aLevelOfKiller >= 60) return 0;
 
             int levelOfMob = CurrentLevel;

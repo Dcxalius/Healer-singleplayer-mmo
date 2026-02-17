@@ -4,6 +4,7 @@ using Project_1.GameObjects.Unit;
 using Project_1.UI.HUD.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
+using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -33,6 +34,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public int CopyPositions(WorldSpace[] destination)
         {
+            ThreadAffinity.AssertSimThread();
             Debug.Assert(destination != null);
             if (destination == null || destination.Length == 0)
             {
@@ -51,11 +53,13 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public Party(Player aOwner)
         {
+            ThreadAffinity.AssertSimThread();
             owner = aOwner;
         }
 
         public void Update()
         {
+            ThreadAffinity.AssertSimThread();
             SummonPartyIfTooFarAway();
         }
 
@@ -72,6 +76,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public void ClearCommand()
         {
+            ThreadAffinity.AssertSimThread();
             if (commands.Count > PartyControlCleared.MaxMembers)
             {
                 Debug.Assert(false, $"Expected at most {PartyControlCleared.MaxMembers} command members but found {commands.Count}.");
@@ -88,6 +93,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public void AddToCommand(GuildMember aGuildMember)
         {
+            ThreadAffinity.AssertSimThread();
             if (commands.Contains(aGuildMember)) { return; }
 
             Mailboxes.PublishUiEvent(new PartyWalkerAdded(aGuildMember.RenderId));
@@ -96,6 +102,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public void NeedyAddToCommand(GuildMember aGuildMember)
         {
+            ThreadAffinity.AssertSimThread();
             commands.Clear();
             AddToCommand(aGuildMember);
 
@@ -103,6 +110,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public void RemoveFromCommand(GuildMember aGuildMember)
         {
+            ThreadAffinity.AssertSimThread();
             if (!commands.Contains(aGuildMember)) { return; }
 
             Mailboxes.PublishUiEvent(new PartyWalkerRemoved(aGuildMember.RenderId));
@@ -111,6 +119,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public bool AddToParty(GuildMember aGuildMember)
         {
+            ThreadAffinity.AssertSimThread();
             if (PartyCount >= maxPartySize) return false;
 
             party.Add(aGuildMember);
@@ -122,6 +131,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public bool RemoveFromParty(GuildMember aGuildMember)
         {
+            ThreadAffinity.AssertSimThread();
             Debug.Assert(PartyCount > 0);
             Debug.Assert(aGuildMember != null);
             Debug.Assert(IsInParty(aGuildMember));
@@ -134,6 +144,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public void IssueMoveOrder(WorldSpace destination, bool append)
         {
+            ThreadAffinity.AssertSimThread();
             foreach (var walker in commands)
             {
                 if (append)
@@ -151,6 +162,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public void IssueTargetOrder(Entity aEntity)
         {
+            ThreadAffinity.AssertSimThread();
             for (int i = 0; i < commands.Count; i++)
             {
                 commands[i].SetTarget(aEntity);
@@ -159,6 +171,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public void ExpToParty(int aExpAmount)
         {
+            ThreadAffinity.AssertSimThread();
             if (PartyCount == 0)
             {
                 owner.GainExperience(aExpAmount);
@@ -170,6 +183,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public void DivideExpAmongParty(int aExpAmount)
         {
+            ThreadAffinity.AssertSimThread();
             int dividedExp = aExpAmount / (PartyCount + 1);
             int bonusExp = 0;//TODO: Check what bonus exp should be
             dividedExp += bonusExp;
@@ -182,6 +196,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         }
         public void GoldToParty(int aGoldAmount)
         {
+            ThreadAffinity.AssertSimThread();
             if (PartyCount == 0)
             {
                 owner.ChangeGold(aGoldAmount);

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Unit.Stats;
+using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,6 +13,8 @@ namespace Project_1.GameObjects.Unit.Resources
 {
     internal abstract class Resource
     {
+        static void AssertSimThread() => ThreadAffinity.AssertSimThread();
+
         public enum ResourceType
         {
             None,
@@ -36,17 +39,15 @@ namespace Project_1.GameObjects.Unit.Resources
         protected virtual float BaseMaxValue { get; set; }
         protected virtual float PerLevel { get; set; }
 
-
         public Resource(ResourceType aResource, Color aColor)
         {
             resourceType = aResource;
             resourceColor = aColor;
-
         }
-
 
         public bool isCastable(float aValue)
         {
+            AssertSimThread();
             return Value - aValue >= 0;
         }
 
@@ -58,11 +59,13 @@ namespace Project_1.GameObjects.Unit.Resources
 
         public virtual void CastSpell(float aCost)
         {
+            AssertSimThread();
             Value -= aCost;
         }
 
         public void LevelUp()
         {
+            AssertSimThread();
             BaseMaxValue += PerLevel;
             MaxValue += PerLevel;
             Value = MaxValue;

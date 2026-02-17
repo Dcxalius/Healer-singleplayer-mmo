@@ -12,6 +12,7 @@ namespace Project_1.GameObjects.Unit.Resources
 {
     internal class Energy : Resource
     {
+        static void AssertSimThread() => ThreadAffinity.AssertSimThread();
         public override float Value
         {
             get => energyValue;
@@ -56,17 +57,23 @@ namespace Project_1.GameObjects.Unit.Resources
 
         public override void CastSpell(float aCost)
         {
+            AssertSimThread();
             base.CastSpell(aCost);
         }
 
         public override void TickRegen(bool aInCombat)
         {
+            AssertSimThread();
             Value += regenValue;
         }
 
         public override void Update()
         {
+            AssertSimThread();
         }
-        public override void Refresh(TotalPrimaryStats aStats) { }
+        public override void Refresh(TotalPrimaryStats aStats)
+        {
+            AssertSimThread();
+        }
     }
 }

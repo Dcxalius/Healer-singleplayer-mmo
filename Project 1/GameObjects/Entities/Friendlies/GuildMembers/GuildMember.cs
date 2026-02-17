@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 using Project_1.GameObjects.Entities.Friendlies.Players;
+using Project_1.Managers;
 
 namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
 {
@@ -45,6 +46,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
 
         public GuildMember(UnitData aData) : base(aData)
         {
+            ThreadAffinity.AssertSimThread();
             RemoveNamePlate(); //TODO: Think of a better way to handle this
             leaving = false;
             attackTree = new AttackTree(this);
@@ -52,6 +54,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
 
         public override void Update()
         {
+            ThreadAffinity.AssertSimThread();
             base.Update();
 
 
@@ -71,11 +74,13 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
 
         public override void RefreshPlates()
         {
+            ThreadAffinity.AssertSimThread();
             if (HasNamePlate) base.RefreshPlates();
         }
 
         public void AddedToParty()
         {
+            ThreadAffinity.AssertSimThread();
             CreateNamePlate();
             FlagForRefresh();
             leaving = false;
@@ -83,11 +88,13 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
 
         public void RemovedFromParty()
         {
+            ThreadAffinity.AssertSimThread();
             leaving = true ;
         }
 
         public void RecieveDirectWalkingOrder(WorldSpace aPos)
         {
+            ThreadAffinity.AssertSimThread();
             target = null;
             Destination.OverwriteDestination(aPos);
         }
@@ -95,7 +102,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
 
         public void AddWalkingOrder(WorldSpace aPos)
         {
-            
+            ThreadAffinity.AssertSimThread();
             Destination.AddDestination(aPos);
         }
 
@@ -116,6 +123,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
 
         public override void ExpToParty(int aExpAmount)
         {
+            ThreadAffinity.AssertSimThread();
             Party party = ObjectManager.Player.Party;
             if (!party.IsInParty(this))
             {

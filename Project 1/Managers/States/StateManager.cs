@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,10 +27,12 @@ using Project_1.UI.PauseMenu;
 using Project_1.UI.UIElements.Boxes;
 using Project_1.UI.UIElements;
 using Project_1.Tiles;
+using Project_1.Textures;
 using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.Entities.Friendlies.Npcs;
+using Project_1.Managers;
 using Project_1.Managers.Saves;
 
 namespace Project_1.Managers.States
@@ -73,6 +76,20 @@ namespace Project_1.Managers.States
         static bool stateChangePending;
         static States pendingState;
         static bool initialized;
+        static Spell groundTargetPendingSpell;
+        static readonly GfxPath groundTargetCircleIndicatorPath = new GfxPath(GfxType.UI, "AoECircle");
+        static readonly GfxPath groundTargetRectangleIndicatorPath = new GfxPath(GfxType.UI, "WhiteBackground");
+        static volatile GroundTargetPreviewSnapshot groundTargetPreviewSnapshot = GroundTargetPreviewSnapshot.Inactive;
+        static readonly List<GroundSpellVisualSnapshot> activeGroundSpellVisuals = new List<GroundSpellVisualSnapshot>();
+        static volatile GroundSpellVisualSnapshot[] groundSpellVisualSnapshots = Array.Empty<GroundSpellVisualSnapshot>();
+        static readonly ChatCommandSpec[] chatCommandSpecs =
+        {
+            new ChatCommandSpec("help", "/help", "Shows available chat commands.", ChatCommandAccess.System),
+            new ChatCommandSpec("clear", "/clear", "Clears the chat panel.", ChatCommandAccess.System),
+            new ChatCommandSpec("where", "/where <friendly name>", "Prints world position for a friendly.", ChatCommandAccess.System),
+            new ChatCommandSpec("tp", "/tp <friendly name> <x> <y>", "Teleports a friendly to world coordinates.", ChatCommandAccess.Debug),
+            new ChatCommandSpec("createitem", "/createitem <friendly name> <item id> <count>", "Creates item(s) and gives them to a friendly with inventory.", ChatCommandAccess.Debug)
+        };
 
         public static void Init()
         {
@@ -153,6 +170,8 @@ namespace Project_1.Managers.States
             KeyboardStateCache.BeginFrame();
             KeyBindStateCache.BeginFrame();
             ApplyPendingStateChange();
+            UpdateGroundTargetPreview();
+            UpdateGroundSpellVisuals();
             currentState.Update();
         }
 
@@ -185,6 +204,11 @@ namespace Project_1.Managers.States
 
         static void ApplyStateChange(States aState)
         {
+            if (aState != States.Game)
+            {
+                CancelGroundTargeting();
+            }
+
             States leavingState = currentStateEnum;
             currentState.OnLeave();
             previousState = leavingState;
@@ -426,6 +450,11 @@ namespace Project_1.Managers.States
             switch (currentStateEnum)
             {
                 case States.Game:
+                    if (HasGroundTargetPendingSpell)
+                    {
+                        CancelGroundTargeting();
+                        break;
+                    }
                     RequestStateChange(States.PauseMenu);
                     break;
                 case States.PauseMenu:
@@ -535,7 +564,158 @@ namespace Project_1.Managers.States
             Player player = ObjectManager.Player;
             if (player == null) return;
             if (!player.SpellBook.TryGetSpell(e.SpellName, out Spell spell)) return;
+
+            if (spell.RequiresGroundTarget)
+            {
+                BeginGroundTargeting(spell);
+                return;
+            }
+
+            CancelGroundTargeting();
             player.StartCast(spell);
+        }
+
+        static bool HasGroundTargetPendingSpell => groundTargetPendingSpell != null;
+
+        static void BeginGroundTargeting(Spell spell)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (spell == null || !spell.RequiresGroundTarget)
+            {
+                CancelGroundTargeting();
+                return;
+            }
+
+            groundTargetPendingSpell = spell;
+            WorldSpace worldPos = WorldSpace.FromRelativeScreenSpace(MouseStateCache.Relative);
+            groundTargetPreviewSnapshot = GroundTargetPreviewSnapshot.Active(worldPos, spell.GroundTargetWidth, spell.GroundTargetHeight, spell.GroundTargetShape);
+        }
+
+        static void CancelGroundTargeting()
+        {
+            if (SimThread.IsRunning)
+            {
+                ThreadAffinity.AssertSimThread();
+            }
+            groundTargetPendingSpell = null;
+            groundTargetPreviewSnapshot = GroundTargetPreviewSnapshot.Inactive;
+        }
+
+        static void UpdateGroundTargetPreview()
+        {
+            ThreadAffinity.AssertSimThread();
+            if (!HasGroundTargetPendingSpell)
+            {
+                groundTargetPreviewSnapshot = GroundTargetPreviewSnapshot.Inactive;
+                return;
+            }
+
+            if (currentStateEnum != States.Game)
+            {
+                CancelGroundTargeting();
+                return;
+            }
+
+            WorldSpace worldPos = WorldSpace.FromRelativeScreenSpace(MouseStateCache.Relative);
+            Spell spell = groundTargetPendingSpell;
+            groundTargetPreviewSnapshot = GroundTargetPreviewSnapshot.Active(worldPos, spell.GroundTargetWidth, spell.GroundTargetHeight, spell.GroundTargetShape);
+        }
+
+        static void UpdateGroundSpellVisuals()
+        {
+            ThreadAffinity.AssertSimThread();
+            if (activeGroundSpellVisuals.Count == 0)
+            {
+                groundSpellVisualSnapshots = Array.Empty<GroundSpellVisualSnapshot>();
+                return;
+            }
+
+            double now = TimeManager.TotalFrameTime;
+            for (int i = activeGroundSpellVisuals.Count - 1; i >= 0; i--)
+            {
+                if (activeGroundSpellVisuals[i].ExpireAtMs > now) continue;
+                activeGroundSpellVisuals.RemoveAt(i);
+            }
+
+            groundSpellVisualSnapshots = activeGroundSpellVisuals.ToArray();
+        }
+
+        static void AddGroundSpellVisual(Spell spell, WorldSpace worldPos)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (spell?.HitEffectGfxPath == null) return;
+            if (string.IsNullOrWhiteSpace(spell.HitEffectGfxPath.Name)) return;
+            if (string.Equals(spell.HitEffectGfxPath.Name, "None", StringComparison.OrdinalIgnoreCase)) return;
+
+            const double lifetimeMs = 1000d;
+            activeGroundSpellVisuals.Add(new GroundSpellVisualSnapshot(
+                spell.HitEffectGfxPath,
+                worldPos,
+                Math.Max(1f, spell.GroundTargetWidth),
+                Math.Max(1f, spell.GroundTargetHeight),
+                TimeManager.TotalFrameTime + lifetimeMs));
+            groundSpellVisualSnapshots = activeGroundSpellVisuals.ToArray();
+        }
+
+        public static void DrawGroundSpellEffects(SpriteBatch batch)
+        {
+            ThreadAffinity.AssertMainThread();
+            if (batch == null) return;
+
+            GroundSpellVisualSnapshot[] snapshots = groundSpellVisualSnapshots;
+            for (int i = 0; i < snapshots.Length; i++)
+            {
+                Texture2D texture = TextureManager.GetTexture(snapshots[i].TexturePath);
+                if (texture == null) continue;
+
+                WorldSpace topLeftWorld = snapshots[i].Center - new WorldSpace(snapshots[i].Width * 0.5f, snapshots[i].Height * 0.5f);
+                AbsoluteScreenPosition topLeft = topLeftWorld.ToAbsoltueScreenPosition();
+                Point size = new Point(
+                    Math.Max(1, (int)MathF.Round(snapshots[i].Width * Camera.Camera.Scale)),
+                    Math.Max(1, (int)MathF.Round(snapshots[i].Height * Camera.Camera.Scale)));
+                batch.Draw(texture, new Rectangle(topLeft, size), Color.White * 0.85f);
+            }
+        }
+
+        static bool TryExecuteGroundTargetedSpellAt(WorldSpace worldPos)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (!HasGroundTargetPendingSpell) return false;
+
+            Player player = ObjectManager.Player;
+            if (player == null) return false;
+
+            Spell spell = groundTargetPendingSpell;
+            if (spell == null || !spell.RequiresGroundTarget) return false;
+            if (!player.StartCastAt(spell, worldPos)) return false;
+
+            AddGroundSpellVisual(spell, worldPos);
+            return true;
+        }
+
+        public static void DrawGroundTargetPreview(SpriteBatch batch)
+        {
+            ThreadAffinity.AssertMainThread();
+            if (batch == null) return;
+
+            GroundTargetPreviewSnapshot snapshot = groundTargetPreviewSnapshot;
+            if (!snapshot.Enabled) return;
+
+            GfxPath texturePath = snapshot.Shape == SpellData.GroundTargetShapeType.Rectangle
+                ? groundTargetRectangleIndicatorPath
+                : groundTargetCircleIndicatorPath;
+            Texture2D texture = TextureManager.GetTexture(texturePath);
+            if (texture == null) return;
+
+            float width = Math.Max(1f, snapshot.Width);
+            float height = Math.Max(1f, snapshot.Height);
+            WorldSpace topLeftWorld = snapshot.Center - new WorldSpace(width * 0.5f, height * 0.5f);
+            AbsoluteScreenPosition topLeft = topLeftWorld.ToAbsoltueScreenPosition();
+            Point size = new Point(
+                Math.Max(1, (int)MathF.Round(width * Camera.Camera.Scale)),
+                Math.Max(1, (int)MathF.Round(height * Camera.Camera.Scale)));
+
+            batch.Draw(texture, new Rectangle(topLeft, size), Color.IndianRed * 0.45f);
         }
 
         static void HandleChatCommandRequested(ChatCommandRequested e)
@@ -551,21 +731,347 @@ namespace Project_1.Managers.States
 
             if (string.IsNullOrWhiteSpace(raw)) return;
 
-            string[] args = raw.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            string command = args[0].ToLowerInvariant();
+            if (!TryTokenizeCommand(raw, out string[] tokens, out string tokenError))
+            {
+                PublishChatSystemMessage(tokenError);
+                return;
+            }
+
+            if (tokens.Length == 0) return;
+
+            string command = tokens[0].ToLowerInvariant();
+            string[] args = new string[tokens.Length - 1];
+            Array.Copy(tokens, 1, args, 0, args.Length);
+            ChatCommandSpec? spec = TryGetChatCommandSpec(command);
+            if (!spec.HasValue)
+            {
+                PublishChatSystemMessage($"Unknown command: /{command}. Use /help.");
+                return;
+            }
+
+            if (spec.Value.Access == ChatCommandAccess.Debug && !DebugManager.Mode(DebugMode.ChatCheats))
+            {
+                return;
+            }
 
             switch (command)
             {
                 case "help":
-                    Mailboxes.PublishUiEvent(new ChatMessagePosted(ChatMessageType.System, "Commands: /help, /clear"));
+                    HandleChatHelp();
                     break;
                 case "clear":
                     Mailboxes.PublishUiEvent(new ChatCleared());
                     break;
-                default:
-                    Mailboxes.PublishUiEvent(new ChatMessagePosted(ChatMessageType.System, $"Unknown command: /{command}"));
+                case "where":
+                    HandleChatWhere(args);
+                    break;
+                case "tp":
+                    HandleChatTeleport(args);
+                    break;
+                case "createitem":
+                    HandleChatCreateItem(args);
                     break;
             }
+        }
+
+        static void HandleChatHelp()
+        {
+            string systemCommands = string.Join(" | ", chatCommandSpecs
+                .Where(x => x.Access == ChatCommandAccess.System)
+                .OrderBy(x => x.Name)
+                .Select(x => $"{x.Usage}: {x.Description}"));
+            string debugCommands = string.Join(" | ", chatCommandSpecs
+                .Where(x => x.Access == ChatCommandAccess.Debug)
+                .OrderBy(x => x.Name)
+                .Select(x => $"{x.Usage}: {x.Description}"));
+            PublishChatSystemMessage($"System: {systemCommands}");
+            PublishChatSystemMessage($"Debug (requires ChatCheats): {debugCommands}");
+        }
+
+        static void HandleChatWhere(string[] args)
+        {
+            if (args.Length > 1)
+            {
+                PublishChatSystemMessage("Usage: /where <friendly name>");
+                return;
+            }
+
+            Friendly friendly;
+            if (args.Length == 0)
+            {
+                friendly = ObjectManager.Player;
+                if (friendly == null) return;
+            }
+            else
+            {
+                string name = args[0];
+                if (!ObjectManager.TryGetFriendlyByName(name, out friendly))
+                {
+                    PublishChatSystemMessage($"Could not find non-mob named '{name}'.");
+                    return;
+                }
+            }
+
+            PublishChatSystemMessage($"{friendly.Name} is at {FormatCoordinate(friendly.FeetPosition.X)} {FormatCoordinate(friendly.FeetPosition.Y)}");
+        }
+
+        static void HandleChatTeleport(string[] args)
+        {
+            if (args.Length != 3)
+            {
+                PublishChatSystemMessage("Usage: /tp <friendly name> <x> <y>");
+                return;
+            }
+
+            string name = args[0];
+            if (!ObjectManager.TryGetFriendlyByName(name, out Friendly friendly))
+            {
+                PublishChatSystemMessage($"Could not find non-mob named '{name}'.");
+                return;
+            }
+
+            if (!TryParseFloat(args[1], out float x) || !TryParseFloat(args[2], out float y))
+            {
+                PublishChatSystemMessage("Coordinates must be numbers. Usage: /tp <friendly name> <x> <y>");
+                return;
+            }
+
+            friendly.Teleport(new WorldSpace(x, y));
+            PublishChatSystemMessage($"{friendly.Name} teleported to {FormatCoordinate(x)} {FormatCoordinate(y)}");
+        }
+
+        static void HandleChatCreateItem(string[] args)
+        {
+            if (args.Length != 3)
+            {
+                PublishChatSystemMessage("Usage: /createitem <friendly name> <item id> <count>");
+                return;
+            }
+
+            string name = args[0];
+            if (!ObjectManager.TryGetFriendlyByName(name, out Friendly friendly))
+            {
+                PublishChatSystemMessage($"Could not find non-mob named '{name}'.");
+                return;
+            }
+
+            if (friendly is not Player player)
+            {
+                PublishChatSystemMessage($"{friendly.Name} cannot receive items (no inventory).");
+                return;
+            }
+
+            if (!int.TryParse(args[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out int itemId) || itemId < 0)
+            {
+                PublishChatSystemMessage("Item id must be a non-negative integer.");
+                return;
+            }
+
+            if (!int.TryParse(args[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out int count) || count <= 0)
+            {
+                PublishChatSystemMessage("Item count must be greater than 0.");
+                return;
+            }
+
+            if (!TryGetItemData(itemId, out ItemData itemData))
+            {
+                PublishChatSystemMessage($"Item id {itemId} does not exist.");
+                return;
+            }
+
+            Items.Item item = ItemFactory.CreateItem(itemData, count);
+            bool addedAll = player.Inventory.AddItem(item);
+            if (addedAll)
+            {
+                PublishChatSystemMessage($"Gave {player.Name} {count}x {item.Name}");
+                return;
+            }
+
+            int leftover = item.Count;
+            int added = count - leftover;
+            if (added <= 0)
+            {
+                PublishChatSystemMessage($"{player.Name} has no room for {item.Name}.");
+                return;
+            }
+
+            PublishChatSystemMessage($"Gave {player.Name} {added}x {item.Name} ({leftover}x did not fit)");
+        }
+
+        static bool TryGetItemData(int itemId, out ItemData itemData)
+        {
+            itemData = null;
+            ItemData[] all = ItemFactory.GetAllItemDataSnapshot();
+            if (all.Length == 0) return false;
+
+            if (itemId >= 0 && itemId < all.Length)
+            {
+                ItemData indexed = all[itemId];
+                if (indexed != null && indexed.ID == itemId)
+                {
+                    itemData = indexed;
+                    return true;
+                }
+            }
+
+            for (int i = 0; i < all.Length; i++)
+            {
+                if (all[i] == null || all[i].ID != itemId) continue;
+                itemData = all[i];
+                return true;
+            }
+
+            return false;
+        }
+
+        static bool TryTokenizeCommand(string text, out string[] tokens, out string error)
+        {
+            error = null;
+            List<string> parsed = new List<string>();
+            StringBuilder current = new StringBuilder();
+            bool inQuotes = false;
+
+            for (int i = 0; i < text.Length; i++)
+            {
+                char c = text[i];
+                if (c == '\\' && i + 1 < text.Length && (text[i + 1] == '"' || text[i + 1] == '\\'))
+                {
+                    current.Append(text[i + 1]);
+                    i++;
+                    continue;
+                }
+
+                if (c == '"')
+                {
+                    inQuotes = !inQuotes;
+                    continue;
+                }
+
+                if (char.IsWhiteSpace(c) && !inQuotes)
+                {
+                    if (current.Length > 0)
+                    {
+                        parsed.Add(current.ToString());
+                        current.Clear();
+                    }
+                    continue;
+                }
+
+                current.Append(c);
+            }
+
+            if (inQuotes)
+            {
+                tokens = Array.Empty<string>();
+                error = "Unclosed quote in command.";
+                return false;
+            }
+
+            if (current.Length > 0)
+            {
+                parsed.Add(current.ToString());
+            }
+
+            tokens = parsed.ToArray();
+            return true;
+        }
+
+        static bool TryParseFloat(string text, out float value)
+        {
+            return float.TryParse(text, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out value);
+        }
+
+        static ChatCommandSpec? TryGetChatCommandSpec(string commandName)
+        {
+            for (int i = 0; i < chatCommandSpecs.Length; i++)
+            {
+                if (!string.Equals(chatCommandSpecs[i].Name, commandName, StringComparison.OrdinalIgnoreCase)) continue;
+                return chatCommandSpecs[i];
+            }
+
+            return null;
+        }
+
+        static string FormatCoordinate(float value)
+        {
+            float rounded = MathF.Round(value);
+            if (MathF.Abs(value - rounded) < 0.0001f)
+            {
+                return ((int)rounded).ToString(CultureInfo.InvariantCulture);
+            }
+
+            return value.ToString("0.##", CultureInfo.InvariantCulture);
+        }
+
+        static void PublishChatSystemMessage(string message)
+        {
+            if (string.IsNullOrWhiteSpace(message)) return;
+            Mailboxes.PublishUiEvent(new ChatMessagePosted(ChatMessageType.System, message));
+        }
+
+        readonly struct ChatCommandSpec
+        {
+            public ChatCommandSpec(string name, string usage, string description, ChatCommandAccess access)
+            {
+                Name = name;
+                Usage = usage;
+                Description = description;
+                Access = access;
+            }
+
+            public string Name { get; }
+            public string Usage { get; }
+            public string Description { get; }
+            public ChatCommandAccess Access { get; }
+        }
+
+        enum ChatCommandAccess
+        {
+            System,
+            Debug
+        }
+
+        sealed class GroundTargetPreviewSnapshot
+        {
+            public static readonly GroundTargetPreviewSnapshot Inactive = new GroundTargetPreviewSnapshot(false, WorldSpace.Zero, 0f, 0f, SpellData.GroundTargetShapeType.Circle);
+
+            GroundTargetPreviewSnapshot(bool enabled, WorldSpace center, float width, float height, SpellData.GroundTargetShapeType shape)
+            {
+                Enabled = enabled;
+                Center = center;
+                Width = width;
+                Height = height;
+                Shape = shape;
+            }
+
+            public bool Enabled { get; }
+            public WorldSpace Center { get; }
+            public float Width { get; }
+            public float Height { get; }
+            public SpellData.GroundTargetShapeType Shape { get; }
+
+            public static GroundTargetPreviewSnapshot Active(WorldSpace center, float width, float height, SpellData.GroundTargetShapeType shape)
+            {
+                return new GroundTargetPreviewSnapshot(true, center, width, height, shape);
+            }
+        }
+
+        readonly struct GroundSpellVisualSnapshot
+        {
+            public GroundSpellVisualSnapshot(GfxPath texturePath, WorldSpace center, float width, float height, double expireAtMs)
+            {
+                TexturePath = texturePath;
+                Center = center;
+                Width = width;
+                Height = height;
+                ExpireAtMs = expireAtMs;
+            }
+
+            public GfxPath TexturePath { get; }
+            public WorldSpace Center { get; }
+            public float Width { get; }
+            public float Height { get; }
+            public double ExpireAtMs { get; }
         }
 
         static void HandleTargetRequested(TargetRequested e)
@@ -724,6 +1230,7 @@ namespace Project_1.Managers.States
         {
             ThreadAffinity.AssertSimThread();
             if (currentState == null || currentState.GetStateEnum != States.Game) return;
+            if (TryHandleGroundTargetWorldClick(e)) return;
             RouteWorldClick(e);
         }
 
@@ -740,6 +1247,29 @@ namespace Project_1.Managers.States
             ScrollEvent.Direction direction = e.Up ? ScrollEvent.Direction.Up : ScrollEvent.Direction.Down;
             ScrollEvent scrollEvent = new ScrollEvent(e.RelativePos, e.Steps, direction, e.ModifiersMask);
             Scroll(scrollEvent);
+        }
+
+        static bool TryHandleGroundTargetWorldClick(in WorldClickRequested clickEvent)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (!HasGroundTargetPendingSpell) return false;
+
+            if (clickEvent.Button == ClickKind.Right)
+            {
+                CancelGroundTargeting();
+                return true;
+            }
+
+            if (clickEvent.Button != ClickKind.Left) return true;
+
+            WorldSpace worldPos = WorldSpace.FromRelativeScreenSpace(clickEvent.RelativePos);
+            if (!TryExecuteGroundTargetedSpellAt(worldPos))
+            {
+                return true;
+            }
+
+            CancelGroundTargeting();
+            return true;
         }
 
         static void RouteWorldClick(in WorldClickRequested clickEvent)

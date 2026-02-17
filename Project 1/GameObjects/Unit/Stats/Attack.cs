@@ -1,16 +1,17 @@
 ﻿using Project_1.GameObjects.Unit.Classes;
+using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
-using static Project_1.GameObjects.Spells.AoE.AreaOfEffectData;
 
 namespace Project_1.GameObjects.Unit.Stats
 {
     internal class Attack
     {
+        static void AssertSimThread() => ThreadAffinity.AssertSimThread();
         const float BASE_CRIT_CHANCE = 0.05f;
         const float BASE_CRIT_DAMAGE = 2f;
         public Attack(UnitData aUnitData)
@@ -36,6 +37,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public virtual void Refresh(UnitData aUnitData)
         {
+            AssertSimThread();
 
             //TODO: Implement spell stats calculations bellow, Don't forget adding racials and talents.
             criticalChance = Math.Clamp(BASE_CRIT_CHANCE + aUnitData.BaseStats.TotalPrimaryStats.Agility * aUnitData.ClassData.AttackCritChanceScaler, 0f, 1f);

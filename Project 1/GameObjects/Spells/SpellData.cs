@@ -20,6 +20,12 @@ namespace Project_1.GameObjects.Spells
             Projectile
         }
 
+        public enum GroundTargetShapeType
+        {
+            Circle,
+            Rectangle
+        }
+
         public string Name { get => name; }
         string name;
         public double Cooldown { get => cooldown; }
@@ -49,6 +55,18 @@ namespace Project_1.GameObjects.Spells
         public TravelType Travel { get => travelType; }
         TravelType travelType;
 
+        public bool RequiresGroundTarget => requiresGroundTarget;
+        bool requiresGroundTarget;
+
+        public float GroundTargetWidth => groundTargetWidth;
+        float groundTargetWidth;
+
+        public float GroundTargetHeight => groundTargetHeight;
+        float groundTargetHeight;
+
+        public GroundTargetShapeType GroundTargetShape => groundTargetShape;
+        GroundTargetShapeType groundTargetShape;
+
         public bool IsBinary => isBinary;
         bool isBinary;
         public SpellSchool[] SpellSchools => spellSchools;
@@ -57,7 +75,23 @@ namespace Project_1.GameObjects.Spells
 
 
         [JsonConstructor]
-        public SpellData(string name, string buttonGfx, string hitEffectGfx, string[] effects, TravelType travelType, Relation.RelationToPlayer[] acceptableTargets, float castDistance, SpellSchool[] spellSchools, bool isBinary = false, double castTime = -1, double cooldown = -1, float resourceCost = -1)
+        public SpellData(
+            string name,
+            string buttonGfx,
+            string hitEffectGfx,
+            string[] effects,
+            TravelType travelType,
+            Relation.RelationToPlayer[] acceptableTargets,
+            float castDistance,
+            SpellSchool[] spellSchools,
+            bool isBinary = false,
+            double castTime = -1,
+            double cooldown = -1,
+            float resourceCost = -1,
+            bool requiresGroundTarget = false,
+            float groundTargetWidth = 0,
+            float groundTargetHeight = -1,
+            GroundTargetShapeType groundTargetShape = GroundTargetShapeType.Circle)
         {
             this.name = name;
             this.buttonGfxName = buttonGfx;
@@ -77,6 +111,10 @@ namespace Project_1.GameObjects.Spells
             this.travelType = travelType;
             this.isBinary = isBinary;
             this.spellSchools = spellSchools;
+            this.requiresGroundTarget = requiresGroundTarget;
+            this.groundTargetWidth = groundTargetWidth;
+            this.groundTargetHeight = groundTargetHeight < 0 ? groundTargetWidth : groundTargetHeight;
+            this.groundTargetShape = groundTargetShape;
             Assert();
         }
         
@@ -89,6 +127,11 @@ namespace Project_1.GameObjects.Spells
             Debug.Assert(effects.Length > 0, "Spell had no effects.");
             Debug.Assert(acceptableTargets.Length > 0, "Spell had no targets.");
             Debug.Assert(travelType > TravelType.None, "Spell never assigned travel type.");
+            if (requiresGroundTarget)
+            {
+                Debug.Assert(groundTargetWidth > 0, "Ground target width was not set in Spell.");
+                Debug.Assert(groundTargetHeight > 0, "Ground target height was not set in Spell.");
+            }
         }
 
         //void Trigger(Entity aCaster, Entity aTarget)

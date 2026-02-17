@@ -5,6 +5,7 @@ using Project_1.GameObjects.Unit.Classes;
 using Project_1.GameObjects.Unit.Stats;
 using Project_1.Items;
 using Project_1.Items.SubTypes;
+using Project_1.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.UI.HUD.Managers;
@@ -16,6 +17,8 @@ namespace Project_1.GameObjects.Unit
 {
     internal class Equipment
     {
+        static void AssertSimThread() => ThreadAffinity.AssertSimThread();
+
         public enum Slot
         {
             Head,
@@ -188,6 +191,7 @@ namespace Project_1.GameObjects.Unit
 
         public void SetOwner(Entity aOwner)
         {
+            AssertSimThread();
             owner = aOwner;
             Mailboxes.PublishUiEvent(new EquipmentSlotsRefreshed(owner.RenderId, owner.RelationToPlayer.ToRelationToPlayerKind(), BuildItemSnapshots()));
         }
@@ -397,6 +401,7 @@ namespace Project_1.GameObjects.Unit
 
         public Item EquipInParticularSlot(Items.SubTypes.Equipment aEquipment, Slot aSlot)
         {
+            AssertSimThread();
             if (aEquipment == null)
             {
                 RemoveItem(aSlot);
@@ -415,6 +420,7 @@ namespace Project_1.GameObjects.Unit
 
         Item EquipInParticularSlotOneHanderWithATwoHanderEquiped(Items.SubTypes.Equipment aEquipment, Slot aSlot)
         {
+            AssertSimThread();
             if (aEquipment.type != Items.SubTypes.Equipment.Type.OneHander) return null;
             if (equipped[(int)Slot.MainHand] == null) return null;
             if (equipped[(int)Slot.MainHand].type != Items.SubTypes.Equipment.Type.TwoHander) return null;
@@ -426,6 +432,7 @@ namespace Project_1.GameObjects.Unit
 
         public Item Equip(Items.SubTypes.Equipment aEquipment)
         {
+            AssertSimThread();
             Items.SubTypes.Equipment.Type type = aEquipment.type;
             switch (type)
             {
@@ -469,6 +476,7 @@ namespace Project_1.GameObjects.Unit
 
         Item EquipAndSwapWeapon(Items.SubTypes.Equipment aEquipment, Slot aSlot) //TODO: Find better name
         {
+            AssertSimThread();
             if (UnableToDualWield(aEquipment, aSlot)) return aEquipment;
 
             Item returnable = EquipAndSwapWeaponWithTwoHander(aEquipment, aSlot);
@@ -485,6 +493,7 @@ namespace Project_1.GameObjects.Unit
 
         Item EquipAndSwapWeaponWithTwoHander(Items.SubTypes.Equipment aEquipment, Slot aSlot)
         {
+            AssertSimThread();
             if (equipped[(int)Slot.MainHand] == null) return null;
             if (equipped[(int)Slot.MainHand].type != Items.SubTypes.Equipment.Type.TwoHander) return null;
             
@@ -498,6 +507,7 @@ namespace Project_1.GameObjects.Unit
 
         public (Item, Item) EquipTwoHander(Items.SubTypes.Equipment aEquipment)
         {
+            AssertSimThread();
             if (aEquipment.type != Items.SubTypes.Equipment.Type.TwoHander) return (null, null);
             Item oh = RemoveItem(Slot.OffHand);
             Item mh = SwapItem(aEquipment, Slot.MainHand);
@@ -509,6 +519,7 @@ namespace Project_1.GameObjects.Unit
 
         Item CheckDoubleSlot(Items.SubTypes.Equipment aEquipment, Slot aSlot, Slot aSlot2)
         {
+            AssertSimThread();
 
             Item first = equipped[(int)aSlot];
             Item second = equipped[(int)aSlot2];
@@ -534,6 +545,7 @@ namespace Project_1.GameObjects.Unit
 
         Item SwapItem(Items.SubTypes.Equipment aEquipment, Slot aSlot)
         {
+            AssertSimThread();
             if (UnableToDualWield(aEquipment, aSlot)) return aEquipment;
             Items.SubTypes.Equipment previouslyEquiped = equipped[(int)aSlot];
             if (!GearTypeCheck(aEquipment, previouslyEquiped)) return aEquipment;
@@ -553,6 +565,7 @@ namespace Project_1.GameObjects.Unit
 
         void EquipItem(Items.SubTypes.Equipment aEquipment, Slot aSlot)
         {
+            AssertSimThread();
             Debug.Assert(equipped[(int)aSlot] == null);
 
             // This path is currently used by weapon/ring/trinket slots where tracked armor-material caps do not apply.
@@ -593,6 +606,7 @@ namespace Project_1.GameObjects.Unit
 
         Item RemoveItem(Slot aSlot)
         {
+            AssertSimThread();
 
             Items.SubTypes.Equipment item = equipped[(int)aSlot];
             if (item == null) return null;
@@ -605,6 +619,7 @@ namespace Project_1.GameObjects.Unit
 
         ItemUiSnapshot[] BuildItemSnapshots()
         {
+            AssertSimThread();
             ItemUiSnapshot[] snapshots = new ItemUiSnapshot[(int)Slot.Count];
             for (int i = 0; i < snapshots.Length; i++)
             {

@@ -31,6 +31,7 @@ namespace Project_1.GameObjects.Entities
 
         public void SetTarget(Entity aEntity)
         {
+            ThreadAffinity.AssertSimThread();
             target = aEntity;
             Mailboxes.PublishUiEvent(new TargetChanged(RelationToPlayer.ToRelationToPlayerKind(), target?.BuildUiSnapshot()));
             if (target == null) return;
@@ -43,6 +44,7 @@ namespace Project_1.GameObjects.Entities
 
         public void RemoveTarget()
         {
+            ThreadAffinity.AssertSimThread();
             target = null;
             Mailboxes.PublishUiEvent(new TargetChanged(RelationToPlayer.ToRelationToPlayerKind(), null));
         }
@@ -113,6 +115,7 @@ namespace Project_1.GameObjects.Entities
 
         public void AddedToAggroTable(NonFriendly aNonfriendly)
         {
+            ThreadAffinity.AssertSimThread();
             if (aggroTablesIAmOn.Contains(aNonfriendly))
             {
                 DebugManager.Print(aNonfriendly + " tried to add me to a table I thought I was on.");
@@ -123,6 +126,7 @@ namespace Project_1.GameObjects.Entities
 
         public void RemovedFromAggroTable(NonFriendly aNonfriendly)
         {
+            ThreadAffinity.AssertSimThread();
             if (!aggroTablesIAmOn.Contains(aNonfriendly))
             {
                 DebugManager.Print(aNonfriendly + " tried to remove me from a table I didn't know I was on.");
@@ -132,6 +136,7 @@ namespace Project_1.GameObjects.Entities
         }
         public void RecieveAttack(HitTable.HitResult aHitResult, Entity aAttacker, Unit.Attack aDamagingThing, Damage aDamageTaken) //TODO: Events need to be checked, all attacks should fire an attack event, and then hit/miss/dodge/parry/block/glancing/crit/crushing events should be fired based on the result, and then a damage event should be fired if damage is actually taken, and then a death event should be fired if the attack killed the target. Also need to make sure that procs can subscribe to the correct events and that the events contain all necessary information for procs to determine whether they should proc or not
         {
+            ThreadAffinity.AssertSimThread();
             string resultString = "";
             Color resultColor = Color.White;
             if (aHitResult <= HitTable.HitResult.Parry)
@@ -218,6 +223,7 @@ namespace Project_1.GameObjects.Entities
 
         public void RecieveSpellAttack(Entity aCaster, SpellEffect aSpellEffect, Damage aDamageTaken)
         {
+            ThreadAffinity.AssertSimThread();
             if (aSpellEffect.StatSource == AbilityStatSource.Attack)
             {
                 Unit.Attack attackSource = GetAttackSourceForAttackStatSpell(aCaster);

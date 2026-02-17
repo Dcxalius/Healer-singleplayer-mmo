@@ -18,6 +18,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Project_1.GameObjects.Entities.Friendlies.Players;
+using Project_1.Managers;
 
 namespace Project_1.GameObjects.Unit
 {
@@ -30,6 +31,7 @@ namespace Project_1.GameObjects.Unit
     }
     class UnitData
     {
+        static void AssertSimThread() => ThreadAffinity.AssertSimThread();
         
         public string Name => name;
         string name;
@@ -146,6 +148,7 @@ namespace Project_1.GameObjects.Unit
 
         public void InitializeWeaponSkill(Entity aOwner)
         {
+            AssertSimThread();
             if (weaponSkill == null)
             {
                 weaponSkill = new WeaponSkill(aOwner, classData);
@@ -278,6 +281,7 @@ namespace Project_1.GameObjects.Unit
 
         public bool Tick(bool aInCombat)
         {
+            AssertSimThread();
             bool healthChanged = Health.HealthRegenTick(aInCombat, SecondaryStats.Defense.Hp5, SecondaryStats.Defense.SpiritHp5);
             float previousResource = Resource.Value;
             Resource.TickRegen(aInCombat);
@@ -291,6 +295,7 @@ namespace Project_1.GameObjects.Unit
 
         public void GainExp(int aExpAmount)
         {
+            AssertSimThread();
             if (!level.GainExp(aExpAmount)) return;
             //Level up
             baseStats.LevelUp();
