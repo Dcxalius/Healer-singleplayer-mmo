@@ -28,6 +28,7 @@ using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.Entities.Friendlies.Npcs;
+using Project_1.GameObjects.Spells;
 using Microsoft.Xna.Framework;
 
 namespace Project_1.GameObjects
@@ -581,8 +582,16 @@ namespace Project_1.GameObjects
         {
             if (player == null)
             {
-                Mailboxes.PublishUiEvent(new PlayerUiSnapshot(false, false, 0, true, 1, WorldSpace.Zero, false, WorldSpace.Zero));
+                Mailboxes.PublishUiEvent(new PlayerUiSnapshot(false, false, 0, true, 1, WorldSpace.Zero, false, WorldSpace.Zero, Array.Empty<SpellUiSnapshot>()));
                 return;
+            }
+
+            Spell[] knownSpells = player.SpellBook.Spells;
+            SpellUiSnapshot[] spellSnapshots = new SpellUiSnapshot[knownSpells.Length];
+            for (int i = 0; i < knownSpells.Length; i++)
+            {
+                Spell spell = knownSpells[i];
+                spellSnapshots[i] = new SpellUiSnapshot(spell.Name, spell.GfxPath, spell.OffCooldown, spell.RatioOfCooldownDone);
             }
 
             Entity target = player.Target;
@@ -594,7 +603,8 @@ namespace Project_1.GameObjects
                 player.RatioOfGlobalCooldownDone,
                 player.FeetPosition,
                 target != null,
-                target?.FeetPosition ?? WorldSpace.Zero));
+                target?.FeetPosition ?? WorldSpace.Zero,
+                spellSnapshots));
         }
 
         internal static void AppendMinimapDots(List<MinimapDotSnapshot> dots)

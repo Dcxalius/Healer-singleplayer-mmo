@@ -1,17 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
-using Project_1.GameObjects.Spells;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.UI.HUD.SpellBook
 {
@@ -19,14 +11,13 @@ namespace Project_1.UI.HUD.SpellBook
     {
         SpellButton[] spellButtons;
         Border border;
+
         public SpellBar(Color aBackgroundColor, int aButtonCount, RelativeScreenPosition aPos, float aSizeX) : base(new UITexture("WhiteBackground", aBackgroundColor), aPos, new RelativeScreenPosition(aSizeX, calcY(aSizeX, aButtonCount)))
         {
             Vector2 offset = RelativeScreenPosition.GetSquareFromX(calcOffset(1, aButtonCount), Size);
             float buttonSize = calcButtonSize(1, aButtonCount);
-            //border = new Border(Vector2.Zero, new Vector2(aSizeX, calcY(aSizeX, aButtonCount)));
             border = new Border(RelativeScreenPosition.Zero, RelativeScreenPosition.One);
             AddChild(border);
-            //Vector2 size = new Vector2(aSize.Y - 0.05f);
             spellButtons = new SpellButton[aButtonCount];
 
             for (int i = 0; i < spellButtons.Length; i++)
@@ -36,19 +27,12 @@ namespace Project_1.UI.HUD.SpellBook
             AddChildren(spellButtons);
         }
 
-        public void LoadBar(Spell[] aSpells)
+        public void LoadBar(string[] aSpellNames)
         {
-            Debug.Assert(aSpells.Length == spellButtons.Length);
-            for (int i = 0; i < aSpells.Length; i++)
+            Debug.Assert(aSpellNames.Length == spellButtons.Length);
+            for (int i = 0; i < aSpellNames.Length; i++)
             {
-
-                //if (aSpells[i] == null)
-                //{
-                //    spellButtons[i].AssignSpell(null);
-                //    continue;
-                //}
-
-                spellButtons[i].AssignSpell(aSpells[i]);
+                spellButtons[i].AssignSpell(aSpellNames[i]);
             }
         }
 
@@ -57,9 +41,7 @@ namespace Project_1.UI.HUD.SpellBook
             string[] returnable = new string[spellButtons.Length];
             for (int i = 0; i < spellButtons.Length; i++)
             {
-                Spell spell = spellButtons[i].SpellData;
-                if (spell == null) continue;
-                returnable[i] = spell.Name;
+                returnable[i] = spellButtons[i].SpellName;
             }
             return returnable;
         }

@@ -76,9 +76,11 @@ namespace Project_1.Managers.States
         static bool stateChangePending;
         static States pendingState;
         static bool initialized;
+        const float GroundTargetGraceRangeRatio = 0.10f;
         static Spell groundTargetPendingSpell;
         static readonly GfxPath groundTargetCircleIndicatorPath = new GfxPath(GfxType.UI, "AoECircle");
         static readonly GfxPath groundTargetRectangleIndicatorPath = new GfxPath(GfxType.UI, "WhiteBackground");
+        static readonly GfxPath groundTargetInvalidIndicatorPath = new GfxPath(GfxType.UI, "AoEOutOfRange");
         static volatile GroundTargetPreviewSnapshot groundTargetPreviewSnapshot = GroundTargetPreviewSnapshot.Inactive;
         static readonly List<GroundSpellVisualSnapshot> activeGroundSpellVisuals = new List<GroundSpellVisualSnapshot>();
         static volatile GroundSpellVisualSnapshot[] groundSpellVisualSnapshots = Array.Empty<GroundSpellVisualSnapshot>();
@@ -586,9 +588,22 @@ namespace Project_1.Managers.States
                 return;
             }
 
+            Player player = ObjectManager.Player;
+            if (IsGroundSpellUnavailableFromCooldown(spell, player))
+            {
+                CancelGroundTargeting();
+                return;
+            }
+
             groundTargetPendingSpell = spell;
-            WorldSpace worldPos = WorldSpace.FromRelativeScreenSpace(MouseStateCache.Relative);
-            groundTargetPreviewSnapshot = GroundTargetPreviewSnapshot.Active(worldPos, spell.GroundTargetWidth, spell.GroundTargetHeight, spell.GroundTargetShape);
+            WorldSpace hoveredPos = WorldSpace.FromRelativeScreenSpace(MouseStateCache.Relative);
+            GroundTargetPlacement placement = ResolveGroundTargetPlacement(spell, hoveredPos);
+            groundTargetPreviewSnapshot = GroundTargetPreviewSnapshot.Active(
+                placement.CastPosition,
+                spell.GroundTargetWidth,
+                spell.GroundTargetHeight,
+                spell.GroundTargetShape,
+                placement.OutOfGrace);
         }
 
         static void CancelGroundTargeting()
@@ -616,9 +631,22 @@ namespace Project_1.Managers.States
                 return;
             }
 
-            WorldSpace worldPos = WorldSpace.FromRelativeScreenSpace(MouseStateCache.Relative);
+            WorldSpace hoveredPos = WorldSpace.FromRelativeScreenSpace(MouseStateCache.Relative);
             Spell spell = groundTargetPendingSpell;
-            groundTargetPreviewSnapshot = GroundTargetPreviewSnapshot.Active(worldPos, spell.GroundTargetWidth, spell.GroundTargetHeight, spell.GroundTargetShape);
+            Player player = ObjectManager.Player;
+            if (IsGroundSpellUnavailableFromCooldown(spell, player))
+            {
+                CancelGroundTargeting();
+                return;
+            }
+
+            GroundTargetPlacement placement = ResolveGroundTargetPlacement(spell, hoveredPos);
+            groundTargetPreviewSnapshot = GroundTargetPreviewSnapshot.Active(
+                placement.CastPosition,
+                spell.GroundTargetWidth,
+                spell.GroundTargetHeight,
+                spell.GroundTargetShape,
+                placement.OutOfGrace);
         }
 
         static void UpdateGroundSpellVisuals()
@@ -655,6 +683,48 @@ namespace Project_1.Managers.States
                 Math.Max(1f, spell.GroundTargetHeight),
                 TimeManager.TotalFrameTime + lifetimeMs));
             groundSpellVisualSnapshots = activeGroundSpellVisuals.ToArray();
+        }
+
+        static GroundTargetPlacement ResolveGroundTargetPlacement(Spell spell, WorldSpace hoveredPos)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (spell == null || player == null)
+            {
+                return new GroundTargetPlacement(hoveredPos, true);
+            }
+
+            float maxRange = Math.Max(0f, spell.CastDistance);
+            if (maxRange <= 0f)
+            {
+                return new GroundTargetPlacement(hoveredPos, false);
+            }
+
+            WorldSpace casterPos = player.FeetPosition;
+            WorldSpace toHovered = hoveredPos - casterPos;
+            float distance = toHovered.ToVector2().Length();
+            if (distance <= maxRange || distance <= 0.0001f)
+            {
+                return new GroundTargetPlacement(hoveredPos, false);
+            }
+
+            float graceRange = maxRange * GroundTargetGraceRangeRatio;
+            if (distance > maxRange + graceRange)
+            {
+                return new GroundTargetPlacement(hoveredPos, true);
+            }
+
+            WorldSpace clamped = casterPos + (toHovered / distance) * maxRange;
+            return new GroundTargetPlacement(clamped, false);
+        }
+
+        static bool IsGroundSpellUnavailableFromCooldown(Spell spell, Player player)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (spell == null || player == null) return true;
+            if (!spell.OffCooldown) return true;
+            if (!player.OffGlobalCooldown) return true;
+            return false;
         }
 
         public static void DrawGroundSpellEffects(SpriteBatch batch)
@@ -701,7 +771,9 @@ namespace Project_1.Managers.States
             GroundTargetPreviewSnapshot snapshot = groundTargetPreviewSnapshot;
             if (!snapshot.Enabled) return;
 
-            GfxPath texturePath = snapshot.Shape == SpellData.GroundTargetShapeType.Rectangle
+            GfxPath texturePath = snapshot.OutOfGrace
+                ? groundTargetInvalidIndicatorPath
+                : snapshot.Shape == SpellData.GroundTargetShapeType.Rectangle
                 ? groundTargetRectangleIndicatorPath
                 : groundTargetCircleIndicatorPath;
             Texture2D texture = TextureManager.GetTexture(texturePath);
@@ -715,7 +787,8 @@ namespace Project_1.Managers.States
                 Math.Max(1, (int)MathF.Round(width * Camera.Camera.Scale)),
                 Math.Max(1, (int)MathF.Round(height * Camera.Camera.Scale)));
 
-            batch.Draw(texture, new Rectangle(topLeft, size), Color.IndianRed * 0.45f);
+            Color tint = snapshot.OutOfGrace ? Color.White : Color.IndianRed * 0.45f;
+            batch.Draw(texture, new Rectangle(topLeft, size), tint);
         }
 
         static void HandleChatCommandRequested(ChatCommandRequested e)
@@ -1033,15 +1106,16 @@ namespace Project_1.Managers.States
 
         sealed class GroundTargetPreviewSnapshot
         {
-            public static readonly GroundTargetPreviewSnapshot Inactive = new GroundTargetPreviewSnapshot(false, WorldSpace.Zero, 0f, 0f, SpellData.GroundTargetShapeType.Circle);
+            public static readonly GroundTargetPreviewSnapshot Inactive = new GroundTargetPreviewSnapshot(false, WorldSpace.Zero, 0f, 0f, SpellData.GroundTargetShapeType.Circle, false);
 
-            GroundTargetPreviewSnapshot(bool enabled, WorldSpace center, float width, float height, SpellData.GroundTargetShapeType shape)
+            GroundTargetPreviewSnapshot(bool enabled, WorldSpace center, float width, float height, SpellData.GroundTargetShapeType shape, bool outOfGrace)
             {
                 Enabled = enabled;
                 Center = center;
                 Width = width;
                 Height = height;
                 Shape = shape;
+                OutOfGrace = outOfGrace;
             }
 
             public bool Enabled { get; }
@@ -1049,11 +1123,24 @@ namespace Project_1.Managers.States
             public float Width { get; }
             public float Height { get; }
             public SpellData.GroundTargetShapeType Shape { get; }
+            public bool OutOfGrace { get; }
 
-            public static GroundTargetPreviewSnapshot Active(WorldSpace center, float width, float height, SpellData.GroundTargetShapeType shape)
+            public static GroundTargetPreviewSnapshot Active(WorldSpace center, float width, float height, SpellData.GroundTargetShapeType shape, bool outOfGrace)
             {
-                return new GroundTargetPreviewSnapshot(true, center, width, height, shape);
+                return new GroundTargetPreviewSnapshot(true, center, width, height, shape, outOfGrace);
             }
+        }
+
+        readonly struct GroundTargetPlacement
+        {
+            public GroundTargetPlacement(WorldSpace castPosition, bool outOfGrace)
+            {
+                CastPosition = castPosition;
+                OutOfGrace = outOfGrace;
+            }
+
+            public WorldSpace CastPosition { get; }
+            public bool OutOfGrace { get; }
         }
 
         readonly struct GroundSpellVisualSnapshot
@@ -1262,9 +1349,34 @@ namespace Project_1.Managers.States
 
             if (clickEvent.Button != ClickKind.Left) return true;
 
-            WorldSpace worldPos = WorldSpace.FromRelativeScreenSpace(clickEvent.RelativePos);
-            if (!TryExecuteGroundTargetedSpellAt(worldPos))
+            Spell spell = groundTargetPendingSpell;
+            Player player = ObjectManager.Player;
+            if (spell == null || player == null)
             {
+                CancelGroundTargeting();
+                return true;
+            }
+
+            WorldSpace hoveredPos = WorldSpace.FromRelativeScreenSpace(clickEvent.RelativePos);
+            GroundTargetPlacement placement = ResolveGroundTargetPlacement(spell, hoveredPos);
+            if (placement.OutOfGrace)
+            {
+                CancelGroundTargeting();
+                return true;
+            }
+
+            if (IsGroundSpellUnavailableFromCooldown(spell, player))
+            {
+                CancelGroundTargeting();
+                return true;
+            }
+
+            if (!TryExecuteGroundTargetedSpellAt(placement.CastPosition))
+            {
+                if (IsGroundSpellUnavailableFromCooldown(spell, player))
+                {
+                    CancelGroundTargeting();
+                }
                 return true;
             }
 

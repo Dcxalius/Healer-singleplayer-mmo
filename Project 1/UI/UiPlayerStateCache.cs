@@ -1,11 +1,14 @@
 using Project_1.Camera;
 using Project_1.Managers;
 using Project_1.Messaging.Events;
+using System.Collections.Generic;
 
 namespace Project_1.UI
 {
     internal static class UiPlayerStateCache
     {
+        static readonly Dictionary<string, SpellUiSnapshot> spellsByName = new Dictionary<string, SpellUiSnapshot>();
+        static readonly object spellLock = new object();
         static bool valid;
         static bool inCombatOrPartyInCombat;
         static int gold;
@@ -91,6 +94,35 @@ namespace Project_1.UI
             playerFeet = snapshot.PlayerFeet;
             hasTarget = snapshot.HasTarget;
             targetFeet = snapshot.TargetFeet;
+
+            lock (spellLock)
+            {
+                spellsByName.Clear();
+                SpellUiSnapshot[] spellSnapshots = snapshot.SpellSnapshots;
+                if (spellSnapshots == null) return;
+
+                for (int i = 0; i < spellSnapshots.Length; i++)
+                {
+                    SpellUiSnapshot spell = spellSnapshots[i];
+                    if (string.IsNullOrWhiteSpace(spell.Name)) continue;
+                    spellsByName[spell.Name] = spell;
+                }
+            }
+        }
+
+        public static bool TryGetSpellSnapshot(string spellName, out SpellUiSnapshot snapshot)
+        {
+            AssertUiOrMainThread();
+            if (string.IsNullOrWhiteSpace(spellName))
+            {
+                snapshot = default;
+                return false;
+            }
+
+            lock (spellLock)
+            {
+                return spellsByName.TryGetValue(spellName, out snapshot);
+            }
         }
 
         static void AssertUiOrMainThread()

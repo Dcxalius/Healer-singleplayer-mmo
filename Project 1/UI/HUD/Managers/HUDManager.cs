@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
-using Project_1.GameObjects.Spells;
 using Project_1.Input;
 using Project_1.Items;
 using Project_1.Managers;
@@ -248,10 +247,10 @@ namespace Project_1.UI.HUD.Managers
             Mailboxes.Ui.Subscribe<InventoryAssigned>(e => SetInventory(e.Snapshot));
             Mailboxes.Ui.Subscribe<SpellbookRefreshed>(e =>
             {
-                windowHandler.RefreshSpellBook(BuildSpellsFromNames(e.SpellNames));
+                windowHandler.RefreshSpellBook(e.SpellNames ?? Array.Empty<string>());
                 InvalidateUi();
             });
-            Mailboxes.Ui.Subscribe<SpellbarLoaded>(e => LoadSpellBar(BuildSpellsFromNames(e.SpellNames)));
+            Mailboxes.Ui.Subscribe<SpellbarLoaded>(e => LoadSpellBar(e.SpellNames ?? Array.Empty<string>()));
             Mailboxes.Ui.Subscribe<CharacterWindowSet>(e =>
             {
                 windowHandler.SetCharacterWindow(e.Snapshot);
@@ -384,7 +383,8 @@ namespace Project_1.UI.HUD.Managers
             Mailboxes.Ui.Subscribe<HeldSpellStart>(e =>
             {
                 if (string.IsNullOrWhiteSpace(e.SpellName)) return;
-                HoldSpell(new Spell(e.SpellName), e.GrabOffset);
+                if (!UiPlayerStateCache.TryGetSpellSnapshot(e.SpellName, out SpellUiSnapshot snapshot)) return;
+                HoldSpell(snapshot.GfxPath, e.GrabOffset);
             });
             Mailboxes.Ui.Subscribe<HeldSpellEnd>(_ => ReleaseSpell());
             Mailboxes.Ui.Subscribe<HudMovableChanged>(e =>
@@ -668,10 +668,10 @@ namespace Project_1.UI.HUD.Managers
         
 
         #region Spell
-        public static void HoldSpell(Spell aSpell, AbsoluteScreenPosition aGrabOffset)
+        public static void HoldSpell(GfxPath spellGfxPath, AbsoluteScreenPosition aGrabOffset)
         {
             AssertUiThreadOrMainFallback();
-            heldSpell.HoldMe(aSpell, aGrabOffset);
+            heldSpell.HoldMe(spellGfxPath, aGrabOffset);
             InvalidateUi();
         }
         public static void ReleaseSpell()
@@ -708,10 +708,10 @@ namespace Project_1.UI.HUD.Managers
 
         
 
-        public static void LoadSpellBar(Spell[] aSpells)
+        public static void LoadSpellBar(string[] spellNames)
         {
             AssertUiThreadOrMainFallback();
-            firstSpellBar.LoadBar(aSpells);
+            firstSpellBar.LoadBar(spellNames);
             InvalidateUi();
         }
         public static string[] SaveSpellBar
@@ -783,18 +783,6 @@ namespace Project_1.UI.HUD.Managers
 
             lastSelfLevel = aCurrentLevel;
             lastSelfExperience = aCurrentExperience;
-        }
-
-        static Spell[] BuildSpellsFromNames(string[] spellNames)
-        {
-            if (spellNames == null) return Array.Empty<Spell>();
-            Spell[] spells = new Spell[spellNames.Length];
-            for (int i = 0; i < spellNames.Length; i++)
-            {
-                if (string.IsNullOrWhiteSpace(spellNames[i])) continue;
-                spells[i] = new Spell(spellNames[i]);
-            }
-            return spells;
         }
 
         public static void HoldItem(Item aItem, AbsoluteScreenPosition aGrabOffset)

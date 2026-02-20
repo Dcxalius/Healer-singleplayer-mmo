@@ -1,9 +1,9 @@
 
 #----------------------------- Global Properties ----------------------------#
 
-/outputDir:bin/$(Platform)
+/outputDir:..\bin\Debug\net8.0\Content
 /intermediateDir:obj/$(Platform)
-/platform:Windows
+/platform:DesktopGL
 /config:
 /profile:Reach
 /compress:False
@@ -18,28 +18,24 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:Effects/CooldownSwirl.fx
-#end
 
 #begin Effects/SuperSoftShadows.fx
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:Effects/SuperSoftShadows.fx
-#end
 
 #begin Effects/TestDarkness.fx
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:Effects/TestDarkness.fx
-#end
 
 #begin Effects/TextOutline.fx
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:Effects/TextOutline.fx
-#end
 
 #begin Font/Gloryser.spritefont
 /importer:FontDescriptionImporter
@@ -47,7 +43,6 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:Font/Gloryser.spritefont;Font/Gloryse.spritefont
-#end
 
 #begin Graphics/Corpse/Corpse.png
 /importer:TextureImporter
@@ -60,7 +55,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Corpse/Corpse.png
-#end
 
 #begin Graphics/Corpse/SheepCorpse.Png
 /importer:TextureImporter
@@ -73,7 +67,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Corpse/SheepCorpse.Png
-#end
 
 #begin Graphics/Debug/Debug.png
 /importer:TextureImporter
@@ -86,7 +79,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Debug/Debug.png
-#end
 
 #begin Graphics/Debug/DebugCircle.png
 /importer:TextureImporter
@@ -99,7 +91,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Debug/DebugCircle.png
-#end
 
 #begin Graphics/Debug/MissingTexture.png
 /importer:TextureImporter
@@ -112,7 +103,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Debug/MissingTexture.png
-#end
 
 #begin Graphics/Effect/CircleOfHealing.png
 /importer:TextureImporter
@@ -125,7 +115,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Effect/CircleOfHealing.png
-#end
 
 #begin Graphics/Effect/Flamestrike.png
 /importer:TextureImporter
@@ -138,7 +127,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Effect/Flamestrike.png
-#end
 
 #begin Graphics/Effect/GeneralHeal.png
 /importer:TextureImporter
@@ -151,7 +139,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Effect/GeneralHeal.png
-#end
 
 #begin Graphics/Effect/Renew.png
 /importer:TextureImporter
@@ -164,7 +151,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Effect/Renew.png
-#end
 
 #begin Graphics/Item/Bag.png
 /importer:TextureImporter
@@ -177,7 +163,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Bag.png
-#end
 
 #begin Graphics/Item/Banana.png
 /importer:TextureImporter
@@ -190,7 +175,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Banana.png
-#end
 
 #begin Graphics/Item/Box.png
 /importer:TextureImporter
@@ -203,7 +187,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Box.png
-#end
 
 #begin Graphics/Item/DefaultBag.png
 /importer:TextureImporter
@@ -216,7 +199,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/DefaultBag.png
-#end
 
 #begin Graphics/Item/EnergyPotion.png
 /importer:TextureImporter
@@ -229,7 +211,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/EnergyPotion.png
-#end
 
 #begin Graphics/Item/Equipment/Helmet.png
 /importer:TextureImporter
@@ -242,7 +223,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/Helmet.png
-#end
 
 #begin Graphics/Item/Equipment/TestAmulet.png
 /importer:TextureImporter
@@ -255,7 +235,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestAmulet.png
-#end
 
 #begin Graphics/Item/Equipment/TestBelt.png
 /importer:TextureImporter
@@ -268,7 +247,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestBelt.png
-#end
 
 #begin Graphics/Item/Equipment/TestBoots.png
 /importer:TextureImporter
@@ -281,7 +259,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestBoots.png
-#end
 
 #begin Graphics/Item/Equipment/TestBow.png
 /importer:TextureImporter
@@ -294,7 +271,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestBow.png
-#end
 
 #begin Graphics/Item/Equipment/TestBracers.png
 /importer:TextureImporter
@@ -307,7 +283,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestBracers.png
-#end
 
 #begin Graphics/Item/Equipment/TestCape.png
 /importer:TextureImporter
@@ -320,7 +295,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestCape.png
-#end
 
 #begin Graphics/Item/Equipment/TestChestpiece.png
 /importer:TextureImporter
@@ -333,7 +307,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestChestpiece.png
-#end
 
 #begin Graphics/Item/Equipment/TestDagger.png
 /importer:TextureImporter
@@ -346,7 +319,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestDagger.png
-#end
 
 #begin Graphics/Item/Equipment/TestGloves.png
 /importer:TextureImporter
@@ -359,7 +331,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestGloves.png
-#end
 
 #begin Graphics/Item/Equipment/TestHelmet.png
 /importer:TextureImporter
@@ -372,7 +343,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestHelmet.png
-#end
 
 #begin Graphics/Item/Equipment/TestMainHandAxe.png
 /importer:TextureImporter
@@ -385,7 +355,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestMainHandAxe.png
-#end
 
 #begin Graphics/Item/Equipment/TestPants.png
 /importer:TextureImporter
@@ -398,7 +367,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestPants.png
-#end
 
 #begin Graphics/Item/Equipment/TestRing1.png
 /importer:TextureImporter
@@ -411,7 +379,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestRing1.png
-#end
 
 #begin Graphics/Item/Equipment/TestRing2.png
 /importer:TextureImporter
@@ -424,7 +391,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestRing2.png
-#end
 
 #begin Graphics/Item/Equipment/TestRing3.png
 /importer:TextureImporter
@@ -437,7 +403,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestRing3.png
-#end
 
 #begin Graphics/Item/Equipment/TestShield.png
 /importer:TextureImporter
@@ -450,7 +415,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestShield.png
-#end
 
 #begin Graphics/Item/Equipment/TestShoulders.png
 /importer:TextureImporter
@@ -463,7 +427,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestShoulders.png
-#end
 
 #begin Graphics/Item/Equipment/TestTrinket1.png
 /importer:TextureImporter
@@ -476,7 +439,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestTrinket1.png
-#end
 
 #begin Graphics/Item/Equipment/TestTrinket2.png
 /importer:TextureImporter
@@ -489,7 +451,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestTrinket2.png
-#end
 
 #begin Graphics/Item/Equipment/TestTrinket3.png
 /importer:TextureImporter
@@ -502,7 +463,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestTrinket3.png
-#end
 
 #begin Graphics/Item/Equipment/TestTwoHander.png
 /importer:TextureImporter
@@ -515,7 +475,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Equipment/TestTwoHander.png
-#end
 
 #begin Graphics/Item/HealthPotion.png
 /importer:TextureImporter
@@ -528,7 +487,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/HealthPotion.png
-#end
 
 #begin Graphics/Item/ManaPotion.png
 /importer:TextureImporter
@@ -541,7 +499,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/ManaPotion.png
-#end
 
 #begin Graphics/Item/Poop.png
 /importer:TextureImporter
@@ -554,7 +511,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Item/Poop.png
-#end
 
 #begin Graphics/Object/Arrow.png
 /importer:TextureImporter
@@ -567,7 +523,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Object/Arrow.png
-#end
 
 #begin Graphics/Object/Chest.png
 /importer:TextureImporter
@@ -580,7 +535,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Object/Chest.png
-#end
 
 #begin Graphics/Object/Priest.png
 /importer:TextureImporter
@@ -593,7 +547,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Object/Priest.png
-#end
 
 #begin Graphics/Object/Renew.png
 /importer:TextureImporter
@@ -606,7 +559,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Object/Renew.png
-#end
 
 #begin Graphics/Object/Rogue.png
 /importer:TextureImporter
@@ -619,7 +571,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Object/Rogue.png
-#end
 
 #begin Graphics/Object/SelectRing.png
 /importer:TextureImporter
@@ -632,7 +583,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Object/SelectRing.png
-#end
 
 #begin Graphics/Object/Shadow.png
 /importer:TextureImporter
@@ -645,7 +595,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Object/Shadow.png
-#end
 
 #begin Graphics/Object/ShadowC.png
 /importer:TextureImporter
@@ -658,7 +607,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Object/ShadowC.png
-#end
 
 #begin Graphics/Object/Sheep.png
 /importer:TextureImporter
@@ -671,7 +619,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Object/Sheep.png
-#end
 
 #begin Graphics/Object/Smile.png
 /importer:TextureImporter
@@ -684,20 +631,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Object/Smile.png
-#end
-
-#begin Graphics/SpellImage/Hand.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Graphics/SpellImage/Hand.png
-#end
 
 #begin Graphics/SpellImage/Backstab.png
 /importer:TextureImporter
@@ -710,7 +643,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/SpellImage/Backstab.png
-#end
 
 #begin Graphics/SpellImage/CircleOfHealing.png
 /importer:TextureImporter
@@ -723,7 +655,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/SpellImage/CircleOfHealing.png
-#end
+
+#begin Graphics/SpellImage/Hand.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Graphics/SpellImage/Hand.png
 
 #begin Graphics/SpellImage/Heal.png
 /importer:TextureImporter
@@ -736,7 +679,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/SpellImage/Heal.png
-#end
 
 #begin Graphics/SpellImage/Kill.png
 /importer:TextureImporter
@@ -749,7 +691,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/SpellImage/Kill.png
-#end
 
 #begin Graphics/SpellImage/Renew.png
 /importer:TextureImporter
@@ -762,7 +703,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/SpellImage/Renew.png
-#end
 
 #begin Graphics/Tile/Dirt.png
 /importer:TextureImporter
@@ -775,7 +715,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Tile/Dirt.png
-#end
 
 #begin Graphics/Tile/FlowerField.png
 /importer:TextureImporter
@@ -788,7 +727,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Tile/FlowerField.png
-#end
 
 #begin Graphics/Tile/Grass.png
 /importer:TextureImporter
@@ -801,7 +739,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Tile/Grass.png
-#end
 
 #begin Graphics/Tile/Wall.png
 /importer:TextureImporter
@@ -814,7 +751,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Tile/Wall.png
-#end
 
 #begin Graphics/UI/AoECircle.png
 /importer:TextureImporter
@@ -827,20 +763,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/AoECircle.png
-#end
-
-#begin Graphics/UI/AoEOutOfRange.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Graphics/UI/AoEOutOfRange.png
-#end
 
 #begin Graphics/UI/ButtonHover.png
 /importer:TextureImporter
@@ -853,7 +775,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/ButtonHover.png
-#end
 
 #begin Graphics/UI/CheckBox.png
 /importer:TextureImporter
@@ -866,7 +787,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/CheckBox.png
-#end
 
 #begin Graphics/UI/CheckMark.png
 /importer:TextureImporter
@@ -879,7 +799,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/CheckMark.png
-#end
 
 #begin Graphics/UI/Cooldown.png
 /importer:TextureImporter
@@ -892,7 +811,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/Cooldown.png
-#end
 
 #begin Graphics/UI/DownArrow.png
 /importer:TextureImporter
@@ -905,7 +823,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/DownArrow.png
-#end
 
 #begin Graphics/UI/Druid.png
 /importer:TextureImporter
@@ -918,7 +835,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/Druid.png
-#end
 
 #begin Graphics/UI/Gold.png
 /importer:TextureImporter
@@ -931,7 +847,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/Gold.png
-#end
 
 #begin Graphics/UI/GrayBackground.png
 /importer:TextureImporter
@@ -944,7 +859,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/GrayBackground.png
-#end
 
 #begin Graphics/UI/GrayWhiteBorder.png
 /importer:TextureImporter
@@ -957,7 +871,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/GrayWhiteBorder.png
-#end
 
 #begin Graphics/UI/Invite.png
 /importer:TextureImporter
@@ -970,7 +883,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/Invite.png
-#end
 
 #begin Graphics/UI/LeftArrow.png
 /importer:TextureImporter
@@ -983,7 +895,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/LeftArrow.png
-#end
 
 #begin Graphics/UI/LeftSwirl.png
 /importer:TextureImporter
@@ -996,7 +907,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/LeftSwirl.png
-#end
 
 #begin Graphics/UI/LevelCircle.png
 /importer:TextureImporter
@@ -1009,7 +919,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/LevelCircle.png
-#end
 
 #begin Graphics/UI/MinimapDot.png
 /importer:TextureImporter
@@ -1022,7 +931,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/MinimapDot.png
-#end
 
 #begin Graphics/UI/MovableHUD.png
 /importer:TextureImporter
@@ -1035,7 +943,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/MovableHUD.png
-#end
 
 #begin Graphics/UI/NodeViewer.png
 /importer:TextureImporter
@@ -1048,7 +955,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/NodeViewer.png
-#end
 
 #begin Graphics/UI/PauseBackground.png
 /importer:TextureImporter
@@ -1061,7 +967,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/PauseBackground.png
-#end
 
 #begin Graphics/UI/Priest.png
 /importer:TextureImporter
@@ -1074,7 +979,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/Priest.png
-#end
 
 #begin Graphics/UI/RightArrow.png
 /importer:TextureImporter
@@ -1087,7 +991,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/RightArrow.png
-#end
 
 #begin Graphics/UI/ScrollBar.png
 /importer:TextureImporter
@@ -1100,7 +1003,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/ScrollBar.png
-#end
 
 #begin Graphics/UI/ScrollPlimp.png
 /importer:TextureImporter
@@ -1113,7 +1015,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/ScrollPlimp.png
-#end
 
 #begin Graphics/UI/Uninvite.png
 /importer:TextureImporter
@@ -1126,7 +1027,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/Uninvite.png
-#end
 
 #begin Graphics/UI/UpArrow.png
 /importer:TextureImporter
@@ -1139,7 +1039,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/UpArrow.png
-#end
 
 #begin Graphics/UI/WhiteBackground.png
 /importer:TextureImporter
@@ -1152,7 +1051,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/WhiteBackground.png
-#end
 
 #begin Graphics/UI/WhiteGrayBasedBar.png
 /importer:TextureImporter
@@ -1165,7 +1063,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/WhiteGrayBasedBar.png
-#end
 
 #begin Graphics/UI/XButton.png
 /importer:TextureImporter
@@ -1178,4 +1075,4 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/UI/XButton.png
-#end
+

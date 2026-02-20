@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Project_1.Input;
 using Project_1.Managers;
-using Project_1.GameObjects.Spells;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Messaging;
@@ -21,55 +20,68 @@ namespace Project_1.UI.HUD.SpellBook
     internal class SpellButton : GFXButton
     {
         CooldownTexture onCooldownGfx;
-        //Border emptyBorder;
-
         KeyBindManager.KeyListner keyListner;
 
-        public Spell SpellData => spellData;
-        Spell spellData;
+        public string SpellName => spellName;
+        string spellName;
+        bool spellOffCooldown = true;
+        double spellCooldownRatio = 1d;
 
-        public SpellButton(KeyBindManager.KeyListner aKeyListner, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Spell aSpell = null) : base(Spell.GetGfxPath(aSpell), aPos, aSize, Color.Gray)
+        public SpellButton(KeyBindManager.KeyListner aKeyListner, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(GfxPath.NullPath, aPos, aSize, Color.Gray)
         {
             keyListner = aKeyListner;
             onCooldownGfx = new CooldownTexture(CooldownTexture.CooldownGfxType.LeftSwirl);
         }
 
-
-
-        public void AssignSpell(Spell aSpell)
+        public void AssignSpell(string aSpellName)
         {
-            spellData = aSpell;
-            imageOnButton.SetImage(Spell.GetGfxPath(aSpell));
-            if (aSpell == null) gfx.Color = Color.Gray;
+            spellName = aSpellName;
+            if (string.IsNullOrWhiteSpace(spellName))
+            {
+                imageOnButton.ClearImage();
+                gfx.Color = Color.Gray;
+                spellOffCooldown = true;
+                spellCooldownRatio = 1d;
+                return;
+            }
 
-
-            //else gfx = new UITexture()
-
+            if (UiPlayerStateCache.TryGetSpellSnapshot(spellName, out SpellUiSnapshot snapshot))
+            {
+                imageOnButton.SetImage(snapshot.GfxPath);
+                spellOffCooldown = snapshot.OffCooldown;
+                spellCooldownRatio = snapshot.CooldownRatio01;
+            }
+            else
+            {
+                imageOnButton.ClearImage();
+                spellOffCooldown = true;
+                spellCooldownRatio = 1d;
+            }
+            gfx.Color = Color.White;
         }
 
         public override void Update()
         {
             base.Update();
 
-            if (spellData == null) return;
+            if (string.IsNullOrWhiteSpace(spellName)) return;
+
+            if (UiPlayerStateCache.TryGetSpellSnapshot(spellName, out SpellUiSnapshot snapshot))
+            {
+                imageOnButton.SetImage(snapshot.GfxPath);
+                spellOffCooldown = snapshot.OffCooldown;
+                spellCooldownRatio = snapshot.CooldownRatio01;
+            }
 
             onCooldownGfx.Update();
-            onCooldownGfx.Ratio = (float)Math.Min(spellData.RatioOfCooldownDone, UiPlayerStateCache.GlobalCooldownRatio); //TODO: Consider splitting the cd effect to two seperate ones
-            if (spellData.OffCooldown && UiPlayerStateCache.OffGlobalCooldown) onCooldownGfx.Ratio = 0;
+            onCooldownGfx.Ratio = (float)Math.Min(spellCooldownRatio, UiPlayerStateCache.GlobalCooldownRatio);
+            if (spellOffCooldown && UiPlayerStateCache.OffGlobalCooldown) onCooldownGfx.Ratio = 0;
 
 
             if (UiKeyBindStateCache.GetPress(keyListner))
             {
                 Triggered();
             }
-
-            if (!UiPlayerStateCache.HasTarget)
-            {
-                gfx.Color = Color.White;
-                return;
-            }
-            if (UiPlayerStateCache.TargetFeet.DistanceTo(UiPlayerStateCache.PlayerFeet) > spellData.CastDistance) gfx.Color = Color.Red;
-            else gfx.Color = Color.White;
         }
 
         public override void ClickedOnAndReleasedOnMe()
@@ -85,14 +97,14 @@ namespace Project_1.UI.HUD.SpellBook
             if (aRelease.Creator == null) return;
             if (aRelease.Creator.GetType() != typeof(SpellBookSpell)) return;
 
-            AssignSpell((aRelease.Creator as SpellBookSpell).SpellData);
+            AssignSpell((aRelease.Creator as SpellBookSpell).SpellName);
         }
 
         void Triggered()
         {
-            if (spellData == null) return;
+            if (string.IsNullOrWhiteSpace(spellName)) return;
 
-            Mailboxes.PublishSimCommand(new SpellCastRequested(spellData.Name));
+            Mailboxes.PublishSimCommand(new SpellCastRequested(spellName));
 
         }
 
@@ -107,13 +119,12 @@ namespace Project_1.UI.HUD.SpellBook
             Project_1.Managers.ThreadAffinity.AssertMainThread();
             base.Draw(aBatch);
 
-            if (spellData == null)
+            if (string.IsNullOrWhiteSpace(spellName))
             {
-                //emptyBorder.Draw(aBatch);
                 return;
             }
 
-            if (!spellData.OffCooldown || !UiPlayerStateCache.OffGlobalCooldown)
+            if (!spellOffCooldown || !UiPlayerStateCache.OffGlobalCooldown)
             {
                 onCooldownGfx.Draw(aBatch, AbsolutePos, Color.White);
             }

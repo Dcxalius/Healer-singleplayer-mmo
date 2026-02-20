@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.GameObjects;
-using Project_1.GameObjects.Spells;
 using Project_1.Textures;
 using Project_1.UI.HUD.SpellBook;
 using System;
@@ -49,24 +48,25 @@ namespace Project_1.UI.HUD.Windows
         {
             for (int i = 0; i < spellBookSpells.Length; i++)
             {
-                spellBookSpells[i].SpellData = null;
+                spellBookSpells[i].SpellName = null;
             }
         }
 
-        public void RefreshSpells(Spell[] aSpells)
+        public void RefreshSpells(string[] aSpellNames)
         {
-            Debug.Assert(aSpells.Length <= spellBookSpells.Length);
+            Debug.Assert(aSpellNames.Length <= spellBookSpells.Length);
             ClearSpells();
-            for (int i = 0; i < aSpells.Length; i++)
+            for (int i = 0; i < aSpellNames.Length; i++)
             {
-
-                spellBookSpells[i].SpellData = aSpells[i];
+                spellBookSpells[i].SpellName = aSpellNames[i];
             }
         }
 
-        public void AssignSpell(Spell aSpell)
+        public void AssignSpell(string aSpellName)
         {
-            spellBookSpells.First(spell => spell.SpellData == null).SpellData = aSpell;
+            SpellBookSpell openSlot = spellBookSpells.FirstOrDefault(spell => string.IsNullOrWhiteSpace(spell.SpellName));
+            if (openSlot == null) return;
+            openSlot.SpellName = aSpellName;
         }
     }
 }

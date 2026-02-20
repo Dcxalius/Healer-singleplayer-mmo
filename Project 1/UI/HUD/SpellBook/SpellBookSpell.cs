@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects.Spells;
 using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
@@ -21,28 +20,42 @@ namespace Project_1.UI.HUD.SpellBook
 
     internal class SpellBookSpell : GFXButton
     {
-
-        CooldownTexture onCooldownGfx;
-        public Spell SpellData
+        public string SpellName
         {
-            get => spellData;
+            get => spellName;
             set
             {
-                spellData = value;
-                if (value != null) imageOnButton.SetImage(spellData.GfxPath);
-                else imageOnButton.ClearImage();
+                spellName = value;
+                TryApplySnapshotVisual();
             }
         }
-        Spell spellData;
+        string spellName;
 
-        public SpellBookSpell(RelativeScreenPosition aPos, RelativeScreenPosition aSize, Spell aSpell = null) : base(Spell.GetGfxPath(aSpell), aPos, aSize, Color.White)
+        public SpellBookSpell(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(GfxPath.NullPath, aPos, aSize, Color.White)
         {
-            onCooldownGfx = new CooldownTexture(CooldownTexture.CooldownGfxType.LeftSwirl);
-            if (aSpell != null)
-            {
-                spellData = aSpell;
+        }
 
+        public override void Update()
+        {
+            base.Update();
+            TryApplySnapshotVisual();
+        }
+
+        void TryApplySnapshotVisual()
+        {
+            if (string.IsNullOrWhiteSpace(spellName))
+            {
+                imageOnButton.ClearImage();
+                return;
             }
+
+            if (UiPlayerStateCache.TryGetSpellSnapshot(spellName, out SpellUiSnapshot snapshot))
+            {
+                imageOnButton.SetImage(snapshot.GfxPath);
+                return;
+            }
+
+            imageOnButton.ClearImage();
         }
 
 
@@ -53,9 +66,9 @@ namespace Project_1.UI.HUD.SpellBook
 
             if (aClick.ButtonPressed != InputManager.ClickType.Left) return;
 
-            if (spellData != null)
+            if (!string.IsNullOrWhiteSpace(spellName))
             {
-                Mailboxes.PublishUiEvent(new HeldSpellStart(spellData.Name, UiMouseStateCache.Absolute - Location));
+                Mailboxes.PublishUiEvent(new HeldSpellStart(spellName, UiMouseStateCache.Absolute - Location));
             }
         }
 
@@ -71,7 +84,7 @@ namespace Project_1.UI.HUD.SpellBook
 
             Mailboxes.PublishUiEvent(new HeldSpellEnd());
 
-            if (spellData != null)
+            if (!string.IsNullOrWhiteSpace(spellName))
             {
                 UiInputBridge.PublishRelease(this, heldEvents.ClickThatCreated);
             }

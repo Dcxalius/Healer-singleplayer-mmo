@@ -218,6 +218,22 @@ namespace Project_1.Messaging.Events
         public string[] Spells { get; }
     }
 
+    internal readonly struct SpellUiSnapshot
+    {
+        public SpellUiSnapshot(string name, GfxPath gfxPath, bool offCooldown, double cooldownRatio01)
+        {
+            Name = name ?? string.Empty;
+            GfxPath = gfxPath;
+            OffCooldown = offCooldown;
+            CooldownRatio01 = cooldownRatio01;
+        }
+
+        public string Name { get; }
+        public GfxPath GfxPath { get; }
+        public bool OffCooldown { get; }
+        public double CooldownRatio01 { get; }
+    }
+
     internal readonly struct CharacterWindowSet
     {
         public CharacterWindowSet(CharacterWindowSnapshot snapshot)
@@ -267,7 +283,7 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct PlayerUiSnapshot
     {
-        public PlayerUiSnapshot(bool valid, bool inCombatOrPartyInCombat, int gold, bool offGlobalCooldown, double globalCooldownRatio, WorldSpace playerFeet, bool hasTarget, WorldSpace targetFeet)
+        public PlayerUiSnapshot(bool valid, bool inCombatOrPartyInCombat, int gold, bool offGlobalCooldown, double globalCooldownRatio, WorldSpace playerFeet, bool hasTarget, WorldSpace targetFeet, SpellUiSnapshot[] spellSnapshots)
         {
             Valid = valid;
             InCombatOrPartyInCombat = inCombatOrPartyInCombat;
@@ -277,6 +293,7 @@ namespace Project_1.Messaging.Events
             PlayerFeet = playerFeet;
             HasTarget = hasTarget;
             TargetFeet = targetFeet;
+            SpellSnapshots = spellSnapshots ?? System.Array.Empty<SpellUiSnapshot>();
         }
 
         public bool Valid { get; }
@@ -287,6 +304,7 @@ namespace Project_1.Messaging.Events
         public WorldSpace PlayerFeet { get; }
         public bool HasTarget { get; }
         public WorldSpace TargetFeet { get; }
+        public SpellUiSnapshot[] SpellSnapshots { get; }
     }
 
     internal enum InviteStatus

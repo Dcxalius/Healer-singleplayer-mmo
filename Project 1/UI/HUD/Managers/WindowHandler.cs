@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Buttons;
 using Project_1.GameObjects.Unit;
-using Project_1.GameObjects.Spells;
 using Project_1.UI.HUD.Windows.Logic;
 using Project_1.Managers;
 using Project_1.Messaging.Events;
@@ -251,15 +250,15 @@ namespace Project_1.UI.HUD.Managers
             return shopWindow.Visible;
         }
 
-        public void AddSpellToSpellBook(Spell aSpell)
+        public void AddSpellToSpellBook(string spellName)
         {
             ThreadAffinity.AssertUiThread();
-            spellBookWindow.AssignSpell(aSpell);
+            spellBookWindow.AssignSpell(spellName);
         }
-        public void RefreshSpellBook(Spell[] aSpells)
+        public void RefreshSpellBook(string[] spellNames)
         {
             ThreadAffinity.AssertUiThread();
-            spellBookWindow.RefreshSpells(aSpells);
+            spellBookWindow.RefreshSpells(spellNames);
         }
     }
 }
