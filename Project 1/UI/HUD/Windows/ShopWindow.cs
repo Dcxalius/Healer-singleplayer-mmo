@@ -1,25 +1,20 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.Managers;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
-using Project_1.UI.HUD.Inventory;
-using Project_1.UI.HUD.Windows.Gossip;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project_1.UI.HUD.Windows
 {
     internal class ShopWindow : Window
     {
         readonly PageBox pageBox;
-        ItemForSale[] itemsForSale;
-        int[] itemIDsInShop = Array.Empty<int>();
+        readonly ItemForSale[] itemsForSale;
+        ItemUiSnapshot[] itemsInShop = Array.Empty<ItemUiSnapshot>();
         string shopkeeperName = string.Empty;
+
         public ShopWindow() : base(new UITexture("WhiteBackground", Color.Lime))
         {
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.05f, Size);
@@ -38,7 +33,6 @@ namespace Project_1.UI.HUD.Windows
         public override void Update()
         {
             base.Update();
-
             // Shop range checks are handled on the simulation thread.
         }
 
@@ -46,12 +40,13 @@ namespace Project_1.UI.HUD.Windows
         {
             ItemForSale itemForSale = aElement as ItemForSale;
             if (itemForSale == null) return;
-            if (aItemIndex < 0 || aItemIndex >= itemIDsInShop.Length)
+            if (aItemIndex < 0 || aItemIndex >= itemsInShop.Length)
             {
                 itemForSale.Clear();
                 return;
             }
-            itemForSale.Set(itemIDsInShop[aItemIndex]);
+
+            itemForSale.Set(itemsInShop[aItemIndex]);
         }
 
         void ClearItemSlot(UIElement aElement)
@@ -62,15 +57,27 @@ namespace Project_1.UI.HUD.Windows
 
         public void OpenShop(int[] itemIds, string aShopkeeperName)
         {
-            itemIDsInShop = itemIds ?? Array.Empty<int>();
+            if (itemIds == null || itemIds.Length == 0)
+            {
+                itemsInShop = Array.Empty<ItemUiSnapshot>();
+            }
+            else
+            {
+                itemsInShop = new ItemUiSnapshot[itemIds.Length];
+                for (int i = 0; i < itemIds.Length; i++)
+                {
+                    itemsInShop[i] = ItemUiSnapshot.FromItemId(itemIds[i]);
+                }
+            }
+
             shopkeeperName = aShopkeeperName ?? string.Empty;
             pageBox.SetPageTitleProvider(GetPageTitle);
-            pageBox.Reset(itemIDsInShop.Length);
+            pageBox.Reset(itemsInShop.Length);
         }
 
         public void ClearShop()
         {
-            itemIDsInShop = Array.Empty<int>();
+            itemsInShop = Array.Empty<ItemUiSnapshot>();
             shopkeeperName = string.Empty;
             pageBox.SetPageTitleProvider(null);
             pageBox.Reset(0);

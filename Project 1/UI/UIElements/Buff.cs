@@ -16,14 +16,17 @@ namespace Project_1.UI.UIElements
     internal class Buff : UIElement , IComparable
     {
         public int EffectId => effectId;
+        public GfxPath GfxPath => gfxPath;
         public double Duration => durationRemainingMs;
         int effectId;
+        readonly GfxPath gfxPath;
         double durationRemainingMs;
         Text xdd;
         public Buff(in BuffUiSnapshot aBuff, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture(aBuff.GfxPath, Color.White), aPos, aSize)
         {
             xdd = new Text("Gloryse", "xdd", Color.Black);
             effectId = aBuff.EffectId;
+            gfxPath = aBuff.GfxPath;
             durationRemainingMs = aBuff.DurationRemainingMs;
             
         }

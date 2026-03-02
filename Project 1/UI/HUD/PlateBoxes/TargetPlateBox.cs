@@ -18,6 +18,7 @@ namespace Project_1.UI.HUD.PlateBoxes
     {
 
         int? targetRenderId;
+        EntityUiSnapshot? targetSnapshot;
 
         PlateBoxNameSegment nameSegment;
         PlateBoxHealthSegment healthSegment;
@@ -41,6 +42,7 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         public override void Refresh(in EntityUiSnapshot snapshot)
         {
+            targetSnapshot = snapshot;
             healthSegment.Refresh(snapshot);
             levelCircle.Refresh(snapshot);
             resourceSegment.Refresh(snapshot);
@@ -53,6 +55,7 @@ namespace Project_1.UI.HUD.PlateBoxes
             if (!aTarget.HasValue)
             {
                 targetRenderId = null;
+                targetSnapshot = null;
                 nameSegment.Name = null;
                 Visible = false;
                 return;
@@ -60,6 +63,7 @@ namespace Project_1.UI.HUD.PlateBoxes
 
             EntityUiSnapshot snapshot = aTarget.Value;
             targetRenderId = snapshot.RenderId;
+            targetSnapshot = snapshot;
             nameSegment.Refresh(snapshot);
             healthSegment.SetTarget(snapshot);
             levelCircle.Refresh(snapshot);
@@ -74,6 +78,28 @@ namespace Project_1.UI.HUD.PlateBoxes
             if (!targetRenderId.HasValue) return;
 
             base.Draw(aBatch);
+        }
+
+        internal override PlateBoxRenderSnapshot BuildRenderSnapshot()
+        {
+            if (!targetSnapshot.HasValue || !targetRenderId.HasValue)
+            {
+                return new PlateBoxRenderSnapshot(false, AbsolutePos, string.Empty, Color.White, 0f, 0f, 0f, 0f, Color.White, 1, false);
+            }
+
+            EntityUiSnapshot snapshot = targetSnapshot.Value;
+            return new PlateBoxRenderSnapshot(
+                Visible,
+                AbsolutePos,
+                snapshot.Name,
+                snapshot.RelationColor,
+                (float)snapshot.CurrentHealth,
+                (float)snapshot.MaxHealth,
+                snapshot.CurrentResource,
+                snapshot.MaxResource,
+                snapshot.ResourceColor,
+                snapshot.Level,
+                false);
         }
 
     }

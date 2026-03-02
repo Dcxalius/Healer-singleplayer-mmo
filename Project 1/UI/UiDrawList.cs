@@ -2,10 +2,10 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Managers;
 using Project_1.UI.HUD;
 using Project_1.UI.HUD.Inventory;
+using Project_1.UI.HUD.PlateBoxes;
 using Project_1.UI.HUD.SpellBook;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
-using Project_1.GameObjects.Entities.Friendlies.Players;
 using System;
 using System.Collections.Generic;
 
@@ -179,21 +179,45 @@ namespace Project_1.UI
 
     internal sealed class PlateDrawList
     {
-        NamePlate[] namePlates = Array.Empty<NamePlate>();
+        NamePlateRenderSnapshot[] namePlates = Array.Empty<NamePlateRenderSnapshot>();
         int namePlateCount;
-        UIElement[] plateBoxes = Array.Empty<UIElement>();
+        PlateBoxRenderSnapshot[] plateBoxes = Array.Empty<PlateBoxRenderSnapshot>();
         int plateBoxCount;
+        BuffBoxRenderSnapshot[] buffBoxes = Array.Empty<BuffBoxRenderSnapshot>();
+        int buffBoxCount;
+        BuffRenderSnapshot[] buffEntries = Array.Empty<BuffRenderSnapshot>();
+        int buffEntryCount;
 
         public PlateDrawList()
         {
         }
 
-        public PlateDrawList(NamePlate[] namePlates, UIElement[] plateBoxes)
+        public PlateDrawList(
+            NamePlateRenderSnapshot[] namePlates,
+            PlateBoxRenderSnapshot[] plateBoxes,
+            BuffBoxRenderSnapshot[] buffBoxes,
+            BuffRenderSnapshot[] buffEntries)
         {
-            Set(namePlates, namePlates?.Length ?? 0, plateBoxes, plateBoxes?.Length ?? 0);
+            Set(
+                namePlates,
+                namePlates?.Length ?? 0,
+                plateBoxes,
+                plateBoxes?.Length ?? 0,
+                buffBoxes,
+                buffBoxes?.Length ?? 0,
+                buffEntries,
+                buffEntries?.Length ?? 0);
         }
 
-        public void Set(NamePlate[] namePlates, int namePlateCount, UIElement[] plateBoxes, int plateBoxCount)
+        public void Set(
+            NamePlateRenderSnapshot[] namePlates,
+            int namePlateCount,
+            PlateBoxRenderSnapshot[] plateBoxes,
+            int plateBoxCount,
+            BuffBoxRenderSnapshot[] buffBoxes,
+            int buffBoxCount,
+            BuffRenderSnapshot[] buffEntries,
+            int buffEntryCount)
         {
             int safeNameCount = Math.Clamp(namePlateCount, 0, namePlates?.Length ?? 0);
             EnsureNameCapacity(safeNameCount);
@@ -210,20 +234,50 @@ namespace Project_1.UI
                 this.plateBoxes[i] = plateBoxes[i];
             }
             this.plateBoxCount = safePlateCount;
+
+            int safeBuffBoxCount = Math.Clamp(buffBoxCount, 0, buffBoxes?.Length ?? 0);
+            EnsureBuffBoxCapacity(safeBuffBoxCount);
+            for (int i = 0; i < safeBuffBoxCount; i++)
+            {
+                this.buffBoxes[i] = buffBoxes[i];
+            }
+            this.buffBoxCount = safeBuffBoxCount;
+
+            int safeBuffEntryCount = Math.Clamp(buffEntryCount, 0, buffEntries?.Length ?? 0);
+            EnsureBuffEntryCapacity(safeBuffEntryCount);
+            for (int i = 0; i < safeBuffEntryCount; i++)
+            {
+                this.buffEntries[i] = buffEntries[i];
+            }
+            this.buffEntryCount = safeBuffEntryCount;
         }
 
         void EnsureNameCapacity(int count)
         {
             if (count <= namePlates.Length) return;
             int capacity = Math.Max(count, Math.Max(8, namePlates.Length * 2));
-            namePlates = new NamePlate[capacity];
+            namePlates = new NamePlateRenderSnapshot[capacity];
         }
 
         void EnsurePlateCapacity(int count)
         {
             if (count <= plateBoxes.Length) return;
             int capacity = Math.Max(count, Math.Max(8, plateBoxes.Length * 2));
-            plateBoxes = new UIElement[capacity];
+            plateBoxes = new PlateBoxRenderSnapshot[capacity];
+        }
+
+        void EnsureBuffBoxCapacity(int count)
+        {
+            if (count <= buffBoxes.Length) return;
+            int capacity = Math.Max(count, Math.Max(8, buffBoxes.Length * 2));
+            buffBoxes = new BuffBoxRenderSnapshot[capacity];
+        }
+
+        void EnsureBuffEntryCapacity(int count)
+        {
+            if (count <= buffEntries.Length) return;
+            int capacity = Math.Max(count, Math.Max(8, buffEntries.Length * 2));
+            buffEntries = new BuffRenderSnapshot[capacity];
         }
 
         public void Draw(SpriteBatch batch)
@@ -237,6 +291,11 @@ namespace Project_1.UI
             for (int i = 0; i < plateBoxCount; i++)
             {
                 plateBoxes[i].Draw(batch);
+            }
+
+            for (int i = 0; i < buffBoxCount; i++)
+            {
+                buffBoxes[i].Draw(batch, buffEntries);
             }
         }
     }

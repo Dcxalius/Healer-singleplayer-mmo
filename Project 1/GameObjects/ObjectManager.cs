@@ -52,6 +52,8 @@ namespace Project_1.GameObjects
         static readonly List<Entity> allScratch = new List<Entity>();
         static readonly HashSet<Entity> allScratchSet = new HashSet<Entity>();
 
+        static double timer = 0; //TODO: Save and load this
+
         static List<Entity> entities;
         static List<GuildMember> guild;
         static List<Npc> npcs;
@@ -289,9 +291,10 @@ namespace Project_1.GameObjects
 
             LootState.Update();
             PublishPlayerUiSnapshot();
-
-            if (TimeManager.TotalFrameTime % 2000 < 1) //TODO: This can cause issues at lower framerate
+            timer += TimeManager.MilisecondSinceLastFrame;
+            if (timer >= 2000)
             {
+                timer -= 2000;
                 for (int i = 0; i < all.Count; i++)
                 {
                     all[i].ServerTick();

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.Managers;
-using Project_1.Managers.States;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
@@ -9,9 +8,6 @@ using Project_1.UI.UIElements.Boxes;
 using Project_1.UI.UIElements.Buttons;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project_1.UI.CharacterCreator
 {

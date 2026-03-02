@@ -19,7 +19,7 @@ namespace Project_1.Items.SubTypes
     internal class EquipmentSet
     {
         int[] itemIdsInSet;
-        (int piecesRequired, EquipmentSetBonus bonus)[] setBonuses;
+        //(int piecesRequired, EquipmentSetBonus bonus)[] setBonuses;
 
         [JsonConstructor]
         EquipmentSet(int[] itemIdsInSet)

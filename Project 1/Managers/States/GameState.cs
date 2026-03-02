@@ -6,12 +6,7 @@ using Project_1.UI;
 using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements.Boxes;
 using System;
-using System.Collections.Generic;
-using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Project_1.Managers.States
 {

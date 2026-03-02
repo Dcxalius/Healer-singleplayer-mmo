@@ -142,6 +142,7 @@ namespace Project_1
             UiThread.Stop();
             WorkerPool.Stop();
             SimThread.Stop();
+            DebugManager.Shutdown();
 
             base.EndRun();
         }

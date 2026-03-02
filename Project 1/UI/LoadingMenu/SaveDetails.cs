@@ -1,7 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.Managers;
-using Project_1.Managers.Saves;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
@@ -10,45 +8,43 @@ using Project_1.UI.UIElements.Boxes;
 using Project_1.UI.UIElements.Buttons;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project_1.UI.LoadingMenu
 {
     internal class SaveDetails : Box
     {
-        Save save;
-        Label textDetails;
-        RuntimeImage image;
-
-        Button loadButton;
-
+        SaveUiSnapshot? save;
+        readonly Label textDetails;
+        readonly RuntimeImage image;
+        readonly Button loadButton;
 
         public SaveDetails(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.Beige), aPos, aSize)
         {
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
-            RelativeScreenPosition imgSize = new RelativeScreenPosition(1 - spacing.X - spacing.X, 1 / 3f - spacing.Y - spacing.Y);
+            RelativeScreenPosition imgSize = new RelativeScreenPosition(1 - spacing.X - spacing.X, 1f / 3f - spacing.Y - spacing.Y);
 
-            image = new RuntimeImage(spacing, imgSize); 
+            image = new RuntimeImage(spacing, imgSize);
             AddChild(image);
+
             textDetails = new Label(null, imgSize.OnlyY + spacing, imgSize, Label.TextAllignment.TopLeft, Color.Black);
             AddChild(textDetails);
+
             capturesClick = false;
             RelativeScreenPosition buttonSize = new RelativeScreenPosition(0.15f, 0.05f);
-            loadButton = new Button(new List<Action>() { LoadSave }, spacing.OnlyX + aSize.OnlyY - buttonSize.OnlyY - spacing.OnlyY, buttonSize, Color.White, "Load Save", Color.Black);
+            loadButton = new Button(new List<Action> { LoadSave }, spacing.OnlyX + aSize.OnlyY - buttonSize.OnlyY - spacing.OnlyY, buttonSize, Color.White, "Load Save", Color.Black);
             //AddChild(loadButton);
         }
 
         void LoadSave()
         {
-            Mailboxes.PublishSimCommand(new LoadSaveRequested(save?.Name));
+            if (!save.HasValue) return;
+            Mailboxes.PublishSimCommand(new LoadSaveRequested(save.Value.SaveName));
         }
 
-        public void SetSave(Save aSave)
+        public void SetSave(SaveUiSnapshot aSave)
         {
             save = aSave;
-            textDetails.Text = save.SaveDetails.Stringify;
+            textDetails.Text = aSave.DetailsText;
             image.SetImage(aSave.ImagePath);
             AddChild(loadButton);
         }

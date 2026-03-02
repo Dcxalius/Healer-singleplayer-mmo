@@ -1,5 +1,31 @@
 namespace Project_1.Messaging.Events
 {
+    internal enum ChatSpeakerType
+    {
+        None,
+        Player,
+        Npc,
+        System
+    }
+
+    internal readonly struct ChatMessage
+    {
+        public ChatMessage(ChatMessageType type, string content, string senderName = null, ChatSpeakerType speakerType = ChatSpeakerType.None)
+        {
+            Type = type;
+            Content = content ?? string.Empty;
+            SenderName = senderName ?? string.Empty;
+            SpeakerType = speakerType;
+        }
+
+        public ChatMessageType Type { get; }
+        public string Content { get; }
+        public string SenderName { get; }
+        public ChatSpeakerType SpeakerType { get; }
+        public bool HasSender => !string.IsNullOrWhiteSpace(SenderName);
+        public string DisplayText => HasSender ? $"{SenderName}: {Content}" : Content;
+    }
+
     internal enum ChatMessageType
     {
         Say,
@@ -13,14 +39,19 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct ChatMessagePosted
     {
-        public ChatMessagePosted(ChatMessageType type, string message)
+        public ChatMessagePosted(ChatMessage message)
         {
-            Type = type;
-            Message = message;
+            ChatMessage = message;
         }
 
-        public ChatMessageType Type { get; }
-        public string Message { get; }
+        public ChatMessagePosted(ChatMessageType type, string message)
+        {
+            ChatMessage = new ChatMessage(type, message);
+        }
+
+        public ChatMessage ChatMessage { get; }
+        public ChatMessageType Type => ChatMessage.Type;
+        public string Message => ChatMessage.Content;
     }
 
     internal readonly struct ChatCommandRequested
@@ -31,6 +62,16 @@ namespace Project_1.Messaging.Events
         }
 
         public string CommandText { get; }
+    }
+
+    internal readonly struct ChatSayRequested
+    {
+        public ChatSayRequested(string messageText)
+        {
+            MessageText = messageText;
+        }
+
+        public string MessageText { get; }
     }
 
     internal readonly struct ChatFiltersChanged

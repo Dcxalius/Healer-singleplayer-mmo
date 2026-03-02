@@ -114,9 +114,32 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         public override void Refresh(in EntityUiSnapshot snapshot)
         {
+            this.snapshot = snapshot;
             health.Refresh(snapshot);
             resource.Refresh(snapshot);
             levelCircle.Refresh(snapshot);
+        }
+
+        internal override PlateBoxRenderSnapshot BuildRenderSnapshot()
+        {
+            if (!snapshot.HasValue || !guildMemberRenderId.HasValue)
+            {
+                return new PlateBoxRenderSnapshot(false, AbsolutePos, string.Empty, Color.White, 0f, 0f, 0f, 0f, Color.White, 1, false);
+            }
+
+            EntityUiSnapshot data = snapshot.Value;
+            return new PlateBoxRenderSnapshot(
+                Visible,
+                AbsolutePos,
+                data.Name,
+                data.RelationColor,
+                (float)data.CurrentHealth,
+                (float)data.MaxHealth,
+                data.CurrentResource,
+                data.MaxResource,
+                data.ResourceColor,
+                data.Level,
+                VisibleBorder);
         }
     }
 }

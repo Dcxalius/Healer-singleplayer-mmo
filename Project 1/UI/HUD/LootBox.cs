@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.Items;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.HUD.Inventory;
@@ -64,12 +63,11 @@ namespace Project_1.UI.HUD
                 ItemUiSnapshot snap = snapshot[i];
                 if (snap.HasValue)
                 {
-                    Items.Item item = snap.ToItem();
-                    loot[i] = new Loot(i, snap, item.GfxPath);
+                    loot[i] = new Loot(i, snap);
                 }
                 else
                 {
-                    loot[i] = new Loot(i, ItemUiSnapshot.Empty, new GfxPath(GfxType.Debug, null));
+                    loot[i] = new Loot(i, ItemUiSnapshot.Empty);
                     indexToHide.Add(i);
                 }
             }

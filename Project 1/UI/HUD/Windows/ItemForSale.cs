@@ -1,30 +1,20 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.Items;
-using Project_1.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
-using Project_1.UI;
-using Project_1.UI.HUD.Inventory;
-using Project_1.UI.HUD.Managers;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project_1.UI.HUD.Windows
 {
     internal class ItemForSale : Box
     {
-        Image displayItem;
-        Items.Item itemForSale;
-        Label itemName;
-        Label goldCost;
-        Image goldImage;
+        readonly Image displayItem;
+        ItemUiSnapshot itemForSale;
+        readonly Label itemName;
+        readonly Label goldCost;
+        readonly Image goldImage;
 
         public static RelativeScreenPosition size;
         static RelativeScreenPosition spacing;
@@ -47,56 +37,51 @@ namespace Project_1.UI.HUD.Windows
         public ItemForSale(RelativeScreenPosition aPos) : base(new UITexture("WhiteBackground", Color.Lavender), aPos, EnsureInitAndGetSize())
         {
             displayItem = new Image(UITexture.Null, spacing, RelativeScreenPosition.GetSquareFromY(1f - spacing.Y * 2, size.ToAbsoluteScreenPos(Window.WindowSize.ToAbsoluteScreenPos())));
-
             itemName = new Label(null, displayItem.RelativeSize.OnlyX + spacing.OnlyX * 2, new RelativeScreenPosition(1, 0.5f) - displayItem.RelativeSize.OnlyX - spacing.OnlyX * 2, Label.TextAllignment.CentreLeft, Color.Black);
-            
             goldCost = new Label(null, displayItem.RelativeSize.OnlyX + displayItem.RelativeSize.OnlyY / 2 + spacing.OnlyX, new RelativeScreenPosition(0.9f, 0.5f) - displayItem.RelativeSize.OnlyX - spacing.OnlyX * 2, Label.TextAllignment.CentreRight, Color.Black);
             goldImage = new Image(new UITexture("Gold", Color.White), new RelativeScreenPosition(1f - spacing.X, 0.75f), RelativeScreenPosition.GetSquareFromX(0.1f, size.ToAbsoluteScreenPos(Window.WindowSize.ToAbsoluteScreenPos())));
-            
+
             AddChild(displayItem);
-            AddChild(itemName); 
+            AddChild(itemName);
             AddChild(goldCost);
             AddChild(goldImage);
-
-            //TODO: Allow the setting of an item to have multiple counts
+            itemForSale = ItemUiSnapshot.Empty;
         }
 
         protected override void OnHover()
         {
             base.OnHover();
-
-            if (!Visible) return;
-            if (itemForSale == null) return;
-            Mailboxes.PublishUiEvent(new DescriptorBoxSet(ItemDescriptorSnapshot.FromItem(itemForSale), RelativePositionOnScreen.ToAbsoluteScreenPos()));
+            if (!Visible || !itemForSale.HasValue || !itemForSale.HasDescriptor) return;
+            Mailboxes.PublishUiEvent(new DescriptorBoxSet(itemForSale.Descriptor, RelativePositionOnScreen.ToAbsoluteScreenPos()));
         }
 
         protected override void OnDeHover()
         {
             base.OnDeHover();
-
             Mailboxes.PublishUiEvent(new DescriptorBoxClear());
         }
 
         public override void ClickedOnAndReleasedOnMe()
         {
             base.ClickedOnAndReleasedOnMe();
-
-            if (!Visible) return;
-
-            if (itemForSale == null) return;
-
+            if (!Visible || !itemForSale.HasValue) return;
             if (!UiPlayerStateCache.Valid) return;
             if (itemForSale.Cost > UiPlayerStateCache.Gold) return; //TODO: Print error msg
-
-            Mailboxes.PublishSimCommand(new ShopPurchaseRequested(itemForSale.ID, itemForSale.Count));
+            Mailboxes.PublishSimCommand(new ShopPurchaseRequested(itemForSale.Id, itemForSale.Count));
         }
 
-        public void Set(int aItemID)
+        public void Set(in ItemUiSnapshot snapshot)
         {
-            itemForSale = ItemFactory.CreateItem(aItemID);
-            displayItem.SetImage(itemForSale.GfxPath);
-            goldCost.Text = itemForSale.Cost.ToString();
-            itemName.Text = itemForSale.Name;
+            itemForSale = snapshot;
+            if (!snapshot.HasValue)
+            {
+                Clear();
+                return;
+            }
+
+            displayItem.SetImage(snapshot.GfxPath);
+            goldCost.Text = snapshot.Cost.ToString();
+            itemName.Text = snapshot.Name;
             goldImage.Visible = true;
         }
 
@@ -106,7 +91,7 @@ namespace Project_1.UI.HUD.Windows
             goldImage.Visible = false;
             itemName.Text = null;
             goldCost.Text = null;
-            itemForSale = null;
+            itemForSale = ItemUiSnapshot.Empty;
         }
     }
 }

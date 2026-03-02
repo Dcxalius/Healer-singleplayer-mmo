@@ -1,15 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Project_1.Camera;
 using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.UI.UIElements.Boxes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.UI.CharacterCreator
 {

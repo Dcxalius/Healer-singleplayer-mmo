@@ -179,19 +179,6 @@ namespace Project_1.UI.HUD.Windows
             }
         }
 
-        void SetAllSlots(Equipment aEquipment)
-        {
-            for (int i = 0; i < (int)Equipment.Slot.Count; i++)
-            {
-                SetSlot((Equipment.Slot)i, aEquipment);
-            }
-        }
-
-        public void SetSlot(Equipment.Slot aSlot, Equipment aEquipment)
-        {
-            equiped[(int)aSlot].AssignItem(aEquipment.EquipedInSlot(aSlot));
-        }
-
         public void SetSlot(Equipment.Slot aSlot, ItemUiSnapshot itemSnapshot)
         {
             equiped[(int)aSlot].AssignItem(itemSnapshot);

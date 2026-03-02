@@ -117,15 +117,14 @@ namespace Project_1.UI.HUD.Managers
             plateBoxes.AddRange(partyPlateBoxes);
 
             loadedPos = aLoadedSettings.Where(x => x.Item1 == typeof(BuffBox).Name).ToArray();
-            playerBuffBox = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, loadedPos[0].Item2, loadedPos[0].Item3);
+            playerBuffBox = new BuffBox(BuffBox.FillDirection.TopRightToDown, loadedPos[0].Item2, loadedPos[0].Item3);
             plateBoxes.Add(playerBuffBox);
-            targetBuffBox = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, loadedPos[1].Item2, loadedPos[1].Item3);
+            targetBuffBox = new BuffBox(BuffBox.FillDirection.TopRightToDown, loadedPos[1].Item2, loadedPos[1].Item3);
             plateBoxes.Add(targetBuffBox);
             partyBuffBoxes = new BuffBox[4];
             for (int i = 0; i < partyBuffBoxes.Length; i++)
             {
-
-                partyBuffBoxes[i] = new BuffBox(null, BuffBox.FillDirection.TopRightToDown, loadedPos[2 + i].Item2, loadedPos[2 + i].Item3);
+                partyBuffBoxes[i] = new BuffBox(BuffBox.FillDirection.TopRightToDown, loadedPos[2 + i].Item2, loadedPos[2 + i].Item3);
             }
             plateBoxes.AddRange(partyBuffBoxes);
         }

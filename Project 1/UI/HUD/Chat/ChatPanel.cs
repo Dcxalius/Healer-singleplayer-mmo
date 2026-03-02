@@ -144,16 +144,21 @@ namespace Project_1.UI.HUD.Chat
                 return;
             }
 
-            Mailboxes.PublishUiEvent(new ChatMessagePosted(ChatMessageType.Say, text));
+            Mailboxes.PublishSimCommand(new ChatSayRequested(text));
+        }
+
+        public void AddMessage(ChatMessage aMessage)
+        {
+            ThreadAffinity.AssertUiThread();
+            if (string.IsNullOrWhiteSpace(aMessage.Content)) return;
+
+            messageBuffer.Add(new ChatMessageEntry(aMessage));
+            RebuildDisplayedMessages(scrollToBottom: true);
         }
 
         public void AddMessage(ChatMessageType aType, string aMessage)
         {
-            ThreadAffinity.AssertUiThread();
-            if (string.IsNullOrWhiteSpace(aMessage)) return;
-
-            messageBuffer.Add(new ChatMessageEntry(aType, aMessage.Trim()));
-            RebuildDisplayedMessages(scrollToBottom: true);
+            AddMessage(new ChatMessage(aType, aMessage));
         }
 
         public void ClearMessages()
@@ -178,10 +183,10 @@ namespace Project_1.UI.HUD.Chat
 
             foreach (ChatMessageEntry entry in messageBuffer.EnumerateChronological())
             {
-                if (!ChatSettings.IsVisible(entry.Type)) continue;
+                if (!ChatSettings.IsVisible(entry.Message.Type)) continue;
 
-                List<string> wrapped = WrapText(entry.Message, maxWidth, font);
-                Color textColor = ResolveMessageColor(entry.Type);
+                List<string> wrapped = WrapText(entry.Message.DisplayText, maxWidth, font);
+                Color textColor = ResolveMessageColor(entry.Message.Type);
                 for (int i = 0; i < wrapped.Count; i++)
                 {
                     messageLog.AddScrollableElement(new ChatLineElement(wrapped[i], textColor));
@@ -339,14 +344,12 @@ namespace Project_1.UI.HUD.Chat
 
         readonly struct ChatMessageEntry
         {
-            public ChatMessageEntry(ChatMessageType aType, string aMessage)
+            public ChatMessageEntry(ChatMessage message)
             {
-                Type = aType;
-                Message = aMessage;
+                Message = message;
             }
 
-            public ChatMessageType Type { get; }
-            public string Message { get; }
+            public ChatMessage Message { get; }
         }
 
         sealed class ChatMessageBuffer

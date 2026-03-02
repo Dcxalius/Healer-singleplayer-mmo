@@ -148,6 +148,7 @@ namespace Project_1.Managers.States
             SubscribeSimCommand<PartyCommandRequested>(HandlePartyCommandRequested);
             SubscribeSimCommand<InteractRequested>(HandleInteractRequested);
             SubscribeSimCommand<ChatCommandRequested>(HandleChatCommandRequested);
+            SubscribeSimCommand<ChatSayRequested>(HandleChatSayRequested);
             SubscribeSimMailbox<KeyboardSnapshot>(e => KeyboardStateCache.Update(e));
             SubscribeSimMailbox<KeyBindSnapshot>(e => KeyBindStateCache.Update(e));
             SubscribeSimMailbox<MouseSnapshot>(e => MouseStateCache.Update(e));
@@ -847,6 +848,22 @@ namespace Project_1.Managers.States
             }
         }
 
+        static void HandleChatSayRequested(ChatSayRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            string text = (e.MessageText ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(text)) return;
+
+            string senderName = ObjectManager.Player?.Name;
+            if (string.IsNullOrWhiteSpace(senderName))
+            {
+                senderName = "Player";
+            }
+
+            Mailboxes.PublishUiEvent(new ChatMessagePosted(
+                new ChatMessage(ChatMessageType.Say, text, senderName, ChatSpeakerType.Player)));
+        }
+
         static void HandleChatHelp()
         {
             string systemCommands = string.Join(" | ", chatCommandSpecs
@@ -1079,7 +1096,8 @@ namespace Project_1.Managers.States
         static void PublishChatSystemMessage(string message)
         {
             if (string.IsNullOrWhiteSpace(message)) return;
-            Mailboxes.PublishUiEvent(new ChatMessagePosted(ChatMessageType.System, message));
+            Mailboxes.PublishUiEvent(new ChatMessagePosted(
+                new ChatMessage(ChatMessageType.System, message, "System", ChatSpeakerType.System)));
         }
 
         readonly struct ChatCommandSpec
@@ -1285,6 +1303,13 @@ namespace Project_1.Managers.States
         static void HandleLoadSaveRequested(LoadSaveRequested e)
         {
             ThreadAffinity.AssertSimThread();
+            if (string.IsNullOrWhiteSpace(e.SaveName))
+            {
+                if (!SaveManager.RequestLoadData(SaveManager.CurrentSave)) return;
+                SetState(States.LoadingMenu);
+                return;
+            }
+
             if (!SaveManager.TryGetSaveByName(e.SaveName, out Save save)) return;
             if (!SaveManager.RequestLoadData(save)) return;
             SetState(States.LoadingMenu);

@@ -3,11 +3,6 @@ using Project_1.Camera;
 using Project_1.Textures;
 using Project_1.UI.PauseMenu;
 using Project_1.UI.UIElements.Boxes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project_1.UI.StartMenu
 {

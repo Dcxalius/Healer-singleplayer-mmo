@@ -1,5 +1,6 @@
 ﻿using Project_1.GameObjects;
 using Project_1.Items;
+using Project_1.Items.SubTypes;
 using Project_1.Managers;
 using Project_1.Messaging.Events;
 using System.Linq;
@@ -42,7 +43,7 @@ namespace Project_1.Messaging
                 {
                     Item it = drop.Drop[i];
                     if (it == null) continue;
-                    cloned[i] = new Item(it.ID, it.Count);
+                    cloned[i] = CloneItem(it);
                     snapshots[i] = ItemUiSnapshot.FromItem(it);
                 }
                 drop.SetDrop(cloned);
@@ -72,7 +73,7 @@ namespace Project_1.Messaging
             if (slot < 0 || slot >= Current.Drop.Length) return null;
             Item existing = Current.Drop[slot];
             if (existing == null) return null;
-            return new Item(existing.ID, existing.Count);
+            return CloneItem(existing);
         }
 
         public static Item Take(int slot, int amount)
@@ -101,7 +102,7 @@ namespace Project_1.Messaging
                 Current = null;
                 CurrentContextId = 0;
             }
-            return new Item(existing.ID, takeAmount);
+            return CloneItemWithCount(existing, takeAmount);
         }
 
         public static void Close(int contextId)
@@ -113,6 +114,38 @@ namespace Project_1.Messaging
                 CurrentContextId = 0;
                 closedFromEmpty = true;
             }
+        }
+
+        static Item CloneItem(Item source)
+        {
+            if (source == null) return null;
+            if (source is Weapon weapon)
+            {
+                return new Weapon(weapon.WeaponData, weapon.Hash);
+            }
+
+            if (source is Equipment equipment)
+            {
+                return new Equipment(equipment.EquipmentData, equipment.Hash);
+            }
+
+            if (source is Container container)
+            {
+                return new Container(ItemFactory.GetItemData<ContainerData>(container.ID));
+            }
+
+            return ItemFactory.CreateItem(source.ID, source.Count);
+        }
+
+        static Item CloneItemWithCount(Item source, int count)
+        {
+            if (source == null) return null;
+            if (source is Weapon || source is Equipment || source is Container)
+            {
+                return CloneItem(source);
+            }
+
+            return ItemFactory.CreateItem(source.ID, count);
         }
     }
 }

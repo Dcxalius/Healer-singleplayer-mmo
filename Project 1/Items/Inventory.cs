@@ -180,12 +180,20 @@ namespace Project_1.Items
         public bool EquipBag((int, int) aBagAndSlot)
         {
             AssertSimThread();
-            Debug.Assert(items[aBagAndSlot.Item1][aBagAndSlot.Item2].ItemType == ItemData.ItemType.Container);
+            Item slotItem = items[aBagAndSlot.Item1][aBagAndSlot.Item2];
+            if (slotItem == null) return false;
+            Debug.Assert(slotItem.ItemType == ItemData.ItemType.Container);
+            if (slotItem.ItemType != ItemData.ItemType.Container) return false;
+
+            Container container = slotItem as Container;
+            Debug.Assert(container != null, $"Inventory slot ({aBagAndSlot.Item1},{aBagAndSlot.Item2}) has ItemType.Container but runtime type {slotItem.GetType().Name}.");
+            if (container == null) return false;
+
             for (int i = 1; i < bags.Length; i++)
             {
                 if (bags[i] == null)
                 {
-                    bags[i] = items[aBagAndSlot.Item1][aBagAndSlot.Item2] as Container;
+                    bags[i] = container;
                     items[i] = new Item[bags[i].SlotCount];
 
                     items[aBagAndSlot.Item1][aBagAndSlot.Item2] = null;
@@ -290,20 +298,27 @@ namespace Project_1.Items
         public void SwapBags((int, int) aSlot, int aSlotToSwapWith)
         {
             AssertSimThread();
-            Debug.Assert(items[aSlot.Item1][aSlot.Item2].ItemType == ItemData.ItemType.Container, "Tried to treat non bag as a bag.");
+            Item slotItem = items[aSlot.Item1][aSlot.Item2];
+            if (slotItem == null) return;
+            Debug.Assert(slotItem.ItemType == ItemData.ItemType.Container, "Tried to treat non bag as a bag.");
+            if (slotItem.ItemType != ItemData.ItemType.Container) return;
+
+            Container slotContainer = slotItem as Container;
+            Debug.Assert(slotContainer != null, $"Inventory slot ({aSlot.Item1},{aSlot.Item2}) has ItemType.Container but runtime type {slotItem.GetType().Name}.");
+            if (slotContainer == null) return;
 
 
             if (bags[aSlotToSwapWith] == null)
             {
                 //Bag to empty
-                AddBag(items[aSlot.Item1][aSlot.Item2] as Container, aSlotToSwapWith);
+                AddBag(slotContainer, aSlotToSwapWith);
                 items[aSlot.Item1][aSlot.Item2] = null;
                 NotifySlotChanged(aSlot, this);
                 NotifySlotChanged(-1, aSlotToSwapWith, this);
                 return;
             }
 
-            if ((items[aSlot.Item1][aSlot.Item2] as Container).SlotCount < CountOfItemsInBag(aSlotToSwapWith))
+            if (slotContainer.SlotCount < CountOfItemsInBag(aSlotToSwapWith))
             {
                 DebugManager.Print("Tried to swap with a bag too small.");
                 return;
@@ -312,7 +327,7 @@ namespace Project_1.Items
             //Bag in bag to bag in rack
             Container tempBag = bags[aSlotToSwapWith];
             Item[] tempItems = items[aSlotToSwapWith].Skip(tempBag.SlotCount).ToArray();
-            bags[aSlotToSwapWith] = items[aSlot.Item1][aSlot.Item2] as Container;
+            bags[aSlotToSwapWith] = slotContainer;
             items[aSlotToSwapWith] = new Item[bags[aSlotToSwapWith].SlotCount];
             for (int i = 0; i < tempItems.Length; i++)
             {
@@ -333,10 +348,12 @@ namespace Project_1.Items
         public void LootItem(int aLootIndex)
         {
             AssertSimThread();
+            int totalLooted = 0;
+            string lootedItemName = null;
             while (true)
             {
                 Item available = LootState.Peek(aLootIndex);
-                if (available == null) return;
+                if (available == null) break;
 
                 bool placed = false;
 
@@ -348,8 +365,10 @@ namespace Project_1.Items
                         if (items[i][j] == null)
                         {
                             Item taken = LootState.Take(aLootIndex, available.Count);
-                            if (taken == null) return;
+                            if (taken == null) break;
                             items[i][j] = taken;
+                            totalLooted += taken.Count;
+                            lootedItemName ??= taken.Name;
                             NotifySlotChanged(i, j, this);
                             placed = true;
                             break;
@@ -362,15 +381,22 @@ namespace Project_1.Items
 
                         int takeAmount = Math.Min(capacity, available.Count);
                         Item takenItem = LootState.Take(aLootIndex, takeAmount);
-                        if (takenItem == null) return;
+                        if (takenItem == null) break;
                         items[i][j].Count += takenItem.Count;
+                        totalLooted += takenItem.Count;
+                        lootedItemName ??= takenItem.Name;
                         NotifySlotChanged(i, j, this);
                         placed = true;
                         break;
                     }
                 }
 
-                if (!placed) return;
+                if (!placed) break;
+            }
+
+            if (totalLooted > 0)
+            {
+                PublishLootReceivedMessage(lootedItemName, totalLooted);
             }
         }
 
@@ -386,6 +412,7 @@ namespace Project_1.Items
                 if (taken == null) return;
                 items[aBagAndSlot.Item1][aBagAndSlot.Item2] = taken;
                 NotifySlotChanged(aBagAndSlot, this);
+                PublishLootReceivedMessage(taken.Name, taken.Count);
                 return;
             }
 
@@ -399,7 +426,15 @@ namespace Project_1.Items
             if (takenPartial == null) return;
             items[aBagAndSlot.Item1][aBagAndSlot.Item2].Count += takenPartial.Count;
             NotifySlotChanged(aBagAndSlot, this);
+            PublishLootReceivedMessage(takenPartial.Name, takenPartial.Count);
 
+        }
+
+        static void PublishLootReceivedMessage(string itemName, int count)
+        {
+            if (count <= 0) return;
+            if (string.IsNullOrWhiteSpace(itemName)) return;
+            Mailboxes.PublishUiEvent(new ChatMessagePosted(ChatMessageType.Loot, $"{count}x [{itemName}]"));
         }
 
 
@@ -628,8 +663,15 @@ namespace Project_1.Items
             if (!(item.ItemType == ItemData.ItemType.Equipment || item.ItemType == ItemData.ItemType.Weapon)) return;
 
             Equipment equipment = item as Equipment;
+            Debug.Assert(equipment != null, $"Inventory slot ({aIndex.Item1},{aIndex.Item2}) has ItemType {item.ItemType} but runtime type {item.GetType().Name}.");
+            if (equipment == null) return;
             
-            if (item.ItemType == ItemData.ItemType.Weapon && !aFriendly.ClassData.WeaponsAllowed.HasFlag((equipment as Weapon).WeaponData.WeaponType)) return;
+            if (item.ItemType == ItemData.ItemType.Weapon)
+            {
+                Weapon weapon = equipment as Weapon;
+                if (weapon == null) return;
+                if (!aFriendly.ClassData.WeaponsAllowed.HasFlag(weapon.WeaponData.WeaponType)) return;
+            }
             GameObjects.Unit.Equipment wearing = aFriendly.Equipment;
 
             if (equipment.type == Equipment.Type.TwoHander) 
@@ -658,7 +700,14 @@ namespace Project_1.Items
             if (!(item.ItemType == ItemData.ItemType.Equipment || item.ItemType == ItemData.ItemType.Weapon)) return;
 
             Equipment equipment = item as Equipment;
-            if (item.ItemType == ItemData.ItemType.Weapon && !aFriendly.ClassData.WeaponsAllowed.HasFlag((equipment as Weapon).WeaponData.WeaponType)) return;
+            Debug.Assert(equipment != null, $"Inventory slot ({aIndex.Item1},{aIndex.Item2}) has ItemType {item.ItemType} but runtime type {item.GetType().Name}.");
+            if (equipment == null) return;
+            if (item.ItemType == ItemData.ItemType.Weapon)
+            {
+                Weapon weapon = equipment as Weapon;
+                if (weapon == null) return;
+                if (!aFriendly.ClassData.WeaponsAllowed.HasFlag(weapon.WeaponData.WeaponType)) return;
+            }
            
 
             if (equipment.type == Equipment.Type.TwoHander)

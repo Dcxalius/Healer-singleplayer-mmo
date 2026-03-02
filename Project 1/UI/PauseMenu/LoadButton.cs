@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.UI.UIElements.Buttons;
@@ -21,7 +20,7 @@ namespace Project_1.UI.PauseMenu
 
         public override void ClickedOnAndReleasedOnMe()
         {
-            Mailboxes.PublishSimCommand(new LoadSaveRequested(SaveManager.CurrentSave?.Name));
+            Mailboxes.PublishSimCommand(new LoadSaveRequested(null));
 
             base.ClickedOnAndReleasedOnMe();
 

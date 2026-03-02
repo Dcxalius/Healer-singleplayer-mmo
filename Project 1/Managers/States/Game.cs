@@ -78,7 +78,7 @@ namespace Project_1.Managers.States
         {
             long frameStartTicks = Stopwatch.GetTimestamp();
             UpdateVfx();
-            PrepRender(Color.White, SpriteSortMode.Immediate, samplerState: SamplerState.PointClamp);
+            PrepRender(Color.White, SpriteSortMode.Immediate, samplerState: SamplerState.PointClamp); //TODO: Should this be immediate?
 
             long worldStartTicks = Stopwatch.GetTimestamp();
             DrawList(spriteBatch);

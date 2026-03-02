@@ -1,16 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
-using Project_1.GameObjects.Entities;
+using Project_1.Managers;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.ExceptionServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project_1.UI.UIElements
 {
@@ -21,53 +16,36 @@ namespace Project_1.UI.UIElements
             TopRightToDown
         }
 
-        FillDirection fillDirection;
-        List<Buff> buffs;
-
+        readonly FillDirection fillDirection;
+        readonly List<Buff> buffs;
         int? ownerRenderId;
-
 
         RelativeScreenPosition StartPosition
         {
             get
             {
-                switch (fillDirection)
+                return fillDirection switch
                 {
-                    case FillDirection.TopRightToDown:
-                        return new RelativeScreenPosition(RelativeSize.X - buffSize.X - spacing.X, spacing.Y);
-                    default:
-                        throw new NotImplementedException();
-                }
+                    FillDirection.TopRightToDown => new RelativeScreenPosition(RelativeSize.X - buffSize.X - spacing.X, spacing.Y),
+                    _ => throw new NotImplementedException()
+                };
             }
         }
 
-        RelativeScreenPosition buffSize = RelativeScreenPosition.GetSquareFromX(0.015f);
-        RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
-        RelativeScreenPosition textSpacing = new RelativeScreenPosition(0, 0.007f);
+        readonly RelativeScreenPosition buffSize = RelativeScreenPosition.GetSquareFromX(0.015f);
+        readonly RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
+        readonly RelativeScreenPosition textSpacing = new RelativeScreenPosition(0, 0.007f);
 
-        public BuffBox(Entity aOwner, FillDirection aDir, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(UITexture.Null, aPos, aSize)
+        public BuffBox(FillDirection aDir, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(UITexture.Null, aPos, aSize)
         {
-            ownerRenderId = aOwner?.RenderId;
             fillDirection = aDir;
             buffs = new List<Buff>();
             AddChildren(buffs);
             capturesClick = false;
         }
-        public bool IsThisMine(Entity aOwner) => aOwner != null && ownerRenderId.HasValue && ownerRenderId.Value == aOwner.RenderId;
-        public bool IsThisMine(int renderId) => ownerRenderId.HasValue && ownerRenderId.Value == renderId;
 
-        public void AssignBox(Entity aOwner)
-        {
-            ownerRenderId = aOwner?.RenderId;
-            if (aOwner == null)
-            {
-                ClearBuffs();
-                Visible = false;
-                return;
-            }
-            SetAllBuffs(aOwner.GetAllBuffs());
-            Visible = true;
-        }
+        public bool IsThisMine(int renderId) => ownerRenderId.HasValue && ownerRenderId.Value == renderId;
+        public int BuffCount => buffs.Count;
 
         public void AssignBox(int? aOwnerRenderId)
         {
@@ -82,18 +60,6 @@ namespace Project_1.UI.UIElements
             KillAllChildren();
         }
 
-        void SetAllBuffs(List<GameObjects.Spells.Buff.Buff> aBuff)
-        {
-            ClearBuffs();
-            for (int i = 0; i < aBuff.Count; i++)
-            {
-                buffs.Add(new Buff(new BuffUiSnapshot(aBuff[i].EffectId, aBuff[i].GfxPath, aBuff[i].DurationRemaining), RelativeScreenPosition.Zero, buffSize));
-            }
-
-            AddChildren(buffs);
-            SortBuffs();
-        }
-
         public void AddBuff(in BuffUiSnapshot aBuff)
         {
             for (int i = 0; i < buffs.Count; i++)
@@ -103,6 +69,7 @@ namespace Project_1.UI.UIElements
                 SortBuffs();
                 return;
             }
+
             buffs.Add(new Buff(aBuff, RelativeScreenPosition.Zero, buffSize));
             AddChild(buffs.Last());
             SortBuffs();
@@ -111,8 +78,6 @@ namespace Project_1.UI.UIElements
         public override void Update()
         {
             base.Update();
-
-
             CheckLast();
         }
 
@@ -144,16 +109,37 @@ namespace Project_1.UI.UIElements
 
         RelativeScreenPosition StepPosition(int i, int aMaxX, int aMaxY)
         {
-            switch (fillDirection)
+            return fillDirection switch
             {
-                case FillDirection.TopRightToDown:
-                    RelativeScreenPosition step = RelativeScreenPosition.Zero;
-                    step.X = (float)((buffSize.X + spacing.X + textSpacing.X) * -Math.Floor((double)i / aMaxY));
-                    step.Y = ((buffSize.Y + spacing.Y + textSpacing.Y) * (i % aMaxY)); 
-                    return step;
-                default:
-                    throw new NotImplementedException();
+                FillDirection.TopRightToDown => new RelativeScreenPosition(
+                    (float)((buffSize.X + spacing.X + textSpacing.X) * -Math.Floor((double)i / aMaxY)),
+                    (buffSize.Y + spacing.Y + textSpacing.Y) * (i % aMaxY)),
+                _ => throw new NotImplementedException()
+            };
+        }
+
+        public int CopyRenderSnapshots(BuffRenderSnapshot[] destination, int startIndex)
+        {
+            AssertUiOrMainThread();
+            if (!Visible) return 0;
+            if (destination == null || buffs.Count == 0) return 0;
+            if (startIndex >= destination.Length) return 0;
+            if (startIndex < 0) startIndex = 0;
+
+            int count = Math.Min(destination.Length - startIndex, buffs.Count);
+            for (int i = 0; i < count; i++)
+            {
+                Buff buff = buffs[i];
+                destination[startIndex + i] = new BuffRenderSnapshot(buff.GfxPath, buff.AbsolutePos, buff.Duration);
             }
+
+            return count;
+        }
+
+        static void AssertUiOrMainThread()
+        {
+            if (ThreadAffinity.IsMainThread) return;
+            ThreadAffinity.AssertUiThread();
         }
     }
 }

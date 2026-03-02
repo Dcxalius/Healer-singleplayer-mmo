@@ -16,6 +16,7 @@ namespace Project_1.Managers
         static ConcurrentDictionary<object, int> pausers;
         static bool initialized;
 
+        public static double MilisecondSinceLastFrame => instanceTime.ElapsedGameTime.TotalMilliseconds;
         public static double SecondsSinceLastFrame => instanceTime.ElapsedGameTime.TotalSeconds;
 
         public static double InstanceTotalFrameTime => instanceTime.TotalGameTime.TotalMilliseconds;

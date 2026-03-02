@@ -50,5 +50,7 @@ namespace Project_1.UI.HUD.PlateBoxes
             AddChildren(horizontalSegments);
             AddChild(levelCircle);
         }
+
+        internal abstract PlateBoxRenderSnapshot BuildRenderSnapshot();
     }
 }

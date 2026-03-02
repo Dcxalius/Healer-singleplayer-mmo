@@ -45,6 +45,25 @@ namespace Project_1.Messaging.Events
             return new ItemDescriptorSnapshot(item.Name, item.Description, statReport, sellPrice, hasStatReport, hasSellPrice);
         }
 
+        public static ItemDescriptorSnapshot FromItemData(ItemData itemData)
+        {
+            if (itemData == null) throw new ArgumentNullException(nameof(itemData));
+            string statReport = null;
+            if (itemData is WeaponData weaponData)
+            {
+                statReport = BuildWeaponDataStatReport(weaponData);
+            }
+            else if (itemData is EquipmentData equipmentData)
+            {
+                statReport = equipmentData.StatReport.Value;
+            }
+
+            bool hasStatReport = !string.IsNullOrEmpty(statReport);
+            bool hasSellPrice = itemData.Cost > 0;
+            int sellPrice = hasSellPrice ? (int)MathF.Floor(itemData.Cost / 4f) : 0;
+            return new ItemDescriptorSnapshot(itemData.Name, itemData.Description, statReport, sellPrice, hasStatReport, hasSellPrice);
+        }
+
         static string BuildWeaponStatReport(Weapon weapon)
         {
             List<string> lines = new List<string>
@@ -71,6 +90,71 @@ namespace Project_1.Messaging.Events
             }
 
             return string.Join("\n", lines);
+        }
+
+        static string BuildWeaponDataStatReport(WeaponData weaponData)
+        {
+            List<string> lines = new List<string>
+            {
+                BuildWeaponCategoryLine(weaponData.Slot, weaponData.WeaponType)
+            };
+
+            if (weaponData.MaxAttackDamage > 0)
+            {
+                int minDamage = (int)Math.Round(weaponData.MinAttackDamage, MidpointRounding.AwayFromZero);
+                int maxDamage = (int)Math.Round(weaponData.MaxAttackDamage, MidpointRounding.AwayFromZero);
+                lines.Add($"{minDamage} - {maxDamage} Damage");
+            }
+
+            if (weaponData.AttackSpeed > 0)
+            {
+                lines.Add($"Speed {weaponData.AttackSpeed.ToString("0.##", CultureInfo.InvariantCulture)}");
+            }
+
+            string equipmentLines = weaponData.StatReport.Value;
+            if (!string.IsNullOrEmpty(equipmentLines))
+            {
+                lines.Add(equipmentLines);
+            }
+
+            return string.Join("\n", lines);
+        }
+
+        static string BuildWeaponCategoryLine(Equipment.Type slotType, Weapon.WeaponType weaponType)
+        {
+            return $"{GetHandRequirementDisplayName(slotType)} {GetWeaponTypeDisplayName(weaponType)}";
+        }
+
+        static string GetHandRequirementDisplayName(Equipment.Type slotType)
+        {
+            return slotType switch
+            {
+                Equipment.Type.TwoHander => "Two-handed",
+                Equipment.Type.MainHander => "Main-hand",
+                Equipment.Type.OffHander => "Off-hand",
+                Equipment.Type.Ranged => "Ranged",
+                _ => "One-handed"
+            };
+        }
+
+        static string GetWeaponTypeDisplayName(Weapon.WeaponType weaponType)
+        {
+            return weaponType switch
+            {
+                Weapon.WeaponType.Dagger => "Dagger",
+                Weapon.WeaponType.Sword or Weapon.WeaponType.TwoHandedSword => "Sword",
+                Weapon.WeaponType.Axe or Weapon.WeaponType.TwoHandedAxe => "Axe",
+                Weapon.WeaponType.Mace or Weapon.WeaponType.TwoHandedMace => "Mace",
+                Weapon.WeaponType.Fist => "Fist Weapon",
+                Weapon.WeaponType.Staff => "Staff",
+                Weapon.WeaponType.Bow => "Bow",
+                Weapon.WeaponType.Gun => "Gun",
+                Weapon.WeaponType.Thrown => "Thrown",
+                Weapon.WeaponType.Wand => "Wand",
+                Weapon.WeaponType.Shield => "Shield",
+                Weapon.WeaponType.Holdable => "Held Item",
+                _ => "Weapon"
+            };
         }
     }
 

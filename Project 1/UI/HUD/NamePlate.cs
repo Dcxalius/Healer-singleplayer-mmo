@@ -22,6 +22,10 @@ namespace Project_1.UI.HUD
         Label name;
         static Color backgroundColor = new Color(120, 50, 50, 80);
         RelativeScreenPosition barSize = new RelativeScreenPosition(1f, 0.2f);
+        WorldSpace feetPosition;
+        int worldHeight;
+        AbsoluteScreenPosition collisionOffset;
+        float healthRatio;
         //RelativeScreenPosition barSize = new RelativeScreenPosition(0.02f, 0.006f);
 
         static Color ColorTransform(Color aRelationColor)
@@ -48,10 +52,14 @@ namespace Project_1.UI.HUD
             SetTarget(snapshot);
         }
 
+        public AbsoluteScreenPosition CollisionOffset => collisionOffset;
+        public AbsoluteScreenPosition AnchorAbsolutePosition => feetPosition.ToAbsoltueScreenPosition();
+
         void SetTarget(in EntityUiSnapshot snapshot) //TODO: Add a minimum size for bar and a maximum size of name.
         {
             name.Text = snapshot.Name;
-            healthBar.Value = (float)(snapshot.CurrentHealth / snapshot.MaxHealth);
+            healthRatio = (float)(snapshot.CurrentHealth / snapshot.MaxHealth);
+            healthBar.Value = healthRatio;
             gfx.Color = ColorTransform(snapshot.RelationColor);
 
             AbsoluteScreenPosition textOffset = new AbsoluteScreenPosition((int)name.UnderlyingTextOffset.X, (int)name.UnderlyingTextOffset.Y);
@@ -63,7 +71,8 @@ namespace Project_1.UI.HUD
 
             name.Resize(textOffset.ToRelativeScreenPosition(Size));     
 
-            Reposition(snapshot);
+            UpdateAnchor(snapshot);
+            SyncToAnchor();
 
             healthBar.Move(RelativeScreenPosition.One.OnlyY - healthBar.RelativeSize.OnlyY);
         }
@@ -77,24 +86,60 @@ namespace Project_1.UI.HUD
 
             name.Resize(textOffset.ToRelativeScreenPosition(Size));
 
+            SyncToAnchor();
             healthBar.Move(RelativeScreenPosition.One.OnlyY - healthBar.RelativeSize.OnlyY);
         }
 
         public void Refresh(in EntityUiSnapshot snapshot)
         {
-            healthBar.Value = (float)(snapshot.CurrentHealth / snapshot.MaxHealth);
+            healthRatio = (float)(snapshot.CurrentHealth / snapshot.MaxHealth);
+            healthBar.Value = healthRatio;
+            gfx.Color = ColorTransform(snapshot.RelationColor);
             if (name.Text != snapshot.Name)
             {
                 SetTarget(snapshot);
                 return;
             }
-            Reposition(snapshot);
+            UpdateAnchor(snapshot);
+            SyncToAnchor();
         }
 
-        public void Reposition(in EntityUiSnapshot snapshot)
+        public void SyncToAnchor()
         {
-            Move((snapshot.FeetPosition.ToAbsoltueScreenPosition() - new AbsoluteScreenPosition(Size.X / 2, snapshot.WorldHeight * 2)).ToRelativeScreenPosition() - RelativeSize.OnlyY);
+            RelativeScreenPosition basePos = (feetPosition.ToAbsoltueScreenPosition() - new AbsoluteScreenPosition(Size.X / 2, worldHeight * 2)).ToRelativeScreenPosition() - RelativeSize.OnlyY;
+            Move(basePos + collisionOffset.ToRelativeScreenPosition());
+        }
 
+        public void ResetCollisionOffset()
+        {
+            collisionOffset = AbsoluteScreenPosition.Zero;
+            SyncToAnchor();
+        }
+
+        public void AddCollisionOffset(AbsoluteScreenPosition amount)
+        {
+            if (amount == AbsoluteScreenPosition.Zero) return;
+            collisionOffset += amount;
+            SyncToAnchor();
+        }
+
+        void UpdateAnchor(in EntityUiSnapshot snapshot)
+        {
+            feetPosition = snapshot.FeetPosition;
+            worldHeight = snapshot.WorldHeight;
+        }
+
+        public NamePlateRenderSnapshot BuildRenderSnapshot()
+        {
+            return new NamePlateRenderSnapshot(
+                AbsolutePos,
+                gfx.Color,
+                healthBar.AbsolutePos,
+                Math.Clamp(healthRatio, 0f, 1f),
+                name.Text ?? string.Empty,
+                name.Color,
+                name.AbsolutePos,
+                name.Location + new AbsoluteScreenPosition(name.Size.X / 2, 0));
         }
     }
 }

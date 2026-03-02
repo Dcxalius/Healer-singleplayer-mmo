@@ -1,12 +1,12 @@
 # Overhaul Progress
 
-Last updated: 2026-02-17
+Last updated: 2026-03-02
 
 ## In Progress
 - None.
 
 ## Finished — waiting on other implementation
-- Shutdown diagnostics on exit/startup are deferred until logging is reworked (current console closes too quickly for reliable readback).
+- None.
 
 ## Finished
 - Texture render snapshots (sim builds, main draws).
@@ -62,6 +62,7 @@ Last updated: 2026-02-17
 - Sim fixed-step decoupling: `SimThread` now runs a self-clocked fixed-step accumulator loop (with catch-up cap) instead of being pulsed by `Game1.Update`; main-thread update no longer blocks on `SimThread.PulseAndWait()`.
 - Sim loop cleanup (post-decouple): removed obsolete sim pulse/wait timeout plumbing (`SimThread.PulseAndWait`, sim wait-timeout counters/stats), and trimmed thread diagnostics to keep sim overrun/drift/catch-up while retaining UI wait-timeout visibility.
 - Diagnostics threshold alerts: added non-spam warning logs (cooldown-based) for mailbox backlog, mailbox handler-failure deltas, and sim/UI thread overrun/timeout timing issues.
+- Shutdown/startup diagnostics persistence: `DebugManager` now rotates `Diagnostics.current.log` -> `Diagnostics.last.log`, emits last-run tail on startup, writes fatal crashes to `Diagnostics.crash.log`, logs lifecycle snapshots on startup/shutdown (thread/mailbox/worker/render stats), and flushes logs on deterministic shutdown (`Game1.EndRun`) and process-exit handlers.
 - Command-routing migration (phase 1 of mailbox ownership cleanup): gameplay command subscriptions in `StateManager` now subscribe on `Mailboxes.Sim`, with a temporary `Main->Sim` forwarding shim for existing publishers; `SimThread` now drains both `Main` and `Sim` each pulse.
 - Command-routing migration (phase 2): gameplay/state command publishers were switched from `Mailboxes.Main.Publish(...)` to `Mailboxes.Sim.Publish(...)` across UI/input/save/state call sites; single-thread fallback now drains `Mailboxes.Sim` in `Game1.Update`.
 - Command-routing migration (phase 3 cleanup): removed temporary `Main->Sim` forwarding shim in `StateManager`; gameplay command handlers are now subscribed only on `Mailboxes.Sim` (with `Main` reserved for worker completion traffic).
@@ -115,3 +116,7 @@ Last updated: 2026-02-17
 - Sim-affinity assert sweep (unit-stat helpers): added explicit `ThreadAffinity.AssertSimThread()` guards to `WeaponSkill` runtime APIs (`SetOwner`, `LevelUpSkill`, `GetSkill`, `UpdateBonus`) and base stat helper mutators (`BasePrimaryStats.LevelUp`, `TotalPrimaryStats.UpdateBaseStats`/`UpdateEquipmentStats`) to close remaining mutable unit-stat helper paths.
 - Sim-affinity assert sweep (object/spawner factory+load entry points): tightened load/factory ownership asserts across `ObjectFactory`, `ObjectManager`, and `SpawnerManager` (sim asserts for runtime load/save/create paths; game-thread asserts for immutable class/mob/gossip lookups used by gameplay/UI) to harden factory/load boundaries.
 - Spell UI ownership fix: removed `GameObjects.Spells.Spell` instances from UI spell widgets/handlers and switched spell UI state to snapshot-only data (`SpellUiSnapshot`: name, image, cooldown state/ratio) delivered through `PlayerUiSnapshot`, so cooldown timing is authoritative from sim and no duplicated `lastTimeCasted` exists on UI.
+- UI snapshot ownership pass (inventory/loot/shop/loading): removed UI `ItemUiSnapshot.ToItem()` reconstruction usage and migrated these UI paths to snapshot-owned metadata (`ItemUiSnapshot` + descriptor payload), converted loading-menu UI from live `Save` objects to `SaveUiSnapshot`, and removed legacy UI APIs that accepted live `Entity`/`Inventory`/`Equipment` references.
+- UI pure draw-list cutover (plan §6.2): `PlateDrawList` is now fully snapshot-driven (`NamePlateRenderSnapshot`, `PlateBoxRenderSnapshot`, `BuffBoxRenderSnapshot` + `BuffRenderSnapshot`) with no live plate `UIElement` drawing on the main thread.
+- UI boundary hardening sweep (follow-up): verified remaining UI/gameplay references are immutable/static lookups, added fail-fast assert for unexpected plate draw element types during snapshot capture, and removed stale gameplay namespace imports from UI files.
+- UI boundary hardening sweep (Start/New/State UI): verified no direct live gameplay manager/object couplings in `StartMenu`/`CharacterCreator` and UI-facing state classes, then trimmed stale imports to keep boundary audits readable.

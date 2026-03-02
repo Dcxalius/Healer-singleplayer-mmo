@@ -6,9 +6,7 @@ Get [[DebugManager]] to display fps and other relevant data
 Rewrite UI of [[OptionMenu]]
 	Make the choice boxes create a [[ScrollBox]] 
 Tinker with [[Name Plate]] system
-Make [[UIElement]]s know their parent from birth
 
-Make a [[Critical Chance]] system
 Make a [[Proc]] system
 Make 2 [[NPC Class]]
 	[[Tank]]
@@ -27,14 +25,9 @@ Pick one for each [[Class]] and [[Slot]] as [[Epic]]
 	The rare [[Gear Effect]] and [[Affixes]] are based on the [[Gear Effect]] and [[Affixes]]  for these [[Epic]]
 	The [[Epic]] all have a [[Set]] and [[Set Bonus]]
 Pick one for each [[Class]] as [[Legendary]]
-Make [[World Object]] that the [[Player]] can interact with
 Write [[World Gen]]
 	Make a [[Mob Generator]]
 		? Generate locally if too expensive
-Write [[NPC]] [[Interaction]]
-	[[Dialogue]]
-	[[Replying]]
-Write [[Shop interaction]]
 Make [[Profession]]
 	Make [[Crafting Profession]]s
 	Make [[Gathering Profession]]s
@@ -42,7 +35,6 @@ Make [[Profession]]
 	Make [[Enchantment]] system
 Make [[Mob Class]]
 Make [[Mob Spells]]
-Finish system for visual [[Area of Effect]]s
 [[Quest]] system
 Make [[Dungeon]] system
 	Each dungeon should have it's own separate [[GameObjectManager]], and [[DoodadManager]] allowing for [[Instance|instancing]].

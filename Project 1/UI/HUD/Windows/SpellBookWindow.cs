@@ -1,15 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects;
 using Project_1.Textures;
 using Project_1.UI.HUD.SpellBook;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.UI.HUD.Windows
 {

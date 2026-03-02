@@ -1,34 +1,26 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Newtonsoft.Json.Bson;
+using Microsoft.Xna.Framework;
 using Project_1.Camera;
-using Project_1.GameObjects;
 using Project_1.Input;
 using Project_1.Items;
-using Project_1.Managers;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.HUD.Inventory;
 using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
 using System;
-using Project_1.Messaging.Events;
 
 namespace Project_1.UI.HUD
 {
-    internal class InventoryBox : Box
+    internal class InventoryBox : Box //This probably needs partial rollback!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     {
-
-        //Inventory inventory;
-
         BagHolderBox bagHolderBox;
-        BagBox[] bagBox;
+        BagContentBox[] bagContentBoxes;
         Label gold;
         Image goldImage;
 
-        const float itemSizeX = 0.06f;
-        const float spacingX = 0.01f;
+        const float itemSizeX = 0.022f;
+        const float spacingX = 0.0025f;
 
-        
         public static RelativeScreenPosition ItemSize => itemSizeInBagSpace;
         static RelativeScreenPosition itemSizeInBagSpace;
 
@@ -44,12 +36,13 @@ namespace Project_1.UI.HUD
         public static AbsoluteScreenPosition AbsBagBoxSpacing => absBagBoxSpacing;
         static AbsoluteScreenPosition absBagBoxSpacing;
 
-
-        static RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(spacingX); //Change name
-
+        static RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(spacingX);
         int columnCount;
+        InventoryUiSnapshot latestSnapshot;
+        bool hasSnapshot;
 
-        public InventoryBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize, int aColumnCount) : base(new UITexture("WhiteBackground",new Color(80, 80, 80, 80)), aPos, new RelativeScreenPosition(0.3f, 0.4f))
+        public InventoryBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize, int aColumnCount)
+            : base(new UITexture("WhiteBackground", new Color(80, 80, 80, 80)), aPos, new RelativeScreenPosition(0.3f, 0.4f))
         {
             InitUIElement(aColumnCount);
             InitStatics();
@@ -66,14 +59,14 @@ namespace Project_1.UI.HUD
             hudMoveable = false;
         }
 
-        void InitStatics() //TODO: Make this indepentet and called in the static constructor
+        void InitStatics()
         {
-
-            bagBoxSize = new RelativeScreenPosition(1 - spacing.X * 2, 0.3f);
-            itemSizeInBagSpace = RelativeScreenPosition.GetSquareFromX((1 - (columnCount + 1) * spacing.X) / (float)columnCount, bagBoxSize.ToAbsoluteScreenPos(Size));
-            absItemSize = itemSizeInBagSpace.ToAbsoluteScreenPos(bagBoxSize.ToAbsoluteScreenPos(Size));
-            bagBoxSpacing = RelativeScreenPosition.GetSquareFromX(spacingX, bagBoxSize.ToAbsoluteScreenPos(Size));
-            absBagBoxSpacing = bagBoxSpacing.ToAbsoluteScreenPos(bagBoxSize.ToAbsoluteScreenPos(Size));
+            // Keep inventory icon metrics window-relative; this avoids feedback loops when the inventory box resizes itself.
+            itemSizeInBagSpace = RelativeScreenPosition.GetSquareFromX(itemSizeX);
+            absItemSize = itemSizeInBagSpace.ToAbsoluteScreenPos();
+            bagBoxSpacing = RelativeScreenPosition.GetSquareFromX(spacingX);
+            absBagBoxSpacing = bagBoxSpacing.ToAbsoluteScreenPos();
+            bagBoxSize = RelativeScreenPosition.One;
         }
 
         void InitChildren()
@@ -81,70 +74,58 @@ namespace Project_1.UI.HUD
             RelativeScreenPosition itemSizeInInventoryScope = AbsItemSize.ToRelativeScreenPosition(Size);
             RelativeScreenPosition bagBoxSpacingInInventoryScope = AbsBagBoxSpacing.ToRelativeScreenPosition(Size);
             RelativeScreenPosition bhPos = new RelativeScreenPosition(bagBoxSpacingInInventoryScope.X, 1f - (itemSizeInInventoryScope.Y + bagBoxSpacingInInventoryScope.Y * 3));
-            RelativeScreenPosition bhSize = new RelativeScreenPosition(itemSizeInInventoryScope.X * (Items.Inventory.bagSlots) + bagBoxSpacingInInventoryScope.X * (Items.Inventory.bagSlots + 1), itemSizeInInventoryScope.Y + bagBoxSpacingInInventoryScope.Y * 2);
+            RelativeScreenPosition bhSize = new RelativeScreenPosition(itemSizeInInventoryScope.X * Items.Inventory.bagSlots + bagBoxSpacingInInventoryScope.X * (Items.Inventory.bagSlots + 1), itemSizeInInventoryScope.Y + bagBoxSpacingInInventoryScope.Y * 2);
 
             bagHolderBox = new BagHolderBox(bhPos, bhSize);
             AddChild(bagHolderBox);
 
-
-            bagBox = new BagBox[Items.Inventory.bagSlots];
-            for (int i = 0; i < bagBox.Length; i++)
+            bagContentBoxes = new BagContentBox[Items.Inventory.bagSlots];
+            for (int i = 0; i < bagContentBoxes.Length; i++)
             {
-                bagBox[i] = new BagBox(i);
+                bagContentBoxes[i] = new BagContentBox(i);
             }
-
-            AddChildren(bagBox);
+            AddChildren(bagContentBoxes);
 
             RelativeScreenPosition imgSize = RelativeScreenPosition.GetSquareFromY(bagHolderBox.RelativeSize.Y / 2, Size);
             goldImage = new Image(new UITexture("Gold", Color.White), RelativeScreenPosition.One - imgSize - bagBoxSpacingInInventoryScope.OnlyX, imgSize);
-
             RelativeScreenPosition goldSize = new RelativeScreenPosition(1 - imgSize.X - bagBoxSpacingInInventoryScope.X * 2, bhSize.Y);
-            gold = new Label("0", RelativeScreenPosition.Zero + RelativeScreenPosition.One.OnlyY - goldSize.OnlyY - bagBoxSpacingInInventoryScope.OnlyY, goldSize, Label.TextAllignment.CentreRight);
-
+            gold = new Label("0", RelativeScreenPosition.One.OnlyY - goldSize.OnlyY - bagBoxSpacingInInventoryScope.OnlyY, goldSize, Label.TextAllignment.CentreRight);
             AddChild(gold);
             AddChild(goldImage);
         }
 
-        public override void Resize(RelativeScreenPosition aSize)
-        {
-            base.Resize(aSize);
-        }
-
         public void SetInventory(InventoryUiSnapshot snapshot)
         {
-            bagHolderBox.SetBags(snapshot.BagItems, itemSizeInBagSpace.ToAbsoluteScreenPos(bagBoxSize.ToAbsoluteScreenPos(Size)), bagBoxSpacing.ToAbsoluteScreenPos(bagBoxSize.ToAbsoluteScreenPos(Size)));
-
-            CreateBagBoxes(RelativeSize, snapshot);
-            CalculateSize(RelativePos);
+            latestSnapshot = snapshot;
+            hasSnapshot = true;
+            RebuildFromSnapshot(snapshot);
+            ApplyDynamicSize(snapshot);
+            LayoutElements();
         }
 
-        void CreateBagBoxes(RelativeScreenPosition aSize, InventoryUiSnapshot snapshot)
+        void RebuildFromSnapshot(InventoryUiSnapshot snapshot)
         {
-            RelativeScreenPosition newBagPos = absBagBoxSpacing.ToRelativeScreenPosition(Size);
+            bagHolderBox.SetBags(
+                snapshot.BagItems,
+                AbsItemSize,
+                AbsBagBoxSpacing);
 
-            bagBox[0].Move(newBagPos);
             ItemUiSnapshot[] defaultBagItems = null;
             if (snapshot.ItemsByBag != null && snapshot.ItemsByBag.Length > 0)
             {
                 defaultBagItems = snapshot.ItemsByBag[0];
             }
-            bagBox[0].RefreshBag(defaultBagItems, Items.Inventory.defaultSlots, columnCount);
+            bagContentBoxes[0].RefreshBag(defaultBagItems, Items.Inventory.defaultSlots, columnCount);
 
-            newBagPos.Y += bagBox[0].RelativeSize.Y;
-            newBagPos.Y += absBagBoxSpacing.ToRelativeScreenPosition().Y;
-
-            for (int i = 1; i < bagBox.Length; i++)
+            for (int i = 1; i < bagContentBoxes.Length; i++)
             {
                 if (snapshot.ItemsByBag == null || snapshot.ItemsByBag.Length <= i || snapshot.ItemsByBag[i] == null)
                 {
-                    bagBox[i].Empty();
+                    bagContentBoxes[i].Empty();
                     continue;
                 }
 
-                bagBox[i].Move(newBagPos);
-                bagBox[i].RefreshBag(snapshot.ItemsByBag[i], snapshot.ItemsByBag[i].Length, columnCount);
-
-                newBagPos.Y += bagBox[i].RelativeSize.Y + absBagBoxSpacing.ToRelativeScreenPosition().Y;
+                bagContentBoxes[i].RefreshBag(snapshot.ItemsByBag[i], snapshot.ItemsByBag[i].Length, columnCount);
             }
         }
 
@@ -152,23 +133,49 @@ namespace Project_1.UI.HUD
 
         public void RefreshSlot(int aBag, int aSlot, InventoryUiSnapshot snapshot)
         {
-            // Slot-level refresh now uses the latest immutable snapshot to avoid live inventory refs on UI thread.
-            SetInventory(snapshot);
-        }
+            latestSnapshot = snapshot;
+            hasSnapshot = true;
 
-        void MoveBags(int aSlot, Items.Inventory aInventory)
-        {
-            RelativeScreenPosition pos = absBagBoxSpacing.ToRelativeScreenPosition(Size) + bagBox[0].RelativeSize.OnlyY + absBagBoxSpacing.ToRelativeScreenPosition(Size).OnlyY;
-            for (int i = 1; i < Items.Inventory.bagSlots; i++)
+            if (aBag < 0)
             {
-                if (aInventory.Bags[i] == null) continue;
-
-                bagBox[i].Move(pos);
-                pos.Y += bagBox[i].RelativeSize.Y + absBagBoxSpacing.ToRelativeScreenPosition(Size).Y;
+                SetInventory(snapshot);
+                return;
             }
+
+            if (aBag >= bagContentBoxes.Length)
+            {
+                SetInventory(snapshot);
+                return;
+            }
+
+            if (snapshot.ItemsByBag == null || snapshot.ItemsByBag.Length <= aBag || snapshot.ItemsByBag[aBag] == null)
+            {
+                bagContentBoxes[aBag].Empty();
+                ApplyDynamicSize(snapshot);
+                LayoutElements();
+                return;
+            }
+
+            ItemUiSnapshot[] bagSnapshots = snapshot.ItemsByBag[aBag];
+            if (bagContentBoxes[aBag].SlotCount != bagSnapshots.Length)
+            {
+                SetInventory(snapshot);
+                return;
+            }
+
+            bagContentBoxes[aBag].RefreshSlot(aSlot, (aSlot >= 0 && aSlot < bagSnapshots.Length) ? bagSnapshots[aSlot] : ItemUiSnapshot.Empty);
+            ApplyDynamicSize(snapshot);
+            LayoutElements();
         }
 
-        void CalculateSize(RelativeScreenPosition aPos) //TODO: Find better name and make this accept a enum that dictates wheter it grows up and down
+        void ApplyDynamicSize(InventoryUiSnapshot snapshot)
+        {
+            CalculateDynamicSize();
+            
+            RebuildFromSnapshot(snapshot);
+        }
+
+        void CalculateDynamicSize()
         {
             RelativeScreenPosition resize = RelativeScreenPosition.Zero;
 
@@ -177,15 +184,15 @@ namespace Project_1.UI.HUD
             resize.X = s;
 
             float bagY = outerSpacingInScreenSpace.Y;
-            (AbsoluteScreenPosition, AbsoluteScreenPosition)[] oldPosAndSize = new (AbsoluteScreenPosition, AbsoluteScreenPosition)[Items.Inventory.bagSlots]; 
-            for (int i = 0; i < bagBox.Length; i++)
+            (AbsoluteScreenPosition, AbsoluteScreenPosition)[] oldPosAndSize = new (AbsoluteScreenPosition, AbsoluteScreenPosition)[Items.Inventory.bagSlots];
+            for (int i = 0; i < bagContentBoxes.Length; i++)
             {
-                if (bagBox[i].RelativeSize.Y == 0)
+                if (bagContentBoxes[i].RelativeSize.Y == 0)
                 {
                     continue;
                 }
-                oldPosAndSize[i] = (bagBox[i].RelativePos.ToAbsoluteScreenPos(Size), bagBox[i].Size);
-                bagY += bagBox[i].Size.ToRelativeScreenPosition().Y + outerSpacingInScreenSpace.Y;
+                oldPosAndSize[i] = (bagContentBoxes[i].RelativePos.ToAbsoluteScreenPos(Size), bagContentBoxes[i].Size);
+                bagY += bagContentBoxes[i].Size.ToRelativeScreenPosition().Y + outerSpacingInScreenSpace.Y;
             }
 
             resize.Y = bagHolderBox.Size.ToRelativeScreenPosition().Y + outerSpacingInScreenSpace.Y + bagY;
@@ -195,12 +202,11 @@ namespace Project_1.UI.HUD
 
             bagHolderBox.Move(new RelativeScreenPosition(AbsBagBoxSpacing.ToRelativeScreenPosition(Size).X, 1f - (bagHolderAbsSize.ToRelativeScreenPosition(Size).Y + AbsBagBoxSpacing.ToRelativeScreenPosition(Size).Y)));
             bagHolderBox.Resize(bagHolderAbsSize.ToRelativeScreenPosition(Size));
-            Move(new RelativeScreenPosition(RelativePos.X, aPos.Y));
 
-            for (int i = 0; i < bagBox.Length; i++)
+            for (int i = 0; i < bagContentBoxes.Length; i++)
             {
-                bagBox[i].Move(AbsBagBoxSpacing.ToRelativeScreenPosition(Size).OnlyX + oldPosAndSize[i].Item1.ToRelativeScreenPosition(Size).OnlyY);
-                bagBox[i].Resize(oldPosAndSize[i].Item2.ToRelativeScreenPosition(Size));
+                bagContentBoxes[i].Move(AbsBagBoxSpacing.ToRelativeScreenPosition(Size).OnlyX + oldPosAndSize[i].Item1.ToRelativeScreenPosition(Size).OnlyY);
+                bagContentBoxes[i].Resize(oldPosAndSize[i].Item2.ToRelativeScreenPosition(Size));
 
             }
 
@@ -214,12 +220,47 @@ namespace Project_1.UI.HUD
             gold.Move(new RelativeScreenPosition(RelativeScreenPosition.Zero + RelativeScreenPosition.One.OnlyY - gold.RelativeSize.OnlyY - outerSpacingInScreenSpace.OnlyY));
         }
 
+        void LayoutElements()
+        {
+            RelativeScreenPosition spacingInScope = AbsBagBoxSpacing.ToRelativeScreenPosition(Size);
+            float nextY = spacingInScope.Y;
+            for (int i = 0; i < bagContentBoxes.Length; i++)
+            {
+                if (bagContentBoxes[i].RelativeSize.Y <= 0f)
+                {
+                    continue;
+                }
+
+                bagContentBoxes[i].Move(new RelativeScreenPosition(spacingInScope.X, nextY));
+                nextY += bagContentBoxes[i].RelativeSize.Y + spacingInScope.Y;
+            }
+
+            bagHolderBox.Move(new RelativeScreenPosition(spacingInScope.X, 1f - bagHolderBox.RelativeSize.Y - spacingInScope.Y));
+            LayoutGold(spacingInScope);
+        }
+
+        void LayoutGold(RelativeScreenPosition spacingInScope)
+        {
+            goldImage.Resize(RelativeScreenPosition.GetSquareFromY(bagHolderBox.RelativeSize.Y / 2, Size));
+            goldImage.Move(RelativeScreenPosition.One - bagHolderBox.RelativeSize.OnlyY / 2 - goldImage.RelativeSize.OnlyY / 2 - goldImage.RelativeSize.OnlyX - spacingInScope.OnlyX);
+            gold.Resize(new RelativeScreenPosition(1 - goldImage.RelativeSize.X - spacingInScope.X * 2, bagHolderBox.RelativeSize.Y));
+            gold.Move(RelativeScreenPosition.One.OnlyY - gold.RelativeSize.OnlyY - spacingInScope.OnlyY);
+        }
+
         public override void Rescale()
         {
-            //TODO
             spacing = RelativeScreenPosition.GetSquareFromX(spacingX);
-            //itemSize = RelativeScreenPosition.GetSquareFromX(itemSizeX).ToAbsoluteScreenPos();
             base.Rescale();
+            InitStatics();
+            if (hasSnapshot)
+            {
+                SetInventory(latestSnapshot);
+            }
+            else
+            {
+                CalculateDynamicSize();
+                LayoutElements();
+            }
         }
     }
 }
