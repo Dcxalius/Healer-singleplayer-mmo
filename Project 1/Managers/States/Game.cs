@@ -29,7 +29,6 @@ namespace Project_1.Managers.States
     internal class Game : GameState
     {
         public override StateManager.States GetStateEnum => StateManager.States.Game;
-        readonly Vector2[] lightPositions = new Vector2[ObjectManager.PartyLightSnapshot.MaxLights];
 
         public Game() : base()
         {
@@ -97,44 +96,13 @@ namespace Project_1.Managers.States
             long uiBuildStartTicks = Stopwatch.GetTimestamp();
             UIDraw();
             long uiBuildTicks = Stopwatch.GetTimestamp() - uiBuildStartTicks;
-            Effect e = EffectManager.GetEffect("TestDarkness");
-            PrepRender(Color.White, SpriteSortMode.FrontToBack, samplerState: SamplerState.PointClamp, effect: e);
-            EffectParameterCollection epc = e.Parameters;
-            epc["minLength"].SetValue(500f);
-            epc["maxBrightness"].SetValue(200f);
-            Vector2 cameraTopLeft = Camera.Camera.CentreInWorldSpace.ToVector2()
-                - Camera.Camera.CentrePointInScreenSpace.ToVector2() / Camera.Camera.Scale;
-            epc["cameraWorldPos"].SetValue(cameraTopLeft);
-            EffectParameter mapOriginParam = epc["transparentMapOriginTile"];
-            if (mapOriginParam != null)
-            {
-                mapOriginParam.SetValue(TileRenderCache.GetTransparencyOriginTile());
-            }
-            EffectParameter cameraScaleParam = epc["cameraScale"];
-            if (cameraScaleParam != null)
-            {
-                cameraScaleParam.SetValue(Camera.Camera.Scale);
-            }
-            EffectParameter cameraSizeParam = epc["cameraSize"];
-            if (cameraSizeParam != null)
-            {
-                cameraSizeParam.SetValue(new Vector2(Camera.Camera.WorldRectangle.Size.X, Camera.Camera.WorldRectangle.Size.Y));
-            }
-            ObjectManager.PartyLightSnapshot lightSnapshot = ObjectManager.RenderLightSnapshot;
-            int lightCount = Math.Min(lightSnapshot.Count, lightPositions.Length);
-            for (int i = 0; i < lightPositions.Length; i++)
-            {
-                lightPositions[i] = i < lightCount ? lightSnapshot.GetPosition(i) : Vector2.Zero;
-            }
-            //epc["tileTransparent"].SetValue(TileManager.GetTransparent(ObjectManager.Player.FeetPosition));
-            epc["lightPos"].SetValue(lightPositions);
-            epc["transparentMap"].SetValue(TileRenderCache.GetTransparencyMapTexture());
-            //GraphicsManager.SetTexture(1, TileManager.GetTransparent(ObjectManager.Player.FeetPosition));
+            PrepRender(Color.White, SpriteSortMode.FrontToBack, samplerState: SamplerState.PointClamp);
             long worldStartTicks = Stopwatch.GetTimestamp();
             DrawList(spriteBatch);
             long worldDrawTicks = Stopwatch.GetTimestamp() - worldStartTicks;
             long compositeStartTicks = Stopwatch.GetTimestamp();
             spriteBatch.End();
+            DrawShadowOverlay(spriteBatch);
             spriteBatch.Begin(SpriteSortMode.Deferred);
             StateManager.DrawGroundSpellEffects(spriteBatch);
             StateManager.DrawGroundTargetPreview(spriteBatch);
@@ -164,7 +132,35 @@ namespace Project_1.Managers.States
             FloatingTextManager.Draw(aBatch);
         }
 
-        
+        static void DrawShadowOverlay(SpriteBatch batch)
+        {
+            ThreadAffinity.AssertMainThread();
+            Texture2D shadowTexture = TileRenderCache.GetShadowMapTexture();
+            if (shadowTexture == null) return;
+
+            Vector2 originTile = TileRenderCache.GetShadowOriginTile();
+            int shadowSize = shadowTexture.Width;
+            int halfMap = shadowSize / 2;
+            int minTileX = (int)originTile.X - halfMap;
+            int minTileY = (int)originTile.Y - halfMap;
+
+            WorldSpace worldTopLeft = new WorldSpace(minTileX * Tile.Size.X, minTileY * Tile.Size.Y);
+            AbsoluteScreenPosition screenTopLeft = worldTopLeft.ToAbsoltueScreenPosition();
+            Point scaledSize = new Point(
+                Math.Max(1, (int)MathF.Round(shadowSize * Tile.Size.X * Camera.Camera.Scale)),
+                Math.Max(1, (int)MathF.Round(shadowSize * Tile.Size.Y * Camera.Camera.Scale)));
+            Rectangle destination = new Rectangle(screenTopLeft, scaledSize);
+            if (!Camera.Camera.ScreenspaceBoundsCheck(destination)) return;
+
+            Effect shadowBlend = EffectManager.GetEffect("ShadowTileBlend");
+            EffectParameterCollection parameters = shadowBlend?.Parameters;
+            parameters?["shadowTextureSize"]?.SetValue(new Vector2(shadowTexture.Width, shadowTexture.Height));
+            parameters?["tilePixelSize"]?.SetValue(Math.Max(1f, Tile.Size.X * Camera.Camera.Scale));
+
+            batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, effect: shadowBlend);
+            batch.Draw(shadowTexture, destination, Color.White);
+            batch.End();
+        }
 
     }
 }

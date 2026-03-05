@@ -27,11 +27,11 @@
 /build:Effects/SuperSoftShadows.fx
 #end
 
-#begin Effects/TestDarkness.fx
+#begin Effects/ShadowTileBlend.fx
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
-/build:Effects/TestDarkness.fx
+/build:Effects/ShadowTileBlend.fx
 #end
 
 #begin Effects/TextOutline.fx

@@ -89,9 +89,11 @@ namespace Project_1.Managers.States
             new ChatCommandSpec("help", "/help", "Shows available chat commands.", ChatCommandAccess.System),
             new ChatCommandSpec("clear", "/clear", "Clears the chat panel.", ChatCommandAccess.System),
             new ChatCommandSpec("where", "/where <friendly name>", "Prints world position for a friendly.", ChatCommandAccess.System),
+            new ChatCommandSpec("chunklevels", "/chunklevels", "Prints chunk average levels (10x10 near player, or all generated if under 100 chunks).", ChatCommandAccess.System),
             new ChatCommandSpec("tp", "/tp <friendly name> <x> <y>", "Teleports a friendly to world coordinates.", ChatCommandAccess.Debug),
             new ChatCommandSpec("createitem", "/createitem <friendly name> <item id> <count>", "Creates item(s) and gives them to a friendly with inventory.", ChatCommandAccess.Debug)
         };
+        const int ChunkLevelsWindowSize = 10;
 
         public static void Init()
         {
@@ -839,6 +841,9 @@ namespace Project_1.Managers.States
                 case "where":
                     HandleChatWhere(args);
                     break;
+                case "chunklevels":
+                    HandleChatChunkLevels(args);
+                    break;
                 case "tp":
                     HandleChatTeleport(args);
                     break;
@@ -928,6 +933,134 @@ namespace Project_1.Managers.States
 
             friendly.Teleport(new WorldSpace(x, y));
             PublishChatSystemMessage($"{friendly.Name} teleported to {FormatCoordinate(x)} {FormatCoordinate(y)}");
+        }
+
+        static void HandleChatChunkLevels(string[] args)
+        {
+            if (args.Length != 0)
+            {
+                PublishChatSystemMessage("Usage: /chunklevels");
+                return;
+            }
+
+            Chunk[] chunks = TileManager.GetChunksSnapshot();
+            if (chunks.Length == 0)
+            {
+                PublishChatSystemMessage("No chunks are currently generated.");
+                return;
+            }
+
+            Point center = ResolveChunkLevelsCenter();
+            if (!HasCompleteChunkLevelsWindow(chunks, center))
+            {
+                PublishChunkLevelsAllGenerated(chunks);
+                return;
+            }
+
+            PublishChunkLevelsWindow(chunks, center);
+        }
+
+        static void PublishChunkLevelsAllGenerated(Chunk[] chunks)
+        {
+            Chunk[] ordered = chunks
+                .OrderBy(c => c.ChunkPosition.Y)
+                .ThenBy(c => c.ChunkPosition.X)
+                .ToArray();
+
+            PublishChatSystemMessage($"Chunk levels for all generated chunks ({ordered.Length}):");
+
+            const int entriesPerMessage = 6;
+            for (int i = 0; i < ordered.Length; i += entriesPerMessage)
+            {
+                int take = Math.Min(entriesPerMessage, ordered.Length - i);
+                string[] entries = new string[take];
+                for (int j = 0; j < take; j++)
+                {
+                    Chunk chunk = ordered[i + j];
+                    Point p = chunk.ChunkPosition;
+                    entries[j] = $"({p.X},{p.Y})={chunk.AverageLevel:00}";
+                }
+                PublishChatSystemMessage(string.Join("  ", entries));
+            }
+        }
+
+        static void PublishChunkLevelsWindow(Chunk[] chunks, Point center)
+        {
+            Dictionary<Point, int> levelsByChunk = new Dictionary<Point, int>(chunks.Length);
+            for (int i = 0; i < chunks.Length; i++)
+            {
+                Chunk chunk = chunks[i];
+                levelsByChunk[chunk.ChunkPosition] = chunk.AverageLevel;
+            }
+
+            int halfLow = ChunkLevelsWindowSize / 2;
+            int halfHigh = ChunkLevelsWindowSize - halfLow - 1;
+            int minX = center.X - halfLow;
+            int maxX = center.X + halfHigh;
+            int minY = center.Y - halfLow;
+            int maxY = center.Y + halfHigh;
+
+            PublishChatSystemMessage($"Chunk levels 10x10 near ({center.X},{center.Y}) [-- = not generated]:");
+
+            string[] xLabels = new string[ChunkLevelsWindowSize];
+            for (int x = minX; x <= maxX; x++)
+            {
+                xLabels[x - minX] = x.ToString("00;-00;00", CultureInfo.InvariantCulture);
+            }
+            PublishChatSystemMessage($"x: {string.Join(" ", xLabels)}");
+
+            for (int y = maxY; y >= minY; y--)
+            {
+                string[] row = new string[ChunkLevelsWindowSize];
+                for (int x = minX; x <= maxX; x++)
+                {
+                    Point key = new Point(x, y);
+                    if (levelsByChunk.TryGetValue(key, out int level))
+                    {
+                        row[x - minX] = level.ToString("00", CultureInfo.InvariantCulture);
+                    }
+                    else
+                    {
+                        row[x - minX] = "--";
+                    }
+                }
+
+                PublishChatSystemMessage($"y {y.ToString("00;-00;00", CultureInfo.InvariantCulture)}: {string.Join(" ", row)}");
+            }
+        }
+
+        static Point ResolveChunkLevelsCenter()
+        {
+            Chunk playerChunk = ObjectManager.Player != null
+                ? TileManager.GetChunkUnder(ObjectManager.Player.FeetPosition)
+                : null;
+            return playerChunk != null ? playerChunk.ChunkPosition : Point.Zero;
+        }
+
+        static bool HasCompleteChunkLevelsWindow(Chunk[] chunks, Point center)
+        {
+            HashSet<Point> generated = new HashSet<Point>();
+            for (int i = 0; i < chunks.Length; i++)
+            {
+                generated.Add(chunks[i].ChunkPosition);
+            }
+
+            int halfLow = ChunkLevelsWindowSize / 2;
+            int halfHigh = ChunkLevelsWindowSize - halfLow - 1;
+            int minX = center.X - halfLow;
+            int maxX = center.X + halfHigh;
+            int minY = center.Y - halfLow;
+            int maxY = center.Y + halfHigh;
+
+            for (int x = minX; x <= maxX; x++)
+            {
+                for (int y = minY; y <= maxY; y++)
+                {
+                    if (!generated.Contains(new Point(x, y))) return false;
+                }
+            }
+
+            return true;
         }
 
         static void HandleChatCreateItem(string[] args)

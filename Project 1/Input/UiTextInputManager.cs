@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Concurrent;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Project_1.Managers;
 using Project_1.UI.UIElements.Boxes;
@@ -10,9 +12,12 @@ namespace Project_1.Input
     /// </summary>
     internal static class UiTextInputManager
     {
+        static readonly ConcurrentQueue<char> pendingCharacters = new ConcurrentQueue<char>();
+        static readonly EventHandler<TextInputEventArgs> textInputHandler = HandleTextInput;
         static InputBox activeInput;
         static int cursorPosition;
         static volatile bool isActive;
+        static bool textInputRegistered;
 
         public static bool IsActive => isActive;
         public static InputBox ActiveInput => activeInput;
@@ -24,6 +29,15 @@ namespace Project_1.Input
             activeInput = input;
             cursorPosition = input?.Input.Length ?? 0;
             isActive = input != null;
+            ClearPendingCharacters();
+            if (isActive)
+            {
+                EnsureTextInputRegistration();
+            }
+            else
+            {
+                RemoveTextInputRegistration();
+            }
         }
 
         public static void Clear()
@@ -32,6 +46,8 @@ namespace Project_1.Input
             activeInput = null;
             cursorPosition = 0;
             isActive = false;
+            ClearPendingCharacters();
+            RemoveTextInputRegistration();
         }
 
         public static void Update()
@@ -39,6 +55,21 @@ namespace Project_1.Input
             ThreadAffinity.AssertUiThread();
             if (activeInput == null) return;
 
+            ProcessControlKeys();
+            if (activeInput == null) return;
+
+            while (pendingCharacters.TryDequeue(out char c))
+            {
+                if (activeInput == null) return;
+                if (char.IsControl(c)) continue;
+                if (!activeInput.ValidInput(c)) continue;
+                if (!activeInput.WriteTo(c, cursorPosition)) continue;
+                cursorPosition++;
+            }
+        }
+
+        static void ProcessControlKeys()
+        {
             Keys[] downKeys = UiKeyboardStateCache.DownKeys;
             for (int i = 0; i < downKeys.Length; i++)
             {
@@ -53,14 +84,6 @@ namespace Project_1.Input
                 }
 
                 HandleCursorMovement(key);
-
-                if (!activeInput.ValidInput(key)) continue;
-
-                bool shiftHeld = UiKeyboardStateCache.GetHold(Keys.LeftShift) || UiKeyboardStateCache.GetHold(Keys.RightShift);
-                if (!TryConvertToCharacter(key, shiftHeld, out char s)) continue;
-
-                if (!activeInput.WriteTo(s, cursorPosition)) continue;
-                cursorPosition++;
             }
         }
 
@@ -97,91 +120,35 @@ namespace Project_1.Input
             if (cursorPosition > max) cursorPosition = max;
         }
 
-        static bool TryConvertToCharacter(Keys key, bool shiftHeld, out char character)
+        static void EnsureTextInputRegistration()
         {
-            character = '\0';
+            if (textInputRegistered) return;
+            if (Game1.Instance is not Game1 game) return;
+            game.RegisterToTextInput(textInputHandler);
+            textInputRegistered = true;
+        }
 
-            if (key >= Keys.A && key <= Keys.Z)
-            {
-                char baseChar = (char)('a' + (key - Keys.A));
-                character = shiftHeld ? char.ToUpper(baseChar) : baseChar;
-                return true;
-            }
+        static void RemoveTextInputRegistration()
+        {
+            if (!textInputRegistered) return;
+            if (Game1.Instance is not Game1 game) return;
+            game.UnregisterFromTextInput();
+            textInputRegistered = false;
+        }
 
-            if (key >= Keys.D0 && key <= Keys.D9)
+        static void ClearPendingCharacters()
+        {
+            while (pendingCharacters.TryDequeue(out _))
             {
-                int digit = key - Keys.D0;
-                character = shiftHeld
-                    ? digit switch
-                    {
-                        0 => ')',
-                        1 => '!',
-                        2 => '@',
-                        3 => '#',
-                        4 => '$',
-                        5 => '%',
-                        6 => '^',
-                        7 => '&',
-                        8 => '*',
-                        9 => '(',
-                        _ => '\0'
-                    }
-                    : (char)('0' + digit);
-                return character != '\0';
             }
+        }
 
-            if (key >= Keys.NumPad0 && key <= Keys.NumPad9)
-            {
-                int digit = key - Keys.NumPad0;
-                character = (char)('0' + digit);
-                return true;
-            }
-
-            switch (key)
-            {
-                case Keys.Space:
-                    character = ' ';
-                    return true;
-                case Keys.OemMinus:
-                    character = shiftHeld ? '_' : '-';
-                    return true;
-                case Keys.OemPlus:
-                    character = shiftHeld ? '+' : '=';
-                    return true;
-                case Keys.OemOpenBrackets:
-                    character = shiftHeld ? '{' : '[';
-                    return true;
-                case Keys.OemCloseBrackets:
-                    character = shiftHeld ? '}' : ']';
-                    return true;
-                case Keys.OemPipe:
-                case Keys.OemBackslash:
-                    character = shiftHeld ? '|' : '\\';
-                    return true;
-                case Keys.OemSemicolon:
-                    character = shiftHeld ? ':' : ';';
-                    return true;
-                case Keys.OemQuotes:
-                    character = shiftHeld ? '"' : '\'';
-                    return true;
-                case Keys.OemComma:
-                    character = shiftHeld ? '<' : ',';
-                    return true;
-                case Keys.OemPeriod:
-                    character = shiftHeld ? '>' : '.';
-                    return true;
-                case Keys.OemQuestion:
-                    character = shiftHeld ? '?' : '/';
-                    return true;
-                case Keys.OemTilde:
-                    character = shiftHeld ? '~' : '`';
-                    return true;
-                case Keys.Decimal:
-                    character = '.';
-                    return true;
-                default:
-                    return false;
-            }
+        static void HandleTextInput(object sender, TextInputEventArgs e)
+        {
+            if (!isActive || activeInput == null) return;
+            char c = e.Character;
+            if (c == '\0') return;
+            pendingCharacters.Enqueue(c);
         }
     }
 }

@@ -67,6 +67,7 @@ namespace Project_1.UI.UIElements.Boxes
                         break;
                     case ValidInputs.Symbols:
                         if (aKey == Keys.Space
+                            || aKey == Keys.Divide
                             || aKey == Keys.OemMinus
                             || aKey == Keys.OemPlus
                             || aKey == Keys.OemOpenBrackets
@@ -87,6 +88,34 @@ namespace Project_1.UI.UIElements.Boxes
                         throw new NotImplementedException();
                 }
             }
+            return false;
+        }
+
+        public bool ValidInput(char aChar)
+        {
+            if (validInputs == null || validInputs.Length == 0) return false;
+            if (validInputs.Contains(ValidInputs.Any)) return true;
+
+            for (int i = 0; i < validInputs.Length; i++)
+            {
+                switch (validInputs[i])
+                {
+                    case ValidInputs.Letters:
+                    case ValidInputs.UpperCaseLetters:
+                    case ValidInputs.LowerCaseLetters:
+                        if (char.IsLetter(aChar)) return true;
+                        break;
+                    case ValidInputs.Digits:
+                        if (char.IsDigit(aChar)) return true;
+                        break;
+                    case ValidInputs.Symbols:
+                        if (char.IsWhiteSpace(aChar) || char.IsPunctuation(aChar) || char.IsSymbol(aChar)) return true;
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+
             return false;
         }
 

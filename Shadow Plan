@@ -1,0 +1,141 @@
+# Shadow Plan
+
+## Goal
+Replace the current GPU `TestDarkness` LOS shader path with a CPU recursive shadowcast pipeline for world lighting/fog, while keeping existing tile rendering, threading boundaries, and UI composition intact.
+
+## What I Read
+
+### Tile system
+- `Project 1/Tiles/TileManager.cs`
+- `Project 1/Tiles/TileConversion.cs`
+- `Project 1/Tiles/TileVisibility.cs`
+- `Project 1/Tiles/TileRenderCache.cs`
+- `Project 1/Tiles/Chunk.cs`
+- `Project 1/Tiles/ChunkRenderSnapshot.cs`
+- `Project 1/Content/Data/TileData.json`
+
+Key observations:
+- Tile opacity comes from `Tile.Transparent` (`Wall` is opaque, `Grass/Dirt` are transparent).
+- Sim/main split is already established:
+  - Sim builds snapshots (`RenderSnapshotManager.BuildGameSnapshots`).
+  - Main consumes snapshots/textures and draws.
+- `TileRenderCache` already has a double-buffer pattern for 65x65 tile data handoff.
+
+### Effect/render path
+- `Project 1/Managers/States/Game.cs`
+- `Project 1/Managers/EffectManager.cs`
+- `Project 1/Game1.cs`
+- `Project 1/Content/Effects/TestDarkness.fx`
+- `Project 1/Content/Content.mgcb`
+
+Key observations:
+- `Game.Draw` currently applies `TestDarkness` directly as the world `SpriteBatch` effect.
+- `TestDarkness.fx` does per-pixel LOS ray marching against a 65x65 transparency map.
+- Party light positions come from `ObjectManager.RenderLightSnapshot` (max 5 lights).
+
+## Target Design (CPU Recursive Shadowcast)
+
+### High-level
+1. Build a tile-space visibility/light map on the sim thread using recursive shadowcasting (8 octants) for each active party light.
+2. Accumulate a final per-tile brightness/visibility value (union of lights, nearest-distance falloff behavior kept).
+3. Publish this map through `TileRenderCache` using the existing lock/swap versioning pattern.
+4. Draw world normally (no `TestDarkness` shader).
+5. Composite a darkness overlay texture on main thread based on the CPU map.
+
+### Data model
+- Keep the 65x65 local map window centered on primary light/player tile for first pass (matches existing assumptions and limits churn).
+- Store per-cell result as either:
+  - `byte darknessAlpha` (0..255), or
+  - `float brightness` (0..1) converted to alpha during publish.
+
+Recommended: `byte` map for compactness and fast upload.
+
+## Implementation Phases
+
+### Phase 1: New shadow map structures
+- Add CPU shadow fields to `TileRenderCache`:
+  - pending/work buffers for darkness values (same double-buffer swap pattern).
+  - origin tile + version fields.
+  - main-thread texture upload method (`GetShadowMapTexture` or equivalent).
+- Keep all GPU object creation and `SetData` on main thread only.
+
+### Phase 2: Recursive shadowcast core
+- Add a new helper in `Tiles` (for example `RecursiveShadowcaster.cs`).
+- Implement octant scan with:
+  - radius in tiles derived from current light range settings,
+  - opaque tiles considered visible but stopping propagation behind them,
+  - bounds-safe sampling via `TileManager.GetTileAtGrid`.
+- Keep this algorithm sim-thread only.
+
+### Phase 3: Multi-light accumulation
+- For each light in `ObjectManager.RenderLightSnapshot`:
+  - run shadowcast,
+  - apply distance attenuation (match current `minLength/maxBrightness` feel in tile-space),
+  - merge into shared map (max brightness per tile).
+- Convert final brightness to darkness alpha (`alpha = 1 - brightness`), clamped.
+
+### Phase 4: Snapshot integration
+- Replace/extend `TileRenderCache.BuildTransparencySnapshot(...)` with shadow-map build/publish.
+- Update `RenderSnapshotManager.BuildGameSnapshots()` to call the new build method.
+- Preserve existing thread affinity asserts.
+
+### Phase 5: Draw path migration (scrap `TestDarkness`)
+- In `Game.Draw`:
+  - remove `EffectManager.GetEffect("TestDarkness")` setup and all shader parameter writes.
+  - render world with normal `SpriteBatch` settings.
+  - draw a darkness overlay from CPU shadow map before UI/plates composite.
+- Ensure overlay aligns to world tiles under camera scale/scroll.
+
+### Phase 6: Asset/system cleanup
+- Remove dead references to `TestDarkness`:
+  - `Content/Content.mgcb` entry,
+  - optionally remove `Content/Effects/TestDarkness.fx` after verification.
+- Keep `EffectManager` intact for other effects (`CooldownSwirl`, `TextOutline`, etc.).
+
+### Phase 7: Validation
+- Functional checks:
+  - walls block vision correctly,
+  - wall tiles themselves can still appear lit at edges,
+  - multiple party lights combine correctly,
+  - camera movement does not cause map jitter/swim.
+- Performance checks:
+  - no per-frame heap allocations in hot path,
+  - stable frame time at target chunk density.
+- Regression checks:
+  - spell visuals/UI/plates unaffected,
+  - single-thread and threaded modes both pass.
+
+## Risks and Mitigations
+- Risk: visual mismatch vs current shader.
+  - Mitigation: keep old distance constants and tune after parity pass.
+- Risk: CPU cost spikes with multiple lights.
+  - Mitigation: tight radius cap + pooled buffers + early-outs for empty lights.
+- Risk: map/camera alignment artifacts.
+  - Mitigation: compute overlay destination strictly from origin tile world position and `Tile.Size * Camera.Scale`.
+
+## Exit Criteria
+- `Game.Draw` no longer depends on `TestDarkness`.
+- Visibility is driven by CPU recursive shadowcast with wall blocking.
+- No threading violations (`ThreadAffinity` asserts stay green).
+- Lighting behavior is stable and performant in normal gameplay scenes.
+
+## Progress Checklist
+- [x] Discovery/read-through of tile system + effect system
+- [x] Phase 1: New shadow map structures
+- [x] Phase 2: Recursive shadowcast core
+- [x] Phase 3: Multi-light accumulation
+- [x] Phase 4: Snapshot integration
+- [x] Phase 5: Draw path migration (remove `TestDarkness` usage)
+- [x] Phase 6: Asset/system cleanup
+- [ ] Phase 7: Validation + perf/regression pass
+
+### Phase 7 Status (2026-03-05)
+- Completed static validation:
+  - `dotnet build "Project 1/Project 1.csproj" -v q` passes with 0 errors/warnings.
+  - `dotnet build "Project 1.sln" -v q` passes with 0 errors/warnings.
+  - Active code/content references to `TestDarkness` are removed (remaining mentions only in backup mgcb files).
+  - New shadow pipeline wiring verified (`RenderSnapshotManager` -> `TileRenderCache.BuildShadowSnapshot` -> `Game.DrawShadowOverlay`).
+- Still pending (requires runtime playtest/profiling):
+  - Visual correctness at runtime (occlusion edges, multi-light blending, camera alignment).
+  - Performance profiling in live gameplay scenes.
+  - Regression pass for gameplay/UI interactions while moving/casting/combat.

@@ -52,8 +52,7 @@ namespace Project_1.Managers
             TileManager.BuildRenderSnapshot();
             ObjectManager.BuildRenderSnapshot();
             ObjectManager.PartyLightSnapshot lightSnapshot = ObjectManager.RenderLightSnapshot;
-            WorldSpace lightOrigin = lightSnapshot.Count > 0 ? lightSnapshot.GetPosition(0) : WorldSpace.Zero;
-            TileRenderCache.BuildTransparencySnapshot(lightOrigin);
+            TileRenderCache.BuildShadowSnapshot(lightSnapshot);
             Camera.Camera.BuildMinimapSnapshot();
             ProjectileManager.BuildRenderSnapshot();
             DoodadManager.BuildRenderSnapshot();

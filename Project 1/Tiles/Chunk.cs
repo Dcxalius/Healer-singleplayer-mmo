@@ -66,52 +66,32 @@ namespace Project_1.Tiles
         bool renderSnapshotBuilt;
         public int Id => id;
         int id;
+        public int AverageLevel => averageLevel;
+        [JsonProperty]
+        int averageLevel;
 
         public static int[,] GenerateTileIds(int chunkId)
         {
             Point chunkPos = GetChunkPosition(chunkId);
-            int seed = HashCode.Combine(chunkId, chunkPos.X, chunkPos.Y);
-            Random rng = new Random(seed);
-
-            int wallId = TileFactory.GetTileData("Wall").ID;
             int dirtId = TileFactory.GetTileData("Dirt").ID;
             int grassId = TileFactory.GetTileData("Grass").ID;
 
             int[,] ids = new int[ChunkSize.X, ChunkSize.Y];
+            int chunkTileX = chunkPos.X * ChunkSize.X;
+            int chunkTileY = chunkPos.Y * ChunkSize.Y;
 
             for (int i = 0; i < ChunkSize.X; i++)
             {
                 for (int j = 0; j < ChunkSize.Y; j++)
                 {
-                    if (i == 0 || j == 0 || i == ChunkSize.X - 1 || j == ChunkSize.Y - 1 || (i >= 4 && i < 6 && j >= 4 && j < 6))
-                    {
-                        ids[i, j] = wallId;
-                        continue;
-                    }
+                    int globalX = chunkTileX + i;
+                    int globalY = chunkTileY + j;
 
-                    int leftId = ids[i - 1, j];
-                    int upId = ids[i, j - 1];
+                    float broadNoise = PerlinNoiseGenerator.Fractal01(globalX, globalY, seed: 4871, scale: 56f, octaves: 4, persistence: 0.5f, lacunarity: 2f);
+                    float detailNoise = PerlinNoiseGenerator.Fractal01(globalX, globalY, seed: 9323, scale: 24f, octaves: 3, persistence: 0.55f, lacunarity: 2f);
+                    float dirtBlend = (broadNoise * 0.75f) + (detailNoise * 0.25f);
 
-                    float oddsOfDirt = 0.1f;
-
-                    if (leftId == wallId || upId == wallId)
-                    {
-                        oddsOfDirt++;
-                    }
-                    if (leftId == wallId || leftId == dirtId)
-                    {
-                        oddsOfDirt += 0.1f;
-                    }
-                    if (upId == wallId || upId == dirtId)
-                    {
-                        if (oddsOfDirt > 0)
-                        {
-                            oddsOfDirt += 0.3f;
-                        }
-                        oddsOfDirt += 0.2f;
-                    }
-
-                    ids[i, j] = rng.NextDouble() < oddsOfDirt ? dirtId : grassId;
+                    ids[i, j] = dirtBlend < 0.5f ? dirtId : grassId;
                 }
             }
 
@@ -123,6 +103,8 @@ namespace Project_1.Tiles
             tiles = new Tile[ChunkSize.X, ChunkSize.Y];
             Position = new WorldSpace(aLeftUppermostTile);
             ChunkPosition = GetChunkPosition(aId);
+            averageLevel = GenerateAverageLevel(ChunkPosition);
+            int[,] tileIds = GenerateTileIds(aId);
 
             Point pos;
 
@@ -132,44 +114,8 @@ namespace Project_1.Tiles
                 for (int j = 0; j < ChunkSize.Y; j++)
                 {
                     pos = new Point(aLeftUppermostTile.X + TileSize.X * i, aLeftUppermostTile.Y + TileSize.Y * j);
-                    if (i == 0 || j == 0 || i == ChunkSize.X - 1 || j == ChunkSize.Y - 1 || (i >= 4 && i < 6 && j >= 4 && j < 6))
-                    {
-                        tiles[i, j] = new Tile(TileFactory.GetTileData("Wall"), pos, new Point(i, j));
-                    }
-                    else
-                    {
-                        Tile leftTile = tiles[i - 1, j];
-                        Tile upTile = tiles[i, j - 1];
-
-                        float oddsOfDirt = 0.1f;
-
-                        if (leftTile.Name == "Wall" || upTile.Name == "Wall")
-                        {
-                            oddsOfDirt++;
-                        }
-                        if (leftTile.Name == "Wall" || leftTile.Name == "Dirt")
-                        {
-                            oddsOfDirt += 0.1f;
-
-                        }
-                        if (upTile.Name == "Wall" || upTile.Name == "Dirt")
-                        {
-                            if (oddsOfDirt > 0)
-                            {
-                                oddsOfDirt += 0.3f;
-                            }
-                            oddsOfDirt += 0.2f;
-                        }
-
-                        if (RandomManager.RollDouble() < oddsOfDirt)
-                        {
-                            tiles[i, j] = new Tile(TileFactory.GetTileData("Dirt"), pos, new Point(i, j));
-                        }
-                        else
-                        {
-                            tiles[i, j] = new Tile(TileFactory.GetTileData("Grass"), pos, new Point(i, j));
-                        }
-                    }
+                    int tileId = tileIds[i, j];
+                    tiles[i, j] = new Tile(TileFactory.GetTileData(tileId), pos, new Point(i, j));
                 }
             }
             //SpawnerManager.CreateNewSpawnZone(new string[] { "sheep" });
@@ -183,11 +129,12 @@ namespace Project_1.Tiles
         }
 
         [JsonConstructor]
-        public Chunk(int[,] tilesAsIDs, int id)
+        public Chunk(int[,] tilesAsIDs, int id, int? averageLevel = null)
         {
             ChunkPosition = GetChunkPosition(id);
             Position = new WorldSpace(ChunkPosition * ChunkSize * TileSize);
             this.id = id;
+            this.averageLevel = Math.Clamp(averageLevel ?? GenerateAverageLevel(ChunkPosition), 1, 60);
             tiles = new Tile[tilesAsIDs.GetLength(0), tilesAsIDs.GetLength(1)];
 
             for (int i = 0; i < tiles.GetLength(0); i++)
@@ -357,5 +304,23 @@ namespace Project_1.Tiles
         }
 
         static int HighestNrInCircle(int circleSize) => 4 * (((circleSize + 1) * (circleSize + 1)) - (circleSize + 1));
+
+        static int GenerateAverageLevel(Point chunkPos)
+        {
+            float macroNoise = PerlinNoiseGenerator.Fractal01(chunkPos.X, chunkPos.Y, seed: 14717, scale: 46f, octaves: 4, persistence: 0.5f, lacunarity: 2f);
+            float detailNoise = PerlinNoiseGenerator.Fractal01(chunkPos.X, chunkPos.Y, seed: 21341, scale: 16f, octaves: 3, persistence: 0.55f, lacunarity: 2f);
+            float worldLevelSignal = MathHelper.Clamp((macroNoise * 0.72f) + (detailNoise * 0.28f), 0f, 1f);
+
+            float starterZoneNoise = PerlinNoiseGenerator.Fractal01(chunkPos.X, chunkPos.Y, seed: 38183, scale: 24f, octaves: 2, persistence: 0.5f, lacunarity: 2f);
+            const float starterZoneThreshold = 0.11f;
+            if (starterZoneNoise < starterZoneThreshold)
+            {
+                float pocketSignal = starterZoneNoise / starterZoneThreshold;
+                float starterLevelSignal = pocketSignal * pocketSignal;
+                return 1 + (int)MathF.Round(starterLevelSignal * 9f);
+            }
+
+            return 2 + (int)MathF.Round(worldLevelSignal * 58f);
+        }
     }
 }

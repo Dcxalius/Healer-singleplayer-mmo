@@ -22,6 +22,8 @@ using Project_1.UI.CharacterCreator;
 using Project_1.UI.HUD.Managers;
 using Project_1.UI.OptionMenu;
 using System.Runtime.InteropServices;
+using System;
+using System.Collections.Generic;
 
 namespace Project_1
 {
@@ -184,6 +186,25 @@ namespace Project_1
             if (ThreadingSettings.UseWorkerThreads) WorkerPool.Start();
             if (ThreadingSettings.UseUiThread) UiThread.Start();
             if (ThreadingSettings.UseSimThread) SimThread.Start();
+        }
+
+        EventHandler<TextInputEventArgs> currentTextInputEvent;
+
+        public void RegisterToTextInput(EventHandler<TextInputEventArgs> e)
+        {
+            UnregisterFromTextInput();
+
+            currentTextInputEvent = e;
+            Window.TextInput += e;
+        }
+
+        public void UnregisterFromTextInput()
+        {
+            if (currentTextInputEvent != null)
+            {
+                Window.TextInput -= currentTextInputEvent;
+                currentTextInputEvent = null;
+            }
         }
     }
 }
