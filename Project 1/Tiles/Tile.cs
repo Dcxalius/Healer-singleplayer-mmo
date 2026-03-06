@@ -57,27 +57,20 @@ namespace Project_1.Tiles
         [JsonIgnore]
         public Point GridPos => tilePos;
         Point tilePos;
+        Point textureOffset;
+        bool debugTextInitialized;
 
         Text xText;
         Text yText;
 
-        UITexture debugTexture;
         TileData tileData;
-
-        Textures.Texture gfx;
         //bool 
 
         public Tile(TileData aTileData, Point aPos, Point aTilePos)
         {
-            gfx = new Textures.RandomlyGeneratedTexture(true, Size, new GfxPath(GfxType.Tile, aTileData.Name));
-            debugTexture = new UITexture(new GfxPath(GfxType.Debug, "Debug"), Color.White);
             tileData = aTileData;
             tilePos = aTilePos;
-            if (DebugManager.Mode(DebugMode.TileCoords))
-            {
-                xText = new Text("Gloryse", tilePos.X.ToString(), Color.Black);
-                yText = new Text("Gloryse", tilePos.Y.ToString(), Color.Yellow);
-            }
+            textureOffset = tileData.GetRandomTextureOffset(new Point(aPos.X / Size.X, aPos.Y / Size.Y));
             Position = new WorldSpace(aPos);
         }
 
@@ -89,21 +82,31 @@ namespace Project_1.Tiles
         public void Draw(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();
-            gfx.Draw(aBatch, Position.ToAbsoltueScreenPosition().ToVector2());
+            Textures.Texture.DrawSnapshot(aBatch, tileData.BuildRenderSnapshot(textureOffset), Position, Camera.Camera.WorldRectangle.Top);
 
             //xText.LeftAllignedDraw(aBatch, new WorldSpace(Position - Size.ToVector2() / 2).ToAbsoltueScreenPosition());
             if (DebugManager.Mode(DebugMode.TileCoords))
             {
+                EnsureDebugText();
                 xText.TopLeftDraw(aBatch, new WorldSpace(Position).ToAbsoltueScreenPosition());
                 yText.TopLeftDraw(aBatch, new WorldSpace(Position + new WorldSpace(xText.Offset.X, 0)).ToAbsoltueScreenPosition());
             }
             //Camera.Camera.WorldPosToCameraSpace(Position), 0); 
         }
 
+        void EnsureDebugText()
+        {
+            ThreadAffinity.AssertMainThread();
+            if (debugTextInitialized) return;
+            debugTextInitialized = true;
+            xText = new Text("Gloryse", tilePos.X.ToString(), Color.Black);
+            yText = new Text("Gloryse", tilePos.Y.ToString(), Color.Yellow);
+        }
+
         internal Textures.Texture.TextureRenderSnapshot BuildRenderSnapshot()
         {
             ThreadAffinity.AssertSimThread();
-            return gfx.BuildRenderSnapshot();
+            return tileData.BuildRenderSnapshot(textureOffset);
         }
     }
 }

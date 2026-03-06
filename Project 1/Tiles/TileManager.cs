@@ -7,6 +7,7 @@ using Project_1.Camera;
 using Project_1.DebugTools;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Doodads;
 using Project_1.GameObjects.Spawners;
 using Project_1.Managers;
 using Project_1.Managers.Saves;
@@ -21,6 +22,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Collections.Concurrent;
 using System.Threading;
+using System.Threading.Tasks;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.Tiles
@@ -69,10 +71,11 @@ namespace Project_1.Tiles
         static readonly HashSet<int> knownChunkIds = new HashSet<int>();
         static readonly HashSet<int> currentChunkIds = new HashSet<int>();
         static readonly ReaderWriterLockSlim chunkLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-        static readonly ConcurrentDictionary<int, int[,]> generatedChunkIds = new ConcurrentDictionary<int, int[,]>();
-        static readonly HashSet<int> pendingChunkGenerations = new HashSet<int>();
+        static readonly ConcurrentDictionary<int, Chunk> unpublishedChunks = new ConcurrentDictionary<int, Chunk>();
+        static readonly ConcurrentDictionary<int, ChunkBuildJob> activeChunkBuildJobs = new ConcurrentDictionary<int, ChunkBuildJob>();
         static readonly List<Chunk> chunkSnapshotScratch = new List<Chunk>();
         static readonly ChunkIdComparer chunkIdComparer = new ChunkIdComparer();
+        static int chunkBuildEpoch;
 
         public static CollisionManager CollisionManager;
 
@@ -92,6 +95,18 @@ namespace Project_1.Tiles
             }
         }
 
+        sealed class ChunkBuildJob
+        {
+            public ChunkBuildJob(int epoch)
+            {
+                Epoch = epoch;
+                Completion = new TaskCompletionSource<Chunk>(TaskCreationOptions.RunContinuationsAsynchronously);
+            }
+
+            public int Epoch { get; }
+            public TaskCompletionSource<Chunk> Completion { get; }
+        }
+
         public static void Init()
         {
             ThreadAffinity.AssertMainThread();
@@ -107,53 +122,42 @@ namespace Project_1.Tiles
             const int surroundingChunkCheckSize = 3; // this should always be odd
             Debug.Assert(surroundingChunkCheckSize % 2 == 1);
             const int maxQueuedPrefetch = 4;
-            chunkLock.EnterWriteLock();
-            try
+            int centreChunkId = Chunk.GetChunkId(
+                (int)MathF.Floor(ObjectManager.Player.FeetPosition.X / Tile.Size.X / Chunk.ChunkSize.X),
+                (int)MathF.Floor(ObjectManager.Player.FeetPosition.Y / Tile.Size.Y / Chunk.ChunkSize.Y));
+            Chunk centreChunk = EnsureChunkLoaded(centreChunkId);
+            Point centreChunkPos = centreChunk.ChunkPosition;
+            int queuedPrefetch = 0;
+            int immediateRadius = surroundingChunkCheckSize / 2;
+            int prefetchRadius = immediateRadius + 1;
+
+            for (int x = -immediateRadius; x <= immediateRadius; x++)
             {
-                Chunk centreChunk = GetChunkUnder(ObjectManager.Player.FeetPosition);
-                Point centreChunkPos = Chunk.GetChunkPosition(centreChunk.Id);
-                int queuedPrefetch = 0;
-                int immediateRadius = surroundingChunkCheckSize / 2;
-                int prefetchRadius = immediateRadius + 1;
-
-                for (int x = -immediateRadius; x <= immediateRadius; x++)
+                for (int y = -immediateRadius; y <= immediateRadius; y++)
                 {
-                    for (int y = -immediateRadius; y <= immediateRadius; y++)
-                    {
-                        if (x == 0 && y == 0) continue;
-                        int newId = Chunk.GetChunkId(centreChunkPos + new Point(x, y));
-                        if (chunks.ContainsKey(newId)) continue;
-
-                        if (!generatedChunkIds.TryRemove(newId, out int[,] tileIds))
-                        {
-                            tileIds = Chunk.GenerateTileIds(newId);
-                        }
-                        chunks[newId] = new Chunk(tileIds, newId);
-                    }
+                    if (x == 0 && y == 0) continue;
+                    int newId = Chunk.GetChunkId(centreChunkPos + new Point(x, y));
+                    EnsureChunkLoaded(newId);
                 }
+            }
 
-                if (WorkerPool.IsRunning)
+            if (WorkerPool.IsRunning)
+            {
+                for (int x = -prefetchRadius; x <= prefetchRadius && queuedPrefetch < maxQueuedPrefetch; x++)
                 {
-                    for (int x = -prefetchRadius; x <= prefetchRadius && queuedPrefetch < maxQueuedPrefetch; x++)
+                    for (int y = -prefetchRadius; y <= prefetchRadius && queuedPrefetch < maxQueuedPrefetch; y++)
                     {
-                        for (int y = -prefetchRadius; y <= prefetchRadius && queuedPrefetch < maxQueuedPrefetch; y++)
-                        {
-                            if (Math.Abs(x) <= immediateRadius && Math.Abs(y) <= immediateRadius) continue;
-                            int id = Chunk.GetChunkId(centreChunkPos + new Point(x, y));
-                            if (chunks.ContainsKey(id)) continue;
-                            if (generatedChunkIds.ContainsKey(id)) continue;
-                            if (pendingChunkGenerations.Contains(id)) continue;
+                        if (Math.Abs(x) <= immediateRadius && Math.Abs(y) <= immediateRadius) continue;
+                        int id = Chunk.GetChunkId(centreChunkPos + new Point(x, y));
+                        if (IsChunkAvailable(id)) continue;
 
-                            QueueChunkGeneration(id);
-                            queuedPrefetch++;
-                        }
+                        GetOrQueueChunkBuild(id);
+                        queuedPrefetch++;
                     }
                 }
             }
-            finally
-            {
-                chunkLock.ExitWriteLock();
-            }
+
+            UpdateChunkDoodads();
         }
 
         public static void New()
@@ -162,7 +166,8 @@ namespace Project_1.Tiles
             TileRenderCache.ResetMinimapSnapshotTracking();
             ClearRenderCache();
             chunks.Clear();
-            chunks[0] = new Chunk(Chunk.GenerateTileIds(0), 0);
+            ResetChunkBuildState();
+            chunks[0] = CreateStructuredChunk(0, Chunk.GenerateTileIds(0));
         }
 
         public static void Load(Save aSave)
@@ -171,6 +176,7 @@ namespace Project_1.Tiles
             TileRenderCache.ResetMinimapSnapshotTracking();
             ClearRenderCache();
             chunks.Clear();
+            ResetChunkBuildState();
 
             string[] files = System.IO.Directory.GetFiles(aSave.Tiles);
             for (int i = 0; i < files.Length; i++)
@@ -180,6 +186,7 @@ namespace Project_1.Tiles
                 //int[,] tileIds = JsonConvert.DeserializeObject<int[,]>(json);
                 int id = int.Parse(SaveManager.TrimToNameOnly(files[i]));
                 chunks[id] = c;
+                EnsureStructureDoodadsForLoadedChunk(c);
 
                 
             }
@@ -191,6 +198,7 @@ namespace Project_1.Tiles
             TileRenderCache.ResetMinimapSnapshotTracking();
             ClearRenderCache();
             chunks.Clear();
+            ResetChunkBuildState();
             if (loadedChunks != null && loadedChunks.Count > 0)
             {
                 for (int i = 0; i < loadedChunks.Count; i++)
@@ -198,22 +206,47 @@ namespace Project_1.Tiles
                     Chunk chunk = loadedChunks[i];
                     if (chunk == null) continue;
                     chunks[chunk.Id] = chunk;
+                    EnsureStructureDoodadsForLoadedChunk(chunk);
                 }
             }
         }
 
-        static void QueueChunkGeneration(int chunkId)
+        static ChunkBuildJob GetOrQueueChunkBuild(int chunkId)
         {
-            if (!pendingChunkGenerations.Add(chunkId)) return;
-
-            WorkerPool.Enqueue(() => Chunk.GenerateTileIds(chunkId), tileIds =>
+            while (true)
             {
-                if (tileIds != null)
+                if (activeChunkBuildJobs.TryGetValue(chunkId, out ChunkBuildJob existingJob)) return existingJob;
+
+                ChunkBuildJob newJob = new ChunkBuildJob(Volatile.Read(ref chunkBuildEpoch));
+                if (!activeChunkBuildJobs.TryAdd(chunkId, newJob))
                 {
-                    generatedChunkIds[chunkId] = tileIds;
+                    continue;
                 }
-                pendingChunkGenerations.Remove(chunkId);
-            });
+
+                WorkerPool.Enqueue(() => BuildChunkOnWorker(chunkId, newJob));
+                return newJob;
+            }
+        }
+
+        static void BuildChunkOnWorker(int chunkId, ChunkBuildJob buildJob)
+        {
+            try
+            {
+                Chunk chunk = CreateStructuredChunk(chunkId, Chunk.GenerateTileIds(chunkId));
+                if (buildJob.Epoch == Volatile.Read(ref chunkBuildEpoch))
+                {
+                    unpublishedChunks[chunkId] = chunk;
+                }
+                buildJob.Completion.TrySetResult(chunk);
+            }
+            catch (Exception ex)
+            {
+                buildJob.Completion.TrySetException(ex);
+            }
+            finally
+            {
+                activeChunkBuildJobs.TryRemove(new KeyValuePair<int, ChunkBuildJob>(chunkId, buildJob));
+            }
         }
 
         public static float GetDragCoeficient(WorldSpace aFeetPos) => GetTile(aFeetPos).DragCoeficient;
@@ -261,6 +294,65 @@ namespace Project_1.Tiles
 
         }
 
+        static void UpdateChunkDoodads()
+        {
+            chunkLock.EnterReadLock();
+            try
+            {
+                foreach (Chunk chunk in chunks.Values)
+                {
+                    chunk?.Doodads?.Update();
+                }
+            }
+            finally
+            {
+                chunkLock.ExitReadLock();
+            }
+        }
+
+        public static bool TryGetDoodadAt(WorldSpace worldPos, out Doodad doodad)
+        {
+            ThreadAffinity.AssertSimThread();
+            doodad = null;
+            chunkLock.EnterReadLock();
+            try
+            {
+                foreach (Chunk chunk in chunks.Values)
+                {
+                    if (chunk?.Doodads == null) continue;
+                    if (!chunk.WorldRectangle.Contains(worldPos.ToPoint())) continue;
+                    if (chunk.Doodads.TryGetDoodadAt(worldPos, out doodad)) return true;
+                }
+            }
+            finally
+            {
+                chunkLock.ExitReadLock();
+            }
+
+            return false;
+        }
+
+        public static bool TryGetDoodadByRenderId(int renderId, out Doodad doodad)
+        {
+            ThreadAffinity.AssertSimThread();
+            doodad = null;
+            chunkLock.EnterReadLock();
+            try
+            {
+                foreach (Chunk chunk in chunks.Values)
+                {
+                    if (chunk?.Doodads == null) continue;
+                    if (chunk.Doodads.TryGetDoodadByRenderId(renderId, out doodad)) return true;
+                }
+            }
+            finally
+            {
+                chunkLock.ExitReadLock();
+            }
+
+            return false;
+        }
+
         internal static void DrawMinimapSnapshots(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aSize)
         {
             ThreadAffinity.AssertMainThread();
@@ -282,6 +374,23 @@ namespace Project_1.Tiles
             {
                 if (!Camera.Camera.WorldspaceBoundsCheck(chunk.WorldRectangle)) continue;
                 chunk.Draw(aBatch);
+            }
+        }
+
+        internal static void DrawDoodadSnapshots(SpriteBatch aBatch)
+        {
+            ThreadAffinity.AssertMainThread();
+            chunkLock.EnterReadLock();
+            try
+            {
+                foreach (Chunk chunk in chunks.Values)
+                {
+                    chunk?.Doodads?.DrawSnapshots(aBatch);
+                }
+            }
+            finally
+            {
+                chunkLock.ExitReadLock();
             }
         }
 
@@ -309,6 +418,23 @@ namespace Project_1.Tiles
             PublishRemovals();
         }
 
+        internal static void BuildDoodadRenderSnapshots()
+        {
+            ThreadAffinity.AssertSimThread();
+            chunkLock.EnterReadLock();
+            try
+            {
+                foreach (Chunk chunk in chunks.Values)
+                {
+                    chunk?.Doodads?.BuildRenderSnapshot();
+                }
+            }
+            finally
+            {
+                chunkLock.ExitReadLock();
+            }
+        }
+
         static void PublishRemovals()
         {
             foreach (int id in knownChunkIds)
@@ -330,6 +456,40 @@ namespace Project_1.Tiles
             renderChunks.RequestClear();
             knownChunkIds.Clear();
             currentChunkIds.Clear();
+        }
+
+        static bool IsChunkAvailable(int chunkId)
+        {
+            chunkLock.EnterReadLock();
+            try
+            {
+                if (chunks.ContainsKey(chunkId)) return true;
+            }
+            finally
+            {
+                chunkLock.ExitReadLock();
+            }
+
+            if (unpublishedChunks.ContainsKey(chunkId)) return true;
+            return activeChunkBuildJobs.ContainsKey(chunkId);
+        }
+
+        static bool TryPublishUnpublishedChunk(int chunkId, out Chunk chunk)
+        {
+            if (!unpublishedChunks.TryRemove(chunkId, out chunk)) return false;
+            chunks[chunkId] = chunk;
+            return true;
+        }
+
+        static void ResetChunkBuildState()
+        {
+            Interlocked.Increment(ref chunkBuildEpoch);
+            unpublishedChunks.Clear();
+            foreach (var pair in activeChunkBuildJobs.ToArray())
+            {
+                if (!activeChunkBuildJobs.TryRemove(pair.Key, out ChunkBuildJob buildJob)) continue;
+                buildJob.Completion.TrySetCanceled();
+            }
         }
 
         public static Chunk[] GetChunksSnapshot()

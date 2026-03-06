@@ -26,8 +26,9 @@ using Project_1.GameObjects.Entities.Friendlies.Players;
 
 namespace Project_1.GameObjects.Entities.Friendlies.Players
 {
-    internal class Player : Friendly
+    internal class Player : Friendly, ILightEmitter
     {
+        public float LightRadiusTiles => 6f;
         public override Color MinimapColor => Color.White;
         public PlayerData PlayerData => UnitData as PlayerData;
         public Inventory Inventory => PlayerData.Inventory;

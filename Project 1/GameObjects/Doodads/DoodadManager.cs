@@ -2,35 +2,43 @@
 using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.Managers;
-using System;
+using Project_1.Tiles;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project_1.GameObjects.Doodads
 {
-    internal static class DoodadManager
+    internal sealed class DoodadManager
     {
-        static List<Doodad> doodads;
-        static readonly RenderCache<WorldObjectRenderSnapshot> renderDoodads = new RenderCache<WorldObjectRenderSnapshot>();
-        static readonly HashSet<int> knownDoodadIds = new HashSet<int>();
-        static readonly HashSet<int> currentDoodadIds = new HashSet<int>();
-        static bool initialized;
+        readonly List<Doodad> doodads = new List<Doodad>();
+        readonly RenderCache<WorldObjectRenderSnapshot> renderDoodads = new RenderCache<WorldObjectRenderSnapshot>();
+        readonly HashSet<int> knownDoodadIds = new HashSet<int>();
+        readonly HashSet<int> currentDoodadIds = new HashSet<int>();
+        bool structuresApplied;
 
-        public static void Init()
+        public void EnsureStructureDoodads(Chunk chunk)
         {
-            ThreadAffinity.AssertMainThread();
-            if (initialized) return;
-            initialized = true;
+            if (chunk == null) return;
+            if (structuresApplied) return;
+            structuresApplied = true;
 
-            doodads = new List<Doodad>();
+            StructureSpawnSystem.DoodadSpawn[] spawns = StructureSpawnSystem.GetDoodadSpawns(chunk.Id);
+            for (int i = 0; i < spawns.Length; i++)
+            {
+                WorldSpace worldPos = chunk.Position + new WorldSpace(
+                    (spawns[i].LocalTile.X + 0.5f) * Tile.Size.X,
+                    (spawns[i].LocalTile.Y + 0.5f) * Tile.Size.Y);
 
-            doodads.Add(new Chest(new Camera.WorldSpace(600, 600))); //DEBUG
+                switch (spawns[i].Type)
+                {
+                    case StructureSpawnSystem.StructureDoodadType.CookingFire:
+                        doodads.Add(new CookingFire(worldPos));
+                        break;
+                }
+            }
         }
 
 
-        public static void Update()
+        public void Update()
         {
             ThreadAffinity.AssertSimThread();
             for (int i = 0; i < doodads.Count; i++)
@@ -39,7 +47,7 @@ namespace Project_1.GameObjects.Doodads
             }
         }
 
-        public static bool TryGetDoodadAt(WorldSpace worldPos, out Doodad doodad)
+        public bool TryGetDoodadAt(WorldSpace worldPos, out Doodad doodad)
         {
             ThreadAffinity.AssertSimThread();
             doodad = null;
@@ -52,7 +60,7 @@ namespace Project_1.GameObjects.Doodads
             return false;
         }
 
-        public static bool TryGetDoodadByRenderId(int renderId, out Doodad doodad)
+        public bool TryGetDoodadByRenderId(int renderId, out Doodad doodad)
         {
             ThreadAffinity.AssertSimThread();
             doodad = null;
@@ -67,10 +75,9 @@ namespace Project_1.GameObjects.Doodads
             return false;
         }
 
-        internal static void DrawSnapshots(SpriteBatch aBatch)
+        internal void DrawSnapshots(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();
-            // Snapshot-only draw path. Do not read live sim doodad list here.
             renderDoodads.ApplyUpdates();
             foreach (WorldObjectRenderSnapshot snapshot in renderDoodads.Values)
             {
@@ -78,7 +85,7 @@ namespace Project_1.GameObjects.Doodads
             }
         }
 
-        internal static void BuildRenderSnapshot()
+        internal void BuildRenderSnapshot()
         {
             ThreadAffinity.AssertSimThread();
             currentDoodadIds.Clear();
@@ -91,7 +98,7 @@ namespace Project_1.GameObjects.Doodads
             PublishRemovals();
         }
 
-        static void PublishRemovals()
+        void PublishRemovals()
         {
             foreach (int id in knownDoodadIds)
             {

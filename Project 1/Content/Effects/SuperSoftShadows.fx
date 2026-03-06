@@ -127,8 +127,8 @@ VSOutput VS_SoftShadow(VSInput input)
     float w = input.ShadowCoord.y;
     float2 proj_xy = lerp(delta - offset, endpoint - light_pos, w);
 
-    // Transform to clip space. Treat proj_xy as light-relative.
-    float4 clipPos = mul(float4(proj_xy + light_pos, 0.0f, w), u_matrix);
+    // Transform to clip space in a stable affine form.
+    float4 clipPos = mul(float4(proj_xy + light_pos, 0.0f, 1.0f), u_matrix);
     o.Position = clipPos;
 
     // --------------------------------------------------------
@@ -179,7 +179,8 @@ VSOutput VS_SoftShadow(VSInput input)
         lp = 0.01f;
 
     // Scale proj position and endpoints to avoid per-pixel multiplies.
-    o.ProjPos = float3(proj_xy, w * lp);
+    // Keep z above zero to avoid unstable divides in the pixel shader.
+    o.ProjPos = float3(proj_xy, max(w * lp, 1e-4f));
     o.Endpoints = float4(endpoint_a, endpoint_b) / lp;
 
     return o;
@@ -221,7 +222,7 @@ float4 PS_SoftShadow(VSOutput input) : SV_Target
         (0.5f + intersection_t) * input.Endpoints.zw;
 
     // Pixel position in the same space, recovered from proj coords.
-    float2 pixel_pos = input.ProjPos.xy / input.ProjPos.z;
+    float2 pixel_pos = input.ProjPos.xy / max(abs(input.ProjPos.z), 1e-4f);
 
     float2 penetration_delta = intersection_point - pixel_pos;
 
@@ -236,6 +237,7 @@ float4 PS_SoftShadow(VSOutput input) : SV_Target
     // --------------------------------------------------------
 
     float shadow = bleed * (1.0f - penumbra) * step(input.Edges.z, 0.0f);
+    shadow = saturate(shadow);
 
     // Output single-channel mask in RGB (alpha = 1).
     return float4(shadow, shadow, shadow, 1.0f);

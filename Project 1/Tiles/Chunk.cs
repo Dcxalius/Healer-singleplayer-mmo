@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using Project_1.Camera;
+using Project_1.GameObjects.Doodads;
 using Project_1.GameObjects.Spawners;
 using Project_1.GameObjects.Spawners.Pathing;
 using Project_1.Managers;
@@ -21,6 +22,8 @@ namespace Project_1.Tiles
 
         [JsonIgnore]
         public WorldSpace Position { get; private set; }
+        [JsonIgnore]
+        public DoodadManager Doodads { get; }
 
         public Tile Tile((int, int) aXY) => Tile(aXY.Item1, aXY.Item2);
         public Tile Tile(int aX, int aY)
@@ -100,6 +103,7 @@ namespace Project_1.Tiles
         public Chunk(Point aLeftUppermostTile, int aId) 
         {
             id = aId;
+            Doodads = new DoodadManager();
             tiles = new Tile[ChunkSize.X, ChunkSize.Y];
             Position = new WorldSpace(aLeftUppermostTile);
             ChunkPosition = GetChunkPosition(aId);
@@ -134,6 +138,7 @@ namespace Project_1.Tiles
             ChunkPosition = GetChunkPosition(id);
             Position = new WorldSpace(ChunkPosition * ChunkSize * TileSize);
             this.id = id;
+            Doodads = new DoodadManager();
             this.averageLevel = Math.Clamp(averageLevel ?? GenerateAverageLevel(ChunkPosition), 1, 60);
             tiles = new Tile[tilesAsIDs.GetLength(0), tilesAsIDs.GetLength(1)];
 
@@ -304,6 +309,9 @@ namespace Project_1.Tiles
         }
 
         static int HighestNrInCircle(int circleSize) => 4 * (((circleSize + 1) * (circleSize + 1)) - (circleSize + 1));
+
+        public static int GetAverageLevelForChunkPosition(Point chunkPos) => GenerateAverageLevel(chunkPos);
+        public static int GetAverageLevelForChunkId(int chunkId) => GenerateAverageLevel(GetChunkPosition(chunkId));
 
         static int GenerateAverageLevel(Point chunkPos)
         {

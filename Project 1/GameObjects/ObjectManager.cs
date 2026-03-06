@@ -47,8 +47,12 @@ namespace Project_1.GameObjects
         static readonly HashSet<int> currentEntityIds = new HashSet<int>();
         static readonly HashSet<int> knownNpcIds = new HashSet<int>();
         static readonly HashSet<int> currentNpcIds = new HashSet<int>();
-        static volatile PartyLightSnapshot renderLightSnapshot = PartyLightSnapshot.Empty;
-        static readonly WorldSpace[] partyLightScratch = new WorldSpace[PartyLightSnapshot.MaxLights];
+        static volatile LightSnapshot renderLightSnapshot = LightSnapshot.Empty;
+        static readonly int[] lightRenderIdScratch = new int[LightSnapshot.MaxLights];
+        static readonly WorldSpace[] lightPositionScratch = new WorldSpace[LightSnapshot.MaxLights];
+        static readonly float[] lightRadiusTilesScratch = new float[LightSnapshot.MaxLights];
+        static readonly bool[] lightCoreScratch = new bool[LightSnapshot.MaxLights];
+        static readonly float[] lightDistanceToPlayerScratch = new float[LightSnapshot.MaxLights];
         static readonly List<Entity> allScratch = new List<Entity>();
         static readonly HashSet<Entity> allScratchSet = new HashSet<Entity>();
 
@@ -195,41 +199,64 @@ namespace Project_1.GameObjects
         static Player player = null;
         static bool initialized;
 
-        public sealed class PartyLightSnapshot
+        public sealed class LightSnapshot
         {
-            public const int MaxLights = 5;
-            public static readonly PartyLightSnapshot Empty = new PartyLightSnapshot(0, WorldSpace.Zero, WorldSpace.Zero, WorldSpace.Zero, WorldSpace.Zero, WorldSpace.Zero, Point.Zero);
+            public const int MaxLights = 16;
+            public const float NearbyEmitterRangeTiles = 40f;
+            public static readonly LightSnapshot Empty = new LightSnapshot(Array.Empty<WorldSpace>(), Array.Empty<float>(), Array.Empty<bool>(), Array.Empty<float>(), Point.Zero);
 
-            public PartyLightSnapshot(int count, WorldSpace position0, WorldSpace position1, WorldSpace position2, WorldSpace position3, WorldSpace position4, Point originTile)
+            LightSnapshot(WorldSpace[] positions, float[] radiusTiles, bool[] isCoreLights, float[] distanceToPlayerWorld, Point originTile)
             {
-                Count = Math.Clamp(count, 0, MaxLights);
-                Position0 = position0;
-                Position1 = position1;
-                Position2 = position2;
-                Position3 = position3;
-                Position4 = position4;
+                Positions = positions ?? Array.Empty<WorldSpace>();
+                RadiusTiles = radiusTiles ?? Array.Empty<float>();
+                IsCoreLights = isCoreLights ?? Array.Empty<bool>();
+                DistanceToPlayerWorld = distanceToPlayerWorld ?? Array.Empty<float>();
                 OriginTile = originTile;
             }
 
-            public int Count { get; }
-            public WorldSpace Position0 { get; }
-            public WorldSpace Position1 { get; }
-            public WorldSpace Position2 { get; }
-            public WorldSpace Position3 { get; }
-            public WorldSpace Position4 { get; }
+            public int Count => Positions.Length;
+            public WorldSpace[] Positions { get; }
+            public float[] RadiusTiles { get; }
+            public bool[] IsCoreLights { get; }
+            public float[] DistanceToPlayerWorld { get; }
             public Point OriginTile { get; }
 
             public WorldSpace GetPosition(int index)
             {
-                return index switch
-                {
-                    0 => Position0,
-                    1 => Position1,
-                    2 => Position2,
-                    3 => Position3,
-                    4 => Position4,
-                    _ => throw new ArgumentOutOfRangeException(nameof(index)),
-                };
+                return Positions[index];
+            }
+
+            public float GetRadiusTiles(int index)
+            {
+                return RadiusTiles[index];
+            }
+
+            public bool IsCoreLight(int index)
+            {
+                if (index < 0 || index >= IsCoreLights.Length) return false;
+                return IsCoreLights[index];
+            }
+
+            public float GetDistanceToPlayerWorld(int index)
+            {
+                if (index < 0 || index >= DistanceToPlayerWorld.Length) return float.MaxValue;
+                return DistanceToPlayerWorld[index];
+            }
+
+            public static LightSnapshot CreateFromScratch(int count, WorldSpace[] positions, float[] radiusTiles, bool[] isCoreLights, float[] distanceToPlayerWorld, Point originTile)
+            {
+                int clampedCount = Math.Clamp(count, 0, MaxLights);
+                if (clampedCount == 0) return Empty;
+
+                WorldSpace[] positionCopy = new WorldSpace[clampedCount];
+                float[] radiusCopy = new float[clampedCount];
+                bool[] coreCopy = new bool[clampedCount];
+                float[] distanceCopy = new float[clampedCount];
+                Array.Copy(positions, positionCopy, clampedCount);
+                Array.Copy(radiusTiles, radiusCopy, clampedCount);
+                Array.Copy(isCoreLights, coreCopy, clampedCount);
+                Array.Copy(distanceToPlayerWorld, distanceCopy, clampedCount);
+                return new LightSnapshot(positionCopy, radiusCopy, coreCopy, distanceCopy, originTile);
             }
         }
 
@@ -316,7 +343,12 @@ namespace Project_1.GameObjects
         {
             ThreadAffinity.AssertSimThread();
             Reset();
-            player = new Player(aName, aClass);
+            WorldSpace spawnPoint = TileManager.FindSpawnPointNearChunkLevel(1);
+            PlayerData playerData = new PlayerData(aName, aClass);
+            playerData.Position = spawnPoint;
+            playerData.Momentum = WorldSpace.Zero;
+            playerData.Velocity = WorldSpace.Zero;
+            player = new Player(playerData);
             ObjectFactory.PlayerData = player.PlayerData;
             Camera.Camera.BindCamera(player);
         }
@@ -385,6 +417,7 @@ namespace Project_1.GameObjects
             renderPlayers.RequestClear();
             renderEntities.RequestClear();
             renderNpcs.RequestClear();
+            renderLightSnapshot = LightSnapshot.Empty;
             if (player != null) player.Delete();
         }
 
@@ -507,7 +540,7 @@ namespace Project_1.GameObjects
             }
         }
 
-        public static PartyLightSnapshot RenderLightSnapshot => renderLightSnapshot;
+        public static LightSnapshot RenderLightSnapshot => renderLightSnapshot;
 
         internal static void BuildRenderSnapshot()
         {
@@ -532,22 +565,81 @@ namespace Project_1.GameObjects
                 EntityRenderSnapshot snapshot = player.BuildRenderSnapshot();
                 renderPlayers.EnqueueUpdate(snapshot);
                 currentPlayerIds.Add(snapshot.RenderId);
-
-                int count = player.Party.CopyPositions(partyLightScratch);
-                WorldSpace position0 = count > 0 ? partyLightScratch[0] : WorldSpace.Zero;
-                WorldSpace position1 = count > 1 ? partyLightScratch[1] : WorldSpace.Zero;
-                WorldSpace position2 = count > 2 ? partyLightScratch[2] : WorldSpace.Zero;
-                WorldSpace position3 = count > 3 ? partyLightScratch[3] : WorldSpace.Zero;
-                WorldSpace position4 = count > 4 ? partyLightScratch[4] : WorldSpace.Zero;
-                Point originTile = count > 0 ? TileManager.GetGridPos(position0) : Point.Zero;
-                renderLightSnapshot = new PartyLightSnapshot(count, position0, position1, position2, position3, position4, originTile);
+                renderLightSnapshot = BuildRenderLightSnapshot();
             }
             else
             {
-                renderLightSnapshot = PartyLightSnapshot.Empty;
+                renderLightSnapshot = LightSnapshot.Empty;
             }
 
             PublishRemovals(renderPlayers, knownPlayerIds, currentPlayerIds);
+        }
+
+        static LightSnapshot BuildRenderLightSnapshot()
+        {
+            ThreadAffinity.AssertSimThread();
+            if (player == null) return LightSnapshot.Empty;
+
+            int count = 0;
+            float nearbyRangeWorld = LightSnapshot.NearbyEmitterRangeTiles * Tile.Size.X;
+            WorldSpace playerFeet = player.FeetPosition;
+            Point originTile = TileManager.GetGridPos(playerFeet);
+
+            AddEmitterIfEligible(player, true, playerFeet, nearbyRangeWorld, ref count);
+
+            for (int i = 0; i < guild.Count && count < LightSnapshot.MaxLights; i++)
+            {
+                GuildMember member = guild[i];
+                if (member == null) continue;
+                if (!player.Party.IsInParty(member)) continue;
+                AddEmitterIfEligible(member, true, playerFeet, nearbyRangeWorld, ref count);
+            }
+
+            for (int i = 0; i < entities.Count && count < LightSnapshot.MaxLights; i++)
+            {
+                AddEmitterIfEligible(entities[i], false, playerFeet, nearbyRangeWorld, ref count);
+            }
+
+            for (int i = 0; i < guild.Count && count < LightSnapshot.MaxLights; i++)
+            {
+                AddEmitterIfEligible(guild[i], false, playerFeet, nearbyRangeWorld, ref count);
+            }
+
+            for (int i = 0; i < npcs.Count && count < LightSnapshot.MaxLights; i++)
+            {
+                AddEmitterIfEligible(npcs[i], false, playerFeet, nearbyRangeWorld, ref count);
+            }
+
+            return LightSnapshot.CreateFromScratch(count, lightPositionScratch, lightRadiusTilesScratch, lightCoreScratch, lightDistanceToPlayerScratch, originTile);
+        }
+
+        static void AddEmitterIfEligible(Entity entity, bool forceInclude, WorldSpace playerFeet, float nearbyRangeWorld, ref int count)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (entity == null) return;
+            if (count >= LightSnapshot.MaxLights) return;
+            if (entity is not ILightEmitter emitter) return;
+
+            if (!forceInclude && entity.FeetPosition.DistanceTo(playerFeet) > nearbyRangeWorld)
+            {
+                return;
+            }
+
+            int renderId = entity.RenderId;
+            for (int i = 0; i < count; i++)
+            {
+                if (lightRenderIdScratch[i] != renderId) continue;
+                if (forceInclude) lightCoreScratch[i] = true;
+                return;
+            }
+
+            lightRenderIdScratch[count] = renderId;
+            WorldSpace feet = entity.FeetPosition;
+            lightPositionScratch[count] = feet;
+            lightRadiusTilesScratch[count] = Math.Max(0.1f, emitter.LightRadiusTiles);
+            lightCoreScratch[count] = forceInclude;
+            lightDistanceToPlayerScratch[count] = feet.DistanceTo(playerFeet);
+            count++;
         }
 
         static void PublishEntitySnapshots<T>(IList<T> source, RenderCache<EntityRenderSnapshot> cache, HashSet<int> knownIds, HashSet<int> currentIds) where T : Entity

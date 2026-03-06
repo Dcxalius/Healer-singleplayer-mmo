@@ -92,6 +92,7 @@ namespace Project_1.Managers
         const double MailboxAgeWarningMs = 50d;
         const double WorkerLatencyWarningMs = 100d;
         const double RenderFrameWarningMs = 25d;
+        const double ShadowPassWarningMs = 8d;
         const double SnapshotAgeWarningMs = 50d;
         const double WarningCooldownMs = 2000d;
         const long CoalescedWarningDeltaThreshold = 64;
@@ -104,6 +105,7 @@ namespace Project_1.Managers
         static double nextWorkerWarningMs;
         static double nextRenderWarningMs;
         static double nextSnapshotWarningMs;
+        static double nextShadowWarningMs;
         static long lastMainFailureCount;
         static long lastUiFailureCount;
         static long lastSimFailureCount;
@@ -399,6 +401,7 @@ namespace Project_1.Managers
                 $"  Overruns: {uiThreadStats.OverrunCount,6}  |  Wait timeouts: {uiThreadStats.WaitTimeouts,6}";
             var renderSyncStats = RenderSnapshotManager.SyncStats;
             var renderStats = MainRenderTelemetry.Stats;
+            var shadowStats = ShadowRenderTelemetry.Stats;
             renderSyncText.Value =
                 "Render Sync\n" +
                 $"  Snapshot age ms last/avg/max: {renderSyncStats.LastSnapshotAgeMs,6:0.0} / {renderSyncStats.AvgSnapshotAgeMs,6:0.0} / {renderSyncStats.MaxSnapshotAgeMs,6:0.0}\n" +
@@ -406,9 +409,14 @@ namespace Project_1.Managers
                 $"  Snapshot build/draw count: {renderSyncStats.TotalBuilds,8} / {renderSyncStats.TotalDraws,8}\n" +
                 "Main Render\n" +
                 $"  Frame ms last/avg/max: {renderStats.LastFrameMs,6:0.0} / {renderStats.AvgFrameMs,6:0.0} / {renderStats.MaxFrameMs,6:0.0}\n" +
-                $"  Phase ms last ui/world/composite: {renderStats.LastUiBuildMs,6:0.0} / {renderStats.LastWorldDrawMs,6:0.0} / {renderStats.LastUiCompositeMs,6:0.0}";
+                $"  Phase ms last ui/world/composite: {renderStats.LastUiBuildMs,6:0.0} / {renderStats.LastWorldDrawMs,6:0.0} / {renderStats.LastUiCompositeMs,6:0.0}\n" +
+                "Shadows\n" +
+                $"  Lights candidate/active/dropped: {shadowStats.CandidateLights,3} / {shadowStats.ActiveLights,3} / {shadowStats.DroppedLights,3}\n" +
+                $"  Segments total/avg/max (capped): {shadowStats.TotalSegments,5} / {shadowStats.AvgSegmentsPerLight,5:0.0} / {shadowStats.MaxSegmentsPerLight,4} ({shadowStats.CappedLights,2})\n" +
+                $"  Shadow pass ms last/avg/max: {shadowStats.LastShadowPassMs,6:0.0} / {shadowStats.AvgShadowPassMs,6:0.0} / {shadowStats.MaxShadowPassMs,6:0.0}\n" +
+                $"  Shadow draw calls last/avg/max: {shadowStats.LastDrawCalls,4} / {shadowStats.AvgDrawCalls,4:0.0} / {shadowStats.MaxDrawCalls,4}";
 
-            EmitDiagnosticsWarnings(mainStats, uiStats, simStats, workerStats, simThreadStats, uiThreadStats, renderSyncStats, renderStats);
+            EmitDiagnosticsWarnings(mainStats, uiStats, simStats, workerStats, simThreadStats, uiThreadStats, renderSyncStats, renderStats, shadowStats);
         }
 
         static void EmitDiagnosticsWarnings(
@@ -419,7 +427,8 @@ namespace Project_1.Managers
             in SimThreadStats simThreadStats,
             in UiThreadStats uiThreadStats,
             in RenderSnapshotSyncStats renderSyncStats,
-            in MainRenderStats renderStats)
+            in MainRenderStats renderStats,
+            in ShadowRenderStats shadowStats)
         {
             if (!Mode(DebugMode.Print)) return;
 
@@ -504,6 +513,11 @@ namespace Project_1.Managers
             {
                 Print($"WARN render frame total/ui/world/composite ms last:{renderStats.LastFrameMs:0.0}/{renderStats.LastUiBuildMs:0.0}/{renderStats.LastWorldDrawMs:0.0}/{renderStats.LastUiCompositeMs:0.0} avg:{renderStats.AvgFrameMs:0.0}/{renderStats.AvgUiBuildMs:0.0}/{renderStats.AvgWorldDrawMs:0.0}/{renderStats.AvgUiCompositeMs:0.0} max:{renderStats.MaxFrameMs:0.0}/{renderStats.MaxUiBuildMs:0.0}/{renderStats.MaxWorldDrawMs:0.0}/{renderStats.MaxUiCompositeMs:0.0}");
                 nextRenderWarningMs = nowMs + WarningCooldownMs;
+            }
+            if ((shadowStats.LastShadowPassMs >= ShadowPassWarningMs || shadowStats.DroppedLights > 0) && nowMs >= nextShadowWarningMs)
+            {
+                Print($"WARN shadow pass ms last/avg/max:{shadowStats.LastShadowPassMs:0.0}/{shadowStats.AvgShadowPassMs:0.0}/{shadowStats.MaxShadowPassMs:0.0} lights candidate/active/dropped:{shadowStats.CandidateLights}/{shadowStats.ActiveLights}/{shadowStats.DroppedLights} segments total/avg/max:{shadowStats.TotalSegments}/{shadowStats.AvgSegmentsPerLight:0.0}/{shadowStats.MaxSegmentsPerLight} capped:{shadowStats.CappedLights} drawCalls last/avg/max:{shadowStats.LastDrawCalls}/{shadowStats.AvgDrawCalls:0.0}/{shadowStats.MaxDrawCalls}");
+                nextShadowWarningMs = nowMs + WarningCooldownMs;
             }
             lastSimOverrunCount = simThreadStats.OverrunCount;
             lastUiOverrunCount = uiThreadStats.OverrunCount;
@@ -702,6 +716,7 @@ namespace Project_1.Managers
                 UiThreadStats uiThreadStats = UiThread.Stats;
                 RenderSnapshotSyncStats renderSyncStats = RenderSnapshotManager.SyncStats;
                 MainRenderStats renderStats = MainRenderTelemetry.Stats;
+                ShadowRenderStats shadowStats = ShadowRenderTelemetry.Stats;
                 string saveName = SaveManager.CurrentSave?.Name ?? "<none>";
 
                 WriteDiagnosticsLine(
@@ -724,6 +739,9 @@ namespace Project_1.Managers
                     Mode(DebugMode.Print));
                 WriteDiagnosticsLine(
                     $"[LIFECYCLE] [{phase}] render snapshot age/stale:{renderSyncStats.LastSnapshotAgeMs:0.0}ms/{renderSyncStats.StaleDrawStreak} render frame last:{renderStats.LastFrameMs:0.0}ms",
+                    Mode(DebugMode.Print));
+                WriteDiagnosticsLine(
+                    $"[LIFECYCLE] [{phase}] shadows lights candidate/active/dropped:{shadowStats.CandidateLights}/{shadowStats.ActiveLights}/{shadowStats.DroppedLights} segments total/avg/max:{shadowStats.TotalSegments}/{shadowStats.AvgSegmentsPerLight:0.0}/{shadowStats.MaxSegmentsPerLight} pass last/avg/max:{shadowStats.LastShadowPassMs:0.0}/{shadowStats.AvgShadowPassMs:0.0}/{shadowStats.MaxShadowPassMs:0.0}ms drawCalls last/avg/max:{shadowStats.LastDrawCalls}/{shadowStats.AvgDrawCalls:0.0}/{shadowStats.MaxDrawCalls}",
                     Mode(DebugMode.Print));
             }
             catch (Exception ex)

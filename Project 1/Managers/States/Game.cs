@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects;
-using Project_1.GameObjects.Doodads;
 using Project_1.GameObjects.Entities.Corspes;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.Entities.Projectiles;
@@ -44,7 +43,6 @@ namespace Project_1.Managers.States
             ObjectManager.Update();
             TileManager.Update();
             CorpseManager.Update();
-            DoodadManager.Update();
             SpawnerManager.Update();
             ProjectileManager.Update();
             base.Update();
@@ -83,6 +81,10 @@ namespace Project_1.Managers.States
             DrawList(spriteBatch);
             long worldDrawTicks = Stopwatch.GetTimestamp() - worldStartTicks;
 
+            spriteBatch.End();
+            SuperSoftShadowRenderer.DrawAndComposite(renderTarget);
+            spriteBatch.Begin(SpriteSortMode.Immediate, samplerState: SamplerState.PointClamp);
+
             CleanRender();
             long totalTicks = Stopwatch.GetTimestamp() - frameStartTicks;
             MainRenderTelemetry.RecordFrame(totalTicks, 0, worldDrawTicks, 0);
@@ -102,7 +104,7 @@ namespace Project_1.Managers.States
             long worldDrawTicks = Stopwatch.GetTimestamp() - worldStartTicks;
             long compositeStartTicks = Stopwatch.GetTimestamp();
             spriteBatch.End();
-            DrawShadowOverlay(spriteBatch);
+            SuperSoftShadowRenderer.DrawAndComposite(renderTarget);
             spriteBatch.Begin(SpriteSortMode.Deferred);
             StateManager.DrawGroundSpellEffects(spriteBatch);
             StateManager.DrawGroundTargetPreview(spriteBatch);
@@ -130,36 +132,6 @@ namespace Project_1.Managers.States
 
             ParticleManager.Draw(aBatch);
             FloatingTextManager.Draw(aBatch);
-        }
-
-        static void DrawShadowOverlay(SpriteBatch batch)
-        {
-            ThreadAffinity.AssertMainThread();
-            Texture2D shadowTexture = TileRenderCache.GetShadowMapTexture();
-            if (shadowTexture == null) return;
-
-            Vector2 originTile = TileRenderCache.GetShadowOriginTile();
-            int shadowSize = shadowTexture.Width;
-            int halfMap = shadowSize / 2;
-            int minTileX = (int)originTile.X - halfMap;
-            int minTileY = (int)originTile.Y - halfMap;
-
-            WorldSpace worldTopLeft = new WorldSpace(minTileX * Tile.Size.X, minTileY * Tile.Size.Y);
-            AbsoluteScreenPosition screenTopLeft = worldTopLeft.ToAbsoltueScreenPosition();
-            Point scaledSize = new Point(
-                Math.Max(1, (int)MathF.Round(shadowSize * Tile.Size.X * Camera.Camera.Scale)),
-                Math.Max(1, (int)MathF.Round(shadowSize * Tile.Size.Y * Camera.Camera.Scale)));
-            Rectangle destination = new Rectangle(screenTopLeft, scaledSize);
-            if (!Camera.Camera.ScreenspaceBoundsCheck(destination)) return;
-
-            Effect shadowBlend = EffectManager.GetEffect("ShadowTileBlend");
-            EffectParameterCollection parameters = shadowBlend?.Parameters;
-            parameters?["shadowTextureSize"]?.SetValue(new Vector2(shadowTexture.Width, shadowTexture.Height));
-            parameters?["tilePixelSize"]?.SetValue(Math.Max(1f, Tile.Size.X * Camera.Camera.Scale));
-
-            batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, effect: shadowBlend);
-            batch.Draw(shadowTexture, destination, Color.White);
-            batch.End();
         }
 
     }

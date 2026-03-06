@@ -192,6 +192,11 @@ namespace Project_1.Textures
             return new TextureRenderSnapshot(gfxPath, visible, color, rotation, offset, flip, size);
         }
 
+        internal TextureRenderSnapshot BuildRenderSnapshot(Rectangle? visibleOverride)
+        {
+            return new TextureRenderSnapshot(gfxPath, visibleOverride, color, rotation, offset, flip, size);
+        }
+
         internal static void DrawSnapshot(SpriteBatch aBatch, in TextureRenderSnapshot snapshot, WorldSpace worldPos, float feetPosY)
         {
             ThreadAffinity.AssertMainThread();

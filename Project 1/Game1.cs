@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Project_1.GameObjects;
-using Project_1.GameObjects.Doodads;
 using Project_1.GameObjects.Entities.Corspes;
 using Project_1.GameObjects.Entities.Projectiles;
 using Project_1.GameObjects.FloatingTexts;
@@ -164,8 +163,8 @@ namespace Project_1
             KeyBindManager.Init();
             TileManager.Init();
             TileRenderCache.Init();
-            TileFactory.Init();
             TextureManager.Init();
+            TileFactory.Init();
             EffectManager.Init();
             ObjectFactory.Init();
             ItemFactory.Init();
@@ -177,7 +176,6 @@ namespace Project_1
             HUDManager.Init();
             ObjectManager.Init();
             SpawnerManager.Init();
-            DoodadManager.Init();
             FloatingTextManager.Init();
             CorpseManager.Init();
             ProjectileManager.Init();

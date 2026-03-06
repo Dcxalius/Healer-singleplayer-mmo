@@ -1,6 +1,5 @@
 using Project_1.Camera;
 using Project_1.GameObjects;
-using Project_1.GameObjects.Doodads;
 using Project_1.GameObjects.Entities.Corspes;
 using Project_1.GameObjects.Entities.Projectiles;
 using Project_1.GameObjects.Spawners;
@@ -51,11 +50,10 @@ namespace Project_1.Managers
             ThreadAffinity.AssertSimThread();
             TileManager.BuildRenderSnapshot();
             ObjectManager.BuildRenderSnapshot();
-            ObjectManager.PartyLightSnapshot lightSnapshot = ObjectManager.RenderLightSnapshot;
-            TileRenderCache.BuildShadowSnapshot(lightSnapshot);
+            ShadowSnapshotManager.BuildSnapshot(ObjectManager.RenderLightSnapshot);
             Camera.Camera.BuildMinimapSnapshot();
             ProjectileManager.BuildRenderSnapshot();
-            DoodadManager.BuildRenderSnapshot();
+            TileManager.BuildDoodadRenderSnapshots();
             CorpseManager.BuildRenderSnapshot();
             SpawnerManager.BuildRenderSnapshot();
             MinimapSnapshotManager.BuildSnapshot();
@@ -95,7 +93,7 @@ namespace Project_1.Managers
             TileManager.DrawSnapshots(batch);
             ProjectileManager.DrawSnapshots(batch);
             ObjectManager.DrawSnapshots(batch);
-            DoodadManager.DrawSnapshots(batch);
+            TileManager.DrawDoodadSnapshots(batch);
             CorpseManager.DrawSnapshots(batch);
             SpawnerManager.DrawSnapshots(batch);
             Interlocked.Increment(ref totalDraws);

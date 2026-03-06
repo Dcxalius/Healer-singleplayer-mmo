@@ -14,8 +14,9 @@ using Project_1.Managers;
 
 namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
 {
-    internal class GuildMember : Friendly
+    internal class GuildMember : Friendly, ILightEmitter
     {
+        public float LightRadiusTiles => 5f;
         
 
         public AttackTree AttackLogic => attackTree;

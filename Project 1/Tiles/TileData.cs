@@ -11,6 +11,7 @@ namespace Project_1.Tiles
 {
     internal class TileData : IComparable<TileData>
     {
+        static readonly Point tileVisibleSize = Tile.Size;
         public int ID => id;
         int id;
         public string Name => name;
@@ -22,6 +23,14 @@ namespace Project_1.Tiles
 
         public bool Transparent => transparent;
         bool transparent;
+        [JsonIgnore]
+        internal Texture Texture => texture;
+        [JsonIgnore]
+        readonly Texture texture;
+        [JsonIgnore]
+        readonly GfxPath texturePath;
+        [JsonIgnore]
+        readonly Point textureSheetSize;
 
         [JsonIgnore]
         public Color AvgColor
@@ -44,6 +53,32 @@ namespace Project_1.Tiles
             this.walkable = walkable;
             this.dragCoeficient = dragCoeficient;
             this.transparent = transparent;
+            texturePath = new GfxPath(GfxType.Tile, name);
+            texture = new Texture(texturePath, tileVisibleSize);
+            textureSheetSize = TextureCatalog.GetSize(texturePath);
+        }
+
+        internal Point GetRandomTextureOffset(Point worldTile)
+        {
+            int maxOffsetX = Math.Max(0, textureSheetSize.X - tileVisibleSize.X);
+            int maxOffsetY = Math.Max(0, textureSheetSize.Y - tileVisibleSize.Y);
+            if (maxOffsetX == 0 && maxOffsetY == 0) return Point.Zero;
+
+            int hash = HashCode.Combine(id, worldTile.X, worldTile.Y);
+            int x = maxOffsetX == 0 ? 0 : PositiveModulo(hash, maxOffsetX + 1);
+            int y = maxOffsetY == 0 ? 0 : PositiveModulo(hash * 31, maxOffsetY + 1);
+            return new Point(x, y);
+        }
+
+        internal Texture.TextureRenderSnapshot BuildRenderSnapshot(Point textureOffset)
+        {
+            return texture.BuildRenderSnapshot(new Rectangle(textureOffset, tileVisibleSize));
+        }
+
+        static int PositiveModulo(int value, int modulo)
+        {
+            int result = value % modulo;
+            return result < 0 ? result + modulo : result;
         }
 
         public int CompareTo(TileData other)

@@ -1564,7 +1564,7 @@ namespace Project_1.Managers.States
                 return;
             }
 
-            if (DoodadManager.TryGetDoodadAt(worldPos, out Doodad doodad))
+            if (TileManager.TryGetDoodadAt(worldPos, out Doodad doodad))
             {
                 Mailboxes.PublishSimCommand(new InteractRequested(doodad.RenderId, clickEvent.Button));
                 return;
@@ -1695,7 +1695,7 @@ namespace Project_1.Managers.States
                 return;
             }
 
-            if (DoodadManager.TryGetDoodadByRenderId(e.TargetRenderId, out Doodad doodad))
+            if (TileManager.TryGetDoodadByRenderId(e.TargetRenderId, out Doodad doodad))
             {
                 if (doodad is Chest chest)
                 {

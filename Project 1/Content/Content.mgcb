@@ -27,13 +27,6 @@
 /build:Effects/SuperSoftShadows.fx
 #end
 
-#begin Effects/ShadowTileBlend.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Effects/ShadowTileBlend.fx
-#end
-
 #begin Effects/TextOutline.fx
 /importer:EffectImporter
 /processor:EffectProcessor
