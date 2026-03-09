@@ -128,7 +128,7 @@ VSOutput VS_SoftShadow(VSInput input)
     float2 proj_xy = lerp(delta - offset, endpoint - light_pos, w);
 
     // Transform to clip space in a stable affine form.
-    float4 clipPos = mul(float4(proj_xy + light_pos, 0.0f, 1.0f), u_matrix);
+    float4 clipPos = mul(float4(proj_xy + light_pos, 0.0f, w), u_matrix);
     o.Position = clipPos;
 
     // --------------------------------------------------------
@@ -240,6 +240,8 @@ float4 PS_SoftShadow(VSOutput input) : SV_Target
     shadow = saturate(shadow);
 
     // Output single-channel mask in RGB (alpha = 1).
+    //float bad = (any(isnan(input.Penumbras)) || any(isnan(input.Edges)) || any(isnan(input.ProjPos))) ? 1.0f : 0.0f;
+    //return float4(1, 1, 1, 0.5f);
     return float4(shadow, shadow, shadow, 1.0f);
 }
 

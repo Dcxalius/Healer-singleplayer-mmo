@@ -37,7 +37,7 @@ namespace Project_1.Managers
         static Point renderSize;
         static bool initialized;
 
-        static float LightPenetrationWorld => Tile.Size.X * 0.5f;
+        static float LightPenetrationWorld => 0.01f;
 
         public static void DrawAndComposite(RenderTarget2D destination)
         {

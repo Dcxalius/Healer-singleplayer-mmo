@@ -46,32 +46,13 @@ namespace Project_1.Textures
 
         static void EnsureContentRoot()
         {
-            string baseDir = AppContext.BaseDirectory;
-            string currentRoot = Path.GetFullPath(Path.Combine(baseDir, contentManager.RootDirectory));
-            string[] candidates =
-            {
-                currentRoot,
-                Path.Combine(baseDir, "Content"),
-                Path.Combine(baseDir, "..", "..", "..", "..", "Content", "bin", "DesktopGL", "Content"),
-                Path.Combine(baseDir, "..", "..", "..", "..", "Content", "bin", "Windows"),
-                Path.Combine(baseDir, "..", "..", "..", "..", "Content", "bin", "Windows", "Content")
-            };
+            string currentRoot = Path.Combine(AppContext.BaseDirectory, "Content");
+            contentManager.RootDirectory = currentRoot;
 
-            for (int i = 0; i < candidates.Length; i++)
-            {
-                string candidate = Path.GetFullPath(candidates[i]);
-                if (!File.Exists(Path.Combine(candidate, "Effects", "TextOutline.xnb"))) continue;
-                contentManager.RootDirectory = candidate;
-                return;
-            }
+            if (File.Exists(Path.Combine(currentRoot, "Effects", "TextOutline.xnb"))) return;
 
-            for (int i = 0; i < candidates.Length; i++)
-            {
-                string candidate = Path.GetFullPath(candidates[i]);
-                if (!Directory.Exists(Path.Combine(candidate, "Graphics"))) continue;
-                contentManager.RootDirectory = candidate;
-                return;
-            }
+            throw new DirectoryNotFoundException(
+                $"Compiled content was not found in the active build output directory '{currentRoot}'.");
         }
 
         static void InitFonts()
