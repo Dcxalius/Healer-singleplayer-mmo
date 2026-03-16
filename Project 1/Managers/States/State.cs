@@ -40,6 +40,7 @@ namespace Project_1.Managers.States
         public abstract bool Release(ReleaseEvent aReleaseEvent);
         public abstract bool Scroll(ScrollEvent aScrollEvent);
         public abstract RenderTarget2D Draw();
+        internal virtual void HandleEscapePressed() { }
 
         internal virtual void MarkUiDirty()
         {

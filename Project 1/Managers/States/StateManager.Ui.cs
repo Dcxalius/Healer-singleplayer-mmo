@@ -154,22 +154,7 @@ namespace Project_1.Managers.States
         static void HandleEscapePressed()
         {
             ThreadAffinity.AssertSimThread();
-            switch (currentStateEnum)
-            {
-                case States.Game:
-                    if (HasGroundTargetPendingSpell)
-                    {
-                        CancelGroundTargeting();
-                        break;
-                    }
-                    RequestStateChange(States.PauseMenu);
-                    break;
-                case States.PauseMenu:
-                    pauseMenu.HandleEscapePressed();
-                    break;
-                default:
-                    break;
-            }
+            currentState?.HandleEscapePressed();
         }
 
         internal static void UiOnLeave(States state)

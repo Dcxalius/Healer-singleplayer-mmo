@@ -1,26 +1,18 @@
-﻿using Microsoft.Win32.SafeHandles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Input;
 using Project_1.Managers;
-using Project_1.Textures;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
+using Project_1.Textures;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
 
 namespace Project_1.UI.UIElements
 {
-
-    internal abstract class UIElement
+    internal abstract partial class UIElement
     {
         static int nextUiElementId;
         static readonly object uiElementRegistryLock = new object();
@@ -56,11 +48,9 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        #region Interactibility
         public virtual bool Visible
         {
             get => visible;
-
             set
             {
                 if (visible == value) return;
@@ -69,14 +59,13 @@ namespace Project_1.UI.UIElements
                 {
                     children[i].Visible = value;
                 }
+
                 TouchInteraction();
             }
         }
 
         bool visible;
-
         protected KeyBindManager.KeyListner? visibleKey;
-
         bool Hovered => AbsolutePos.Contains(UiMouseStateCache.Absolute.ToPoint());
         protected bool isHovered;
 
@@ -95,7 +84,7 @@ namespace Project_1.UI.UIElements
                 alwaysOnScreen = value;
                 if (value)
                 {
-                    alwaysFullyOnScreen = !value;
+                    alwaysFullyOnScreen = false;
                 }
             }
         }
@@ -103,16 +92,15 @@ namespace Project_1.UI.UIElements
         protected bool alwaysOnScreen;
         readonly Point alwaysOnScreenAmount = new Point(10, 10);
 
-        public bool AlwaysFullyOnScreen //TOOD: Change to enum?
+        public bool AlwaysFullyOnScreen
         {
             get => alwaysFullyOnScreen;
             protected set
             {
                 alwaysFullyOnScreen = value;
-
                 if (value)
                 {
-                    alwaysOnScreen = !value;
+                    alwaysOnScreen = false;
                 }
             }
         }
@@ -124,12 +112,12 @@ namespace Project_1.UI.UIElements
             get => dragable;
             protected set => dragable = value;
         }
-        bool dragable;
 
+        bool dragable;
         RelativeScreenPosition oldPosition;
-        protected bool hudMoving; //Todo: Change name on these, this means the hud is in movable state, maybe even move this out
+        protected bool hudMoving;
         public bool HudMoveable => hudMoveable;
-        protected bool hudMoveable; //Todo: Change name on these, this means the element is movable
+        protected bool hudMoveable;
         static UITexture movableGfx;
         static bool movableGfxInitialized;
 
@@ -144,14 +132,11 @@ namespace Project_1.UI.UIElements
                 return movableGfx;
             }
         }
+
         Text nameText;
-
         readonly TimeSpan timeBeforeDragRegisters = TimeSpan.FromSeconds(0.2);
-
         public HoldEvent heldEvents;
-        #endregion
 
-        #region Position
         public RelativeScreenPosition RelativePos => relativePos;
         RelativeScreenPosition relativePos;
         public RelativeScreenPosition RelativeSize => relativeSize;
@@ -170,70 +155,25 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        public AbsoluteScreenPosition Location => (ParentPos) + (RelativePos * ParentRelativeSize).ToAbsoluteScreenPos();
+        public AbsoluteScreenPosition Location => ParentPos + (RelativePos * ParentRelativeSize).ToAbsoluteScreenPos();
         public AbsoluteScreenPosition Size => (RelativeSize * ParentRelativeSize).ToAbsoluteScreenPos();
-        #endregion
 
-        #region Graphics
-        public UITexture Gfx => gfx;
-        protected UITexture gfx;
-        public virtual Color Color { get => gfx.Color; set => gfx.Color = value; } 
-        #endregion
-
-        #region Parentage
         protected UIElement parent;
         protected AbsoluteScreenPosition ParentPos => parent == null ? AbsoluteScreenPosition.Zero : parent.Location;
         protected RelativeScreenPosition ParentRelativePos => parent == null ? RelativeScreenPosition.Zero : parent.RelativePos;
         protected AbsoluteScreenPosition ParentSize => parent == null ? Camera.Camera.WindowSize : parent.Size;
         protected RelativeScreenPosition ParentRelativeSize => parent == null ? new RelativeScreenPosition(1) : parent.RelativeSize * parent.ParentRelativeSize;
-        //protected RelativeScreenPosition ParentRelativeSize => parent == null ? new RelativeScreenPosition(1) : parent.Size.ToRelativeScreenPosition(parent.ParentSize);
 
         List<UIElement> children = new List<UIElement>();
         protected int ChildCount => children.Count;
 
-        protected virtual void KillAllChildren() => children.Clear();
-        protected virtual void KillChild(int aIndex) => children.RemoveAt(aIndex);
-        protected virtual void KillChild(UIElement aChild) => children.Remove(aChild);
-        protected UIElement GetChild(int aIndex) => children[aIndex];
-        protected int GetChildID(UIElement aChild) => children.IndexOf(aChild);
-        protected void ForAllChildren(Action<UIElement> aAction)
-        {
-            for (int i = 0; i < children.Count; i++)
-            {
-                aAction(children[i]);
-            }
-        }
-
-        protected virtual void AddChild(UIElement aUIElement)
-        {
-            aUIElement.Visible = Visible;
-            aUIElement.parent = this;
-            children.Add(aUIElement);
-        }
-
-        protected void AddChildren(UIElement[] aUIElement)
-        {
-            for (int i = 0; i < aUIElement.Length; i++)
-            {
-                aUIElement[i].parent = this;
-                AddChild(aUIElement[i]);
-            }
-        }
-
-        protected void AddChildren<T>(List<T> aUIElement) where T : UIElement
-        {
-            for (int i = 0; i < aUIElement.Count; i++)
-            {
-                aUIElement[i].parent = this;
-                AddChild(aUIElement[i]);
-            }
-        }
-
-        #endregion
+        public UITexture Gfx => gfx;
+        protected UITexture gfx;
+        public virtual Color Color { get => gfx.Color; set => gfx.Color = value; }
 
         public (string, RelativeScreenPosition, RelativeScreenPosition) Save => (GetType().Name, RelativePos, RelativeSize);
 
-        protected UIElement(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) //aPos and aSize should be between 0 and 1
+        protected UIElement(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize)
         {
             UiElementId = Interlocked.Increment(ref nextUiElementId);
             lock (uiElementRegistryLock)
@@ -243,12 +183,9 @@ namespace Project_1.UI.UIElements
 
             visible = true;
             gfx = aGfx;
-
             relativePos = aPos;
             relativeSize = aSize;
-
             nameText = new Text("Gloryse", GetType().Name);
-
 
             capturesClick = true;
             capturesScroll = false;
@@ -256,461 +193,6 @@ namespace Project_1.UI.UIElements
             alwaysOnScreen = false;
             alwaysFullyOnScreen = false;
             hudMoveable = true;
-        }
-
-
-
-
-
-        #region Update
-        public virtual void Update()
-        {
-            ThreadAffinity.AssertUiThread();
-            HoldUpdate();
-            UpdateChildren();
-            HoverUpdate();
-            GetVisibiltyPress();
-        }
-
-        public void HUDMovableUpdate()
-        {
-            ThreadAffinity.AssertUiThread();
-            if (!hudMoveable) return;
-            HoldUpdate();
-        }
-
-        void UpdateChildren()
-        {
-            for (int i = 0; i < children.Count; i++)
-            {
-                children[i].Update();
-            }
-        }
-
-        protected virtual void HoldUpdate()
-        {
-            if (heldEvents == null) return;
-
-            if (!heldEvents.IsStillHeld())
-            {
-                Released();
-                if (isHovered)
-                {
-                    ClickedOnAndReleasedOnMe();
-                    return;
-                }
-
-                HoldReleaseAwayFromMe();
-                return;
-            }
-
-            if (!Dragable && !hudMoving) return;
-            if (heldEvents.DurationHeld < timeBeforeDragRegisters.TotalSeconds) return;
-            
-            Move(UiMouseStateCache.Relative - heldEvents.Offset);
-        }
-
-        protected virtual void Released()
-        {
-
-        }
-        #endregion
- 
-        #region Change
-        void GetVisibiltyPress()
-        {
-            if (!visibleKey.HasValue) return;
-            if (UiKeyBindStateCache.GetPress(visibleKey.Value))
-            {
-                ToggleVisibilty();
-            }
-        }
-
-        public void SetHudMoveable(bool aSet)
-        {
-            if (hudMoving == aSet) return;
-            hudMoving = aSet;
-            if (!hudMoveable) return;
-            if (hudMoving)
-            {
-                oldPosition = RelativePos;
-            }
-            TouchInteraction();
-        }
-
-        public void ResetHudMoveable()
-        {
-            if (!hudMoving) return;
-            hudMoving = false;
-            if (!hudMoveable) return;
-            Move(oldPosition);
-            TouchInteraction();
-        }
-
-        public virtual void ToggleVisibilty()
-        {
-            Visible = !visible;
-            TouchInteraction();
-        }
-
-        public virtual void Rescale()
-        {
-            //pos = RelativeScreenPosition.TransformToAbsoluteRect(relativePos, relativeSize);
-
-            for (int i = 0; i < children.Count; i++)
-            {
-                children[i].Rescale();
-            }
-
-            nameText.Rescale();
-        }
-
-        public void Move(RelativeScreenPosition aNewPos)
-        {
-            aNewPos.Assert();
-            RelativeScreenPosition oldPos = relativePos;
-            if (oldPos == aNewPos) return;
-            relativePos = aNewPos;
-            MoveBoundsCheck();
-            if (relativePos != oldPos)
-            {
-                TouchInteraction();
-            }
-        }
-
-        public void Bump(AbsoluteScreenPosition aAmount)
-        {
-            RelativeScreenPosition a = aAmount.ToRelativeScreenPosition();
-            Move(RelativePos + a);
-
-        }
-
-        void MoveBoundsCheck()
-        {
-            AlwaysOnScreenCheck();
-            AlwaysFullyOnScreenCheck();
-        }
-
-        void AlwaysOnScreenCheck()
-        {
-            if (!alwaysOnScreen) return;
-
-            Rectangle overlap = Rectangle.Intersect(Camera.Camera.ScreenRectangle, AbsolutePos);
-
-            if (overlap == AbsolutePos) return;
-
-            (bool, bool) outOfBounds = OutOfBoundsCheck(overlap.Size, alwaysOnScreenAmount);
-            bool xOutOfBounds = outOfBounds.Item1;
-            bool yOutOfBounds = outOfBounds.Item2;
-
-            if (!xOutOfBounds && !yOutOfBounds) return;
-
-
-            relativePos = new AbsoluteScreenPosition( GetNewMove(xOutOfBounds, yOutOfBounds, alwaysOnScreenAmount)).ToRelativeScreenPosition();
-        }
-
-        void AlwaysFullyOnScreenCheck()
-        {
-            if (!alwaysFullyOnScreen) return;
-
-            Rectangle overlap = Rectangle.Intersect(Camera.Camera.ScreenRectangle, AbsolutePos);
-
-            if (overlap == AbsolutePos) return;
-
-            (bool, bool) outOfBounds = OutOfBoundsCheck(overlap.Size, Size);
-            bool xOutOfBounds = outOfBounds.Item1;
-            bool yOutOfBounds = outOfBounds.Item2;
-
-            if (!xOutOfBounds && !yOutOfBounds) return;
-
-
-            relativePos = new AbsoluteScreenPosition(GetNewMove(xOutOfBounds, yOutOfBounds, Size)).ToRelativeScreenPosition();
-
-            //relativePos = new AbsoluteScreenPosition(Location).ToRelativeScreenPosition();
-        }
-
-        Point GetNewMove(bool xOutOfBounds, bool yOutOfBounds, Point alwaysOnScreenAmount)
-        {
-            Point returnable = Location;
-
-            if (xOutOfBounds)
-            {
-                if (Location.X < 0)
-                {
-                    returnable.X = alwaysOnScreenAmount.X - Size.X;
-                }
-                else
-                {
-                    returnable.X = Camera.Camera.ScreenRectangle.Width - alwaysOnScreenAmount.X;
-                }
-            }
-
-            if (yOutOfBounds)
-            {
-                if (Location.Y < 0)
-                {
-                    returnable.Y = alwaysOnScreenAmount.Y - Size.Y;
-                }
-                else
-                {
-                    returnable.Y = Camera.Camera.ScreenRectangle.Height - alwaysOnScreenAmount.Y;
-                }
-            }
-
-            return returnable;
-        }
-
-        (bool, bool) OutOfBoundsCheck(Point aOverlapSize, Point aOnScreenAmount)
-        {
-            bool xOutOfBounds = false;
-            bool yOutOfBounds = false;
-            if (aOverlapSize.X < aOnScreenAmount.X)
-            {
-                if (Location.X < Size.X - aOnScreenAmount.X || Location.X > Camera.Camera.ScreenRectangle.Width - aOnScreenAmount.X)
-                {
-                    xOutOfBounds = true;
-                }
-            }
-            if (aOverlapSize.Y < aOnScreenAmount.Y)
-            {
-                if (Location.Y < Size.Y - aOnScreenAmount.Y || Location.Y > Camera.Camera.ScreenRectangle.Height - aOnScreenAmount.Y)
-                {
-                    yOutOfBounds = true;
-                }
-            }
-            return (xOutOfBounds, yOutOfBounds);
-        }
-
-        public virtual void Resize(RelativeScreenPosition aSize)
-        {
-            aSize.Assert();
-            if (relativeSize == aSize) return;
-            relativeSize = aSize;
-            TouchInteraction();
-        }
-
-        public virtual void Resize(AbsoluteScreenPosition aSize) => Resize(aSize.ToRelativeScreenPosition(ParentSize));
-
-        public virtual void Close()
-        {
-            for (int i = 0; i < children.Count; i++)
-            {
-                children[i].Close();
-            }
-        }
-
-        public virtual void LeavingGameState()
-        {
-            for (int i = 0; i < children.Count; i++)
-            {
-                children[i].LeavingGameState();
-            }
-            heldEvents = null;
-        }
-
-        #endregion
-
-        #region Release
-        public virtual bool ReleasedOn(ReleaseEvent aRelease)
-        {
-            if (!visible) return false;
-            if (!AbsolutePos.Contains(aRelease.AbsolutePos)) return false;
-
-
-            if (ReleasedOnChildren(aRelease)) return true;
-
-            ReleaseOnMe(aRelease);
-            return capturesRelease;
-        }
-
-        public bool ReleasedOnChildren(ReleaseEvent aRelease)
-        {
-            if (!visible) return false;
-            for (int i = 0; i < children.Count; i++)
-            {
-
-                bool releasedOn = children[i].ReleasedOn(aRelease);
-                if (releasedOn)
-                {
-                    ReleasedOnChild(aRelease);
-                    return true;
-
-                }
-            }
-
-            return false;
-        }
-
-        public virtual void ReleasedOnChild(ReleaseEvent aRelease)
-        {
-            if (!visible) return;
-        }
-
-        public virtual void ReleaseOnMe(ReleaseEvent aRelease)
-        {
-            if (!visible) return;
-        }
-
-        public virtual void ClickedOnAndReleasedOnMe()
-        {
-            heldEvents = null;
-            TouchInteraction();
-            if (parent != null || !hudMoveable || !hudMoving) return;
-            Mailboxes.PublishUiEvent(new HudSizeChangerSet(UiElementId));
-        }
-
-        protected virtual void HoldReleaseAwayFromMe()
-        {
-            heldEvents = null;
-            TouchInteraction();
-        }
-        #endregion
-
-        #region Hover
-        void HoverUpdate()
-        {
-            if (!visible && (!hudMoveable && !hudMoving)) return;
-            if (!isHovered && Hovered)
-            {
-                isHovered = true;
-                OnHover();
-                TouchInteraction();
-                return;
-            }
-
-            if (isHovered && !Hovered)
-            {
-                isHovered = false;
-                OnDeHover();
-                TouchInteraction();
-                return;
-            }
-        }
-
-        protected virtual void OnHover()
-        {
-            if (!visible) return;
-        }
-
-        protected virtual void OnDeHover()
-        {
-            if (!visible) return;
-        }
-        #endregion
-
-        #region Click
-        public virtual bool ClickedOn(ClickEvent aClick)
-        {
-            if (!visible && !(hudMoveable && hudMoving)) return false;
-
-            if (!AbsolutePos.Contains(aClick.AbsolutePos)) return false;
-
-
-            if (ClickedOnChildren(aClick)) return true;
-
-            ClickedOnMe(aClick);
-            return capturesClick;
-        }
-
-        protected virtual bool ClickedOnChildren(ClickEvent aClick)
-        {
-            if (!visible || (hudMoveable && hudMoving)) return false;
-
-            for (int i = 0; i < children.Count; i++)
-            {
-                if (!children[i].ClickedOn(aClick)) continue;
-
-                ClickedOnChild(aClick);
-                return children[i].capturesClick;
-            }
-
-            return false;
-        }
-
-        protected virtual void ClickedOnChild(ClickEvent aClick)
-        {
-            if (!visible) return;
-        }
-
-        protected virtual void ClickedOnMe(ClickEvent aClick)
-        {
-            if (!visible && !(hudMoveable && hudMoving)) return;
-            heldEvents = new HoldEvent(aClick, this);
-            TouchInteraction();
-
-            //DebugManager.Print("Clicked on " + pos);
-        }
-        #endregion
-
-        #region Scroll
-        internal virtual bool ScrolledOn(ScrollEvent aScrollEvent)
-        {
-            if (!visible) return false;
-
-            if (!AbsolutePos.Contains(aScrollEvent.AbsolutePos)) return false;
-
-            if (ScrolledOnChildren(aScrollEvent)) return true;
-
-            ScrolledOnMe(aScrollEvent);
-            return capturesScroll;
-        }
-
-        protected virtual void ScrolledOnMe(ScrollEvent aScrollEvent)
-        {
-            if (!visible) return;
-
-        }
-
-        protected virtual bool ScrolledOnChildren(ScrollEvent aScrollEvent)
-        {
-            if (!visible) return false;
-            for (int i = 0; i < children.Count; i++)
-            {
-                if (!children[i].ScrolledOn(aScrollEvent)) continue;
-
-                ScrolledOnChild(aScrollEvent);
-                return children[i].capturesScroll;
-            }
-            return false;
-        }
-
-        protected virtual void ScrolledOnChild(ScrollEvent aScrollEvent)
-        {
-            
-        }
-        #endregion
-
-        public void HudMovableDraw(SpriteBatch aBatch)
-        {
-            ThreadAffinity.AssertMainThread();
-            if (!hudMoveable) return;
-
-            if (gfx != null) gfx.Draw(aBatch, AbsolutePos);
-
-            MovableGfx.Draw(aBatch, AbsolutePos);
-            nameText.CentredDraw(aBatch, Location + Size / 2);
-
-        }
-
-        public virtual void Draw(SpriteBatch aBatch)
-        {
-            ThreadAffinity.AssertMainThread();
-            if (!visible) return;
-
-            if (gfx != null)
-            {
-
-                gfx.Draw(aBatch, AbsolutePos);
-            }
-            
-            if (children.Count == 0) return;
-
-            GraphicsManager.CaptureScissor(this, AbsolutePos);
-            foreach (UIElement child in children)
-            {
-                child.Draw(aBatch);
-            }
-            GraphicsManager.ReleaseScissor(this);
         }
     }
 }

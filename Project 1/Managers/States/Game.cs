@@ -7,6 +7,7 @@ using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.Entities.Projectiles;
 using Project_1.GameObjects.FloatingTexts;
 using Project_1.GameObjects.Spawners;
+using Project_1.GameObjects.Spells;
 using Project_1.Particles;
 using Project_1.Tiles;
 using Project_1.UI;
@@ -39,6 +40,7 @@ namespace Project_1.Managers.States
         public override void Update()
         {
             ThreadAffinity.AssertSimThread();
+            GroundTargetingController.Update();
             Camera.Camera.Update();
             ObjectManager.Update();
             TileManager.Update();
@@ -60,10 +62,22 @@ namespace Project_1.Managers.States
 
         public override void OnLeave()
         {
+            GroundTargetingController.Cancel();
             StateManager.FinalGameFrame = renderTarget;
             
 
             TimeManager.StartPause(this);
+        }
+
+        internal override void HandleEscapePressed()
+        {
+            if (GroundTargetingController.HasPendingSpell)
+            {
+                GroundTargetingController.Cancel();
+                return;
+            }
+
+            StateManager.RequestStateChange(StateManager.States.PauseMenu);
         }
 
         internal void UiOnLeave()
@@ -106,8 +120,8 @@ namespace Project_1.Managers.States
             spriteBatch.End();
             SuperSoftShadowRenderer.DrawAndComposite(renderTarget);
             spriteBatch.Begin(SpriteSortMode.Deferred);
-            StateManager.DrawGroundSpellEffects(spriteBatch);
-            StateManager.DrawGroundTargetPreview(spriteBatch);
+            GroundTargetingController.DrawSpellEffects(spriteBatch);
+            GroundTargetingController.DrawTargetPreview(spriteBatch);
             spriteBatch.Draw(plateTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
             spriteBatch.Draw(uITarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
             long uiCompositeTicks = Stopwatch.GetTimestamp() - compositeStartTicks;

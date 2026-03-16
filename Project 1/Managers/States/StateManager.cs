@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Project_1.GameObjects.Spells;
+using Project_1.Camera;
+using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
+using Project_1.UI;
 using Project_1.UI.UIElements.Boxes;
 
 namespace Project_1.Managers.States
@@ -41,7 +43,6 @@ namespace Project_1.Managers.States
         public static RenderTarget2D FinalGameFrame { get => finalGameFrame; set => finalGameFrame = value; }
         static RenderTarget2D finalGameFrame;
         static bool pendingRedrawGame;
-        public static Rectangle RenderTargetPosition { set => renderTargetPosition = value; }
         static Rectangle renderTargetPosition;
 
         public static States PreviousState => previousState;
@@ -49,25 +50,6 @@ namespace Project_1.Managers.States
         static bool stateChangePending;
         static States pendingState;
         static bool initialized;
-        const float GroundTargetGraceRangeRatio = 0.10f;
-        static Spell groundTargetPendingSpell;
-        static readonly GfxPath groundTargetCircleIndicatorPath = new GfxPath(GfxType.UI, "AoECircle");
-        static readonly GfxPath groundTargetRectangleIndicatorPath = new GfxPath(GfxType.UI, "WhiteBackground");
-        static readonly GfxPath groundTargetInvalidIndicatorPath = new GfxPath(GfxType.UI, "AoEOutOfRange");
-        static volatile GroundTargetPreviewSnapshot groundTargetPreviewSnapshot = GroundTargetPreviewSnapshot.Inactive;
-        static readonly List<GroundSpellVisualSnapshot> activeGroundSpellVisuals = new List<GroundSpellVisualSnapshot>();
-        static volatile GroundSpellVisualSnapshot[] groundSpellVisualSnapshots = Array.Empty<GroundSpellVisualSnapshot>();
-        static readonly ChatCommandSpec[] chatCommandSpecs =
-        {
-            new ChatCommandSpec("help", "/help", "Shows available chat commands.", ChatCommandAccess.System),
-            new ChatCommandSpec("clear", "/clear", "Clears the chat panel.", ChatCommandAccess.System),
-            new ChatCommandSpec("where", "/where <friendly name>", "Prints world position for a friendly.", ChatCommandAccess.System),
-            new ChatCommandSpec("chunklevels", "/chunklevels", "Prints chunk average levels (10x10 near player, or all generated if under 100 chunks).", ChatCommandAccess.System),
-            new ChatCommandSpec("tp", "/tp <friendly name> <x> <y>", "Teleports a friendly to world coordinates.", ChatCommandAccess.Debug),
-            new ChatCommandSpec("createitem", "/createitem <friendly name> <item id> <count>", "Creates item(s) and gives them to a friendly with inventory.", ChatCommandAccess.Debug)
-        };
-        const int ChunkLevelsWindowSize = 10;
-
         public static void Init()
         {
             ThreadAffinity.AssertMainThread();
@@ -76,10 +58,12 @@ namespace Project_1.Managers.States
 
             finalBatch = GraphicsManager.CreateSpriteBatch();
             CreateStates();
-            RegisterStateAndSaveSubscriptions();
-            RegisterWorldInteractionSubscriptions();
-            RegisterInventorySubscriptions();
-            RegisterChatSubscriptions();
+            GraphicsManager.WindowLayoutChanged += HandleGraphicsLayoutChanged;
+            if (GraphicsManager.HasWindowLayout)
+            {
+                HandleGraphicsLayoutChanged(GraphicsManager.CurrentWindowSize, GraphicsManager.CurrentRenderTargetDestination);
+            }
+            RegisterStateSubscriptions();
             RegisterUiAndInputSubscriptions();
         }
 
@@ -97,56 +81,9 @@ namespace Project_1.Managers.States
             currentStateEnum = States.StartScreen;
         }
 
-        static void RegisterStateAndSaveSubscriptions()
+        static void RegisterStateSubscriptions()
         {
             SubscribeSimCommand<StateChangeRequested>(e => SetState(e.State.ToStateManagerState()));
-            SubscribeSimCommand<ResetToMainMenuRequested>(_ => HandleResetToMainMenuRequested());
-            SubscribeSimCommand<CreateNewPlayerRequested>(HandleCreateNewPlayerRequested);
-            SubscribeSimCommand<SaveDataRequested>(_ => HandleSaveDataRequested());
-            SubscribeSimCommand<LoadSaveRequested>(HandleLoadSaveRequested);
-            SubscribeSimCommand<ContinueLastSaveRequested>(_ => HandleContinueLastSaveRequested());
-            SubscribeSimCommand<NewGameRequested>(_ => HandleNewGameRequested());
-            SubscribeSimCommand<SaveLoadParsed>(HandleSaveLoadParsed);
-            SubscribeSimCommand<LogicWindowSnapshotRequested>(HandleLogicWindowSnapshotRequested);
-            SubscribeSimCommand<SpellCastRequested>(HandleSpellCastRequested);
-            SubscribeSimCommand<ShopPurchaseRequested>(HandleShopPurchaseRequested);
-        }
-
-        static void RegisterWorldInteractionSubscriptions()
-        {
-            SubscribeSimCommand<TargetRequested>(HandleTargetRequested);
-            SubscribeSimCommand<PartyMemberInviteRequested>(HandlePartyMemberInviteRequested);
-            SubscribeSimCommand<PartyMemberKickRequested>(HandlePartyMemberKickRequested);
-            SubscribeSimCommand<WorldClickRequested>(HandleWorldClickRequested);
-            SubscribeSimCommand<WorldReleaseRequested>(HandleWorldReleaseRequested);
-            SubscribeSimCommand<WorldScrollRequested>(HandleWorldScrollRequested);
-            SubscribeSimCommand<PlayerMovementRequested>(HandlePlayerMovementRequested);
-            SubscribeSimCommand<MoveOrderRequested>(HandleMoveOrderRequested);
-            SubscribeSimCommand<PartyTargetOrderRequested>(HandlePartyTargetOrderRequested);
-            SubscribeSimCommand<TargetClearedRequested>(_ => HandleTargetClearedRequested());
-            SubscribeSimCommand<PartyCommandRequested>(HandlePartyCommandRequested);
-            SubscribeSimCommand<InteractRequested>(HandleInteractRequested);
-        }
-
-        static void RegisterInventorySubscriptions()
-        {
-            SubscribeSimCommand<InventorySwapItemsRequested>(HandleInventorySwapItemsRequested);
-            SubscribeSimCommand<InventorySwapEquipmentRequested>(HandleInventorySwapEquipmentRequested);
-            SubscribeSimCommand<InventoryEquipBagRequested>(HandleInventoryEquipBagRequested);
-            SubscribeSimCommand<InventoryUnequipBagRequested>(HandleInventoryUnequipBagRequested);
-            SubscribeSimCommand<InventorySwapBagsRequested>(HandleInventorySwapBagsRequested);
-            SubscribeSimCommand<InventorySwapBagSlotsRequested>(HandleInventorySwapBagSlotsRequested);
-            SubscribeSimCommand<LootItemRequested>(HandleLootItemRequested);
-            SubscribeSimCommand<InventoryEquipRequested>(HandleInventoryEquipRequested);
-            SubscribeSimCommand<InventoryConsumeRequested>(HandleInventoryConsumeRequested);
-            SubscribeSimCommand<EquipmentSwapRequested>(HandleEquipmentSwapRequested);
-            SubscribeSimCommand<EquipmentMoveToInventoryRequested>(HandleEquipmentMoveToInventoryRequested);
-        }
-
-        static void RegisterChatSubscriptions()
-        {
-            SubscribeSimCommand<ChatCommandRequested>(HandleChatCommandRequested);
-            SubscribeSimCommand<ChatSayRequested>(HandleChatSayRequested);
         }
 
         static void RegisterUiAndInputSubscriptions()
@@ -176,8 +113,6 @@ namespace Project_1.Managers.States
             KeyboardStateCache.BeginFrame();
             KeyBindStateCache.BeginFrame();
             ApplyPendingStateChange();
-            UpdateGroundTargetPreview();
-            UpdateGroundSpellVisuals();
             currentState.Update();
         }
 
@@ -198,6 +133,7 @@ namespace Project_1.Managers.States
                 SetState(aState);
                 return;
             }
+
             Mailboxes.PublishSimCommand(new StateChangeRequested(aState.ToStateKind()));
         }
 
@@ -210,11 +146,6 @@ namespace Project_1.Managers.States
 
         static void ApplyStateChange(States aState)
         {
-            if (aState != States.Game)
-            {
-                CancelGroundTargeting();
-            }
-
             States leavingState = currentStateEnum;
             currentState.OnLeave();
             previousState = leavingState;
@@ -244,6 +175,7 @@ namespace Project_1.Managers.States
                 default:
                     throw new NotImplementedException();
             }
+
             currentStateEnum = aState;
             currentState.OnEnter();
             if (UiThread.IsRunning || SimThread.IsRunning)
@@ -263,9 +195,9 @@ namespace Project_1.Managers.States
                 pendingRedrawGame = true;
                 return;
             }
+
             finalGameFrame = game.Draw();
         }
-
 
         public static bool Release(ReleaseEvent aRelease)
         {
@@ -293,6 +225,7 @@ namespace Project_1.Managers.States
             loadingMenu.Rescale();
             newGame.Rescale();
         }
+
         public static void Draw()
         {
             ThreadAffinity.AssertMainThread();
@@ -301,26 +234,20 @@ namespace Project_1.Managers.States
                 pendingRedrawGame = false;
                 finalGameFrame = game.Draw();
             }
-            RenderTarget2D target = currentState.Draw();
 
+            RenderTarget2D target = currentState.Draw();
             finalBatch.Begin();
             finalBatch.Draw(target, renderTargetPosition, Color.White);
             finalBatch.End();
         }
+
         public static States CurrentState => currentStateEnum;
 
-        static void HandleShopPurchaseRequested(ShopPurchaseRequested e)
+        static void HandleGraphicsLayoutChanged(Point windowSize, Rectangle renderTargetDestination)
         {
-            ThreadAffinity.AssertSimThread();
-            Player player = ObjectManager.Player;
-            if (player == null) return;
-
-            Items.Item item = ItemFactory.CreateItem(e.ItemId, e.Count);
-            if (item == null) return;
-            if (item.Cost > player.Gold) return;
-
-            player.ChangeGold(-item.Cost);
-            player.Inventory.AddItem(item);
+            ThreadAffinity.AssertMainThread();
+            renderTargetPosition = renderTargetDestination;
+            Rescale();
         }
 
     }

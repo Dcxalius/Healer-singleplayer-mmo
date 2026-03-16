@@ -137,7 +137,7 @@ namespace Project_1.Managers.States
             }
         }
 
-        internal void HandleEscapePressed()
+        internal override void HandleEscapePressed()
         {
             if (dialogueBoxes.Count == 0)
             {
