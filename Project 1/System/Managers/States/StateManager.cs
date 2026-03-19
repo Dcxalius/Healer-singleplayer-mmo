@@ -88,8 +88,8 @@ namespace Project_1.Managers.States
 
         static void RegisterUiAndInputSubscriptions()
         {
-            Mailboxes.Ui.Subscribe<StateChanged>(HandleUiStateChanged);
-            Mailboxes.Ui.Subscribe<HudRescaleRequested>(e => UiRescale(e.WindowSize));
+            MailboxManager.Ui.Subscribe<StateChanged>(HandleUiStateChanged);
+            MailboxManager.Ui.Subscribe<HudRescaleRequested>(e => UiRescale(e.WindowSize));
             SubscribeSimMailbox<KeyboardSnapshot>(e => KeyboardStateCache.Update(e));
             SubscribeSimMailbox<KeyBindSnapshot>(e => KeyBindStateCache.Update(e));
             SubscribeSimMailbox<MouseSnapshot>(e => MouseStateCache.Update(e));
@@ -98,13 +98,13 @@ namespace Project_1.Managers.States
 
         static void SubscribeSimCommand<T>(Action<T> handler)
         {
-            Mailboxes.RegisterSimCommandType<T>();
+            MailboxManager.RegisterSimCommandType<T>();
             SubscribeSimMailbox(handler);
         }
 
         static void SubscribeSimMailbox<T>(Action<T> handler)
         {
-            Mailboxes.Sim.Subscribe(handler);
+            MailboxManager.Sim.Subscribe(handler);
         }
 
         public static void Update()
@@ -134,7 +134,7 @@ namespace Project_1.Managers.States
                 return;
             }
 
-            Mailboxes.PublishSimCommand(new StateChangeRequested(aState.ToStateKind()));
+            MailboxManager.PublishSimCommand(new StateChangeRequested(aState.ToStateKind()));
         }
 
         static void ApplyPendingStateChange()
@@ -180,7 +180,7 @@ namespace Project_1.Managers.States
             currentState.OnEnter();
             if (UiThread.IsRunning || SimThread.IsRunning)
             {
-                Mailboxes.PublishUiEvent(new StateChanged(leavingState.ToStateKind(), aState.ToStateKind()));
+                MailboxManager.PublishUiEvent(new StateChanged(leavingState.ToStateKind(), aState.ToStateKind()));
                 return;
             }
 

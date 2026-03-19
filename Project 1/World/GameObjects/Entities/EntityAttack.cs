@@ -33,12 +33,12 @@ namespace Project_1.GameObjects.Entities
         {
             ThreadAffinity.AssertSimThread();
             target = aEntity;
-            Mailboxes.PublishUiEvent(new TargetChanged(RelationToPlayer.ToRelationToPlayerKind(), target?.BuildUiSnapshot()));
+            MailboxManager.PublishUiEvent(new TargetChanged(RelationToPlayer.ToRelationToPlayerKind(), target?.BuildUiSnapshot()));
             if (target == null) return;
             List<Project_1.GameObjects.Spells.Buff.Buff> buffs = target.GetAllBuffs();
             for (int i = 0; i < buffs.Count; i++)
             {
-                Mailboxes.PublishUiEvent(new BuffAdded(target.RenderId, new BuffUiSnapshot(buffs[i].EffectId, buffs[i].GfxPath, buffs[i].DurationRemaining)));
+                MailboxManager.PublishUiEvent(new BuffAdded(target.RenderId, new BuffUiSnapshot(buffs[i].EffectId, buffs[i].GfxPath, buffs[i].DurationRemaining)));
             }
         }
 
@@ -46,7 +46,7 @@ namespace Project_1.GameObjects.Entities
         {
             ThreadAffinity.AssertSimThread();
             target = null;
-            Mailboxes.PublishUiEvent(new TargetChanged(RelationToPlayer.ToRelationToPlayerKind(), null));
+            MailboxManager.PublishUiEvent(new TargetChanged(RelationToPlayer.ToRelationToPlayerKind(), null));
         }
 
 

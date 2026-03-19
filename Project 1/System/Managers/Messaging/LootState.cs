@@ -28,7 +28,7 @@ namespace Project_1.Messaging
                 Current = null;
                 CurrentContextId = 0;
                 closedFromEmpty = true;
-                Mailboxes.PublishUiEvent(new LootClosed(contextId));
+                MailboxManager.PublishUiEvent(new LootClosed(contextId));
             }
         }
 
@@ -89,16 +89,16 @@ namespace Project_1.Messaging
             if (takeAmount >= existing.Count)
             {
                 Current.Drop[slot] = null;
-                Mailboxes.PublishUiEvent(new LootSlotRemoved(slot));
+                MailboxManager.PublishUiEvent(new LootSlotRemoved(slot));
                 return existing;
             }
 
             existing.Count -= takeAmount;
-            Mailboxes.PublishUiEvent(new LootSlotChanged(slot, ItemUiSnapshot.FromItem(existing), takeAmount));
+            MailboxManager.PublishUiEvent(new LootSlotChanged(slot, ItemUiSnapshot.FromItem(existing), takeAmount));
             if (Current.Drop.Where(x => x != null).Count() == 0 && !closedFromEmpty)
             {
                 closedFromEmpty = true;
-                Mailboxes.PublishUiEvent(new LootClosed(CurrentContextId));
+                MailboxManager.PublishUiEvent(new LootClosed(CurrentContextId));
                 Current = null;
                 CurrentContextId = 0;
             }

@@ -20,7 +20,7 @@ namespace Project_1.UI.PauseMenu
 
         public override void ClickedOnAndReleasedOnMe()
         {
-            Mailboxes.PublishSimCommand(new LoadSaveRequested(null));
+            MailboxManager.PublishSimCommand(new LoadSaveRequested(null));
 
             base.ClickedOnAndReleasedOnMe();
 

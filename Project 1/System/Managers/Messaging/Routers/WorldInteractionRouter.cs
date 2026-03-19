@@ -42,8 +42,8 @@ namespace Project_1.GameObjects
 
         static void SubscribeSimCommand<T>(System.Action<T> handler)
         {
-            Mailboxes.RegisterSimCommandType<T>();
-            Mailboxes.Sim.Subscribe(handler);
+            MailboxManager.RegisterSimCommandType<T>();
+            MailboxManager.Sim.Subscribe(handler);
         }
 
         static void HandleTargetRequested(TargetRequested e)
@@ -121,13 +121,13 @@ namespace Project_1.GameObjects
 
             if (CorpseManager.TryGetCorpseAt(worldPos, out Corpse corpse))
             {
-                Mailboxes.PublishSimCommand(new InteractRequested(corpse.RenderId, clickEvent.Button));
+                MailboxManager.PublishSimCommand(new InteractRequested(corpse.RenderId, clickEvent.Button));
                 return;
             }
 
             if (TileManager.TryGetDoodadAt(worldPos, out Doodad doodad))
             {
-                Mailboxes.PublishSimCommand(new InteractRequested(doodad.RenderId, clickEvent.Button));
+                MailboxManager.PublishSimCommand(new InteractRequested(doodad.RenderId, clickEvent.Button));
                 return;
             }
 
@@ -141,27 +141,27 @@ namespace Project_1.GameObjects
 
             if (noModifiers)
             {
-                Mailboxes.PublishSimCommand(new TargetRequested(entity.RenderId));
+                MailboxManager.PublishSimCommand(new TargetRequested(entity.RenderId));
                 if (rightClick)
                 {
-                    Mailboxes.PublishSimCommand(new PartyTargetOrderRequested(entity.RenderId));
+                    MailboxManager.PublishSimCommand(new PartyTargetOrderRequested(entity.RenderId));
                 }
             }
             else if (entity is GuildMember member)
             {
                 if (clickEvent.Modifier(InputManager.HoldModifier.Shift))
                 {
-                    Mailboxes.PublishSimCommand(new PartyCommandRequested(PartyCommandAction.Add, member.RenderId));
+                    MailboxManager.PublishSimCommand(new PartyCommandRequested(PartyCommandAction.Add, member.RenderId));
                 }
                 else if (clickEvent.Modifier(InputManager.HoldModifier.Ctrl))
                 {
-                    Mailboxes.PublishSimCommand(new PartyCommandRequested(PartyCommandAction.NeedyAdd, member.RenderId));
+                    MailboxManager.PublishSimCommand(new PartyCommandRequested(PartyCommandAction.NeedyAdd, member.RenderId));
                 }
             }
 
             if (entity is Npc npc)
             {
-                Mailboxes.PublishSimCommand(new InteractRequested(npc.RenderId, clickEvent.Button));
+                MailboxManager.PublishSimCommand(new InteractRequested(npc.RenderId, clickEvent.Button));
             }
         }
 
@@ -171,18 +171,18 @@ namespace Project_1.GameObjects
             {
                 if (clickEvent.Modifier(InputManager.HoldModifier.Shift) || clickEvent.Modifier(InputManager.HoldModifier.Ctrl))
                 {
-                    Mailboxes.PublishSimCommand(new PartyCommandRequested(PartyCommandAction.Clear, null));
+                    MailboxManager.PublishSimCommand(new PartyCommandRequested(PartyCommandAction.Clear, null));
                     return;
                 }
 
-                Mailboxes.PublishSimCommand(new TargetClearedRequested());
+                MailboxManager.PublishSimCommand(new TargetClearedRequested());
                 return;
             }
 
             if (clickEvent.Button == ClickKind.Right)
             {
                 bool append = clickEvent.Modifier(InputManager.HoldModifier.Shift);
-                Mailboxes.PublishSimCommand(new MoveOrderRequested(worldPos, append));
+                MailboxManager.PublishSimCommand(new MoveOrderRequested(worldPos, append));
             }
         }
 

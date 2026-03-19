@@ -59,10 +59,10 @@ namespace Project_1.Managers
             if (initialized) return;
             initialized = true;
 
-            Mailboxes.RegisterSimCommandType<ChatCommandRequested>();
-            Mailboxes.RegisterSimCommandType<ChatSayRequested>();
-            Mailboxes.Sim.Subscribe<ChatCommandRequested>(HandleChatCommandRequested);
-            Mailboxes.Sim.Subscribe<ChatSayRequested>(HandleChatSayRequested);
+            MailboxManager.RegisterSimCommandType<ChatCommandRequested>();
+            MailboxManager.RegisterSimCommandType<ChatSayRequested>();
+            MailboxManager.Sim.Subscribe<ChatCommandRequested>(HandleChatCommandRequested);
+            MailboxManager.Sim.Subscribe<ChatSayRequested>(HandleChatSayRequested);
         }
 
         static void HandleChatCommandRequested(ChatCommandRequested e)
@@ -107,7 +107,7 @@ namespace Project_1.Managers
                     HandleChatHelp();
                     break;
                 case "clear":
-                    Mailboxes.PublishUiEvent(new ChatCleared());
+                    MailboxManager.PublishUiEvent(new ChatCleared());
                     break;
                 case "where":
                     HandleChatWhere(args);
@@ -136,7 +136,7 @@ namespace Project_1.Managers
                 senderName = "Player";
             }
 
-            Mailboxes.PublishUiEvent(new ChatMessagePosted(
+            MailboxManager.PublishUiEvent(new ChatMessagePosted(
                 new ChatMessage(ChatMessageType.Say, text, senderName, ChatSpeakerType.Player)));
         }
 
@@ -500,7 +500,7 @@ namespace Project_1.Managers
         static void PublishChatSystemMessage(string message)
         {
             if (string.IsNullOrWhiteSpace(message)) return;
-            Mailboxes.PublishUiEvent(new ChatMessagePosted(
+            MailboxManager.PublishUiEvent(new ChatMessagePosted(
                 new ChatMessage(ChatMessageType.System, message, "System", ChatSpeakerType.System)));
         }
     }

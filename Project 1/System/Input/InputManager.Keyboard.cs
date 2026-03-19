@@ -12,14 +12,14 @@ namespace Project_1.Input
         {
             if (!oldKeyboardState.IsKeyDown(Keys.Escape) && newKeyboardState.IsKeyDown(Keys.Escape))
             {
-                Mailboxes.PublishUiEvent(new EscapePressed());
+                MailboxManager.PublishUiEvent(new EscapePressed());
             }
         }
 
         static void PublishKeyboardSnapshots()
         {
             Keys[] downKeys = newKeyboardState.GetPressedKeys();
-            Mailboxes.PublishUiEvent(new KeyboardSnapshot(downKeys));
+            MailboxManager.PublishUiEvent(new KeyboardSnapshot(downKeys));
 
             int count = (int)KeyBindManager.KeyListner.Count;
             Debug.Assert(count <= KeyBindMaskBitCount, $"KeyBindSnapshot currently supports up to {KeyBindMaskBitCount} key listeners.");
@@ -40,7 +40,7 @@ namespace Project_1.Input
                 }
             }
 
-            Mailboxes.PublishUiEvent(new KeyBindSnapshot(pressedMask, heldMask, releasedMask));
+            MailboxManager.PublishUiEvent(new KeyBindSnapshot(pressedMask, heldMask, releasedMask));
         }
     }
 }

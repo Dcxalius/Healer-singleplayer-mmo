@@ -163,13 +163,13 @@ namespace Project_1.Managers
             if (!ThreadingSettings.UseWorkerThreads || !WorkerPool.IsRunning)
             {
                 SaveLoadPayload payload = SaveLoadPayload.Parse(save);
-                Mailboxes.PublishSimCommand(new SaveLoadParsed(payload, requestId));
+                MailboxManager.PublishSimCommand(new SaveLoadParsed(payload, requestId));
                 return true;
             }
 
             WorkerPool.Enqueue(() => SaveLoadPayload.Parse(save), payload =>
             {
-                Mailboxes.PublishSimCommand(new SaveLoadParsed(payload, requestId));
+                MailboxManager.PublishSimCommand(new SaveLoadParsed(payload, requestId));
             });
             return true;
         }
@@ -237,19 +237,19 @@ namespace Project_1.Managers
             if (currentSave == null) return;
             if (!ThreadingSettings.UseWorkerThreads || !WorkerPool.IsRunning)
             {
-                Mailboxes.PublishUiEvent(new SaveDataStarted());
+                MailboxManager.PublishUiEvent(new SaveDataStarted());
                 try
                 {
                     currentSave.SaveData();
                 }
                 finally
                 {
-                    Mailboxes.PublishUiEvent(new SaveDataFinished());
+                    MailboxManager.PublishUiEvent(new SaveDataFinished());
                 }
                 return;
             }
 
-            Mailboxes.PublishUiEvent(new SaveDataStarted());
+            MailboxManager.PublishUiEvent(new SaveDataStarted());
             SaveWritePayload payload = SaveWritePayload.Capture(currentSave);
             RequestScreenshot(currentSave);
             WorkerPool.Enqueue(() =>
@@ -260,7 +260,7 @@ namespace Project_1.Managers
                 }
                 finally
                 {
-                    Mailboxes.PublishUiEvent(new SaveDataFinished());
+                    MailboxManager.PublishUiEvent(new SaveDataFinished());
                 }
             });
         }

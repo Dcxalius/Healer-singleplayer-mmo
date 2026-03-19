@@ -43,7 +43,7 @@ namespace Project_1.Tiles
 
         List<Rectangle> ConvertUnwalkableTilesToRectangles(WorldSpace aPos)
         {
-            Tile[,] tilesSurroundingObject = TileQuery.GetSurroundingTiles(TileManager.GetTile(aPos));
+            Tile[,] tilesSurroundingObject = TileManager.GetSurroundingTiles(TileManager.GetTile(aPos));
 
             BuildMergedColliders(tilesSurroundingObject);
             return mergedColliders;

@@ -53,13 +53,13 @@ namespace Project_1.UI.OptionMenu
             if (oldValue == aVisible) return;
 
             ChatSettings.SetVisible(aType, aVisible);
-            Mailboxes.PublishUiEvent(new ChatFiltersChanged());
+            MailboxManager.PublishUiEvent(new ChatFiltersChanged());
 
             OptionManager.AddActionToDoAtExitOfOptionMenu(
                 () =>
                 {
                     ChatSettings.SetVisible(aType, oldValue);
-                    Mailboxes.PublishUiEvent(new ChatFiltersChanged());
+                    MailboxManager.PublishUiEvent(new ChatFiltersChanged());
                 },
                 ChatSettings.ExportSettings);
         }

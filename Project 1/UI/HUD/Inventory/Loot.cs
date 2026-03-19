@@ -84,7 +84,7 @@ namespace Project_1.UI.HUD.Inventory
         public override void ClickedOnAndReleasedOnMe()
         {
             if (heldEvents.ClickThatCreated != InputManager.ClickType.Right) return;
-            Mailboxes.PublishSimCommand(new LootItemRequested(slotIndex, null));
+            MailboxManager.PublishSimCommand(new LootItemRequested(slotIndex, null));
             base.ClickedOnAndReleasedOnMe();
         }
     }

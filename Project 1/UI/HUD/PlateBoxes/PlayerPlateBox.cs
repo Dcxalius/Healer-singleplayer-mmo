@@ -80,7 +80,7 @@ namespace Project_1.UI.HUD.PlateBoxes
         {
             base.ClickedOnAndReleasedOnMe();
 
-            Mailboxes.PublishSimCommand(new TargetRequested(null));
+            MailboxManager.PublishSimCommand(new TargetRequested(null));
         }
 
         protected override bool ClickedOnChildren(ClickEvent aClick)

@@ -56,17 +56,17 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         public Player(PlayerData aPlayerData) : base(aPlayerData)
         {
             ThreadAffinity.AssertSimThread();
-            Mailboxes.PublishUiEvent(new InventoryAssigned(Inventory.BuildUiSnapshot()));
+            MailboxManager.PublishUiEvent(new InventoryAssigned(Inventory.BuildUiSnapshot()));
             party = new Party(this);
             guild = new Guild(this);
             SpellBook.Init(this);
 
             LoadSpellBar(PlayerData.SavedSpellsOnBar);
 
-            Mailboxes.PublishUiEvent(new SpellbookRefreshed(RenderId, SpellBook.Spells.Select(x => x.Name).ToArray()));
-            Mailboxes.PublishUiEvent(new CharacterWindowSet(BuildCharacterWindowSnapshot()));
-            Mailboxes.PublishUiEvent(new PlayerPlateSet(BuildUiSnapshot()));
-            Mailboxes.PublishUiEvent(new GoldChanged(Gold));
+            MailboxManager.PublishUiEvent(new SpellbookRefreshed(RenderId, SpellBook.Spells.Select(x => x.Name).ToArray()));
+            MailboxManager.PublishUiEvent(new CharacterWindowSet(BuildCharacterWindowSnapshot()));
+            MailboxManager.PublishUiEvent(new PlayerPlateSet(BuildUiSnapshot()));
+            MailboxManager.PublishUiEvent(new GoldChanged(Gold));
         }
 
         public override void Update()
@@ -96,7 +96,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
                 if (!indexOfSpellsToAdd[i].HasValue) continue;
                 spellNamesToAddToBar[i] = spells[indexOfSpellsToAdd[i].Value].Name;
             }
-            Mailboxes.PublishUiEvent(new SpellbarLoaded(RenderId, spellNamesToAddToBar));
+            MailboxManager.PublishUiEvent(new SpellbarLoaded(RenderId, spellNamesToAddToBar));
         }
 
         public void GetPartyMembersFromGuild()
@@ -108,7 +108,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
                 GuildMember guildMember = guild.GetGuildMemberByName(partyMembers[i]);
                 ObjectManager.SpawnGuildMemberToParty(guildMember, guildMember.FeetPosition);
             }
-            Mailboxes.PublishUiEvent(new GuildInviteStatusUpdated(partyMembers, Enumerable.Repeat(InviteStatus.Accepted, partyMembers.Length).ToArray()));
+            MailboxManager.PublishUiEvent(new GuildInviteStatusUpdated(partyMembers, Enumerable.Repeat(InviteStatus.Accepted, partyMembers.Length).ToArray()));
         }
 
         public void ApplyMoveInput(bool left, bool right, bool up, bool down)
@@ -128,7 +128,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         {
             ThreadAffinity.AssertSimThread();
             PlayerData.Gold += aAmount;
-            Mailboxes.PublishUiEvent(new GoldChanged(Gold));
+            MailboxManager.PublishUiEvent(new GoldChanged(Gold));
         }
 
         CharacterWindowSnapshot BuildCharacterWindowSnapshot()

@@ -17,10 +17,10 @@ namespace Project_1.UI.HUD.Guild
         {
             if (member.RelationToPlayer == RelationToPlayerKind.Self)
             {
-                Mailboxes.PublishUiEvent(new CharacterWindowToggled());
+                MailboxManager.PublishUiEvent(new CharacterWindowToggled());
                 return;
             }
-            Mailboxes.PublishUiEvent(new InspectWindowToggled(member));
+            MailboxManager.PublishUiEvent(new InspectWindowToggled(member));
         }
 
         public OpenInspectWindow(EntityUiSnapshot aSnapshot, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new List<Action>() { new Action(() => OpenWindow(aSnapshot)) }, new GfxPath(GfxType.Item, "TestDagger"), aPos, aSize, Color.White)

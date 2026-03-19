@@ -42,7 +42,7 @@ namespace Project_1.UI.HUD.Windows
                 hoverSnapshot = aHoverSnapshot;
                 if (!aHasHoverSnapshot && hasHoverSnapshot && isHovered)
                 {
-                    Mailboxes.PublishUiEvent(new DescriptorBoxClear());
+                    MailboxManager.PublishUiEvent(new DescriptorBoxClear());
                 }
 
                 hasHoverSnapshot = aHasHoverSnapshot;
@@ -52,7 +52,7 @@ namespace Project_1.UI.HUD.Windows
             {
                 if (hasHoverSnapshot && isHovered)
                 {
-                    Mailboxes.PublishUiEvent(new DescriptorBoxClear());
+                    MailboxManager.PublishUiEvent(new DescriptorBoxClear());
                 }
 
                 numberLabel.Text = null;
@@ -65,14 +65,14 @@ namespace Project_1.UI.HUD.Windows
             {
                 base.OnHover();
                 if (!Visible || !hasHoverSnapshot) return;
-                Mailboxes.PublishUiEvent(new DescriptorBoxSet(hoverSnapshot));
+                MailboxManager.PublishUiEvent(new DescriptorBoxSet(hoverSnapshot));
             }
 
             protected override void OnDeHover()
             {
                 base.OnDeHover();
                 if (!hasHoverSnapshot) return;
-                Mailboxes.PublishUiEvent(new DescriptorBoxClear());
+                MailboxManager.PublishUiEvent(new DescriptorBoxClear());
             }
         }
 

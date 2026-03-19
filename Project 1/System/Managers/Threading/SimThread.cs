@@ -61,8 +61,8 @@ namespace Project_1.Managers
             ThreadAffinity.AssertMainThread();
             if (running) return;
             running = true;
-            Mailboxes.RegisterSimCommandType<WorkerCompletionReady>();
-            Mailboxes.Sim.Subscribe<WorkerCompletionReady>(e => WorkerPool.RunCompletion(e.CompletionId));
+            MailboxManager.RegisterSimCommandType<WorkerCompletionReady>();
+            MailboxManager.Sim.Subscribe<WorkerCompletionReady>(e => WorkerPool.RunCompletion(e.CompletionId));
             thread = new Thread(Run)
             {
                 IsBackground = true,
@@ -145,9 +145,9 @@ namespace Project_1.Managers
         static void RunOneStep()
         {
             long startTicks = Stopwatch.GetTimestamp();
-            Mailboxes.Sim.DispatchAll();
+            MailboxManager.Sim.DispatchAll();
             StateManager.Update();
-            Mailboxes.Sim.DispatchAll();
+            MailboxManager.Sim.DispatchAll();
             DebugManager.Update();
             long elapsedTicks = Stopwatch.GetTimestamp() - startTicks;
             long driftTicks = elapsedTicks - frameBudgetTicks;

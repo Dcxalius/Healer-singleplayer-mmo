@@ -49,7 +49,7 @@ namespace Project_1.Managers
             if (!KeyBindStateCache.GetPress(KeyBindManager.KeyListner.DebugTestGear)) return;
 
             RelativeScreenPosition dialogueBoxSize = new RelativeScreenPosition(0.2f);
-            Mailboxes.PublishUiEvent(new DialogueOpened(
+            MailboxManager.PublishUiEvent(new DialogueOpened(
                 "Hello Cheater!\n\nxdd",
                 Color.White,
                 DialogueBox.LocationOfPopUp.HUDManager.ToDialoguePopupLocation(),

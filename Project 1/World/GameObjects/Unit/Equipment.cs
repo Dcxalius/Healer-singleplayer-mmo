@@ -193,7 +193,7 @@ namespace Project_1.GameObjects.Unit
         {
             AssertSimThread();
             owner = aOwner;
-            Mailboxes.PublishUiEvent(new EquipmentSlotsRefreshed(owner.RenderId, owner.RelationToPlayer.ToRelationToPlayerKind(), BuildItemSnapshots()));
+            MailboxManager.PublishUiEvent(new EquipmentSlotsRefreshed(owner.RenderId, owner.RelationToPlayer.ToRelationToPlayerKind(), BuildItemSnapshots()));
         }
 
         void RefreshStatsFromEquipment()
@@ -559,7 +559,7 @@ namespace Project_1.GameObjects.Unit
             IncrementGearTypeCount(aEquipment);
             RefreshStatsFromEquipment();
             
-            Mailboxes.PublishUiEvent(new EquipmentSlotChanged(owner.RenderId, owner.RelationToPlayer.ToRelationToPlayerKind(), aSlot.ToEquipmentSlotKind(), BuildItemSnapshot(aSlot))); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
+            MailboxManager.PublishUiEvent(new EquipmentSlotChanged(owner.RenderId, owner.RelationToPlayer.ToRelationToPlayerKind(), aSlot.ToEquipmentSlotKind(), BuildItemSnapshot(aSlot))); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
             return previouslyEquiped;
         }
 
@@ -572,7 +572,7 @@ namespace Project_1.GameObjects.Unit
             equipped[(int)aSlot] = aEquipment;
             IncrementGearTypeCount(aEquipment);
             RefreshStatsFromEquipment();
-            Mailboxes.PublishUiEvent(new EquipmentSlotChanged(owner.RenderId, owner.RelationToPlayer.ToRelationToPlayerKind(), aSlot.ToEquipmentSlotKind(), BuildItemSnapshot(aSlot))); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
+            MailboxManager.PublishUiEvent(new EquipmentSlotChanged(owner.RenderId, owner.RelationToPlayer.ToRelationToPlayerKind(), aSlot.ToEquipmentSlotKind(), BuildItemSnapshot(aSlot))); //TODO: Change this to a system that tracks equipment changed during a frame and then at end sends the refresh command?
         }
 
         bool UnableToDualWield(Items.SubTypes.Equipment aEquipment, Slot aSlot)
@@ -613,7 +613,7 @@ namespace Project_1.GameObjects.Unit
             equipped[(int)aSlot] = null;
             DecrementGearTypeCount(item);
             RefreshStatsFromEquipment();
-            Mailboxes.PublishUiEvent(new EquipmentSlotChanged(owner.RenderId, owner.RelationToPlayer.ToRelationToPlayerKind(), aSlot.ToEquipmentSlotKind(), ItemUiSnapshot.Empty));
+            MailboxManager.PublishUiEvent(new EquipmentSlotChanged(owner.RenderId, owner.RelationToPlayer.ToRelationToPlayerKind(), aSlot.ToEquipmentSlotKind(), ItemUiSnapshot.Empty));
             return item;
         }
 

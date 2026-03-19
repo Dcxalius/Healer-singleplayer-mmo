@@ -190,7 +190,7 @@ namespace Project_1.GameObjects
         {
             if (player == null)
             {
-                Mailboxes.PublishUiEvent(new PlayerUiSnapshot(false, false, 0, true, 1, WorldSpace.Zero, false, WorldSpace.Zero, Array.Empty<SpellUiSnapshot>()));
+                MailboxManager.PublishUiEvent(new PlayerUiSnapshot(false, false, 0, true, 1, WorldSpace.Zero, false, WorldSpace.Zero, Array.Empty<SpellUiSnapshot>()));
                 return;
             }
 
@@ -203,7 +203,7 @@ namespace Project_1.GameObjects
             }
 
             Entity target = player.Target;
-            Mailboxes.PublishUiEvent(new PlayerUiSnapshot(
+            MailboxManager.PublishUiEvent(new PlayerUiSnapshot(
                 true,
                 player.InCombatOrPartyInCombat,
                 player.Gold,

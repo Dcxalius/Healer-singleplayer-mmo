@@ -116,7 +116,7 @@ namespace Project_1.Managers
             graphicsDeviceManager.ApplyChanges();
 
             Camera.Camera.SetWindowSize(new Camera.AbsoluteScreenPosition(aSize));
-            Mailboxes.PublishUiEvent(new HudRescaleRequested(aSize));
+            MailboxManager.PublishUiEvent(new HudRescaleRequested(aSize));
             PublishWindowLayoutChanged(aSize, renderTargetDestination);
             uncapturedScissorRect = graphicsDeviceManager.GraphicsDevice.ScissorRectangle;
             graphicsDeviceManager.GraphicsDevice.ScissorRectangle = uncapturedScissorRect;

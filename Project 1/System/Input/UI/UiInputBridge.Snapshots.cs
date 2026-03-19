@@ -10,20 +10,20 @@ namespace Project_1.Input
         {
             ThreadAffinity.AssertUiThread();
             UiKeyboardStateCache.Update(snapshot);
-            Mailboxes.PublishSimCommand(snapshot);
+            MailboxManager.PublishSimCommand(snapshot);
         }
 
         static void HandleKeyBindSnapshot(KeyBindSnapshot snapshot)
         {
             ThreadAffinity.AssertUiThread();
             UiKeyBindStateCache.Update(snapshot);
-            Mailboxes.PublishSimCommand(snapshot);
+            MailboxManager.PublishSimCommand(snapshot);
             if (UiTextInputManager.IsActive)
             {
                 return;
             }
 
-            Mailboxes.PublishSimCommand(new PlayerMovementRequested(
+            MailboxManager.PublishSimCommand(new PlayerMovementRequested(
                 UiKeyBindStateCache.GetHold(KeyBindManager.KeyListner.MoveCharacterLeft),
                 UiKeyBindStateCache.GetHold(KeyBindManager.KeyListner.MoveCharacterRight),
                 UiKeyBindStateCache.GetHold(KeyBindManager.KeyListner.MoveCharacterUp),
@@ -34,7 +34,7 @@ namespace Project_1.Input
         {
             ThreadAffinity.AssertUiThread();
             UiMouseStateCache.Update(snapshot);
-            Mailboxes.PublishSimCommand(snapshot);
+            MailboxManager.PublishSimCommand(snapshot);
         }
     }
 }

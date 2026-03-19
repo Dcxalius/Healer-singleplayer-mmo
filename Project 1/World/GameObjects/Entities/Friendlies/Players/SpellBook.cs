@@ -105,7 +105,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         {
             ThreadAffinity.AssertSimThread();
             knownSpells.Add(aSpell);
-            Mailboxes.PublishUiEvent(new SpellbookRefreshed(owner.RenderId, knownSpells.Select(x => x.Name).ToArray()));
+            MailboxManager.PublishUiEvent(new SpellbookRefreshed(owner.RenderId, knownSpells.Select(x => x.Name).ToArray()));
         }
 
 

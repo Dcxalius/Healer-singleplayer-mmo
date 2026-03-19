@@ -16,7 +16,7 @@ namespace Project_1.UI.StartMenu
         {
             base.ClickedOnAndReleasedOnMe();
 
-            Mailboxes.PublishSimCommand(new ContinueLastSaveRequested());
+            MailboxManager.PublishSimCommand(new ContinueLastSaveRequested());
         }
     }
 }

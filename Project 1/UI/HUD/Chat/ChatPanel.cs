@@ -140,11 +140,11 @@ namespace Project_1.UI.HUD.Chat
 
             if (text.StartsWith("/"))
             {
-                Mailboxes.PublishSimCommand(new ChatCommandRequested(text));
+                MailboxManager.PublishSimCommand(new ChatCommandRequested(text));
                 return;
             }
 
-            Mailboxes.PublishSimCommand(new ChatSayRequested(text));
+            MailboxManager.PublishSimCommand(new ChatSayRequested(text));
         }
 
         public void AddMessage(ChatMessage aMessage)

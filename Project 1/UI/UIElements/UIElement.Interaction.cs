@@ -96,7 +96,7 @@ namespace Project_1.UI.UIElements
             heldEvents = null;
             TouchInteraction();
             if (parent != null || !hudMoveable || !hudMoving) return;
-            Mailboxes.PublishUiEvent(new HudSizeChangerSet(UiElementId));
+            MailboxManager.PublishUiEvent(new HudSizeChangerSet(UiElementId));
         }
 
         protected virtual void HoldReleaseAwayFromMe()

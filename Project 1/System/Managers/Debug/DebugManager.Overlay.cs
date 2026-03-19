@@ -85,9 +85,9 @@ namespace Project_1.Managers
             frameTimeText.Value = $"Frame Time: {frameTimeMs,7:0.00} ms";
             totalTimeText.Value = $"Session Time: {totalTime:hh\\:mm\\:ss}";
 
-            MailboxStats mainStats = Mailboxes.MainStats;
-            MailboxStats uiStats = Mailboxes.UiStats;
-            MailboxStats simStats = Mailboxes.SimStats;
+            MailboxStats mainStats = MailboxManager.MainStats;
+            MailboxStats uiStats = MailboxManager.UiStats;
+            MailboxStats simStats = MailboxManager.SimStats;
             mailboxText.Value =
                 "Mailbox Queue Depth (pending/peak)\n" +
                 $"  Main: {mainStats.Pending,4}/{mainStats.Peak,4}\n" +

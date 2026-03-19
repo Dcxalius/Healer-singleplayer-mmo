@@ -16,8 +16,8 @@ namespace Project_1.Items
             if (initialized) return;
             initialized = true;
 
-            Mailboxes.RegisterSimCommandType<ShopPurchaseRequested>();
-            Mailboxes.Sim.Subscribe<ShopPurchaseRequested>(HandleShopPurchaseRequested);
+            MailboxManager.RegisterSimCommandType<ShopPurchaseRequested>();
+            MailboxManager.Sim.Subscribe<ShopPurchaseRequested>(HandleShopPurchaseRequested);
         }
 
         static void HandleShopPurchaseRequested(ShopPurchaseRequested e)

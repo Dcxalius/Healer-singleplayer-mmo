@@ -38,7 +38,7 @@ namespace Project_1.UI.LoadingMenu
         void LoadSave()
         {
             if (!save.HasValue) return;
-            Mailboxes.PublishSimCommand(new LoadSaveRequested(save.Value.SaveName));
+            MailboxManager.PublishSimCommand(new LoadSaveRequested(save.Value.SaveName));
         }
 
         public void SetSave(SaveUiSnapshot aSave)

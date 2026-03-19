@@ -29,7 +29,7 @@ namespace Project_1.UI.PauseMenu
                 base.ClickedOnAndReleasedOnMe();
                 return;
             }
-            Mailboxes.PublishSimCommand(new SaveDataRequested());
+            MailboxManager.PublishSimCommand(new SaveDataRequested());
 
             base.ClickedOnAndReleasedOnMe();
 

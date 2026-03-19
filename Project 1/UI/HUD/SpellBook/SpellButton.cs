@@ -104,7 +104,7 @@ namespace Project_1.UI.HUD.SpellBook
         {
             if (string.IsNullOrWhiteSpace(spellName)) return;
 
-            Mailboxes.PublishSimCommand(new SpellCastRequested(spellName));
+            MailboxManager.PublishSimCommand(new SpellCastRequested(spellName));
 
         }
 

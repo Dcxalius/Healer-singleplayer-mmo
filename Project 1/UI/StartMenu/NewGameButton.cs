@@ -17,7 +17,7 @@ namespace Project_1.UI.StartMenu
         {
             base.ClickedOnAndReleasedOnMe();
 
-            Mailboxes.PublishSimCommand(new NewGameRequested());
+            MailboxManager.PublishSimCommand(new NewGameRequested());
         }
     }
 }

@@ -47,7 +47,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             {
                 data[i] = guildMembers[i].BuildUiSnapshot();
             }
-            Mailboxes.PublishUiEvent(new GuildMembersSet(data));
+            MailboxManager.PublishUiEvent(new GuildMembersSet(data));
         }
     }
 }

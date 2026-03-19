@@ -112,7 +112,7 @@ namespace Project_1.GameObjects
             ThreadAffinity.AssertSimThread();
             ObjectFactory.AddGuildMember("xdddd", "Rogue");
             guild = ObjectFactory.GetGuildMemebers();
-            Mailboxes.PublishUiEvent(new GuildMemberAdded(guild.Last().BuildUiSnapshot()));
+            MailboxManager.PublishUiEvent(new GuildMemberAdded(guild.Last().BuildUiSnapshot()));
         }
 
         public static void Reset()
@@ -123,7 +123,7 @@ namespace Project_1.GameObjects
                 guild[i].Delete();
             }
 
-            Mailboxes.PublishUiEvent(new PartyCleared());
+            MailboxManager.PublishUiEvent(new PartyCleared());
             entities.Clear();
             guild.Clear();
             npcs.Clear();

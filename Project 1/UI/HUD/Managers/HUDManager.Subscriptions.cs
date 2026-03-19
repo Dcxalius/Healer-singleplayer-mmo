@@ -27,104 +27,104 @@ namespace Project_1.UI.HUD.Managers
 
         static void RegisterChatSubscriptions()
         {
-            Mailboxes.Ui.Subscribe<ChatMessagePosted>(OnChatMessagePosted);
-            Mailboxes.Ui.Subscribe<ChatFiltersChanged>(OnChatFiltersChanged);
-            Mailboxes.Ui.Subscribe<ChatCleared>(OnChatCleared);
+            MailboxManager.Ui.Subscribe<ChatMessagePosted>(OnChatMessagePosted);
+            MailboxManager.Ui.Subscribe<ChatFiltersChanged>(OnChatFiltersChanged);
+            MailboxManager.Ui.Subscribe<ChatCleared>(OnChatCleared);
         }
 
         static void RegisterLootSubscriptions()
         {
-            Mailboxes.Ui.Subscribe<LootOpened>(HandleLootOpened);
-            Mailboxes.Ui.Subscribe<LootSlotChanged>(OnLootSlotChanged);
-            Mailboxes.Ui.Subscribe<LootSlotRemoved>(OnLootSlotRemoved);
-            Mailboxes.Ui.Subscribe<LootClosed>(OnLootClosed);
+            MailboxManager.Ui.Subscribe<LootOpened>(HandleLootOpened);
+            MailboxManager.Ui.Subscribe<LootSlotChanged>(OnLootSlotChanged);
+            MailboxManager.Ui.Subscribe<LootSlotRemoved>(OnLootSlotRemoved);
+            MailboxManager.Ui.Subscribe<LootClosed>(OnLootClosed);
         }
 
         static void RegisterInventorySubscriptions()
         {
-            Mailboxes.Ui.Subscribe<InventoryAssigned>(OnInventoryAssigned);
-            Mailboxes.Ui.Subscribe<InventorySlotChanged>(OnInventorySlotChanged);
-            Mailboxes.Ui.Subscribe<GoldChanged>(OnGoldChanged);
-            Mailboxes.Ui.Subscribe<DescriptorBoxSet>(OnDescriptorBoxSet);
-            Mailboxes.Ui.Subscribe<DescriptorBoxClear>(OnDescriptorBoxClear);
+            MailboxManager.Ui.Subscribe<InventoryAssigned>(OnInventoryAssigned);
+            MailboxManager.Ui.Subscribe<InventorySlotChanged>(OnInventorySlotChanged);
+            MailboxManager.Ui.Subscribe<GoldChanged>(OnGoldChanged);
+            MailboxManager.Ui.Subscribe<DescriptorBoxSet>(OnDescriptorBoxSet);
+            MailboxManager.Ui.Subscribe<DescriptorBoxClear>(OnDescriptorBoxClear);
         }
 
         static void RegisterSpellSubscriptions()
         {
-            Mailboxes.Ui.Subscribe<CastChannelStarted>(OnCastChannelStarted);
-            Mailboxes.Ui.Subscribe<CastChannelProgress>(OnCastChannelProgress);
-            Mailboxes.Ui.Subscribe<CastChannelCancelled>(OnCastChannelCancelled);
-            Mailboxes.Ui.Subscribe<CastChannelFinished>(OnCastChannelFinished);
-            Mailboxes.Ui.Subscribe<SpellbookRefreshed>(OnSpellbookRefreshed);
-            Mailboxes.Ui.Subscribe<SpellbarLoaded>(OnSpellbarLoaded);
+            MailboxManager.Ui.Subscribe<CastChannelStarted>(OnCastChannelStarted);
+            MailboxManager.Ui.Subscribe<CastChannelProgress>(OnCastChannelProgress);
+            MailboxManager.Ui.Subscribe<CastChannelCancelled>(OnCastChannelCancelled);
+            MailboxManager.Ui.Subscribe<CastChannelFinished>(OnCastChannelFinished);
+            MailboxManager.Ui.Subscribe<SpellbookRefreshed>(OnSpellbookRefreshed);
+            MailboxManager.Ui.Subscribe<SpellbarLoaded>(OnSpellbarLoaded);
         }
 
         static void RegisterWindowSubscriptions()
         {
-            Mailboxes.Ui.Subscribe<EquipmentSlotChanged>(OnEquipmentSlotChanged);
-            Mailboxes.Ui.Subscribe<EquipmentSlotsRefreshed>(OnEquipmentSlotsRefreshed);
-            Mailboxes.Ui.Subscribe<StatsRefreshed>(OnStatsRefreshed);
-            Mailboxes.Ui.Subscribe<ExperienceRefreshed>(OnExperienceRefreshed);
-            Mailboxes.Ui.Subscribe<CharacterWindowSet>(OnCharacterWindowSet);
-            Mailboxes.Ui.Subscribe<GuildInviteStatusUpdated>(OnGuildInviteStatusUpdated);
-            Mailboxes.Ui.Subscribe<GuildMembersSet>(OnGuildMembersSet);
-            Mailboxes.Ui.Subscribe<GuildMemberAdded>(OnGuildMemberAdded);
-            Mailboxes.Ui.Subscribe<GossipOpened>(OnGossipOpened);
-            Mailboxes.Ui.Subscribe<GossipClosed>(OnGossipClosed);
-            Mailboxes.Ui.Subscribe<ShopOpened>(OnShopOpened);
-            Mailboxes.Ui.Subscribe<ShopClosed>(OnShopClosed);
-            Mailboxes.Ui.Subscribe<InspectWindowToggled>(OnInspectWindowToggled);
-            Mailboxes.Ui.Subscribe<LogicWindowOpened>(OnLogicWindowOpened);
-            Mailboxes.Ui.Subscribe<LogicWindowSnapshotSet>(OnLogicWindowSnapshotSet);
-            Mailboxes.Ui.Subscribe<CharacterWindowToggled>(OnCharacterWindowToggled);
+            MailboxManager.Ui.Subscribe<EquipmentSlotChanged>(OnEquipmentSlotChanged);
+            MailboxManager.Ui.Subscribe<EquipmentSlotsRefreshed>(OnEquipmentSlotsRefreshed);
+            MailboxManager.Ui.Subscribe<StatsRefreshed>(OnStatsRefreshed);
+            MailboxManager.Ui.Subscribe<ExperienceRefreshed>(OnExperienceRefreshed);
+            MailboxManager.Ui.Subscribe<CharacterWindowSet>(OnCharacterWindowSet);
+            MailboxManager.Ui.Subscribe<GuildInviteStatusUpdated>(OnGuildInviteStatusUpdated);
+            MailboxManager.Ui.Subscribe<GuildMembersSet>(OnGuildMembersSet);
+            MailboxManager.Ui.Subscribe<GuildMemberAdded>(OnGuildMemberAdded);
+            MailboxManager.Ui.Subscribe<GossipOpened>(OnGossipOpened);
+            MailboxManager.Ui.Subscribe<GossipClosed>(OnGossipClosed);
+            MailboxManager.Ui.Subscribe<ShopOpened>(OnShopOpened);
+            MailboxManager.Ui.Subscribe<ShopClosed>(OnShopClosed);
+            MailboxManager.Ui.Subscribe<InspectWindowToggled>(OnInspectWindowToggled);
+            MailboxManager.Ui.Subscribe<LogicWindowOpened>(OnLogicWindowOpened);
+            MailboxManager.Ui.Subscribe<LogicWindowSnapshotSet>(OnLogicWindowSnapshotSet);
+            MailboxManager.Ui.Subscribe<CharacterWindowToggled>(OnCharacterWindowToggled);
         }
 
         static void RegisterPlateAndPartySubscriptions()
         {
-            Mailboxes.Ui.Subscribe<PlayerPlateSet>(OnPlayerPlateSet);
-            Mailboxes.Ui.Subscribe<TargetChanged>(OnTargetChanged);
-            Mailboxes.Ui.Subscribe<PlateRefreshRequested>(OnPlateRefreshRequested);
-            Mailboxes.Ui.Subscribe<NamePlateAdded>(OnNamePlateAdded);
-            Mailboxes.Ui.Subscribe<NamePlateRemoved>(OnNamePlateRemoved);
-            Mailboxes.Ui.Subscribe<BuffAdded>(OnBuffAdded);
-            Mailboxes.Ui.Subscribe<PartyControlCleared>(OnPartyControlCleared);
-            Mailboxes.Ui.Subscribe<PartyWalkerAdded>(OnPartyWalkerAdded);
-            Mailboxes.Ui.Subscribe<PartyWalkerRemoved>(OnPartyWalkerRemoved);
-            Mailboxes.Ui.Subscribe<PartyMemberAdded>(OnPartyMemberAdded);
-            Mailboxes.Ui.Subscribe<PartyMemberRemoved>(OnPartyMemberRemoved);
-            Mailboxes.Ui.Subscribe<PartyCleared>(OnPartyCleared);
+            MailboxManager.Ui.Subscribe<PlayerPlateSet>(OnPlayerPlateSet);
+            MailboxManager.Ui.Subscribe<TargetChanged>(OnTargetChanged);
+            MailboxManager.Ui.Subscribe<PlateRefreshRequested>(OnPlateRefreshRequested);
+            MailboxManager.Ui.Subscribe<NamePlateAdded>(OnNamePlateAdded);
+            MailboxManager.Ui.Subscribe<NamePlateRemoved>(OnNamePlateRemoved);
+            MailboxManager.Ui.Subscribe<BuffAdded>(OnBuffAdded);
+            MailboxManager.Ui.Subscribe<PartyControlCleared>(OnPartyControlCleared);
+            MailboxManager.Ui.Subscribe<PartyWalkerAdded>(OnPartyWalkerAdded);
+            MailboxManager.Ui.Subscribe<PartyWalkerRemoved>(OnPartyWalkerRemoved);
+            MailboxManager.Ui.Subscribe<PartyMemberAdded>(OnPartyMemberAdded);
+            MailboxManager.Ui.Subscribe<PartyMemberRemoved>(OnPartyMemberRemoved);
+            MailboxManager.Ui.Subscribe<PartyCleared>(OnPartyCleared);
         }
 
         static void RegisterHeldDragSubscriptions()
         {
-            Mailboxes.Ui.Subscribe<HeldItemStart>(OnHeldItemStart);
-            Mailboxes.Ui.Subscribe<HeldItemEnd>(OnHeldItemEnd);
-            Mailboxes.Ui.Subscribe<HeldSpellStart>(OnHeldSpellStart);
-            Mailboxes.Ui.Subscribe<HeldSpellEnd>(OnHeldSpellEnd);
+            MailboxManager.Ui.Subscribe<HeldItemStart>(OnHeldItemStart);
+            MailboxManager.Ui.Subscribe<HeldItemEnd>(OnHeldItemEnd);
+            MailboxManager.Ui.Subscribe<HeldSpellStart>(OnHeldSpellStart);
+            MailboxManager.Ui.Subscribe<HeldSpellEnd>(OnHeldSpellEnd);
         }
 
         static void RegisterHudMoveSubscriptions()
         {
-            Mailboxes.Ui.Subscribe<HudMovableChanged>(OnHudMovableChanged);
-            Mailboxes.Ui.Subscribe<HudSizeChangeRequested>(OnHudSizeChangeRequested);
-            Mailboxes.Ui.Subscribe<HudSizeChangerSet>(OnHudSizeChangerSet);
+            MailboxManager.Ui.Subscribe<HudMovableChanged>(OnHudMovableChanged);
+            MailboxManager.Ui.Subscribe<HudSizeChangeRequested>(OnHudSizeChangeRequested);
+            MailboxManager.Ui.Subscribe<HudSizeChangerSet>(OnHudSizeChangerSet);
         }
 
         static void RegisterDialogueSubscriptions()
         {
-            Mailboxes.Ui.Subscribe<DialogueOpened>(AddDialogueBox);
-            Mailboxes.Ui.Subscribe<DialogueClosed>(OnDialogueClosed);
+            MailboxManager.Ui.Subscribe<DialogueOpened>(AddDialogueBox);
+            MailboxManager.Ui.Subscribe<DialogueClosed>(OnDialogueClosed);
         }
 
         static void RegisterSaveIndicatorSubscriptions()
         {
-            Mailboxes.Ui.Subscribe<SaveDataStarted>(OnSaveDataStarted);
-            Mailboxes.Ui.Subscribe<SaveDataFinished>(OnSaveDataFinished);
+            MailboxManager.Ui.Subscribe<SaveDataStarted>(OnSaveDataStarted);
+            MailboxManager.Ui.Subscribe<SaveDataFinished>(OnSaveDataFinished);
         }
 
         static void RegisterMiscSubscriptions()
         {
-            Mailboxes.Ui.Subscribe<PlayerUiSnapshot>(OnPlayerUiSnapshot);
+            MailboxManager.Ui.Subscribe<PlayerUiSnapshot>(OnPlayerUiSnapshot);
         }
 
         static void OnChatMessagePosted(ChatMessagePosted e)
@@ -309,7 +309,7 @@ namespace Project_1.UI.HUD.Managers
         static void OnLogicWindowOpened(LogicWindowOpened e)
         {
             windowHandler.OpenLogicWindow(e.MemberRenderId);
-            Mailboxes.PublishSimCommand(new LogicWindowSnapshotRequested(e.MemberRenderId));
+            MailboxManager.PublishSimCommand(new LogicWindowSnapshotRequested(e.MemberRenderId));
             InvalidateUi();
         }
 

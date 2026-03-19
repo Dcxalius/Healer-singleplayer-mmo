@@ -33,8 +33,8 @@ namespace Project_1.Items
 
         static void SubscribeSimCommand<T>(System.Action<T> handler)
         {
-            Mailboxes.RegisterSimCommandType<T>();
-            Mailboxes.Sim.Subscribe(handler);
+            MailboxManager.RegisterSimCommandType<T>();
+            MailboxManager.Sim.Subscribe(handler);
         }
 
         static void HandleInventorySwapItemsRequested(InventorySwapItemsRequested e)

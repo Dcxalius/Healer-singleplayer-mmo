@@ -87,7 +87,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             int renderId1 = count > 1 ? commands[1].RenderId : 0;
             int renderId2 = count > 2 ? commands[2].RenderId : 0;
             int renderId3 = count > 3 ? commands[3].RenderId : 0;
-            Mailboxes.PublishUiEvent(new PartyControlCleared(count, renderId0, renderId1, renderId2, renderId3));
+            MailboxManager.PublishUiEvent(new PartyControlCleared(count, renderId0, renderId1, renderId2, renderId3));
             commands.Clear();
         }
 
@@ -96,7 +96,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             ThreadAffinity.AssertSimThread();
             if (commands.Contains(aGuildMember)) { return; }
 
-            Mailboxes.PublishUiEvent(new PartyWalkerAdded(aGuildMember.RenderId));
+            MailboxManager.PublishUiEvent(new PartyWalkerAdded(aGuildMember.RenderId));
             commands.Add(aGuildMember);
         }
 
@@ -113,7 +113,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             ThreadAffinity.AssertSimThread();
             if (!commands.Contains(aGuildMember)) { return; }
 
-            Mailboxes.PublishUiEvent(new PartyWalkerRemoved(aGuildMember.RenderId));
+            MailboxManager.PublishUiEvent(new PartyWalkerRemoved(aGuildMember.RenderId));
             commands.Remove(aGuildMember);
         }
 
@@ -125,7 +125,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             party.Add(aGuildMember);
             aGuildMember.AddedToParty();
 
-            Mailboxes.PublishUiEvent(new PartyMemberAdded(party[party.Count - 1].BuildUiSnapshot()));
+            MailboxManager.PublishUiEvent(new PartyMemberAdded(party[party.Count - 1].BuildUiSnapshot()));
             return true;
         }
 
@@ -136,7 +136,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             Debug.Assert(aGuildMember != null);
             Debug.Assert(IsInParty(aGuildMember));
 
-            Mailboxes.PublishUiEvent(new PartyMemberRemoved(aGuildMember.RenderId));
+            MailboxManager.PublishUiEvent(new PartyMemberRemoved(aGuildMember.RenderId));
             party.Remove(aGuildMember);
             aGuildMember.RemovedFromParty();
             return true;

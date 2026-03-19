@@ -28,7 +28,8 @@ namespace Project_1.Input
             {
                 if (exception is not IndexOutOfRangeException &&
                     exception is not JsonSerializationException &&
-                    exception is not FileNotFoundException)
+                    exception is not FileNotFoundException &&
+                    exception is not MissingDataException)
                 {
                     throw;
                 }
@@ -38,11 +39,19 @@ namespace Project_1.Input
             }
         }
 
+        private class MissingDataException : Exception
+        {
+            public MissingDataException(string message) : base(message) { }
+        }
+
         static void LoadBindings(string aKeyBindSetting)
         {
             string dataAsString = File.ReadAllText(aKeyBindSetting);
             KeySet[] importedBinds = SaveManager.ImportData<KeySet[]>(dataAsString);
-            Debug.Assert(importedBinds.Length == (int)KeyListner.Count * 2);
+            if (importedBinds.Length != (int)KeyListner.Count * 2)
+            {
+                throw new MissingDataException($"Invalid number of keybinds in both files. Expected {(int)KeyListner.Count * 2} but got {importedBinds.Length}");
+            }
 
             for (int i = 0; i < (int)KeyListner.Count; i++)
             {

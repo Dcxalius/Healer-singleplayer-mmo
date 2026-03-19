@@ -154,7 +154,7 @@ namespace Project_1.Managers
                 {
                     int completionId = Interlocked.Increment(ref nextCompletionId);
                     completions[completionId] = () => onComplete(result);
-                    Mailboxes.PublishSimCommand(new WorkerCompletionReady(completionId));
+                    MailboxManager.PublishSimCommand(new WorkerCompletionReady(completionId));
                 }
             });
         }

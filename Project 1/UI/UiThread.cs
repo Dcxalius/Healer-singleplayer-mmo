@@ -120,7 +120,7 @@ namespace Project_1.UI
                 lock (HUDManager.UiLock)
                 {
                     long phaseStart = Stopwatch.GetTimestamp();
-                    Mailboxes.Ui.DispatchAll();
+                    MailboxManager.Ui.DispatchAll();
                     long afterDispatch = Stopwatch.GetTimestamp();
                     dispatchTicks = afterDispatch - phaseStart;
                     if (doUpdate)

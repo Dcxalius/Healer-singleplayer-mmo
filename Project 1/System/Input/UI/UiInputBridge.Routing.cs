@@ -17,7 +17,7 @@ namespace Project_1.Input
                 clickEvent,
                 StateManager.UiClick,
                 HUDManager.Click,
-                static e => Mailboxes.PublishSimCommand(WorldClickRequested.FromClickEvent(e)));
+                static e => MailboxManager.PublishSimCommand(WorldClickRequested.FromClickEvent(e)));
         }
 
         static void HandleRelease(ReleaseEvent releaseEvent)
@@ -27,7 +27,7 @@ namespace Project_1.Input
                 releaseEvent,
                 StateManager.UiRelease,
                 HUDManager.Release,
-                static e => Mailboxes.PublishSimCommand(WorldReleaseRequested.FromReleaseEvent(e)));
+                static e => MailboxManager.PublishSimCommand(WorldReleaseRequested.FromReleaseEvent(e)));
         }
 
         static void HandleScroll(ScrollEvent scrollEvent)
@@ -37,7 +37,7 @@ namespace Project_1.Input
                 scrollEvent,
                 StateManager.UiScroll,
                 HUDManager.Scroll,
-                static e => Mailboxes.PublishSimCommand(WorldScrollRequested.FromScrollEvent(e)));
+                static e => MailboxManager.PublishSimCommand(WorldScrollRequested.FromScrollEvent(e)));
         }
 
         static void HandleEscapePressed(EscapePressed _)
@@ -49,7 +49,7 @@ namespace Project_1.Input
                 return;
             }
 
-            Mailboxes.PublishSimCommand(new EscapeRequested());
+            MailboxManager.PublishSimCommand(new EscapeRequested());
         }
 
         static void RoutePointerEvent<TEvent>(

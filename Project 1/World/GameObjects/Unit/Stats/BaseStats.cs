@@ -98,7 +98,7 @@ namespace Project_1.GameObjects.Unit.Stats
             owner.Equipment.SetMeleeAttackPower = GetAttackPower(classData);
             fistAttack.AttackPower = GetAttackPower(classData);
             if (owner is not Friendly friendlyOwner) return;
-            Mailboxes.PublishUiEvent(new StatsRefreshed(
+            MailboxManager.PublishUiEvent(new StatsRefreshed(
                 owner.RenderId,
                 owner.RelationToPlayer.ToRelationToPlayerKind(),
                 StatReportSnapshot.FromPairReport(StatReport, default, StatLineCategoryResolver.ResolveCharacter),
@@ -135,7 +135,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
 
             if (owner is not Friendly friendlyOwner) return;
-            Mailboxes.PublishUiEvent(new StatsRefreshed(
+            MailboxManager.PublishUiEvent(new StatsRefreshed(
                 owner.RenderId,
                 owner.RelationToPlayer.ToRelationToPlayerKind(),
                 StatReportSnapshot.FromPairReport(StatReport, default, StatLineCategoryResolver.ResolveCharacter),

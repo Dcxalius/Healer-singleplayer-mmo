@@ -45,14 +45,14 @@ namespace Project_1.Input
         {
             byte modifiersMask = GetHoldModifierMask();
             ClickEvent clickEvent = new ClickEvent(GetMousePosRelative(), aTypeOfClick, modifiersMask);
-            Mailboxes.PublishUiEvent(clickEvent);
+            MailboxManager.PublishUiEvent(clickEvent);
         }
 
         public static void CreateReleaseEvent(ClickType aTypeOfRelease)
         {
             byte modifiersMask = GetHoldModifierMask();
             ReleaseEvent releaseEvent = new ReleaseEvent(null, GetMousePosRelative(), aTypeOfRelease, modifiersMask);
-            Mailboxes.PublishUiEvent(releaseEvent);
+            MailboxManager.PublishUiEvent(releaseEvent);
         }
 
         static void CreateScrollEvent()
@@ -64,14 +64,14 @@ namespace Project_1.Input
                 : ScrollEvent.Direction.Down;
 
             ScrollEvent scrollEvent = new ScrollEvent(GetMousePosRelative(), amount, direction, modifiersMask);
-            Mailboxes.PublishUiEvent(scrollEvent);
+            MailboxManager.PublishUiEvent(scrollEvent);
         }
 
         static void PublishMouseSnapshot()
         {
             AbsoluteScreenPosition absolute = GetMousePosAbsolute();
             RelativeScreenPosition relative = GetMousePosRelative();
-            Mailboxes.PublishUiEvent(new MouseSnapshot(absolute, relative, scrollWheelValue, scrollDelta));
+            MailboxManager.PublishUiEvent(new MouseSnapshot(absolute, relative, scrollWheelValue, scrollDelta));
         }
 
         public static AbsoluteScreenPosition GetMousePosAbsolute()

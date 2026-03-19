@@ -17,8 +17,8 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
             if (initialized) return;
             initialized = true;
 
-            Mailboxes.RegisterSimCommandType<LogicWindowSnapshotRequested>();
-            Mailboxes.Sim.Subscribe<LogicWindowSnapshotRequested>(HandleLogicWindowSnapshotRequested);
+            MailboxManager.RegisterSimCommandType<LogicWindowSnapshotRequested>();
+            MailboxManager.Sim.Subscribe<LogicWindowSnapshotRequested>(HandleLogicWindowSnapshotRequested);
         }
 
         static void HandleLogicWindowSnapshotRequested(LogicWindowSnapshotRequested e)
@@ -26,12 +26,12 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
             ThreadAffinity.AssertSimThread();
             if (!ObjectManager.TryGetGuildMemberByRenderId(e.MemberRenderId, out GuildMember member))
             {
-                Mailboxes.PublishUiEvent(new LogicWindowSnapshotSet(e.MemberRenderId, Array.Empty<LogicNodeUiSnapshot>()));
+                MailboxManager.PublishUiEvent(new LogicWindowSnapshotSet(e.MemberRenderId, Array.Empty<LogicNodeUiSnapshot>()));
                 return;
             }
 
             LogicNode root = member.AttackLogic?.RootNode;
-            Mailboxes.PublishUiEvent(new LogicWindowSnapshotSet(e.MemberRenderId, BuildLogicNodeSnapshot(root)));
+            MailboxManager.PublishUiEvent(new LogicWindowSnapshotSet(e.MemberRenderId, BuildLogicNodeSnapshot(root)));
         }
 
         static LogicNodeUiSnapshot[] BuildLogicNodeSnapshot(LogicNode root)

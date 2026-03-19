@@ -16,18 +16,18 @@ namespace Project_1.Input
             ThreadAffinity.AssertUiThread();
             bool[] heldModifiers = UiKeyboardStateCache.GetHoldModifiers();
             ReleaseEvent releaseEvent = new ReleaseEvent(creator, UiMouseStateCache.Relative, clickType, heldModifiers);
-            Mailboxes.PublishUiEvent(releaseEvent);
+            MailboxManager.PublishUiEvent(releaseEvent);
         }
 
         public static void Init()
         {
-            Mailboxes.Ui.Subscribe<ClickEvent>(HandleClick);
-            Mailboxes.Ui.Subscribe<ReleaseEvent>(HandleRelease);
-            Mailboxes.Ui.Subscribe<ScrollEvent>(HandleScroll);
-            Mailboxes.Ui.Subscribe<KeyboardSnapshot>(HandleKeyboardSnapshot);
-            Mailboxes.Ui.Subscribe<KeyBindSnapshot>(HandleKeyBindSnapshot);
-            Mailboxes.Ui.Subscribe<MouseSnapshot>(HandleMouseSnapshot);
-            Mailboxes.Ui.Subscribe<EscapePressed>(HandleEscapePressed);
+            MailboxManager.Ui.Subscribe<ClickEvent>(HandleClick);
+            MailboxManager.Ui.Subscribe<ReleaseEvent>(HandleRelease);
+            MailboxManager.Ui.Subscribe<ScrollEvent>(HandleScroll);
+            MailboxManager.Ui.Subscribe<KeyboardSnapshot>(HandleKeyboardSnapshot);
+            MailboxManager.Ui.Subscribe<KeyBindSnapshot>(HandleKeyBindSnapshot);
+            MailboxManager.Ui.Subscribe<MouseSnapshot>(HandleMouseSnapshot);
+            MailboxManager.Ui.Subscribe<EscapePressed>(HandleEscapePressed);
         }
     }
 }

@@ -48,7 +48,7 @@ namespace Project_1
 
             if (DebugManager.Mode(DebugMode.InstantlyContinue))
             {
-                Mailboxes.PublishSimCommand(new Messaging.Events.ContinueLastSaveRequested());
+                MailboxManager.PublishSimCommand(new Messaging.Events.ContinueLastSaveRequested());
             }
             base.Initialize();
         }
@@ -73,15 +73,15 @@ namespace Project_1
             else if (!SimThread.IsRunning)
             {
                 // Single-thread mode: process UI input before sim update.
-                Mailboxes.Ui.DispatchAll();
+                MailboxManager.Ui.DispatchAll();
             }
             if (!SimThread.IsRunning)
             {
-                Mailboxes.Main.DispatchAll();
-                Mailboxes.Sim.DispatchAll();
+                MailboxManager.Main.DispatchAll();
+                MailboxManager.Sim.DispatchAll();
                 StateManager.Update();
-                Mailboxes.Main.DispatchAll();
-                Mailboxes.Sim.DispatchAll();
+                MailboxManager.Main.DispatchAll();
+                MailboxManager.Sim.DispatchAll();
                 DebugManager.Update();
             }
             if (!UiThread.IsRunning)
@@ -90,7 +90,7 @@ namespace Project_1
                 {
                     lock (HUDManager.UiLock)
                     {
-                        Mailboxes.Ui.DispatchAll();
+                        MailboxManager.Ui.DispatchAll();
                         UiTextInputManager.Update();
                         StateManager.UiUpdate();
                         HUDManager.Update();
@@ -99,7 +99,7 @@ namespace Project_1
                 }
                 else
                 {
-                    Mailboxes.Ui.DispatchAll();
+                    MailboxManager.Ui.DispatchAll();
                     UiTextInputManager.Update();
                     StateManager.UiUpdate();
                     HUDManager.Update();
@@ -153,7 +153,7 @@ namespace Project_1
         {
             ThreadAffinity.InitMainThread();
             ThreadAffinity.AssertMainThread();
-            Mailboxes.InitMainThread();
+            MailboxManager.InitMainThread();
             GraphicsManager.Init();
             SaveManager.Init();
             DebugManager.Init();

@@ -15,8 +15,8 @@ namespace Project_1.GameObjects.Spells
             if (initialized) return;
             initialized = true;
 
-            Mailboxes.RegisterSimCommandType<SpellCastRequested>();
-            Mailboxes.Sim.Subscribe<SpellCastRequested>(HandleSpellCastRequested);
+            MailboxManager.RegisterSimCommandType<SpellCastRequested>();
+            MailboxManager.Sim.Subscribe<SpellCastRequested>(HandleSpellCastRequested);
         }
 
         static void HandleSpellCastRequested(SpellCastRequested e)

@@ -68,7 +68,7 @@ namespace Project_1.UI.HUD.SpellBook
 
             if (!string.IsNullOrWhiteSpace(spellName))
             {
-                Mailboxes.PublishUiEvent(new HeldSpellStart(spellName, UiMouseStateCache.Absolute - Location));
+                MailboxManager.PublishUiEvent(new HeldSpellStart(spellName, UiMouseStateCache.Absolute - Location));
             }
         }
 
@@ -76,13 +76,13 @@ namespace Project_1.UI.HUD.SpellBook
         {
             base.ClickedOnAndReleasedOnMe();
 
-            Mailboxes.PublishUiEvent(new HeldSpellEnd());
+            MailboxManager.PublishUiEvent(new HeldSpellEnd());
         }
 
         protected override void HoldReleaseAwayFromMe()
         {
 
-            Mailboxes.PublishUiEvent(new HeldSpellEnd());
+            MailboxManager.PublishUiEvent(new HeldSpellEnd());
 
             if (!string.IsNullOrWhiteSpace(spellName))
             {

@@ -250,9 +250,9 @@ namespace Project_1.Managers
 
             try
             {
-                MailboxStats mainStats = Mailboxes.MainStats;
-                MailboxStats uiStats = Mailboxes.UiStats;
-                MailboxStats simStats = Mailboxes.SimStats;
+                MailboxStats mainStats = MailboxManager.MainStats;
+                MailboxStats uiStats = MailboxManager.UiStats;
+                MailboxStats simStats = MailboxManager.SimStats;
                 WorkerPoolStats workerStats = WorkerPool.Stats;
                 SimThreadStats simThreadStats = SimThread.Stats;
                 UiThreadStats uiThreadStats = UiThread.Stats;

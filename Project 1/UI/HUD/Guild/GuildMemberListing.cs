@@ -80,7 +80,7 @@ namespace Project_1.UI.HUD.Guild
 
         void NodeViewerOpener()
         {
-            Mailboxes.PublishUiEvent(new LogicWindowOpened(data.RenderId));
+            MailboxManager.PublishUiEvent(new LogicWindowOpened(data.RenderId));
         }
 
         public void SetInviteButtonState(TwoStateGFXButton.State aState)

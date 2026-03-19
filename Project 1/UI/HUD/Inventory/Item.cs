@@ -164,7 +164,7 @@ namespace Project_1.UI.HUD.Inventory
                 if (aItemDroppedOnMe.slotIndex == bagIndex) return true; //Bag is tried being placed in itself
                 if (!snapshot.HasValue)
                 {
-                    Mailboxes.PublishSimCommand(new InventoryUnequipBagRequested(aItemDroppedOnMe.slotIndex, Index));
+                    MailboxManager.PublishSimCommand(new InventoryUnequipBagRequested(aItemDroppedOnMe.slotIndex, Index));
                     return true;
                 }
 
@@ -174,7 +174,7 @@ namespace Project_1.UI.HUD.Inventory
 
             if (bagIndex == -1) //Onto bagrack
             {
-                Mailboxes.PublishSimCommand(new InventorySwapBagSlotsRequested(aItemDroppedOnMe.slotIndex, slotIndex));
+                MailboxManager.PublishSimCommand(new InventorySwapBagSlotsRequested(aItemDroppedOnMe.slotIndex, slotIndex));
                 return true;
             }
 
@@ -187,7 +187,7 @@ namespace Project_1.UI.HUD.Inventory
             if (aItemDroppedOnMe.bagIndex == -2) return true; //Drop from loot
             if (!aItemDroppedOnMe.snapshot.HasValue || aItemDroppedOnMe.snapshot.ItemType != ItemData.ItemType.Container) return true; //Dropped is not bag
 
-            Mailboxes.PublishSimCommand(new InventorySwapBagsRequested(aItemDroppedOnMe.Index, slotIndex));
+            MailboxManager.PublishSimCommand(new InventorySwapBagsRequested(aItemDroppedOnMe.Index, slotIndex));
             return true;
         }
 
@@ -195,7 +195,7 @@ namespace Project_1.UI.HUD.Inventory
         {
             if (aItemDroppedOnMe.bagIndex != -2) return false;
 
-            Mailboxes.PublishSimCommand(new LootItemRequested(aItemDroppedOnMe.slotIndex, Index));
+            MailboxManager.PublishSimCommand(new LootItemRequested(aItemDroppedOnMe.slotIndex, Index));
             return true;
         }
 
@@ -215,7 +215,7 @@ namespace Project_1.UI.HUD.Inventory
                 if (!aItemDroppedOnMe.snapshot.FitsInSlot((GameObjects.Unit.Equipment.Slot)slotIndex)) return true;
                 if (!snapshot.HasValue)
                 {
-                    Mailboxes.PublishSimCommand(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, null));
+                    MailboxManager.PublishSimCommand(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, null));
                     return true;
                 }
 
@@ -223,7 +223,7 @@ namespace Project_1.UI.HUD.Inventory
                 if (aItemDroppedOnMe.snapshot.EquipmentType != snapshot.EquipmentType) return true;
                 if (aItemDroppedOnMe.snapshot.IsMainHandRestrictedType) return true;
                 if (snapshot.IsMainHandRestrictedType) return true;
-                Mailboxes.PublishSimCommand(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, null));
+                MailboxManager.PublishSimCommand(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, null));
                 return true;
             }
 
@@ -231,13 +231,13 @@ namespace Project_1.UI.HUD.Inventory
             {
                 if (!snapshot.HasValue)
                 {
-                    Mailboxes.PublishSimCommand(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, null));
+                    MailboxManager.PublishSimCommand(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, null));
                     return true;
                 }
 
                 if (!snapshot.IsEquipmentLike) return true;
                 if (!snapshot.FitsInSlot((GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex)) return true;
-                Mailboxes.PublishSimCommand(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, null));
+                MailboxManager.PublishSimCommand(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, null));
                 return true;
             }
 
@@ -247,7 +247,7 @@ namespace Project_1.UI.HUD.Inventory
         bool ToCharacterPane(Item aItemDroppedOnMe)
         {
             if (bagIndex != -3) return false;
-            Mailboxes.PublishSimCommand(new InventorySwapEquipmentRequested(aItemDroppedOnMe.Index, slotIndex, null));
+            MailboxManager.PublishSimCommand(new InventorySwapEquipmentRequested(aItemDroppedOnMe.Index, slotIndex, null));
             //TODO: Handle if trying to drag inbetween sheets.
             return true;
         }
@@ -264,7 +264,7 @@ namespace Project_1.UI.HUD.Inventory
                 if (!aItemDroppedOnMe.snapshot.FitsInSlot((GameObjects.Unit.Equipment.Slot)slotIndex)) return true;
                 if (!snapshot.HasValue)
                 {
-                    Mailboxes.PublishSimCommand(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, inspectTargetRenderId.Value));
+                    MailboxManager.PublishSimCommand(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, inspectTargetRenderId.Value));
                     return true;
                 }
 
@@ -272,7 +272,7 @@ namespace Project_1.UI.HUD.Inventory
                 if (aItemDroppedOnMe.snapshot.EquipmentType != snapshot.EquipmentType) return true;
                 if (aItemDroppedOnMe.snapshot.IsMainHandRestrictedType) return true;
                 if (snapshot.IsMainHandRestrictedType) return true;
-                Mailboxes.PublishSimCommand(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, inspectTargetRenderId.Value));
+                MailboxManager.PublishSimCommand(new EquipmentSwapRequested(aItemDroppedOnMe.slotIndex, slotIndex, inspectTargetRenderId.Value));
                 return true;
             }
 
@@ -280,13 +280,13 @@ namespace Project_1.UI.HUD.Inventory
             {
                 if (!snapshot.HasValue)
                 {
-                    Mailboxes.PublishSimCommand(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, inspectTargetRenderId.Value));
+                    MailboxManager.PublishSimCommand(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, inspectTargetRenderId.Value));
                     return true;
                 }
 
                 if (!snapshot.IsEquipmentLike) return true;
                 if (!snapshot.FitsInSlot((GameObjects.Unit.Equipment.Slot)aItemDroppedOnMe.slotIndex)) return true;
-                Mailboxes.PublishSimCommand(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, inspectTargetRenderId.Value));
+                MailboxManager.PublishSimCommand(new EquipmentMoveToInventoryRequested(aItemDroppedOnMe.slotIndex, Index, inspectTargetRenderId.Value));
                 return true;
             }
 
@@ -299,7 +299,7 @@ namespace Project_1.UI.HUD.Inventory
             int? inspectTargetRenderId = GetInspectTargetRenderId();
             if (inspectTargetRenderId.HasValue)
             {
-                Mailboxes.PublishSimCommand(new InventorySwapEquipmentRequested(aItemDroppedOnMe.Index, slotIndex, inspectTargetRenderId.Value));
+                MailboxManager.PublishSimCommand(new InventorySwapEquipmentRequested(aItemDroppedOnMe.Index, slotIndex, inspectTargetRenderId.Value));
             }
             //TODO: Handle if trying to drag inbetween sheets.
             return true;
@@ -307,7 +307,7 @@ namespace Project_1.UI.HUD.Inventory
 
         bool InventoryToInventory(Item aItemDroppedOnMe)
         {
-            Mailboxes.PublishSimCommand(new InventorySwapItemsRequested(aItemDroppedOnMe.Index, Index));
+            MailboxManager.PublishSimCommand(new InventorySwapItemsRequested(aItemDroppedOnMe.Index, Index));
             return true;
         }
 
@@ -318,8 +318,8 @@ namespace Project_1.UI.HUD.Inventory
 
             if (!isEmpty && holdable)
             {
-                Mailboxes.PublishUiEvent(new DescriptorBoxClear());
-                Mailboxes.PublishUiEvent(new HeldItemStart(UiElementId, UiMouseStateCache.Absolute - Location));
+                MailboxManager.PublishUiEvent(new DescriptorBoxClear());
+                MailboxManager.PublishUiEvent(new HeldItemStart(UiElementId, UiMouseStateCache.Absolute - Location));
             }
         }
 
@@ -332,8 +332,8 @@ namespace Project_1.UI.HUD.Inventory
 
             if (!isEmpty && holdable && heldEvents.ClickThatCreated == InputManager.ClickType.Left)
             {
-                Mailboxes.PublishUiEvent(new DescriptorBoxClear());
-                Mailboxes.PublishUiEvent(new HeldItemEnd());
+                MailboxManager.PublishUiEvent(new DescriptorBoxClear());
+                MailboxManager.PublishUiEvent(new HeldItemEnd());
             }
 
             base.ClickedOnAndReleasedOnMe();
@@ -344,8 +344,8 @@ namespace Project_1.UI.HUD.Inventory
             if (!isEmpty && holdable && heldEvents.ClickThatCreated == InputManager.ClickType.Left)
             {
                 UiInputBridge.PublishRelease(this, heldEvents.ClickThatCreated);
-                Mailboxes.PublishUiEvent(new DescriptorBoxClear());
-                Mailboxes.PublishUiEvent(new HeldItemEnd());
+                MailboxManager.PublishUiEvent(new DescriptorBoxClear());
+                MailboxManager.PublishUiEvent(new HeldItemEnd());
             }
             base.HoldReleaseAwayFromMe();
         }
@@ -371,16 +371,16 @@ namespace Project_1.UI.HUD.Inventory
                     case ItemData.ItemType.NotSet:
                         return;
                     case ItemData.ItemType.Container:
-                        Mailboxes.PublishSimCommand(new InventoryEquipBagRequested(Index));
+                        MailboxManager.PublishSimCommand(new InventoryEquipBagRequested(Index));
                         return;
                     case ItemData.ItemType.Trash:
                         return;
                     case ItemData.ItemType.Consumable:
-                        Mailboxes.PublishSimCommand(new InventoryConsumeRequested(Index, targetRenderId));
+                        MailboxManager.PublishSimCommand(new InventoryConsumeRequested(Index, targetRenderId));
                         return;
                     case ItemData.ItemType.Equipment:
                     case ItemData.ItemType.Weapon:
-                        Mailboxes.PublishSimCommand(new InventoryEquipRequested(Index, targetRenderId));
+                        MailboxManager.PublishSimCommand(new InventoryEquipRequested(Index, targetRenderId));
                         return;
                     default:
                         throw new NotImplementedException();
@@ -389,13 +389,13 @@ namespace Project_1.UI.HUD.Inventory
 
             if (bagIndex == -1)
             {
-                Mailboxes.PublishSimCommand(new InventoryUnequipBagRequested(slotIndex, null));
+                MailboxManager.PublishSimCommand(new InventoryUnequipBagRequested(slotIndex, null));
                 return;
             }
 
             if (bagIndex == -2)
             {
-                Mailboxes.PublishSimCommand(new LootItemRequested(slotIndex, null));
+                MailboxManager.PublishSimCommand(new LootItemRequested(slotIndex, null));
                 return;
             }
         }
@@ -404,7 +404,7 @@ namespace Project_1.UI.HUD.Inventory
         {
             base.OnHover();
             if (!Visible || !holdable || !snapshot.HasValue || !snapshot.HasDescriptor) return;
-            Mailboxes.PublishUiEvent(new DescriptorBoxSet(snapshot.Descriptor));
+            MailboxManager.PublishUiEvent(new DescriptorBoxSet(snapshot.Descriptor));
         }
 
         protected override void OnDeHover()
@@ -416,7 +416,7 @@ namespace Project_1.UI.HUD.Inventory
         protected void HideDescriptorBox()
         {
             if (!holdable) return;
-            Mailboxes.PublishUiEvent(new DescriptorBoxClear());
+            MailboxManager.PublishUiEvent(new DescriptorBoxClear());
         }
 
         public override void Rescale()

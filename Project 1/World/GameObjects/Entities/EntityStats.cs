@@ -213,7 +213,7 @@ namespace Project_1.GameObjects.Entities
             unitData.GainExp(aExpAmount);
 
             if (!(this is Friendly)) return;
-            Mailboxes.PublishUiEvent(new ExperienceRefreshed(RenderId, RelationToPlayer.ToRelationToPlayerKind(), CurrentLevel, Level.Experience));
+            MailboxManager.PublishUiEvent(new ExperienceRefreshed(RenderId, RelationToPlayer.ToRelationToPlayerKind(), CurrentLevel, Level.Experience));
         }
 
 
@@ -221,7 +221,7 @@ namespace Project_1.GameObjects.Entities
         {
             ThreadAffinity.AssertSimThread();
             hasNamePlate = true;
-            Mailboxes.PublishUiEvent(new NamePlateAdded(BuildUiSnapshot()));
+            MailboxManager.PublishUiEvent(new NamePlateAdded(BuildUiSnapshot()));
 
         }
 
@@ -229,7 +229,7 @@ namespace Project_1.GameObjects.Entities
         {
             ThreadAffinity.AssertSimThread();
             hasNamePlate = false;
-            Mailboxes.PublishUiEvent(new NamePlateRemoved(RenderId));
+            MailboxManager.PublishUiEvent(new NamePlateRemoved(RenderId));
         }
 
         protected void FlagForRefresh() => namePlateRequiresUpdate = true;
@@ -238,7 +238,7 @@ namespace Project_1.GameObjects.Entities
         {
             ThreadAffinity.AssertSimThread();
             if (!namePlateRequiresUpdate) return;
-            Mailboxes.PublishUiEvent(new PlateRefreshRequested(BuildUiSnapshot()));
+            MailboxManager.PublishUiEvent(new PlateRefreshRequested(BuildUiSnapshot()));
         }
 
         public Item EquipInParticularSlot(Items.SubTypes.Equipment aEquipment, Slot aSlot)

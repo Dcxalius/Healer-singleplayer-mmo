@@ -48,7 +48,7 @@ namespace Project_1.GameObjects
             const float step = 50;
             while (tiles.Length == 0)
             {
-                tiles = TileQuery.GetTilesAroundPosition(Player.FeetPosition, start);
+                tiles = TileManager.GetTilesAroundPosition(Player.FeetPosition, start);
                 start -= step;
                 Debug.Assert(start > 0);
             }

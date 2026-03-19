@@ -226,7 +226,7 @@ namespace Project_1.Items
         {
             if (count <= 0) return;
             if (string.IsNullOrWhiteSpace(itemName)) return;
-            Mailboxes.PublishUiEvent(new ChatMessagePosted(ChatMessageType.Loot, $"{count}x [{itemName}]"));
+            MailboxManager.PublishUiEvent(new ChatMessagePosted(ChatMessageType.Loot, $"{count}x [{itemName}]"));
         }
 
         public void AssignItem(Item item, (int, int) aBagAndSlotIndex)
@@ -242,7 +242,7 @@ namespace Project_1.Items
             NotifySlotChanged(aBagIndex, aSlotIndex, this);
         }
 
-        void NotifySlotChanged(int bagIndex, int slotIndex) => Mailboxes.PublishUiEvent(new InventorySlotChanged(bagIndex, slotIndex, BuildUiSnapshot()));
+        void NotifySlotChanged(int bagIndex, int slotIndex) => MailboxManager.PublishUiEvent(new InventorySlotChanged(bagIndex, slotIndex, BuildUiSnapshot()));
         void NotifySlotChanged((int, int) bagAndSlot) => NotifySlotChanged(bagAndSlot.Item1, bagAndSlot.Item2);
 
         // Temporary overloads to keep call sites compact during migration.

@@ -46,12 +46,12 @@ namespace Project_1.GameObjects.Entities
             }
 
             if (FinishChannel()) return;
-            Mailboxes.PublishUiEvent(new CastChannelProgress((float)((TimeManager.TotalFrameTime - startCastTime) / channeledSpell.CastTime)));
+            MailboxManager.PublishUiEvent(new CastChannelProgress((float)((TimeManager.TotalFrameTime - startCastTime) / channeledSpell.CastTime)));
         }
 
         void CancelChannel()
         {
-            Mailboxes.PublishUiEvent(new CastChannelCancelled());
+            MailboxManager.PublishUiEvent(new CastChannelCancelled());
             ClearChannelState();
         }
 
@@ -83,7 +83,7 @@ namespace Project_1.GameObjects.Entities
                 CastSpell(channeledSpell, target);
             }
 
-            Mailboxes.PublishUiEvent(new CastChannelFinished());
+            MailboxManager.PublishUiEvent(new CastChannelFinished());
             ClearChannelState();
             return true;
         }
@@ -130,8 +130,8 @@ namespace Project_1.GameObjects.Entities
             lastCastSpell = TimeManager.TotalFrameTime;
             channeledSpell = aSpell;
             startCastTime = TimeManager.TotalFrameTime;
-            Mailboxes.PublishUiEvent(new CastChannelStarted(owner.RenderId, channeledSpell.Name, channeledSpell.GfxPath, channeledSpell.CastTime));
-            Mailboxes.PublishUiEvent(new CastChannelProgress(0));
+            MailboxManager.PublishUiEvent(new CastChannelStarted(owner.RenderId, channeledSpell.Name, channeledSpell.GfxPath, channeledSpell.CastTime));
+            MailboxManager.PublishUiEvent(new CastChannelProgress(0));
             return true;
         }
 
