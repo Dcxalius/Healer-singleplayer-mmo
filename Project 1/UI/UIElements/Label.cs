@@ -36,11 +36,16 @@ namespace Project_1.UI.UIElements
         public string TextWidthFixer(string s)
         {
             if (s == null) return null;
-            if (Textures.Text.CalculateOffset(s, underlyingText.Font).X <= Size.X || Textures.Text.CalculateOffset(s, underlyingText.Font).X == 0 || Size.X == 0) return s;
+            if (Textures.Text.CalculateOffset(s, underlyingText.Font, underlyingText.TextSize).X <= Size.X
+                || Textures.Text.CalculateOffset(s, underlyingText.Font, underlyingText.TextSize).X == 0
+                || Size.X == 0)
+            {
+                return s;
+            }
 
             
             int lastNewlineIndex = s.LastIndexOf('\n');
-            float ratioOfSizes = Size.X / Textures.Text.CalculateOffset(s.Substring(lastNewlineIndex + 1), underlyingText.Font).X;
+            float ratioOfSizes = Size.X / Textures.Text.CalculateOffset(s.Substring(lastNewlineIndex + 1), underlyingText.Font, underlyingText.TextSize).X;
             int len = (int)((s.Length - lastNewlineIndex + 1) * ratioOfSizes) + lastNewlineIndex + 1;
             if (ratioOfSizes > 1 || len >= s.Length) return s;
             
@@ -58,7 +63,7 @@ namespace Project_1.UI.UIElements
 
         int TextWidthLineLengthCheck(string s, int aLastNewlineIndex, int aSpaceIndex)
         {
-            if (Textures.Text.CalculateOffset(s.Substring(aLastNewlineIndex + 1, aSpaceIndex - (aLastNewlineIndex + 1)), underlyingText.Font).X / Size.X < 1) return aSpaceIndex;
+            if (Textures.Text.CalculateOffset(s.Substring(aLastNewlineIndex + 1, aSpaceIndex - (aLastNewlineIndex + 1)), underlyingText.Font, underlyingText.TextSize).X / Size.X < 1) return aSpaceIndex;
 
             int newSpaceIndex = s.Substring(aLastNewlineIndex + 1, aSpaceIndex - (aLastNewlineIndex + 1)).LastIndexOf(' ') + aLastNewlineIndex + 1;
             return TextWidthLineLengthCheck(s, aLastNewlineIndex, newSpaceIndex);
@@ -83,9 +88,19 @@ namespace Project_1.UI.UIElements
         }
         Text  underlyingText;
 
-        public Label(string aText, RelativeScreenPosition aPos, RelativeScreenPosition aSize, TextAllignment aTextAlignment, Color? aTextColor = null, string aFontname = "Gloryse") : base(null, aPos, aSize)
+        public float TextSize
         {
-            underlyingText = aTextColor.HasValue ? new Text(aFontname, aText, aTextColor.Value) : new Text(aFontname, aText);
+            get => underlyingText.TextSize;
+            set
+            {
+                underlyingText.TextSize = value;
+                Text = underlyingText.Value;
+            }
+        }
+
+        public Label(string aText, RelativeScreenPosition aPos, RelativeScreenPosition aSize, TextAllignment aTextAlignment, Color? aTextColor = null, string aFontname = "Comfortaa-msdf", float aTextSize = 12f) : base(null, aPos, aSize)
+        {
+            underlyingText = aTextColor.HasValue ? new Text(aFontname, aText, aTextColor.Value, aTextSize) : new Text(aFontname, aText, aTextSize);
             textAlignment = aTextAlignment;
             capturesClick = false;
             capturesRelease = false;

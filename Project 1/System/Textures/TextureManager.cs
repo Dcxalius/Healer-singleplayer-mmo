@@ -1,33 +1,28 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Project_1.GameObjects.Spells;
 using Project_1.Managers;
+using SpriteFontPlus;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Serialization;
 
 namespace Project_1.Textures
 {
     internal static class TextureManager
     {
-        const string FALLBACK_FONT = "Gloryse";
+        const string FALLBACK_FONT = "Comfortaa";
         static Dictionary<string, Texture2D>[] texturesDict;
         static Dictionary<string, Point>[] textureSizes;
         static Dictionary<string, Color>[] avgColors;
-        static Dictionary<string, SpriteFont> fontDict;//TODO: Font is not open source so need to be change at some point
+        static Dictionary<string, GameFont> fontDict;
 
         static ContentManager contentManager;
         static bool initialized;
 
         public static Effect textOutline;
+        public static Effect MsdfTextEffect { get; private set; }
 
         public static void Init()
         {
@@ -41,7 +36,7 @@ namespace Project_1.Textures
             InitFonts();
             TextureCatalog.Init(textureSizes, avgColors);
             textOutline = contentManager.Load<Effect>("Effects\\TextOutline");
-            //textOutline.Parameters["texelSize"].SetValue()
+            MsdfTextEffect = contentManager.Load<Effect>("Effects\\MsdfText");
         }
 
         static void EnsureContentRoot()
@@ -49,7 +44,9 @@ namespace Project_1.Textures
             string currentRoot = Path.Combine(AppContext.BaseDirectory, "Content");
             contentManager.RootDirectory = currentRoot;
 
-            if (File.Exists(Path.Combine(currentRoot, "Effects", "TextOutline.xnb"))) return;
+            bool hasTextOutline = File.Exists(Path.Combine(currentRoot, "Effects", "TextOutline.xnb"));
+            bool hasMsdfText = File.Exists(Path.Combine(currentRoot, "Effects", "MsdfText.xnb"));
+            if (hasTextOutline && hasMsdfText) return;
 
             throw new DirectoryNotFoundException(
                 $"Compiled content was not found in the active build output directory '{currentRoot}'.");
@@ -57,30 +54,51 @@ namespace Project_1.Textures
 
         static void InitFonts()
         {
-            fontDict = new Dictionary<string, SpriteFont>();
-            string debug = "Fonts loaded: ";
-
+            //TODO: Move fonts out of proj and into monogame pipeline
             string fontDir = Path.Combine(contentManager.RootDirectory, "Font");
+            fontDict = AtlasFontLoader.LoadFonts(fontDir);
             if (!Directory.Exists(fontDir))
             {
                 FontCache.Init(fontDict, FALLBACK_FONT);
                 return;
             }
-            string[] dir = Directory.GetFiles(fontDir);
 
-
-            for (int i = 0; i < dir.Length; i++)
+            string[] compiledFonts = Directory.GetFiles(fontDir, "*.xnb", SearchOption.TopDirectoryOnly);
+            for (int i = 0; i < compiledFonts.Length; i++)
             {
-                string filePath = TrimContentFolderAndImageFileExtention(dir[i]);
-                string fontName = filePath.Split('\\')[1];
-
-                fontDict.Add(fontName, contentManager.Load<SpriteFont>(filePath));
-                debug += fontName + ", ";
-
+                string assetName = GetContentAssetName(compiledFonts[i]);
+                string fontName = Path.GetFileNameWithoutExtension(assetName);
+                fontDict[fontName] = new SpriteGameFont(fontName, contentManager.Load<SpriteFont>(assetName));
             }
 
-            DebugManager.Print(debug);
+            LoadRuntimeComfortaa(fontDir);
+
+            if (!fontDict.ContainsKey(FALLBACK_FONT) && fontDict.Count > 0)
+            {
+                fontDict[FALLBACK_FONT] = fontDict.Values.First();
+            }
+
+            DebugManager.Print("Fonts loaded: " + string.Join(", ", fontDict.Keys));
             FontCache.Init(fontDict, FALLBACK_FONT);
+        }
+
+        static void LoadRuntimeComfortaa(string fontDir)
+        {
+            string ttfPath = Path.Combine(fontDir, "Comfortaa.ttf");
+            if (!File.Exists(ttfPath)) return;
+
+            try
+            {
+                byte[] bytes = File.ReadAllBytes(ttfPath);
+                TtfFontBakerResult baked = TtfFontBaker.Bake(bytes, 12, 1024, 1024, new[] { CharacterRange.BasicLatin });
+                SpriteFont comfortaa = baked.CreateSpriteFont(GraphicsManager.GraphicsDevice);
+                fontDict["Comfortaa"] = new SpriteGameFont("Comfortaa", comfortaa);
+                fontDict[FALLBACK_FONT] = fontDict["Comfortaa"];
+            }
+            catch (Exception ex)
+            {
+                DebugManager.Print("Failed to load Comfortaa.ttf at runtime: " + ex.Message);
+            }
         }
 
         static void InitArrays()
@@ -108,10 +126,9 @@ namespace Project_1.Textures
                 textureSizes[i] = new Dictionary<string, Point>();
                 avgColors[i] = new Dictionary<string, Color>();
 
-
                 for (int j = 0; j < dir.Length; j++)
                 {
-                    string filePath = TrimContentFolderAndImageFileExtention(dir[j]); 
+                    string filePath = TrimContentFolderAndImageFileExtention(dir[j]);
                     string textureName = filePath.Split('\\').Last();
 
                     Texture2D texture = contentManager.Load<Texture2D>(filePath);
@@ -119,11 +136,10 @@ namespace Project_1.Textures
                     textureSizes[i].Add(textureName, texture.Bounds.Size);
                     avgColors[i].Add(textureName, ComputeAvgColor(texture));
                     debug += textureName + ", ";
-
                 }
 
                 string[] dirsInDir = Directory.GetDirectories(path);
-                
+
                 for (int j = 0; j < dirsInDir.Length; j++)
                 {
                     string[] filesInFolders = Directory.GetFiles(dirsInDir[j]);
@@ -138,8 +154,6 @@ namespace Project_1.Textures
                         avgColors[i].Add(textureName, ComputeAvgColor(texture));
                         debug += textureName + ", ";
                     }
-                    
-
                 }
             }
 
@@ -162,15 +176,21 @@ namespace Project_1.Textures
             return avg;
         }
 
-
         static string TrimContentFolderAndImageFileExtention(string aPath)
         {
             string filePath = aPath.Substring(contentManager.RootDirectory.Length + 1);
             return filePath.Substring(0, filePath.Length - 4);
         }
 
+        static string GetContentAssetName(string filePath)
+        {
+            string relativePath = Path.GetRelativePath(contentManager.RootDirectory, filePath);
+            string extension = Path.GetExtension(relativePath);
+            string assetName = relativePath.Substring(0, relativePath.Length - extension.Length);
+            return assetName.Replace(Path.DirectorySeparatorChar, '\\');
+        }
 
-        public static SpriteFont GetFont(string fontName)
+        public static GameFont GetFont(string fontName)
         {
             if (fontDict == null)
                 throw new InvalidOperationException("TextureManager fonts not initialized.");
@@ -189,7 +209,6 @@ namespace Project_1.Textures
         public static Texture2D GetTexture(GfxPath aGfxPath)
         {
             ThreadAffinity.AssertMainThread();
-            // Basic safety checks
             if (texturesDict == null)
                 throw new InvalidOperationException("TextureManager: texturesDict is null. InitArrays() / static ctor did not run.");
 
@@ -201,16 +220,12 @@ namespace Project_1.Textures
 
             if (!dict.TryGetValue(aGfxPath.Name, out var texture))
             {
-                DebugManager.Print("Texture " + aGfxPath.Name + " from type " + aGfxPath.Type + " was not found."
-                );
+                DebugManager.Print("Texture " + aGfxPath.Name + " from type " + aGfxPath.Type + " was not found.");
 
-                // Fallback to MissingTexture in the Debug gfx type
                 var debugDict = texturesDict[(int)GfxType.Debug];
 
                 if (!debugDict.TryGetValue("MissingTexture", out texture))
-                    throw new KeyNotFoundException(
-                        "Fallback texture 'MissingTexture' not found in GfxType.Debug."
-                    );
+                    throw new KeyNotFoundException("Fallback texture 'MissingTexture' not found in GfxType.Debug.");
             }
 
             return texture;
@@ -227,6 +242,5 @@ namespace Project_1.Textures
             ThreadAffinity.AssertMainThread();
             return TextureCatalog.GetAvgColor(aGfxPath);
         }
-
     }
 }

@@ -24,7 +24,7 @@ namespace Project_1.UI.UIElements
         Text xdd;
         public Buff(in BuffUiSnapshot aBuff, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture(aBuff.GfxPath, Color.White), aPos, aSize)
         {
-            xdd = new Text("Gloryse", "xdd", Color.Black);
+            xdd = new Text("Comfortaa-msdf", "xdd", Color.Black);
             effectId = aBuff.EffectId;
             gfxPath = aBuff.GfxPath;
             durationRemainingMs = aBuff.DurationRemainingMs;

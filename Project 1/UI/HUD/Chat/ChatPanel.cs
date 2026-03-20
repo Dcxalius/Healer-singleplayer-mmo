@@ -21,6 +21,7 @@ namespace Project_1.UI.HUD.Chat
     {
         const int MaxMessages = 100;
         const float VisibleRows = 9f;
+        const float ChatTextSize = Text.DefaultTextSize;
 
         readonly ScrollableBox messageLog;
         readonly InputBox inputBox;
@@ -179,13 +180,11 @@ namespace Project_1.UI.HUD.Chat
             messageLog.RemoveAllScrollableElements();
 
             float maxWidth = CalculateLineWidthPx();
-            SpriteFont font = FontCache.GetFont("Gloryse");
-
             foreach (ChatMessageEntry entry in messageBuffer.EnumerateChronological())
             {
                 if (!ChatSettings.IsVisible(entry.Message.Type)) continue;
 
-                List<string> wrapped = WrapText(entry.Message.DisplayText, maxWidth, font);
+                List<string> wrapped = WrapText(entry.Message.DisplayText, maxWidth, "Comfortaa-msdf", ChatTextSize);
                 Color textColor = ResolveMessageColor(entry.Message.Type);
                 for (int i = 0; i < wrapped.Count; i++)
                 {
@@ -209,7 +208,7 @@ namespace Project_1.UI.HUD.Chat
             return Math.Max(1f, maxWidth - horizontalPadding);
         }
 
-        static List<string> WrapText(string aText, float aMaxWidthPx, SpriteFont aFont)
+        static List<string> WrapText(string aText, float aMaxWidthPx, string aFontName, float aTextSize)
         {
             List<string> lines = new List<string>();
             if (string.IsNullOrEmpty(aText))
@@ -226,12 +225,12 @@ namespace Project_1.UI.HUD.Chat
             string[] sourceLines = aText.Replace("\r", string.Empty).Split('\n');
             for (int i = 0; i < sourceLines.Length; i++)
             {
-                WrapSingleLine(sourceLines[i], aMaxWidthPx, aFont, lines);
+                WrapSingleLine(sourceLines[i], aMaxWidthPx, aFontName, aTextSize, lines);
             }
             return lines;
         }
 
-        static void WrapSingleLine(string aLine, float aMaxWidthPx, SpriteFont aFont, List<string> aOutput)
+        static void WrapSingleLine(string aLine, float aMaxWidthPx, string aFontName, float aTextSize, List<string> aOutput)
         {
             if (string.IsNullOrEmpty(aLine))
             {
@@ -250,7 +249,7 @@ namespace Project_1.UI.HUD.Chat
             for (int i = 0; i < words.Length; i++)
             {
                 string word = words[i];
-                if (!FitsWithinWidth(word, aMaxWidthPx, aFont))
+                if (!FitsWithinWidth(word, aMaxWidthPx, aFontName, aTextSize))
                 {
                     if (current.Length > 0)
                     {
@@ -258,7 +257,7 @@ namespace Project_1.UI.HUD.Chat
                         current.Clear();
                     }
 
-                    List<string> brokenWord = BreakLongWord(word, aMaxWidthPx, aFont);
+                    List<string> brokenWord = BreakLongWord(word, aMaxWidthPx, aFontName, aTextSize);
                     for (int j = 0; j < brokenWord.Count; j++)
                     {
                         if (j + 1 < brokenWord.Count)
@@ -274,7 +273,7 @@ namespace Project_1.UI.HUD.Chat
                 }
 
                 string candidate = current.Length == 0 ? word : $"{current} {word}";
-                if (FitsWithinWidth(candidate, aMaxWidthPx, aFont))
+                if (FitsWithinWidth(candidate, aMaxWidthPx, aFontName, aTextSize))
                 {
                     current.Clear();
                     current.Append(candidate);
@@ -292,14 +291,14 @@ namespace Project_1.UI.HUD.Chat
             }
         }
 
-        static List<string> BreakLongWord(string aWord, float aMaxWidthPx, SpriteFont aFont)
+        static List<string> BreakLongWord(string aWord, float aMaxWidthPx, string aFontName, float aTextSize)
         {
             List<string> parts = new List<string>();
             StringBuilder current = new StringBuilder();
             for (int i = 0; i < aWord.Length; i++)
             {
                 current.Append(aWord[i]);
-                if (FitsWithinWidth(current.ToString(), aMaxWidthPx, aFont)) continue;
+                if (FitsWithinWidth(current.ToString(), aMaxWidthPx, aFontName, aTextSize)) continue;
 
                 if (current.Length == 1)
                 {
@@ -323,9 +322,9 @@ namespace Project_1.UI.HUD.Chat
             return parts;
         }
 
-        static bool FitsWithinWidth(string aText, float aMaxWidthPx, SpriteFont aFont)
+        static bool FitsWithinWidth(string aText, float aMaxWidthPx, string aFontName, float aTextSize)
         {
-            return Text.CalculateOffset(aText, aFont).X <= aMaxWidthPx;
+            return Text.CalculateOffset(aText, aFontName, aTextSize).X <= aMaxWidthPx;
         }
 
         static Color ResolveMessageColor(ChatMessageType aType)
@@ -403,7 +402,7 @@ namespace Project_1.UI.HUD.Chat
                 capturesClick = false;
                 capturesRelease = false;
 
-                label = new Label(aText, RelativeScreenPosition.Zero, RelativeScreenPosition.One, Label.TextAllignment.CentreLeft, aTextColor);
+                label = new Label(aText, RelativeScreenPosition.Zero, RelativeScreenPosition.One, Label.TextAllignment.CentreLeft, aTextColor, aTextSize: ChatTextSize);
                 AddChild(label);
             }
 

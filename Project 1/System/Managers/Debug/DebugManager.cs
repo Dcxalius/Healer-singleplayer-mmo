@@ -11,6 +11,8 @@ namespace Project_1.Managers
         DebugShapes,
         DebugOverlay,
         Print,
+        ShadowMaskPreview,
+        ShadowMagentaClear,
         FalseRandom,
         TileCoords,
         InvCheats,
@@ -106,6 +108,8 @@ namespace Project_1.Managers
             SetMode(DebugMode.DebugOverlay, true);
             SetMode(DebugMode.FalseRandom, false);
             SetMode(DebugMode.Print, true);
+            SetMode(DebugMode.ShadowMaskPreview, false);
+            SetMode(DebugMode.ShadowMagentaClear, false);
             SetMode(DebugMode.TileCoords, false);
             SetMode(DebugMode.InvCheats, true);
             SetMode(DebugMode.Teleport, true);

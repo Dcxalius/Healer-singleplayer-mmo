@@ -65,7 +65,7 @@ namespace Project_1.UI.HUD.Inventory
             bagIndex = aBagIndex;
             slotIndex = aSlotIndex;
             if (aPath.Name != null) isEmpty = false;
-            itemCount = new Text("Gloryse");
+            itemCount = new Text("Comfortaa-msdf");
             holdable = aHoldable;
             usesPressedGfx = false;
             snapshot = ItemUiSnapshot.Empty;

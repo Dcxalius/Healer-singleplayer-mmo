@@ -63,7 +63,7 @@ namespace Project_1.GameObjects.FloatingTexts
         {
             ThreadAffinity.AssertMainThread();
 
-            builtText ??= new Text("Gloryse", textValue, color);
+            builtText ??= new Text("Comfortaa-msdf", textValue, color);
             builtText.TopLeftDraw(aBatch, position.ToAbsoltueScreenPosition());
         }
     }

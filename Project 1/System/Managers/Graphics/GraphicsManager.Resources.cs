@@ -5,6 +5,8 @@ namespace Project_1.Managers
 {
     internal static partial class GraphicsManager
     {
+        public static GraphicsDevice GraphicsDevice => graphicsDeviceManager.GraphicsDevice;
+
         public static Texture2D CreateNewTexture(Point aSize)
         {
             ThreadAffinity.AssertMainThread();

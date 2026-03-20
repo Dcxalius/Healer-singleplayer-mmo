@@ -84,13 +84,17 @@ namespace Project_1.UI.HUD.PlateBoxes
         {
             if (!targetSnapshot.HasValue || !targetRenderId.HasValue)
             {
-                return new PlateBoxRenderSnapshot(false, AbsolutePos, string.Empty, Color.White, 0f, 0f, 0f, 0f, Color.White, 1, false);
+                return new PlateBoxRenderSnapshot(false, AbsolutePos, Rectangle.Empty, Rectangle.Empty, Rectangle.Empty, Rectangle.Empty, string.Empty, Color.White, 0f, 0f, 0f, 0f, Color.White, 1, false);
             }
 
             EntityUiSnapshot snapshot = targetSnapshot.Value;
             return new PlateBoxRenderSnapshot(
                 Visible,
                 AbsolutePos,
+                nameSegment.AbsolutePos,
+                healthSegment.AbsolutePos,
+                resourceSegment.AbsolutePos,
+                levelCircle.AbsolutePos,
                 snapshot.Name,
                 snapshot.RelationColor,
                 (float)snapshot.CurrentHealth,

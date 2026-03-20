@@ -95,9 +95,9 @@ namespace Project_1.Managers.States
             DrawList(spriteBatch);
             long worldDrawTicks = Stopwatch.GetTimestamp() - worldStartTicks;
 
-            spriteBatch.End();
+            GraphicsManager.EndSpriteBatch(spriteBatch);
             SuperSoftShadowRenderer.DrawAndComposite(renderTarget);
-            spriteBatch.Begin(SpriteSortMode.Immediate, samplerState: SamplerState.PointClamp);
+            GraphicsManager.BeginSpriteBatch(spriteBatch, SpriteSortMode.Immediate, samplerState: SamplerState.PointClamp);
 
             CleanRender();
             long totalTicks = Stopwatch.GetTimestamp() - frameStartTicks;
@@ -117,9 +117,9 @@ namespace Project_1.Managers.States
             DrawList(spriteBatch);
             long worldDrawTicks = Stopwatch.GetTimestamp() - worldStartTicks;
             long compositeStartTicks = Stopwatch.GetTimestamp();
-            spriteBatch.End();
+            GraphicsManager.EndSpriteBatch(spriteBatch);
             SuperSoftShadowRenderer.DrawAndComposite(renderTarget);
-            spriteBatch.Begin(SpriteSortMode.Deferred);
+            GraphicsManager.BeginSpriteBatch(spriteBatch, SpriteSortMode.Deferred);
             GroundTargetingController.DrawSpellEffects(spriteBatch);
             GroundTargetingController.DrawTargetPreview(spriteBatch);
             spriteBatch.Draw(plateTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);

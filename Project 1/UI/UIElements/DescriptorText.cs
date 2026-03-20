@@ -11,7 +11,6 @@ namespace Project_1.UI.UIElements
 {
     internal class DescriptorText : Text
     {
-        
         float maxX;
         
         public int NameLines { get => nameLines; }
@@ -28,7 +27,7 @@ namespace Project_1.UI.UIElements
                     base.Value = value;
                     return;
                 }
-                if (font.MeasureString(value).X > maxX)
+                if (Text.CalculateOffset(value, font, TextSize).X > maxX)
                 {
                     string trim = value.Trim();
                     string[] split = trim.Split(' ');
@@ -46,7 +45,7 @@ namespace Project_1.UI.UIElements
                                 base.Value = returnable;
                                 return;
                             }
-                            if (font.MeasureString(partialString).X > maxX)
+                            if (Text.CalculateOffset(partialString, font, TextSize).X > maxX)
                             {
                                 Debug.Assert(partialString != split[i], "First word was to long.");
                                 returnable += partialString + "\n";

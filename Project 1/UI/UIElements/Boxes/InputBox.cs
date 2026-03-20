@@ -16,6 +16,8 @@ namespace Project_1.UI.UIElements.Boxes
 {
     internal class InputBox : Box
     {
+        const float DefaultTextSize = Textures.Text.DefaultTextSize;
+
         public enum ValidInputs
         {
             Any,
@@ -129,14 +131,14 @@ namespace Project_1.UI.UIElements.Boxes
             RelativeScreenPosition position = spacingSquare;
             RelativeScreenPosition size = RelativeScreenPosition.One - spacingSquare * 2;
 
-            //AbsoluteScreenPosition textSize = new AbsoluteScreenPosition(TextureManager.GetFont("Gloryse").MeasureString(aTextBeforeInputWindow).ToPoint());
-            AbsoluteScreenPosition textSize = new AbsoluteScreenPosition(FontCache.GetFont("Gloryse").MeasureString(aTextBeforeInputWindow).ToPoint());
+            //AbsoluteScreenPosition textSize = new AbsoluteScreenPosition(TextureManager.GetFont("Comfortaa-msdf").MeasureString(aTextBeforeInputWindow).ToPoint());
+            AbsoluteScreenPosition textSize = new AbsoluteScreenPosition(Text.CalculateOffset(aTextBeforeInputWindow, "Comfortaa-msdf", DefaultTextSize).ToPoint());
             DebugManager.Print("textSize = " + textSize);
             
             RelativeScreenPosition textSizeRelative = textSize.ToRelativeScreenPosition(new AbsoluteScreenPosition((int)(aThisIsUglyAFButItWorksForNow.X * aSize.X), (int)(aThisIsUglyAFButItWorksForNow.Y * aSize.Y))); //TODO: This has wrong size due to size being unset when objects is created
             //beforeWindowLabel = new Label(aTextBeforeInputWindow, position, textSizeRelative, Label.TextAllignment.CentreLeft, aTextBeforeColor);
             //beforeWindowLabel = new Label(aTextBeforeInputWindow, position, textSizeRelative.OnlyX + spacingSquare.OnlyX * 2 + size.OnlyY - spacingSquare.OnlyY * 2, Label.TextAllignment.CentreLeft, aTextBeforeColor);
-            beforeWindowLabel = new Label(aTextBeforeInputWindow, position, size.OnlyY + textSizeRelative.OnlyX + spacingSquare.OnlyX * 2, Label.TextAllignment.CentreLeft, aTextBeforeColor);
+            beforeWindowLabel = new Label(aTextBeforeInputWindow, position, size.OnlyY + textSizeRelative.OnlyX + spacingSquare.OnlyX * 2, Label.TextAllignment.CentreLeft, aTextBeforeColor, aTextSize: DefaultTextSize);
             DebugManager.Print("after = " + beforeWindowLabel.UnderlyingTextOffset.ToString());
             AddChild(beforeWindowLabel);
 
@@ -149,10 +151,10 @@ namespace Project_1.UI.UIElements.Boxes
             AddChild(textBackgroundBox);
 
 
-            inputLabel = new Label(aDisplayText, position + position.OnlyX * 2 + beforeWindowLabel.RelativeSize.OnlyX, size - beforeWindowLabel.RelativeSize.OnlyX - position.OnlyX * 2, Label.TextAllignment.CentreLeft, aPassiveColor);
+            inputLabel = new Label(aDisplayText, position + position.OnlyX * 2 + beforeWindowLabel.RelativeSize.OnlyX, size - beforeWindowLabel.RelativeSize.OnlyX - position.OnlyX * 2, Label.TextAllignment.CentreLeft, aPassiveColor, aTextSize: DefaultTextSize);
             AddChild(inputLabel);
 
-            cursor = new Textures.Text("Gloryse", "|", aPostClickColor);
+            cursor = new Textures.Text("Comfortaa-msdf", "|", aPostClickColor, DefaultTextSize);
             text = "";
 
             enterActions = new List<Action>();
@@ -171,7 +173,7 @@ namespace Project_1.UI.UIElements.Boxes
         {
             if (validInputs.Contains(ValidInputs.LowerCaseLetters) && !validInputs.Contains(ValidInputs.UpperCaseLetters) && char.IsUpper(aCharToWrite)) aCharToWrite = char.ToLower(aCharToWrite);
             if (validInputs.Contains(ValidInputs.UpperCaseLetters) && !validInputs.Contains(ValidInputs.LowerCaseLetters) && char.IsLower(aCharToWrite)) aCharToWrite = char.ToUpper(aCharToWrite);
-            float x = Text.CalculateOffset(text + aCharToWrite, FontCache.GetFont("Gloryse")).X;
+            float x = Text.CalculateOffset(text + aCharToWrite, "Comfortaa-msdf", inputLabel.TextSize).X;
             if (x > inputLabel.Size.X) return false;
             if (aIndex == text.Length) text += aCharToWrite;
             else text = text.Insert(aIndex, aCharToWrite.ToString());

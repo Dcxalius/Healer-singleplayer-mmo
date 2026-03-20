@@ -9,6 +9,8 @@ namespace Project_1.UI.UIElements
 {
     internal readonly struct BuffRenderSnapshot
     {
+        const float TextSize = 12f;
+
         public BuffRenderSnapshot(GfxPath gfxPath, Rectangle absolutePos, double remainingMsAtBuild)
         {
             GfxPath = gfxPath;
@@ -20,7 +22,7 @@ namespace Project_1.UI.UIElements
         public Rectangle AbsolutePos { get; }
         public double RemainingMsAtBuild { get; }
 
-        public void Draw(SpriteBatch batch, SpriteFont font, double elapsedMs)
+        public void Draw(SpriteBatch batch, double elapsedMs)
         {
             ThreadAffinity.AssertMainThread();
             if (GfxPath == null || GfxPath.Name == null) return;
@@ -35,9 +37,8 @@ namespace Project_1.UI.UIElements
             string durationText = Math.Round(remainingMs / 1000d, 1).ToString();
             if (durationText.Length == 0) return;
 
-            Vector2 textSize = font.MeasureString(durationText);
-            Vector2 textPos = new Vector2(AbsolutePos.Center.X, AbsolutePos.Center.Y + AbsolutePos.Height - 3);
-            batch.DrawString(font, durationText, textPos, Color.Black, 0f, textSize / 2f, Camera.Camera.Zoom, SpriteEffects.None, 1f);
+            Text label = new Text("Comfortaa-msdf", durationText, Color.Black, TextSize);
+            label.BottomCentreDraw(batch, new AbsoluteScreenPosition(AbsolutePos.Center.X, AbsolutePos.Center.Y + AbsolutePos.Height - 3));
         }
     }
 
@@ -62,11 +63,10 @@ namespace Project_1.UI.UIElements
             if (!Visible || EntryCount <= 0 || entries == null) return;
 
             double elapsedMs = Math.Max(0d, TimeManager.TotalFrameTime - BuildFrameTimeMs);
-            SpriteFont font = FontCache.GetFont("Gloryse");
             int end = Math.Min(entries.Length, EntryStartIndex + EntryCount);
             for (int i = EntryStartIndex; i < end; i++)
             {
-                entries[i].Draw(batch, font, elapsedMs);
+                entries[i].Draw(batch, elapsedMs);
             }
         }
     }

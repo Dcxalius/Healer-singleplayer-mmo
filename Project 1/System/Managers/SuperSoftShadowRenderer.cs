@@ -43,6 +43,8 @@ namespace Project_1.Managers
         {
             ThreadAffinity.AssertMainThread();
             long startTicks = Stopwatch.GetTimestamp();
+            bool previewShadowMask = DebugManager.Mode(DebugMode.ShadowMaskPreview);
+            bool useMagentaClear = DebugManager.Mode(DebugMode.ShadowMagentaClear);
             if (destination == null)
             {
                 ShadowRenderTelemetry.RecordRender(0, 0, 0);
@@ -92,6 +94,12 @@ namespace Project_1.Managers
             GraphicsManager.SetRenderTarget(combinedMaskTarget);
             GraphicsManager.ClearScreen(Color.Black);
 
+            if (previewShadowMask)
+            {
+                GraphicsManager.SetRenderTarget(lightMaskTarget);
+                GraphicsManager.ClearScreen(useMagentaClear ? Color.Magenta : Color.Black);
+            }
+
             int renderedLights = 0;
             int drawCalls = 0;
             for (int i = 0; i < frameSnapshot.Count; i++)
@@ -100,7 +108,7 @@ namespace Project_1.Managers
                 if (light.VertexCount <= 0 || light.IndexCount <= 0) continue;
 
                 GraphicsManager.SetRenderTarget(lightMaskTarget);
-                GraphicsManager.ClearScreen(Color.Black);
+                GraphicsManager.ClearScreen(useMagentaClear ? Color.Magenta : Color.Black);
 
                 device.BlendState = maxBlendState;
                 device.DepthStencilState = DepthStencilState.None;
@@ -127,16 +135,35 @@ namespace Project_1.Managers
                 }
 
                 GraphicsManager.SetRenderTarget(combinedMaskTarget);
-                spriteBatch.Begin(
+                GraphicsManager.BeginSpriteBatch(
+                    spriteBatch,
                     SpriteSortMode.Immediate,
                     maxBlendState,
                     SamplerState.PointClamp,
                     DepthStencilState.None,
                     RasterizerState.CullNone);
                 spriteBatch.Draw(lightMaskTarget, new Rectangle(0, 0, renderSize.X, renderSize.Y), Color.White);
-                spriteBatch.End();
+                GraphicsManager.EndSpriteBatch(spriteBatch);
                 drawCalls++;
                 renderedLights++;
+            }
+
+            if (previewShadowMask)
+            {
+                RenderTarget2D diagnosticTarget = renderedLights > 0 ? combinedMaskTarget : lightMaskTarget;
+                GraphicsManager.SetRenderTarget(destination);
+                GraphicsManager.BeginSpriteBatch(
+                    spriteBatch,
+                    SpriteSortMode.Immediate,
+                    BlendState.Opaque,
+                    SamplerState.PointClamp,
+                    DepthStencilState.None,
+                    RasterizerState.CullNone);
+                spriteBatch.Draw(diagnosticTarget, new Rectangle(0, 0, destination.Width, destination.Height), Color.White);
+                GraphicsManager.EndSpriteBatch(spriteBatch);
+                drawCalls++;
+                ShadowRenderTelemetry.RecordRender(Stopwatch.GetTimestamp() - startTicks, drawCalls, renderedLights);
+                return;
             }
 
             if (renderedLights <= 0)
@@ -147,14 +174,15 @@ namespace Project_1.Managers
             }
 
             GraphicsManager.SetRenderTarget(destination);
-            spriteBatch.Begin(
+            GraphicsManager.BeginSpriteBatch(
+                spriteBatch,
                 SpriteSortMode.Immediate,
                 darkenByMaskBlendState,
                 SamplerState.PointClamp,
                 DepthStencilState.None,
                 RasterizerState.CullNone);
             spriteBatch.Draw(combinedMaskTarget, new Rectangle(0, 0, destination.Width, destination.Height), Color.White);
-            spriteBatch.End();
+            GraphicsManager.EndSpriteBatch(spriteBatch);
             drawCalls++;
             ShadowRenderTelemetry.RecordRender(Stopwatch.GetTimestamp() - startTicks, drawCalls, renderedLights);
         }

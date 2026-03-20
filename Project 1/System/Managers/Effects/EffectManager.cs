@@ -78,12 +78,12 @@ namespace Project_1.Managers
 
                 
                 GraphicsManager.SetRenderTarget(curRenderT);
-                spriteBatch.Begin(effect: effects[effectToProcess.EffectName]);
+                GraphicsManager.BeginSpriteBatch(spriteBatch, effect: effects[effectToProcess.EffectName]);
                 GraphicsManager.ClearScreen(Color.Transparent);
 
                 effectToProcess.TextureToEffectWith.Draw(spriteBatch, Vector2.Zero);
 
-                spriteBatch.End();
+                GraphicsManager.EndSpriteBatch(spriteBatch);
                 GraphicsManager.SetRenderTarget(null);
                 effectToProcess.ReturnedRenderTarget = curRenderT;
             }

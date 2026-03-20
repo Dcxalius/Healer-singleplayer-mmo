@@ -62,8 +62,8 @@ namespace Project_1.UI.UIElements.Bars
 
         public ResourceBar(BarTexture aBarGfx, UITexture aBackgroundGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aBarGfx, aBackgroundGfx, aPos, aSize)
         {
-            fractionText = new Text("Gloryse", Color.Black);
-            percentageText = new Text("Gloryse", Color.Black);
+            fractionText = new Text("Comfortaa-msdf", Color.Black);
+            percentageText = new Text("Comfortaa-msdf", Color.Black);
             maxValue = 0f;
             currentValue = 0f;
         }

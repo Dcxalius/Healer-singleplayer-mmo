@@ -59,16 +59,16 @@ namespace Project_1.Managers
         public static void LoadContent()
         {
             ThreadAffinity.AssertMainThread();
-            fpsText = new Text("Gloryse", Color.Chartreuse);
-            frameTimeText = new Text("Gloryse", Color.Chartreuse);
-            totalTimeText = new Text("Gloryse", Color.Chartreuse);
-            mailboxText = new Text("Gloryse", Color.Chartreuse);
-            dispatchText = new Text("Gloryse", Color.Chartreuse);
-            workerText = new Text("Gloryse", Color.Chartreuse);
-            screenshotText = new Text("Gloryse", Color.Chartreuse);
-            simThreadText = new Text("Gloryse", Color.Chartreuse);
-            uiThreadText = new Text("Gloryse", Color.Chartreuse);
-            renderSyncText = new Text("Gloryse", Color.Chartreuse);
+            fpsText = new Text("Comfortaa-msdf", Color.Chartreuse);
+            frameTimeText = new Text("Comfortaa-msdf", Color.Chartreuse);
+            totalTimeText = new Text("Comfortaa-msdf", Color.Chartreuse);
+            mailboxText = new Text("Comfortaa-msdf", Color.Chartreuse);
+            dispatchText = new Text("Comfortaa-msdf", Color.Chartreuse);
+            workerText = new Text("Comfortaa-msdf", Color.Chartreuse);
+            screenshotText = new Text("Comfortaa-msdf", Color.Chartreuse);
+            simThreadText = new Text("Comfortaa-msdf", Color.Chartreuse);
+            uiThreadText = new Text("Comfortaa-msdf", Color.Chartreuse);
+            renderSyncText = new Text("Comfortaa-msdf", Color.Chartreuse);
             debugTextOrigin = new AbsoluteScreenPosition(12, 12);
         }
 
@@ -143,7 +143,8 @@ namespace Project_1.Managers
                 $"  Lights candidate/active/dropped: {shadowStats.CandidateLights,3} / {shadowStats.ActiveLights,3} / {shadowStats.DroppedLights,3}\n" +
                 $"  Segments total/avg/max (capped): {shadowStats.TotalSegments,5} / {shadowStats.AvgSegmentsPerLight,5:0.0} / {shadowStats.MaxSegmentsPerLight,4} ({shadowStats.CappedLights,2})\n" +
                 $"  Shadow pass ms last/avg/max: {shadowStats.LastShadowPassMs,6:0.0} / {shadowStats.AvgShadowPassMs,6:0.0} / {shadowStats.MaxShadowPassMs,6:0.0}\n" +
-                $"  Shadow draw calls last/avg/max: {shadowStats.LastDrawCalls,4} / {shadowStats.AvgDrawCalls,4:0.0} / {shadowStats.MaxDrawCalls,4}";
+                $"  Shadow draw calls last/avg/max: {shadowStats.LastDrawCalls,4} / {shadowStats.AvgDrawCalls,4:0.0} / {shadowStats.MaxDrawCalls,4}\n" +
+                $"  Diagnostics preview/magenta: {(Mode(DebugMode.ShadowMaskPreview) ? "on" : "off")} / {(Mode(DebugMode.ShadowMagentaClear) ? "on" : "off")}";
 
             EmitDiagnosticsWarnings(mainStats, uiStats, simStats, workerStats, simThreadStats, uiThreadStats, renderSyncStats, renderStats, shadowStats);
         }

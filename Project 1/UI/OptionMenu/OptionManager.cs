@@ -127,7 +127,8 @@ namespace Project_1.UI.OptionMenu
         {
             optionElements[(int)OptionScreen.Debug] = new List<UIElement>
             {
-                new DebugOptionsPanel(new RelativeScreenPosition(0.1f, 0.1f), new RelativeScreenPosition(0.55f, 0.78f))
+                new DebugOptionsPanel(new RelativeScreenPosition(0.1f, 0.1f), new RelativeScreenPosition(0.275f, 0.78f)),
+                new ShadowDiagnosticsPanel(new RelativeScreenPosition(0.39f, 0.1f), new RelativeScreenPosition(0.275f, 0.78f))
             };
         }
 

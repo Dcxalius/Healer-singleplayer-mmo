@@ -9,6 +9,7 @@ namespace Project_1.UI.HUD.PlateBoxes
 {
     internal readonly struct PlateBoxRenderSnapshot
     {
+        const float TextSize = 12f;
         static readonly GfxPath whiteBackgroundPath = new GfxPath(GfxType.UI, "WhiteBackground");
         static readonly GfxPath barFillPath = new GfxPath(GfxType.UI, "WhiteGrayBasedBar");
         static readonly GfxPath levelCirclePath = new GfxPath(GfxType.UI, "LevelCircle");
@@ -17,6 +18,10 @@ namespace Project_1.UI.HUD.PlateBoxes
         public PlateBoxRenderSnapshot(
             bool visible,
             Rectangle boxRect,
+            Rectangle nameRect,
+            Rectangle healthRect,
+            Rectangle resourceRect,
+            Rectangle levelRect,
             string name,
             Color relationColor,
             float currentHealth,
@@ -29,6 +34,10 @@ namespace Project_1.UI.HUD.PlateBoxes
         {
             Visible = visible;
             BoxRect = boxRect;
+            NameRect = nameRect;
+            HealthRect = healthRect;
+            ResourceRect = resourceRect;
+            LevelRect = levelRect;
             Name = name ?? string.Empty;
             RelationColor = relationColor;
             CurrentHealth = currentHealth;
@@ -42,6 +51,10 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         bool Visible { get; }
         Rectangle BoxRect { get; }
+        Rectangle NameRect { get; }
+        Rectangle HealthRect { get; }
+        Rectangle ResourceRect { get; }
+        Rectangle LevelRect { get; }
         string Name { get; }
         Color RelationColor { get; }
         float CurrentHealth { get; }
@@ -60,35 +73,21 @@ namespace Project_1.UI.HUD.PlateBoxes
 
             Texture2D whiteTexture = TextureManager.GetTexture(whiteBackgroundPath);
             Texture2D fillTexture = TextureManager.GetTexture(barFillPath);
-            SpriteFont font = FontCache.GetFont("Gloryse");
 
-            Rectangle nameRect = SegmentRect(0f, 0.5f);
-            Rectangle healthRect = SegmentRect(0.5f, 0.25f);
-            Rectangle resourceRect = SegmentRect(0.75f, 0.25f);
+            batch.Draw(whiteTexture, NameRect, null, RelationColor, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+            DrawCenteredText(batch, Name, Color.Black, NameRect);
 
-            batch.Draw(whiteTexture, nameRect, null, RelationColor, 0f, Vector2.Zero, SpriteEffects.None, 1f);
-            DrawCenteredText(batch, font, Name, Color.Black, nameRect);
+            DrawResourceLike(batch, whiteTexture, fillTexture, HealthRect, CurrentHealth, MaxHealth, Color.Red, true);
+            DrawResourceLike(batch, whiteTexture, fillTexture, ResourceRect, CurrentResource, MaxResource, ResourceColor, true);
 
-            DrawResourceLike(batch, whiteTexture, fillTexture, healthRect, CurrentHealth, MaxHealth, Color.Red, true, font);
-            DrawResourceLike(batch, whiteTexture, fillTexture, resourceRect, CurrentResource, MaxResource, ResourceColor, true, font);
-
-            DrawLevel(batch, font);
+            DrawLevel(batch);
             if (ShowCommandBorder)
             {
                 DrawBorder(batch, whiteTexture, Color.YellowGreen, 2);
             }
         }
 
-        Rectangle SegmentRect(float yStartRatio, float heightRatio)
-        {
-            int y = BoxRect.Y + (int)Math.Round(BoxRect.Height * yStartRatio);
-            int h = Math.Max(1, (int)Math.Round(BoxRect.Height * heightRatio));
-            int bottom = Math.Min(BoxRect.Bottom, y + h);
-            if (bottom <= y) bottom = y + 1;
-            return new Rectangle(BoxRect.X, y, BoxRect.Width, bottom - y);
-        }
-
-        void DrawResourceLike(SpriteBatch batch, Texture2D bgTexture, Texture2D fillTexture, Rectangle rect, float current, float max, Color fillColor, bool drawText, SpriteFont font)
+        void DrawResourceLike(SpriteBatch batch, Texture2D bgTexture, Texture2D fillTexture, Rectangle rect, float current, float max, Color fillColor, bool drawText)
         {
             batch.Draw(bgTexture, rect, null, barBackgroundColor, 0f, Vector2.Zero, SpriteEffects.None, 1f);
 
@@ -115,17 +114,15 @@ namespace Project_1.UI.HUD.PlateBoxes
             if (!drawText || max <= 0f) return;
             string fraction = $"{Math.Round(current)}/{max:0.##}";
             string percent = $"{(int)Math.Clamp((current / max) * 100f, 0f, 100f)}%";
-            DrawTextLeft(batch, font, fraction, Color.Black, rect, 5);
-            DrawTextRight(batch, font, percent, Color.Black, rect, 5);
+            DrawTextLeft(batch, fraction, Color.Black, rect, 5);
+            DrawTextRight(batch, percent, Color.Black, rect, 5);
         }
 
-        void DrawLevel(SpriteBatch batch, SpriteFont font)
+        void DrawLevel(SpriteBatch batch)
         {
-            int circleSize = Math.Max(1, (int)Math.Round(BoxRect.Width * 0.05f));
-            Rectangle circleRect = new Rectangle(BoxRect.Right - circleSize, BoxRect.Y, circleSize, circleSize);
             Texture2D levelTexture = TextureManager.GetTexture(levelCirclePath);
-            batch.Draw(levelTexture, circleRect, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
-            DrawCenteredText(batch, font, Level.ToString(), Color.Pink, circleRect);
+            batch.Draw(levelTexture, LevelRect, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+            DrawCenteredText(batch, Level.ToString(), Color.Pink, LevelRect);
         }
 
         void DrawBorder(SpriteBatch batch, Texture2D texture, Color color, int thickness)
@@ -141,31 +138,25 @@ namespace Project_1.UI.HUD.PlateBoxes
             batch.Draw(texture, right, null, color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
         }
 
-        static void DrawCenteredText(SpriteBatch batch, SpriteFont font, string text, Color color, Rectangle rect)
+        static void DrawCenteredText(SpriteBatch batch, string text, Color color, Rectangle rect)
         {
             if (string.IsNullOrWhiteSpace(text)) return;
-            Vector2 size = font.MeasureString(text);
-            Vector2 pos = new Vector2(rect.X + rect.Width / 2f, rect.Y + rect.Height / 2f);
-            Vector2 origin = size / 2f;
-            batch.DrawString(font, text, pos, color, 0f, origin, Camera.Camera.Zoom, SpriteEffects.None, 1f);
+            Text label = new Text("Comfortaa-msdf", text, color, TextSize);
+            label.CentredDraw(batch, new AbsoluteScreenPosition(rect.Center));
         }
 
-        static void DrawTextLeft(SpriteBatch batch, SpriteFont font, string text, Color color, Rectangle rect, int padding)
+        static void DrawTextLeft(SpriteBatch batch, string text, Color color, Rectangle rect, int padding)
         {
             if (string.IsNullOrWhiteSpace(text)) return;
-            Vector2 size = font.MeasureString(text);
-            Vector2 pos = new Vector2(rect.Left + padding, rect.Center.Y);
-            Vector2 origin = new Vector2(0f, size.Y / 2f);
-            batch.DrawString(font, text, pos, color, 0f, origin, Camera.Camera.Zoom, SpriteEffects.None, 1f);
+            Text label = new Text("Comfortaa-msdf", text, color, TextSize);
+            label.CentreLeftDraw(batch, new AbsoluteScreenPosition(rect.Left + padding, rect.Center.Y));
         }
 
-        static void DrawTextRight(SpriteBatch batch, SpriteFont font, string text, Color color, Rectangle rect, int padding)
+        static void DrawTextRight(SpriteBatch batch, string text, Color color, Rectangle rect, int padding)
         {
             if (string.IsNullOrWhiteSpace(text)) return;
-            Vector2 size = font.MeasureString(text);
-            Vector2 pos = new Vector2(rect.Right - padding, rect.Center.Y);
-            Vector2 origin = new Vector2(size.X, size.Y / 2f);
-            batch.DrawString(font, text, pos, color, 0f, origin, Camera.Camera.Zoom, SpriteEffects.None, 1f);
+            Text label = new Text("Comfortaa-msdf", text, color, TextSize);
+            label.CentreRightDraw(batch, new AbsoluteScreenPosition(rect.Right - padding, rect.Center.Y));
         }
     }
 }

@@ -51,14 +51,14 @@ namespace Project_1.Managers.States
         {
             GraphicsManager.SetRenderTarget(renderTarget);
             
-            spriteBatch.Begin(sortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, transformMatrix);
+            GraphicsManager.BeginSpriteBatch(spriteBatch, sortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, transformMatrix);
             GraphicsManager.ClearScreen(aClearColor);
 
         }
 
         public virtual void CleanRender()
         {
-            spriteBatch.End();
+            GraphicsManager.EndSpriteBatch(spriteBatch);
             GraphicsManager.SetRenderTarget(null);
         }
 

@@ -99,8 +99,8 @@ namespace Project_1.Tiles
             ThreadAffinity.AssertMainThread();
             if (debugTextInitialized) return;
             debugTextInitialized = true;
-            xText = new Text("Gloryse", tilePos.X.ToString(), Color.Black);
-            yText = new Text("Gloryse", tilePos.Y.ToString(), Color.Yellow);
+            xText = new Text("Comfortaa-msdf", tilePos.X.ToString(), Color.Black);
+            yText = new Text("Comfortaa-msdf", tilePos.Y.ToString(), Color.Yellow);
         }
 
         internal Textures.Texture.TextureRenderSnapshot BuildRenderSnapshot()

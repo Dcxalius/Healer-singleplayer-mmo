@@ -185,7 +185,7 @@ namespace Project_1.UI.UIElements
             gfx = aGfx;
             relativePos = aPos;
             relativeSize = aSize;
-            nameText = new Text("Gloryse", GetType().Name);
+            nameText = new Text("Comfortaa-msdf", GetType().Name);
 
             capturesClick = true;
             capturesScroll = false;

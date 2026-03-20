@@ -27,6 +27,17 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Update="Content/Font/**/*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Content/Font/**/*.bmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Content/Font/**/*.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <Content Remove="Content\Settings\Content.mgcb.backup" />
   </ItemGroup>
   <Target Name="BuildMonoGameContent" BeforeTargets="Build">

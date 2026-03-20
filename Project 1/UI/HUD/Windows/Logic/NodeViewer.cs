@@ -25,7 +25,7 @@ namespace Project_1.UI.HUD.Windows.Logic
         {
             nodeTexture = new UITexture("WhiteBackground", Color.LightGray);
             linkTexture = new UITexture("WhiteBackground", Color.Black);
-            label = new Text("Gloryse");
+            label = new Text("Comfortaa-msdf");
         }
 
         public void SetCurrentTarget(int guildMemberRenderId)

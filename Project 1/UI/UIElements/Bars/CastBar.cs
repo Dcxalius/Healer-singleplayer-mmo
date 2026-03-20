@@ -27,7 +27,7 @@ namespace Project_1.UI.UIElements.Bars
         }
         public CastBar(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new BarTexture(BarTexture.FillingDirection.Right, Color.White), new UITexture(new GfxPath(GfxType.UI, "WhiteBackground"), Color.Black), aPos, aSize)
         {
-            remainingCast = new Text("Gloryse", Color.Wheat);
+            remainingCast = new Text("Comfortaa-msdf", Color.Wheat);
             capturesClick = false;
             capturesRelease = false;
 

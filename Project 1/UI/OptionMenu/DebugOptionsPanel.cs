@@ -44,6 +44,7 @@ namespace Project_1.UI.OptionMenu
             AddOverlayToggle("Sim Thread", DebugOverlayInfo.SimThread);
             AddOverlayToggle("UI Thread", DebugOverlayInfo.UiThread);
             AddOverlayToggle("Render Sync", DebugOverlayInfo.RenderSync);
+
         }
 
         void AddOverlayToggle(string aLabel, DebugOverlayInfo aInfo)
@@ -63,13 +64,7 @@ namespace Project_1.UI.OptionMenu
 
         void SetDebugOverlayEnabled(bool aEnabled)
         {
-            bool oldValue = DebugManager.Mode(DebugMode.DebugOverlay);
-            if (oldValue == aEnabled) return;
-
-            DebugManager.SetMode(DebugMode.DebugOverlay, aEnabled);
-            OptionManager.AddActionToDoAtExitOfOptionMenu(
-                () => DebugManager.SetMode(DebugMode.DebugOverlay, oldValue),
-                DebugManager.ExportSettings);
+            SetDebugMode(DebugMode.DebugOverlay, aEnabled);
         }
 
         void SetOverlayInfoEnabled(DebugOverlayInfo aInfo, bool aEnabled)
@@ -80,6 +75,17 @@ namespace Project_1.UI.OptionMenu
             DebugManager.SetOverlayInfo(aInfo, aEnabled);
             OptionManager.AddActionToDoAtExitOfOptionMenu(
                 () => DebugManager.SetOverlayInfo(aInfo, oldValue),
+                DebugManager.ExportSettings);
+        }
+
+        void SetDebugMode(DebugMode aMode, bool aEnabled)
+        {
+            bool oldValue = DebugManager.Mode(aMode);
+            if (oldValue == aEnabled) return;
+
+            DebugManager.SetMode(aMode, aEnabled);
+            OptionManager.AddActionToDoAtExitOfOptionMenu(
+                () => DebugManager.SetMode(aMode, oldValue),
                 DebugManager.ExportSettings);
         }
     }

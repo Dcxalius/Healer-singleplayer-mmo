@@ -9,6 +9,7 @@ namespace Project_1.UI.HUD
 {
     internal readonly struct NamePlateRenderSnapshot
     {
+        const float TextSize = 12f;
         static readonly GfxPath platePath = new GfxPath(GfxType.UI, "GrayBackground");
         static readonly GfxPath barBackgroundPath = new GfxPath(GfxType.UI, "WhiteBackground");
         static readonly GfxPath barFillPath = new GfxPath(GfxType.UI, "WhiteGrayBasedBar");
@@ -70,13 +71,10 @@ namespace Project_1.UI.HUD
             }
 
             if (string.IsNullOrWhiteSpace(NameText)) return;
-            SpriteFont font = FontCache.GetFont("Gloryse");
-            Vector2 textSize = font.MeasureString(NameText);
-            Vector2 textPos = NameTopCenter.ToVector2();
-            Vector2 origin = new Vector2(textSize.X / 2f, 0f);
+            Text nameText = new Text("Comfortaa-msdf", NameText, NameColor, TextSize);
             object scissorToken = new object();
             GraphicsManager.CaptureScissor(scissorToken, NameClipRect);
-            batch.DrawString(font, NameText, textPos, NameColor, 0f, origin, Camera.Camera.Zoom, SpriteEffects.None, 1f);
+            nameText.TopCentreDraw(batch, NameTopCenter);
             GraphicsManager.ReleaseScissor(scissorToken);
         }
     }

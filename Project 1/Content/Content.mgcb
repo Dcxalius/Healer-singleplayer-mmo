@@ -34,6 +34,17 @@
 /build:Effects/TextOutline.fx
 #end
 
+#begin Effects/MsdfText.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/MsdfText.fx
+#end
+
+#begin Font/Comfortaa.ttf
+/copy:Font/Comfortaa.ttf
+#end
+
 #begin Font/Gloryser.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor

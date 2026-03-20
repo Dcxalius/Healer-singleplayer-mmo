@@ -236,9 +236,9 @@ namespace Project_1.Managers.States
             }
 
             RenderTarget2D target = currentState.Draw();
-            finalBatch.Begin();
+            GraphicsManager.BeginSpriteBatch(finalBatch);
             finalBatch.Draw(target, renderTargetPosition, Color.White);
-            finalBatch.End();
+            GraphicsManager.EndSpriteBatch(finalBatch);
         }
 
         public static States CurrentState => currentStateEnum;

@@ -1,18 +1,16 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Managers;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project_1.Textures
 {
     internal class Text
     {
+        internal const float DefaultTextSize = 12f;
+
         public virtual string Value
         {
             get => textToDisplay;
@@ -20,15 +18,10 @@ namespace Project_1.Textures
             set
             {
                 textToDisplay = value;
-                if (value == null)
-                {
-                    offset = Vector2.Zero;
-                    return;
-                }
-
-                offset = font.MeasureString(value);
+                RecalculateOffset();
             }
         }
+
         string textToDisplay;
 
         public virtual Color Color
@@ -37,59 +30,102 @@ namespace Project_1.Textures
             set => color = value;
         }
 
-        public Vector2 Offset { get => offset; }
+        public float TextSize
+        {
+            get => textSize;
+            set
+            {
+                textSize = value <= 0f ? DefaultTextSize : value;
+                UpdateScale();
+                RecalculateOffset();
+            }
+        }
+
+        public Vector2 Offset => offset;
         Vector2 offset;
+
         public Vector2 CalculatePartialOffset(int aIndexToCalculateTo) => CalculatePartialOffset(0, aIndexToCalculateTo);
-        public Vector2 CalculatePartialOffset(int aStartIndex, int aIndexToCalculateTo) => font.MeasureString(textToDisplay.Substring(aStartIndex, aIndexToCalculateTo));
-        static public Vector2 CalculateOffset(string aString, SpriteFont aFont) => aFont.MeasureString(aString);
-        static public Vector2 CalculatePartialOffset(string aString, SpriteFont aFont, int aIndexToCalculateTo) => CalculatePartialOffset(aString, aFont, 0, aIndexToCalculateTo);
-        static public Vector2 CalculatePartialOffset(string aString, SpriteFont aFont, int aStartIndex, int aIndexToCalculateTo) => CalculateOffset(aString.Substring(aStartIndex, aIndexToCalculateTo), aFont);
+        public Vector2 CalculatePartialOffset(int aStartIndex, int aIndexToCalculateTo) => MeasureScaledPartial(textToDisplay, font, scale, aStartIndex, aIndexToCalculateTo);
+        public static Vector2 CalculateOffset(string aString, string aFontName, float aTextSize = DefaultTextSize) => CalculateOffset(aString, FontCache.GetFont(aFontName), aTextSize);
+        public static Vector2 CalculateOffset(string aString, GameFont aFont, float aTextSize = DefaultTextSize) => MeasureScaled(aString, aFont, GetScale(aFont, aTextSize));
+        public static Vector2 CalculatePartialOffset(string aString, string aFontName, int aIndexToCalculateTo, float aTextSize = DefaultTextSize) => CalculatePartialOffset(aString, FontCache.GetFont(aFontName), 0, aIndexToCalculateTo, aTextSize);
+        public static Vector2 CalculatePartialOffset(string aString, string aFontName, int aStartIndex, int aIndexToCalculateTo, float aTextSize = DefaultTextSize) => CalculatePartialOffset(aString, FontCache.GetFont(aFontName), aStartIndex, aIndexToCalculateTo, aTextSize);
+        public static Vector2 CalculatePartialOffset(string aString, GameFont aFont, int aIndexToCalculateTo, float aTextSize = DefaultTextSize) => CalculatePartialOffset(aString, aFont, 0, aIndexToCalculateTo, aTextSize);
+        public static Vector2 CalculatePartialOffset(string aString, GameFont aFont, int aStartIndex, int aIndexToCalculateTo, float aTextSize = DefaultTextSize) => MeasureScaledPartial(aString, aFont, GetScale(aFont, aTextSize), aStartIndex, aIndexToCalculateTo);
 
-
-        public SpriteFont Font => font;
-        protected SpriteFont font;
+        public GameFont Font => font;
+        protected GameFont font;
         Color color;
         float scale;
-        
-        public Text(string aFontName) : this(aFontName, null, Color.White) { }
-        public Text(string aFontName, string aTextToStart) : this(aFontName, aTextToStart, Color.White) { }
-        public Text(string aFontName, Color aColor) : this(aFontName, null, aColor) { }
+        float textSize;
 
-        public Text(string aFontName, string aTextToStart, Color aColor)
+        public Text(string aFontName, float aTextSize = DefaultTextSize) : this(aFontName, null, Color.White, aTextSize) { }
+        public Text(string aFontName, string aTextToStart, float aTextSize = DefaultTextSize) : this(aFontName, aTextToStart, Color.White, aTextSize) { }
+        public Text(string aFontName, Color aColor, float aTextSize = DefaultTextSize) : this(aFontName, null, aColor, aTextSize) { }
+
+        public Text(string aFontName, string aTextToStart, Color aColor, float aTextSize = DefaultTextSize)
         {
             font = FontCache.GetFont(aFontName);
             Debug.Assert(font != null, "Font not found");
-            scale = Camera.Camera.Zoom;
-            Value = aTextToStart;
+            textSize = aTextSize <= 0f ? DefaultTextSize : aTextSize;
             color = aColor;
+            UpdateScale();
+            Value = aTextToStart;
         }
 
         public void Rescale()
         {
-            scale = Camera.Camera.Zoom;
+            UpdateScale();
+            RecalculateOffset();
         }
-
 
         public void TopLeftDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, Vector2.Zero);
         public void TopCentreDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X / 2, 0));
         public void TopRightDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X, 0));
 
-        public void CentreLeftDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(0, offset.Y / 2)); //Offset by half y
-        public void CentredDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, offset / 2); //Offsets by half of textsize
-        public void CentreRightDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X, offset.Y / 2)); //Offset by textlength and half y
+        public void CentreLeftDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(0, offset.Y / 2));
+        public void CentredDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, offset / 2);
+        public void CentreRightDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X, offset.Y / 2));
 
         public void BottomLeftDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(0, offset.Y));
         public void BottomCentreDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X / 2, offset.Y));
         public void BottomRightDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X, offset.Y));
-
-
 
         void Draw(SpriteBatch aBatch, AbsoluteScreenPosition aPos, Vector2 aOffset)
         {
             ThreadAffinity.AssertMainThread();
             if (textToDisplay == null) return;
 
-            aBatch.DrawString(font, textToDisplay, aPos.ToVector2(), color, 0f, aOffset, scale, SpriteEffects.None, 1f);
+            font.DrawString(aBatch, textToDisplay, aPos.ToVector2(), color, aOffset, scale, 1f);
+        }
+
+        void RecalculateOffset()
+        {
+            offset = MeasureScaled(textToDisplay, font, scale);
+        }
+
+        void UpdateScale()
+        {
+            scale = GetScale(font, textSize);
+        }
+
+        static float GetScale(GameFont aFont, float aTextSize)
+        {
+            if (aFont == null) return 1f;
+            float lineHeight = Math.Max(1f, aFont.LineHeight);
+            return aTextSize / lineHeight;
+        }
+
+        static Vector2 MeasureScaled(string aString, GameFont aFont, float aScale)
+        {
+            if (aFont == null || string.IsNullOrEmpty(aString)) return Vector2.Zero;
+            return aFont.MeasureString(aString) * aScale;
+        }
+
+        static Vector2 MeasureScaledPartial(string aString, GameFont aFont, float aScale, int aStartIndex, int aIndexToCalculateTo)
+        {
+            if (aFont == null || string.IsNullOrEmpty(aString) || aIndexToCalculateTo <= 0) return Vector2.Zero;
+            return aFont.MeasurePartialString(aString, aStartIndex, aIndexToCalculateTo) * aScale;
         }
     }
 }

@@ -101,21 +101,21 @@ namespace Project_1.Managers.States
 
             GraphicsManager.SetRenderTarget(uITarget);
             GraphicsManager.ClearScreen(Color.Transparent);
-            uIDraw.Begin(SpriteSortMode.Immediate, null, null, null, rasterizerState);
+            GraphicsManager.BeginSpriteBatch(uIDraw, SpriteSortMode.Immediate, null, null, null, rasterizerState);
 
             uiDrawList.Draw(uIDraw);
             DebugManager.Draw(uIDraw);
 
-            uIDraw.End();
+            GraphicsManager.EndSpriteBatch(uIDraw);
             GraphicsManager.SetRenderTarget(null);
 
             if (redrawPlates && plateDrawList != null)
             {
                 GraphicsManager.SetRenderTarget(plateTarget);
                 GraphicsManager.ClearScreen(Color.Transparent);
-                uIDraw.Begin(SpriteSortMode.Immediate, null, null, null, rasterizerState);
+                GraphicsManager.BeginSpriteBatch(uIDraw, SpriteSortMode.Immediate, null, null, null, rasterizerState);
                 plateDrawList.Draw(uIDraw);
-                uIDraw.End();
+                GraphicsManager.EndSpriteBatch(uIDraw);
                 GraphicsManager.SetRenderTarget(null);
             }
         }

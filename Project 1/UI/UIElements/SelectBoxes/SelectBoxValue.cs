@@ -24,7 +24,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
         protected SelectBoxValue(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, string aStartText, SelectBox aParent) : base(aGfx, aPos, aSize)
         {
             selectBoxParent = aParent;
-            text = new Text("Gloryse", aStartText, Color.Teal);
+            text = new Text("Comfortaa-msdf", aStartText, Color.Teal);
         }
 
         public override void Rescale()
