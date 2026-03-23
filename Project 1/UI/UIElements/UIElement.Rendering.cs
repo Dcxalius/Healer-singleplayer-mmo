@@ -30,7 +30,7 @@ namespace Project_1.UI.UIElements
             }
 
             if (children.Count == 0) return;
-
+            //TODO: Lock this or change draw system
             GraphicsManager.CaptureScissor(this, AbsolutePos);
             foreach (UIElement child in children)
             {

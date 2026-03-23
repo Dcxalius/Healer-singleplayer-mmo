@@ -158,6 +158,22 @@ namespace Project_1.Messaging.Events
         }
     }
 
+    internal readonly struct SpellDescriptorSnapshot
+    {
+        public SpellDescriptorSnapshot(string name, string description, string statReport, bool hasStatReport)
+        {
+            Name = name ?? string.Empty;
+            Description = description ?? string.Empty;
+            StatReport = statReport;
+            HasStatReport = hasStatReport;
+        }
+
+        public string Name { get; }
+        public string Description { get; }
+        public string StatReport { get; }
+        public bool HasStatReport { get; }
+    }
+
     internal readonly struct DescriptorBoxSet
     {
         public DescriptorBoxSet(ItemDescriptorSnapshot snapshot, AbsoluteScreenPosition? pos = null)
@@ -171,5 +187,17 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct DescriptorBoxClear
     {
+    }
+
+    internal readonly struct SpellDescriptorBoxSet
+    {
+        public SpellDescriptorBoxSet(SpellDescriptorSnapshot snapshot, AbsoluteScreenPosition? pos = null)
+        {
+            Snapshot = snapshot;
+            Position = pos;
+        }
+
+        public SpellDescriptorSnapshot Snapshot { get; }
+        public AbsoluteScreenPosition? Position { get; }
     }
 }

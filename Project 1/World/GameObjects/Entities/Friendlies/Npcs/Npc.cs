@@ -75,6 +75,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Npcs
             activeConversation = null;
             MailboxManager.PublishUiEvent(new GossipClosed());
             MailboxManager.PublishUiEvent(new ShopClosed());
+            MailboxManager.PublishUiEvent(new SpellTrainingClosed());
         }
     }
 }

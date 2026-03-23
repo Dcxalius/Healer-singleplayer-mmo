@@ -61,4 +61,8 @@ namespace Project_1.Messaging.Events
 
         public EntityUiSnapshot Snapshot { get; }
     }
+
+    internal readonly struct PlateLayerCleared
+    {
+    }
 }

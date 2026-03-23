@@ -129,17 +129,5 @@ namespace Project_1.UI.HUD
             worldHeight = snapshot.WorldHeight;
         }
 
-        public NamePlateRenderSnapshot BuildRenderSnapshot()
-        {
-            return new NamePlateRenderSnapshot(
-                AbsolutePos,
-                gfx.Color,
-                healthBar.AbsolutePos,
-                Math.Clamp(healthRatio, 0f, 1f),
-                name.Text ?? string.Empty,
-                name.Color,
-                name.AbsolutePos,
-                name.Location + new AbsoluteScreenPosition(name.Size.X / 2, 0));
-        }
     }
 }

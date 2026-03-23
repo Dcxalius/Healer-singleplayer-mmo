@@ -63,7 +63,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
             LoadSpellBar(PlayerData.SavedSpellsOnBar);
 
-            MailboxManager.PublishUiEvent(new SpellbookRefreshed(RenderId, SpellBook.Spells.Select(x => x.Name).ToArray()));
+            MailboxManager.PublishUiEvent(new SpellbookRefreshed(RenderId, SpellBook.Spells.Select(x => x.SpellKey).ToArray()));
             MailboxManager.PublishUiEvent(new CharacterWindowSet(BuildCharacterWindowSnapshot()));
             MailboxManager.PublishUiEvent(new PlayerPlateSet(BuildUiSnapshot()));
             MailboxManager.PublishUiEvent(new GoldChanged(Gold));
@@ -80,21 +80,12 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         {
             if (aSpellOnBar == null) return;
             Project_1.GameObjects.Spells.Spell[] spells = SpellBook.Spells;
-            int?[] indexOfSpellsToAdd = new int?[aSpellOnBar.Length];
+            string[] spellNamesToAddToBar = new string[aSpellOnBar.Length];
             for (int i = 0; i < aSpellOnBar.Length; i++)
             {
-                if (aSpellOnBar[i] == null) continue;
-
-                int indexOfSpell = Array.FindIndex(spells, x => x.Name == aSpellOnBar[i]);
-                Debug.Assert(indexOfSpell >= 0);
-
-                indexOfSpellsToAdd[i] = indexOfSpell;
-            }
-            string[] spellNamesToAddToBar = new string[indexOfSpellsToAdd.Length];
-            for (int i = 0; i < indexOfSpellsToAdd.Length; i++)
-            {
-                if (!indexOfSpellsToAdd[i].HasValue) continue;
-                spellNamesToAddToBar[i] = spells[indexOfSpellsToAdd[i].Value].Name;
+                if (string.IsNullOrWhiteSpace(aSpellOnBar[i])) continue;
+                if (!SpellBook.TryGetSpell(aSpellOnBar[i], out Project_1.GameObjects.Spells.Spell spell)) continue;
+                spellNamesToAddToBar[i] = spell.SpellKey;
             }
             MailboxManager.PublishUiEvent(new SpellbarLoaded(RenderId, spellNamesToAddToBar));
         }

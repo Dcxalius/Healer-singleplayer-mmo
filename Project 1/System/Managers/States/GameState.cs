@@ -71,7 +71,6 @@ namespace Project_1.Managers.States
             ThreadAffinity.AssertMainThread();
             UiDrawList uiDrawList;
             PlateDrawList plateDrawList;
-            bool redrawPlates;
 
             GraphicsManager.AssertScissorStackEmpty();
 
@@ -79,7 +78,6 @@ namespace Project_1.Managers.States
             {
                 if (!uiDirty && !plateDirty && Interlocked.Read(ref uiHeartbeatTicks) < uiHeartbeatThresholdTicks) return;
                 Interlocked.Exchange(ref uiHeartbeatTicks, 0);
-                redrawPlates = plateDirty;
 
                 if (!UiThread.IsRunning)
                 {
@@ -109,7 +107,7 @@ namespace Project_1.Managers.States
             GraphicsManager.EndSpriteBatch(uIDraw);
             GraphicsManager.SetRenderTarget(null);
 
-            if (redrawPlates && plateDrawList != null)
+            if (plateDrawList != null)
             {
                 GraphicsManager.SetRenderTarget(plateTarget);
                 GraphicsManager.ClearScreen(Color.Transparent);

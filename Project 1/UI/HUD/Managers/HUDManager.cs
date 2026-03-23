@@ -63,11 +63,8 @@ namespace Project_1.UI.HUD.Managers
         static readonly HudMoveDrawList hudMoveDrawListA = new HudMoveDrawList();
         static readonly HudMoveDrawList hudMoveDrawListB = new HudMoveDrawList();
         static volatile HudMoveDrawList hudMoveDrawList = hudMoveDrawListA;
-        static NamePlateRenderSnapshot[] plateNameScratch = Array.Empty<NamePlateRenderSnapshot>();
         static UIElement[] plateBoxScratch = Array.Empty<UIElement>();
-        static PlateBoxRenderSnapshot[] plateBoxSnapshotScratch = Array.Empty<PlateBoxRenderSnapshot>();
-        static BuffBoxRenderSnapshot[] buffBoxSnapshotScratch = Array.Empty<BuffBoxRenderSnapshot>();
-        static BuffRenderSnapshot[] buffEntryScratch = Array.Empty<BuffRenderSnapshot>();
+        static UIElement[] plateElementScratch = Array.Empty<UIElement>();
 
         static bool uiDrawListDirty = true;
         static bool plateDrawListDirty = true;
@@ -263,46 +260,21 @@ namespace Project_1.UI.HUD.Managers
             AssertUiOrMainThread();
             int namePlateCount = 0;
             int plateBoxCount = 0;
-            int plateBoxSnapshotCount = 0;
-            int buffBoxSnapshotCount = 0;
-            int buffEntryCount = 0;
+            int plateElementCount = 0;
             if (plateDrawListDirty || hudMoveDrawListDirty)
             {
                 namePlateCount = namePlateHandler.DrawListCount;
-                EnsureNamePlateScratchCapacity(namePlateCount);
-                namePlateCount = namePlateHandler.CopyDrawList(plateNameScratch);
-
                 plateBoxCount = plateBoxHandler.DrawListCount;
+                EnsurePlateElementScratchCapacity(namePlateCount + plateBoxCount);
+                namePlateCount = namePlateHandler.CopyDrawList(plateElementScratch);
+
                 EnsurePlateBoxScratchCapacity(plateBoxCount);
                 plateBoxCount = plateBoxHandler.CopyDrawList(plateBoxScratch);
-
-                EnsurePlateBoxSnapshotScratchCapacity(plateBoxCount);
-                EnsureBuffBoxSnapshotScratchCapacity(plateBoxCount);
-                double snapshotBuildFrameTimeMs = TimeManager.TotalFrameTime;
                 for (int i = 0; i < plateBoxCount; i++)
                 {
-                    UIElement element = plateBoxScratch[i];
-                    if (element is PlateBox plateBox)
-                    {
-                        plateBoxSnapshotScratch[plateBoxSnapshotCount++] = plateBox.BuildRenderSnapshot();
-                        continue;
-                    }
-
-                    if (element is BuffBox buffBox)
-                    {
-                        EnsureBuffEntryScratchCapacity(buffEntryCount + buffBox.BuffCount);
-                        int copied = buffBox.CopyRenderSnapshots(buffEntryScratch, buffEntryCount);
-                        buffBoxSnapshotScratch[buffBoxSnapshotCount++] = new BuffBoxRenderSnapshot(
-                            buffBox.Visible,
-                            buffEntryCount,
-                            copied,
-                            snapshotBuildFrameTimeMs);
-                        buffEntryCount += copied;
-                        continue;
-                    }
-
-                    Debug.Assert(false, $"Unexpected plate draw element type: {element?.GetType().FullName ?? "null"}");
+                    plateElementScratch[namePlateCount + i] = plateBoxScratch[i];
                 }
+                plateElementCount = namePlateCount + plateBoxCount;
             }
 
             if (uiDrawListDirty)
@@ -316,15 +288,7 @@ namespace Project_1.UI.HUD.Managers
             if (plateDrawListDirty)
             {
                 PlateDrawList buildTarget = ReferenceEquals(plateDrawList, plateDrawListA) ? plateDrawListB : plateDrawListA;
-                buildTarget.Set(
-                    plateNameScratch,
-                    namePlateCount,
-                    plateBoxSnapshotScratch,
-                    plateBoxSnapshotCount,
-                    buffBoxSnapshotScratch,
-                    buffBoxSnapshotCount,
-                    buffEntryScratch,
-                    buffEntryCount);
+                buildTarget.Set(plateElementScratch, plateElementCount);
                 plateDrawList = buildTarget;
                 plateDrawListDirty = false;
             }
@@ -338,13 +302,6 @@ namespace Project_1.UI.HUD.Managers
             }
         }
 
-        static void EnsureNamePlateScratchCapacity(int count)
-        {
-            if (count <= plateNameScratch.Length) return;
-            int capacity = Math.Max(count, Math.Max(8, plateNameScratch.Length * 2));
-            plateNameScratch = new NamePlateRenderSnapshot[capacity];
-        }
-
         static void EnsurePlateBoxScratchCapacity(int count)
         {
             if (count <= plateBoxScratch.Length) return;
@@ -352,25 +309,11 @@ namespace Project_1.UI.HUD.Managers
             plateBoxScratch = new UIElement[capacity];
         }
 
-        static void EnsurePlateBoxSnapshotScratchCapacity(int count)
+        static void EnsurePlateElementScratchCapacity(int count)
         {
-            if (count <= plateBoxSnapshotScratch.Length) return;
-            int capacity = Math.Max(count, Math.Max(8, plateBoxSnapshotScratch.Length * 2));
-            plateBoxSnapshotScratch = new PlateBoxRenderSnapshot[capacity];
-        }
-
-        static void EnsureBuffBoxSnapshotScratchCapacity(int count)
-        {
-            if (count <= buffBoxSnapshotScratch.Length) return;
-            int capacity = Math.Max(count, Math.Max(8, buffBoxSnapshotScratch.Length * 2));
-            buffBoxSnapshotScratch = new BuffBoxRenderSnapshot[capacity];
-        }
-
-        static void EnsureBuffEntryScratchCapacity(int count)
-        {
-            if (count <= buffEntryScratch.Length) return;
-            int capacity = Math.Max(count, Math.Max(8, buffEntryScratch.Length * 2));
-            buffEntryScratch = new BuffRenderSnapshot[capacity];
+            if (count <= plateElementScratch.Length) return;
+            int capacity = Math.Max(count, Math.Max(8, plateElementScratch.Length * 2));
+            plateElementScratch = new UIElement[capacity];
         }
     }
 }

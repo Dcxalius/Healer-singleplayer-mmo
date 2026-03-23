@@ -83,9 +83,9 @@ namespace Project_1.Textures
         public void TopCentreDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X / 2, 0));
         public void TopRightDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X, 0));
 
-        public void CentreLeftDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(0, offset.Y / 2));
-        public void CentredDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, offset / 2);
-        public void CentreRightDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X, offset.Y / 2));
+        public void CentreLeftDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(0, GetCenteredYOffset()));
+        public void CentredDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X / 2, GetCenteredYOffset()));
+        public void CentreRightDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X, GetCenteredYOffset()));
 
         public void BottomLeftDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(0, offset.Y));
         public void BottomCentreDraw(SpriteBatch aBatch, AbsoluteScreenPosition aPos) => Draw(aBatch, aPos, new Vector2(offset.X / 2, offset.Y));
@@ -107,6 +107,12 @@ namespace Project_1.Textures
         void UpdateScale()
         {
             scale = GetScale(font, textSize);
+        }
+
+        float GetCenteredYOffset()
+        {
+            float descenderHeight = font?.MeasureDescenderDepth(textToDisplay) * scale ?? 0f;
+            return Math.Max(0f, (offset.Y - descenderHeight) / 2f);
         }
 
         static float GetScale(GameFont aFont, float aTextSize)

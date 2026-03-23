@@ -20,11 +20,14 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             get
             {
                 ThreadAffinity.AssertSimThread();
-                return knownSpells.ToArray();
+                return castableSpells.ToArray();
             }
         }
-        List<Spell> knownSpells;
-        List<Spell> learnableSpells;
+        List<(int rank, Spell spell)> knownSpells;
+        readonly List<Spell> castableSpells;
+        readonly Dictionary<string, Spell> castableSpellsByKey;
+        HashSet<string> learnableSpells;
+        HashSet<string> levelOneSpells;
         Entity owner;
 
         public string[] LearntSpells
@@ -35,7 +38,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
                 string[] returnable = new string[knownSpells.Count];
                 for (int i = 0; i < returnable.Length; i++)
                 {
-                    returnable[i] = knownSpells[i].Name;
+                    returnable[i] = Spell.BuildSpellKey(knownSpells[i].spell.Name, knownSpells[i].rank);
                 }
                 return returnable;
             }
@@ -46,7 +49,9 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         {
             ThreadAffinity.AssertSimThread();
             loadedSpells = aSpellsAlreadyLearnt;
-            knownSpells = new List<Spell>();
+            knownSpells = new List<(int, Spell)>();
+            castableSpells = new List<Spell>();
+            castableSpellsByKey = new Dictionary<string, Spell>();
         }
 
         public SpellBook() : this(Array.Empty<string>())
@@ -61,58 +66,62 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             if (aEntity.RelationToPlayer != Relation.RelationToPlayer.Self) return;
             owner = aEntity as Friendly;
             aEntity = aEntity as Friendly;
-            learnableSpells = new List<Spell>();
             Friendly f = owner as Friendly;
-            string[] learnables = f.ClassData.LearnableSpells;
-            for (int i = 0; i < learnables.Length; i++)
-            {
-                learnableSpells.Add(new Spell(learnables[i]));
-            }
+            learnableSpells = new HashSet<string>(f.ClassData.LearnableSpells ?? Array.Empty<string>());
+            levelOneSpells = new HashSet<string>(f.ClassData.LevelOneSpells ?? Array.Empty<string>());
 
-            string[] levelOneSpells = f.ClassData.LevelOneSpells;
-
-            for (int i = 0; i < levelOneSpells.Length; i++)
+            foreach (string levelOneSpell in levelOneSpells)
             {
-                AddSpell(new Spell(levelOneSpells[i]));
+                AddSpell(levelOneSpell, 1, false);
             }
 
             for (int i = 0; i < loadedSpells.Length; i++)
             {
-                if (levelOneSpells.Contains(loadedSpells[i])) continue;
-                LearnSpell(loadedSpells[i]);
+                RestoreSpellProgress(loadedSpells[i]);
             }
 
             if (DebugManager.Mode(DebugMode.LearnKill))
             {
-                AddSpell(new Spell("Kill"));
+                AddSpell("Kill", 1);
             }
         }
 
         public void LearnSpell(string aSpellName)
         {
             ThreadAffinity.AssertSimThread();
-            Spell s = learnableSpells.Find(x => x.Name == aSpellName);
-            if (s == null)
+            if (!Spell.TryParseSpellKey(aSpellName, out string spellName, out int explicitRank))
             {
-                DebugManager.Print("Tried to learn spell named " + aSpellName + " but it was null.");
                 return;
             }
 
-            AddSpell(s);
+            if (!learnableSpells.Contains(spellName) && !levelOneSpells.Contains(spellName))
+            {
+                DebugManager.Print("Tried to learn spell named " + spellName + " but it was null.");
+                return;
+            }
+
+            int currentRank = GetKnownRank(spellName);
+            int targetRank = explicitRank > 1 ? explicitRank : currentRank + 1;
+            if (currentRank <= 0)
+            {
+                targetRank = Math.Max(1, explicitRank);
+            }
+
+            AddSpell(spellName, targetRank);
         }
 
         public void AddSpell(Spell aSpell)
         {
             ThreadAffinity.AssertSimThread();
-            knownSpells.Add(aSpell);
-            MailboxManager.PublishUiEvent(new SpellbookRefreshed(owner.RenderId, knownSpells.Select(x => x.Name).ToArray()));
+            if (aSpell == null) return;
+            AddSpell(aSpell.Name, aSpell.Rank);
         }
 
 
         public bool HasSpell(Spell aSpell)
         {
             ThreadAffinity.AssertSimThread();
-            return knownSpells.Contains(aSpell);
+            return aSpell != null && castableSpellsByKey.ContainsKey(aSpell.SpellKey);
         }
 
         public bool TryGetSpell(string spellName, out Spell spell)
@@ -120,8 +129,94 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             ThreadAffinity.AssertSimThread();
             spell = null;
             if (string.IsNullOrWhiteSpace(spellName)) return false;
-            spell = knownSpells.Find(x => x.Name == spellName);
-            return spell != null;
+            if (!Spell.TryParseSpellKey(spellName, out string parsedName, out int parsedRank)) return false;
+
+            string exactKey = Spell.BuildSpellKey(parsedName, parsedRank);
+            if (castableSpellsByKey.TryGetValue(exactKey, out spell))
+            {
+                return true;
+            }
+
+            int knownRank = GetKnownRank(parsedName);
+            if (knownRank <= 0) return false;
+
+            return castableSpellsByKey.TryGetValue(Spell.BuildSpellKey(parsedName, knownRank), out spell);
+        }
+
+        void RestoreSpellProgress(string spellIdentifier)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (!Spell.TryParseSpellKey(spellIdentifier, out string spellName, out int savedRank)) return;
+            if (levelOneSpells.Contains(spellName) && savedRank <= 1) return;
+            AddSpell(spellName, Math.Max(1, savedRank), false);
+        }
+
+        void AddSpell(string spellName, int rank, bool publish = true)
+        {
+            ThreadAffinity.AssertSimThread();
+            SpellData spellData = SpellFactory.GetSpell(spellName);
+            int clampedRank = spellData.ClampRank(rank);
+            int index = knownSpells.FindIndex(x => x.spell.Name == spellName);
+            if (index >= 0)
+            {
+                if (clampedRank <= knownSpells[index].rank) return;
+                knownSpells[index] = (clampedRank, new Spell(spellName, clampedRank));
+            }
+            else
+            {
+                knownSpells.Add((clampedRank, new Spell(spellName, clampedRank)));
+            }
+
+            RebuildCastableSpells();
+            if (publish)
+            {
+                PublishSpellbookRefreshed();
+            }
+        }
+
+        void RebuildCastableSpells()
+        {
+            ThreadAffinity.AssertSimThread();
+            Dictionary<string, Spell> previous = new Dictionary<string, Spell>(castableSpellsByKey);
+            castableSpells.Clear();
+            castableSpellsByKey.Clear();
+
+            for (int i = 0; i < knownSpells.Count; i++)
+            {
+                (int rank, Spell highestSpell) entry = knownSpells[i];
+                Spell resolvedHighestRankSpell = null;
+                for (int rank = 1; rank <= entry.rank; rank++)
+                {
+                    string key = Spell.BuildSpellKey(entry.highestSpell.Name, rank);
+                    if (!previous.TryGetValue(key, out Spell spell))
+                    {
+                        spell = new Spell(entry.highestSpell.Name, rank);
+                    }
+
+                    castableSpells.Add(spell);
+                    castableSpellsByKey[key] = spell;
+                    if (rank == entry.rank)
+                    {
+                        resolvedHighestRankSpell = spell;
+                    }
+                }
+
+                knownSpells[i] = (entry.rank, resolvedHighestRankSpell ?? new Spell(entry.highestSpell.Name, entry.rank));
+            }
+        }
+
+        public int GetKnownRank(string spellIdentifier)
+        {
+            if (!Spell.TryParseSpellKey(spellIdentifier, out string spellName, out _)) return 0;
+            int index = knownSpells.FindIndex(x => x.spell.Name == spellName);
+            if (index < 0) return 0;
+            return knownSpells[index].rank;
+        }
+
+        void PublishSpellbookRefreshed()
+        {
+            if (owner == null) return;
+            MailboxManager.PublishUiEvent(new SpellbookRefreshed(owner.RenderId, castableSpells.Select(x => x.SpellKey).ToArray()));
         }
     }
 }

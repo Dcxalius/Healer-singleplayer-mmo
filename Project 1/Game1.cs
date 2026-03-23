@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities.Corspes;
 using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.Entities.Projectiles;
 using Project_1.GameObjects.FloatingTexts;
 using Project_1.GameObjects.Spawners;
@@ -174,6 +175,7 @@ namespace Project_1
             LootFactory.Init();
             SpellFactory.Init();
             SpellCastRouter.Init();
+            SpellTrainingRouter.Init();
             ProjectileFactory.Init();
             OptionManager.Init();
             ChatCommandRouter.Init();

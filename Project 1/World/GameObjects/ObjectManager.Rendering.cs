@@ -199,7 +199,7 @@ namespace Project_1.GameObjects
             for (int i = 0; i < knownSpells.Length; i++)
             {
                 Spell spell = knownSpells[i];
-                spellSnapshots[i] = new SpellUiSnapshot(spell.Name, spell.GfxPath, spell.OffCooldown, spell.RatioOfCooldownDone);
+                spellSnapshots[i] = new SpellUiSnapshot(spell.SpellKey, spell.GfxPath, spell.OffCooldown, spell.RatioOfCooldownDone);
             }
 
             Entity target = player.Target;

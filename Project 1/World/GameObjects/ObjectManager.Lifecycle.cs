@@ -124,6 +124,7 @@ namespace Project_1.GameObjects
             }
 
             MailboxManager.PublishUiEvent(new PartyCleared());
+            MailboxManager.PublishUiEvent(new PlateLayerCleared());
             entities.Clear();
             guild.Clear();
             npcs.Clear();

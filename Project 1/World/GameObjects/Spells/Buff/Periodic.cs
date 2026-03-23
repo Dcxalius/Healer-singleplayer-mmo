@@ -13,6 +13,9 @@ namespace Project_1.GameObjects.Spells.Buff
     {
         int tickCounter;
         readonly double tickScalar;
+        readonly bool useRankScaling;
+        readonly SpellData spellData;
+        readonly int spellRank;
 
         public override GfxPath GfxPath => OverTime.GfxPath;
         OverTime OverTime { get => effect as OverTime; }
@@ -24,6 +27,16 @@ namespace Project_1.GameObjects.Spells.Buff
             ThreadAffinity.AssertSimThread();
             tickCounter = 0;
             tickScalar = aTickScalar;
+        }
+
+        public Periodic(Entity aCaster, OverTime aOverTime, SpellData spellData, int spellRank) : base(aCaster, aOverTime)
+        {
+            ThreadAffinity.AssertSimThread();
+            tickCounter = 0;
+            tickScalar = 1.0 / aOverTime.TickCount;
+            useRankScaling = true;
+            this.spellData = spellData;
+            this.spellRank = spellRank;
         }
 
         public override void Recast()
@@ -41,7 +54,15 @@ namespace Project_1.GameObjects.Spells.Buff
             while (tickCounter < OverTime.TickCount && createTime + OverTime.TickRate * (tickCounter + 1) <= TimeManager.TotalFrameTime)
             {
                 int effectIndex = Math.Min(OverTime.Effects.Length - 1, tickCounter);
-                OverTime.Effects[effectIndex].Trigger(caster, aEntity, tickScalar);
+                Instant instant = OverTime.Effects[effectIndex];
+                if (useRankScaling)
+                {
+                    instant.TriggerRanked(caster, aEntity, spellData, spellRank, tickScalar, true, OverTime.TickCount);
+                }
+                else
+                {
+                    instant.Trigger(caster, aEntity, tickScalar);
+                }
                 aEntity.AddEffect(new VisualEffect(OverTime.HitGfxPath, 500));
                 tickCounter++;
             }

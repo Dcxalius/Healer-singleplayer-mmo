@@ -46,6 +46,7 @@ namespace Project_1.UI.HUD.Managers
             MailboxManager.Ui.Subscribe<InventorySlotChanged>(OnInventorySlotChanged);
             MailboxManager.Ui.Subscribe<GoldChanged>(OnGoldChanged);
             MailboxManager.Ui.Subscribe<DescriptorBoxSet>(OnDescriptorBoxSet);
+            MailboxManager.Ui.Subscribe<SpellDescriptorBoxSet>(OnSpellDescriptorBoxSet);
             MailboxManager.Ui.Subscribe<DescriptorBoxClear>(OnDescriptorBoxClear);
         }
 
@@ -73,6 +74,8 @@ namespace Project_1.UI.HUD.Managers
             MailboxManager.Ui.Subscribe<GossipClosed>(OnGossipClosed);
             MailboxManager.Ui.Subscribe<ShopOpened>(OnShopOpened);
             MailboxManager.Ui.Subscribe<ShopClosed>(OnShopClosed);
+            MailboxManager.Ui.Subscribe<SpellTrainingOpened>(OnSpellTrainingOpened);
+            MailboxManager.Ui.Subscribe<SpellTrainingClosed>(OnSpellTrainingClosed);
             MailboxManager.Ui.Subscribe<InspectWindowToggled>(OnInspectWindowToggled);
             MailboxManager.Ui.Subscribe<LogicWindowOpened>(OnLogicWindowOpened);
             MailboxManager.Ui.Subscribe<LogicWindowSnapshotSet>(OnLogicWindowSnapshotSet);
@@ -86,6 +89,7 @@ namespace Project_1.UI.HUD.Managers
             MailboxManager.Ui.Subscribe<PlateRefreshRequested>(OnPlateRefreshRequested);
             MailboxManager.Ui.Subscribe<NamePlateAdded>(OnNamePlateAdded);
             MailboxManager.Ui.Subscribe<NamePlateRemoved>(OnNamePlateRemoved);
+            MailboxManager.Ui.Subscribe<PlateLayerCleared>(OnPlateLayerCleared);
             MailboxManager.Ui.Subscribe<BuffAdded>(OnBuffAdded);
             MailboxManager.Ui.Subscribe<PartyControlCleared>(OnPartyControlCleared);
             MailboxManager.Ui.Subscribe<PartyWalkerAdded>(OnPartyWalkerAdded);
@@ -194,6 +198,17 @@ namespace Project_1.UI.HUD.Managers
             ClearDescriptorBox();
         }
 
+        static void OnSpellDescriptorBoxSet(SpellDescriptorBoxSet e)
+        {
+            if (e.Position.HasValue)
+            {
+                SetDescriptorBox(e.Snapshot, e.Position.Value.ToRelativeScreenPosition());
+                return;
+            }
+
+            SetDescriptorBox(e.Snapshot, UiMouseStateCache.Relative);
+        }
+
         static void OnCastChannelStarted(CastChannelStarted e)
         {
             ChannelSpell(e.SpellGfxPath, e.DurationMs);
@@ -300,6 +315,18 @@ namespace Project_1.UI.HUD.Managers
             InvalidateUi();
         }
 
+        static void OnSpellTrainingOpened(SpellTrainingOpened e)
+        {
+            windowHandler.OpenSpellTrainingWindow(e.Entries, e.TrainerName);
+            InvalidateUi();
+        }
+
+        static void OnSpellTrainingClosed(SpellTrainingClosed _)
+        {
+            windowHandler.CloseSpellTrainingWindow();
+            InvalidateUi();
+        }
+
         static void OnInspectWindowToggled(InspectWindowToggled e)
         {
             windowHandler.ToggleInspectWindow(e.Member);
@@ -357,6 +384,14 @@ namespace Project_1.UI.HUD.Managers
         static void OnNamePlateRemoved(NamePlateRemoved e)
         {
             namePlateHandler.RemoveNamePlate(e.RenderId);
+            InvalidateUi();
+            InvalidatePlates();
+        }
+
+        static void OnPlateLayerCleared(PlateLayerCleared _)
+        {
+            namePlateHandler.Clear();
+            plateBoxHandler.Clear();
             InvalidateUi();
             InvalidatePlates();
         }

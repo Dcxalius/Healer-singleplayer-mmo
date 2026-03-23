@@ -80,31 +80,5 @@ namespace Project_1.UI.HUD.PlateBoxes
             base.Draw(aBatch);
         }
 
-        internal override PlateBoxRenderSnapshot BuildRenderSnapshot()
-        {
-            if (!targetSnapshot.HasValue || !targetRenderId.HasValue)
-            {
-                return new PlateBoxRenderSnapshot(false, AbsolutePos, Rectangle.Empty, Rectangle.Empty, Rectangle.Empty, Rectangle.Empty, string.Empty, Color.White, 0f, 0f, 0f, 0f, Color.White, 1, false);
-            }
-
-            EntityUiSnapshot snapshot = targetSnapshot.Value;
-            return new PlateBoxRenderSnapshot(
-                Visible,
-                AbsolutePos,
-                nameSegment.AbsolutePos,
-                healthSegment.AbsolutePos,
-                resourceSegment.AbsolutePos,
-                levelCircle.AbsolutePos,
-                snapshot.Name,
-                snapshot.RelationColor,
-                (float)snapshot.CurrentHealth,
-                (float)snapshot.MaxHealth,
-                snapshot.CurrentResource,
-                snapshot.MaxResource,
-                snapshot.ResourceColor,
-                snapshot.Level,
-                false);
-        }
-
     }
 }

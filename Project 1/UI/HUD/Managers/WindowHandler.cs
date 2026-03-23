@@ -24,6 +24,7 @@ namespace Project_1.UI.HUD.Managers
         static InspectWindow inspectWindow;
         static GossipWindow gossipWindow;
         static ShopWindow shopWindow;
+        static SpellTrainingWindow spellTrainingWindow;
         static LogicWindow logicWindow;
 
         public void InitWindows(ref List<UIElement> aHudElements)
@@ -50,6 +51,9 @@ namespace Project_1.UI.HUD.Managers
 
             shopWindow = new ShopWindow();
             aHudElements.Add(shopWindow);
+
+            spellTrainingWindow = new SpellTrainingWindow();
+            aHudElements.Add(spellTrainingWindow);
 
             logicWindow = new LogicWindow();
             aHudElements.Add(logicWindow);
@@ -86,6 +90,23 @@ namespace Project_1.UI.HUD.Managers
             ThreadAffinity.AssertUiThread();
             shopWindow.ClearShop();
             shopWindow.CloseWindow();
+            HUDManager.InvalidateUi();
+        }
+
+        public void OpenSpellTrainingWindow(SpellTrainingEntrySnapshot[] entries, string trainerName)
+        {
+            ThreadAffinity.AssertUiThread();
+            gossipWindow.CloseWindow();
+            spellTrainingWindow.OpenWindow();
+            spellTrainingWindow.OpenTrainer(entries, trainerName);
+            HUDManager.InvalidateUi();
+        }
+
+        public void CloseSpellTrainingWindow()
+        {
+            ThreadAffinity.AssertUiThread();
+            spellTrainingWindow.ClearTrainer();
+            spellTrainingWindow.CloseWindow();
             HUDManager.InvalidateUi();
         }
 

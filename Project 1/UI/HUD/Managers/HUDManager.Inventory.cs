@@ -28,6 +28,13 @@ namespace Project_1.UI.HUD.Managers
             InvalidateUi();
         }
 
+        public static void SetDescriptorBox(in SpellDescriptorSnapshot snapshot, RelativeScreenPosition aPos)
+        {
+            AssertUiThreadOrMainFallback();
+            descriptorBox.SetToSnapshot(snapshot, aPos);
+            InvalidateUi();
+        }
+
         public static void ClearDescriptorBox()
         {
             AssertUiThreadOrMainFallback();

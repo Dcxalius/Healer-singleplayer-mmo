@@ -23,16 +23,7 @@ namespace Project_1.GameObjects.Spells
         {
             get
             {
-                if (minValue == maxValue) return Math.Abs(minValue);
-                if (type == Type.Heal)
-                {
-                    return RandomManager.RollInt(minValue, maxValue);
-                }
-                if (type == Type.Attack)
-                {
-                    return RandomManager.RollInt(Math.Abs(minValue), Math.Abs(maxValue));
-                }
-                throw new NotImplementedException();
+                return RollValue(minValue, maxValue);
             }
         }
 
@@ -55,10 +46,29 @@ namespace Project_1.GameObjects.Spells
 
         public override bool Trigger(Entity aCaster, Entity aTarget, double aScalar = 1.0)
         {
+            return TriggerCore(aCaster, aTarget, minValue, maxValue, aScalar);
+        }
+
+        public bool TriggerRanked(Entity aCaster, Entity aTarget, SpellData spellData, int spellRank, double aScalar = 1.0, bool scaleAsTotalOverTime = false, int tickCount = 1)
+        {
+            int rankedMin = scaleAsTotalOverTime
+                ? spellData.ScaleOverTimeTickValueForRank(minValue, tickCount, spellRank)
+                : spellData.ScaleInstantValueForRank(minValue, spellRank);
+            int rankedMax = scaleAsTotalOverTime
+                ? spellData.ScaleOverTimeTickValueForRank(maxValue, tickCount, spellRank)
+                : spellData.ScaleInstantValueForRank(maxValue, spellRank);
+
+            return TriggerCore(aCaster, aTarget, rankedMin, rankedMax, aScalar);
+        }
+
+        bool TriggerCore(Entity aCaster, Entity aTarget, int currentMinValue, int currentMaxValue, double aScalar)
+        {
             ThreadAffinity.AssertSimThread();
-            if (type == Type.Attack)
+            Type currentType = currentMinValue > 0 ? Type.Heal : Type.Attack;
+            int randomValue = RollValue(currentMinValue, currentMaxValue);
+            if (currentType == Type.Attack)
             {
-                double finalValue = RandomValue;
+                double finalValue = randomValue;
                 if (StatSource == AbilityStatSource.Spell)
                 {
                     int spellPower = GetSpellPower(aCaster);
@@ -69,15 +79,31 @@ namespace Project_1.GameObjects.Spells
                 return true;
             }
 
-            if (type == Type.Heal)
+            if (currentType == Type.Heal)
             {
                 int spellPower = GetSpellPower(aCaster);
-                double finalValue = RandomValue + spellPower * Math.Clamp(aScalar, 0.0, 1.0);
+                double finalValue = randomValue + spellPower * Math.Clamp(aScalar, 0.0, 1.0);
                 aTarget.TakeHealing(aCaster, (float)Math.Max(1, finalValue));
                 return true;
 
             }
             return false;
+        }
+
+        static int RollValue(int minValue, int maxValue)
+        {
+            if (minValue == maxValue) return Math.Abs(minValue);
+
+            if (minValue > 0)
+            {
+                int low = Math.Min(minValue, maxValue);
+                int high = Math.Max(minValue, maxValue);
+                return RandomManager.RollInt(low, high);
+            }
+
+            int minMagnitude = Math.Min(Math.Abs(minValue), Math.Abs(maxValue));
+            int maxMagnitude = Math.Max(Math.Abs(minValue), Math.Abs(maxValue));
+            return RandomManager.RollInt(minMagnitude, maxMagnitude);
         }
 
         int GetSpellPower(Entity aCaster)

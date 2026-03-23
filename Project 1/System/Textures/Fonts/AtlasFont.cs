@@ -39,6 +39,33 @@ namespace Project_1.Textures
         }
 
         public override float LineHeight => lineHeightPx;
+        public override float MeasureDescenderDepth(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return 0f;
+
+            float penY = 0f;
+            float maxDescenderDepth = 0f;
+
+            for (int i = 0; i < text.Length; i++)
+            {
+                char c = text[i];
+                if (c == '\r') continue;
+                if (c == '\n')
+                {
+                    penY += lineHeightPx;
+                    continue;
+                }
+
+                AtlasFontGlyph glyph = ResolveGlyph(c);
+                if (glyph.SourceRect.Width <= 0 || glyph.SourceRect.Height <= 0) continue;
+
+                float glyphBottom = penY + ascenderPx - glyph.PlaneBottomPx;
+                float baseline = penY + ascenderPx;
+                maxDescenderDepth = Math.Max(maxDescenderDepth, glyphBottom - baseline);
+            }
+
+            return Math.Max(0f, maxDescenderDepth);
+        }
 
         public override Vector2 MeasureString(string text)
         {
@@ -62,7 +89,7 @@ namespace Project_1.Textures
                 effect.Parameters["PxRange"]?.SetValue(pxRange);
             }
 
-            Vector2 basePosition = position - origin * scale;
+            Vector2 basePosition = position - origin;
             GraphicsManager.DrawWithTemporaryEffect(batch, effect, _ =>
             {
                 float penX = 0f;
@@ -115,6 +142,9 @@ namespace Project_1.Textures
             float penY = 0f;
             float maxX = 0f;
             float height = lineHeightPx;
+            float minVisibleY = float.MaxValue;
+            float maxVisibleY = float.MinValue;
+            bool hasVisibleGlyph = false;
             int previousCodepoint = -1;
 
             for (int i = startIndex; i < end; i++)
@@ -137,9 +167,23 @@ namespace Project_1.Textures
                     penX += GetKerning(previousCodepoint, glyph.Codepoint);
                 }
 
+                if (glyph.SourceRect.Width > 0 && glyph.SourceRect.Height > 0)
+                {
+                    float glyphTop = penY + ascenderPx - glyph.PlaneTopPx;
+                    float glyphBottom = penY + ascenderPx - glyph.PlaneBottomPx;
+                    minVisibleY = Math.Min(minVisibleY, glyphTop);
+                    maxVisibleY = Math.Max(maxVisibleY, glyphBottom);
+                    hasVisibleGlyph = true;
+                }
+
                 penX += glyph.AdvancePx;
                 maxX = Math.Max(maxX, penX);
                 previousCodepoint = glyph.Codepoint;
+            }
+
+            if (hasVisibleGlyph)
+            {
+                height = Math.Max(0f, maxVisibleY - minVisibleY);
             }
 
             return new Vector2(maxX, height);

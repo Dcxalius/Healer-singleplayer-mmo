@@ -136,7 +136,6 @@ namespace Project_1.UI.UIElements
 
                 case TextAllignment.TopLeft:
                     underlyingText.TopLeftDraw(aBatch, Location);
-                    //underlyingText.LeftCentredDraw(aBatch, (AbsoluteScreenPosition)AbsolutePos.Location + new AbsoluteScreenPosition(0, (int)(underlyingText.Offset.Y / 2)));
                     break;
 
                 case TextAllignment.TopCentre:
@@ -145,8 +144,6 @@ namespace Project_1.UI.UIElements
 
                 case TextAllignment.TopRight:
                     underlyingText.TopRightDraw(aBatch, Location + new AbsoluteScreenPosition(Size.X, 0));
-
-                    //underlyingText.RightCentredDraw(aBatch, (AbsoluteScreenPosition)AbsolutePos.Location + new AbsoluteScreenPosition(AbsolutePos.Size.X, 0) + new AbsoluteScreenPosition(0, (int)(underlyingText.Offset.Y / 2)));
                     break;
 
                 case TextAllignment.BottomLeft:

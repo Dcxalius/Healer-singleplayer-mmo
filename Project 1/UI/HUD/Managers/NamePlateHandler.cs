@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Managers;
 using Project_1.Messaging.Events;
+using Project_1.UI.UIElements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,6 +45,15 @@ namespace Project_1.UI.HUD.Managers
             if (renderId <= 0) return;
             namePlates.Remove(renderId);
             HUDManager.InvalidatePlates();
+        }
+
+        public void Clear()
+        {
+            AssertUiOrMainThread();
+            namePlates.Clear();
+            namePlateScratch.Clear();
+            collisionIndexScratch.Clear();
+            collisionRectScratch.Clear();
         }
 
 
@@ -176,7 +186,7 @@ namespace Project_1.UI.HUD.Managers
             }
         }
 
-        public int CopyDrawList(NamePlateRenderSnapshot[] destination)
+        public int CopyDrawList(UIElement[] destination)
         {
             AssertUiOrMainThread();
             if (destination == null || destination.Length == 0) return 0;
@@ -186,7 +196,7 @@ namespace Project_1.UI.HUD.Managers
             foreach (NamePlate plate in namePlates.Values)
             {
                 if (i >= max) break;
-                destination[i++] = plate.BuildRenderSnapshot();
+                destination[i++] = plate;
             }
             return i;
         }

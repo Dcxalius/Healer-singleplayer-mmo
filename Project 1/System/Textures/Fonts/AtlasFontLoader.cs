@@ -31,6 +31,7 @@ namespace Project_1.Textures
         {
             public float lineHeight { get; set; }
             public float ascender { get; set; }
+            public float descender { get; set; }
         }
 
         sealed class GlyphInfo

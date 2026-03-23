@@ -5,6 +5,7 @@ using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.Entities.Projectiles;
 using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Unit.Stats;
+using Project_1.GameObjects.Spells.Buff;
 using Project_1.Managers;
 using Project_1.Textures;
 using System;
@@ -31,9 +32,11 @@ namespace Project_1.GameObjects.Spells
         }
 
         public string Name { get => spellData.Name; }
+        public int Rank => rank;
+        public string SpellKey => BuildSpellKey(Name, Rank);
         public float CastDistance { get => spellData.CastDistance; }
-        public double CastTime { get => spellData.CastTime; }
-        public float ResourceCost { get => spellData.ResourceCost; }
+        public double CastTime { get => spellData.GetCastTimeForRank(rank); }
+        public float ResourceCost { get => spellData.GetResourceCostForRank(rank); }
         public bool Targetable(Relation.RelationToPlayer aTarget) => spellData.Targetable(aTarget);
         public GfxPath GfxPath { get => spellData.ButtonGfxPath; }
         public SpellSchool[] SpellSchools => spellData.SpellSchools;
@@ -43,16 +46,60 @@ namespace Project_1.GameObjects.Spells
         public SpellData.GroundTargetShapeType GroundTargetShape => spellData.GroundTargetShape;
         public GfxPath HitEffectGfxPath => spellData.HitGfxPath;
         public bool BinarySpell => spellData.IsBinary;
-        public bool OffCooldown { get => lastTimeCasted + spellData.Cooldown < TimeManager.TotalFrameTime; }
-        public double RatioOfCooldownDone { get => Math.Min((TimeManager.TotalFrameTime - lastTimeCasted) / spellData.Cooldown, 1); }
+        public bool OffCooldown => Cooldown <= 0 || lastTimeCasted + Cooldown < TimeManager.TotalFrameTime;
+        public double RatioOfCooldownDone => Cooldown <= 0 ? 1.0 : Math.Min((TimeManager.TotalFrameTime - lastTimeCasted) / Cooldown, 1);
+        double Cooldown => spellData.GetCooldownForRank(rank);
         double lastTimeCasted;
 
 
         SpellData spellData;
+        readonly int rank;
+
+        public static string BuildSpellKey(string spellName, int rank)
+        {
+            if (string.IsNullOrWhiteSpace(spellName)) return string.Empty;
+            if (rank <= 1) return spellName;
+            return spellName + "#" + rank;
+        }
+
+        public static bool TryParseSpellKey(string spellIdentifier, out string spellName, out int rank)
+        {
+            spellName = spellIdentifier?.Trim() ?? string.Empty;
+            rank = 1;
+            if (string.IsNullOrWhiteSpace(spellName)) return false;
+
+            int separator = spellName.LastIndexOf('#');
+            if (separator <= 0 || separator >= spellName.Length - 1) return true;
+
+            string rankText = spellName[(separator + 1)..];
+            if (!int.TryParse(rankText, out int parsedRank) || parsedRank <= 0) return true;
+
+            spellName = spellName[..separator].TrimEnd();
+            rank = parsedRank;
+            return !string.IsNullOrWhiteSpace(spellName);
+        }
 
         public Spell(string aName)
         {
-            spellData = SpellFactory.GetSpell(aName);
+            if (!TryParseSpellKey(aName, out string spellName, out int parsedRank))
+            {
+                throw new ArgumentException("Spell identifier was invalid.", nameof(aName));
+            }
+
+            spellData = SpellFactory.GetSpell(spellName);
+            rank = spellData.ClampRank(parsedRank);
+            lastTimeCasted = double.NegativeInfinity;
+        }
+
+        public Spell(string aName, int aRank)
+        {
+            if (!TryParseSpellKey(aName, out string spellName, out _))
+            {
+                throw new ArgumentException("Spell identifier was invalid.", nameof(aName));
+            }
+
+            spellData = SpellFactory.GetSpell(spellName);
+            rank = spellData.ClampRank(aRank);
             lastTimeCasted = double.NegativeInfinity;
         }
 
@@ -113,10 +160,22 @@ namespace Project_1.GameObjects.Spells
         public bool Trigger(Entity aCaster, Entity aTarget)
         {
             AssertSimThread();
-            double scalar = GetDirectEffectScalarFromCastTime(spellData.CastTime);
+            double scalar = GetDirectEffectScalarFromCastTime(CastTime);
             for (int i = 0; i < spellData.Effects.Length; i++)
             {
-                spellData.Effects[i].Trigger(aCaster, aTarget, scalar);
+                SpellEffect effect = spellData.Effects[i];
+                if (effect is Instant instant)
+                {
+                    instant.TriggerRanked(aCaster, aTarget, spellData, rank, scalar);
+                }
+                else if (effect is OverTime overTime)
+                {
+                    overTime.TriggerRanked(aCaster, aTarget, spellData, rank);
+                }
+                else
+                {
+                    effect.Trigger(aCaster, aTarget, scalar);
+                }
                 aTarget.AddEffect(new VisualEffect(spellData.HitGfxPath, 1000));
             }
             return true;

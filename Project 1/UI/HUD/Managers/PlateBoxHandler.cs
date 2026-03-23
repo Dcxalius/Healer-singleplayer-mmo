@@ -263,6 +263,32 @@ namespace Project_1.UI.HUD.Managers
             HUDManager.InvalidatePlates();
         }
 
+        public void Clear()
+        {
+            AssertUiOrMainThread();
+            targetPlateBox?.SetTarget(null);
+            targetBuffBox?.AssignBox(null);
+            playerBuffBox?.AssignBox(null);
+
+            if (partyBuffBoxes != null)
+            {
+                for (int i = 0; i < partyBuffBoxes.Length; i++)
+                {
+                    partyBuffBoxes[i]?.AssignBox(null);
+                }
+            }
+
+            if (partyPlateBoxes != null)
+            {
+                for (int i = 0; i < partyPlateBoxes.Length; i++)
+                {
+                    partyPlateBoxes[i]?.RemoveTarget();
+                }
+            }
+
+            PartyPlateBox.ClearPartyBoxes();
+        }
+
         int FindGuildMemberPartyIndex(int aGuildMemberRenderId)
         {
             for (int i = 0; i < partyPlateBoxes.Length; i++)

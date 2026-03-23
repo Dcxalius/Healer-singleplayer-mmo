@@ -58,5 +58,13 @@ namespace Project_1.GameObjects.Spells.Buff
             aTarget.AddBuff(periodic);
             return true;
         }
+
+        public bool TriggerRanked(Entity aCaster, Entity aTarget, SpellData spellData, int spellRank)
+        {
+            ThreadAffinity.AssertSimThread();
+            Periodic periodic = new Periodic(aCaster, this, spellData, spellRank);
+            aTarget.AddBuff(periodic);
+            return true;
+        }
     }
 }

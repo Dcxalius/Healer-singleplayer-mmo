@@ -71,6 +71,7 @@ namespace Project_1.UI.HUD.Windows.Gossip
                 {
                     "C" => new ChatGossipOption(header, data),
                     "S" => new ShopGossipOption(header, data),
+                    "T" => new SpellTrainerGossipOption(header),
                     _ => throw new NotImplementedException()
                 };
             }

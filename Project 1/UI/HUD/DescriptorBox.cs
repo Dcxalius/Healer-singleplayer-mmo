@@ -90,6 +90,33 @@ namespace Project_1.UI.HUD
 
         }
 
+        public void SetToSnapshot(in SpellDescriptorSnapshot snapshot, RelativeScreenPosition aPos)
+        {
+            Visible = true;
+            spacingInWorld = RelativeScreenPosition.GetSquareFromX(0.005f);
+
+            SetText(snapshot, out float ySize, out int spacingNeeded);
+
+            Resize(new RelativeScreenPosition(xMax, ySize / Camera.Camera.ScreenRectangle.Height) + spacingInWorld.OnlyX * 2 + spacingInWorld.OnlyY * spacingNeeded);
+            Move(aPos - spacingFromItem - RelativeSize);
+            RelativeScreenPosition spacingInBox = spacingInWorld.ToAbsoluteScreenPos().ToRelativeScreenPosition(Size);
+
+            RelativeScreenPosition pos = spacingInBox;
+            itemName.Resize(new AbsoluteScreenPosition(Size.X, (int)itemName.UnderlyingTextOffset.Y).ToRelativeScreenPosition(Size));
+            itemName.Move(pos);
+            pos += itemName.RelativeSize.OnlyY + spacingInBox.OnlyY;
+
+            itemDescription.Resize(new AbsoluteScreenPosition(Size.X, (int)itemDescription.UnderlyingTextOffset.Y).ToRelativeScreenPosition(Size));
+            itemDescription.Move(pos);
+            pos += itemDescription.RelativeSize.OnlyY + spacingInBox.OnlyY;
+
+            if (itemStats.Text != null)
+            {
+                itemStats.Resize(new AbsoluteScreenPosition(Size.X, (int)itemStats.UnderlyingTextOffset.Y).ToRelativeScreenPosition(Size));
+                itemStats.Move(pos);
+            }
+        }
+
         public void Clear()
         {
             ResetDescriptor();
@@ -127,6 +154,32 @@ namespace Project_1.UI.HUD
 
             }
             else { itemSellPrice.Text = null; }
+        }
+
+        void SetText(in SpellDescriptorSnapshot snapshot, out float ySize, out int spacingNeeded)
+        {
+            ySize = 0;
+            spacingNeeded = 1;
+            itemName.Text = snapshot.Name;
+            ySize += itemName.UnderlyingTextOffset.Y;
+
+            spacingNeeded += 1;
+            itemDescription.Text = snapshot.Description;
+            ySize += itemDescription.UnderlyingTextOffset.Y;
+
+            if (snapshot.HasStatReport)
+            {
+                spacingNeeded += 1;
+                itemStats.Text = snapshot.StatReport;
+                ySize += itemStats.UnderlyingTextOffset.Y;
+            }
+            else
+            {
+                itemStats.Text = null;
+            }
+
+            itemSellPrice.Text = null;
+            goldImage.Visible = false;
         }
 
         

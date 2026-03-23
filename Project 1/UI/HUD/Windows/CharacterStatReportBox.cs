@@ -30,6 +30,7 @@ namespace Project_1.UI.HUD.Windows
                 AddChild(numberLabel);
                 AddChild(textLabel);
 
+                Visible = false;
                 CapturesClick = false;
                 CapturesRelease = false;
                 CapturesScroll = false;
@@ -112,6 +113,7 @@ namespace Project_1.UI.HUD.Windows
 
             SetPageElements(statLines, BindStatLine, ClearStatLine);
             SetPageTitleProvider(GetCurrentPageTitle);
+            Visible = false;
         }
 
         public void SetOwnerContext(in EntityUiSnapshot aOwnerSnapshot)

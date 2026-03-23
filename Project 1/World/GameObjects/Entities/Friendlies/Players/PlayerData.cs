@@ -4,6 +4,7 @@ using Project_1.Camera;
 using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Unit;
 using Project_1.Items;
+using Project_1.Managers;
 using Project_1.UI.HUD.Managers;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,8 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         Inventory inventory;
 
         [JsonProperty("LearntSpells")]
-        string[] LearntSpellNames => spellBook.LearntSpells;
+        string[] LearntSpellNames => learntSpellNames;
+        string[] learntSpellNames;
 
         [JsonIgnore]
         public SpellBook SpellBook => spellBook;
@@ -53,6 +55,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             : base(name, corpseGfxName, className, relation, level, experience, currentHp, currentResource, equipment, position, momentum, velocity, destinations, defenseSkill)
         {
             spellBook = new SpellBook(learntSpells);
+            learntSpellNames = learntSpells ?? Array.Empty<string>();
             this.spellOnBar = spellOnBar;
 
             this.inventory = inventory;
@@ -67,7 +70,14 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         {
             inventory = new Inventory();
             spellBook = new SpellBook();
+            learntSpellNames = Array.Empty<string>();
 
+        }
+
+        internal void CaptureSaveState()
+        {
+            ThreadAffinity.AssertSimThread();
+            learntSpellNames = spellBook?.LearntSpells ?? Array.Empty<string>();
         }
     }
 }

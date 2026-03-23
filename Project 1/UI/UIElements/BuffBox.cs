@@ -118,24 +118,6 @@ namespace Project_1.UI.UIElements
             };
         }
 
-        public int CopyRenderSnapshots(BuffRenderSnapshot[] destination, int startIndex)
-        {
-            AssertUiOrMainThread();
-            if (!Visible) return 0;
-            if (destination == null || buffs.Count == 0) return 0;
-            if (startIndex >= destination.Length) return 0;
-            if (startIndex < 0) startIndex = 0;
-
-            int count = Math.Min(destination.Length - startIndex, buffs.Count);
-            for (int i = 0; i < count; i++)
-            {
-                Buff buff = buffs[i];
-                destination[startIndex + i] = new BuffRenderSnapshot(buff.GfxPath, buff.AbsolutePos, buff.Duration);
-            }
-
-            return count;
-        }
-
         static void AssertUiOrMainThread()
         {
             if (ThreadAffinity.IsMainThread) return;

@@ -41,6 +41,7 @@ namespace Project_1.Managers.Saves
             payload.SaveDetails = details;
             payload.CameraPosition = Camera.Camera.CentreInWorldSpace;
             payload.PlayerData = ObjectFactory.PlayerData;
+            payload.PlayerData?.CaptureSaveState();
             payload.GuildData = ObjectFactory.GetGuildDataSnapshot();
             payload.Chunks = TileManager.GetChunksSnapshot();
             payload.Corpses = CorpseManager.GetSnapshot();
