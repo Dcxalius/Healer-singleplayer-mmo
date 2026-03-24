@@ -58,6 +58,20 @@ namespace Project_1.UI.HUD.SpellBook
             imageOnButton.ClearImage();
         }
 
+        protected override void OnHover()
+        {
+            base.OnHover();
+            if (string.IsNullOrWhiteSpace(spellName)) return;
+            if (!UiPlayerStateCache.TryGetSpellSnapshot(spellName, out SpellUiSnapshot snapshot)) return;
+            MailboxManager.PublishUiEvent(new SpellDescriptorBoxSet(snapshot.Descriptor, RelativePositionOnScreen.ToAbsoluteScreenPos()));
+        }
+
+        protected override void OnDeHover()
+        {
+            base.OnDeHover();
+            MailboxManager.PublishUiEvent(new DescriptorBoxClear());
+        }
+
 
 
         protected override void ClickedOnMe(ClickEvent aClick)

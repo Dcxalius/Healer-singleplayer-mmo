@@ -1,6 +1,7 @@
 using Project_1.Items;
 using Project_1.Items.SubTypes;
 using Project_1.Camera;
+using Project_1.GameObjects.Spells;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -172,6 +173,52 @@ namespace Project_1.Messaging.Events
         public string Description { get; }
         public string StatReport { get; }
         public bool HasStatReport { get; }
+
+        public static SpellDescriptorSnapshot FromSpell(Spell spell)
+        {
+            if (spell == null) throw new ArgumentNullException(nameof(spell));
+            SpellData spellData = SpellFactory.GetSpell(spell.Name);
+            List<string> lines = new List<string>
+            {
+                $"Required Level: {spellData.GetRequiredLevelForRank(spell.Rank)}"
+            };
+
+            if (spell.CastTime > 0)
+            {
+                lines.Add($"Cast Time: {(spell.CastTime / 1000d).ToString("0.##", CultureInfo.InvariantCulture)} sec");
+            }
+            else
+            {
+                lines.Add("Cast Time: Instant");
+            }
+
+            if (spellData.GetCooldownForRank(spell.Rank) > 0)
+            {
+                lines.Add($"Cooldown: {(spellData.GetCooldownForRank(spell.Rank) / 1000d).ToString("0.##", CultureInfo.InvariantCulture)} sec");
+            }
+
+            lines.Add($"Cost: {spell.ResourceCost.ToString("0.##", CultureInfo.InvariantCulture)}");
+            lines.Add($"Range: {spell.CastDistance.ToString("0.##", CultureInfo.InvariantCulture)}");
+
+            if (spellData.Effects != null && spellData.Effects.Length > 0)
+            {
+                lines.Add(string.Empty);
+                for (int i = 0; i < spellData.Effects.Length; i++)
+                {
+                    SpellEffect effect = spellData.Effects[i];
+                    if (effect == null) continue;
+                    string effectDescription = effect.GetRankDescription(spellData, spell.Rank);
+                    if (string.IsNullOrWhiteSpace(effectDescription)) continue;
+                    lines.Add(effectDescription);
+                }
+            }
+
+            return new SpellDescriptorSnapshot(
+                spellData.MaxRank > 1 ? $"{spell.Name} (Rank {spell.Rank})" : spell.Name,
+                string.IsNullOrWhiteSpace(spellData.Description) ? "No description." : spellData.Description,
+                string.Join("\n", lines),
+                true);
+        }
     }
 
     internal readonly struct DescriptorBoxSet

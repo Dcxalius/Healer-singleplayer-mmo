@@ -6,8 +6,11 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.GameObjects;
+using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.GameObjects.Entities.Friendlies.Players;
+using Project_1.GameObjects.Spells;
+using Project_1.GameObjects.Unit.Stats;
 using Project_1.Items;
 using Project_1.Items.SubTypes;
 using Project_1.Messaging;
@@ -18,6 +21,13 @@ namespace Project_1.Managers
 {
     internal static class ChatCommandRouter
     {
+        sealed class DebugDamageEffect : SpellEffect
+        {
+            public DebugDamageEffect() : base("Debug Damage", false, new HashSet<SpellSchool>())
+            {
+            }
+        }
+
         readonly struct ChatCommandSpec
         {
             public ChatCommandSpec(string name, string usage, string description, ChatCommandAccess access)
@@ -46,6 +56,9 @@ namespace Project_1.Managers
             new ChatCommandSpec("clear", "/clear", "Clears the chat panel.", ChatCommandAccess.System),
             new ChatCommandSpec("where", "/where <friendly name>", "Prints world position for a friendly.", ChatCommandAccess.System),
             new ChatCommandSpec("chunklevels", "/chunklevels", "Prints chunk average levels (10x10 near player, or all generated if under 100 chunks).", ChatCommandAccess.System),
+            new ChatCommandSpec("damage", "/damage [friendly name] <amount>", "Deals true damage to a friendly. Defaults to the player.", ChatCommandAccess.Debug),
+            new ChatCommandSpec("gold", "/gold <amount>", "Changes the player's gold by the given amount.", ChatCommandAccess.Debug),
+            new ChatCommandSpec("exp", "/exp [friendly name] <amount>", "Gives experience to a friendly. Defaults to the player.", ChatCommandAccess.Debug),
             new ChatCommandSpec("tp", "/tp <friendly name> <x> <y>", "Teleports a friendly to world coordinates.", ChatCommandAccess.Debug),
             new ChatCommandSpec("createitem", "/createitem <friendly name> <item id> <count>", "Creates item(s) and gives them to a friendly with inventory.", ChatCommandAccess.Debug)
         };
@@ -114,6 +127,15 @@ namespace Project_1.Managers
                     break;
                 case "chunklevels":
                     HandleChatChunkLevels(args);
+                    break;
+                case "damage":
+                    HandleChatDamage(args);
+                    break;
+                case "gold":
+                    HandleChatGold(args);
+                    break;
+                case "exp":
+                    HandleChatExperience(args);
                     break;
                 case "tp":
                     HandleChatTeleport(args);
@@ -392,6 +414,62 @@ namespace Project_1.Managers
             PublishChatSystemMessage($"Gave {player.Name} {added}x {item.Name} ({leftover}x did not fit)");
         }
 
+        static void HandleChatDamage(string[] args)
+        {
+            if (!TryResolveOptionalFriendlyAmountCommand(args, "/damage [friendly name] <amount>", out Friendly friendly, out int amount))
+            {
+                return;
+            }
+
+            if (amount <= 0)
+            {
+                PublishChatSystemMessage("Damage amount must be greater than 0.");
+                return;
+            }
+
+            Entity caster = ObjectManager.Player ?? friendly;
+            friendly.RecieveSpellAttack(caster, new DebugDamageEffect(), new Damage(amount, DamageType.True));
+            PublishChatSystemMessage($"{friendly.Name} took {amount} debug damage.");
+        }
+
+        static void HandleChatGold(string[] args)
+        {
+            if (args.Length != 1)
+            {
+                PublishChatSystemMessage("Usage: /gold <amount>");
+                return;
+            }
+
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+
+            if (!int.TryParse(args[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out int amount))
+            {
+                PublishChatSystemMessage("Gold amount must be an integer. Usage: /gold <amount>");
+                return;
+            }
+
+            player.ChangeGold(amount);
+            PublishChatSystemMessage($"Player gold changed by {amount}.");
+        }
+
+        static void HandleChatExperience(string[] args)
+        {
+            if (!TryResolveOptionalFriendlyAmountCommand(args, "/exp [friendly name] <amount>", out Friendly friendly, out int amount))
+            {
+                return;
+            }
+
+            if (amount <= 0)
+            {
+                PublishChatSystemMessage("Experience amount must be greater than 0.");
+                return;
+            }
+
+            friendly.GainExperience(amount);
+            PublishChatSystemMessage($"{friendly.Name} gained {amount} experience.");
+        }
+
         static bool TryGetItemData(int itemId, out ItemData itemData)
         {
             itemData = null;
@@ -416,6 +494,46 @@ namespace Project_1.Managers
             }
 
             return false;
+        }
+
+        static bool TryResolveOptionalFriendlyAmountCommand(string[] args, string usage, out Friendly friendly, out int amount)
+        {
+            friendly = null;
+            amount = 0;
+
+            if (args.Length == 1)
+            {
+                friendly = ObjectManager.Player;
+                if (friendly == null) return false;
+
+                if (!int.TryParse(args[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out amount))
+                {
+                    PublishChatSystemMessage($"Amount must be an integer. Usage: {usage}");
+                    return false;
+                }
+
+                return true;
+            }
+
+            if (args.Length != 2)
+            {
+                PublishChatSystemMessage($"Usage: {usage}");
+                return false;
+            }
+
+            if (!ObjectManager.TryGetFriendlyByName(args[0], out friendly))
+            {
+                PublishChatSystemMessage($"Could not find non-mob named '{args[0]}'.");
+                return false;
+            }
+
+            if (!int.TryParse(args[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out amount))
+            {
+                PublishChatSystemMessage($"Amount must be an integer. Usage: {usage}");
+                return false;
+            }
+
+            return true;
         }
 
         static bool TryTokenizeCommand(string text, out string[] tokens, out string error)

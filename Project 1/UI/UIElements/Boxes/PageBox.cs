@@ -149,6 +149,7 @@ namespace Project_1.UI.UIElements.Boxes
                 int elementIndex = startIndex + i;
                 if (elementIndex < totalItems)
                 {
+                    //TODO: This causes page elemts to be hoverable on creation
                     pageElement.Visible = true;
                     bindPageElement?.Invoke(pageElement, elementIndex);
                     continue;

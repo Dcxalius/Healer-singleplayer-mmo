@@ -90,6 +90,20 @@ namespace Project_1.UI.HUD.SpellBook
             Triggered();
         }
 
+        protected override void OnHover()
+        {
+            base.OnHover();
+            if (string.IsNullOrWhiteSpace(spellName)) return;
+            if (!UiPlayerStateCache.TryGetSpellSnapshot(spellName, out SpellUiSnapshot snapshot)) return;
+            MailboxManager.PublishUiEvent(new SpellDescriptorBoxSet(snapshot.Descriptor, RelativePositionOnScreen.ToAbsoluteScreenPos()));
+        }
+
+        protected override void OnDeHover()
+        {
+            base.OnDeHover();
+            MailboxManager.PublishUiEvent(new DescriptorBoxClear());
+        }
+
         public override void ReleaseOnMe(ReleaseEvent aRelease)
         {
             base.ReleaseOnMe(aRelease);

@@ -53,18 +53,20 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct SpellUiSnapshot
     {
-        public SpellUiSnapshot(string name, GfxPath gfxPath, bool offCooldown, double cooldownRatio01)
+        public SpellUiSnapshot(string name, GfxPath gfxPath, bool offCooldown, double cooldownRatio01, SpellDescriptorSnapshot descriptor)
         {
             Name = name ?? string.Empty;
             GfxPath = gfxPath;
             OffCooldown = offCooldown;
             CooldownRatio01 = cooldownRatio01;
+            Descriptor = descriptor;
         }
 
         public string Name { get; }
         public GfxPath GfxPath { get; }
         public bool OffCooldown { get; }
         public double CooldownRatio01 { get; }
+        public SpellDescriptorSnapshot Descriptor { get; }
     }
 
     internal readonly struct BuffUiSnapshot

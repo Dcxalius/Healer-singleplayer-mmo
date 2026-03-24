@@ -138,11 +138,27 @@ namespace Project_1.GameObjects.Spells
             return true;
         }
 
-        bool TryCast(Entity aTarget)
+        bool TryCast(Entity aTarget, Entity aCaster)
         {
             AssertSimThread();
             if (!OffCooldown) return false;
             if (!spellData.Targetable(aTarget.RelationToPlayer)) return false;
+            if (spellData.Effects.Any(x => x is Instant)) return true;
+            List<Buff.Buff> targetBuffs = aTarget.GetAllBuffs();
+            bool[] failures = new bool[spellData.Effects.Length];
+            for (int i = 0; i < spellData.Effects.Length; i++)
+            {
+                OverTime overTime = spellData.Effects[i] as OverTime;
+                for (int j = 0; j < targetBuffs.Count; j++)
+                {
+                    if (targetBuffs[j].EffectId != overTime.Id) continue;
+                    Buff.Buff existing = targetBuffs[j];
+                    if (existing.MultipleSourceStackable && !existing.SameCaster(aCaster)) continue;
+                    if (!overTime.Numerable && (existing.Rank > rank || existing.DurationRemaining > overTime.Duration)) failures[i] = true;
+                    if (overTime.Numerable && (existing.Power > overTime.CalculatePower() || existing.DurationRemaining > overTime.Duration)) failures[i] = true;
+                }
+            }
+            if (failures.All(x => x)) return false;
             return true;
         }
 

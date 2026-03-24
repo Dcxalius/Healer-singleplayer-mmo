@@ -29,6 +29,17 @@ namespace Project_1.GameObjects.Spells
         public bool IsBinary => isBinary;
         bool isBinary;
 
+        public virtual string Description => "";
+
+        public bool sourceStackable;
+
+        public int MaxStackCount;
+
+        public virtual string GetRankDescription(SpellData spellData, int spellRank)
+        {
+            return Description;
+        }
+
         public virtual AbilityStatSource StatSource => AbilityStatSource.Spell;
 
         public HashSet<SpellSchool> SpellSchools => spellSchools;
@@ -45,11 +56,10 @@ namespace Project_1.GameObjects.Spells
             Debug.Assert(name != null, "No name");
         }
 
-        public virtual bool Trigger(Entity aCaster, Entity aTarget, double aScalar = 1.0)
+        public virtual bool Trigger(Entity aCaster, Entity aTarget, double aSpellPowerScalar = 1.0)
         {
             AssertSimThread();
-
-            return false;
+            throw new NotImplementedException($"Tried to trigger effect {name} with no trigger implementation.");
         }
     }
 }

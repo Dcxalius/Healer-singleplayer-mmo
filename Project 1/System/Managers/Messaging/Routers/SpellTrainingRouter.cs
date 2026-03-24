@@ -119,38 +119,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         static SpellDescriptorSnapshot BuildDescriptor(SpellData spellData, int rank)
         {
-            Spell spell = new Spell(spellData.Name, rank);
-            string description = string.IsNullOrWhiteSpace(spellData.Description)
-                ? "No description."
-                : spellData.Description;
-
-            List<string> lines = new List<string>
-            {
-                $"Required Level: {spellData.GetRequiredLevelForRank(rank)}"
-            };
-
-            if (spell.CastTime > 0)
-            {
-                lines.Add($"Cast Time: {(spell.CastTime / 1000d).ToString("0.##", CultureInfo.InvariantCulture)} sec");
-            }
-            else
-            {
-                lines.Add("Cast Time: Instant");
-            }
-
-            if (spellData.GetCooldownForRank(rank) > 0)
-            {
-                lines.Add($"Cooldown: {(spellData.GetCooldownForRank(rank) / 1000d).ToString("0.##", CultureInfo.InvariantCulture)} sec");
-            }
-
-            lines.Add($"Cost: {spell.ResourceCost.ToString("0.##", CultureInfo.InvariantCulture)}");
-            lines.Add($"Range: {spell.CastDistance.ToString("0.##", CultureInfo.InvariantCulture)}");
-
-            return new SpellDescriptorSnapshot(
-                BuildDisplayName(spellData.Name, rank, spellData.MaxRank),
-                description,
-                string.Join("\n", lines),
-                true);
+            return SpellDescriptorSnapshot.FromSpell(new Spell(spellData.Name, rank));
         }
     }
 }

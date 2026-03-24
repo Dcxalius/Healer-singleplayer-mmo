@@ -27,6 +27,8 @@ namespace Project_1.GameObjects.Spells
             }
         }
 
+        public override string Description => BuildDescription(minValue, maxValue);
+
         DamageType damageType;
         int minValue;
         int maxValue;
@@ -44,9 +46,35 @@ namespace Project_1.GameObjects.Spells
             this.damageType = damageType;
         }
 
-        public override bool Trigger(Entity aCaster, Entity aTarget, double aScalar = 1.0)
+        //Deprectated?
+        //public override bool Trigger(Entity aCaster, Entity aTarget, double aScalar = 1.0)
+        //{
+        //    return TriggerCore(aCaster, aTarget, minValue, maxValue, aScalar);
+        //}
+
+        public override string GetRankDescription(SpellData spellData, int spellRank)
         {
-            return TriggerCore(aCaster, aTarget, minValue, maxValue, aScalar);
+            int rankedMin = spellData.ScaleInstantValueForRank(minValue, spellRank);
+            int rankedMax = spellData.ScaleInstantValueForRank(maxValue, spellRank);
+            return BuildDescription(rankedMin, rankedMax);
+        }
+
+        public string GetRankDescriptionAsOverTimeTick(SpellData spellData, int spellRank, int tickCount)
+        {
+            int rankedMin = spellData.ScaleOverTimeTickValueForRank(minValue, tickCount, spellRank);
+            int rankedMax = spellData.ScaleOverTimeTickValueForRank(maxValue, tickCount, spellRank);
+            return BuildDescription(rankedMin, rankedMax);
+        }
+
+        public string GetRankDescriptionAsOverTimeTickWithTotal(SpellData spellData, int spellRank, int tickCount)
+        {
+            int safeTickCount = Math.Max(1, tickCount);
+            int rankedTickMin = spellData.ScaleOverTimeTickValueForRank(minValue, safeTickCount, spellRank);
+            int rankedTickMax = spellData.ScaleOverTimeTickValueForRank(maxValue, safeTickCount, spellRank);
+            int totalMin = rankedTickMin * safeTickCount;
+            int totalMax = rankedTickMax * safeTickCount;
+
+            return BuildOverTimeDescription(rankedTickMin, rankedTickMax, totalMin, totalMax);
         }
 
         public bool TriggerRanked(Entity aCaster, Entity aTarget, SpellData spellData, int spellRank, double aScalar = 1.0, bool scaleAsTotalOverTime = false, int tickCount = 1)
@@ -104,6 +132,59 @@ namespace Project_1.GameObjects.Spells
             int minMagnitude = Math.Min(Math.Abs(minValue), Math.Abs(maxValue));
             int maxMagnitude = Math.Max(Math.Abs(minValue), Math.Abs(maxValue));
             return RandomManager.RollInt(minMagnitude, maxMagnitude);
+        }
+
+        string BuildDescription(int currentMinValue, int currentMaxValue)
+        {
+            Type currentType = currentMinValue > 0 ? Type.Heal : Type.Attack;
+            if (currentType == Type.Attack)
+            {
+                string damageTypeString = damageType.ToString();
+                if (Math.Abs(currentMinValue) == Math.Abs(currentMaxValue))
+                {
+                    return $"Deals {Math.Abs(currentMinValue)} {damageTypeString} damage.";
+                }
+
+                int low = Math.Min(Math.Abs(currentMinValue), Math.Abs(currentMaxValue));
+                int high = Math.Max(Math.Abs(currentMinValue), Math.Abs(currentMaxValue));
+                return $"Deals {low} to {high} {damageTypeString} damage.";
+            }
+
+            if (Math.Abs(currentMinValue) == Math.Abs(currentMaxValue))
+            {
+                return $"Heals for {Math.Abs(currentMinValue)}.";
+            }
+
+            int healLow = Math.Min(Math.Abs(currentMinValue), Math.Abs(currentMaxValue));
+            int healHigh = Math.Max(Math.Abs(currentMinValue), Math.Abs(currentMaxValue));
+            return $"Heals for {healLow} to {healHigh}.";
+        }
+
+        string BuildOverTimeDescription(int tickMinValue, int tickMaxValue, int totalMinValue, int totalMaxValue)
+        {
+            Type currentType = tickMinValue > 0 ? Type.Heal : Type.Attack;
+            int tickLow = Math.Min(Math.Abs(tickMinValue), Math.Abs(tickMaxValue));
+            int tickHigh = Math.Max(Math.Abs(tickMinValue), Math.Abs(tickMaxValue));
+            int totalLow = Math.Min(Math.Abs(totalMinValue), Math.Abs(totalMaxValue));
+            int totalHigh = Math.Max(Math.Abs(totalMinValue), Math.Abs(totalMaxValue));
+
+            if (currentType == Type.Attack)
+            {
+                string damageTypeString = damageType.ToString();
+                if (tickLow == tickHigh && totalLow == totalHigh)
+                {
+                    return $"Deals {tickLow} {damageTypeString} damage every tick ({totalLow} total).";
+                }
+
+                return $"Deals {tickLow} to {tickHigh} {damageTypeString} damage every tick ({totalLow} to {totalHigh} total).";
+            }
+
+            if (tickLow == tickHigh && totalLow == totalHigh)
+            {
+                return $"Heals for {tickLow} every tick ({totalLow} total).";
+            }
+
+            return $"Heals for {tickLow} to {tickHigh} every tick ({totalLow} to {totalHigh} total).";
         }
 
         int GetSpellPower(Entity aCaster)
