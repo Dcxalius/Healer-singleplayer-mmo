@@ -155,6 +155,31 @@ namespace Project_1.UI.HUD.Managers
             }
         }
 
+        public void RemoveBuff(int buffId, int ownerRenderId)
+        {
+            if (targetBuffBox.IsThisMine(ownerRenderId))
+            {
+                targetBuffBox.RemoveBuff(buffId);
+                HUDManager.InvalidatePlates();
+            }
+            if (playerBuffBox.IsThisMine(ownerRenderId))
+            {
+                playerBuffBox.RemoveBuff(buffId);
+                HUDManager.InvalidatePlates();
+                return;
+            }
+            for (int i = 0; i < partyBuffBoxes.Length; i++)
+            {
+                if (partyBuffBoxes[i] == null) continue;
+                if (partyBuffBoxes[i].IsThisMine(ownerRenderId))
+                {
+                    partyBuffBoxes[i].RemoveBuff(buffId);
+                    HUDManager.InvalidatePlates();
+                    return;
+                }
+            }
+        }
+
         public void SetPlayerPlateBox(in EntityUiSnapshot playerSnapshot)
         {
             playerPlateBox.SetData(playerSnapshot);

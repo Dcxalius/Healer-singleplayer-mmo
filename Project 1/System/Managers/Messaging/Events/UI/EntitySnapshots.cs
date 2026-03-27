@@ -1,6 +1,8 @@
 using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.Textures;
+using Project_1.UI.CharacterCreator;
+using System.Threading;
 
 namespace Project_1.Messaging.Events
 {
@@ -71,15 +73,19 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct BuffUiSnapshot
     {
-        public BuffUiSnapshot(int effectId, GfxPath gfxPath, double durationRemainingMs)
+        public BuffUiSnapshot(int buffId, GfxPath gfxPath, double finalTime, int count, int maxCount)
         {
-            EffectId = effectId;
+            BuffId = buffId;
+            Count = count;
+            MaxCount = maxCount;
             GfxPath = gfxPath;
-            DurationRemainingMs = durationRemainingMs;
+            FinalTime = finalTime;
         }
 
-        public int EffectId { get; }
+        public int MaxCount { get; }
+        public int Count { get; }
+        public int BuffId { get; }
         public GfxPath GfxPath { get; }
-        public double DurationRemainingMs { get; }
+        public double FinalTime { get; }
     }
 }

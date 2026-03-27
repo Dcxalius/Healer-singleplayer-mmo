@@ -2,6 +2,7 @@ using Project_1.GameObjects;
 using Project_1.GameObjects.Entities.Friendlies.Npcs;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.Spells;
+using Project_1.GameObjects.Unit;
 using Project_1.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
@@ -14,7 +15,6 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 {
     internal static class SpellTrainingRouter
     {
-        const int SpellTrainingCost = 10;
         static bool initialized;
 
         public static void Init()
@@ -49,9 +49,10 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             bool previousRanksLearnt = rank <= 1 || highestKnownRank >= rank - 1;
             bool appropriateLevel = player.CurrentLevel >= requiredLevel;
             if (learned || !previousRanksLearnt || !appropriateLevel) return;
-            if (player.Gold < SpellTrainingCost) return;
+            int cost = SpellTrainingCost(spellData.GetRequiredLevelForRank(rank));
+            if (player.Gold < cost) return;
 
-            player.ChangeGold(-SpellTrainingCost);
+            player.ChangeGold(-cost);
             player.SpellBook.LearnSpell(Spell.BuildSpellKey(spellName, rank));
             PublishTrainerWindow(player, trainer.Name);
         }
@@ -100,15 +101,24 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
                         Spell.BuildSpellKey(spellName, rank),
                         BuildDisplayName(spellName, rank, spellData.MaxRank),
                         requiredLevel,
-                        SpellTrainingCost,
+                        SpellTrainingCost(requiredLevel),
                         learned,
-                        learnable,
+                        player.CurrentLevel >= requiredLevel,
+                        previousRanksLearnt,
                         new Spell(spellName, rank).GfxPath,
                         BuildDescriptor(spellData, rank)));
                 }
             }
 
             return entries.ToArray();
+        }
+
+        static int SpellTrainingCost(int aLevel)
+        {
+            if (aLevel <= 10) return (int)Math.Round(0.065 * Math.Pow(aLevel, 2d));
+            if (aLevel <= 16) return (int)Math.Round(1.1 * aLevel - 2.5);
+            if (aLevel <= 24) return (int)Math.Round(13 + 3.4 * (aLevel - 16));
+            return ((int)Math.Round(0.082 * Math.Pow(aLevel, 2) + 4.26 * aLevel - 116.8) / 10) * 10;
         }
 
         static string BuildDisplayName(string spellName, int rank, int maxRank)

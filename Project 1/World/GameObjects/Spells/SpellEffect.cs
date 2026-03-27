@@ -16,7 +16,7 @@ namespace Project_1.GameObjects.Spells
         Attack
     }
 
-    internal class SpellEffect
+    internal abstract class SpellEffect
     {
         static void AssertSimThread() => ThreadAffinity.AssertSimThread();
         static int GetId => nextId++;
@@ -28,17 +28,17 @@ namespace Project_1.GameObjects.Spells
 
         public bool IsBinary => isBinary;
         bool isBinary;
+        
+        bool canCrit;
 
         public virtual string Description => "";
 
         public bool sourceStackable;
 
         public int MaxStackCount;
+        public abstract double CalculatePower(Spell aSpell, int aRank);
 
-        public virtual string GetRankDescription(SpellData spellData, int spellRank)
-        {
-            return Description;
-        }
+        public abstract string GetRankDescription(Spell aSpell, int aRank);
 
         public virtual AbilityStatSource StatSource => AbilityStatSource.Spell;
 
@@ -56,10 +56,6 @@ namespace Project_1.GameObjects.Spells
             Debug.Assert(name != null, "No name");
         }
 
-        public virtual bool Trigger(Entity aCaster, Entity aTarget, double aSpellPowerScalar = 1.0)
-        {
-            AssertSimThread();
-            throw new NotImplementedException($"Tried to trigger effect {name} with no trigger implementation.");
-        }
+        public abstract bool Trigger(Entity aCaster, Entity aTarget, Spell aSpell);
     }
 }

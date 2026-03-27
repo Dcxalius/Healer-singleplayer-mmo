@@ -26,6 +26,21 @@ namespace Project_1.Managers
             public DebugDamageEffect() : base("Debug Damage", false, new HashSet<SpellSchool>())
             {
             }
+
+            public override double CalculatePower(Project_1.GameObjects.Spells.Spell aSpell, int aRank)
+            {
+                return 0;
+            }
+
+            public override string GetRankDescription(Project_1.GameObjects.Spells.Spell aSpell, int aRank)
+            {
+                return string.Empty;
+            }
+
+            public override bool Trigger(Entity aCaster, Entity aTarget, Project_1.GameObjects.Spells.Spell aSpell)
+            {
+                return false;
+            }
         }
 
         readonly struct ChatCommandSpec
@@ -57,7 +72,8 @@ namespace Project_1.Managers
             new ChatCommandSpec("where", "/where <friendly name>", "Prints world position for a friendly.", ChatCommandAccess.System),
             new ChatCommandSpec("chunklevels", "/chunklevels", "Prints chunk average levels (10x10 near player, or all generated if under 100 chunks).", ChatCommandAccess.System),
             new ChatCommandSpec("damage", "/damage [friendly name] <amount>", "Deals true damage to a friendly. Defaults to the player.", ChatCommandAccess.Debug),
-            new ChatCommandSpec("gold", "/gold <amount>", "Changes the player's gold by the given amount.", ChatCommandAccess.Debug),
+            new ChatCommandSpec("gold", "/gold <amount>", "Adds the given amount of gold to the player.", ChatCommandAccess.Debug),
+            new ChatCommandSpec("setgold", "/setgold <amount>", "Sets the player's gold to the given amount.", ChatCommandAccess.Debug),
             new ChatCommandSpec("exp", "/exp [friendly name] <amount>", "Gives experience to a friendly. Defaults to the player.", ChatCommandAccess.Debug),
             new ChatCommandSpec("tp", "/tp <friendly name> <x> <y>", "Teleports a friendly to world coordinates.", ChatCommandAccess.Debug),
             new ChatCommandSpec("createitem", "/createitem <friendly name> <item id> <count>", "Creates item(s) and gives them to a friendly with inventory.", ChatCommandAccess.Debug)
@@ -111,6 +127,7 @@ namespace Project_1.Managers
 
             if (spec.Value.Access == ChatCommandAccess.Debug && !DebugManager.Mode(DebugMode.ChatCheats))
             {
+                PublishChatSystemMessage($"Unknown command: /{command}. Use /help. Or turn on ChatCheats");
                 return;
             }
 
@@ -133,6 +150,9 @@ namespace Project_1.Managers
                     break;
                 case "gold":
                     HandleChatGold(args);
+                    break;
+                case "setgold":
+                    HandleChatSetGold(args);
                     break;
                 case "exp":
                     HandleChatExperience(args);
@@ -450,7 +470,29 @@ namespace Project_1.Managers
             }
 
             player.ChangeGold(amount);
-            PublishChatSystemMessage($"Player gold changed by {amount}.");
+            PublishChatSystemMessage($"Added {amount} gold. Player now has {player.Gold} gold.");
+        }
+
+        static void HandleChatSetGold(string[] args)
+        {
+            if (args.Length != 1)
+            {
+                PublishChatSystemMessage("Usage: /setgold <amount>");
+                return;
+            }
+
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+
+            if (!int.TryParse(args[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out int amount))
+            {
+                PublishChatSystemMessage("Gold amount must be an integer. Usage: /setgold <amount>");
+                return;
+            }
+
+            int delta = amount - player.Gold;
+            player.ChangeGold(delta);
+            PublishChatSystemMessage($"Player gold set to {player.Gold}.");
         }
 
         static void HandleChatExperience(string[] args)

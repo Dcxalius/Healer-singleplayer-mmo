@@ -9,7 +9,7 @@ namespace Project_1.UI.LoadingMenu
 {
     internal class LoadingBox : MenuBox
     {
-        readonly ScrollableBox savesToLoadFrom;
+        readonly ScrollableBox<ExistingSave> savesToLoadFrom;
         readonly SaveDetails saveDetails;
         ExistingSave[] existingSaves = Array.Empty<ExistingSave>();
 
@@ -17,7 +17,7 @@ namespace Project_1.UI.LoadingMenu
         {
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f, Size);
             RelativeScreenPosition size = new RelativeScreenPosition(0.5f - spacing.X - spacing.X, 1 - spacing.Y - spacing.Y);
-            savesToLoadFrom = new ScrollableBox(3f, new UITexture("WhiteBackground", Color.AntiqueWhite), Color.AliceBlue, spacing, size);
+            savesToLoadFrom = new ScrollableBox<ExistingSave>(3f, new UITexture("WhiteBackground", Color.AntiqueWhite), Color.AliceBlue, spacing, size);
             AddChild(savesToLoadFrom);
             ExistingSave.callAtClick = SetSave;
 

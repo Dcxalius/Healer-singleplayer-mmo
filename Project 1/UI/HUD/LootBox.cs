@@ -17,8 +17,8 @@ namespace Project_1.UI.HUD
     internal class LootBox : Box
     {
         LootContext context;
-        Loot[] loot;
-        ScrollableBox scrollableComponent;
+        Loot[] loot; //TODO: Should be removed
+        ScrollableBox<Loot> scrollableComponent;
 
         RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.025f);
 
@@ -27,7 +27,7 @@ namespace Project_1.UI.HUD
         {
             ToggleVisibilty();
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.025f, Size);
-            scrollableComponent = new ScrollableBox(3f, new UITexture("WhiteBackground", Color.White), Color.Yellow, spacing, RelativeScreenPosition.One - spacing - spacing);
+            scrollableComponent = new ScrollableBox<Loot>(3f, new UITexture("WhiteBackground", Color.White), Color.Yellow, spacing, RelativeScreenPosition.One - spacing - spacing);
             //capturesScroll = true;
             AddChild(scrollableComponent);
             Dragable = true;

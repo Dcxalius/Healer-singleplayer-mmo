@@ -1,5 +1,7 @@
 ﻿using Project_1.GameObjects.Entities;
 using Project_1.Managers;
+using Project_1.Messaging;
+using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
 using System;
@@ -14,6 +16,10 @@ namespace Project_1.GameObjects.Spells.Buff
     class Buff
     {
         static void AssertSimThread() => ThreadAffinity.AssertSimThread();
+
+        public int Id => id;
+        int id;
+        static int buffIdCounter = 0;
         protected Entity caster;
 
         protected SpellEffect effect;
@@ -38,19 +44,29 @@ namespace Project_1.GameObjects.Spells.Buff
         public double Power => power;
         double power;
 
-        public Buff(Entity aCaster, SpellEffect aEffect, int aRank)
+        public BuffUiSnapshot BuffUiSnapshot => new BuffUiSnapshot(Id, GfxPath, TimeManager.InstanceTotalFrameTime + DurationRemaining, count, MaxStackCount);
+
+
+
+        public Buff(Entity aCaster, SpellEffect aEffect, Spell aSpell)
         {
             AssertSimThread();
+            id = buffIdCounter++;
             effect = aEffect;
             caster = aCaster;
-            rank = aRank;
+            rank = aSpell.Rank;
             createTime = TimeManager.TotalFrameTime;
+            power = aSpell.GetPower(aEffect);
         }
 
-        public virtual void Recast(Entity aCaster)
+        public virtual void Recast(Buff aBuff)
         {
             AssertSimThread();
-            createTime = TimeManager.TotalFrameTime;
+            if (MaxStackCount > count) count++;
+            createTime = TimeManager.TotalFrameTime /*TODO: + a remaider of time so a tick is not lost*/;
+                                                    //This is currently handled by periodic reseting tickcounter but that feels clunky, but if above mentioned remainder is added that shouldn't reset anymore
+            caster = aBuff.caster;
+            power = aBuff.power;
         }
 
         public virtual void Update(Entity aEntity)
@@ -64,13 +80,20 @@ namespace Project_1.GameObjects.Spells.Buff
             AssertSimThread();
         }
 
+        public virtual void OnDispelled(Entity aOwner, Entity aDispeller)
+        {
+            AssertSimThread();
+            MailboxManager.PublishUiEvent(new BuffRemoved(aOwner.RenderId, id));
+        }
+
         public virtual void OnRemoved(Entity aOwner)
         {
             AssertSimThread();
+            MailboxManager.PublishUiEvent(new BuffRemoved(aOwner.RenderId, id));
         }
 
         public bool SameCaster(Entity aCaster) => caster == aCaster;
-
+        public bool SameCaster(Buff aBuff) => caster == aBuff.caster;
         public static bool operator ==(Buff aBuff, Buff bBuff)
         {
             if (ReferenceEquals(aBuff, bBuff)) return true;

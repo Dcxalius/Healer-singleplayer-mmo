@@ -95,5 +95,10 @@ namespace Project_1.UI.HUD.Windows
             nameLabel.Color = textColor;
             levelLabel.Color = textColor;
         }
+
+        public override string ToString()
+        {
+            return $"{snapshot.DisplayName}";
+        }
     }
 }

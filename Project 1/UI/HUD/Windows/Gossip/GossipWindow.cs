@@ -18,7 +18,7 @@ namespace Project_1.UI.HUD.Windows.Gossip
     internal class GossipWindow : Window
     {
         Label introduction;
-        ScrollableBox options;
+        ScrollableBox<GossipOption> options;
         string activeSpeakerName = string.Empty;
 
         public GossipWindow() : base(new UITexture("WhiteBackground", Color.AntiqueWhite))
@@ -27,7 +27,7 @@ namespace Project_1.UI.HUD.Windows.Gossip
             RelativeScreenPosition introSize = new RelativeScreenPosition((1 - spacing.X * 2), 0.4f);
             introduction = new Label("", spacing, introSize, Label.TextAllignment.TopLeft, Color.Black);
             AddChild(introduction);
-            options = new ScrollableBox(10, UITexture.Null, Color.AliceBlue, introSize.OnlyY + spacing, RelativeScreenPosition.One - spacing - introSize.OnlyY);
+            options = new ScrollableBox<GossipOption>(10, UITexture.Null, Color.AliceBlue, introSize.OnlyY + spacing, RelativeScreenPosition.One - spacing - introSize.OnlyY);
             AddChild(options);
         }
 

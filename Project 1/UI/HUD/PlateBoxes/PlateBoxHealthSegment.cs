@@ -14,36 +14,30 @@ namespace Project_1.UI.HUD.PlateBoxes
 {
     internal class PlateBoxHealthSegment : PlateBoxSegment
     {
-        ResourceBar healthBar;
-        static Color backgroundColor = new Color(255, 211, 211, 120);
-
-        public PlateBoxHealthSegment(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, aPos, aSize)
+        public PlateBoxHealthSegment(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new Color(255, 211, 211, 120), aPos, aSize)
         {
-            healthBar = new ResourceBar(new BarTexture(BarTexture.FillingDirection.Right, Color.Red), new UITexture("WhiteBackground", backgroundColor), RelativeScreenPosition.Zero, RelativeScreenPosition.One);
-
-            AddChild(healthBar);
+            bar.Visible = true;
+            bar.Color = Color.Red;
         }
 
-
-
+        public void SetTextSize(ResourceBar.Labels aLabel, float textSize) => bar.SetLabelTextSize(aLabel, textSize);
 
         public override void Refresh(in EntityUiSnapshot snapshot)
         {
-            healthBar.MaxValue = (float)snapshot.MaxHealth;
-            healthBar.Value = (float)snapshot.CurrentHealth;
+            bar.MaxValue = (float)snapshot.MaxHealth;
+            bar.Value = (float)snapshot.CurrentHealth;
         }
 
         public void SetTarget(in EntityUiSnapshot snapshot)
         {
-            healthBar.MaxValue = (float)snapshot.MaxHealth;
-            healthBar.Value = (float)snapshot.CurrentHealth;
+            bar.MaxValue = (float)snapshot.MaxHealth;
+            bar.Value = (float)snapshot.CurrentHealth;
         }
 
-
-        public override void Draw(SpriteBatch aBatch)
+        public override void Clear()
         {
-            Project_1.Managers.ThreadAffinity.AssertMainThread();
-            base.Draw(aBatch);
+            bar.Value = 0;
+            bar.MaxValue = 0;
         }
     }
 }

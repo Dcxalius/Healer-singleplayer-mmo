@@ -104,22 +104,16 @@ namespace Project_1.Managers
 
             modeMask = 0;
             overlayMask = AllOverlayMask;
-            SetMode(DebugMode.DebugShapes, true);
-            SetMode(DebugMode.DebugOverlay, true);
-            SetMode(DebugMode.FalseRandom, false);
+            ImportSettings();
+
+#if DEBUG
             SetMode(DebugMode.Print, true);
-            SetMode(DebugMode.ShadowMaskPreview, false);
-            SetMode(DebugMode.ShadowMagentaClear, false);
-            SetMode(DebugMode.TileCoords, false);
-            SetMode(DebugMode.InvCheats, true);
             SetMode(DebugMode.Teleport, true);
             SetMode(DebugMode.InstantlyContinue, true);
             SetMode(DebugMode.Console, true);
-            SetMode(DebugMode.TeleportStuckThings, true);
             SetMode(DebugMode.LearnKill, true);
-            SetMode(DebugMode.ChatCheats, false);
-
-            ImportSettings();
+            SetMode(DebugMode.ChatCheats, true);
+#endif
 
             if (Mode(DebugMode.Console))
             {

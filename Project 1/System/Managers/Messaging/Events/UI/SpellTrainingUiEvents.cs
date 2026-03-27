@@ -4,30 +4,19 @@ namespace Project_1.Messaging.Events
 {
     internal readonly struct SpellTrainingEntrySnapshot
     {
-        public SpellTrainingEntrySnapshot(string spellKey, string displayName, int requiredLevel, int cost, bool learned, bool learnable, GfxPath gfxPath)
+        public SpellTrainingEntrySnapshot(string spellKey, string displayName, int requiredLevel, int cost, bool learned, bool levelReq, bool rankReq, GfxPath gfxPath, SpellDescriptorSnapshot descriptor)
         {
             SpellKey = spellKey ?? string.Empty;
             DisplayName = displayName ?? string.Empty;
             RequiredLevel = requiredLevel;
             Cost = cost;
             Learned = learned;
-            Learnable = learnable;
-            GfxPath = gfxPath;
-            Descriptor = default;
-            HasDescriptor = false;
-        }
-
-        public SpellTrainingEntrySnapshot(string spellKey, string displayName, int requiredLevel, int cost, bool learned, bool learnable, GfxPath gfxPath, SpellDescriptorSnapshot descriptor)
-        {
-            SpellKey = spellKey ?? string.Empty;
-            DisplayName = displayName ?? string.Empty;
-            RequiredLevel = requiredLevel;
-            Cost = cost;
-            Learned = learned;
-            Learnable = learnable;
+            PassLevelReq = levelReq;
+            PassRankReq = rankReq;
             GfxPath = gfxPath;
             Descriptor = descriptor;
             HasDescriptor = true;
+
         }
 
         public string SpellKey { get; }
@@ -35,7 +24,9 @@ namespace Project_1.Messaging.Events
         public int RequiredLevel { get; }
         public int Cost { get; }
         public bool Learned { get; }
-        public bool Learnable { get; }
+        public bool Learnable => !Learned && PassLevelReq && PassRankReq;
+        public bool PassLevelReq { get; }
+        public bool PassRankReq { get; }
         public GfxPath GfxPath { get; }
         public SpellDescriptorSnapshot Descriptor { get; }
         public bool HasDescriptor { get; }

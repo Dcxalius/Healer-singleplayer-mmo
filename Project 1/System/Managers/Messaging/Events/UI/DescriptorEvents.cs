@@ -207,7 +207,7 @@ namespace Project_1.Messaging.Events
                 {
                     SpellEffect effect = spellData.Effects[i];
                     if (effect == null) continue;
-                    string effectDescription = effect.GetRankDescription(spellData, spell.Rank);
+                    string effectDescription = effect.GetRankDescription(spell, spell.Rank);
                     if (string.IsNullOrWhiteSpace(effectDescription)) continue;
                     lines.Add(effectDescription);
                 }

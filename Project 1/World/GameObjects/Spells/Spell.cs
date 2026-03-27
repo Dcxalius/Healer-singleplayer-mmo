@@ -1,17 +1,19 @@
-﻿using Project_1.Camera;
+﻿using Newtonsoft.Json.Linq;
+using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.Entities.Projectiles;
+using Project_1.GameObjects.Spells.Buff;
 using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Unit.Stats;
-using Project_1.GameObjects.Spells.Buff;
 using Project_1.Managers;
 using Project_1.Textures;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,6 +34,10 @@ namespace Project_1.GameObjects.Spells
         }
 
         public string Name { get => spellData.Name; }
+
+        public int Id => id;
+        int id;
+        static int spellIds = 0;
         public int Rank => rank;
         public string SpellKey => BuildSpellKey(Name, Rank);
         public float CastDistance { get => spellData.CastDistance; }
@@ -51,9 +57,16 @@ namespace Project_1.GameObjects.Spells
         double Cooldown => spellData.GetCooldownForRank(rank);
         double lastTimeCasted;
 
-
         SpellData spellData;
         readonly int rank;
+        public bool IsRanked => spellData.MaxRank > 1;
+
+        public double GetPower(SpellEffect aEffect)
+        {
+            Debug.Assert(spellData.Effects.Contains(aEffect), "Effect does not belong to this spell.");
+            return aEffect.CalculatePower(this, rank);
+        }
+
 
         public static string BuildSpellKey(string spellName, int rank)
         {
@@ -79,18 +92,6 @@ namespace Project_1.GameObjects.Spells
             return !string.IsNullOrWhiteSpace(spellName);
         }
 
-        public Spell(string aName)
-        {
-            if (!TryParseSpellKey(aName, out string spellName, out int parsedRank))
-            {
-                throw new ArgumentException("Spell identifier was invalid.", nameof(aName));
-            }
-
-            spellData = SpellFactory.GetSpell(spellName);
-            rank = spellData.ClampRank(parsedRank);
-            lastTimeCasted = double.NegativeInfinity;
-        }
-
         public Spell(string aName, int aRank)
         {
             if (!TryParseSpellKey(aName, out string spellName, out _))
@@ -101,6 +102,7 @@ namespace Project_1.GameObjects.Spells
             spellData = SpellFactory.GetSpell(spellName);
             rank = spellData.ClampRank(aRank);
             lastTimeCasted = double.NegativeInfinity;
+            id = spellIds++;
         }
 
         public bool Cast(Entity aTarget, Entity aCaster)
@@ -109,7 +111,7 @@ namespace Project_1.GameObjects.Spells
             if (RequiresGroundTarget) return false;
             if (aTarget == null) return Cast(aCaster, aCaster);
 
-            if (!TryCast(aTarget)) return false;
+            if (!TryCast(aTarget, aCaster)) return false;
             
             ProccessCast(aTarget, aCaster);
             
@@ -154,10 +156,14 @@ namespace Project_1.GameObjects.Spells
                     if (targetBuffs[j].EffectId != overTime.Id) continue;
                     Buff.Buff existing = targetBuffs[j];
                     if (existing.MultipleSourceStackable && !existing.SameCaster(aCaster)) continue;
-                    if (!overTime.Numerable && (existing.Rank > rank || existing.DurationRemaining > overTime.Duration)) failures[i] = true;
-                    if (overTime.Numerable && (existing.Power > overTime.CalculatePower() || existing.DurationRemaining > overTime.Duration)) failures[i] = true;
+                    //Check if spell weak
+                    if ((!overTime.Numerable && existing.Rank > rank) || (overTime.Numerable && existing.Power > overTime.CalculatePower(this, rank))) failures[i] = true;
+                    //Check if time would increase or stack count would increase
+                    if ((!overTime.Numerable && existing.Rank == rank) || (overTime.Numerable && existing.Power == overTime.CalculatePower(this, rank)) && (existing.DurationRemaining > overTime.Duration && existing.MaxStackCount == existing.Count)) failures[i] = true;
                 }
             }
+            //TODO: Think about how failures should be handled when there are multiple effects.
+            //Other posibilites are single failure, or list of failable effects (or vice versa, list of must succeed effects).
             if (failures.All(x => x)) return false;
             return true;
         }
@@ -182,19 +188,35 @@ namespace Project_1.GameObjects.Spells
                 SpellEffect effect = spellData.Effects[i];
                 if (effect is Instant instant)
                 {
-                    instant.TriggerRanked(aCaster, aTarget, spellData, rank, scalar);
+                    instant.Trigger(aCaster, aTarget, this);
                 }
                 else if (effect is OverTime overTime)
                 {
-                    overTime.TriggerRanked(aCaster, aTarget, spellData, rank);
+                    overTime.Trigger(aCaster, aTarget, this);
                 }
                 else
                 {
-                    effect.Trigger(aCaster, aTarget, scalar);
+                    effect.Trigger(aCaster, aTarget, this);
                 }
                 aTarget.AddEffect(new VisualEffect(spellData.HitGfxPath, 1000));
             }
             return true;
+        }
+
+        public double GetScalar(SpellEffect aEffect)
+        {
+            if (aEffect is Instant)
+            {
+                return GetDirectEffectScalarFromCastTime(CastTime);
+            }
+            else if (aEffect is OverTime)
+            {
+                return 1.0;
+            }
+            else
+            {
+                throw new ArgumentException("Unknown effect type.", nameof(aEffect));
+            }
         }
 
         static double GetDirectEffectScalarFromCastTime(double aCastTimeMs)
@@ -227,5 +249,19 @@ namespace Project_1.GameObjects.Spells
             float dy = (targetPosition.Y - center.Y) / halfHeight;
             return dx * dx + dy * dy <= 1f;
         }
+
+        public int ScaleInstantValueForRank(int baseValue, int rank)
+        {
+            return (int)Math.Round(spellData.ScaleSignedValue(baseValue, spellData.ClampRank(rank)), MidpointRounding.AwayFromZero);
+        }
+
+        public (int, int) ScaleOverTimeTickValueForRank((int min, int max) val, int tickCount, int rank)
+        {
+            Debug.Assert(tickCount > 0, "Tick count must be greater than 0.");
+            (double min, double max) scaled = (spellData.ScaleSignedValue(val.min * tickCount, spellData.ClampRank(rank)), spellData.ScaleSignedValue(val.max * tickCount, spellData.ClampRank(rank)));
+            return ((int)Math.Round(scaled.min / tickCount), (int)Math.Round(scaled.max / tickCount)) ;
+        }
+
+
     }
 }

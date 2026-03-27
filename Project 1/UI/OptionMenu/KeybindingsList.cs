@@ -13,7 +13,7 @@ using static Project_1.UI.OptionMenu.OptionManager;
 
 namespace Project_1.UI.OptionMenu
 {
-    internal class KeybindingsList : ScrollableBox
+    internal class KeybindingsList : ScrollableBox<KeybindingObject>
     {
         public KeybindingsList(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(15, new UITexture("GrayBackground", Color.WhiteSmoke), Color.Turquoise, aPos, aSize)
         {

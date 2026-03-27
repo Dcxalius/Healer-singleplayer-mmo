@@ -4,6 +4,7 @@ using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -12,11 +13,36 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.UIElements.Boxes
 {
-    internal class ScrollableBox : Box
+    internal abstract class ScrollableBox : Box
     {
+
+        public const float WidthOfBar = 0.03f;
+        public const float WidthOfSpacing = 0.005f;
+
+        public ScrollableBox(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aGfx, aPos, aSize)
+        {
+        }
+
+        public abstract void SetScrollValue(float v);
+    }
+
+    internal class ScrollableBox<T> : ScrollableBox where T : UIElement
+    {
+        public T this[int index]
+        {
+            get => scrollableElements[index];
+            set
+            {
+                scrollableElements[index] = value;
+                scrollableElements[index].Resize(elementSize);
+                scrollableElements[index].Move(new RelativeScreenPosition(spacing.X, elementSize.Y * index + spacing.Y * (index + 1)));
+                originalYPos[index] = scrollableElements[index].RelativePos.Y;
+            }
+        }
+
         ScrollBar scrollBar;
         public int ScrollableElementsCount => scrollableElements.Count;
-        List<UIElement> scrollableElements;
+        List<T> scrollableElements;
         protected bool TooMuchForWindow
         {
             get
@@ -59,12 +85,10 @@ namespace Project_1.UI.UIElements.Boxes
         }
 
         RelativeScreenPosition elementSize;
-        public const float WidthOfBar = 0.03f;
-        public const float WidthOfSpacing = 0.005f;
 
         public ScrollableBox(float visibleElements, UITexture aGfx, Color aBarColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aGfx, aPos, aSize)
         {
-            scrollableElements = new List<UIElement>();
+            scrollableElements = new List<T>();
 
             RelativeScreenPosition barSpacing = RelativeScreenPosition.GetSquareFromX(WidthOfSpacing, Size);
             RelativeScreenPosition sizeOfScrollBar = new RelativeScreenPosition(WidthOfBar, 1f - barSpacing.Y - barSpacing.Y);
@@ -78,7 +102,7 @@ namespace Project_1.UI.UIElements.Boxes
             elementSize = new RelativeScreenPosition(1f - spacing.X - spacing.X - sizeOfScrollBar.X - barSpacing.X, (1f - spacing.Y) / visibleElements);
         }
 
-        public void SetScrollValue(float aValue)
+        public override void SetScrollValue(float aValue)
         {
             if (scrollableElements.Count == 0)
             {
@@ -119,7 +143,7 @@ namespace Project_1.UI.UIElements.Boxes
         }
 
 
-        public void RemoveScrollableElement(UIElement aUIElement)
+        public void RemoveScrollableElement(T aUIElement)
         {
             int scrollableID = scrollableElements.IndexOf(aUIElement);
             scrollableElements.RemoveAt(scrollableID);
@@ -130,7 +154,7 @@ namespace Project_1.UI.UIElements.Boxes
 
         public void RemoveScrollableElement(int aIndex) => RemoveScrollableElement(scrollableElements[aIndex]);
 
-        public void AddScrollableElement(UIElement aUIElement)
+        public void AddScrollableElement(T aUIElement)
         {
             aUIElement.Resize(elementSize);
             aUIElement.Move(new RelativeScreenPosition(spacing.X, elementSize.Y * ScrollableElementsCount + spacing.Y * (ScrollableElementsCount + 1)));
@@ -142,12 +166,12 @@ namespace Project_1.UI.UIElements.Boxes
             else scrollBar.SetScrollPlimpSize((elementSize.Y + spacing.Y) / (originalYPos.Last() + scrollableElements.Last().RelativeSize.Y + Spacing.Y));
         }
 
-        public void AddScrollableElements(List<UIElement> aList)
+        public void AddScrollableElements(List<T> aList)
         {
             for (int i = 0; i < aList.Count; i++) AddScrollableElement(aList[i]);
         }
 
-        public void AddScrollableElements(UIElement[] aArray)
+        public void AddScrollableElements(T[] aArray)
         {
             for (int i = 0; i < aArray.Length; i++) AddScrollableElement(aArray[i]);
         }
@@ -174,6 +198,12 @@ namespace Project_1.UI.UIElements.Boxes
 
                 scrollableElements[i].Move(new RelativeScreenPosition(scrollableElements[i].RelativePos.X, originalYPos[i] - scrollValue));
             }
+        }
+
+        internal void Sort(IComparer<T> comparer)
+        {
+            scrollableElements.Sort(comparer);
+            UpdateScrollableComponentPosition();
         }
     }
 }

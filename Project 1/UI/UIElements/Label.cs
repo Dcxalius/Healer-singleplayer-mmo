@@ -123,6 +123,7 @@ namespace Project_1.UI.UIElements
             switch (textAlignment)
             {
                 case TextAllignment.CentreLeft:
+                    //TODO: Add settable offset?
                     underlyingText.CentreLeftDraw(aBatch, Location + Size.OnlyY / 2);
                     break;
 

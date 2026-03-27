@@ -49,7 +49,7 @@ namespace Project_1.UI.HUD.Windows
 
         public void RefreshSpells(string[] aSpellNames)
         {
-            Debug.Assert(aSpellNames.Length <= spellBookSpells.Length);
+            Debug.Assert(aSpellNames.Length <= spellBookSpells.Length); //TODO: Add more spellslots. Also spell pages
             ClearSpells();
             for (int i = 0; i < aSpellNames.Length; i++)
             {

@@ -32,6 +32,17 @@ namespace Project_1.Messaging.Events
         public BuffUiSnapshot Buff { get; }
     }
 
+    internal readonly struct BuffRemoved
+    {
+        public BuffRemoved(int ownerRenderId, int buffId)
+        {
+            OwnerRenderId = ownerRenderId;
+            BuffId = buffId;
+        }
+        public int OwnerRenderId { get; }
+        public int BuffId { get; }
+    }
+
     internal readonly struct GossipOpened
     {
         public GossipOpened(GossipUiSnapshot data)

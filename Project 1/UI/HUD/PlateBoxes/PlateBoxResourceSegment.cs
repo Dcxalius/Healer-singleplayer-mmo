@@ -13,27 +13,30 @@ namespace Project_1.UI.HUD.PlateBoxes
 {
     internal class PlateBoxResourceSegment : PlateBoxSegment
     {
-        ResourceBar resourceBar;
-        static Color backgroundColor = new Color(255, 211, 211, 120);
-        public PlateBoxResourceSegment(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, aPos, aSize)
+        public PlateBoxResourceSegment(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new Color(255, 211, 211, 120), aPos, aSize)
         {
-            resourceBar = new ResourceBar(new BarTexture(BarTexture.FillingDirection.Right, Color.White), new UITexture("WhiteBackground", backgroundColor), RelativeScreenPosition.Zero, RelativeScreenPosition.One);
-
-            AddChild(resourceBar);
+            bar.Visible = true;
+            bar.Color = Color.Transparent;
         }
 
         public override void Refresh(in EntityUiSnapshot snapshot)
         {
-            resourceBar.Value = snapshot.CurrentResource;
-            resourceBar.MaxValue = snapshot.MaxResource;
+            bar.Value = snapshot.CurrentResource;
+            bar.MaxValue = snapshot.MaxResource;
         }
 
         public void SetTarget(in EntityUiSnapshot snapshot)
         {
-            resourceBar.MaxValue = snapshot.MaxResource;
-            resourceBar.Value = snapshot.CurrentResource;
-            resourceBar.Color = snapshot.ResourceColor;
+            bar.MaxValue = snapshot.MaxResource;
+            bar.Value = snapshot.CurrentResource;
+            bar.Color = snapshot.ResourceColor;
         }
 
+        public override void Clear()
+        {
+            bar.Value = 0;
+            bar.MaxValue = 0;
+            bar.Color = Color.Transparent;
+        }
     }
 }

@@ -50,15 +50,11 @@ namespace Project_1.UI.UIElements
 
         public virtual bool Visible
         {
-            get => visible;
+            get => parent != null ? parent.Visible ? visible : false : visible;
             set
             {
                 if (visible == value) return;
                 visible = value;
-                for (int i = 0; i < children.Count; i++)
-                {
-                    children[i].Visible = value;
-                }
 
                 TouchInteraction();
             }
@@ -187,7 +183,7 @@ namespace Project_1.UI.UIElements
             relativeSize = aSize;
             nameText = new Text("Comfortaa-msdf", GetType().Name);
 
-            capturesClick = true;
+            capturesClick = true; //TODO: Should the default be false?
             capturesScroll = false;
             capturesRelease = true;
             alwaysOnScreen = false;

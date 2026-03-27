@@ -23,7 +23,7 @@ namespace Project_1.UI.HUD.Chat
         const float VisibleRows = 9f;
         const float ChatTextSize = Text.DefaultTextSize;
 
-        readonly ScrollableBox messageLog;
+        readonly ScrollableBox<ChatLineElement> messageLog;
         readonly InputBox inputBox;
         readonly ChatMessageBuffer messageBuffer = new ChatMessageBuffer(MaxMessages);
 
@@ -40,7 +40,7 @@ namespace Project_1.UI.HUD.Chat
                 1f - outerPadding.X * 2,
                 1f - outerPadding.Y * 3 - inputHeight.Y);
 
-            messageLog = new ScrollableBox(
+            messageLog = new ScrollableBox<ChatLineElement>(
                 VisibleRows,
                 UITexture.Null,
                 new Color(120, 120, 120, 200),

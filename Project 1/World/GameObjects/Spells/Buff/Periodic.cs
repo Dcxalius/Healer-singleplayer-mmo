@@ -13,36 +13,25 @@ namespace Project_1.GameObjects.Spells.Buff
     {
         int tickCounter;
         readonly double tickScalar;
-        readonly bool useRankScaling;
-        readonly SpellData spellData;
-        readonly int spellRank;
-
+        Spell spell;
         public override GfxPath GfxPath => OverTime.GfxPath;
         OverTime OverTime { get => effect as OverTime; }
 
         public override double Duration => OverTime.Duration;
 
-        public Periodic(Entity aCaster, OverTime aOverTime, double aTickScalar) : base(aCaster, aOverTime)
-        {
-            ThreadAffinity.AssertSimThread();
-            tickCounter = 0;
-            tickScalar = aTickScalar;
-        }
 
-        public Periodic(Entity aCaster, OverTime aOverTime, SpellData spellData, int spellRank) : base(aCaster, aOverTime)
+        public Periodic(Entity aCaster, OverTime aOverTime, Spell aSpell) : base(aCaster, aOverTime, aSpell)
         {
             ThreadAffinity.AssertSimThread();
             tickCounter = 0;
             tickScalar = 1.0 / aOverTime.TickCount;
-            useRankScaling = true;
-            this.spellData = spellData;
-            this.spellRank = spellRank;
+            spell = aSpell;
         }
 
-        public override void Recast()
+        public override void Recast(Buff buff)
         {
             ThreadAffinity.AssertSimThread();
-            base.Recast();
+            base.Recast(buff);
 
             tickCounter = 0;
         }
@@ -55,14 +44,8 @@ namespace Project_1.GameObjects.Spells.Buff
             {
                 int effectIndex = Math.Min(OverTime.Effects.Length - 1, tickCounter);
                 Instant instant = OverTime.Effects[effectIndex];
-                if (useRankScaling)
-                {
-                    instant.TriggerRanked(caster, aEntity, spellData, spellRank, tickScalar, true, OverTime.TickCount);
-                }
-                else
-                {
-                    instant.Trigger(caster, aEntity, tickScalar);
-                }
+                instant.TriggerPeriodic(caster, aEntity, spell, OverTime.TickCount);
+
                 aEntity.AddEffect(new VisualEffect(OverTime.HitGfxPath, 500));
                 tickCounter++;
             }

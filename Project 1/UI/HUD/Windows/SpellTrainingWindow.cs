@@ -4,8 +4,8 @@ using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
-using Project_1.UI.UIElements.Buttons;
 using Project_1.UI.UIElements.Boxes;
+using Project_1.UI.UIElements.Buttons;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +21,11 @@ namespace Project_1.UI.HUD.Windows
         }
 
         readonly Label titleLabel;
-        readonly ScrollableBox entriesBox;
-        readonly List<SpellTrainingEntryButton> entryButtons;
+        readonly ScrollableBox<SpellTrainingEntryButton> entriesBox;
         readonly Button sortLevelButton;
         readonly Button sortNameButton;
+        readonly DescriptCheckBox hideLearnedCheckBox;
+        readonly DescriptCheckBox hideUnavailableCheckBox;
         readonly Label selectedLabel;
         readonly Label selectedStatusLabel;
         readonly Button buyButton;
@@ -33,9 +34,16 @@ namespace Project_1.UI.HUD.Windows
         SpellTrainingEntrySnapshot selectedEntry;
         SortMode sortMode = SortMode.LevelRequired;
         string trainerName = string.Empty;
+        bool hideLearned;
+        bool hideUnavailable;
+        Color clickableButton;
+        Color unclickableButton;
 
         public SpellTrainingWindow() : base(new UITexture("WhiteBackground", Color.DarkSlateGray))
         {
+            clickableButton = Color.ForestGreen;
+            unclickableButton = Color.Maroon;
+
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.03f, Size);
             titleLabel = new Label("", spacing, new RelativeScreenPosition(0.94f, 0.08f), Label.TextAllignment.CentreLeft, Color.White, aTextSize: 14f);
             AddChild(titleLabel);
@@ -48,10 +56,30 @@ namespace Project_1.UI.HUD.Windows
             sortNameButton.AddAction(() => SetSortMode(SortMode.Name));
             AddChild(sortNameButton);
 
-            entriesBox = new ScrollableBox(10, UITexture.Null, Color.LightGray, new RelativeScreenPosition(0.05f, 0.19f), new RelativeScreenPosition(0.90f, 0.56f));
-            AddChild(entriesBox);
+            hideLearnedCheckBox = new DescriptCheckBox(
+                "Hide learned",
+                Color.White,
+                false,
+                () => SetHideLearned(true),
+                () => SetHideLearned(false),
+                new RelativeScreenPosition(0.58f, 0.10f),
+                new RelativeScreenPosition(0.16f, 0.07f),
+                Size);
+            AddChild(hideLearnedCheckBox);
 
-            entryButtons = new List<SpellTrainingEntryButton>();
+            hideUnavailableCheckBox = new DescriptCheckBox(
+                "Hide unavailable",
+                Color.White,
+                false,
+                () => SetHideUnavailable(true),
+                () => SetHideUnavailable(false),
+                new RelativeScreenPosition(0.75f, 0.10f),
+                new RelativeScreenPosition(0.20f, 0.07f),
+                Size);
+            AddChild(hideUnavailableCheckBox);
+
+            entriesBox = new ScrollableBox<SpellTrainingEntryButton>(10, UITexture.Null, Color.LightGray, new RelativeScreenPosition(0.05f, 0.19f), new RelativeScreenPosition(0.90f, 0.56f));
+            AddChild(entriesBox);
 
             selectedLabel = new Label("Select a spell.", new RelativeScreenPosition(0.05f, 0.77f), new RelativeScreenPosition(0.90f, 0.08f), Label.TextAllignment.CentreLeft, Color.White, aTextSize: 12f);
             AddChild(selectedLabel);
@@ -63,7 +91,7 @@ namespace Project_1.UI.HUD.Windows
             buyButton.AddAction(BuySelectedSpell);
             AddChild(buyButton);
 
-            SetSortMode(SortMode.LevelRequired);
+            SetSortMode(SortMode.LevelRequired); //TODO: Load and save this from settings 
             ClearTrainer();
         }
 
@@ -97,41 +125,84 @@ namespace Project_1.UI.HUD.Windows
         void SetSortMode(SortMode mode)
         {
             sortMode = mode;
-            sortLevelButton.Color = mode == SortMode.LevelRequired ? Color.CornflowerBlue : Color.SteelBlue;
+            sortLevelButton.Color = mode == SortMode.LevelRequired ? Color.MediumPurple : Color.SteelBlue;
             sortNameButton.Color = mode == SortMode.Name ? Color.MediumPurple : Color.SlateBlue;
             RefreshList();
+        }
+
+        void SetHideLearned(bool value)
+        {
+            hideLearned = value;
+            RefreshList();
+        }
+
+        void SetHideUnavailable(bool value)
+        {
+            hideUnavailable = value;
+            RefreshList();
+        }
+
+        void RefreshSort()
+        {
+            entriesBox.Sort(new Sorter(sortMode));
+        }
+
+        private class Sorter : IComparer<SpellTrainingEntryButton>
+        {
+            private readonly SortMode sortMode;
+            public Sorter(SortMode sortMode)
+            {
+                this.sortMode = sortMode;
+            }
+            public int Compare(SpellTrainingEntryButton x, SpellTrainingEntryButton y)
+            {
+                if (x == null || y == null) return 0;
+                if (sortMode == SortMode.LevelRequired)
+                {
+                    int levelComparison = x.Snapshot.RequiredLevel.CompareTo(y.Snapshot.RequiredLevel);
+                    if (levelComparison != 0) return levelComparison;
+                }
+                int nameComparison = string.Compare(x.Snapshot.DisplayName, y.Snapshot.DisplayName, StringComparison.Ordinal);
+                if (nameComparison != 0) return nameComparison;
+                return x.Snapshot.RequiredLevel.CompareTo(y.Snapshot.RequiredLevel);
+            }
         }
 
         void RefreshList()
         {
             SpellTrainingEntrySnapshot[] ordered = entries
+                .Where(ShouldShowEntry)
                 .OrderBy(x => sortMode == SortMode.LevelRequired ? x.RequiredLevel : int.MinValue)
                 .ThenBy(x => x.DisplayName)
                 .ThenBy(x => x.RequiredLevel)
                 .ToArray();
 
-            EnsureEntryCapacity(ordered.Length);
-            for (int i = 0; i < entryButtons.Count; i++)
+            if (!string.IsNullOrWhiteSpace(selectedEntry.SpellKey) && !ordered.Any(x => x.SpellKey == selectedEntry.SpellKey))
             {
-                if (i >= ordered.Length)
-                {
-                    entryButtons[i].Clear();
-                    continue;
-                }
+                selectedEntry = default;
+            }
 
+            EnsureEntryCapacity(ordered.Length);
+            for (int i = 0; i < ordered.Length; i++)
+            {
                 bool isSelected = ordered[i].SpellKey == selectedEntry.SpellKey;
-                entryButtons[i].Set(ordered[i], isSelected);
+                entriesBox[i].Set(ordered[i], isSelected);
+            }
+
+            for (int i = ordered.Length; i < entriesBox.ScrollableElementsCount; i++)
+            {
+                entriesBox[i].Clear();
             }
 
             entriesBox.SetScrollValue(0f);
+            RefreshSelectionDetails();
         }
 
         void EnsureEntryCapacity(int count)
         {
-            while (entryButtons.Count < count)
+            while (entriesBox.ScrollableElementsCount < count)
             {
                 SpellTrainingEntryButton button = new SpellTrainingEntryButton(SelectEntry);
-                entryButtons.Add(button);
                 entriesBox.AddScrollableElement(button);
             }
         }
@@ -140,7 +211,13 @@ namespace Project_1.UI.HUD.Windows
         {
             selectedEntry = snapshot;
             RefreshList();
-            RefreshSelectionDetails();
+        }
+
+        bool ShouldShowEntry(SpellTrainingEntrySnapshot entry)
+        {
+            if (hideLearned && entry.Learned) return false;
+            if (hideUnavailable && !entry.Learnable) return false;
+            return true;
         }
 
         void RefreshSelectionDetails()
@@ -149,36 +226,27 @@ namespace Project_1.UI.HUD.Windows
             {
                 selectedLabel.Text = "Select a spell.";
                 selectedStatusLabel.Text = "";
-                buyButton.Color = Color.DarkOliveGreen;
+                buyButton.Color = unclickableButton;
                 return;
             }
 
-            selectedLabel.Text = $"{selectedEntry.DisplayName} - Cost {selectedEntry.Cost}";
-
-            if (selectedEntry.Learned)
-            {
-                selectedStatusLabel.Text = "Already learned";
-                buyButton.Color = Color.DarkOliveGreen;
-                return;
-            }
+            selectedLabel.Text = $"{selectedEntry.DisplayName}";
 
             bool affordable = UiPlayerStateCache.Gold >= selectedEntry.Cost;
-            if (selectedEntry.Learnable && affordable)
+
+            if (selectedEntry.Learned || !selectedEntry.PassRankReq || !selectedEntry.PassLevelReq || !affordable)
             {
-                selectedStatusLabel.Text = "Available to learn";
-                buyButton.Color = Color.ForestGreen;
+                buyButton.Color = unclickableButton;
+                if (selectedEntry.Learned) selectedStatusLabel.Text = "Already learned";
+                else if (!selectedEntry.PassLevelReq && !selectedEntry.PassRankReq) selectedStatusLabel.Text = $"Requires level {selectedEntry.RequiredLevel} and previous ranks";
+                else if(!selectedEntry.PassLevelReq) selectedStatusLabel.Text = $"Requires level {selectedEntry.RequiredLevel}";
+                else if (!selectedEntry.PassRankReq) selectedStatusLabel.Text = $"Requires previous ranks";
+                else if (!affordable) selectedStatusLabel.Text = "Not enough gold";
+
                 return;
             }
-
-            if (!affordable)
-            {
-                selectedStatusLabel.Text = "Not enough gold";
-                buyButton.Color = Color.Maroon;
-                return;
-            }
-
-            selectedStatusLabel.Text = $"Requires level {selectedEntry.RequiredLevel} and previous ranks";
-            buyButton.Color = Color.DarkOliveGreen;
+            selectedStatusLabel.Text = $"Available to learn for {selectedEntry.Cost} gold.";
+            buyButton.Color = clickableButton;
         }
 
         void BuySelectedSpell()

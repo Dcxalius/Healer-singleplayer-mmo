@@ -190,6 +190,8 @@ namespace Project_1.GameObjects.Spells
         public int GetRequiredLevelForRank(int rank)
         {
             int clampedRank = ClampRank(rank);
+            // TODO: LevelOneSpells can grant rank 1 before this required level. If that remains intentional,
+            // split "learned at start" from "trainer unlock level" so descriptors and trainer UI do not lie.
             if (clampedRank <= 1) return firstLevel;
             return firstLevel + levelGap * (clampedRank - 1);
         }
@@ -211,18 +213,7 @@ namespace Project_1.GameObjects.Spells
             return (float)scaled;
         }
 
-        public int ScaleInstantValueForRank(int baseValue, int rank)
-        {
-            return RoundAwayFromZero(ScaleSignedValue(baseValue, ClampRank(rank)));
-        }
-
-        public int ScaleOverTimeTickValueForRank(int basePerTickValue, int tickCount, int rank)
-        {
-            int safeTickCount = Math.Max(1, tickCount);
-            double baseTotal = basePerTickValue * safeTickCount;
-            double scaledTotal = ScaleSignedValue(baseTotal, ClampRank(rank));
-            return RoundAwayFromZero(scaledTotal / safeTickCount);
-        }
+        
 
         void Assert()
         {
@@ -256,7 +247,7 @@ namespace Project_1.GameObjects.Spells
             return scaled;
         }
 
-        double ScaleSignedValue(double baseValue, int rank)
+        public double ScaleSignedValue(double baseValue, int rank)
         {
             int rankOffset = Math.Max(0, rank - 1);
             if (rankOffset == 0) return baseValue;
@@ -267,12 +258,6 @@ namespace Project_1.GameObjects.Spells
             double adjusted = baseValue + sign * add * rankOffset;
             return adjusted * Math.Pow(mod, rankOffset);
         }
-
-        static int RoundAwayFromZero(double value)
-        {
-            return (int)Math.Round(value, MidpointRounding.AwayFromZero);
-        }
-
         //void Trigger(Entity aCaster, Entity aTarget)
         //{
         //    effects[0].Trigger(aCaster, aTarget);

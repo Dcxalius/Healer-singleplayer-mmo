@@ -15,65 +15,64 @@ namespace Project_1.UI.UIElements
 {
     internal class Buff : UIElement , IComparable
     {
-        public int EffectId => effectId;
         public GfxPath GfxPath => gfxPath;
-        public double Duration => durationRemainingMs;
-        int effectId;
         readonly GfxPath gfxPath;
-        double durationRemainingMs;
-        Text xdd;
+
+        double DurationRemainingMs => finalTime - TimeManager.InstanceTotalFrameTime;
+        double finalTime;
+
+        public int BuffId => buffId;
+        int buffId;
+        
+        Label timer;
+        Label counter;
         public Buff(in BuffUiSnapshot aBuff, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture(aBuff.GfxPath, Color.White), aPos, aSize)
         {
-            xdd = new Text("Comfortaa-msdf", "xdd", Color.Black);
-            effectId = aBuff.EffectId;
+            if (aBuff.MaxCount > 1)
+            {
+                counter = new Label(aBuff.Count.ToString(), aPos, aSize, Label.TextAllignment.TopLeft, Color.Black, "Comfortaa-msdf", 8);
+                AddChild(counter);
+            }
+
+            timer = new Label("xdd", aPos, aSize, Label.TextAllignment.BottomRight, Color.Black, "Comfortaa-msdf", 8);
+            AddChild(timer);
+            buffId = aBuff.BuffId;
             gfxPath = aBuff.GfxPath;
-            durationRemainingMs = aBuff.DurationRemainingMs;
-            
+            finalTime = aBuff.FinalTime;
+            SetTimer(DurationRemainingMs);
         }
 
         public void Refresh(in BuffUiSnapshot aBuff)
         {
-            durationRemainingMs = aBuff.DurationRemainingMs;
+            finalTime = aBuff.FinalTime;
+            if (aBuff.MaxCount > 1) counter.Text = aBuff.Count.ToString();
+            SetTimer(DurationRemainingMs);
         }
 
         public override void Update()
         {
             base.Update();
-            durationRemainingMs = Math.Max(0, durationRemainingMs - TimeManager.SecondsSinceLastFrame * 1000d);
-            xdd.Value = Math.Round(Duration / 1000, 1).ToString();
+            SetTimer(DurationRemainingMs);
         }
-        public override void Draw(SpriteBatch aBatch)
+
+        void SetTimer(double aTime)
         {
-            Project_1.Managers.ThreadAffinity.AssertMainThread();
-            base.Draw(aBatch);
-
-            xdd.CentredDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Center.X, AbsolutePos.Center.Y + AbsolutePos.Size.Y - 3));
+            double seconds = aTime / 1000;
+            if (seconds >= 10) timer.Text = ((int)Math.Round(seconds, MidpointRounding.ToZero)).ToString();
+            else timer.Text = Math.Round(seconds, 2).ToString();
         }
 
-        
 
-        public int CompareTo(Buff aBuffToCompare)
-        {
-            if (aBuffToCompare == null) return 1;
-            return Duration.CompareTo(aBuffToCompare.Duration);
-        }
+
+        public int CompareTo(Buff aBuffToCompare) => DurationRemainingMs.CompareTo(aBuffToCompare.DurationRemainingMs);
 
         public int CompareTo(object obj)
         {
-            if (obj == null) return 1;
-            
-            Buff b = obj as Buff;
-            if(b != null)
+            if (obj is Buff buff)
             {
-                return b.Duration.CompareTo(Duration);
+                return buff.DurationRemainingMs.CompareTo(DurationRemainingMs);
             }
-            else
-            {
-                throw new ArgumentException("Tried to compare Buff to nonbuff.");
-            }
-
-
-            
+            throw new ArgumentException("Tried to compare Buff to nonbuff.");
         }
     }
 }

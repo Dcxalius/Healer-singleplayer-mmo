@@ -29,10 +29,10 @@ namespace Project_1.GameObjects.Entities
             return spellCast.StartCastAt(aSpell, aTargetPosition);
         }
 
-        public bool TryAddBuff(Buff aBuff)
+        public void AddBuff(Buff aBuff)
         {
             ThreadAffinity.AssertSimThread();
-            return buffList.AddBuff(aBuff, this);
+            buffList.AddBuff(aBuff, this);
         }
 
         public List<Buff> GetAllBuffs()

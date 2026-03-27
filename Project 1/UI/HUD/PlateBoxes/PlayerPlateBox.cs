@@ -35,6 +35,7 @@ namespace Project_1.UI.HUD.PlateBoxes
 
             AddSegmentsToChildren();
 
+            health.SetTextSize(UIElements.Bars.ResourceBar.Labels.Percentage, Size.Y - 2);
         }
 
         public void SetData(in EntityUiSnapshot snapshot)

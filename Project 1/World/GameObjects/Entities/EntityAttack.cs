@@ -38,7 +38,7 @@ namespace Project_1.GameObjects.Entities
             List<Project_1.GameObjects.Spells.Buff.Buff> buffs = target.GetAllBuffs();
             for (int i = 0; i < buffs.Count; i++)
             {
-                MailboxManager.PublishUiEvent(new BuffAdded(target.RenderId, new BuffUiSnapshot(buffs[i].EffectId, buffs[i].GfxPath, buffs[i].DurationRemaining)));
+                MailboxManager.PublishUiEvent(new BuffAdded(target.RenderId, buffs[i].BuffUiSnapshot));
             }
         }
 

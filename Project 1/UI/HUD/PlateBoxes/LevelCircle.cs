@@ -28,21 +28,5 @@ namespace Project_1.UI.HUD.PlateBoxes
         {
             numberLabel.Text = snapshot.Level.ToString();
         }
-
-        //public override void Resize(AbsoluteScreenPosition aSize)
-        //{
-        //    Resize(aSize.ToRelativeScreenPosition());
-        //}
-
-        public override void Resize(RelativeScreenPosition aSize)
-        {
-            base.Resize(aSize);
-        }
-
-        public override void Draw(SpriteBatch aBatch)
-        {
-            Project_1.Managers.ThreadAffinity.AssertMainThread();
-            base.Draw(aBatch);
-        }
     }
 }

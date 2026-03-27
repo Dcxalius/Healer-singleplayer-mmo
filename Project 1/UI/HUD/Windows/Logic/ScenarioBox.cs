@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.Textures;
+using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Boxes;
 using Project_1.UI.UIElements.SelectBoxes;
 using System;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.HUD.Windows.Logic
 {
-    internal class ScenarioBox : ScrollableBox
+    internal class ScenarioBox : ScrollableBox<UIElement> //TODO: I dont think this UIE is right xdd
     {
         public enum ScenarioType
         {

@@ -64,7 +64,7 @@ namespace Project_1.UI.UIElements
         {
             for (int i = 0; i < buffs.Count; i++)
             {
-                if (buffs[i].EffectId != aBuff.EffectId) continue;
+                if (buffs[i].BuffId != aBuff.BuffId) continue;
                 buffs[i].Refresh(aBuff);
                 SortBuffs();
                 return;
@@ -75,22 +75,6 @@ namespace Project_1.UI.UIElements
             SortBuffs();
         }
 
-        public override void Update()
-        {
-            base.Update();
-            CheckLast();
-        }
-
-        void CheckLast()
-        {
-            if (buffs.Count == 0) return;
-            if (buffs.Last().Duration <= 0)
-            {
-                KillChild(buffs.Count - 1);
-                buffs.RemoveAt(buffs.Count - 1);
-                CheckLast();
-            }
-        }
 
         void SortBuffs()
         {
@@ -118,10 +102,14 @@ namespace Project_1.UI.UIElements
             };
         }
 
-        static void AssertUiOrMainThread()
+        internal void RemoveBuff(int buffId)
         {
-            if (ThreadAffinity.IsMainThread) return;
-            ThreadAffinity.AssertUiThread();
+            for (int i = 0; i < buffs.Count; i++)
+            {
+                if (buffs[i].BuffId != buffId) continue;
+                KillChild(i);
+                return;
+            }
         }
     }
 }

@@ -39,22 +39,23 @@ namespace Project_1.GameObjects.Entities
             ThreadAffinity.AssertSimThread();
             for (int i = 0; i < buffs.Count; i++)
             {
-                if (buffs[i] == aBuff)
+                if (buffs[i] != aBuff) continue;
+                Buff currentBuff = buffs[i];
+                if (aBuff.MultipleSourceStackable && !buffs[i].SameCaster(aBuff)) break;
+                if (currentBuff.Rank < aBuff.Rank)
                 {
-                    buffs[i].Recast();
-                    MailboxManager.PublishUiEvent(new BuffAdded(aOwner.RenderId, BuildSnapshot(buffs[i])));
-                    return;
+                    currentBuff.OnRemoved(aOwner);
+                    buffs.Remove(currentBuff);
+                    break;
                 }
+                buffs[i].Recast(aBuff);
+                MailboxManager.PublishUiEvent(new BuffAdded(aOwner.RenderId, buffs[i].BuffUiSnapshot));
+                return;
             }
 
             buffs.Add(aBuff);
             aBuff.OnApplied(aOwner);
-            MailboxManager.PublishUiEvent(new BuffAdded(aOwner.RenderId, BuildSnapshot(buffs.Last())));
-        }
-
-        static BuffUiSnapshot BuildSnapshot(Buff buff)
-        {
-            return new BuffUiSnapshot(buff.EffectId, buff.GfxPath, buff.DurationRemaining);
+            MailboxManager.PublishUiEvent(new BuffAdded(aOwner.RenderId, buffs.Last().BuffUiSnapshot));
         }
 
         public List<Buff> GetAllBuffs()

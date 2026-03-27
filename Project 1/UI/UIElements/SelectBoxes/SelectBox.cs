@@ -24,7 +24,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
         protected int selectedValue;
         protected SelectBoxValueDisplay displayValue;
 
-        protected ScrollableBox allValues;
+        protected ScrollableBox<SelectBoxValue> allValues;
 
         RelativeScreenPosition defaultPos;
         RelativeScreenPosition defaultSize;
@@ -37,7 +37,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
             defaultSize = aCollapsedSize;
             selectedValue = aStartDisplayValue;
 
-            allValues = new ScrollableBox(5, UITexture.Null, Color.AliceBlue, new RelativeScreenPosition(ScrollableBox.WidthOfBar + ScrollableBox.WidthOfSpacing * 2, 1 / sizeMulti), new RelativeScreenPosition(1 - ScrollableBox.WidthOfBar - ScrollableBox.WidthOfSpacing * 3, 1 - 1 / sizeMulti));
+            allValues = new ScrollableBox<SelectBoxValue>(5, UITexture.Null, Color.AliceBlue, new RelativeScreenPosition(ScrollableBox.WidthOfBar + ScrollableBox.WidthOfSpacing * 2, 1 / sizeMulti), new RelativeScreenPosition(1 - ScrollableBox.WidthOfBar - ScrollableBox.WidthOfSpacing * 3, 1 - 1 / sizeMulti));
             AddChild(allValues);
             allValues.Visible = false;
         }

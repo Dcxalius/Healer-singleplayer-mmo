@@ -91,6 +91,7 @@ namespace Project_1.UI.HUD.Managers
             MailboxManager.Ui.Subscribe<NamePlateRemoved>(OnNamePlateRemoved);
             MailboxManager.Ui.Subscribe<PlateLayerCleared>(OnPlateLayerCleared);
             MailboxManager.Ui.Subscribe<BuffAdded>(OnBuffAdded);
+            MailboxManager.Ui.Subscribe<BuffRemoved>(OnBuffRemoved);
             MailboxManager.Ui.Subscribe<PartyControlCleared>(OnPartyControlCleared);
             MailboxManager.Ui.Subscribe<PartyWalkerAdded>(OnPartyWalkerAdded);
             MailboxManager.Ui.Subscribe<PartyWalkerRemoved>(OnPartyWalkerRemoved);
@@ -399,6 +400,13 @@ namespace Project_1.UI.HUD.Managers
         static void OnBuffAdded(BuffAdded e)
         {
             plateBoxHandler.AddBuff(e.Buff, e.OwnerRenderId);
+            InvalidateUi();
+            InvalidatePlates();
+        }
+
+        static void OnBuffRemoved(BuffRemoved e)
+        {
+            plateBoxHandler.RemoveBuff(e.BuffId, e.OwnerRenderId);
             InvalidateUi();
             InvalidatePlates();
         }

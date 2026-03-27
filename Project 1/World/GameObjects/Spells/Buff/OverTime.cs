@@ -33,7 +33,7 @@ namespace Project_1.GameObjects.Spells.Buff
         public bool Numerable;
 
 
-        public int TickCount => tickRate <= 0 ? 1 : Math.Max(1, (int)Math.Floor(duration / tickRate));
+        public int TickCount => (int)Math.Floor(duration / tickRate);
 
         public override string Description
         {
@@ -48,7 +48,7 @@ namespace Project_1.GameObjects.Spells.Buff
             }
         }
 
-        public override string GetRankDescription(SpellData spellData, int spellRank)
+        public override string GetRankDescription(Spell spell, int spellRank)
         {
             List<string> lines = new List<string>
             {
@@ -59,15 +59,24 @@ namespace Project_1.GameObjects.Spells.Buff
             {
                 Instant effect = effects[i];
                 if (effect == null) continue;
-                lines.Add($"- {effect.GetRankDescriptionAsOverTimeTickWithTotal(spellData, spellRank, TickCount)}");
+                lines.Add($"- {effect.GetRankDescriptionAsOverTimeTickWithTotal(spell, spellRank, TickCount)}");
             }
 
             return string.Join("\n", lines);
         }
 
-        public double CalculatePower()
+        public override double CalculatePower(Spell aSpellData, int aRank)
         {
+            if (!Numerable) throw new MissingFieldException();
+            double power = 0;
+            for (int i = 0; i < effects.Length; i++)
+            {
+                Instant effect = effects[i];
+                if (effect == null) continue;
+                power += effect.CalculatePower(aSpellData, aRank);
+            }
 
+            return power * TickCount;
         }
 
         [JsonConstructor]
@@ -84,7 +93,7 @@ namespace Project_1.GameObjects.Spells.Buff
             gfxPath = new GfxPath(GfxType.SpellImage, gfxName);
             hitEffectPath = new GfxPath(GfxType.Effect, hitEffectGfx);
 
-            Debug.Assert(this.duration > this.tickRate);
+            Debug.Assert(this.duration > this.tickRate && tickRate > 0);
         }
 
         // I think this is deprecated
@@ -97,11 +106,11 @@ namespace Project_1.GameObjects.Spells.Buff
         //    return true;
         //}
 
-        public bool TriggerRanked(Entity aCaster, Entity aTarget, SpellData spellData, int spellRank)
+        public override bool Trigger(Entity aCaster, Entity aTarget, Spell aSpell)
         {
             ThreadAffinity.AssertSimThread();
-            Periodic periodic = new Periodic(aCaster, this, spellData, spellRank);
-            aTarget.TryAddBuff(periodic);
+            Periodic periodic = new Periodic(aCaster, this, aSpell);
+            aTarget.AddBuff(periodic);
             return true;
         }
     }

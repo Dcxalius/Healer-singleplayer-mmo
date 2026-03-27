@@ -56,7 +56,9 @@ namespace Project_1.UI.HUD.PlateBoxes
             {
                 targetRenderId = null;
                 targetSnapshot = null;
-                nameSegment.Name = null;
+                nameSegment.Clear();
+                healthSegment.Clear();
+                resourceSegment.Clear();
                 Visible = false;
                 return;
             }

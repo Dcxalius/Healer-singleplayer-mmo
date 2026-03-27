@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.HUD.Guild
 {
-    internal class GuildRoster : ScrollableBox
+    internal class GuildRoster : ScrollableBox<GuildMemberListing>
     {
         public enum SortBy
         {
@@ -27,7 +27,7 @@ namespace Project_1.UI.HUD.Guild
         RelativeScreenPosition size;
 
 
-        List<GuildMemberListing> guildMembers;
+        List<GuildMemberListing> guildMembers; //TODO: Should be removed
         public GuildRoster(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(10, new UITexture("WhiteBackground", Color.AliceBlue), Color.DarkSeaGreen, aPos, aSize)
         {
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f, Size);

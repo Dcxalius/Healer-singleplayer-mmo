@@ -21,7 +21,6 @@ namespace Project_1.UI.UIElements
 
         protected virtual void AddChild(UIElement aUIElement)
         {
-            aUIElement.Visible = Visible;
             aUIElement.parent = this;
             children.Add(aUIElement);
         }
