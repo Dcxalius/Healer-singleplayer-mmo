@@ -21,10 +21,10 @@ namespace Project_1.UI.OptionMenu
         public OptionScreenBox(int aCountOfButtons, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, aPos, aSize)
         {
             RelativeScreenPosition buttonSize = new RelativeScreenPosition(1f / aCountOfButtons, 1);
-            videoOptionsButton = new VideoOptionsButton(new RelativeScreenPosition(0), buttonSize);
-            keybindingsOptionButton = new KeybindingsOptionButton(new RelativeScreenPosition(buttonSize.X, 0), buttonSize);
-            chatOptionsButton = new ChatOptionsButton(new RelativeScreenPosition(buttonSize.X * 2, 0), buttonSize);
-            debugOptionsButton = new DebugOptionsButton(new RelativeScreenPosition(buttonSize.X * 3, 0), buttonSize);
+            videoOptionsButton = new VideoOptionsButton(new RelativeScreenPosition(0), buttonSize, this);
+            keybindingsOptionButton = new KeybindingsOptionButton(new RelativeScreenPosition(buttonSize.X, 0), buttonSize, this);
+            chatOptionsButton = new ChatOptionsButton(new RelativeScreenPosition(buttonSize.X * 2, 0), buttonSize, this);
+            debugOptionsButton = new DebugOptionsButton(new RelativeScreenPosition(buttonSize.X * 3, 0), buttonSize, this);
 
             AddChild(videoOptionsButton);  
             AddChild(keybindingsOptionButton);

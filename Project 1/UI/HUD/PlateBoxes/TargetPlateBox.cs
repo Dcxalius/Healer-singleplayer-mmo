@@ -25,11 +25,11 @@ namespace Project_1.UI.HUD.PlateBoxes
         PlateBoxResourceSegment resourceSegment;
 
 
-        public TargetPlateBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize)
+        public TargetPlateBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, null)
         {
-            nameSegment = new PlateBoxNameSegment(null, Color.White, RelativeScreenPosition.Zero, new RelativeScreenPosition(1, 0.5f));
-            healthSegment = new PlateBoxHealthSegment(new RelativeScreenPosition(0, 0.5f), new RelativeScreenPosition(1, 0.25f));
-            resourceSegment = new PlateBoxResourceSegment(new RelativeScreenPosition(0, 0.75f), new RelativeScreenPosition(1, 0.25f));
+            nameSegment = new PlateBoxNameSegment(null, Color.White, Color.Black, RelativeScreenPosition.Zero, new RelativeScreenPosition(1, 0.5f), this);
+            healthSegment = new PlateBoxHealthSegment(new RelativeScreenPosition(0, 0.5f), new RelativeScreenPosition(1, 0.25f), this);
+            resourceSegment = new PlateBoxResourceSegment(new RelativeScreenPosition(0, 0.75f), new RelativeScreenPosition(1, 0.25f), this);
 
             leftVerticalSegments = new PlateBoxSegment[] { };
             rightVerticalSegments = new PlateBoxSegment[] { };

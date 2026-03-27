@@ -12,7 +12,7 @@ namespace Project_1.UI.HUD.Guild
     internal class InviteButton : TwoStateGFXButton
     {
         int memberRenderId;
-        public InviteButton(int aMemberRenderId, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new List<Action>() { }, new GfxPath(GfxType.UI, "Invite"), new List<Action>() { }, new GfxPath(GfxType.UI, "Uninvite"), aPos, aSize, Color.White)
+        public InviteButton(int aMemberRenderId, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(new List<Action>() { }, new GfxPath(GfxType.UI, "Invite"), new List<Action>() { }, new GfxPath(GfxType.UI, "Uninvite"), aPos, aSize, Color.White, aParent: aParent)
         {
             memberRenderId = aMemberRenderId;
             AddAction(new Action(() => Invite()), State.First);

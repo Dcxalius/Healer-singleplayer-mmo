@@ -18,9 +18,10 @@ namespace Project_1.UI.UIElements.Boxes
         protected List<Button> buttons;
         PausesGame pauses;
 
-        public ButtonBox(Button[] aButtons, PausesGame aPauses, UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aGfx, aPos, aSize) 
+        public ButtonBox(Func<UIElement, Button[]> aButtonFactory, PausesGame aPauses, UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aGfx, aPos, aSize) 
         {
-            buttons = aButtons.ToList();
+            Button[] builtButtons = aButtonFactory?.Invoke(this) ?? Array.Empty<Button>();
+            buttons = builtButtons.ToList();
 
             pauses = aPauses;
             if (aPauses == PausesGame.Pauses) 

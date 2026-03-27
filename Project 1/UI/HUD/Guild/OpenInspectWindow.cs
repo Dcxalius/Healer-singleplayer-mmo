@@ -23,7 +23,7 @@ namespace Project_1.UI.HUD.Guild
             MailboxManager.PublishUiEvent(new InspectWindowToggled(member));
         }
 
-        public OpenInspectWindow(EntityUiSnapshot aSnapshot, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new List<Action>() { new Action(() => OpenWindow(aSnapshot)) }, new GfxPath(GfxType.Item, "TestDagger"), aPos, aSize, Color.White)
+        public OpenInspectWindow(EntityUiSnapshot aSnapshot, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(new List<Action>() { new Action(() => OpenWindow(aSnapshot)) }, new GfxPath(GfxType.Item, "TestDagger"), aPos, aSize, Color.White, aParent: aParent)
         {
 
         }

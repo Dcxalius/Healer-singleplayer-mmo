@@ -16,9 +16,9 @@ namespace Project_1.UI.HUD.PlateBoxes
     {
         Label numberLabel;
 
-        public LevelCircle(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("LevelCircle", Color.White), aPos, aSize)
+        public LevelCircle(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent) : base(aParent, new UITexture("LevelCircle", Color.White), aPos, aSize)
         {
-            numberLabel = new Label("1", RelativeScreenPosition.Zero, RelativeScreenPosition.One, Label.TextAllignment.Centred, Color.Pink);
+            numberLabel = new Label("1", RelativeScreenPosition.Zero, RelativeScreenPosition.One, Label.TextAllignment.Centred, Color.Pink, aParent: this);
             capturesClick = false;
 
             AddChild(numberLabel);

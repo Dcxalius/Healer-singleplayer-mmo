@@ -8,7 +8,7 @@ namespace Project_1.UI.CharacterCreator
 {
     internal class FinalizeCharacterButton : Button
     {
-        public FinalizeCharacterButton(List<Action> aActions, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aActions, aPos, aSize, Color.White, "Create Character", Color.Black)
+        public FinalizeCharacterButton(List<Action> aActions, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(aActions, aPos, aSize, Color.White, "Create Character", Color.Black, aParent)
         {
         }
 

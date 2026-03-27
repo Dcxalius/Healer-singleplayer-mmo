@@ -76,20 +76,20 @@ namespace Project_1.UI.HUD
             RelativeScreenPosition bhPos = new RelativeScreenPosition(bagBoxSpacingInInventoryScope.X, 1f - (itemSizeInInventoryScope.Y + bagBoxSpacingInInventoryScope.Y * 3));
             RelativeScreenPosition bhSize = new RelativeScreenPosition(itemSizeInInventoryScope.X * Items.Inventory.bagSlots + bagBoxSpacingInInventoryScope.X * (Items.Inventory.bagSlots + 1), itemSizeInInventoryScope.Y + bagBoxSpacingInInventoryScope.Y * 2);
 
-            bagHolderBox = new BagHolderBox(bhPos, bhSize);
+            bagHolderBox = new BagHolderBox(bhPos, bhSize, this);
             AddChild(bagHolderBox);
 
             bagContentBoxes = new BagContentBox[Items.Inventory.bagSlots];
             for (int i = 0; i < bagContentBoxes.Length; i++)
             {
-                bagContentBoxes[i] = new BagContentBox(i);
+                bagContentBoxes[i] = new BagContentBox(i, this);
             }
             AddChildren(bagContentBoxes);
 
             RelativeScreenPosition imgSize = RelativeScreenPosition.GetSquareFromY(bagHolderBox.RelativeSize.Y / 2, Size);
-            goldImage = new Image(new UITexture("Gold", Color.White), RelativeScreenPosition.One - imgSize - bagBoxSpacingInInventoryScope.OnlyX, imgSize);
+            goldImage = new Image(new UITexture("Gold", Color.White), RelativeScreenPosition.One - imgSize - bagBoxSpacingInInventoryScope.OnlyX, imgSize, this);
             RelativeScreenPosition goldSize = new RelativeScreenPosition(1 - imgSize.X - bagBoxSpacingInInventoryScope.X * 2, bhSize.Y);
-            gold = new Label("0", RelativeScreenPosition.One.OnlyY - goldSize.OnlyY - bagBoxSpacingInInventoryScope.OnlyY, goldSize, Label.TextAllignment.CentreRight);
+            gold = new Label("0", RelativeScreenPosition.One.OnlyY - goldSize.OnlyY - bagBoxSpacingInInventoryScope.OnlyY, goldSize, Label.TextAllignment.CentreRight, aParent: this);
             AddChild(gold);
             AddChild(goldImage);
         }

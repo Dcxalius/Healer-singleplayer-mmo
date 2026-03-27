@@ -14,7 +14,7 @@ namespace Project_1.UI.HUD.PlateBoxes
 {
     internal class PlateBoxHealthSegment : PlateBoxSegment
     {
-        public PlateBoxHealthSegment(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new Color(255, 211, 211, 120), aPos, aSize)
+        public PlateBoxHealthSegment(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(new Color(255, 211, 211, 120), aPos, aSize, aParent: aParent)
         {
             bar.Visible = true;
             bar.Color = Color.Red;

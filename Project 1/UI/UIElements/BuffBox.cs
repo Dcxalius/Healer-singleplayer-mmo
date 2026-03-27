@@ -70,7 +70,7 @@ namespace Project_1.UI.UIElements
                 return;
             }
 
-            buffs.Add(new Buff(aBuff, RelativeScreenPosition.Zero, buffSize));
+            buffs.Add(new Buff(aBuff, RelativeScreenPosition.Zero, buffSize, this));
             AddChild(buffs.Last());
             SortBuffs();
         }

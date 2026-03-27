@@ -19,7 +19,7 @@ namespace Project_1.UI.UIElements
         
         
         bool waitingForPress = false;
-        public KeybindingButton(bool aButtonLevel, KeyBindManager.KeyListner aKeyListner, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, Color.White, KeyBindManager.GetKey(aButtonLevel, aKeyListner).ToString(), Color.Black)
+        public KeybindingButton(bool aButtonLevel, KeyBindManager.KeyListner aKeyListner, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent) : base(aPos, aSize, Color.White, KeyBindManager.GetKey(aButtonLevel, aKeyListner).ToString(), Color.Black, aParent)
         {
             buttonLevel = aButtonLevel; 
             keyListner = aKeyListner;

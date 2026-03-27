@@ -13,7 +13,7 @@ namespace Project_1.UI.PauseMenu
 {
     internal class LoadButton : Button
     {
-        public LoadButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, Color.Magenta, "Load", Color.Teal)
+        public LoadButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(aPos, aSize, Color.Magenta, "Load", Color.Teal, aParent)
         {
 
         }

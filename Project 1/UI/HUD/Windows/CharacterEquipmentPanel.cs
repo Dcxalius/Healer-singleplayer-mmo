@@ -22,7 +22,7 @@ namespace Project_1.UI.HUD.Windows
 
         readonly Item[] equippedItems;
 
-        public CharacterEquipmentPanel(int aBagIndex) : base(null, RelativeScreenPosition.Zero, RelativeScreenPosition.One)
+        public CharacterEquipmentPanel(int aBagIndex, UIElement aParent = null) : base(aParent, null, RelativeScreenPosition.Zero, RelativeScreenPosition.One)
         {
             equippedItems = new Item[(int)Equipment.Slot.Count];
 
@@ -59,7 +59,7 @@ namespace Project_1.UI.HUD.Windows
         {
             for (int i = (int)aStart; i <= (int)aEnd; i++)
             {
-                equippedItems[i] = new Item(aBagIndex, i, true, Color.Teal, new GfxPath(GfxType.Item, null), aStartPos + aChangeInPos * (i - (int)aStart), itemSize);
+                equippedItems[i] = new Item(aBagIndex, i, true, Color.Teal, new GfxPath(GfxType.Item, null), aStartPos + aChangeInPos * (i - (int)aStart), itemSize, this);
             }
         }
     }

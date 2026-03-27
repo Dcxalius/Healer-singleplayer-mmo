@@ -35,16 +35,16 @@ namespace Project_1.UI.HUD
         {
             xMax = 0.15f;
 
-            itemName = new Label(null, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopLeft);
+            itemName = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopLeft);
             AddChild(itemName);
-            itemDescription = new Label(null, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopLeft);
+            itemDescription = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopLeft);
             AddChild(itemDescription);
-            itemStats = new Label(null, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopLeft);
+            itemStats = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopLeft);
             AddChild(itemStats);
-            itemSellPrice = new Label(null, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreRight);
+            itemSellPrice = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreRight);
             AddChild(itemSellPrice);
 
-            goldImage = new Image(new UITexture("Gold", Color.White), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
+            goldImage = new Image(new UITexture("Gold", Color.White), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, this);
 
             AddChild(goldImage);
             Visible = false;

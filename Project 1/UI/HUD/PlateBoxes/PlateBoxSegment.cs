@@ -18,9 +18,9 @@ namespace Project_1.UI.HUD.PlateBoxes
         public virtual Color BackgroundColor { set => gfx.Color = value; }
         protected ResourceBar bar;
 
-        public PlateBoxSegment(Color aBackgroundColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize, BarTexture.FillingDirection fillingDirection = BarTexture.FillingDirection.Right) : base(new UITexture("WhiteBackground", aBackgroundColor), aPos, aSize)
+        public PlateBoxSegment(Color aBackgroundColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize, BarTexture.FillingDirection fillingDirection = BarTexture.FillingDirection.Right, UIElement aParent = null) : base(aParent, new UITexture("WhiteBackground", aBackgroundColor), aPos, aSize)
         {
-            bar = new ResourceBar(new BarTexture(fillingDirection, Color.Transparent), null, RelativeScreenPosition.Zero, RelativeScreenPosition.One);
+            bar = new ResourceBar(new BarTexture(fillingDirection, Color.Transparent), null, RelativeScreenPosition.Zero, RelativeScreenPosition.One, this);
 
 
             AddChild(bar);

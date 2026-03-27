@@ -31,7 +31,7 @@ namespace Project_1.UI.HUD.SpellBook
         }
         string spellName;
 
-        public SpellBookSpell(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(GfxPath.NullPath, aPos, aSize, Color.White)
+        public SpellBookSpell(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(GfxPath.NullPath, aPos, aSize, Color.White, aParent)
         {
         }
 

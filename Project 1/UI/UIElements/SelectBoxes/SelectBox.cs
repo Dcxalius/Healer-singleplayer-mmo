@@ -31,13 +31,13 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
         const float sizeMulti = 5;
 
-        public SelectBox(UITexture aGfx, int aStartDisplayValue, RelativeScreenPosition aPos, RelativeScreenPosition aCollapsedSize) : base(aGfx, aPos, aCollapsedSize) 
+        public SelectBox(UITexture aGfx, int aStartDisplayValue, RelativeScreenPosition aPos, RelativeScreenPosition aCollapsedSize, UIElement aParent = null) : base(aGfx, aPos, aCollapsedSize, aParent) 
         {
             defaultPos = aPos;
             defaultSize = aCollapsedSize;
             selectedValue = aStartDisplayValue;
 
-            allValues = new ScrollableBox<SelectBoxValue>(5, UITexture.Null, Color.AliceBlue, new RelativeScreenPosition(ScrollableBox.WidthOfBar + ScrollableBox.WidthOfSpacing * 2, 1 / sizeMulti), new RelativeScreenPosition(1 - ScrollableBox.WidthOfBar - ScrollableBox.WidthOfSpacing * 3, 1 - 1 / sizeMulti));
+            allValues = new ScrollableBox<SelectBoxValue>(5, UITexture.Null, Color.AliceBlue, new RelativeScreenPosition(ScrollableBox.WidthOfBar + ScrollableBox.WidthOfSpacing * 2, 1 / sizeMulti), new RelativeScreenPosition(1 - ScrollableBox.WidthOfBar - ScrollableBox.WidthOfSpacing * 3, 1 - 1 / sizeMulti), this);
             AddChild(allValues);
             allValues.Visible = false;
         }

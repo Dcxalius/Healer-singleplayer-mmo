@@ -11,7 +11,7 @@ namespace Project_1.UI.UIElements
 {
     internal class Image : Box
     {
-        public Image(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aGfx, aPos, aSize)
+        public Image(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(aGfx, aPos, aSize, aParent)
         {
             capturesClick = false;
             capturesRelease = false;

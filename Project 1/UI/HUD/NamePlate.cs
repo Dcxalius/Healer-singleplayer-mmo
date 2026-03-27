@@ -42,8 +42,8 @@ namespace Project_1.UI.HUD
 
         public NamePlate(in EntityUiSnapshot snapshot) : base(new UITexture("GrayBackground", ColorTransform(snapshot.RelationColor)), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
         {
-            name = new Label(snapshot.Name, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopCentre);
-            healthBar = new Bar(new BarTexture(BarTexture.FillingDirection.Right, Color.Red), new UITexture("WhiteBackground", backgroundColor), RelativeScreenPosition.Zero, barSize);
+            name = new Label(snapshot.Name, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopCentre, aParent: this);
+            healthBar = new Bar(new BarTexture(BarTexture.FillingDirection.Right, Color.Red), new UITexture("WhiteBackground", backgroundColor), RelativeScreenPosition.Zero, barSize, this);
             
 
             AddChild(name);

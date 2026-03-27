@@ -15,9 +15,9 @@ namespace Project_1.UI.OptionMenu
     internal class ScreenSizeSelect : SelectBox
     {
         static readonly string[] screenRezes = new string[] { "1500, 900", "1200, 900", "900, 1100", "100, 100", "5000, 5000", "1337, 420"}; //TODO: Make this pull this data from file
-        public ScreenSizeSelect(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.White), 0, aPos, aSize)
+        public ScreenSizeSelect(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent) : base(new UITexture("WhiteBackground", Color.White), 0, aPos, aSize, aParent)
         {
-            values  = SelectBoxValueOption.CreateArray(this, screenRezes);
+            values  = SelectBoxValueOption.CreateArray(this, allValues, screenRezes);
 
             allValues.AddScrollableElements(values);
 

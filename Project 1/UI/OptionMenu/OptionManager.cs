@@ -109,9 +109,9 @@ namespace Project_1.UI.OptionMenu
         {
             optionElements[(int)OptionScreen.Video] = new List<UIElement>
             {
-                new ScreenSizeSelect(new RelativeScreenPosition(0.1f, 0.1f), new RelativeScreenPosition(0.3f, 0.1f)),
-                new CameraStyleSelect(new RelativeScreenPosition(0.1f, 0.22f), new RelativeScreenPosition(0.3f, 0.1f)),
-                new FullScreenSelect(new RelativeScreenPosition(0.1f, 0.34f), new RelativeScreenPosition(0.3f, 0.1f))
+                new ScreenSizeSelect(new RelativeScreenPosition(0.1f, 0.1f), new RelativeScreenPosition(0.3f, 0.1f), null),
+                new CameraStyleSelect(new RelativeScreenPosition(0.1f, 0.22f), new RelativeScreenPosition(0.3f, 0.1f), null),
+                new FullScreenSelect(new RelativeScreenPosition(0.1f, 0.34f), new RelativeScreenPosition(0.3f, 0.1f), null)
             };
         }
 

@@ -98,7 +98,7 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        public Label(string aText, RelativeScreenPosition aPos, RelativeScreenPosition aSize, TextAllignment aTextAlignment, Color? aTextColor = null, string aFontname = "Comfortaa-msdf", float aTextSize = 12f) : base(null, aPos, aSize)
+        public Label(UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize, TextAllignment aTextAlignment, Color? aTextColor = null, string aFontname = "Comfortaa-msdf", float aTextSize = 12f, string aText = "") : base(aParent, null, aPos, aSize)
         {
             underlyingText = aTextColor.HasValue ? new Text(aFontname, aText, aTextColor.Value, aTextSize) : new Text(aFontname, aText, aTextSize);
             textAlignment = aTextAlignment;

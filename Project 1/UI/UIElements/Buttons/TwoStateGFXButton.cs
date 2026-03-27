@@ -38,7 +38,7 @@ namespace Project_1.UI.UIElements.Buttons
 
         public State state;
 
-        public TwoStateGFXButton(List<Action> aActions, GfxPath aPath, List<Action> aSecondActions, GfxPath aSecondPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColor, string aText = null, Color? aTextColor = null) : base(aActions, aPos, aSize, aColor, aText, aTextColor)
+        public TwoStateGFXButton(List<Action> aActions, GfxPath aPath, List<Action> aSecondActions, GfxPath aSecondPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColor, string aText = null, Color? aTextColor = null, UIElement aParent = null) : base(aActions, aPos, aSize, aColor, aText, aTextColor, aParent)
         {
             state = State.First;
 

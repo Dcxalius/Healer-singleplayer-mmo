@@ -21,7 +21,7 @@ namespace Project_1.UI.OptionMenu
             capturesClick = false;
             capturesRelease = false;
 
-            AddChild(new Label("Debug Overlay", new RelativeScreenPosition(0.03f, 0.02f), new RelativeScreenPosition(0.94f, HeaderHeight), Label.TextAllignment.CentreLeft, Color.Black));
+            AddChild(new Label("Debug Overlay", new RelativeScreenPosition(0.03f, 0.02f), new RelativeScreenPosition(0.94f, HeaderHeight), Label.TextAllignment.CentreLeft, Color.Black, aParent: this));
 
             nextRowY = 0.1f;
             AddToggleRow(
@@ -31,7 +31,7 @@ namespace Project_1.UI.OptionMenu
                 () => SetDebugOverlayEnabled(false));
 
             nextRowY += 0.02f;
-            AddChild(new Label("Visible Overlay Info", new RelativeScreenPosition(0.03f, nextRowY), new RelativeScreenPosition(0.94f, HeaderHeight), Label.TextAllignment.CentreLeft, Color.Black));
+            AddChild(new Label("Visible Overlay Info", new RelativeScreenPosition(0.03f, nextRowY), new RelativeScreenPosition(0.94f, HeaderHeight), Label.TextAllignment.CentreLeft, Color.Black, aParent: this));
             nextRowY += HeaderHeight + 0.01f;
 
             AddOverlayToggle("FPS", DebugOverlayInfo.Fps);
@@ -58,7 +58,7 @@ namespace Project_1.UI.OptionMenu
 
         void AddToggleRow(string aLabel, bool aStartState, Action aOnTicked, Action aOnUnticked)
         {
-            AddChild(new DebugToggleRow(aLabel, aStartState, aOnTicked, aOnUnticked, new RelativeScreenPosition(0.03f, nextRowY), new RelativeScreenPosition(0.94f, RowHeight)));
+            AddChild(new DebugToggleRow(aLabel, aStartState, aOnTicked, aOnUnticked, new RelativeScreenPosition(0.03f, nextRowY), new RelativeScreenPosition(0.94f, RowHeight), this));
             nextRowY += RowHeight + RowSpacing;
         }
 
@@ -92,14 +92,14 @@ namespace Project_1.UI.OptionMenu
 
     internal class DebugToggleRow : UIElement
     {
-        public DebugToggleRow(string aLabel, bool aStartState, Action aOnTicked, Action aOnUnticked, RelativeScreenPosition aPos, RelativeScreenPosition aSize)
-            : base(new UITexture("WhiteBackground", Color.Wheat), aPos, aSize)
+        public DebugToggleRow(string aLabel, bool aStartState, Action aOnTicked, Action aOnUnticked, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null)
+            : base(aParent, new UITexture("WhiteBackground", Color.Wheat), aPos, aSize)
         {
             capturesClick = false;
             capturesRelease = false;
 
-            CheckBox checkBox = new CheckBox(aStartState, aOnTicked, aOnUnticked, new RelativeScreenPosition(0.01f, 0.14f), new RelativeScreenPosition(0.075f, 0.72f));
-            Label label = new Label(aLabel, new RelativeScreenPosition(0.11f, 0), new RelativeScreenPosition(0.88f, 1), Label.TextAllignment.CentreLeft, Color.Black);
+            CheckBox checkBox = new CheckBox(aStartState, aOnTicked, aOnUnticked, new RelativeScreenPosition(0.01f, 0.14f), new RelativeScreenPosition(0.075f, 0.72f), this);
+            Label label = new Label(aLabel, new RelativeScreenPosition(0.11f, 0), new RelativeScreenPosition(0.88f, 1), Label.TextAllignment.CentreLeft, Color.Black, aParent: this);
 
             AddChild(checkBox);
             AddChild(label);

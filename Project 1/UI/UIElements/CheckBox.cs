@@ -58,8 +58,8 @@ namespace Project_1.UI.UIElements
         List<Action> tickedActions;
         List<Action> untickedActions;
 
-        public CheckBox(bool aStartState, Action aTickedAction, Action aUntickedAction, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : this(aStartState, new List<Action> { aTickedAction }, new List<Action> { aUntickedAction }, aPos, aSize) { }
-        public CheckBox(bool aStartState, List<Action> aTickedActions, List<Action> aUntickedActions, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("CheckBox", Color.White), aPos, aSize)
+        public CheckBox(bool aStartState, Action aTickedAction, Action aUntickedAction, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : this(aStartState, new List<Action> { aTickedAction }, new List<Action> { aUntickedAction }, aPos, aSize, aParent) { }
+        public CheckBox(bool aStartState, List<Action> aTickedActions, List<Action> aUntickedActions, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(aParent, new UITexture("CheckBox", Color.White), aPos, aSize)
         {
             capturesClick = true;
             ticked = aStartState;

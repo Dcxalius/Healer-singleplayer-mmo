@@ -14,9 +14,9 @@ namespace Project_1.UI.OptionMenu
     internal class CameraStyleSelect : SelectBox
     {
 
-        public CameraStyleSelect(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.White), (int)Camera.Camera.CurrentCameraSetting, aPos, aSize)
+        public CameraStyleSelect(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent) : base(new UITexture("WhiteBackground", Color.White), (int)Camera.Camera.CurrentCameraSetting, aPos, aSize, aParent)
         {
-            values = SelectBoxValueOption.CreateArray(this, Enum.GetNames(typeof(CameraSettings.Follow)));
+            values = SelectBoxValueOption.CreateArray(this, allValues, Enum.GetNames(typeof(CameraSettings.Follow)));
 
             allValues.AddScrollableElements(values);
 

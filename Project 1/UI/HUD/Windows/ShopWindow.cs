@@ -18,13 +18,13 @@ namespace Project_1.UI.HUD.Windows
         public ShopWindow() : base(new UITexture("WhiteBackground", Color.Lime))
         {
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.05f, Size);
+            pageBox = new PageBox(new UITexture("WhiteBackground", Color.Transparent), RelativeScreenPosition.Zero, RelativeScreenPosition.One, new Point(2, 5), this);
             itemsForSale = new ItemForSale[10];
             for (int i = 0; i < itemsForSale.Length; i++)
             {
-                itemsForSale[i] = new ItemForSale(new RelativeScreenPosition((ItemForSale.size.X + spacing.X) * (i % 2) + spacing.X * (i % 2 + 1), (ItemForSale.size.Y + spacing.Y) * MathF.Floor(i / 2) + spacing.Y * (MathF.Floor(1 / 2) + 1)));
+                itemsForSale[i] = new ItemForSale(new RelativeScreenPosition((ItemForSale.size.X + spacing.X) * (i % 2) + spacing.X * (i % 2 + 1), (ItemForSale.size.Y + spacing.Y) * MathF.Floor(i / 2) + spacing.Y * (MathF.Floor(1 / 2) + 1)), pageBox);
             }
 
-            pageBox = new PageBox(new UITexture("WhiteBackground", Color.Transparent), RelativeScreenPosition.Zero, RelativeScreenPosition.One, new Point(2, 5));
             pageBox.SetPageElements(itemsForSale, BindItemSlot, ClearItemSlot);
             AddChild(pageBox);
             //TODO: Add buyback system

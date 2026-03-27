@@ -13,9 +13,9 @@ namespace Project_1.UI.UIElements
 {
     internal class Border : Box
     {
-        public Border(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : this(Color.White, aPos, aSize) { }
+        public Border(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : this(Color.White, aPos, aSize, aParent) { }
 
-        public Border(Color aBorderColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayWhiteBorder", aBorderColor), aPos, aSize)
+        public Border(Color aBorderColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(new UITexture("GrayWhiteBorder", aBorderColor), aPos, aSize, aParent)
         {
         }
 

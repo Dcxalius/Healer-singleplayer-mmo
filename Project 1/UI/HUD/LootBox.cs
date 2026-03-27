@@ -27,7 +27,7 @@ namespace Project_1.UI.HUD
         {
             ToggleVisibilty();
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.025f, Size);
-            scrollableComponent = new ScrollableBox<Loot>(3f, new UITexture("WhiteBackground", Color.White), Color.Yellow, spacing, RelativeScreenPosition.One - spacing - spacing);
+            scrollableComponent = new ScrollableBox<Loot>(3f, new UITexture("WhiteBackground", Color.White), Color.Yellow, spacing, RelativeScreenPosition.One - spacing - spacing, this);
             //capturesScroll = true;
             AddChild(scrollableComponent);
             Dragable = true;
@@ -63,11 +63,11 @@ namespace Project_1.UI.HUD
                 ItemUiSnapshot snap = snapshot[i];
                 if (snap.HasValue)
                 {
-                    loot[i] = new Loot(i, snap);
+                    loot[i] = new Loot(i, snap, scrollableComponent);
                 }
                 else
                 {
-                    loot[i] = new Loot(i, ItemUiSnapshot.Empty);
+                    loot[i] = new Loot(i, ItemUiSnapshot.Empty, scrollableComponent);
                     indexToHide.Add(i);
                 }
             }

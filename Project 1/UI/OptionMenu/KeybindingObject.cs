@@ -19,11 +19,11 @@ namespace Project_1.UI.OptionMenu
 
         const float spacingX = 0.03f;
 
-        public KeybindingObject(KeyBindManager.KeyListner aListner, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.Wheat), aPos, aSize)
+        public KeybindingObject(KeyBindManager.KeyListner aListner, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent) : base(aParent, new UITexture("WhiteBackground", Color.Wheat), aPos, aSize)
         {
-            nameOfButton = new Label(aListner.ToString(), RelativeScreenPosition.Zero, new RelativeScreenPosition(1f / 3, 1f), Label.TextAllignment.Centred, Color.Black);
-            firstKeybindingButton = new KeybindingButton(true, aListner, new RelativeScreenPosition(1f/3, 0), new RelativeScreenPosition(1f / 3, 1f));
-            secondKeybindingButton = new KeybindingButton(false, aListner, new RelativeScreenPosition(1f * 2 / 3 + spacingX, 0), new RelativeScreenPosition(1f / 3, 1f));
+            nameOfButton = new Label(aListner.ToString(), RelativeScreenPosition.Zero, new RelativeScreenPosition(1f / 3, 1f), Label.TextAllignment.Centred, Color.Black, aParent: this);
+            firstKeybindingButton = new KeybindingButton(true, aListner, new RelativeScreenPosition(1f/3, 0), new RelativeScreenPosition(1f / 3, 1f), this);
+            secondKeybindingButton = new KeybindingButton(false, aListner, new RelativeScreenPosition(1f * 2 / 3 + spacingX, 0), new RelativeScreenPosition(1f / 3, 1f), this);
 
             AddChild(nameOfButton);
             AddChild(firstKeybindingButton);

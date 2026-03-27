@@ -45,7 +45,8 @@ namespace Project_1.UI.HUD.Chat
                 UITexture.Null,
                 new Color(120, 120, 120, 200),
                 outerPadding,
-                logSize);
+                logSize,
+                this);
             AddChild(messageLog);
 
             RelativeScreenPosition inputPos = new RelativeScreenPosition(
@@ -63,7 +64,8 @@ namespace Project_1.UI.HUD.Chat
                 Color.LightGray,
                 Color.White,
                 inputPos,
-                inputSize);
+                inputSize,
+                this);
             inputBox.Visible = false;
             inputBox.SetEnter(new List<Action> { SubmitInput });
             AddChild(inputBox);
@@ -188,7 +190,7 @@ namespace Project_1.UI.HUD.Chat
                 Color textColor = ResolveMessageColor(entry.Message.Type);
                 for (int i = 0; i < wrapped.Count; i++)
                 {
-                    messageLog.AddScrollableElement(new ChatLineElement(wrapped[i], textColor));
+                    messageLog.AddScrollableElement(new ChatLineElement(wrapped[i], textColor, messageLog));
                 }
             }
 
@@ -396,13 +398,13 @@ namespace Project_1.UI.HUD.Chat
         {
             readonly Label label;
 
-            public ChatLineElement(string aText, Color aTextColor)
-                : base(UITexture.Null, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
+            public ChatLineElement(string aText, Color aTextColor, UI.UIElements.UIElement aParent = null)
+                : base(UITexture.Null, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, aParent)
             {
                 capturesClick = false;
                 capturesRelease = false;
 
-                label = new Label(aText, RelativeScreenPosition.Zero, RelativeScreenPosition.One, Label.TextAllignment.CentreLeft, aTextColor, aTextSize: ChatTextSize);
+                label = new Label(aText, RelativeScreenPosition.Zero, RelativeScreenPosition.One, Label.TextAllignment.CentreLeft, aTextColor, aTextSize: ChatTextSize, aParent: this);
                 AddChild(label);
             }
 

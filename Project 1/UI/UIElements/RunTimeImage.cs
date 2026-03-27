@@ -12,10 +12,10 @@ namespace Project_1.UI.UIElements
 {
     internal class RuntimeImage : Box
     {
-        public RuntimeImage(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, aPos, aSize)
+        public RuntimeImage(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(null, aPos, aSize, aParent)
         {
         }
-        public RuntimeImage(string aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, aPos, aSize)
+        public RuntimeImage(string aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(null, aPos, aSize, aParent)
         {
             SetImage(aPath);
         }

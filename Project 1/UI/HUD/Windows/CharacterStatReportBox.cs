@@ -23,10 +23,10 @@ namespace Project_1.UI.HUD.Windows
             ItemDescriptorSnapshot hoverSnapshot;
             bool hasHoverSnapshot;
 
-            public StatLineElement(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, aPos, aSize)
+            public StatLineElement(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(aParent, null, aPos, aSize)
             {
-                numberLabel = new Label(null, new RelativeScreenPosition(0f, 0f), new RelativeScreenPosition(0.45f, 1f), Label.TextAllignment.CentreRight, Color.Black);
-                textLabel = new Label(null, new RelativeScreenPosition(0.5f, 0f), new RelativeScreenPosition(0.5f, 1f), Label.TextAllignment.CentreLeft, Color.Black);
+                numberLabel = new Label(this, new RelativeScreenPosition(0f, 0f), new RelativeScreenPosition(0.45f, 1f), Label.TextAllignment.CentreRight, Color.Black);
+                textLabel = new Label(this, new RelativeScreenPosition(0.5f, 0f), new RelativeScreenPosition(0.5f, 1f), Label.TextAllignment.CentreLeft, Color.Black);
                 AddChild(numberLabel);
                 AddChild(textLabel);
 
@@ -100,15 +100,15 @@ namespace Project_1.UI.HUD.Windows
         string ownerClassName = string.Empty;
         RelationToPlayerKind ownerRelation = RelationToPlayerKind.Self;
 
-        public CharacterStatReportBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize)
-            : base(new UITexture("WhiteBackground", Color.Transparent), aPos, aSize, StatPageSize)
+        public CharacterStatReportBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null)
+            : base(new UITexture("WhiteBackground", Color.Transparent), aPos, aSize, StatPageSize, aParent)
         {
             statLines = new StatLineElement[StatRowsPerPage];
             for (int i = 0; i < statLines.Length; i++)
             {
                 float rowHeight = (1f - StatPageTopPadding) / StatRowsPerPage;
                 float y = StatPageTopPadding + rowHeight * i;
-                statLines[i] = new StatLineElement(new RelativeScreenPosition(0.05f, y), new RelativeScreenPosition(0.9f, rowHeight));
+                statLines[i] = new StatLineElement(new RelativeScreenPosition(0.05f, y), new RelativeScreenPosition(0.9f, rowHeight), this);
             }
 
             SetPageElements(statLines, BindStatLine, ClearStatLine);

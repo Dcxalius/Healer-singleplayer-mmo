@@ -17,15 +17,15 @@ namespace Project_1.UI.LoadingMenu
         {
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f, Size);
             RelativeScreenPosition size = new RelativeScreenPosition(0.5f - spacing.X - spacing.X, 1 - spacing.Y - spacing.Y);
-            savesToLoadFrom = new ScrollableBox<ExistingSave>(3f, new UITexture("WhiteBackground", Color.AntiqueWhite), Color.AliceBlue, spacing, size);
+            savesToLoadFrom = new ScrollableBox<ExistingSave>(3f, new UITexture("WhiteBackground", Color.AntiqueWhite), Color.AliceBlue, spacing, size, this);
             AddChild(savesToLoadFrom);
             ExistingSave.callAtClick = SetSave;
 
-            saveDetails = new SaveDetails(new RelativeScreenPosition(size.X + spacing.X * 3, spacing.Y), size);
+            saveDetails = new SaveDetails(new RelativeScreenPosition(size.X + spacing.X * 3, spacing.Y), size, this);
             AddChild(saveDetails);
 
             RelativeScreenPosition square = RelativeScreenPosition.GetSquareFromY(0.07f, Size);
-            AddChild(new ExitButton(RelativeScreenPosition.One - square - spacing, square));
+            AddChild(new ExitButton(RelativeScreenPosition.One - square - spacing, square, this));
         }
 
         public void Setup(SaveUiSnapshot[] saves)
@@ -33,7 +33,7 @@ namespace Project_1.UI.LoadingMenu
             existingSaves = saves == null ? Array.Empty<ExistingSave>() : new ExistingSave[saves.Length];
             for (int i = 0; i < existingSaves.Length; i++)
             {
-                existingSaves[i] = new ExistingSave(saves[i]);
+                existingSaves[i] = new ExistingSave(saves[i], savesToLoadFrom);
                 savesToLoadFrom.AddScrollableElement(existingSaves[i]);
             }
         }

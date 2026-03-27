@@ -169,7 +169,7 @@ namespace Project_1.UI.UIElements
 
         public (string, RelativeScreenPosition, RelativeScreenPosition) Save => (GetType().Name, RelativePos, RelativeSize);
 
-        protected UIElement(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize)
+        protected UIElement(UIElement aParent, UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize)
         {
             UiElementId = Interlocked.Increment(ref nextUiElementId);
             lock (uiElementRegistryLock)
@@ -178,6 +178,7 @@ namespace Project_1.UI.UIElements
             }
 
             visible = true;
+            parent = aParent;
             gfx = aGfx;
             relativePos = aPos;
             relativeSize = aSize;
@@ -189,6 +190,11 @@ namespace Project_1.UI.UIElements
             alwaysOnScreen = false;
             alwaysFullyOnScreen = false;
             hudMoveable = true;
+        }
+
+        protected UIElement(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize)
+            : this(null, aGfx, aPos, aSize)
+        {
         }
     }
 }

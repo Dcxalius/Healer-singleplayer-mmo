@@ -21,7 +21,11 @@ namespace Project_1.UI.UIElements
 
         protected virtual void AddChild(UIElement aUIElement)
         {
-            aUIElement.parent = this;
+            if (aUIElement == null) return;
+            if (aUIElement.parent != this)
+            {
+                throw new InvalidOperationException($"{aUIElement.GetType().Name} must be constructed with parent {GetType().Name} before AddChild.");
+            }
             children.Add(aUIElement);
         }
 
@@ -29,7 +33,6 @@ namespace Project_1.UI.UIElements
         {
             for (int i = 0; i < aUIElement.Length; i++)
             {
-                aUIElement[i].parent = this;
                 AddChild(aUIElement[i]);
             }
         }
@@ -38,7 +41,6 @@ namespace Project_1.UI.UIElements
         {
             for (int i = 0; i < aUIElement.Count; i++)
             {
-                aUIElement[i].parent = this;
                 AddChild(aUIElement[i]);
             }
         }

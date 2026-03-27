@@ -15,7 +15,7 @@ namespace Project_1.UI.UIElements.Boxes
     internal class Box : UIElement
     {
 
-        public Box(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aGfx, aPos, aSize)
+        public Box(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(aParent, aGfx, aPos, aSize)
         {
 
         }

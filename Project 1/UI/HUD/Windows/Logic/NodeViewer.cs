@@ -21,7 +21,7 @@ namespace Project_1.UI.HUD.Windows.Logic
         readonly Color textColor = Color.Black;
         const int linkThickness = 2;
 
-        public NodeViewer(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.Lime), aPos, aSize)
+        public NodeViewer(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(new UITexture("WhiteBackground", Color.Lime), aPos, aSize, aParent)
         {
             nodeTexture = new UITexture("WhiteBackground", Color.LightGray);
             linkTexture = new UITexture("WhiteBackground", Color.Black);

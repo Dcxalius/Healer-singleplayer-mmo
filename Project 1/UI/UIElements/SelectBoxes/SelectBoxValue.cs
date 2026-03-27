@@ -21,9 +21,9 @@ namespace Project_1.UI.UIElements.SelectBoxes
 
         protected Text text;
 
-        protected SelectBoxValue(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, string aStartText, SelectBox aParent) : base(aGfx, aPos, aSize)
+        protected SelectBoxValue(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, string aStartText, SelectBox aSelectBoxParent, UIElement aParent) : base(aParent, aGfx, aPos, aSize)
         {
-            selectBoxParent = aParent;
+            selectBoxParent = aSelectBoxParent;
             text = new Text("Comfortaa-msdf", aStartText, Color.Teal);
         }
 

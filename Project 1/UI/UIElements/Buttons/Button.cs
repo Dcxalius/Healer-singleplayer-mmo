@@ -38,15 +38,15 @@ namespace Project_1.UI.UIElements.Buttons
         public virtual List<Action> Actions => actions;
         List<Action> actions;
 
-        public Button(List<Action> aActions, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColor, string aText = null, Color? aTextColor = null) : this(aPos, aSize, aColor, aText, aTextColor)
+        public Button(List<Action> aActions, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColor, string aText = null, Color? aTextColor = null, UIElement aParent = null) : this(aPos, aSize, aColor, aText, aTextColor, aParent)
         {
             actions = aActions ?? new List<Action>();
         }
 
-        public Button(RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColor, string aText = null, Color? aTextColor = null) : base(new UITexture("WhiteBackground", aColor), aPos, aSize)
+        public Button(RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColor, string aText = null, Color? aTextColor = null, UIElement aParent = null) : base(aParent, new UITexture("WhiteBackground", aColor), aPos, aSize)
         {
             Color denullifiedTextColor = aTextColor ?? Color.White;
-            label = new Label(aText, RelativeScreenPosition.Zero, RelativeScreenPosition.One, Label.TextAllignment.Centred, denullifiedTextColor);
+            label = new Label(aText, RelativeScreenPosition.Zero, RelativeScreenPosition.One, Label.TextAllignment.Centred, denullifiedTextColor, aParent: this);
             AddChild(label);
             pressedGfx = new UITexture("GrayBackground", aColor);
             hoverGfx = new UITexture("ButtonHover", Color.Yellow);

@@ -22,7 +22,7 @@ namespace Project_1.UI.CharacterCreator
             classSelected = null;
         }
 
-        public ClassSelectButton(string aClassName, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new GfxPath(GfxType.UI, aClassName), aPos, aSize, Color.White)
+        public ClassSelectButton(string aClassName, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(new GfxPath(GfxType.UI, aClassName), aPos, aSize, Color.White, aParent)
         {
             className = aClassName;
             classSelectButtons.Add(this);

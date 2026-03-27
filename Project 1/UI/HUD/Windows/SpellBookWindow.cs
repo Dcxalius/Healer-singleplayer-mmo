@@ -31,7 +31,7 @@ namespace Project_1.UI.HUD.Windows
                 //    spellBookSpells[i] = new SpellBookSpell(pos, size, spells[i]);
                 //    continue;
                 //}
-                spellBookSpells[i] = new SpellBookSpell(pos, size);
+                spellBookSpells[i] = new SpellBookSpell(pos, size, this);
             }
 
             AddChildren(spellBookSpells);

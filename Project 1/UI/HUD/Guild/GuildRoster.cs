@@ -28,7 +28,7 @@ namespace Project_1.UI.HUD.Guild
 
 
         List<GuildMemberListing> guildMembers; //TODO: Should be removed
-        public GuildRoster(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(10, new UITexture("WhiteBackground", Color.AliceBlue), Color.DarkSeaGreen, aPos, aSize)
+        public GuildRoster(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent) : base(10, new UITexture("WhiteBackground", Color.AliceBlue), Color.DarkSeaGreen, aPos, aSize, aParent)
         {
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f, Size);
             guildMembers = new List<GuildMemberListing>();
@@ -60,16 +60,15 @@ namespace Project_1.UI.HUD.Guild
 
             for (int i = 0; i < aData.Length; i++)
             {
-                AddScrollableElement(new GuildMemberListing(aData[i], ElementSize.ToAbsoluteScreenPos(Size)));
+                AddScrollableElement(new GuildMemberListing(aData[i], ElementSize.ToAbsoluteScreenPos(Size), this));
                 //guildMembers.Add(new GuildMemberListing(aData[i], firstPosition + changeInY * i, size));
             }
             Sort();
-            AddChildren(guildMembers);
         }
 
         public void AddMember(EntityUiSnapshot aData)
         {
-            AddScrollableElement(new GuildMemberListing(aData, ElementSize.ToAbsoluteScreenPos(Size)));
+            AddScrollableElement(new GuildMemberListing(aData, ElementSize.ToAbsoluteScreenPos(Size), this));
 
             //guildMembers.Add(new GuildMemberListing(aData, firstPosition, size));
             //AddChild(guildMembers.Last());

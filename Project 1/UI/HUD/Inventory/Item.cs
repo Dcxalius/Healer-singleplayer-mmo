@@ -55,12 +55,27 @@ namespace Project_1.UI.HUD.Inventory
                 itemSnapshot.HasValue ? itemSnapshot.QualityColor : Color.DarkGray,
                 itemSnapshot.HasValue ? itemSnapshot.GfxPath : new GfxPath(GfxType.Item, null),
                 aPos,
-                aSize)
+                aSize,
+                null)
         {
             AssignItem(itemSnapshot);
         }
 
-        public Item(int aBagIndex, int aSlotIndex, bool aHoldable, Color aBackgroundColor, GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPath, aPos, aSize, aBackgroundColor) //TODO: Change this so a nulled path isn't required and figure out what to do with colors.
+        public Item(int aBagIndex, int aSlotIndex, bool aHoldable, ItemUiSnapshot itemSnapshot, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent)
+            : this(
+                aBagIndex,
+                aSlotIndex,
+                aHoldable,
+                itemSnapshot.HasValue ? itemSnapshot.QualityColor : Color.DarkGray,
+                itemSnapshot.HasValue ? itemSnapshot.GfxPath : new GfxPath(GfxType.Item, null),
+                aPos,
+                aSize,
+                aParent)
+        {
+            AssignItem(itemSnapshot);
+        }
+
+        public Item(int aBagIndex, int aSlotIndex, bool aHoldable, Color aBackgroundColor, GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(aPath, aPos, aSize, aBackgroundColor, aParent) //TODO: Change this so a nulled path isn't required and figure out what to do with colors.
         {
             bagIndex = aBagIndex;
             slotIndex = aSlotIndex;

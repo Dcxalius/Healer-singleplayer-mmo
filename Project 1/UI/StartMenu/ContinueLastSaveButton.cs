@@ -8,7 +8,7 @@ namespace Project_1.UI.StartMenu
 {
     internal class ContinueLastSaveButton : Button
     {
-        public ContinueLastSaveButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, Color.LightSkyBlue, "Continue", Color.Black)
+        public ContinueLastSaveButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(aPos, aSize, Color.LightSkyBlue, "Continue", Color.Black, aParent)
         {
         }
 

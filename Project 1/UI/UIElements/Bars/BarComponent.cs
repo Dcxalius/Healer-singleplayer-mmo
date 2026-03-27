@@ -13,7 +13,7 @@ namespace Project_1.UI.UIElements.Bars
     {
         public new Color Color { get => gfx.Color; set => gfx.Color = value; }
 
-        public BarComponent(BarTexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aGfx, aPos, aSize)
+        public BarComponent(BarTexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(aParent, aGfx, aPos, aSize)
         {
             capturesClick = false;
         }

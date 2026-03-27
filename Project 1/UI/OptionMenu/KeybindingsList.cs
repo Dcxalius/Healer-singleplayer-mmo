@@ -19,7 +19,7 @@ namespace Project_1.UI.OptionMenu
         {
             for (int i = 0; i < (int)KeyBindManager.KeyListner.Count; i++)
             {
-                AddScrollableElement(new KeybindingObject((KeyBindManager.KeyListner)i, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero));
+                AddScrollableElement(new KeybindingObject((KeyBindManager.KeyListner)i, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, this));
             }
         }
     }

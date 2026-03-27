@@ -25,9 +25,9 @@ namespace Project_1.UI.HUD.Windows.Gossip
         {
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.05f, Size);
             RelativeScreenPosition introSize = new RelativeScreenPosition((1 - spacing.X * 2), 0.4f);
-            introduction = new Label("", spacing, introSize, Label.TextAllignment.TopLeft, Color.Black);
+            introduction = new Label("", spacing, introSize, Label.TextAllignment.TopLeft, Color.Black, aParent: this);
             AddChild(introduction);
-            options = new ScrollableBox<GossipOption>(10, UITexture.Null, Color.AliceBlue, introSize.OnlyY + spacing, RelativeScreenPosition.One - spacing - introSize.OnlyY);
+            options = new ScrollableBox<GossipOption>(10, UITexture.Null, Color.AliceBlue, introSize.OnlyY + spacing, RelativeScreenPosition.One - spacing - introSize.OnlyY, this);
             AddChild(options);
         }
 

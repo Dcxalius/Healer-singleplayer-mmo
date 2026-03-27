@@ -17,9 +17,9 @@ namespace Project_1.UI.UIElements.Boxes
         float RelativeSpacing => spacing * RelativeSize.Y;
         const float spacing = 0.0234375f; //(Length of the head part)/(Length of entire bar)
         
-        public ScrollBar(Color aColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("ScrollBar", aColor), aPos, aSize)
+        public ScrollBar(Color aColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(aParent, new UITexture("ScrollBar", aColor), aPos, aSize)
         {
-            scrollPlimp = new ScrollPlimp(aColor, RelativeScreenPosition.Zero, new RelativeScreenPosition(1, 1f / 32f)); //32 is from (graphical size of bar)/(graphical side of blimp)
+            scrollPlimp = new ScrollPlimp(aColor, RelativeScreenPosition.Zero, new RelativeScreenPosition(1, 1f / 32f), this); //32 is from (graphical size of bar)/(graphical side of blimp)
             AddChild(scrollPlimp);
             SetValue(0);
             capturesClick = true;

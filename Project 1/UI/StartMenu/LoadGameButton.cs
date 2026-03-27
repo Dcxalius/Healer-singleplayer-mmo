@@ -7,7 +7,7 @@ namespace Project_1.UI.StartMenu
 {
     internal class LoadGameButton : Button
     {
-        public LoadGameButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, Color.LightYellow, "Load", Color.Black)
+        public LoadGameButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(aPos, aSize, Color.LightYellow, "Load", Color.Black, aParent)
         {
         }
 

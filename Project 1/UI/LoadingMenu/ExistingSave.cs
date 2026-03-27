@@ -15,10 +15,10 @@ namespace Project_1.UI.LoadingMenu
         readonly SaveUiSnapshot save;
         public static Action<ExistingSave> callAtClick;
 
-        public ExistingSave(SaveUiSnapshot aSave) : base(new UITexture("WhiteBackground", Color.White), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
+        public ExistingSave(SaveUiSnapshot aSave, UIElement aParent) : base(new UITexture("WhiteBackground", Color.White), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, aParent)
         {
             save = aSave;
-            playerName = new Label(aSave.SaveName, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreLeft, Color.Black);
+            playerName = new Label(aSave.SaveName, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreLeft, Color.Black, aParent: this);
             AddChild(playerName);
         }
 

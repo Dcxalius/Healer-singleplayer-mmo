@@ -12,7 +12,7 @@ namespace Project_1.UI.HUD.Guild
 {
     internal class OpenInventory : GFXButton
     {
-        public OpenInventory(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new GfxPath(GfxType.Item, "DefaultBag"), aPos, aSize, Color.White)
+        public OpenInventory(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(new GfxPath(GfxType.Item, "DefaultBag"), aPos, aSize, Color.White, aParent)
         {
         }
     }

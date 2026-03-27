@@ -45,7 +45,7 @@ namespace Project_1.UI.HUD.Windows
             hudMoveable = false;
 
             RelativeScreenPosition buttonSize = RelativeScreenPosition.GetSquareFromX(0.05f, size.ToAbsoluteScreenPos());
-            GFXButton gFXButton = new GFXButton(new List<Action>() { new Action(CloseWindow) }, new GfxPath(GfxType.UI, "XButton"), RelativeScreenPosition.One.OnlyX + new RelativeScreenPosition(-buttonSize.X, 0), buttonSize, Color.White);
+            GFXButton gFXButton = new GFXButton(new List<Action>() { new Action(CloseWindow) }, new GfxPath(GfxType.UI, "XButton"), RelativeScreenPosition.One.OnlyX + new RelativeScreenPosition(-buttonSize.X, 0), buttonSize, Color.White, aParent: this);
             AddChild(gFXButton);
         }
 

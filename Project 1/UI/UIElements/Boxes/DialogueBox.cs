@@ -47,7 +47,7 @@ namespace Project_1.UI.UIElements.Boxes
             RelativeScreenPosition aPos, RelativeScreenPosition aSize, 
             RelativeScreenPosition aButtonPos, RelativeScreenPosition aButtonSize, Color aButtonColor, string aButtonText = null, Color? aButtonTextColor = null)
                 : base(
-                    new Button[] { new Button(aAction, aButtonPos, aButtonSize, aButtonColor, aButtonText, aButtonTextColor)}, aPauses, aGfx, aPos, aSize)
+                    aParent => new Button[] { new Button(aAction, aButtonPos, aButtonSize, aButtonColor, aButtonText, aButtonTextColor, aParent) }, aPauses, aGfx, aPos, aSize)
         {
             switch (aLocation)
             {
@@ -62,7 +62,7 @@ namespace Project_1.UI.UIElements.Boxes
             }
 
 
-            textToDisplay = new Label(aMessage, defaultEdgeSpacing, RelativeScreenPosition.One - defaultEdgeSpacing * 2, Label.TextAllignment.TopCentre, aMessageColor);
+            textToDisplay = new Label(aMessage, defaultEdgeSpacing, RelativeScreenPosition.One - defaultEdgeSpacing * 2, Label.TextAllignment.TopCentre, aMessageColor, aParent: this);
             AddChild(textToDisplay);
         }
     }

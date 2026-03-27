@@ -21,7 +21,7 @@ namespace Project_1.UI.HUD.Windows.Logic
             OutOfRangeOfBind
         }
 
-        public ScenarioBox() : base(10, new UITexture("WhiteBackground", Color.Chartreuse), Color.GreenYellow, new RelativeScreenPosition(0.01f, 0.51f), new RelativeScreenPosition(0.48f, 0.48f))
+        public ScenarioBox(UI.UIElements.UIElement aParent = null) : base(10, new UITexture("WhiteBackground", Color.Chartreuse), Color.GreenYellow, new RelativeScreenPosition(0.01f, 0.51f), new RelativeScreenPosition(0.48f, 0.48f), aParent)
         {
         }
     }

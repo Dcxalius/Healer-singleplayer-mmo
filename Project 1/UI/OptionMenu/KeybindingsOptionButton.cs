@@ -11,7 +11,7 @@ namespace Project_1.UI.OptionMenu
 {
     internal class KeybindingsOptionButton : Button
     {
-        public KeybindingsOptionButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, Color.White, "Keybindings", Color.Black)
+        public KeybindingsOptionButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(aPos, aSize, Color.White, "Keybindings", Color.Black, aParent)
         {
 
         }

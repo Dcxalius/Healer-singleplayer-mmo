@@ -12,6 +12,7 @@ using Project_1.Camera;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.UI;
+using Project_1.UI.UIElements;
 using Project_1.UI.UIElements.Buttons;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 
@@ -27,7 +28,7 @@ namespace Project_1.UI.HUD.SpellBook
         bool spellOffCooldown = true;
         double spellCooldownRatio = 1d;
 
-        public SpellButton(KeyBindManager.KeyListner aKeyListner, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(GfxPath.NullPath, aPos, aSize, Color.Gray)
+        public SpellButton(KeyBindManager.KeyListner aKeyListner, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(GfxPath.NullPath, aPos, aSize, Color.Gray, aParent)
         {
             keyListner = aKeyListner;
             onCooldownGfx = new CooldownTexture(CooldownTexture.CooldownGfxType.LeftSwirl);

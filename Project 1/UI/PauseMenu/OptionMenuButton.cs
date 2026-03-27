@@ -12,7 +12,7 @@ namespace Project_1.UI.PauseMenu
 {
     internal class OptionMenuButton : Button
     {
-        public OptionMenuButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, Color.Blue, "Options Menu")
+        public OptionMenuButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(aPos, aSize, Color.Blue, "Options Menu", aParent: aParent)
         {
 
         }

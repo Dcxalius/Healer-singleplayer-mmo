@@ -19,13 +19,13 @@ namespace Project_1.UI.HUD.Windows
 
         public SpellTrainingEntrySnapshot Snapshot => snapshot;
 
-        public SpellTrainingEntryButton(Action<SpellTrainingEntrySnapshot> onSelected) : base(RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Color.SlateGray)
+        public SpellTrainingEntryButton(Action<SpellTrainingEntrySnapshot> onSelected, UIElement aParent) : base(RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Color.SlateGray, aParent: aParent)
         {
             Color = Color.SlateGray;
             RelativeScreenPosition iconSize = new RelativeScreenPosition(0.08f, 0.80f);
-            iconImage = new Image(UITexture.Null, new RelativeScreenPosition(0.02f, 0.10f), iconSize);
-            nameLabel = new Label("", new RelativeScreenPosition(0.12f, 0f), new RelativeScreenPosition(0.63f, 1f), Label.TextAllignment.CentreLeft, Color.White, aTextSize: 11f);
-            levelLabel = new Label("", new RelativeScreenPosition(0.76f, 0f), new RelativeScreenPosition(0.20f, 1f), Label.TextAllignment.CentreRight, Color.White, aTextSize: 11f);
+            iconImage = new Image(UITexture.Null, new RelativeScreenPosition(0.02f, 0.10f), iconSize, this);
+            nameLabel = new Label("", new RelativeScreenPosition(0.12f, 0f), new RelativeScreenPosition(0.63f, 1f), Label.TextAllignment.CentreLeft, Color.White, aTextSize: 11f, aParent: this);
+            levelLabel = new Label("", new RelativeScreenPosition(0.76f, 0f), new RelativeScreenPosition(0.20f, 1f), Label.TextAllignment.CentreRight, Color.White, aTextSize: 11f, aParent: this);
             AddChild(iconImage);
             AddChild(nameLabel);
             AddChild(levelLabel);

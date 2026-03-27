@@ -13,9 +13,9 @@ namespace Project_1.UI.OptionMenu
 {
     internal class FullScreenSelect : SelectBox
     {
-        public FullScreenSelect(RelativeScreenPosition aPos, RelativeScreenPosition aCollapsedSize) : base(new UITexture("WhiteBackground", Color.White), (int)Camera.Camera.FullScreen, aPos, aCollapsedSize)
+        public FullScreenSelect(RelativeScreenPosition aPos, RelativeScreenPosition aCollapsedSize, UI.UIElements.UIElement aParent) : base(new UITexture("WhiteBackground", Color.White), (int)Camera.Camera.FullScreen, aPos, aCollapsedSize, aParent)
         {
-            values = SelectBoxValueOption.CreateArray(this, Enum.GetNames(typeof(CameraSettings.WindowType)));
+            values = SelectBoxValueOption.CreateArray(this, allValues, Enum.GetNames(typeof(CameraSettings.WindowType)));
 
             allValues.AddScrollableElements(values);
 

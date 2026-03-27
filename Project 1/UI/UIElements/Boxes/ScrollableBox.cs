@@ -19,7 +19,7 @@ namespace Project_1.UI.UIElements.Boxes
         public const float WidthOfBar = 0.03f;
         public const float WidthOfSpacing = 0.005f;
 
-        public ScrollableBox(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aGfx, aPos, aSize)
+        public ScrollableBox(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(aGfx, aPos, aSize, aParent)
         {
         }
 
@@ -86,13 +86,13 @@ namespace Project_1.UI.UIElements.Boxes
 
         RelativeScreenPosition elementSize;
 
-        public ScrollableBox(float visibleElements, UITexture aGfx, Color aBarColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aGfx, aPos, aSize)
+        public ScrollableBox(float visibleElements, UITexture aGfx, Color aBarColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(aGfx, aPos, aSize, aParent)
         {
             scrollableElements = new List<T>();
 
             RelativeScreenPosition barSpacing = RelativeScreenPosition.GetSquareFromX(WidthOfSpacing, Size);
             RelativeScreenPosition sizeOfScrollBar = new RelativeScreenPosition(WidthOfBar, 1f - barSpacing.Y - barSpacing.Y);
-            scrollBar = new ScrollBar(aBarColor, new RelativeScreenPosition(1f - sizeOfScrollBar.X - barSpacing.X, barSpacing.Y), sizeOfScrollBar);
+            scrollBar = new ScrollBar(aBarColor, new RelativeScreenPosition(1f - sizeOfScrollBar.X - barSpacing.X, barSpacing.Y), sizeOfScrollBar, this);
             originalYPos = new List<float>();
             AddChild(scrollBar);
 

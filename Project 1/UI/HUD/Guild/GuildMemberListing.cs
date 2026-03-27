@@ -41,7 +41,7 @@ namespace Project_1.UI.HUD.Guild
         }
 
 
-        public GuildMemberListing(EntityUiSnapshot aData, AbsoluteScreenPosition aSizeForButtonScaling) : base(new UITexture("WhiteBackground", Color.Pink), RelativeScreenPosition.One, RelativeScreenPosition.One) //TODO: Make this sortable
+        public GuildMemberListing(EntityUiSnapshot aData, AbsoluteScreenPosition aSizeForButtonScaling, UIElement aParent) : base(new UITexture("WhiteBackground", Color.Pink), RelativeScreenPosition.One, RelativeScreenPosition.One, aParent) //TODO: Make this sortable
         {
             data = aData;
 
@@ -50,20 +50,20 @@ namespace Project_1.UI.HUD.Guild
             buttonPos = new RelativeScreenPosition(1, spacing.Y);
             changeInX = new RelativeScreenPosition(-buttonSize.X - spacing.X, 0);
 
-            openInspectWindow = new OpenInspectWindow(aData, GetButtonPos, buttonSize);
-            openInventory = new OpenInventory(GetButtonPos, buttonSize);
+            openInspectWindow = new OpenInspectWindow(aData, GetButtonPos, buttonSize, this);
+            openInventory = new OpenInventory(GetButtonPos, buttonSize, this);
             if (aData.RelationToPlayer != RelationToPlayerKind.Self)
             {
-                invite = new InviteButton(aData.RenderId, GetButtonPos, buttonSize);
-                nodeViewer = new Button(new List<Action> { NodeViewerOpener }, GetButtonPos, buttonSize, Color.LightGray);
+                invite = new InviteButton(aData.RenderId, GetButtonPos, buttonSize, this);
+                nodeViewer = new Button(new List<Action> { NodeViewerOpener }, GetButtonPos, buttonSize, Color.LightGray, aParent: this);
             }
 
             float labelPosX = (buttonPos.X - spacing.X - spacing.X) / 3;
             RelativeScreenPosition labelSize = new RelativeScreenPosition(labelPosX, 1);
 
-            name = new Label(aData.Name, new RelativeScreenPosition(spacing.X, 0), labelSize, Label.TextAllignment.CentreLeft);
-            level = new Label(aData.Level.ToString(), new RelativeScreenPosition(spacing.X + labelPosX, 0), labelSize, Label.TextAllignment.Centred);
-            @class = new Label(aData.ClassName, new RelativeScreenPosition(spacing.X + labelPosX * 2, 0), labelSize, Label.TextAllignment.CentreRight);
+            name = new Label(aData.Name, new RelativeScreenPosition(spacing.X, 0), labelSize, Label.TextAllignment.CentreLeft, aParent: this);
+            level = new Label(aData.Level.ToString(), new RelativeScreenPosition(spacing.X + labelPosX, 0), labelSize, Label.TextAllignment.Centred, aParent: this);
+            @class = new Label(aData.ClassName, new RelativeScreenPosition(spacing.X + labelPosX * 2, 0), labelSize, Label.TextAllignment.CentreRight, aParent: this);
 
             AddChild(name);
             AddChild(level);

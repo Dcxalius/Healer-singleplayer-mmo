@@ -11,7 +11,7 @@ namespace Project_1.UI.OptionMenu
 {
     internal class VideoOptionsButton : Button
     {
-        public VideoOptionsButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, Color.White, "Video", Color.Black)
+        public VideoOptionsButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(aPos, aSize, Color.White, "Video", Color.Black, aParent)
         {
 
         }

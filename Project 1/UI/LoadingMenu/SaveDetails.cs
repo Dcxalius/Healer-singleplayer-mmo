@@ -18,20 +18,20 @@ namespace Project_1.UI.LoadingMenu
         readonly RuntimeImage image;
         readonly Button loadButton;
 
-        public SaveDetails(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("WhiteBackground", Color.Beige), aPos, aSize)
+        public SaveDetails(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(new UITexture("WhiteBackground", Color.Beige), aPos, aSize, aParent)
         {
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
             RelativeScreenPosition imgSize = new RelativeScreenPosition(1 - spacing.X - spacing.X, 1f / 3f - spacing.Y - spacing.Y);
 
-            image = new RuntimeImage(spacing, imgSize);
+            image = new RuntimeImage(spacing, imgSize, this);
             AddChild(image);
 
-            textDetails = new Label(null, imgSize.OnlyY + spacing, imgSize, Label.TextAllignment.TopLeft, Color.Black);
+            textDetails = new Label(null, imgSize.OnlyY + spacing, imgSize, Label.TextAllignment.TopLeft, Color.Black, aParent: this);
             AddChild(textDetails);
 
             capturesClick = false;
             RelativeScreenPosition buttonSize = new RelativeScreenPosition(0.15f, 0.05f);
-            loadButton = new Button(new List<Action> { LoadSave }, spacing.OnlyX + aSize.OnlyY - buttonSize.OnlyY - spacing.OnlyY, buttonSize, Color.White, "Load Save", Color.Black);
+            loadButton = new Button(new List<Action> { LoadSave }, spacing.OnlyX + aSize.OnlyY - buttonSize.OnlyY - spacing.OnlyY, buttonSize, Color.White, "Load Save", Color.Black, this);
             //AddChild(loadButton);
         }
 
