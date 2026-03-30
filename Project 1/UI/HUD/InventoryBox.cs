@@ -11,7 +11,7 @@ using System;
 
 namespace Project_1.UI.HUD
 {
-    internal class InventoryBox : Box //This probably needs partial rollback!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    internal class InventoryBox : Box
     {
         BagHolderBox bagHolderBox;
         BagContentBox[] bagContentBoxes;
