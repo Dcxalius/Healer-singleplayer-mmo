@@ -14,7 +14,7 @@ namespace Project_1.UI.OptionMenu
     {
         List<Action> finalActions;
 
-        public SaveChangesButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColor, Color aTextColor) : base(aPos, aSize, aColor, "Save Changes", aTextColor)
+        public SaveChangesButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColor, Color aTextColor) : base(null, aPos, aSize, aColor, "Save Changes", aTextColor)
         {
             Visible = false;
             finalActions = new List<Action>();

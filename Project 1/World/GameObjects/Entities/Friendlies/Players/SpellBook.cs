@@ -160,11 +160,11 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             if (index >= 0)
             {
                 if (clampedRank <= knownSpells[index].rank) return;
-                knownSpells[index] = (clampedRank, new Spell(spellName, clampedRank));
+                knownSpells[index] = (clampedRank, new Spell(owner, spellName, clampedRank));
             }
             else
             {
-                knownSpells.Add((clampedRank, new Spell(spellName, clampedRank)));
+                knownSpells.Add((clampedRank, new Spell(owner, spellName, clampedRank)));
             }
 
             RebuildCastableSpells();
@@ -190,7 +190,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
                     string key = Spell.BuildSpellKey(entry.highestSpell.Name, rank);
                     if (!previous.TryGetValue(key, out Spell spell))
                     {
-                        spell = new Spell(entry.highestSpell.Name, rank);
+                        spell = new Spell(owner, entry.highestSpell.Name, rank);
                     }
 
                     castableSpells.Add(spell);
@@ -201,7 +201,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
                     }
                 }
 
-                knownSpells[i] = (entry.rank, resolvedHighestRankSpell ?? new Spell(entry.highestSpell.Name, entry.rank));
+                knownSpells[i] = (entry.rank, resolvedHighestRankSpell ?? new Spell(owner, entry.highestSpell.Name, entry.rank));
             }
         }
 

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Project_1.GameObjects.Entities.Friendlies.Players;
+using Project_1.World.GameObjects.Unit.Talents;
 
 namespace Project_1.GameObjects.Unit.Classes
 {
@@ -147,14 +148,17 @@ namespace Project_1.GameObjects.Unit.Classes
         //Warlock	2.0%	    20
         //Warrior	0.0%	    20
 
+        TalentTree[] talentTrees;
+
         [JsonConstructor]
-        public ClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp,
+        public ClassData(string name, int[] talentTrees, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp,
             float spiritHp5Constant, float spiritHp5Scaling,
             float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed, MeleeAttackPowerBonus meleeAttackPowerBonus,
             float agilityDodgeScaling = float.NaN, float baseDodge = 0f, float meleeCritScaling = 0f,
             Weapon.WeaponType weaponsAllowed = Weapon.WeaponType.None, bool canDualWield = false, bool isCaster = false, bool canParry = false, float spellCritScaling = 0f, float dodgeScaling = float.NaN)
         {
             this.name = name;
+            this.talentTrees = new TalentTree[talentTrees.Length];
             this.resource = resource;
             this.baseStats = new PrimaryStats(baseStats);
             this.perLevelStats = new PrimaryStats(perLevelStats);

@@ -5,6 +5,7 @@ using Project_1.Input;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
+using Project_1.UI.UIElements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,12 +22,12 @@ namespace Project_1.UI.HUD.PlateBoxes
         static PlateBoxHealthSegment health;
         static PlateBoxResourceSegment resource;
 
-        public PlayerPlateBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize, null)
+        public PlayerPlateBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aPos, aSize)
         {
 
-            name = new PlateBoxNameSegment(Color.White, Color.Black, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(1, 0.5f), this);
-            health = new PlateBoxHealthSegment(new RelativeScreenPosition(0, 0.5f), new RelativeScreenPosition(1, 0.25f), this);
-            resource = new PlateBoxResourceSegment(new RelativeScreenPosition(0, 0.75f), new RelativeScreenPosition(1, 0.25f), this);
+            name = new PlateBoxNameSegment(this, Color.White, Color.Black, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(1, 0.5f));
+            health = new PlateBoxHealthSegment(this, new RelativeScreenPosition(0, 0.5f), new RelativeScreenPosition(1, 0.25f));
+            resource = new PlateBoxResourceSegment(this, new RelativeScreenPosition(0, 0.75f), new RelativeScreenPosition(1, 0.25f));
 
 
             leftVerticalSegments = new PlateBoxSegment[] { };

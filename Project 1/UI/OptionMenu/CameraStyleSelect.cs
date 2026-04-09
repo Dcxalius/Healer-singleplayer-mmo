@@ -14,13 +14,13 @@ namespace Project_1.UI.OptionMenu
     internal class CameraStyleSelect : SelectBox
     {
 
-        public CameraStyleSelect(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent) : base(new UITexture("WhiteBackground", Color.White), (int)Camera.Camera.CurrentCameraSetting, aPos, aSize, aParent)
+        public CameraStyleSelect(UI.UIElements.UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, new UITexture("WhiteBackground", Color.White), (int)Camera.Camera.CurrentCameraSetting, aPos, aSize)
         {
             values = SelectBoxValueOption.CreateArray(this, allValues, Enum.GetNames(typeof(CameraSettings.Follow)));
 
             allValues.AddScrollableElements(values);
 
-            displayValue = new SelectBoxValueDisplay(RelativeScreenPosition.Zero, RelativeScreenPosition.One, values[(int)Camera.Camera.CurrentCameraSetting].DisplayText, this);
+            displayValue = new SelectBoxValueDisplay(this, RelativeScreenPosition.Zero, RelativeScreenPosition.One, values[(int)Camera.Camera.CurrentCameraSetting].DisplayText);
 
             AddChild(displayValue);
         }

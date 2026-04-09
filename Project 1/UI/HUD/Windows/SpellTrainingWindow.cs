@@ -45,18 +45,19 @@ namespace Project_1.UI.HUD.Windows
             unclickableButton = Color.Maroon;
 
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.03f, Size);
-            titleLabel = new Label("", spacing, new RelativeScreenPosition(0.94f, 0.08f), Label.TextAllignment.CentreLeft, Color.White, aTextSize: 14f, aParent: this);
+            titleLabel = new Label(this, spacing, new RelativeScreenPosition(0.94f, 0.08f), Label.TextAllignment.CentreLeft, Color.White, aTextSize: 14f);
             AddChild(titleLabel);
 
-            sortLevelButton = new Button(new RelativeScreenPosition(0.05f, 0.10f), new RelativeScreenPosition(0.28f, 0.07f), Color.SteelBlue, "Level Req", Color.White, this);
+            sortLevelButton = new Button(this, new RelativeScreenPosition(0.05f, 0.10f), new RelativeScreenPosition(0.28f, 0.07f), Color.SteelBlue, "Level Req", Color.White);
             sortLevelButton.AddAction(() => SetSortMode(SortMode.LevelRequired));
             AddChild(sortLevelButton);
 
-            sortNameButton = new Button(new RelativeScreenPosition(0.35f, 0.10f), new RelativeScreenPosition(0.20f, 0.07f), Color.SlateBlue, "Name", Color.White, this);
+            sortNameButton = new Button(this, new RelativeScreenPosition(0.35f, 0.10f), new RelativeScreenPosition(0.20f, 0.07f), Color.SlateBlue, "Name", Color.White);
             sortNameButton.AddAction(() => SetSortMode(SortMode.Name));
             AddChild(sortNameButton);
 
             hideLearnedCheckBox = new DescriptCheckBox(
+                this,
                 "Hide learned",
                 Color.White,
                 false,
@@ -64,11 +65,11 @@ namespace Project_1.UI.HUD.Windows
                 () => SetHideLearned(false),
                 new RelativeScreenPosition(0.58f, 0.10f),
                 new RelativeScreenPosition(0.16f, 0.07f),
-                Size,
-                this);
+                Size);
             AddChild(hideLearnedCheckBox);
 
             hideUnavailableCheckBox = new DescriptCheckBox(
+                this,
                 "Hide unavailable",
                 Color.White,
                 false,
@@ -76,20 +77,19 @@ namespace Project_1.UI.HUD.Windows
                 () => SetHideUnavailable(false),
                 new RelativeScreenPosition(0.75f, 0.10f),
                 new RelativeScreenPosition(0.20f, 0.07f),
-                Size,
-                this);
+                Size);
             AddChild(hideUnavailableCheckBox);
 
-            entriesBox = new ScrollableBox<SpellTrainingEntryButton>(10, UITexture.Null, Color.LightGray, new RelativeScreenPosition(0.05f, 0.19f), new RelativeScreenPosition(0.90f, 0.56f), this);
+            entriesBox = new ScrollableBox<SpellTrainingEntryButton>(this, 10, UITexture.Null, Color.LightGray, new RelativeScreenPosition(0.05f, 0.19f), new RelativeScreenPosition(0.90f, 0.56f));
             AddChild(entriesBox);
 
-            selectedLabel = new Label("Select a spell.", new RelativeScreenPosition(0.05f, 0.77f), new RelativeScreenPosition(0.90f, 0.08f), Label.TextAllignment.CentreLeft, Color.White, aTextSize: 12f, aParent: this);
+            selectedLabel = new Label(this, new RelativeScreenPosition(0.05f, 0.77f), new RelativeScreenPosition(0.90f, 0.08f), Label.TextAllignment.CentreLeft, Color.White, aTextSize: 12f, aText: "Select a spell.");
             AddChild(selectedLabel);
 
-            selectedStatusLabel = new Label("", new RelativeScreenPosition(0.05f, 0.84f), new RelativeScreenPosition(0.55f, 0.08f), Label.TextAllignment.CentreLeft, Color.Gainsboro, aTextSize: 11f, aParent: this);
+            selectedStatusLabel = new Label(this, new RelativeScreenPosition(0.05f, 0.84f), new RelativeScreenPosition(0.55f, 0.08f), Label.TextAllignment.CentreLeft, Color.Gainsboro, aTextSize: 11f);
             AddChild(selectedStatusLabel);
 
-            buyButton = new Button(new RelativeScreenPosition(0.72f, 0.82f), new RelativeScreenPosition(0.18f, 0.09f), Color.ForestGreen, "Buy", Color.White, this);
+            buyButton = new Button(this, new RelativeScreenPosition(0.72f, 0.82f), new RelativeScreenPosition(0.18f, 0.09f), Color.ForestGreen, "Buy", Color.White);
             buyButton.AddAction(BuySelectedSpell);
             AddChild(buyButton);
 
@@ -204,7 +204,7 @@ namespace Project_1.UI.HUD.Windows
         {
             while (entriesBox.ScrollableElementsCount < count)
             {
-                SpellTrainingEntryButton button = new SpellTrainingEntryButton(SelectEntry, this);
+                SpellTrainingEntryButton button = new SpellTrainingEntryButton(this, SelectEntry);
                 entriesBox.AddScrollableElement(button);
             }
         }

@@ -14,14 +14,14 @@ namespace Project_1.UI.StartMenu
 
         static RelativeScreenPosition mainPos = new RelativeScreenPosition(0.5f - (mainSize.X / 2), 0.5f - mainSize.Y / 2);
 
-        public MainMenu() : base(new UITexture("GrayBackground", Color.Red), new RelativeScreenPosition(0.6f, 0.4f), new RelativeScreenPosition(0.3f, 0.5f))
+        public MainMenu() : base(null, new UITexture("GrayBackground", Color.Red), new RelativeScreenPosition(0.6f, 0.4f), new RelativeScreenPosition(0.3f, 0.5f))
         {
-            AddChild(new ContinueLastSaveButton(GetStartPositionFromTop, ButtonSize, this));
-            AddChild(new NewGameButton(GetStartPositionFromTop, ButtonSize, this));
-            AddChild(new LoadGameButton(GetStartPositionFromTop, ButtonSize, this));
-            AddChild(new OptionMenuButton(GetStartPositionFromTop, ButtonSize, this));
+            AddChild(new ContinueLastSaveButton(this, GetStartPositionFromTop, ButtonSize));
+            AddChild(new NewGameButton(this, GetStartPositionFromTop, ButtonSize));
+            AddChild(new LoadGameButton(this, GetStartPositionFromTop, ButtonSize));
+            AddChild(new OptionMenuButton(this, GetStartPositionFromTop, ButtonSize));
 
-            AddChild(new ExitGameButton(GetStartPositionFromBottom, ButtonSize, this));
+            AddChild(new ExitGameButton(this, GetStartPositionFromBottom, ButtonSize));
         }
     }
 }

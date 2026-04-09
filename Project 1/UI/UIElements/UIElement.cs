@@ -192,9 +192,5 @@ namespace Project_1.UI.UIElements
             hudMoveable = true;
         }
 
-        protected UIElement(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize)
-            : this(null, aGfx, aPos, aSize)
-        {
-        }
     }
 }

@@ -25,7 +25,7 @@ namespace Project_1.Managers.States
         public MoveHUD() : base()
         {
             pauseBackground = new Textures.Texture(new GfxPath(GfxType.UI, "PauseBackground"));
-            MoveHUDBox = new MoveHUDBox();
+            MoveHUDBox = new MoveHUDBox(null);
             moveHudDrawList = moveHudDrawListA;
         }
 

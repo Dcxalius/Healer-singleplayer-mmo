@@ -16,7 +16,7 @@ namespace Project_1.UI.PauseMenu
     internal class MainMenuButton : Button
     {
 
-        public MainMenuButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(aPos, aSize, Color.Gray, "Main Menu", aParent: aParent)
+        public MainMenuButton(UI.UIElements.UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, aPos, aSize, Color.Gray, "Main Menu")
         {
 
         }

@@ -6,7 +6,7 @@ namespace Project_1.UI.OptionMenu
 {
     internal class DebugOptionsButton : Button
     {
-        public DebugOptionsButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(aPos, aSize, Color.White, "Debug", Color.Black, aParent)
+        public DebugOptionsButton(UI.UIElements.UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, aPos, aSize, Color.White, "Debug", Color.Black)
         {
         }
 

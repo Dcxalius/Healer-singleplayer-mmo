@@ -26,7 +26,7 @@ namespace Project_1.UI.UIElements
             minimapDot = new UITexture("MinimapDot", Color.White);
         }
 
-        public Minimap(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", Color.White), aPos, aSize)
+        public Minimap(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, new UITexture("GrayBackground", Color.White), aPos, aSize)
         {
             Init();
         }

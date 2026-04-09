@@ -26,6 +26,8 @@ namespace Project_1.GameObjects.Spells
             Rectangle
         }
 
+        public int Id => id;
+        int id;
         public string Name { get => name; }
         string name;
         public string Description => description;
@@ -108,6 +110,7 @@ namespace Project_1.GameObjects.Spells
 
         [JsonConstructor]
         public SpellData(
+            int id,
             string name,
             string buttonGfx,
             string hitEffectGfx,
@@ -148,6 +151,7 @@ namespace Project_1.GameObjects.Spells
             {
                 tempEffects.Add(SpellFactory.GetSpellEffect(effects[i]));
             }
+            this.id = id;
             this.effects = tempEffects.ToArray();
             this.resourceCost = resourceCost;
             this.acceptableTargets = acceptableTargets;

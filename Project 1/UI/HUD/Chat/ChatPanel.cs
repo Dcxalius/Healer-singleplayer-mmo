@@ -30,7 +30,7 @@ namespace Project_1.UI.HUD.Chat
         bool suppressOpenUntilEnterReleased;
 
         public ChatPanel(RelativeScreenPosition aPos, RelativeScreenPosition aSize)
-            : base(new UITexture("GrayBackground", new Color(50, 50, 50, 165)), aPos, aSize)
+            : base(null, new UITexture("GrayBackground", new Color(50, 50, 50, 165)), aPos, aSize)
         {
             AlwaysOnScreen = true;
 
@@ -41,12 +41,12 @@ namespace Project_1.UI.HUD.Chat
                 1f - outerPadding.Y * 3 - inputHeight.Y);
 
             messageLog = new ScrollableBox<ChatLineElement>(
+                this,
                 VisibleRows,
                 UITexture.Null,
                 new Color(120, 120, 120, 200),
                 outerPadding,
-                logSize,
-                this);
+                logSize);
             AddChild(messageLog);
 
             RelativeScreenPosition inputPos = new RelativeScreenPosition(
@@ -54,6 +54,7 @@ namespace Project_1.UI.HUD.Chat
                 1f - outerPadding.Y - inputHeight.Y);
             RelativeScreenPosition inputSize = new RelativeScreenPosition(1f - outerPadding.X * 2, inputHeight.Y);
             inputBox = new InputBox(
+                this,
                 "",
                 Size,
                 new[] { InputBox.ValidInputs.Any },
@@ -64,8 +65,7 @@ namespace Project_1.UI.HUD.Chat
                 Color.LightGray,
                 Color.White,
                 inputPos,
-                inputSize,
-                this);
+                inputSize);
             inputBox.Visible = false;
             inputBox.SetEnter(new List<Action> { SubmitInput });
             AddChild(inputBox);
@@ -190,7 +190,7 @@ namespace Project_1.UI.HUD.Chat
                 Color textColor = ResolveMessageColor(entry.Message.Type);
                 for (int i = 0; i < wrapped.Count; i++)
                 {
-                    messageLog.AddScrollableElement(new ChatLineElement(wrapped[i], textColor, messageLog));
+                    messageLog.AddScrollableElement(new ChatLineElement(messageLog, wrapped[i], textColor));
                 }
             }
 
@@ -398,13 +398,13 @@ namespace Project_1.UI.HUD.Chat
         {
             readonly Label label;
 
-            public ChatLineElement(string aText, Color aTextColor, UI.UIElements.UIElement aParent = null)
-                : base(UITexture.Null, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, aParent)
+            public ChatLineElement(UI.UIElements.UIElement aParent, string aText, Color aTextColor)
+                : base(aParent, UITexture.Null, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
             {
                 capturesClick = false;
                 capturesRelease = false;
 
-                label = new Label(aText, RelativeScreenPosition.Zero, RelativeScreenPosition.One, Label.TextAllignment.CentreLeft, aTextColor, aTextSize: ChatTextSize, aParent: this);
+                label = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.One, Label.TextAllignment.CentreLeft, aTextColor, aTextSize: ChatTextSize, aText: aText);
                 AddChild(label);
             }
 

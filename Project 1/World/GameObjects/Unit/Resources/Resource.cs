@@ -45,7 +45,7 @@ namespace Project_1.GameObjects.Unit.Resources
             resourceColor = aColor;
         }
 
-        public bool isCastable(float aValue)
+        public bool isCastable(double aValue)
         {
             AssertSimThread();
             return Value - aValue >= 0;
@@ -57,10 +57,11 @@ namespace Project_1.GameObjects.Unit.Resources
 
         public virtual void SetOwner(Entity aOwner) { }
 
-        public virtual void CastSpell(float aCost)
+        public virtual void CastSpell(double aCost)
         {
             AssertSimThread();
-            Value -= aCost;
+            //TODO: oh no, this is a double and the resource is a float, should we be doing something about that?
+            Value -= (float)aCost;
         }
 
         public void LevelUp()

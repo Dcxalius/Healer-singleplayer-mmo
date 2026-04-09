@@ -15,7 +15,7 @@ namespace Project_1.UI.OptionMenu
     {
         List<Action> onExit;
 
-        public ExitOptionsButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColor, Color aTextColor) : base(new RelativeScreenPosition(0.9f), new RelativeScreenPosition(0.08f, 0.05f), Color.Beige, "Close", Color.Black)
+        public ExitOptionsButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColor, Color aTextColor) : base(null, new RelativeScreenPosition(0.9f), new RelativeScreenPosition(0.08f, 0.05f), Color.Beige, "Close", Color.Black)
         {
             onExit = new List<Action>();
 

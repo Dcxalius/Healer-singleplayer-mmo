@@ -31,8 +31,8 @@ namespace Project_1.UI.UIElements.Boxes
         int maxPages;
         int totalItems;
 
-        public PageBox(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Point aPageDimensions, UIElement aParent = null)
-            : base(aGfx, aPos, aSize, aParent)
+        public PageBox(UIElement aParent, UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Point aPageDimensions)
+            : base(aParent, aGfx, aPos, aSize)
         {
             int pageX = Math.Max(1, aPageDimensions.X);
             int pageY = Math.Max(1, aPageDimensions.Y);
@@ -42,9 +42,9 @@ namespace Project_1.UI.UIElements.Boxes
 
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.05f, Size);
             RelativeScreenPosition arrowSize = new RelativeScreenPosition(0.1f, 0.05f);
-            pageTitle = new Label(null, new RelativeScreenPosition(0f, 0f), new RelativeScreenPosition(1f, 0.1f), Label.TextAllignment.Centred, Color.Black, aParent: this);
-            rightArrow = new GFXButton(new List<Action> { PressRightArrow }, new GfxPath(GfxType.UI, "RightArrow"), RelativeScreenPosition.One - spacing - arrowSize, arrowSize, Color.White, aParent: this);
-            leftArrow = new GFXButton(new List<Action> { PressLeftArrow }, new GfxPath(GfxType.UI, "LeftArrow"), RelativeScreenPosition.One.OnlyY + spacing.OnlyX - spacing.OnlyY - arrowSize.OnlyY, arrowSize, Color.White, aParent: this);
+            pageTitle = new Label(this, new RelativeScreenPosition(0f, 0f), new RelativeScreenPosition(1f, 0.1f), Label.TextAllignment.Centred, Color.Black);
+            rightArrow = new GFXButton(this, new List<Action> { PressRightArrow }, new GfxPath(GfxType.UI, "RightArrow"), RelativeScreenPosition.One - spacing - arrowSize, arrowSize, Color.White);
+            leftArrow = new GFXButton(this, new List<Action> { PressLeftArrow }, new GfxPath(GfxType.UI, "LeftArrow"), RelativeScreenPosition.One.OnlyY + spacing.OnlyX - spacing.OnlyY - arrowSize.OnlyY, arrowSize, Color.White);
             pageTitleProvider = DefaultPageTitle;
 
             AddChild(pageTitle);

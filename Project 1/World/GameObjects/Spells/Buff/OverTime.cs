@@ -15,19 +15,19 @@ namespace Project_1.GameObjects.Spells.Buff
 {
     internal class OverTime : SpellEffect
     {
-        public double Duration { get => duration; }
+        public double Duration => duration;
         double duration;
 
-        public double TickRate { get => tickRate; }
+        public double TickRate => tickRate;
         double tickRate;
 
-        public Instant[] Effects { get => effects; }
+        public Instant[] Effects => effects;
         Instant[] effects;
 
-        public GfxPath GfxPath { get => gfxPath; }
+        public GfxPath GfxPath => gfxPath;
         GfxPath gfxPath;
 
-        public GfxPath HitGfxPath { get => hitEffectPath; }
+        public GfxPath HitGfxPath => hitEffectPath;
         GfxPath hitEffectPath;
 
         public bool Numerable;
@@ -94,6 +94,7 @@ namespace Project_1.GameObjects.Spells.Buff
             hitEffectPath = new GfxPath(GfxType.Effect, hitEffectGfx);
 
             Debug.Assert(this.duration > this.tickRate && tickRate > 0);
+            Debug.Assert(effects.Contains(null) == false);
         }
 
         // I think this is deprecated

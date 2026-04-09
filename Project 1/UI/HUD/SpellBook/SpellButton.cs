@@ -28,7 +28,7 @@ namespace Project_1.UI.HUD.SpellBook
         bool spellOffCooldown = true;
         double spellCooldownRatio = 1d;
 
-        public SpellButton(KeyBindManager.KeyListner aKeyListner, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(GfxPath.NullPath, aPos, aSize, Color.Gray, aParent)
+        public SpellButton(UIElement aParent, KeyBindManager.KeyListner aKeyListner, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, GfxPath.NullPath, aPos, aSize, Color.Gray)
         {
             keyListner = aKeyListner;
             onCooldownGfx = new CooldownTexture(CooldownTexture.CooldownGfxType.LeftSwirl);

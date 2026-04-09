@@ -26,6 +26,9 @@ namespace Project_1.GameObjects.Entities
 {
     internal partial class Entity
     {
+        public int GetTalentRank(int aTalentId) => learntTalents.SingleOrDefault(x => x.id == aTalentId).rank;
+        (int id, int rank)[] learntTalents;
+
         protected UnitData UnitData => unitData;
         UnitData unitData;
 

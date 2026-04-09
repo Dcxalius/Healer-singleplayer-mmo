@@ -23,12 +23,12 @@ namespace Project_1.UI.HUD.PlateBoxes
         protected LevelCircle levelCircle;
 
 
-        public PlateBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent) : base(new UITexture("GrayBackground", Color.White), aPos, aSize, aParent)
+        public PlateBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, new UITexture("GrayBackground", Color.White), aPos, aSize)
         {
             RelativeScreenPosition levelCircleSize = RelativeScreenPosition.GetSquareFromX(0.05f, Size);
             //TODO: Make sure the segmentsizes add up to 1, handle pixel rounding by checking the total of the segment and then adding the missing pixels to the biggest segment or something like that
 
-            levelCircle = new LevelCircle(new RelativeScreenPosition(1 - levelCircleSize.X, 0), levelCircleSize, this);
+            levelCircle = new LevelCircle(this, new RelativeScreenPosition(1 - levelCircleSize.X, 0), levelCircleSize);
         }
 
         public abstract void Refresh(in EntityUiSnapshot snapshot);

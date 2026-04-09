@@ -31,19 +31,19 @@ namespace Project_1.UI.PauseMenu
             return staticGfx;
         }
 
-        public PauseBox() : base (EnsureGfx(), pausePos, pauseSize) 
+        public PauseBox() : base(null, EnsureGfx(), pausePos, pauseSize) 
         {
-            AddChild(new ResumeButton(GetStartPositionFromTop, ButtonSize, this));
-            AddChild(new OptionMenuButton(GetStartPositionFromTop, ButtonSize, this));
-            AddChild(new Button(new List<Action>() { new Action(() => StateManager.RequestStateChange(StateManager.States.MoveHUD)) }, GetStartPositionFromTop, ButtonSize, Color.WhiteSmoke, "Move HUD", Color.Black, this));
+            AddChild(new ResumeButton(this, GetStartPositionFromTop, ButtonSize));
+            AddChild(new OptionMenuButton(this, GetStartPositionFromTop, ButtonSize));
+            AddChild(new Button(this, new List<Action>() { new Action(() => StateManager.RequestStateChange(StateManager.States.MoveHUD)) }, GetStartPositionFromTop, ButtonSize, Color.WhiteSmoke, "Move HUD", Color.Black));
             
-            AddChild(new SaveButton(GetStartPositionFromTop, ButtonSize, this));
-            AddChild(new LoadButton(GetStartPositionFromTop, ButtonSize, this));
+            AddChild(new SaveButton(this, GetStartPositionFromTop, ButtonSize));
+            AddChild(new LoadButton(this, GetStartPositionFromTop, ButtonSize));
 
 
 
-            AddChild(new ExitGameButton(GetStartPositionFromBottom, ButtonSize, this));
-            AddChild(new MainMenuButton(GetStartPositionFromBottom, ButtonSize, this));
+            AddChild(new ExitGameButton(this, GetStartPositionFromBottom, ButtonSize));
+            AddChild(new MainMenuButton(this, GetStartPositionFromBottom, ButtonSize));
         }
 
     }

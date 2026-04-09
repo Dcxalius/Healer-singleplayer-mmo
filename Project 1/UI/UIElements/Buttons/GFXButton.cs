@@ -19,15 +19,15 @@ namespace Project_1.UI.UIElements.Buttons
         protected Image imageOnButton;
 
 
-        public GFXButton(GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColorOfBorder, UIElement aParent = null) : base(aPos, aSize, aColorOfBorder, aParent: aParent)
+        public GFXButton(UIElement aParent, GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColorOfBorder) : base(aParent, aPos, aSize, aColorOfBorder)
         {
-            imageOnButton = new Image(new UITexture(aPath, Color.White), new RelativeScreenPosition(0.1f), new RelativeScreenPosition(0.8f), this);
+            imageOnButton = new Image(this, new UITexture(aPath, Color.White), new RelativeScreenPosition(0.1f), new RelativeScreenPosition(0.8f));
             AddChild(imageOnButton);
         }
 
-        public GFXButton(List<Action> aActions, GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColor, string aText = null, Color? aTextColor = null, UIElement aParent = null) : base(aActions, aPos, aSize, aColor, aText, aTextColor, aParent)
+        public GFXButton(UIElement aParent, List<Action> aActions, GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColor, string aText = null, Color? aTextColor = null) : base(aParent, aActions, aPos, aSize, aColor, aText, aTextColor)
         {
-            imageOnButton = new Image(new UITexture(aPath, Color.White), new RelativeScreenPosition(0.1f), new RelativeScreenPosition(0.8f), this);
+            imageOnButton = new Image(this, new UITexture(aPath, Color.White), new RelativeScreenPosition(0.1f), new RelativeScreenPosition(0.8f));
             AddChild(imageOnButton);
         }
         protected override void ClickedOnMe(ClickEvent aClick)

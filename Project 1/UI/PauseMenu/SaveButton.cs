@@ -16,7 +16,7 @@ namespace Project_1.UI.PauseMenu
 {
     internal class SaveButton : Button
     {
-        public SaveButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(aPos, aSize, Color.AliceBlue, "Save", Color.Black, aParent)
+        public SaveButton(UI.UIElements.UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, aPos, aSize, Color.AliceBlue, "Save", Color.Black)
         {
 
         }
@@ -25,7 +25,7 @@ namespace Project_1.UI.PauseMenu
         {
             if (UiPlayerStateCache.Valid && UiPlayerStateCache.InCombatOrPartyInCombat)
             {
-                StateManager.PopUp(new UIElements.Boxes.DialogueBox("Cannot save while in combat.", Color.Black, UIElements.Boxes.DialogueBox.LocationOfPopUp.StateManager, UIElements.Boxes.DialogueBox.PausesGame.NoPause, null, new Textures.UITexture("GrayBackground", Color.White), new RelativeScreenPosition(0.4f, 0.5f), new RelativeScreenPosition(0.2f, 0.1f), "Okay"));
+                StateManager.PopUp(new UIElements.Boxes.DialogueBox(null, "Cannot save while in combat.", Color.Black, UIElements.Boxes.DialogueBox.LocationOfPopUp.StateManager, UIElements.Boxes.DialogueBox.PausesGame.NoPause, null, new Textures.UITexture("GrayBackground", Color.White), new RelativeScreenPosition(0.4f, 0.5f), new RelativeScreenPosition(0.2f, 0.1f), "Okay"));
                 base.ClickedOnAndReleasedOnMe();
                 return;
             }

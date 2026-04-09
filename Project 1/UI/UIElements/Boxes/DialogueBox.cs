@@ -40,14 +40,14 @@ namespace Project_1.UI.UIElements.Boxes
 
         Label textToDisplay;
 
-        public DialogueBox(string aMessage, Color aMessageColor, LocationOfPopUp aLocation, PausesGame aPauses, List<Action> aAction, UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, string aButtonText = null) 
-            : this(aMessage, aMessageColor, aLocation, aPauses, aAction, aGfx, aPos, aSize, DefaultButtonPos, defaultButtonSize, defaultButtonColor, aButtonText, defaultButtonTextColor) { }
+        public DialogueBox(UIElement aParent, string aMessage, Color aMessageColor, LocationOfPopUp aLocation, PausesGame aPauses, List<Action> aAction, UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, string aButtonText = null)
+            : this(aParent, aMessage, aMessageColor, aLocation, aPauses, aAction, aGfx, aPos, aSize, DefaultButtonPos, defaultButtonSize, defaultButtonColor, aButtonText, defaultButtonTextColor) { }
 
-        public DialogueBox(string aMessage, Color aMessageColor, LocationOfPopUp aLocation, PausesGame aPauses, List<Action> aAction, UITexture aGfx, 
-            RelativeScreenPosition aPos, RelativeScreenPosition aSize, 
+        public DialogueBox(UIElement aParent, string aMessage, Color aMessageColor, LocationOfPopUp aLocation, PausesGame aPauses, List<Action> aAction, UITexture aGfx,
+            RelativeScreenPosition aPos, RelativeScreenPosition aSize,
             RelativeScreenPosition aButtonPos, RelativeScreenPosition aButtonSize, Color aButtonColor, string aButtonText = null, Color? aButtonTextColor = null)
                 : base(
-                    aParent => new Button[] { new Button(aAction, aButtonPos, aButtonSize, aButtonColor, aButtonText, aButtonTextColor, aParent) }, aPauses, aGfx, aPos, aSize)
+                    aParent, aParent2 => new Button[] { new Button(aParent2, aAction, aButtonPos, aButtonSize, aButtonColor, aButtonText, aButtonTextColor) }, aPauses, aGfx, aPos, aSize)
         {
             switch (aLocation)
             {
@@ -62,7 +62,7 @@ namespace Project_1.UI.UIElements.Boxes
             }
 
 
-            textToDisplay = new Label(aMessage, defaultEdgeSpacing, RelativeScreenPosition.One - defaultEdgeSpacing * 2, Label.TextAllignment.TopCentre, aMessageColor, aParent: this);
+            textToDisplay = new Label(this, defaultEdgeSpacing, RelativeScreenPosition.One - defaultEdgeSpacing * 2, Label.TextAllignment.TopCentre, aMessageColor, aText: aMessage);
             AddChild(textToDisplay);
         }
     }

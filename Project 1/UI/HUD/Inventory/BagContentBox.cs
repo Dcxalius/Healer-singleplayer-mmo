@@ -15,7 +15,7 @@ namespace Project_1.UI.HUD.Inventory
         Item[] slots = Array.Empty<Item>();
         readonly int bagNr;
 
-        public BagContentBox(int aBagNr, UI.UIElements.UIElement aParent = null) : base(new UITexture("WhiteBackground", Color.Beige), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, aParent)
+        public BagContentBox(UI.UIElements.UIElement aParent, int aBagNr) : base(aParent, new UITexture("WhiteBackground", Color.Beige), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
         {
             bagNr = aBagNr;
         }
@@ -63,11 +63,11 @@ namespace Project_1.UI.HUD.Inventory
                 RelativeScreenPosition pos = new RelativeScreenPosition(x, y);
                 if (itemSnapshots != null && i < itemSnapshots.Length && itemSnapshots[i].HasValue)
                 {
-                    slots[i] = new Item(bagNr, i, true, itemSnapshots[i], pos, itemSize, this);
+                    slots[i] = new Item(this, bagNr, i, true, itemSnapshots[i], pos, itemSize);
                 }
                 else
                 {
-                    slots[i] = new Item(bagNr, i, true, ItemUiSnapshot.Empty, pos, itemSize, this);
+                    slots[i] = new Item(this, bagNr, i, true, ItemUiSnapshot.Empty, pos, itemSize);
                 }
             }
         }

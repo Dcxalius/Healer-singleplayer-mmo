@@ -40,6 +40,7 @@ namespace Project_1.Camera
             position = aPosition;
         }
 
+
         public WorldSpace(float aX) : this(aX, aX) { }
         public WorldSpace(float aX, float aY) : this(new Vector2(aX, aY)) { }
 

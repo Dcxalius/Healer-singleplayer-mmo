@@ -18,9 +18,9 @@ namespace Project_1.UI.HUD.PlateBoxes
         Label name;
         
 
-        public PlateBoxNameSegment(Color aNamePlateColor, Color aTextColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(aNamePlateColor, aPos, aSize, aParent: aParent)
+        public PlateBoxNameSegment(UIElement aParent, Color aNamePlateColor, Color aTextColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, aNamePlateColor, aPos, aSize)
         {
-            name = new Label("Name", RelativeScreenPosition.Zero, RelativeScreenPosition.One, Label.TextAllignment.Centred, aTextColor, "Comforaa-msdf", 13, this);
+            name = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.One, Label.TextAllignment.Centred, aTextColor, "Comforaa-msdf", 13, "Name");
             AddChild(name);
         }
 

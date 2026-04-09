@@ -11,7 +11,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
 {
     internal class SelectBoxValueOption : SelectBoxValue
     {
-        public SelectBoxValueOption(SelectBox aSelectBoxParent, UIElement aParent, string aString) : base(new UITexture("WhiteBackground", Color.Wheat), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, aString, aSelectBoxParent, aParent)
+        public SelectBoxValueOption(UIElement aParent, SelectBox aSelectBoxParent, string aString) : base(new UITexture("WhiteBackground", Color.Wheat), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, aString, aSelectBoxParent, aParent)
         {
         }
 
@@ -21,7 +21,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
             for (int i = 0; i < aDisplayValue.Count(); i++)
             {
                 //returnable[i] = new T(((CameraSettings.Follow)i), aParent);
-                returnable[i] = new SelectBoxValueOption(aSelectBoxParent, aParent, aDisplayValue[i]);
+                returnable[i] = new SelectBoxValueOption(aParent, aSelectBoxParent, aDisplayValue[i]);
                 returnable[i].selectBoxParent = aSelectBoxParent;
                 returnable[i].DisplayText = aDisplayValue[i];
             }

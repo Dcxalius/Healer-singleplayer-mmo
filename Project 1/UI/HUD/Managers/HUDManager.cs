@@ -110,8 +110,8 @@ namespace Project_1.UI.HUD.Managers
             inventoryBox = new InventoryBox(new RelativeScreenPosition(0.59f, 0.60f), new RelativeScreenPosition(0.4f), 16);
             hudElements.Add(inventoryBox);
 
-            descriptorBox = new DescriptorBox();
-            sizeChanger = new SizeChanger();
+            descriptorBox = new DescriptorBox(null);
+            sizeChanger = new SizeChanger(null);
             windowHandler.InitWindows(ref hudElements);
 
             var loaded = LoadedSettings.Find(x => x.Item1 == typeof(SpellBar).Name);

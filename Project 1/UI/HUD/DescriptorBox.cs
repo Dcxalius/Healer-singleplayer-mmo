@@ -31,7 +31,7 @@ namespace Project_1.UI.HUD
         RelativeScreenPosition spacingInWorld;
 
 
-        public DescriptorBox() : base(new UITexture("GrayBackground", Color.White), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
+        public DescriptorBox(UIElement aParent) : base(aParent, new UITexture("GrayBackground", Color.White), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
         {
             xMax = 0.15f;
 
@@ -44,7 +44,7 @@ namespace Project_1.UI.HUD
             itemSellPrice = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreRight);
             AddChild(itemSellPrice);
 
-            goldImage = new Image(new UITexture("Gold", Color.White), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, this);
+            goldImage = new Image(this, new UITexture("Gold", Color.White), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
 
             AddChild(goldImage);
             Visible = false;

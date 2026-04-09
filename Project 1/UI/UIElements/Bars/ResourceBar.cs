@@ -68,10 +68,10 @@ namespace Project_1.UI.UIElements.Bars
         Label fractionText;
         Label percentageText;
 
-        public ResourceBar(BarTexture aBarGfx, UITexture aBackgroundGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(aBarGfx, aBackgroundGfx, aPos, aSize, aParent)
+        public ResourceBar(UIElement aParent, BarTexture aBarGfx, UITexture aBackgroundGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, aBarGfx, aBackgroundGfx, aPos, aSize)
         {
-            fractionText = new Label("", RelativeScreenPosition.Zero, aSize, Label.TextAllignment.CentreLeft, Color.Black, "Comforaa-msdf", 13, this);
-            percentageText = new Label("", RelativeScreenPosition.Zero, aSize, Label.TextAllignment.CentreRight, Color.Black, "Comforaa-msdf", 14, this);
+            fractionText = new Label(this, RelativeScreenPosition.Zero, aSize, Label.TextAllignment.CentreLeft, Color.Black, "Comforaa-msdf", 13, "");
+            percentageText = new Label(this, RelativeScreenPosition.Zero, aSize, Label.TextAllignment.CentreRight, Color.Black, "Comforaa-msdf", 14, "");
             AddChild(fractionText);
             AddChild(percentageText);
             maxValue = 0f;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Project_1.UI.UIElements
 {
@@ -21,7 +22,8 @@ namespace Project_1.UI.UIElements
 
         protected virtual void AddChild(UIElement aUIElement)
         {
-            if (aUIElement == null) return;
+            Debug.Assert(aUIElement != null, "Cannot add null child to UIElement.");
+            Debug.Assert(children.Contains(aUIElement), "Duplicate child added to UIElement. This can cause issues with removing children. Make sure to only add a child once.");
             if (aUIElement.parent != this)
             {
                 throw new InvalidOperationException($"{aUIElement.GetType().Name} must be constructed with parent {GetType().Name} before AddChild.");

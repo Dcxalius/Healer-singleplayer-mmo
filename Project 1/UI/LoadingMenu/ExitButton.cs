@@ -13,7 +13,7 @@ namespace Project_1.UI.LoadingMenu
 {
     internal class ExitButton : GFXButton
     {
-        public ExitButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(new GfxPath(GfxType.UI, "XButton"), aPos, aSize, Color.White, aParent)
+        public ExitButton(UI.UIElements.UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, new GfxPath(GfxType.UI, "XButton"), aPos, aSize, Color.White)
         {
         }
 

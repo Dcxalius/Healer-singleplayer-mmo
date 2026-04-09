@@ -16,7 +16,7 @@ namespace Project_1.UI.HUD
         double savedUntilMs;
 
         public SaveStatusIndicator(RelativeScreenPosition aPos, RelativeScreenPosition aSize)
-            : base(new UITexture("LeftSwirl", Color.White), aPos, aSize)
+            : base(null, new UITexture("LeftSwirl", Color.White), aPos, aSize)
         {
             savingTexture = gfx;
             savedTexture = new UITexture("CheckMark", Color.White);

@@ -12,7 +12,7 @@ namespace Project_1.UI.UIElements.SelectBoxes
 {
     internal class SelectBoxValueDisplay : SelectBoxValue
     {
-        public SelectBoxValueDisplay(RelativeScreenPosition aPos, RelativeScreenPosition aSize, string aStartValue, SelectBox aParent) : base(new UITexture("WhiteBackground", Color.WhiteSmoke), aPos, aSize, aStartValue, aParent, aParent)
+        public SelectBoxValueDisplay(SelectBox aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize, string aStartValue) : base(new UITexture("WhiteBackground", Color.WhiteSmoke), aPos, aSize, aStartValue, aParent, aParent)
         {
             capturesClick = false;
         }

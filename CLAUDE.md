@@ -4,15 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build & Run
 
-```bash
-dotnet build 'Project 1.sln' -v q                     # Full solution (runs content pipeline)
-dotnet build 'Project 1/Project 1.csproj' -v q        # Game project only
-dotnet run --project 'Project 1/Project 1.csproj'     # Launch game
-```
 
-On Linux-based agents, `mgcb` (content pipeline) may fail if Wine is unavailable. Treat this as an environment issue unless content files changed.
-
-There is no automated test project. For code changes: build the solution, exercise the feature in-game, and note unverified paths in the change summary.
+There is no automated test project. Let the user build themselves if needed
 
 ## Code Style
 
@@ -78,16 +71,3 @@ Spells support instant casts, channeled casts, and area effects. Buffs carry a `
 ### Data-Driven Content
 
 All game data is JSON in `Content/Data/` (items, spells, mobs, NPCs, loot tables, classes, effects, projectiles). Loaded via `Newtonsoft.Json`. Factory classes (`ItemFactory`, `ObjectFactory`, `TileFactory`, `SpellFactory`) construct runtime objects from this data.
-
-## Active Refactoring Plan
-
-`SpringClean.md` documents the decomposition backlog. Priority order:
-1. `StateManager` — split UI dispatch, ground-targeting, chat commands, logic tree, and domain request handlers into partial-class files
-2. `DebugManager` — split into logging, draw, flags, commands
-3. `ObjectManager` — split by spawn/despawn, lookup, update loop, render snapshot
-4. `Inventory` / `EquipmentData`
-5. `UIElement`
-6. `TileManager` (continue current direction)
-7. Messaging event files (group by domain)
-
-When doing any refactoring, verify file ownership before moving code across systems.

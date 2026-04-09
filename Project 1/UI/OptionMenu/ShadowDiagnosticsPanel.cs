@@ -17,12 +17,12 @@ namespace Project_1.UI.OptionMenu
         float nextRowY;
 
         public ShadowDiagnosticsPanel(RelativeScreenPosition aPos, RelativeScreenPosition aSize)
-            : base(new UITexture("GrayBackground", Color.WhiteSmoke), aPos, aSize)
+            : base(null, new UITexture("GrayBackground", Color.WhiteSmoke), aPos, aSize)
         {
             capturesClick = false;
             capturesRelease = false;
 
-            AddChild(new Label("Shadow Diagnostics", new RelativeScreenPosition(0.03f, 0.02f), new RelativeScreenPosition(0.94f, HeaderHeight), Label.TextAllignment.CentreLeft, Color.Black, aParent: this));
+            AddChild(new Label(this, new RelativeScreenPosition(0.03f, 0.02f), new RelativeScreenPosition(0.94f, HeaderHeight), Label.TextAllignment.CentreLeft, Color.Black, aText: "Shadow Diagnostics"));
 
             nextRowY = 0.1f;
             AddToggleRow(
@@ -40,7 +40,7 @@ namespace Project_1.UI.OptionMenu
 
         void AddToggleRow(string aLabel, bool aStartState, Action aOnTicked, Action aOnUnticked)
         {
-            AddChild(new DebugToggleRow(aLabel, aStartState, aOnTicked, aOnUnticked, new RelativeScreenPosition(0.03f, nextRowY), new RelativeScreenPosition(0.94f, RowHeight), this));
+            AddChild(new DebugToggleRow(this, aLabel, aStartState, aOnTicked, aOnUnticked, new RelativeScreenPosition(0.03f, nextRowY), new RelativeScreenPosition(0.94f, RowHeight)));
             nextRowY += RowHeight + RowSpacing;
         }
 

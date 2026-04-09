@@ -10,6 +10,5 @@ namespace Project_1.GameObjects.Unit
     internal interface IDamager
     {
         public bool BinarySpell { get; }
-        
     }
 }

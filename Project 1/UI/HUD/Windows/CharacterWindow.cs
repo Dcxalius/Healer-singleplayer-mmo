@@ -25,17 +25,17 @@ namespace Project_1.UI.HUD.Windows
 
         public CharacterWindow() : base(new UITexture("WhiteBackground", Color.Turquoise))
         {
-            nameLabel = new Label(null, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(1, CharacterEquipmentPanel.ItemSize.Y), Label.TextAllignment.TopCentre, Color.Black, aParent: this);
+            nameLabel = new Label(this, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(1, CharacterEquipmentPanel.ItemSize.Y), Label.TextAllignment.TopCentre, Color.Black);
 
             visibleKey = Input.KeyBindManager.KeyListner.Character;
-            equipmentPanel = new CharacterEquipmentPanel(BagIndexForItem, this);
+            equipmentPanel = new CharacterEquipmentPanel(this, BagIndexForItem);
 
             RelativeScreenPosition reportBoxPos = CharacterEquipmentPanel.StatsTop + CharacterEquipmentPanel.ItemSpacing;
             RelativeScreenPosition reportBoxSize = new RelativeScreenPosition(1 - CharacterEquipmentPanel.ItemSpacing.X * 2, 1 - CharacterEquipmentPanel.StatsTop.Y - CharacterEquipmentPanel.ItemSpacing.Y * 2 - expBarSize.Y);
 
-            statReportBox = new CharacterStatReportBox(reportBoxPos, reportBoxSize, this);
+            statReportBox = new CharacterStatReportBox(this, reportBoxPos, reportBoxSize);
 
-            expBar = new ExpBar(expBarPos, expBarSize, this);
+            expBar = new ExpBar(this, expBarPos, expBarSize);
             AddChild(nameLabel);
             AddChild(equipmentPanel);
             AddChild(statReportBox);

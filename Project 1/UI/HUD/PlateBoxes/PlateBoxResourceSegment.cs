@@ -13,7 +13,7 @@ namespace Project_1.UI.HUD.PlateBoxes
 {
     internal class PlateBoxResourceSegment : PlateBoxSegment
     {
-        public PlateBoxResourceSegment(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(new Color(255, 211, 211, 120), aPos, aSize, aParent: aParent)
+        public PlateBoxResourceSegment(UI.UIElements.UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, new Color(255, 211, 211, 120), aPos, aSize)
         {
             bar.Visible = true;
             bar.Color = Color.Transparent;

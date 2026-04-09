@@ -32,11 +32,11 @@ namespace Project_1.UI.HUD.PlateBoxes
         static int partyBoxesActive = 0;
         public static void ClearPartyBoxes() => partyBoxesActive = 0;
 
-        public PartyPlateBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize, int aIndex) : base(aPos, aSize, null)
+        public PartyPlateBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize, int aIndex) : base(aPos, aSize)
         {
-            name = new PlateBoxNameSegment(null, Color.White, Color.Black, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(1, 0.5f), this);
-            health = new PlateBoxHealthSegment(new RelativeScreenPosition(0, 0.5f), new RelativeScreenPosition(1, 0.25f), this);
-            resource = new PlateBoxResourceSegment(new RelativeScreenPosition(0, 0.75f), new RelativeScreenPosition(1, 0.25f), this);
+            name = new PlateBoxNameSegment(this, Color.White, Color.Black, new RelativeScreenPosition(0, 0), new RelativeScreenPosition(1, 0.5f));
+            health = new PlateBoxHealthSegment(this, new RelativeScreenPosition(0, 0.5f), new RelativeScreenPosition(1, 0.25f));
+            resource = new PlateBoxResourceSegment(this, new RelativeScreenPosition(0, 0.75f), new RelativeScreenPosition(1, 0.25f));
 
             //health = new PlateBoxHealthSegment(walker, new Vector2(0, 0), new Vector2(aSize.X, aSize.Y / 2));
 
@@ -47,7 +47,7 @@ namespace Project_1.UI.HUD.PlateBoxes
 
             AddSegmentsToChildren();
 
-            border = new CommandBorder(Color.YellowGreen, RelativeScreenPosition.Zero, aSize, this);
+            border = new CommandBorder(this, Color.YellowGreen, RelativeScreenPosition.Zero, aSize);
             AddChild(border);
             VisibleBorder = false;
             Visible = false;

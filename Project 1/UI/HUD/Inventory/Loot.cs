@@ -15,13 +15,13 @@ namespace Project_1.UI.HUD.Inventory
         Label itemName;
         readonly int slotIndex;
 
-        public Loot(int aSlotIndex, ItemUiSnapshot snapshot, UIElement aParent) : base(new UITexture("GrayBackground", Color.AliceBlue), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, aParent)
+        public Loot(UIElement aParent, int aSlotIndex, ItemUiSnapshot snapshot) : base(aParent, new UITexture("GrayBackground", Color.AliceBlue), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero)
         {
             slotIndex = aSlotIndex;
             if (!snapshot.HasValue) return;
 
-            item = new Item(-2, aSlotIndex, true, snapshot, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, this);
-            itemName = new Label(snapshot.Name, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreLeft, snapshot.QualityColor, aParent: this);
+            item = new Item(this, -2, aSlotIndex, true, snapshot, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
+            itemName = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreLeft, snapshot.QualityColor, aText: snapshot.Name);
             AddChild(item);
             AddChild(itemName);
             if (snapshot.MaxStack <= 1) return;
@@ -62,14 +62,14 @@ namespace Project_1.UI.HUD.Inventory
 
             if (item == null)
             {
-                item = new Item(-2, slotIndex, true, snapshot, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, this);
+                item = new Item(this, -2, slotIndex, true, snapshot, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
                 AddChild(item);
             }
 
             item.AssignItem(snapshot);
             if (itemName == null)
             {
-                itemName = new Label(snapshot.Name, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreLeft, snapshot.QualityColor, aParent: this);
+                itemName = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreLeft, snapshot.QualityColor, aText: snapshot.Name);
                 AddChild(itemName);
             }
             else

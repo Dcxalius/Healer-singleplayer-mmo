@@ -54,7 +54,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
         {
             var friendlyData = owner.ClassData;
             if (friendlyData == null || friendlyData.LevelOneSpells == null) return new List<Spell>();
-            return friendlyData.LevelOneSpells.Select(name => new Spell(name, 1)).ToList();
+            return friendlyData.LevelOneSpells.Select(name => new Spell(owner, name, 1)).ToList();
         }
 
         static bool NeedsNewTarget(GuildMember owner)

@@ -14,7 +14,7 @@ namespace Project_1.UI.UIElements
     internal class CommandBorder : UIElement
     {
         
-        public CommandBorder(Color aColor, RelativeScreenPosition aPos, RelativeScreenPosition aSizeOfBoxToBorder, UIElement aParent = null) : base(aParent, null, aPos, aSizeOfBoxToBorder)
+        public CommandBorder(UIElement aParent, Color aColor, RelativeScreenPosition aPos, RelativeScreenPosition aSizeOfBoxToBorder) : base(aParent, null, aPos, aSizeOfBoxToBorder)
         //public Border(Color aColor, Vector2 aPos, Vector2 aSize) : base(new UITexture("GrayWhiteBorder", aColor), aPos, aSize)
         {
             //TODO: This should probably be a shader

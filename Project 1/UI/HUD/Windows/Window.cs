@@ -39,13 +39,13 @@ namespace Project_1.UI.HUD.Windows
             maxNrOfOpenWindows = 1 + (int)((1 - (furthestLeftWindow.X + size.X)) / (spacing.X + size.X));
             openWindows = new List<Window>();
         }
-        public Window(UITexture aGfx) : base(aGfx, RelativeScreenPosition.Zero, size)
+        public Window(UITexture aGfx) : base(null, aGfx, RelativeScreenPosition.Zero, size)
         {
             Visible = false;
             hudMoveable = false;
 
             RelativeScreenPosition buttonSize = RelativeScreenPosition.GetSquareFromX(0.05f, size.ToAbsoluteScreenPos());
-            GFXButton gFXButton = new GFXButton(new List<Action>() { new Action(CloseWindow) }, new GfxPath(GfxType.UI, "XButton"), RelativeScreenPosition.One.OnlyX + new RelativeScreenPosition(-buttonSize.X, 0), buttonSize, Color.White, aParent: this);
+            GFXButton gFXButton = new GFXButton(this, new List<Action>() { new Action(CloseWindow) }, new GfxPath(GfxType.UI, "XButton"), RelativeScreenPosition.One.OnlyX + new RelativeScreenPosition(-buttonSize.X, 0), buttonSize, Color.White);
             AddChild(gFXButton);
         }
 

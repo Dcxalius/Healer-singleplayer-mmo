@@ -34,12 +34,12 @@ namespace Project_1.UI.HUD.Windows
             return size;
         }
 
-        public ItemForSale(RelativeScreenPosition aPos, UIElement aParent = null) : base(new UITexture("WhiteBackground", Color.Lavender), aPos, EnsureInitAndGetSize(), aParent)
+        public ItemForSale(UIElement aParent, RelativeScreenPosition aPos) : base(aParent, new UITexture("WhiteBackground", Color.Lavender), aPos, EnsureInitAndGetSize())
         {
-            displayItem = new Image(UITexture.Null, spacing, RelativeScreenPosition.GetSquareFromY(1f - spacing.Y * 2, size.ToAbsoluteScreenPos(Window.WindowSize.ToAbsoluteScreenPos())), this);
-            itemName = new Label(null, displayItem.RelativeSize.OnlyX + spacing.OnlyX * 2, new RelativeScreenPosition(1, 0.5f) - displayItem.RelativeSize.OnlyX - spacing.OnlyX * 2, Label.TextAllignment.CentreLeft, Color.Black, aParent: this);
-            goldCost = new Label(null, displayItem.RelativeSize.OnlyX + displayItem.RelativeSize.OnlyY / 2 + spacing.OnlyX, new RelativeScreenPosition(0.9f, 0.5f) - displayItem.RelativeSize.OnlyX - spacing.OnlyX * 2, Label.TextAllignment.CentreRight, Color.Black, aParent: this);
-            goldImage = new Image(new UITexture("Gold", Color.White), new RelativeScreenPosition(1f - spacing.X, 0.75f), RelativeScreenPosition.GetSquareFromX(0.1f, size.ToAbsoluteScreenPos(Window.WindowSize.ToAbsoluteScreenPos())), this);
+            displayItem = new Image(this, UITexture.Null, spacing, RelativeScreenPosition.GetSquareFromY(1f - spacing.Y * 2, size.ToAbsoluteScreenPos(Window.WindowSize.ToAbsoluteScreenPos())));
+            itemName = new Label(this, displayItem.RelativeSize.OnlyX + spacing.OnlyX * 2, new RelativeScreenPosition(1, 0.5f) - displayItem.RelativeSize.OnlyX - spacing.OnlyX * 2, Label.TextAllignment.CentreLeft, Color.Black);
+            goldCost = new Label(this, displayItem.RelativeSize.OnlyX + displayItem.RelativeSize.OnlyY / 2 + spacing.OnlyX, new RelativeScreenPosition(0.9f, 0.5f) - displayItem.RelativeSize.OnlyX - spacing.OnlyX * 2, Label.TextAllignment.CentreRight, Color.Black);
+            goldImage = new Image(this, new UITexture("Gold", Color.White), new RelativeScreenPosition(1f - spacing.X, 0.75f), RelativeScreenPosition.GetSquareFromX(0.1f, size.ToAbsoluteScreenPos(Window.WindowSize.ToAbsoluteScreenPos())));
 
             AddChild(displayItem);
             AddChild(itemName);

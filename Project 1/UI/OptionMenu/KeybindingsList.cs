@@ -15,11 +15,11 @@ namespace Project_1.UI.OptionMenu
 {
     internal class KeybindingsList : ScrollableBox<KeybindingObject>
     {
-        public KeybindingsList(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(15, new UITexture("GrayBackground", Color.WhiteSmoke), Color.Turquoise, aPos, aSize)
+        public KeybindingsList(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, 15, new UITexture("GrayBackground", Color.WhiteSmoke), Color.Turquoise, aPos, aSize)
         {
             for (int i = 0; i < (int)KeyBindManager.KeyListner.Count; i++)
             {
-                AddScrollableElement(new KeybindingObject((KeyBindManager.KeyListner)i, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, this));
+                AddScrollableElement(new KeybindingObject(this, (KeyBindManager.KeyListner)i, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero));
             }
         }
     }

@@ -55,7 +55,7 @@ namespace Project_1.GameObjects.Unit.Resources
             regenValue = 20.0f;
         }
 
-        public override void CastSpell(float aCost)
+        public override void CastSpell(double aCost)
         {
             AssertSimThread();
             base.CastSpell(aCost);

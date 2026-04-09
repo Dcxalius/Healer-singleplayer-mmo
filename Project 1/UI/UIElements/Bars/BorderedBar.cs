@@ -12,10 +12,10 @@ namespace Project_1.UI.UIElements.Bars
     internal class BorderedBar : Bar
     {
         Border border;
-        public BorderedBar(BarTexture aBarGfx, UITexture aBackgroundGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : this(Color.White, aBarGfx, aBackgroundGfx, aPos, aSize, aParent) { }
-        public BorderedBar(Color aBorderColor, BarTexture aBarGfx, UITexture aBackgroundGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(aBarGfx, aBackgroundGfx, aPos, aSize, aParent)
+        public BorderedBar(UIElement aParent, BarTexture aBarGfx, UITexture aBackgroundGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : this(aParent, Color.White, aBarGfx, aBackgroundGfx, aPos, aSize) { }
+        public BorderedBar(UIElement aParent, Color aBorderColor, BarTexture aBarGfx, UITexture aBackgroundGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, aBarGfx, aBackgroundGfx, aPos, aSize)
         {
-            border = new Border(aBorderColor, RelativeScreenPosition.Zero, aSize, this);
+            border = new Border(this, aBorderColor, RelativeScreenPosition.Zero, aSize);
             AddChild(border);
         }
     }

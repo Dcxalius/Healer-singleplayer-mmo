@@ -6,7 +6,7 @@ namespace Project_1.UI.OptionMenu
 {
     internal class ChatOptionsButton : Button
     {
-        public ChatOptionsButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(aPos, aSize, Color.White, "Chat", Color.Black, aParent)
+        public ChatOptionsButton(UI.UIElements.UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, aPos, aSize, Color.White, "Chat", Color.Black)
         {
         }
 

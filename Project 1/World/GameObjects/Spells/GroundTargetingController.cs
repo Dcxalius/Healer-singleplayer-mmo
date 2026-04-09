@@ -147,11 +147,11 @@ namespace Project_1.GameObjects.Spells
                 Texture2D texture = TextureManager.GetTexture(snapshots[i].TexturePath);
                 if (texture == null) continue;
 
-                WorldSpace topLeftWorld = snapshots[i].Center - new WorldSpace(snapshots[i].Width * 0.5f, snapshots[i].Height * 0.5f);
+                WorldSpace topLeftWorld = snapshots[i].Center - new WorldSpace((float)snapshots[i].Width * 0.5f, (float)snapshots[i].Height * 0.5f);
                 AbsoluteScreenPosition topLeft = topLeftWorld.ToAbsoltueScreenPosition();
                 Point size = new Point(
-                    Math.Max(1, (int)MathF.Round(snapshots[i].Width * Camera.Camera.Scale)),
-                    Math.Max(1, (int)MathF.Round(snapshots[i].Height * Camera.Camera.Scale)));
+                    Math.Max(1, (int)Math.Round(snapshots[i].Width * Camera.Camera.Scale)),
+                    Math.Max(1, (int)Math.Round(snapshots[i].Height * Camera.Camera.Scale)));
                 batch.Draw(texture, new Rectangle(topLeft, size), Color.White * 0.85f);
             }
         }
@@ -172,13 +172,13 @@ namespace Project_1.GameObjects.Spells
             Texture2D texture = TextureManager.GetTexture(texturePath);
             if (texture == null) return;
 
-            float width = Math.Max(1f, snapshot.Width);
-            float height = Math.Max(1f, snapshot.Height);
-            WorldSpace topLeftWorld = snapshot.Center - new WorldSpace(width * 0.5f, height * 0.5f);
+            double width = Math.Max(1f, snapshot.Width);
+            double height = Math.Max(1f, snapshot.Height);
+            WorldSpace topLeftWorld = snapshot.Center - new WorldSpace((float)width * 0.5f, (float)height * 0.5f);
             AbsoluteScreenPosition topLeft = topLeftWorld.ToAbsoltueScreenPosition();
             Point size = new Point(
-                Math.Max(1, (int)MathF.Round(width * Camera.Camera.Scale)),
-                Math.Max(1, (int)MathF.Round(height * Camera.Camera.Scale)));
+                Math.Max(1, (int)Math.Round(width * Camera.Camera.Scale)),
+                Math.Max(1, (int)Math.Round(height * Camera.Camera.Scale)));
 
             Color tint = snapshot.OutOfGrace ? Color.White : Color.IndianRed * 0.45f;
             batch.Draw(texture, new Rectangle(topLeft, size), tint);
@@ -244,8 +244,8 @@ namespace Project_1.GameObjects.Spells
             activeGroundSpellVisuals.Add(new GroundSpellVisualSnapshot(
                 spell.HitEffectGfxPath,
                 worldPos,
-                Math.Max(1f, spell.GroundTargetWidth),
-                Math.Max(1f, spell.GroundTargetHeight),
+                Math.Max(1, spell.GroundTargetWidth),
+                Math.Max(1, spell.GroundTargetHeight),
                 TimeManager.TotalFrameTime + lifetimeMs));
             groundSpellVisualSnapshots = activeGroundSpellVisuals.ToArray();
         }
@@ -258,7 +258,7 @@ namespace Project_1.GameObjects.Spells
                 return new GroundTargetPlacement(hoveredPos, true);
             }
 
-            float maxRange = Math.Max(0f, spell.CastDistance);
+            double maxRange = Math.Max(0f, spell.CastDistance);
             if (maxRange <= 0f)
             {
                 return new GroundTargetPlacement(hoveredPos, false);
@@ -272,13 +272,13 @@ namespace Project_1.GameObjects.Spells
                 return new GroundTargetPlacement(hoveredPos, false);
             }
 
-            float graceRange = maxRange * GroundTargetGraceRangeRatio;
+            double graceRange = maxRange * GroundTargetGraceRangeRatio;
             if (distance > maxRange + graceRange)
             {
                 return new GroundTargetPlacement(hoveredPos, true);
             }
 
-            WorldSpace clamped = casterPos + (toHovered / distance) * maxRange;
+            WorldSpace clamped = casterPos + (toHovered / distance) * (float)maxRange;
             return new GroundTargetPlacement(clamped, false);
         }
 
@@ -294,7 +294,7 @@ namespace Project_1.GameObjects.Spells
         {
             public static readonly GroundTargetPreviewSnapshot Inactive = new GroundTargetPreviewSnapshot(false, WorldSpace.Zero, 0f, 0f, SpellData.GroundTargetShapeType.Circle, false);
 
-            GroundTargetPreviewSnapshot(bool enabled, WorldSpace center, float width, float height, SpellData.GroundTargetShapeType shape, bool outOfGrace)
+            GroundTargetPreviewSnapshot(bool enabled, WorldSpace center, double width, double height, SpellData.GroundTargetShapeType shape, bool outOfGrace)
             {
                 Enabled = enabled;
                 Center = center;
@@ -306,12 +306,12 @@ namespace Project_1.GameObjects.Spells
 
             public bool Enabled { get; }
             public WorldSpace Center { get; }
-            public float Width { get; }
-            public float Height { get; }
+            public double Width { get; }
+            public double Height { get; }
             public SpellData.GroundTargetShapeType Shape { get; }
             public bool OutOfGrace { get; }
 
-            public static GroundTargetPreviewSnapshot Active(WorldSpace center, float width, float height, SpellData.GroundTargetShapeType shape, bool outOfGrace)
+            public static GroundTargetPreviewSnapshot Active(WorldSpace center, double width, double height, SpellData.GroundTargetShapeType shape, bool outOfGrace)
             {
                 return new GroundTargetPreviewSnapshot(true, center, width, height, shape, outOfGrace);
             }
@@ -331,7 +331,7 @@ namespace Project_1.GameObjects.Spells
 
         readonly struct GroundSpellVisualSnapshot
         {
-            public GroundSpellVisualSnapshot(GfxPath texturePath, WorldSpace center, float width, float height, double expireAtMs)
+            public GroundSpellVisualSnapshot(GfxPath texturePath, WorldSpace center, double width, double height, double expireAtMs)
             {
                 TexturePath = texturePath;
                 Center = center;
@@ -342,8 +342,8 @@ namespace Project_1.GameObjects.Spells
 
             public GfxPath TexturePath { get; }
             public WorldSpace Center { get; }
-            public float Width { get; }
-            public float Height { get; }
+            public double Width { get; }
+            public double Height { get; }
             public double ExpireAtMs { get; }
         }
     }

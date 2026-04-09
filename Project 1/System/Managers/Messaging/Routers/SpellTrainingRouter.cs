@@ -105,8 +105,8 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
                         learned,
                         player.CurrentLevel >= requiredLevel,
                         previousRanksLearnt,
-                        new Spell(spellName, rank).GfxPath,
-                        BuildDescriptor(spellData, rank)));
+                        new Spell(player, spellName, rank).GfxPath,
+                        BuildDescriptor(player, spellData, rank)));
                 }
             }
 
@@ -127,9 +127,9 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             return $"{spellName} (Rank {rank})";
         }
 
-        static SpellDescriptorSnapshot BuildDescriptor(SpellData spellData, int rank)
+        static SpellDescriptorSnapshot BuildDescriptor(Entity e, SpellData spellData, int rank)
         {
-            return SpellDescriptorSnapshot.FromSpell(new Spell(spellData.Name, rank));
+            return SpellDescriptorSnapshot.FromSpell(new Spell(e, spellData.Name, rank));
         }
     }
 }

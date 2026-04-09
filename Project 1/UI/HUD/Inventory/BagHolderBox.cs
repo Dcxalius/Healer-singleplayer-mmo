@@ -11,11 +11,11 @@ namespace Project_1.UI.HUD.Inventory
         readonly Item defaultBag;
         Item[] bags = System.Array.Empty<Item>();
 
-        public BagHolderBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(new UITexture("WhiteBackground", Color.White), aPos, aSize, aParent)
+        public BagHolderBox(UI.UIElements.UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, new UITexture("WhiteBackground", Color.White), aPos, aSize)
         {
             RelativeScreenPosition spacing = InventoryBox.AbsBagBoxSpacing.ToRelativeScreenPosition(Size);
             RelativeScreenPosition itemSize = InventoryBox.AbsItemSize.ToRelativeScreenPosition(Size);
-            defaultBag = new Item(-1, 0, false, Color.White, new GfxPath(GfxType.Item, "DefaultBag"), spacing, itemSize, this);
+            defaultBag = new Item(this, -1, 0, false, Color.White, new GfxPath(GfxType.Item, "DefaultBag"), spacing, itemSize);
             AddChild(defaultBag);
         }
 
@@ -38,7 +38,7 @@ namespace Project_1.UI.HUD.Inventory
             for (int i = 1; i < aBags.Length; i++)
             {
                 RelativeScreenPosition pos = new RelativeScreenPosition(i * (relItemSize.X + relSpacing.X) + relSpacing.X, relSpacing.Y);
-                bags[i - 1] = new Item(-1, i, true, aBags[i], pos, relItemSize, this);
+                bags[i - 1] = new Item(this, -1, i, true, aBags[i], pos, relItemSize);
             }
 
             AddChildren(bags);

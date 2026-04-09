@@ -25,7 +25,7 @@ namespace Project_1.UI.UIElements.Bars
                 base.Value = value;
             }
         }
-        public CastBar(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new BarTexture(BarTexture.FillingDirection.Right, Color.White), new UITexture(new GfxPath(GfxType.UI, "WhiteBackground"), Color.Black), aPos, aSize)
+        public CastBar(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, new BarTexture(BarTexture.FillingDirection.Right, Color.White), new UITexture(new GfxPath(GfxType.UI, "WhiteBackground"), Color.Black), aPos, aSize)
         {
             remainingCast = new Text("Comfortaa-msdf", Color.Wheat);
             capturesClick = false;

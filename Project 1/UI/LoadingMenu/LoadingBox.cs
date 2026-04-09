@@ -13,19 +13,19 @@ namespace Project_1.UI.LoadingMenu
         readonly SaveDetails saveDetails;
         ExistingSave[] existingSaves = Array.Empty<ExistingSave>();
 
-        public LoadingBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", Color.Orange), aPos, aSize)
+        public LoadingBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, new UITexture("GrayBackground", Color.Orange), aPos, aSize)
         {
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f, Size);
             RelativeScreenPosition size = new RelativeScreenPosition(0.5f - spacing.X - spacing.X, 1 - spacing.Y - spacing.Y);
-            savesToLoadFrom = new ScrollableBox<ExistingSave>(3f, new UITexture("WhiteBackground", Color.AntiqueWhite), Color.AliceBlue, spacing, size, this);
+            savesToLoadFrom = new ScrollableBox<ExistingSave>(this, 3f, new UITexture("WhiteBackground", Color.AntiqueWhite), Color.AliceBlue, spacing, size);
             AddChild(savesToLoadFrom);
             ExistingSave.callAtClick = SetSave;
 
-            saveDetails = new SaveDetails(new RelativeScreenPosition(size.X + spacing.X * 3, spacing.Y), size, this);
+            saveDetails = new SaveDetails(this, new RelativeScreenPosition(size.X + spacing.X * 3, spacing.Y), size);
             AddChild(saveDetails);
 
             RelativeScreenPosition square = RelativeScreenPosition.GetSquareFromY(0.07f, Size);
-            AddChild(new ExitButton(RelativeScreenPosition.One - square - spacing, square, this));
+            AddChild(new ExitButton(this, RelativeScreenPosition.One - square - spacing, square));
         }
 
         public void Setup(SaveUiSnapshot[] saves)
@@ -33,7 +33,7 @@ namespace Project_1.UI.LoadingMenu
             existingSaves = saves == null ? Array.Empty<ExistingSave>() : new ExistingSave[saves.Length];
             for (int i = 0; i < existingSaves.Length; i++)
             {
-                existingSaves[i] = new ExistingSave(saves[i], savesToLoadFrom);
+                existingSaves[i] = new ExistingSave(savesToLoadFrom, saves[i]);
                 savesToLoadFrom.AddScrollableElement(existingSaves[i]);
             }
         }

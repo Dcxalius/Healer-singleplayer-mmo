@@ -36,7 +36,7 @@ namespace Project_1.UI.UIElements
         readonly RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f);
         readonly RelativeScreenPosition textSpacing = new RelativeScreenPosition(0, 0.007f);
 
-        public BuffBox(FillDirection aDir, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(UITexture.Null, aPos, aSize)
+        public BuffBox(FillDirection aDir, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, UITexture.Null, aPos, aSize)
         {
             fillDirection = aDir;
             buffs = new List<Buff>();
@@ -70,7 +70,7 @@ namespace Project_1.UI.UIElements
                 return;
             }
 
-            buffs.Add(new Buff(aBuff, RelativeScreenPosition.Zero, buffSize, this));
+            buffs.Add(new Buff(this, aBuff, RelativeScreenPosition.Zero, buffSize));
             AddChild(buffs.Last());
             SortBuffs();
         }

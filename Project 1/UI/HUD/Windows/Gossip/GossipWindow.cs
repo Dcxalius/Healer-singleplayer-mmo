@@ -25,9 +25,9 @@ namespace Project_1.UI.HUD.Windows.Gossip
         {
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.05f, Size);
             RelativeScreenPosition introSize = new RelativeScreenPosition((1 - spacing.X * 2), 0.4f);
-            introduction = new Label("", spacing, introSize, Label.TextAllignment.TopLeft, Color.Black, aParent: this);
+            introduction = new Label(this, spacing, introSize, Label.TextAllignment.TopLeft, Color.Black);
             AddChild(introduction);
-            options = new ScrollableBox<GossipOption>(10, UITexture.Null, Color.AliceBlue, introSize.OnlyY + spacing, RelativeScreenPosition.One - spacing - introSize.OnlyY, this);
+            options = new ScrollableBox<GossipOption>(this, 10, UITexture.Null, Color.AliceBlue, introSize.OnlyY + spacing, RelativeScreenPosition.One - spacing - introSize.OnlyY);
             AddChild(options);
         }
 
@@ -69,9 +69,9 @@ namespace Project_1.UI.HUD.Windows.Gossip
 
                 built[i] = type switch
                 {
-                    "C" => new ChatGossipOption(header, data),
-                    "S" => new ShopGossipOption(header, data),
-                    "T" => new SpellTrainerGossipOption(header),
+                    "C" => new ChatGossipOption(this, header, data),
+                    "S" => new ShopGossipOption(this, header, data),
+                    "T" => new SpellTrainerGossipOption(this, header),
                     _ => throw new NotImplementedException()
                 };
             }

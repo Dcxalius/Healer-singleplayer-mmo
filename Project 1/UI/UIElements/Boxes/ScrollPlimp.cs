@@ -13,7 +13,7 @@ namespace Project_1.UI.UIElements.Boxes
     internal class ScrollPlimp : UIElement
     {
         bool held;
-        public ScrollPlimp(Color aColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(aParent, new UITexture("ScrollPlimp", aColor), aPos, aSize)
+        public ScrollPlimp(UIElement aParent, Color aColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, new UITexture("ScrollPlimp", aColor), aPos, aSize)
         {
             CapturesClick = true;
         }

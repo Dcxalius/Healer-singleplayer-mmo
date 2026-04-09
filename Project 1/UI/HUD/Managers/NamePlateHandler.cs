@@ -27,7 +27,7 @@ namespace Project_1.UI.HUD.Managers
             ThreadAffinity.AssertUiThread();
             if (snapshot.RenderId <= 0) return;
             if (namePlates.ContainsKey(snapshot.RenderId)) return;
-            namePlates.Add(snapshot.RenderId, new NamePlate(snapshot));
+            namePlates.Add(snapshot.RenderId, new NamePlate(null, snapshot));
             HUDManager.InvalidatePlates();
         }
 

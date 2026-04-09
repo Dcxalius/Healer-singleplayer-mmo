@@ -83,7 +83,7 @@ namespace Project_1.GameObjects.Unit.Resources
             AssertSimThread();
         }
 
-        public override void CastSpell(float aCost)
+        public override void CastSpell(double aCost)
         {
             AssertSimThread();
             lastCastSpellOrTick = TimeManager.TotalFrameTime;

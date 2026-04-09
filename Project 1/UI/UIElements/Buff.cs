@@ -26,15 +26,15 @@ namespace Project_1.UI.UIElements
         
         Label timer;
         Label counter;
-        public Buff(in BuffUiSnapshot aBuff, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(aParent, new UITexture(aBuff.GfxPath, Color.White), aPos, aSize)
+        public Buff(UIElement aParent, in BuffUiSnapshot aBuff, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, new UITexture(aBuff.GfxPath, Color.White), aPos, aSize)
         {
             if (aBuff.MaxCount > 1)
             {
-                counter = new Label(aBuff.Count.ToString(), aPos, aSize, Label.TextAllignment.TopLeft, Color.Black, "Comfortaa-msdf", 8, this);
+                counter = new Label(this, aPos, aSize, Label.TextAllignment.TopLeft, Color.Black, "Comfortaa-msdf", 8, aBuff.Count.ToString());
                 AddChild(counter);
             }
 
-            timer = new Label("xdd", aPos, aSize, Label.TextAllignment.BottomRight, Color.Black, "Comfortaa-msdf", 8, this);
+            timer = new Label(this, aPos, aSize, Label.TextAllignment.BottomRight, Color.Black, "Comfortaa-msdf", 8, "xdd");
             AddChild(timer);
             buffId = aBuff.BuffId;
             gfxPath = aBuff.GfxPath;

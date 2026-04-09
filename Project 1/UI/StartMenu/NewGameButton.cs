@@ -8,7 +8,7 @@ namespace Project_1.UI.StartMenu
 {
     internal class NewGameButton : Button
     {
-        public NewGameButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(aPos, aSize, Color.LightCyan, "New Game", Color.Black, aParent)
+        public NewGameButton(UI.UIElements.UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, aPos, aSize, Color.LightCyan, "New Game", Color.Black)
         {
 
         }

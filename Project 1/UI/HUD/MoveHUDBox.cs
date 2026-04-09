@@ -25,13 +25,13 @@ namespace Project_1.UI.HUD
         static RelativeScreenPosition BButtonPos => RelativeScreenPosition.One - Spacing - ButtonSize;
 
         DescriptCheckBox sizeChangeCheckBox;
-        public MoveHUDBox() : base("HUD Changer", Color.White, LocationOfPopUp.StateManager, PausesGame.NoPause, new List<Action> { HUDManager.DisableHudMoveable, HUDManager.Save }, new List<Action> { HUDManager.ResetHudMoveable },
+        public MoveHUDBox(UIElement aParent) : base(aParent, "HUD Changer", Color.White, LocationOfPopUp.StateManager, PausesGame.NoPause, new List<Action> { HUDManager.DisableHudMoveable, HUDManager.Save }, new List<Action> { HUDManager.ResetHudMoveable },
             new UITexture("WhiteBackground", Color.Black), Pos, statSize, AButtonPos, BButtonPos, ButtonSize, Color.Gray, "Confirm", "Reset", Color.White)
         {
             Dragable = true; //TODO: Should this be movable?
             for (int i = 0; i < buttons.Count; i++) buttons[i].AddAction(() => StateManager.RequestStateChange(StateManager.States.PauseMenu)); //TODO: Formalize this
 
-            sizeChangeCheckBox = new DescriptCheckBox("Size change", Color.White, false, () => MailboxManager.PublishUiEvent(new HudSizeChangeRequested(true)), () => MailboxManager.PublishUiEvent(new HudSizeChangeRequested(false)), Spacing + new RelativeScreenPosition(0.05f).OnlyY, new RelativeScreenPosition(1f, 0.15f), Size, this);
+            sizeChangeCheckBox = new DescriptCheckBox(this, "Size change", Color.White, false, () => MailboxManager.PublishUiEvent(new HudSizeChangeRequested(true)), () => MailboxManager.PublishUiEvent(new HudSizeChangeRequested(false)), Spacing + new RelativeScreenPosition(0.05f).OnlyY, new RelativeScreenPosition(1f, 0.15f), Size);
             
             AddChild(sizeChangeCheckBox);
         }

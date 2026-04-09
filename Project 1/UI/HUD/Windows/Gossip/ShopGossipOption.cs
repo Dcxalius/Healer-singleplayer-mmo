@@ -11,7 +11,7 @@ namespace Project_1.UI.HUD.Windows.Gossip
         public static Action<ShopGossipOption> CloseGossipWindowAndOpenShop;
         public int[] ItemIDsInShop => itemIDsInShop;
         int[] itemIDsInShop;
-        public ShopGossipOption(string aDescriptor, string aData) : base(aDescriptor)
+        public ShopGossipOption(UIElements.UIElement aParent, string aDescriptor, string aData) : base(aParent, aDescriptor)
         {
             string[] splitData = aData.Split(',');
             itemIDsInShop = new int[splitData.Length];

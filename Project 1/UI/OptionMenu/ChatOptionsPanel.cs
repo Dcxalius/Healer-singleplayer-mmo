@@ -18,12 +18,12 @@ namespace Project_1.UI.OptionMenu
         float nextRowY;
 
         public ChatOptionsPanel(RelativeScreenPosition aPos, RelativeScreenPosition aSize)
-            : base(new Project_1.Textures.UITexture("GrayBackground", Color.WhiteSmoke), aPos, aSize)
+            : base(null, new Project_1.Textures.UITexture("GrayBackground", Color.WhiteSmoke), aPos, aSize)
         {
             capturesClick = false;
             capturesRelease = false;
 
-            AddChild(new Label("Chat Message Filters", new RelativeScreenPosition(0.03f, 0.02f), new RelativeScreenPosition(0.94f, HeaderHeight), Label.TextAllignment.CentreLeft, Color.Black, aParent: this));
+            AddChild(new Label(this, new RelativeScreenPosition(0.03f, 0.02f), new RelativeScreenPosition(0.94f, HeaderHeight), Label.TextAllignment.CentreLeft, Color.Black, aText: "Chat Message Filters"));
 
             nextRowY = 0.1f;
             AddMessageTypeToggle("Say", ChatMessageType.Say);
@@ -38,13 +38,13 @@ namespace Project_1.UI.OptionMenu
         {
             bool startState = ChatSettings.IsVisible(aType);
             AddChild(new ChatToggleRow(
+                this,
                 aLabel,
                 startState,
                 () => SetMessageTypeVisibility(aType, true),
                 () => SetMessageTypeVisibility(aType, false),
                 new RelativeScreenPosition(0.03f, nextRowY),
-                new RelativeScreenPosition(0.94f, RowHeight),
-                this));
+                new RelativeScreenPosition(0.94f, RowHeight)));
             nextRowY += RowHeight + RowSpacing;
         }
 
@@ -68,14 +68,14 @@ namespace Project_1.UI.OptionMenu
 
     internal sealed class ChatToggleRow : UIElement
     {
-        public ChatToggleRow(string aLabel, bool aStartState, Action aOnTicked, Action aOnUnticked, RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null)
+        public ChatToggleRow(UIElement aParent, string aLabel, bool aStartState, Action aOnTicked, Action aOnUnticked, RelativeScreenPosition aPos, RelativeScreenPosition aSize)
             : base(aParent, new Project_1.Textures.UITexture("WhiteBackground", Color.Wheat), aPos, aSize)
         {
             capturesClick = false;
             capturesRelease = false;
 
-            CheckBox checkBox = new CheckBox(aStartState, aOnTicked, aOnUnticked, new RelativeScreenPosition(0.01f, 0.14f), new RelativeScreenPosition(0.075f, 0.72f), this);
-            Label label = new Label(aLabel, new RelativeScreenPosition(0.11f, 0), new RelativeScreenPosition(0.88f, 1), Label.TextAllignment.CentreLeft, Color.Black, aParent: this);
+            CheckBox checkBox = new CheckBox(this, aStartState, aOnTicked, aOnUnticked, new RelativeScreenPosition(0.01f, 0.14f), new RelativeScreenPosition(0.075f, 0.72f));
+            Label label = new Label(this, new RelativeScreenPosition(0.11f, 0), new RelativeScreenPosition(0.88f, 1), Label.TextAllignment.CentreLeft, Color.Black, aText: aLabel);
 
             AddChild(checkBox);
             AddChild(label);

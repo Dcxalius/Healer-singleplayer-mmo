@@ -12,7 +12,7 @@ namespace Project_1.UI.PauseMenu
 {
     internal class ResumeButton : Button
     {
-        public ResumeButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(aPos, aSize, Color.PaleVioletRed, "Resume Game", aParent: aParent)
+        public ResumeButton(UI.UIElements.UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, aPos, aSize, Color.PaleVioletRed, "Resume Game")
         {
             
         }

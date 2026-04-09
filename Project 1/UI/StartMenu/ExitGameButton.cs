@@ -6,7 +6,7 @@ namespace Project_1.UI.StartMenu
 {
     internal class ExitGameButton : Button
     {
-        public ExitGameButton(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UI.UIElements.UIElement aParent = null) : base(aPos, aSize, Color.LightGreen, "Exit", Color.Black, aParent)
+        public ExitGameButton(UI.UIElements.UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, aPos, aSize, Color.LightGreen, "Exit", Color.Black)
         {
         }
 

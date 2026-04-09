@@ -19,7 +19,7 @@ namespace Project_1.UI.HUD.Managers
         {
             AssertUiThreadOrMainFallback();
             UITexture background = e.Background == null ? UITexture.Null : new UITexture(e.Background, Color.White);
-            DialogueBox box = new DialogueBox(e.Text, e.TextColor, e.Location.ToDialogueBoxLocation(), e.Pauses.ToDialogueBoxPause(), new List<System.Action>(), background, e.Pos, e.Size, e.CloseText);
+            DialogueBox box = new DialogueBox(null, e.Text, e.TextColor, e.Location.ToDialogueBoxLocation(), e.Pauses.ToDialogueBoxPause(), new List<System.Action>(), background, e.Pos, e.Size, e.CloseText);
             dialogueBoxes.Add(box);
             InvalidateUi();
         }

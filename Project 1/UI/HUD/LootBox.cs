@@ -23,11 +23,11 @@ namespace Project_1.UI.HUD
         RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.025f);
 
 
-        public LootBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(new UITexture("GrayBackground", Color.NavajoWhite), aPos, aSize)
+        public LootBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, new UITexture("GrayBackground", Color.NavajoWhite), aPos, aSize)
         {
             ToggleVisibilty();
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.025f, Size);
-            scrollableComponent = new ScrollableBox<Loot>(3f, new UITexture("WhiteBackground", Color.White), Color.Yellow, spacing, RelativeScreenPosition.One - spacing - spacing, this);
+            scrollableComponent = new ScrollableBox<Loot>(this, 3f, new UITexture("WhiteBackground", Color.White), Color.Yellow, spacing, RelativeScreenPosition.One - spacing - spacing);
             //capturesScroll = true;
             AddChild(scrollableComponent);
             Dragable = true;
@@ -63,11 +63,11 @@ namespace Project_1.UI.HUD
                 ItemUiSnapshot snap = snapshot[i];
                 if (snap.HasValue)
                 {
-                    loot[i] = new Loot(i, snap, scrollableComponent);
+                    loot[i] = new Loot(scrollableComponent, i, snap);
                 }
                 else
                 {
-                    loot[i] = new Loot(i, ItemUiSnapshot.Empty, scrollableComponent);
+                    loot[i] = new Loot(scrollableComponent, i, ItemUiSnapshot.Empty);
                     indexToHide.Add(i);
                 }
             }

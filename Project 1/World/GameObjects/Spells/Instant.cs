@@ -27,17 +27,15 @@ namespace Project_1.GameObjects.Spells
         DamageType damageType;
         readonly (int min, int max) valueRange;
 
-        Type type => valueRange.min > 0 ? Type.Heal : Type.Attack;
+        Type type => GetEffectType(valueRange);
         public override AbilityStatSource StatSource => type == Type.Attack && damageType == DamageType.Physical
             ? AbilityStatSource.Attack
             : AbilityStatSource.Spell;
 
         public override double CalculatePower(Spell aSpell, int aRank)
         {
-            int rankedMin = aSpell.ScaleInstantValueForRank(valueRange.min, aRank);
-            int rankedMax = aSpell.ScaleInstantValueForRank(valueRange.max, aRank);
-
-            return (Math.Abs(rankedMin) + Math.Abs(rankedMax)) / 2.0;
+            (int min, int max) ranked = aSpell.ScaleInstantValueForRankAndTalent(valueRange, aRank);
+            return (Math.Abs(ranked.min) + Math.Abs(ranked.max)) / 2.0;
         }
 
         [JsonConstructor]
@@ -45,6 +43,7 @@ namespace Project_1.GameObjects.Spells
         {
             Debug.Assert(maxValue != 0, "Tried to make Instant effect with no effect.");
             valueRange = (minValue, maxValue);
+            Debug.Assert(minValue > 0 ? maxValue >= minValue : maxValue <= minValue, "Min value should be the closest value to 0.");
             this.damageType = damageType;
         }
 
@@ -54,13 +53,7 @@ namespace Project_1.GameObjects.Spells
         //    return TriggerCore(aCaster, aTarget, minValue, maxValue, aScalar);
         //}
 
-        public override string GetRankDescription(Spell spell, int spellRank)
-        {
-            int rankedMin = spell.ScaleInstantValueForRank(valueRange.min, spellRank);
-            int rankedMax = spell.ScaleInstantValueForRank(valueRange.max, spellRank);
-            return BuildDescription((rankedMin, rankedMax));
-        }
-
+        public override string GetRankDescription(Spell spell, int spellRank) => BuildDescription(spell.ScaleInstantValueForRankAndTalent(valueRange, spellRank));
         public string GetRankDescriptionAsOverTimeTick(Spell spell, int spellRank, int tickCount) => BuildDescription(spell.ScaleOverTimeTickValueForRank(valueRange, tickCount, spellRank));
 
         public string GetRankDescriptionAsOverTimeTickWithTotal(Spell spell, int spellRank, int tickCount)
@@ -69,115 +62,94 @@ namespace Project_1.GameObjects.Spells
             return BuildOverTimeDescription(rankedTick, (rankedTick.min * tickCount, rankedTick.max * tickCount));
         }
 
-        public override bool Trigger(Entity aCaster, Entity aTarget, Spell aSpell)
-        {
-            int min = aSpell.ScaleInstantValueForRank(valueRange.min, aSpell.Rank);
-            int max = aSpell.ScaleInstantValueForRank(valueRange.max, aSpell.Rank);
-            return TriggerCore(aCaster, aTarget, min, max, aSpell.GetScalar(this));
-        }
-        public bool TriggerPeriodic(Entity aCaster, Entity aTarget, Spell aSpell, int maxTicks = 1)
-        {
-            (int min, int max) values = aSpell.ScaleOverTimeTickValueForRank(valueRange, maxTicks, aSpell.Rank);
-            return TriggerCore(aCaster, aTarget, values.min, values.max, aSpell.GetScalar(this));
-        }
+        public override bool Trigger(Entity aCaster, Entity aTarget, Spell aSpell) => TriggerCore(aCaster, aTarget, aSpell.ScaleInstantValueForRankAndTalent(valueRange, aSpell.Rank), aSpell.GetScalar(this));
+        public bool TriggerPeriodic(Entity aCaster, Entity aTarget, Spell aSpell, int maxTicks = 1) => TriggerCore(aCaster, aTarget, aSpell.ScaleOverTimeTickValueForRank(valueRange, maxTicks, aSpell.Rank), aSpell.GetScalar(this));
 
-        bool TriggerCore(Entity aCaster, Entity aTarget, int currentMinValue, int currentMaxValue, double aScalar)
+        bool TriggerCore(Entity aCaster, Entity aTarget, (int min, int max) currentValue, double aScalar)
         {
             ThreadAffinity.AssertSimThread();
-            Type currentType = currentMinValue > 0 ? Type.Heal : Type.Attack;
-            int randomValue = RollValue((currentMinValue, currentMaxValue));
-            if (currentType == Type.Attack)
-            {
-                double finalValue = randomValue;
-                if (StatSource == AbilityStatSource.Spell)
-                {
-                    int spellPower = GetSpellPower(aCaster);
-                    //TODO: Check if this clamp is real
-                    finalValue += spellPower * Math.Clamp(aScalar, 0.0, 1.0);
-                }
+            (int min, int max) currentRange = currentValue;
+            int randomValue = RollValue(currentRange);
+            double finalValue = randomValue;
 
+            if (StatSource == AbilityStatSource.Spell)
+            {
+                finalValue += GetSpellPower(aCaster) * Math.Clamp(aScalar, 0.0, 1.0);
+            }
+
+            if (GetEffectType(currentRange) == Type.Attack)
+            {
                 aTarget.RecieveSpellAttack(aCaster, this, new Damage(Math.Max(1, finalValue), damageType));
                 return true;
             }
 
-            if (currentType == Type.Heal)
-            {
-                int spellPower = GetSpellPower(aCaster);
-                double finalValue = randomValue + spellPower * Math.Clamp(aScalar, 0.0, 1.0);
-                aTarget.TakeHealing(aCaster, (float)Math.Max(1, finalValue));
-                return true;
-
-            }
-            return false;
+            aTarget.TakeHealing(aCaster, (float)Math.Max(1, finalValue));
+            return true;
         }
 
         static int RollValue((int min, int max) valueRange)
         {
-            if (valueRange.min == valueRange.max) return Math.Abs(valueRange.min);
-
-            if (valueRange.min > 0)
-            {
-                int low = Math.Min(valueRange.min, valueRange.max);
-                int high = Math.Max(valueRange.min, valueRange.max);
-                return RandomManager.RollInt(low, high);
-            }
-
-            int minMagnitude = Math.Min(Math.Abs(valueRange.min), Math.Abs(valueRange.max));
-            int maxMagnitude = Math.Max(Math.Abs(valueRange.min), Math.Abs(valueRange.max));
-            return RandomManager.RollInt(minMagnitude, maxMagnitude);
+            (int min, int max) magnitudeRange = GetMagnitudeRange(valueRange);
+            if (magnitudeRange.min == magnitudeRange.max) return magnitudeRange.min;
+            return RandomManager.RollInt(magnitudeRange.min, magnitudeRange.max);
         }
 
         string BuildDescription((int currentMin, int currentMax) value)
         {
-            Type currentType = value.currentMin > 0 ? Type.Heal : Type.Attack;
+            Type currentType = GetEffectType((value.currentMin, value.currentMax));
+            (int min, int max) magnitudeRange = GetMagnitudeRange((value.currentMin, value.currentMax));
             if (currentType == Type.Attack)
             {
                 string damageTypeString = damageType.ToString();
-                if (Math.Abs(value.currentMin) == Math.Abs(value.currentMax))
+                if (magnitudeRange.min == magnitudeRange.max)
                 {
-                    return $"Deals {Math.Abs(value.currentMin)} {damageTypeString} damage.";
+                    return $"Deals {magnitudeRange.min} {damageTypeString} damage.";
                 }
 
-                int low = Math.Min(Math.Abs(value.currentMin), Math.Abs(value.currentMax));
-                int high = Math.Max(Math.Abs(value.currentMin), Math.Abs(value.currentMax));
-                return $"Deals {low} to {high} {damageTypeString} damage.";
+                return $"Deals {magnitudeRange.min} to {magnitudeRange.max} {damageTypeString} damage.";
             }
 
-            if (Math.Abs(value.currentMin) == Math.Abs(value.currentMax))
+            if (magnitudeRange.min == magnitudeRange.max)
             {
-                return $"Heals for {Math.Abs(value.currentMin)}.";
+                return $"Heals for {magnitudeRange.min}.";
             }
 
-            int healLow = Math.Min(Math.Abs(value.currentMin), Math.Abs(value.currentMax));
-            int healHigh = Math.Max(Math.Abs(value.currentMin), Math.Abs(value.currentMax));
-            return $"Heals for {healLow} to {healHigh}.";
+            return $"Heals for {magnitudeRange.min} to {magnitudeRange.max}.";
         }
 
         string BuildOverTimeDescription((int min, int max) tick, (int min, int max) total)
         {
-            Type currentType = tick.min > 0 ? Type.Heal : Type.Attack;
-            int tickLow = Math.Min(Math.Abs(tick.min), Math.Abs(tick.max));
-            int tickHigh = Math.Max(Math.Abs(tick.min), Math.Abs(tick.max));
-            int totalLow = Math.Min(Math.Abs(total.min), Math.Abs(total.max));
-            int totalHigh = Math.Max(Math.Abs(total.min), Math.Abs(total.max));
+            Type currentType = GetEffectType(tick);
+            (int min, int max) tickMagnitudeRange = GetMagnitudeRange(tick);
+            (int min, int max) totalMagnitudeRange = GetMagnitudeRange(total);
 
             if (currentType == Type.Attack)
             {
                 string damageTypeString = damageType.ToString();
-                if (tickLow == tickHigh && totalLow == totalHigh)
+                if (tickMagnitudeRange.min == tickMagnitudeRange.max && totalMagnitudeRange.min == totalMagnitudeRange.max)
                 {
-                    return $"Deals {tickLow} {damageTypeString} damage every tick ({totalLow} total).";
+                    return $"Deals {tickMagnitudeRange.min} {damageTypeString} damage every tick ({totalMagnitudeRange.min} total).";
                 }
 
-                return $"Deals {tickLow} to {tickHigh} {damageTypeString} damage every tick ({totalLow} to {totalHigh} total).";
+                return $"Deals {tickMagnitudeRange.min} to {tickMagnitudeRange.max} {damageTypeString} damage every tick ({totalMagnitudeRange.min} to {totalMagnitudeRange.max} total).";
             }
 
-            if (tickLow == tickHigh && totalLow == totalHigh)
+            if (tickMagnitudeRange.min == tickMagnitudeRange.max && totalMagnitudeRange.min == totalMagnitudeRange.max)
             {
-                return $"Heals for {tickLow} every tick ({totalLow} total).";
+                return $"Heals for {tickMagnitudeRange.min} every tick ({totalMagnitudeRange.min} total).";
             }
 
-            return $"Heals for {tickLow} to {tickHigh} every tick ({totalLow} to {totalHigh} total).";
+            return $"Heals for {tickMagnitudeRange.min} to {tickMagnitudeRange.max} every tick ({totalMagnitudeRange.min} to {totalMagnitudeRange.max} total).";
+        }
+
+        static Type GetEffectType((int min, int max) valueRange) => valueRange.min > 0 ? Type.Heal : Type.Attack;
+
+        static (int min, int max) GetMagnitudeRange((int min, int max) valueRange)
+        {
+            Debug.Assert(valueRange.min > 0 ? valueRange.max >= valueRange.min : valueRange.max <= valueRange.min, "Min value should be the closest value to 0.");
+            return GetEffectType(valueRange) == Type.Heal
+                ? valueRange
+                : (-valueRange.min, -valueRange.max);
         }
 
         int GetSpellPower(Entity aCaster)

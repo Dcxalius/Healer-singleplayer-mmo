@@ -40,7 +40,7 @@ namespace Project_1.UI.UIElements.Boxes
 
         protected RelativeScreenPosition ButtonSize => buttonSize;
 
-        public MenuBox(UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aGfx, aPos, aSize)
+        public MenuBox(UIElement aParent, UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, aGfx, aPos, aSize)
         {
             //pauseSize = new RelativeScreenPosition(0.2f, 0.5f);
             //pausePos = new RelativeScreenPosition(0.5f - (pauseSize.X / 2), 0.5f - pauseSize.Y / 2);

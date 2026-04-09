@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Project_1.UI.UIElements;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace Project_1.UI.HUD.Windows.Gossip
 
         public static Action<ChatGossipOption> SetGossipWindow;
 
-        public ChatGossipOption(string aDescriptor, string aText) : base(aDescriptor)
+        public ChatGossipOption(UIElement aParent, string aDescriptor, string aText) : base(aParent, aDescriptor)
         {
             gossipOptions = new List<GossipOption>();
             introText = aText;

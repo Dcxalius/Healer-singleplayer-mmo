@@ -23,7 +23,7 @@ namespace Project_1.UI.HUD.Windows
             ItemDescriptorSnapshot hoverSnapshot;
             bool hasHoverSnapshot;
 
-            public StatLineElement(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null) : base(aParent, null, aPos, aSize)
+            public StatLineElement(UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, null, aPos, aSize)
             {
                 numberLabel = new Label(this, new RelativeScreenPosition(0f, 0f), new RelativeScreenPosition(0.45f, 1f), Label.TextAllignment.CentreRight, Color.Black);
                 textLabel = new Label(this, new RelativeScreenPosition(0.5f, 0f), new RelativeScreenPosition(0.5f, 1f), Label.TextAllignment.CentreLeft, Color.Black);
@@ -100,15 +100,15 @@ namespace Project_1.UI.HUD.Windows
         string ownerClassName = string.Empty;
         RelationToPlayerKind ownerRelation = RelationToPlayerKind.Self;
 
-        public CharacterStatReportBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize, UIElement aParent = null)
-            : base(new UITexture("WhiteBackground", Color.Transparent), aPos, aSize, StatPageSize, aParent)
+        public CharacterStatReportBox(UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize)
+            : base(aParent, new UITexture("WhiteBackground", Color.Transparent), aPos, aSize, StatPageSize)
         {
             statLines = new StatLineElement[StatRowsPerPage];
             for (int i = 0; i < statLines.Length; i++)
             {
                 float rowHeight = (1f - StatPageTopPadding) / StatRowsPerPage;
                 float y = StatPageTopPadding + rowHeight * i;
-                statLines[i] = new StatLineElement(new RelativeScreenPosition(0.05f, y), new RelativeScreenPosition(0.9f, rowHeight), this);
+                statLines[i] = new StatLineElement(this, new RelativeScreenPosition(0.05f, y), new RelativeScreenPosition(0.9f, rowHeight));
             }
 
             SetPageElements(statLines, BindStatLine, ClearStatLine);
