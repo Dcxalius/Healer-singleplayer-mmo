@@ -33,10 +33,6 @@ namespace Project_1.UI.HUD.Windows
                 //}
                 spellBookSpells[i] = new SpellBookSpell(this, pos, size);
             }
-
-            AddChildren(spellBookSpells);
-
-            //ToggleVisibilty();
         }
 
         public void ClearSpells()

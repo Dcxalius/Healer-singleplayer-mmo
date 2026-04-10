@@ -77,7 +77,7 @@ namespace Project_1.Textures
             return MeasureText(text, startIndex, length);
         }
 
-        public override void DrawString(SpriteBatch batch, string text, Vector2 position, Color color, Vector2 origin, float scale, float layerDepth)
+        public override void DrawString(SpriteBatch batch, string text, Vector2 position, Color color, Vector2 origin, float scale, float layerDepth, Color aBorderColor, float aBorderWidth)
         {
             ThreadAffinity.AssertMainThread();
             if (batch == null || string.IsNullOrEmpty(text)) return;
@@ -87,6 +87,8 @@ namespace Project_1.Textures
             {
                 effect.Parameters["TextureSize"]?.SetValue(new Vector2(textureSize.X, textureSize.Y));
                 effect.Parameters["PxRange"]?.SetValue(pxRange);
+                effect.Parameters["BorderColor"]?.SetValue(aBorderColor.ToVector4());
+                effect.Parameters["BorderWidth"]?.SetValue(aBorderWidth);
             }
 
             Vector2 basePosition = position - origin;

@@ -12,6 +12,7 @@ namespace Project_1.World.GameObjects.Unit.Talents
     internal class Talent
     {
         public bool HasChanges(Spell aSpell) => changes.Any(x => x.spellDataId == aSpell.SpellDataId);
+        public GfxPath GfxPath => gfxPath;
 
         GfxPath gfxPath;
 
@@ -27,18 +28,19 @@ namespace Project_1.World.GameObjects.Unit.Talents
         public string Name => name;
         string name;
         string description;
+        public string Description => description ??= GenerateDescription();
 
         [JsonConstructor]
-        public Talent(int id, string name, string gfxName, (int id, int amount)[] required, List<((TalentChange change, float amount, bool flat)[] changes, int spellId)> changes)
+        public Talent(int id, string name, string gfxName, int maxRank, (int id, int amount)[] required, List<((TalentChange change, float amount, bool flat)[] changes, int spellId)> changes)
         {
             //TODO: Should the gfxtype be spell image? Maybe talents should have their own gfx type?
             gfxPath = new GfxPath(GfxType.SpellImage, gfxName);
 
-            description = GenerateDescription();
             this.name = name;
             this.id = id;
-            this.required = required;
-            this.changes = changes;
+            this.maxRank = maxRank;
+            this.required = required ?? Array.Empty<(int, int)>();
+            this.changes = changes ?? new List<((TalentChange, float, bool)[], int)>();
         }
 
         //TODO: Change this

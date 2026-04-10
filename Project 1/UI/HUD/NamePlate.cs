@@ -45,10 +45,6 @@ namespace Project_1.UI.HUD
             name = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopCentre, aText: snapshot.Name);
             healthBar = new Bar(this, new BarTexture(BarTexture.FillingDirection.Right, Color.Red), new UITexture("WhiteBackground", backgroundColor), RelativeScreenPosition.Zero, barSize);
             
-
-            AddChild(name);
-            AddChild(healthBar);
-
             SetTarget(snapshot);
         }
 

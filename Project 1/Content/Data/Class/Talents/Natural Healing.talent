@@ -1,0 +1,1 @@
+{ "Id": 5, "Name": "Natural Healing", "GfxName": "Heal", "MaxRank": 5, "Required": [], "SpellChanges": [ { "SpellDataId": 0, "Changes": [ { "Change": "Amount", "Amount": 0.05, "Flat": false } ] } ] }

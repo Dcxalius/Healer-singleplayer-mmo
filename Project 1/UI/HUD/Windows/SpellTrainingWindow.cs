@@ -46,15 +46,12 @@ namespace Project_1.UI.HUD.Windows
 
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.03f, Size);
             titleLabel = new Label(this, spacing, new RelativeScreenPosition(0.94f, 0.08f), Label.TextAllignment.CentreLeft, Color.White, aTextSize: 14f);
-            AddChild(titleLabel);
 
             sortLevelButton = new Button(this, new RelativeScreenPosition(0.05f, 0.10f), new RelativeScreenPosition(0.28f, 0.07f), Color.SteelBlue, "Level Req", Color.White);
             sortLevelButton.AddAction(() => SetSortMode(SortMode.LevelRequired));
-            AddChild(sortLevelButton);
 
             sortNameButton = new Button(this, new RelativeScreenPosition(0.35f, 0.10f), new RelativeScreenPosition(0.20f, 0.07f), Color.SlateBlue, "Name", Color.White);
             sortNameButton.AddAction(() => SetSortMode(SortMode.Name));
-            AddChild(sortNameButton);
 
             hideLearnedCheckBox = new DescriptCheckBox(
                 this,
@@ -66,7 +63,6 @@ namespace Project_1.UI.HUD.Windows
                 new RelativeScreenPosition(0.58f, 0.10f),
                 new RelativeScreenPosition(0.16f, 0.07f),
                 Size);
-            AddChild(hideLearnedCheckBox);
 
             hideUnavailableCheckBox = new DescriptCheckBox(
                 this,
@@ -78,20 +74,15 @@ namespace Project_1.UI.HUD.Windows
                 new RelativeScreenPosition(0.75f, 0.10f),
                 new RelativeScreenPosition(0.20f, 0.07f),
                 Size);
-            AddChild(hideUnavailableCheckBox);
 
             entriesBox = new ScrollableBox<SpellTrainingEntryButton>(this, 10, UITexture.Null, Color.LightGray, new RelativeScreenPosition(0.05f, 0.19f), new RelativeScreenPosition(0.90f, 0.56f));
-            AddChild(entriesBox);
 
             selectedLabel = new Label(this, new RelativeScreenPosition(0.05f, 0.77f), new RelativeScreenPosition(0.90f, 0.08f), Label.TextAllignment.CentreLeft, Color.White, aTextSize: 12f, aText: "Select a spell.");
-            AddChild(selectedLabel);
 
             selectedStatusLabel = new Label(this, new RelativeScreenPosition(0.05f, 0.84f), new RelativeScreenPosition(0.55f, 0.08f), Label.TextAllignment.CentreLeft, Color.Gainsboro, aTextSize: 11f);
-            AddChild(selectedStatusLabel);
 
             buyButton = new Button(this, new RelativeScreenPosition(0.72f, 0.82f), new RelativeScreenPosition(0.18f, 0.09f), Color.ForestGreen, "Buy", Color.White);
             buyButton.AddAction(BuySelectedSpell);
-            AddChild(buyButton);
 
             SetSortMode(SortMode.LevelRequired); //TODO: Load and save this from settings 
             ClearTrainer();

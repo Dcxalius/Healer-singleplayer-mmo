@@ -177,7 +177,7 @@ namespace Project_1.GameObjects.Entities
 
             WorldSpace dir = GetDirOfFloatingText(aHealer.FeetPosition);
 
-            SpawnFlyingText(FormatHealthDelta(value), dir, Color.White);//TODO: Change color to green once text border has been implemented
+            SpawnFlyingText(FormatHealthDelta(value), dir, Color.Green, Color.Black, 1f);//TODO: Change color to green once text border has been implemented
             FlagForRefresh();
             return true;
         }

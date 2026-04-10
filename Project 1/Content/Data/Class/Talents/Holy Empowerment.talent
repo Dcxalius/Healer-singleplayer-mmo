@@ -1,0 +1,1 @@
+{ "Id": 4, "Name": "Holy Empowerment", "GfxName": "Heal", "MaxRank": 5, "Required": [ { "Id": 0, "Amount": 1 } ], "SpellChanges": [ { "SpellDataId": 0, "Changes": [ { "Change": "Amount", "Amount": 0.05, "Flat": false } ] } ] }

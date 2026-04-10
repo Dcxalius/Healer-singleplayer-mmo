@@ -46,7 +46,6 @@ namespace Project_1.UI.HUD.Windows
 
             RelativeScreenPosition buttonSize = RelativeScreenPosition.GetSquareFromX(0.05f, size.ToAbsoluteScreenPos());
             GFXButton gFXButton = new GFXButton(this, new List<Action>() { new Action(CloseWindow) }, new GfxPath(GfxType.UI, "XButton"), RelativeScreenPosition.One.OnlyX + new RelativeScreenPosition(-buttonSize.X, 0), buttonSize, Color.White);
-            AddChild(gFXButton);
         }
 
         public void OpenWindow()

@@ -46,10 +46,10 @@ namespace Project_1.Managers.States
 
         #region NYI
         public override void PopUp(DialogueBox aBox) => throw new NotImplementedException();
-        public override bool Release(ReleaseEvent aReleaseEvent) => false;
         public override void RemovePopUp(DialogueBox aBox) => throw new NotImplementedException();
         #endregion
 
+        public override bool Release(ReleaseEvent aReleaseEvent) => false;
         public override bool Scroll(ScrollEvent aScrollEvent) => false;
 
         public override void Update()

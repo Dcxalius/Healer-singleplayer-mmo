@@ -140,7 +140,6 @@ namespace Project_1.UI.UIElements.Boxes
             //beforeWindowLabel = new Label(aTextBeforeInputWindow, position, textSizeRelative.OnlyX + spacingSquare.OnlyX * 2 + size.OnlyY - spacingSquare.OnlyY * 2, Label.TextAllignment.CentreLeft, aTextBeforeColor);
             beforeWindowLabel = new Label(this, position, size.OnlyY + textSizeRelative.OnlyX + spacingSquare.OnlyX * 2, Label.TextAllignment.CentreLeft, aTextBeforeColor, aTextSize: DefaultTextSize, aText: aTextBeforeInputWindow);
             DebugManager.Print("after = " + beforeWindowLabel.UnderlyingTextOffset.ToString());
-            AddChild(beforeWindowLabel);
 
             RelativeScreenPosition bgPos = RelativeScreenPosition.Zero;
             RelativeScreenPosition bgSize = size;
@@ -148,11 +147,9 @@ namespace Project_1.UI.UIElements.Boxes
             if (aYSpacing) bgSize = RelativeScreenPosition.One - spacingSquare.OnlyX * 2 - spacingSquare.OnlyY * 2;
             Box textBackgroundBox = new Box(this, new UITexture("WhiteBackground", aBackgroundColor), bgPos + beforeWindowLabel.RelativeSize.OnlyX + spacingSquare.OnlyX, bgSize - beforeWindowLabel.RelativeSize.OnlyX - position.OnlyX);
             textBackgroundBox.CapturesClick = false;
-            AddChild(textBackgroundBox);
 
 
             inputLabel = new Label(this, position + position.OnlyX * 2 + beforeWindowLabel.RelativeSize.OnlyX, size - beforeWindowLabel.RelativeSize.OnlyX - position.OnlyX * 2, Label.TextAllignment.CentreLeft, aPassiveColor, aTextSize: DefaultTextSize, aText: aDisplayText);
-            AddChild(inputLabel);
 
             cursor = new Textures.Text("Comfortaa-msdf", "|", aPostClickColor, DefaultTextSize);
             text = "";

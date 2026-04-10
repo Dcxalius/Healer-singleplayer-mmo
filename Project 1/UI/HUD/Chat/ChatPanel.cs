@@ -47,7 +47,6 @@ namespace Project_1.UI.HUD.Chat
                 new Color(120, 120, 120, 200),
                 outerPadding,
                 logSize);
-            AddChild(messageLog);
 
             RelativeScreenPosition inputPos = new RelativeScreenPosition(
                 outerPadding.X,
@@ -68,7 +67,6 @@ namespace Project_1.UI.HUD.Chat
                 inputSize);
             inputBox.Visible = false;
             inputBox.SetEnter(new List<Action> { SubmitInput });
-            AddChild(inputBox);
         }
 
         public override void Update()
@@ -405,7 +403,6 @@ namespace Project_1.UI.HUD.Chat
                 capturesRelease = false;
 
                 label = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.One, Label.TextAllignment.CentreLeft, aTextColor, aTextSize: ChatTextSize, aText: aText);
-                AddChild(label);
             }
 
             public override void Resize(RelativeScreenPosition aSize)

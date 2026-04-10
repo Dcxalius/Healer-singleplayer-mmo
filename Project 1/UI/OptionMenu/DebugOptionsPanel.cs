@@ -21,7 +21,7 @@ namespace Project_1.UI.OptionMenu
             capturesClick = false;
             capturesRelease = false;
 
-            AddChild(new Label(this, new RelativeScreenPosition(0.03f, 0.02f), new RelativeScreenPosition(0.94f, HeaderHeight), Label.TextAllignment.CentreLeft, Color.Black, aText: "Debug Overlay"));
+            new Label(this, new RelativeScreenPosition(0.03f, 0.02f), new RelativeScreenPosition(0.94f, HeaderHeight), Label.TextAllignment.CentreLeft, Color.Black, aText: "Debug Overlay");
 
             nextRowY = 0.1f;
             AddToggleRow(
@@ -31,7 +31,7 @@ namespace Project_1.UI.OptionMenu
                 () => SetDebugOverlayEnabled(false));
 
             nextRowY += 0.02f;
-            AddChild(new Label(this, new RelativeScreenPosition(0.03f, nextRowY), new RelativeScreenPosition(0.94f, HeaderHeight), Label.TextAllignment.CentreLeft, Color.Black, aText: "Visible Overlay Info"));
+            new Label(this, new RelativeScreenPosition(0.03f, nextRowY), new RelativeScreenPosition(0.94f, HeaderHeight), Label.TextAllignment.CentreLeft, Color.Black, aText: "Visible Overlay Info");
             nextRowY += HeaderHeight + 0.01f;
 
             AddOverlayToggle("FPS", DebugOverlayInfo.Fps);
@@ -58,7 +58,7 @@ namespace Project_1.UI.OptionMenu
 
         void AddToggleRow(string aLabel, bool aStartState, Action aOnTicked, Action aOnUnticked)
         {
-            AddChild(new DebugToggleRow(this, aLabel, aStartState, aOnTicked, aOnUnticked, new RelativeScreenPosition(0.03f, nextRowY), new RelativeScreenPosition(0.94f, RowHeight)));
+            new DebugToggleRow(this, aLabel, aStartState, aOnTicked, aOnUnticked, new RelativeScreenPosition(0.03f, nextRowY), new RelativeScreenPosition(0.94f, RowHeight));
             nextRowY += RowHeight + RowSpacing;
         }
 
@@ -100,9 +100,6 @@ namespace Project_1.UI.OptionMenu
 
             CheckBox checkBox = new CheckBox(this, aStartState, aOnTicked, aOnUnticked, new RelativeScreenPosition(0.01f, 0.14f), new RelativeScreenPosition(0.075f, 0.72f));
             Label label = new Label(this, new RelativeScreenPosition(0.11f, 0), new RelativeScreenPosition(0.88f, 1), Label.TextAllignment.CentreLeft, Color.Black, aText: aLabel);
-
-            AddChild(checkBox);
-            AddChild(label);
         }
     }
 }

@@ -77,21 +77,17 @@ namespace Project_1.UI.HUD
             RelativeScreenPosition bhSize = new RelativeScreenPosition(itemSizeInInventoryScope.X * Items.Inventory.bagSlots + bagBoxSpacingInInventoryScope.X * (Items.Inventory.bagSlots + 1), itemSizeInInventoryScope.Y + bagBoxSpacingInInventoryScope.Y * 2);
 
             bagHolderBox = new BagHolderBox(this, bhPos, bhSize);
-            AddChild(bagHolderBox);
 
             bagContentBoxes = new BagContentBox[Items.Inventory.bagSlots];
             for (int i = 0; i < bagContentBoxes.Length; i++)
             {
                 bagContentBoxes[i] = new BagContentBox(this, i);
             }
-            AddChildren(bagContentBoxes);
 
             RelativeScreenPosition imgSize = RelativeScreenPosition.GetSquareFromY(bagHolderBox.RelativeSize.Y / 2, Size);
             goldImage = new Image(this, new UITexture("Gold", Color.White), RelativeScreenPosition.One - imgSize - bagBoxSpacingInInventoryScope.OnlyX, imgSize);
             RelativeScreenPosition goldSize = new RelativeScreenPosition(1 - imgSize.X - bagBoxSpacingInInventoryScope.X * 2, bhSize.Y);
             gold = new Label(this, RelativeScreenPosition.One.OnlyY - goldSize.OnlyY - bagBoxSpacingInInventoryScope.OnlyY, goldSize, Label.TextAllignment.CentreRight, aText: "0");
-            AddChild(gold);
-            AddChild(goldImage);
         }
 
         public void SetInventory(InventoryUiSnapshot snapshot)

@@ -16,6 +16,8 @@ namespace Project_1.GameObjects.FloatingTexts
     internal class FloatingText
     {
         Color color;
+        Color borderColor;
+        float borderWidth;
         readonly string textValue;
         WorldSpace position;
         float speed;
@@ -26,7 +28,7 @@ namespace Project_1.GameObjects.FloatingTexts
         double duration;
         Text builtText;
 
-        public FloatingText(string aTextToDisplay, Color aColor, WorldSpace aStartPos, WorldSpace aHeadingVector, WorldSpace? aVelocity = null, float aSpeed = 75, double aDuration = 600d)
+        public FloatingText(string aTextToDisplay, Color aColor, WorldSpace aStartPos, WorldSpace aHeadingVector, Color aBorderColor, float aBorderWidth, WorldSpace? aVelocity = null, float aSpeed = 75, double aDuration = 600d)
         {
             textValue = aTextToDisplay;
             speed = aSpeed;
@@ -44,6 +46,9 @@ namespace Project_1.GameObjects.FloatingTexts
                 velocity = new WorldSpace(0, 9.8f);
             }
             duration = aDuration;
+            borderColor = aBorderColor;
+            borderWidth = aBorderWidth;
+            builtText = new Text("Comfortaa-msdf", textValue, color, aTextSize: 30, aBorderColor: borderColor, aBorderWidth: borderWidth);
         }
 
         public void Update()
@@ -63,7 +68,6 @@ namespace Project_1.GameObjects.FloatingTexts
         {
             ThreadAffinity.AssertMainThread();
 
-            builtText ??= new Text("Comfortaa-msdf", textValue, color);
             builtText.TopLeftDraw(aBatch, position.ToAbsoltueScreenPosition());
         }
     }

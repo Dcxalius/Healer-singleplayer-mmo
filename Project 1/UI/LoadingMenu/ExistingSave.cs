@@ -19,13 +19,6 @@ namespace Project_1.UI.LoadingMenu
         {
             save = aSave;
             playerName = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreLeft, Color.Black, aText: aSave.SaveName);
-            AddChild(playerName);
-        }
-
-        public override void Resize(RelativeScreenPosition aSize)
-        {
-            base.Resize(aSize);
-            playerName.Resize(aSize);
         }
 
         public override void ClickedOnAndReleasedOnMe()

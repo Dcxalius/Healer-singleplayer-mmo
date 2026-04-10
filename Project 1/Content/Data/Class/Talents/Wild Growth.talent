@@ -1,0 +1,1 @@
+{ "Id": 7, "Name": "Wild Growth", "GfxName": "Renew", "MaxRank": 3, "Required": [ { "Id": 6, "Amount": 1 } ], "SpellChanges": [ { "SpellDataId": 1, "Changes": [ { "Change": "Duration", "Amount": 0.1, "Flat": false } ] } ] }

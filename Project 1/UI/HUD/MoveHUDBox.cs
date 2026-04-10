@@ -32,8 +32,6 @@ namespace Project_1.UI.HUD
             for (int i = 0; i < buttons.Count; i++) buttons[i].AddAction(() => StateManager.RequestStateChange(StateManager.States.PauseMenu)); //TODO: Formalize this
 
             sizeChangeCheckBox = new DescriptCheckBox(this, "Size change", Color.White, false, () => MailboxManager.PublishUiEvent(new HudSizeChangeRequested(true)), () => MailboxManager.PublishUiEvent(new HudSizeChangeRequested(false)), Spacing + new RelativeScreenPosition(0.05f).OnlyY, new RelativeScreenPosition(1f, 0.15f), Size);
-            
-            AddChild(sizeChangeCheckBox);
         }
     }
 }

@@ -17,14 +17,12 @@ namespace Project_1.UI.HUD.SpellBook
             Vector2 offset = RelativeScreenPosition.GetSquareFromX(calcOffset(1, aButtonCount), Size);
             float buttonSize = calcButtonSize(1, aButtonCount);
             border = new Border(this, RelativeScreenPosition.Zero, RelativeScreenPosition.One);
-            AddChild(border);
             spellButtons = new SpellButton[aButtonCount];
 
             for (int i = 0; i < spellButtons.Length; i++)
             {
                 spellButtons[i] = new SpellButton(this, Input.KeyBindManager.KeyListner.SpellBar1Spell1 + i, new RelativeScreenPosition(offset.X + (offset.X + buttonSize) * i, offset.Y), RelativeScreenPosition.GetSquareFromX(buttonSize, Size));
             }
-            AddChildren(spellButtons);
         }
 
         public void LoadBar(string[] aSpellNames)

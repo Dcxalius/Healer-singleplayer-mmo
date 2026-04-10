@@ -31,11 +31,9 @@ namespace Project_1.UI.UIElements
             if (aBuff.MaxCount > 1)
             {
                 counter = new Label(this, aPos, aSize, Label.TextAllignment.TopLeft, Color.Black, "Comfortaa-msdf", 8, aBuff.Count.ToString());
-                AddChild(counter);
             }
 
             timer = new Label(this, aPos, aSize, Label.TextAllignment.BottomRight, Color.Black, "Comfortaa-msdf", 8, "xdd");
-            AddChild(timer);
             buffId = aBuff.BuffId;
             gfxPath = aBuff.GfxPath;
             finalTime = aBuff.FinalTime;

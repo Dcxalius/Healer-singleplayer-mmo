@@ -28,23 +28,8 @@ namespace Project_1.UI.UIElements.Boxes
             {
                 TimeManager.StartPause(this);
                 buttons.First().AddAction(new Action(() => TimeManager.StopPause(this)));
-
             }
-
-
-
-            AddChildren(buttons);
         }
 
-        public void AddButton(Button aButton)
-        {
-            if (pauses == PausesGame.Pauses)
-            {
-                aButton.AddAction(new Action(() => TimeManager.StopPause(this)));
-            }
-
-            buttons.Add(aButton);
-            AddChild(buttons.Last());
-        }
     }
 }

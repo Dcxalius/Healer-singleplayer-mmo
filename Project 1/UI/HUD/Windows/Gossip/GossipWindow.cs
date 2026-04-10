@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Project_1.Managers;
 
 namespace Project_1.UI.HUD.Windows.Gossip
 {
@@ -26,9 +27,9 @@ namespace Project_1.UI.HUD.Windows.Gossip
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.05f, Size);
             RelativeScreenPosition introSize = new RelativeScreenPosition((1 - spacing.X * 2), 0.4f);
             introduction = new Label(this, spacing, introSize, Label.TextAllignment.TopLeft, Color.Black);
-            AddChild(introduction);
             options = new ScrollableBox<GossipOption>(this, 10, UITexture.Null, Color.AliceBlue, introSize.OnlyY + spacing, RelativeScreenPosition.One - spacing - introSize.OnlyY);
-            AddChild(options);
+            DebugManager.Print(options.AbsolutePos.ToString());
+            DebugManager.Print(options.Size.ToString());
         }
 
         public override void Update()
@@ -69,9 +70,9 @@ namespace Project_1.UI.HUD.Windows.Gossip
 
                 built[i] = type switch
                 {
-                    "C" => new ChatGossipOption(this, header, data),
-                    "S" => new ShopGossipOption(this, header, data),
-                    "T" => new SpellTrainerGossipOption(this, header),
+                    "C" => new ChatGossipOption(options, header, data),
+                    "S" => new ShopGossipOption(options, header, data),
+                    "T" => new SpellTrainerGossipOption(options, header),
                     _ => throw new NotImplementedException()
                 };
             }

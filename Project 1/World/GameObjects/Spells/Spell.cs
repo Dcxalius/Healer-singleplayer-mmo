@@ -35,21 +35,21 @@ namespace Project_1.GameObjects.Spells
         static int spellIds = 0;
         public int Rank => rank;
         public string SpellKey => BuildSpellKey(Name, Rank);
-        public double CastDistance => (spellData.CastDistance + TalentFlatChange(TalentChange.Range)) * TalentPercentChange(TalentChange.Range);
-        public double CastTime => (spellData.GetCastTimeForRank(rank) - TalentFlatChange(TalentChange.CastSpeed)) * TalentPercentChange(TalentChange.CastSpeed);
-        public double ResourceCost => (spellData.GetResourceCostForRank(rank) - TalentFlatChange(TalentChange.Cost)) * TalentPercentChange(TalentChange.Cost);
+        public double CastDistance => (spellData.CastDistance + TalentFlatChange(TalentChange.Range)) * (1.0 + TalentPercentChange(TalentChange.Range));
+        public double CastTime => (spellData.GetCastTimeForRank(rank) - TalentFlatChange(TalentChange.CastSpeed)) * (1.0 + TalentPercentChange(TalentChange.CastSpeed));
+        public double ResourceCost => (spellData.GetResourceCostForRank(rank) - TalentFlatChange(TalentChange.Cost)) * (1.0 + TalentPercentChange(TalentChange.Cost));
         public bool Targetable(Relation.RelationToPlayer aTarget) => spellData.Targetable(aTarget);
         public GfxPath GfxPath => spellData.ButtonGfxPath;
         public SpellSchool[] SpellSchools => spellData.SpellSchools;
         public bool RequiresGroundTarget => spellData.RequiresGroundTarget;
-        public double GroundTargetWidth => (spellData.GroundTargetWidth + TalentFlatChange(TalentChange.Radius)) * TalentPercentChange(TalentChange.Radius);
-        public double GroundTargetHeight => (spellData.GroundTargetHeight + TalentFlatChange(TalentChange.Radius)) * TalentPercentChange(TalentChange.Radius);
+        public double GroundTargetWidth => (spellData.GroundTargetWidth + TalentFlatChange(TalentChange.Radius)) * (1.0 + TalentPercentChange(TalentChange.Radius));
+        public double GroundTargetHeight => (spellData.GroundTargetHeight + TalentFlatChange(TalentChange.Radius)) * (1.0 + TalentPercentChange(TalentChange.Radius));
         public SpellData.GroundTargetShapeType GroundTargetShape => spellData.GroundTargetShape;
         public GfxPath HitEffectGfxPath => spellData.HitGfxPath;
         public bool BinarySpell => spellData.IsBinary;
         public bool OffCooldown => Cooldown <= 0 || lastTimeCasted + Cooldown < TimeManager.TotalFrameTime;
         public double RatioOfCooldownDone => Cooldown <= 0 ? 1.0 : Math.Min((TimeManager.TotalFrameTime - lastTimeCasted) / Cooldown, 1);
-        double Cooldown => (spellData.GetCooldownForRank(rank) - TalentFlatChange(TalentChange.Cooldown)) * TalentPercentChange(TalentChange.Cooldown);
+        double Cooldown => (spellData.GetCooldownForRank(rank) - TalentFlatChange(TalentChange.Cooldown)) * (1.0 + TalentPercentChange(TalentChange.Cooldown));
 
         double lastTimeCasted;
 
@@ -259,8 +259,8 @@ namespace Project_1.GameObjects.Spells
             (int min, int max) returnV;
             returnV.min = (int)Math.Round(spellData.ScaleSignedValue(baseValue.min, spellData.ClampRank(rank)), MidpointRounding.AwayFromZero);
             returnV.max = (int)Math.Round(spellData.ScaleSignedValue(baseValue.max, spellData.ClampRank(rank)), MidpointRounding.AwayFromZero);
-            returnV.min = (int)Math.Round((returnV.min + TalentFlatChange(TalentChange.Amount)) * TalentPercentChange(TalentChange.Amount), MidpointRounding.AwayFromZero);
-            returnV.max = (int)Math.Round((returnV.max + TalentFlatChange(TalentChange.Amount)) * TalentPercentChange(TalentChange.Amount), MidpointRounding.AwayFromZero);
+            returnV.min = (int)Math.Round((returnV.min + TalentFlatChange(TalentChange.Amount)) * (1.0 + TalentPercentChange(TalentChange.Amount)), MidpointRounding.AwayFromZero);
+            returnV.max = (int)Math.Round((returnV.max + TalentFlatChange(TalentChange.Amount)) * (1.0 + TalentPercentChange(TalentChange.Amount)), MidpointRounding.AwayFromZero);
             return returnV;
         }
 
@@ -268,8 +268,8 @@ namespace Project_1.GameObjects.Spells
         {
             Debug.Assert(tickCount > 0, "Tick count must be greater than 0.");
             (double min, double max) scaled = (spellData.ScaleSignedValue(val.min * tickCount, spellData.ClampRank(rank)), spellData.ScaleSignedValue(val.max * tickCount, spellData.ClampRank(rank)));
-            scaled.min = (scaled.min + TalentFlatChange(TalentChange.Amount) * tickCount) * TalentPercentChange(TalentChange.Amount);
-            scaled.max = (scaled.max + TalentFlatChange(TalentChange.Amount) * tickCount) * TalentPercentChange(TalentChange.Amount);
+            scaled.min = (scaled.min + TalentFlatChange(TalentChange.Amount) * tickCount) * (1.0 + TalentPercentChange(TalentChange.Amount));
+            scaled.max = (scaled.max + TalentFlatChange(TalentChange.Amount) * tickCount) * (1.0 + TalentPercentChange(TalentChange.Amount));
             return ((int)Math.Round(scaled.min / tickCount), (int)Math.Round(scaled.max / tickCount)) ;
         }
 

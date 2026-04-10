@@ -18,22 +18,21 @@ namespace Project_1.UI.HUD.Windows
         public ShopWindow() : base(new UITexture("WhiteBackground", Color.Lime))
         {
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.05f, Size);
-            pageBox = new PageBox(this, new UITexture("WhiteBackground", Color.Transparent), RelativeScreenPosition.Zero, RelativeScreenPosition.One, new Point(2, 5));
-            itemsForSale = new ItemForSale[10];
-            for (int i = 0; i < itemsForSale.Length; i++)
+            Func<PageBox, UIElement[]> func; //TODO: This is really gross, but it needs to be here before the itemsForSale array is initialized, and the itemsForSale array needs to be initialized before the pageBox is initialized. Refactor this when possible.
+            
+            func = (aPageBox) =>
             {
-                itemsForSale[i] = new ItemForSale(pageBox, new RelativeScreenPosition((ItemForSale.size.X + spacing.X) * (i % 2) + spacing.X * (i % 2 + 1), (ItemForSale.size.Y + spacing.Y) * MathF.Floor(i / 2) + spacing.Y * (MathF.Floor(1 / 2) + 1)));
-            }
+                UIElement[] itemsForSale = new ItemForSale[10];
+                for (int i = 0; i < itemsForSale.Length; i++)
+                {
+                    itemsForSale[i] = new ItemForSale(aPageBox, new RelativeScreenPosition((ItemForSale.size.X + spacing.X) * (i % 2) + spacing.X * (i % 2 + 1), (ItemForSale.size.Y + spacing.Y) * MathF.Floor(i / 2) + spacing.Y * (MathF.Floor(1 / 2) + 1)));
+                }
+                return itemsForSale;
+            };
+            
+            pageBox = new PageBox(this, func, new UITexture("WhiteBackground", Color.Transparent), RelativeScreenPosition.Zero, RelativeScreenPosition.One, new Point(2, 5), BindItemSlot, ClearItemSlot);
 
-            pageBox.SetPageElements(itemsForSale, BindItemSlot, ClearItemSlot);
-            AddChild(pageBox);
             //TODO: Add buyback system
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            // Shop range checks are handled on the simulation thread.
         }
 
         void BindItemSlot(UIElement aElement, int aItemIndex)

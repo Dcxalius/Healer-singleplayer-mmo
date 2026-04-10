@@ -72,8 +72,6 @@ namespace Project_1.UI.UIElements.Bars
         {
             fractionText = new Label(this, RelativeScreenPosition.Zero, aSize, Label.TextAllignment.CentreLeft, Color.Black, "Comforaa-msdf", 13, "");
             percentageText = new Label(this, RelativeScreenPosition.Zero, aSize, Label.TextAllignment.CentreRight, Color.Black, "Comforaa-msdf", 14, "");
-            AddChild(fractionText);
-            AddChild(percentageText);
             maxValue = 0f;
             currentValue = 0f;
         }

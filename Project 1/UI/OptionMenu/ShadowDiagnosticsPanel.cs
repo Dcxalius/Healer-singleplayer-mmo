@@ -22,7 +22,7 @@ namespace Project_1.UI.OptionMenu
             capturesClick = false;
             capturesRelease = false;
 
-            AddChild(new Label(this, new RelativeScreenPosition(0.03f, 0.02f), new RelativeScreenPosition(0.94f, HeaderHeight), Label.TextAllignment.CentreLeft, Color.Black, aText: "Shadow Diagnostics"));
+            new Label(this, new RelativeScreenPosition(0.03f, 0.02f), new RelativeScreenPosition(0.94f, HeaderHeight), Label.TextAllignment.CentreLeft, Color.Black, aText: "Shadow Diagnostics");
 
             nextRowY = 0.1f;
             AddToggleRow(
@@ -40,7 +40,7 @@ namespace Project_1.UI.OptionMenu
 
         void AddToggleRow(string aLabel, bool aStartState, Action aOnTicked, Action aOnUnticked)
         {
-            AddChild(new DebugToggleRow(this, aLabel, aStartState, aOnTicked, aOnUnticked, new RelativeScreenPosition(0.03f, nextRowY), new RelativeScreenPosition(0.94f, RowHeight)));
+            new DebugToggleRow(this, aLabel, aStartState, aOnTicked, aOnUnticked, new RelativeScreenPosition(0.03f, nextRowY), new RelativeScreenPosition(0.94f, RowHeight));
             nextRowY += RowHeight + RowSpacing;
         }
 

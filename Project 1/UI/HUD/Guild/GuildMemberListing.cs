@@ -23,6 +23,7 @@ namespace Project_1.UI.HUD.Guild
         Label @class;
         OpenInventory openInventory;
         OpenInspectWindow openInspectWindow;
+        Button talentButton;
         InviteButton invite;
         Button nodeViewer;
 
@@ -52,6 +53,7 @@ namespace Project_1.UI.HUD.Guild
 
             openInspectWindow = new OpenInspectWindow(this, aData, GetButtonPos, buttonSize);
             openInventory = new OpenInventory(this, GetButtonPos, buttonSize);
+            talentButton = new Button(this, new List<Action> { OpenTalentWindow }, GetButtonPos, buttonSize, Color.LightGoldenrodYellow, "Tal", Color.Black);
             if (aData.RelationToPlayer != RelationToPlayerKind.Self)
             {
                 invite = new InviteButton(this, aData.RenderId, GetButtonPos, buttonSize);
@@ -64,18 +66,11 @@ namespace Project_1.UI.HUD.Guild
             name = new Label(this, new RelativeScreenPosition(spacing.X, 0), labelSize, Label.TextAllignment.CentreLeft, aText: aData.Name);
             level = new Label(this, new RelativeScreenPosition(spacing.X + labelPosX, 0), labelSize, Label.TextAllignment.Centred, aText: aData.Level.ToString());
             @class = new Label(this, new RelativeScreenPosition(spacing.X + labelPosX * 2, 0), labelSize, Label.TextAllignment.CentreRight, aText: aData.ClassName);
+        }
 
-            AddChild(name);
-            AddChild(level);
-            AddChild(@class);
-            AddChild(openInspectWindow);
-            AddChild(openInventory);
-
-            if (aData.RelationToPlayer != RelationToPlayerKind.Self)
-            {
-                AddChild(invite);
-                AddChild(nodeViewer);
-            }
+        void OpenTalentWindow()
+        {
+            MailboxManager.PublishUiEvent(new TalentWindowToggled(data));
         }
 
         void NodeViewerOpener()

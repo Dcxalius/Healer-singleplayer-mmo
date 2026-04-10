@@ -58,15 +58,20 @@ namespace Project_1.Textures
         Color color;
         float scale;
         float textSize;
+        Color borderColor;
+        float borderWidth;
 
-        public Text(string aFontName, float aTextSize = DefaultTextSize) : this(aFontName, null, Color.White, aTextSize) { }
-        public Text(string aFontName, string aTextToStart, float aTextSize = DefaultTextSize) : this(aFontName, aTextToStart, Color.White, aTextSize) { }
-        public Text(string aFontName, Color aColor, float aTextSize = DefaultTextSize) : this(aFontName, null, aColor, aTextSize) { }
+        public Text(string aFontName, float aTextSize = DefaultTextSize, Color? aBorderColor = null, float aBorderWidth = 0) : this(aFontName, null, Color.White, aTextSize, aBorderColor, aBorderWidth) { }
+        public Text(string aFontName, string aTextToStart, float aTextSize = DefaultTextSize, Color? aBorderColor = null, float aBorderWidth = 0) : this(aFontName, aTextToStart, Color.White, aTextSize, aBorderColor, aBorderWidth) { }
+        public Text(string aFontName, Color aColor, float aTextSize = DefaultTextSize, Color? aBorderColor = null, float aBorderWidth = 0) : this(aFontName, null, aColor, aTextSize, aBorderColor, aBorderWidth) { }
 
-        public Text(string aFontName, string aTextToStart, Color aColor, float aTextSize = DefaultTextSize)
+        public Text(string aFontName, string aTextToStart, Color aColor, float aTextSize = DefaultTextSize, Color? aBorderColor = null, float aBorderWidth = 0)
         {
             font = FontCache.GetFont(aFontName);
             Debug.Assert(font != null, "Font not found");
+            Debug.Assert(!((aBorderColor == null && aBorderWidth > 0) || (aBorderColor != null && aBorderWidth == 0)), "Border color and width must be set together");
+            borderColor = aBorderColor ?? Color.Transparent;
+            borderWidth = aBorderWidth;
             textSize = aTextSize <= 0f ? DefaultTextSize : aTextSize;
             color = aColor;
             UpdateScale();
@@ -96,7 +101,7 @@ namespace Project_1.Textures
             ThreadAffinity.AssertMainThread();
             if (textToDisplay == null) return;
 
-            font.DrawString(aBatch, textToDisplay, aPos.ToVector2(), color, aOffset, scale, 1f);
+            font.DrawString(aBatch, textToDisplay, aPos.ToVector2(), color, aOffset, scale, 1f, borderColor, borderWidth);
         }
 
         void RecalculateOffset()

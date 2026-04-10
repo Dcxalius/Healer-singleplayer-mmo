@@ -24,9 +24,7 @@ namespace Project_1.UI.OptionMenu
             Point p = Camera.Camera.WindowSizeAsPoint;
             string s = p.X + ", " + p.Y;
 
-            displayValue = new SelectBoxValueDisplay(this, RelativeScreenPosition.Zero, RelativeScreenPosition.One, s); //TODO: Get actual value currently in use and not 0
-
-            AddChild(displayValue);
+            displayValue = new SelectBoxValueDisplay(this, RelativeScreenPosition.Zero, RelativeScreenPosition.One, s);
             //displayValue = new SelectBoxValueDisplay(Pos, setOfValues[(int)Camera.CurrentCameraSetting], new UITexture("WhiteBackground", Color.White), aSize);
         }
 

@@ -1,0 +1,1 @@
+{ "Id": 9, "Name": "Flourish", "GfxName": "Renew", "MaxRank": 5, "Required": [ { "Id": 8, "Amount": 1 } ], "SpellChanges": [ { "SpellDataId": 0, "Changes": [ { "Change": "Amount", "Amount": 0.05, "Flat": false } ] }, { "SpellDataId": 1, "Changes": [ { "Change": "Amount", "Amount": 0.05, "Flat": false } ] } ] }

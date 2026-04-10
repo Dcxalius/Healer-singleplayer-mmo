@@ -1,0 +1,1 @@
+{ "Id": 6, "Name": "Tranquility", "GfxName": "Renew", "MaxRank": 3, "Required": [], "SpellChanges": [ { "SpellDataId": 1, "Changes": [ { "Change": "Cost", "Amount": 0.1, "Flat": false } ] } ] }

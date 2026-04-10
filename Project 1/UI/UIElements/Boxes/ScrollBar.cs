@@ -20,7 +20,6 @@ namespace Project_1.UI.UIElements.Boxes
         public ScrollBar(UIElement aParent, Color aColor, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, new UITexture("ScrollBar", aColor), aPos, aSize)
         {
             scrollPlimp = new ScrollPlimp(this, aColor, RelativeScreenPosition.Zero, new RelativeScreenPosition(1, 1f / 32f)); //32 is from (graphical size of bar)/(graphical side of blimp)
-            AddChild(scrollPlimp);
             SetValue(0);
             capturesClick = true;
         }

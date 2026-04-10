@@ -22,8 +22,6 @@ namespace Project_1.UI.HUD.Inventory
 
             item = new Item(this, -2, aSlotIndex, true, snapshot, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
             itemName = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreLeft, snapshot.QualityColor, aText: snapshot.Name);
-            AddChild(item);
-            AddChild(itemName);
             if (snapshot.MaxStack <= 1) return;
             item.ItemCount = snapshot.Count.ToString();
         }
@@ -63,14 +61,12 @@ namespace Project_1.UI.HUD.Inventory
             if (item == null)
             {
                 item = new Item(this, -2, slotIndex, true, snapshot, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
-                AddChild(item);
             }
 
             item.AssignItem(snapshot);
             if (itemName == null)
             {
                 itemName = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreLeft, snapshot.QualityColor, aText: snapshot.Name);
-                AddChild(itemName);
             }
             else
             {

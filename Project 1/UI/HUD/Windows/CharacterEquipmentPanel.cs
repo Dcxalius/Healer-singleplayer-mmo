@@ -33,7 +33,6 @@ namespace Project_1.UI.HUD.Windows
             RelativeScreenPosition xChange = new RelativeScreenPosition(itemSpacing.X + itemSize.X, 0);
             CreateItems(aBagIndex, Equipment.Slot.MainHand, Equipment.Slot.Ranged, bottomSideLeft, xChange);
 
-            AddChildren(equippedItems);
             CapturesClick = false;
             CapturesRelease = false;
             CapturesScroll = false;

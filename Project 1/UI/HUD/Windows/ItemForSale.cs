@@ -41,10 +41,6 @@ namespace Project_1.UI.HUD.Windows
             goldCost = new Label(this, displayItem.RelativeSize.OnlyX + displayItem.RelativeSize.OnlyY / 2 + spacing.OnlyX, new RelativeScreenPosition(0.9f, 0.5f) - displayItem.RelativeSize.OnlyX - spacing.OnlyX * 2, Label.TextAllignment.CentreRight, Color.Black);
             goldImage = new Image(this, new UITexture("Gold", Color.White), new RelativeScreenPosition(1f - spacing.X, 0.75f), RelativeScreenPosition.GetSquareFromX(0.1f, size.ToAbsoluteScreenPos(Window.WindowSize.ToAbsoluteScreenPos())));
 
-            AddChild(displayItem);
-            AddChild(itemName);
-            AddChild(goldCost);
-            AddChild(goldImage);
             itemForSale = ItemUiSnapshot.Empty;
         }
 

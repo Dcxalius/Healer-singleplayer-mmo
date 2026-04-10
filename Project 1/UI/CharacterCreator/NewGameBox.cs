@@ -19,15 +19,14 @@ namespace Project_1.UI.CharacterCreator
         public NewGameBox(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, new UITexture("GrayBackground", Color.AliceBlue), aPos, aSize)
         {
             RelativeScreenPosition size = RelativeScreenPosition.GetSquareFromY(0.05f, Size);
-            AddChild(new LoadingMenu.ExitButton(this, RelativeScreenPosition.One - size, size));
+            new LoadingMenu.ExitButton(this, RelativeScreenPosition.One - size, size);
             inputBox = new InputBox(this, "Name:", Size, new InputBox.ValidInputs[] { InputBox.ValidInputs.Letters },Color.Black, "Input Character Name", Color.White, true, Color.LightGray, Color.Black, new RelativeScreenPosition(0.05f), new RelativeScreenPosition(0.5f, 0.08f));
-            AddChild(inputBox);
+            
             //AddChild(new GFXButton(new List<Action>() { new Action(() => className = "Priest")}, new GfxPath(GfxType.UI, "Priest"), new RelativeScreenPosition(0.4f), new AbsoluteScreenPosition(64).ToRelativeScreenPosition(), Color.AliceBlue));
             //AddChild(new GFXButton(new List<Action>() { new Action(() => className = "Druid")}, new GfxPath(GfxType.UI, "Druid"), new RelativeScreenPosition(0.5f, 0.4f), new AbsoluteScreenPosition(64).ToRelativeScreenPosition(), Color.AliceBlue));
-            AddChild(new ClassSelector(this, new RelativeScreenPosition(0.4f, 0.3f), new RelativeScreenPosition(0.2f)));
+            new ClassSelector(this, new RelativeScreenPosition(0.4f, 0.3f), new RelativeScreenPosition(0.2f));
             RelativeScreenPosition finalButtonSize = new RelativeScreenPosition(0.3f, 0.05f);
             finalizeCharacterButton = new FinalizeCharacterButton(this, new List<Action>() { new Action(CreateNewCharacter) }, new RelativeScreenPosition(0.5f - finalButtonSize.X / 2, 0.95f - finalButtonSize.Y), finalButtonSize);
-            AddChild(finalizeCharacterButton);
             finalizeCharacterButton.Visible = false;
         }
 

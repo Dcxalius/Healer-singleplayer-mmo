@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Project_1.Camera;
 using Project_1.Managers;
 using Project_1.Textures;
@@ -14,14 +15,14 @@ namespace Project_1.UI.UIElements.Boxes
     internal class ABDialogueBox : DialogueBox
     {
         Button secondButton;
-        //public ABDialogueBox(string aMessage, Color aMessageColor, LocationOfPopUp aLocation, PausesGame aPauses, List<Action> aAction, UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, string aButtonText = null) : base(aMessage, aMessageColor, aLocation, aPauses, aAction, aGfx, aPos, aSize, aButtonText)
-        //{
-        //}
 
         public ABDialogueBox(UIElement aParent, string aMessage, Color aMessageColor, LocationOfPopUp aLocation, PausesGame aPauses, List<Action> aAAction, List<Action> aBAction, UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, RelativeScreenPosition aAButtonPos, RelativeScreenPosition aBButtonPos, RelativeScreenPosition aButtonSize, Color aButtonColor, string aAButtonText = null, string aBButtonText = null, Color? aButtonTextColor = null) : base(aParent, aMessage, aMessageColor, aLocation, aPauses, aAAction, aGfx, aPos, aSize, aAButtonPos, aButtonSize, aButtonColor, aAButtonText, aButtonTextColor)
         {
             secondButton = new Button(this, aBAction, aBButtonPos, aButtonSize, aButtonColor, aBButtonText, aButtonTextColor);
-            AddButton(secondButton);
+            if (aPauses == PausesGame.Pauses)
+            {
+                secondButton.AddAction(new Action(() => TimeManager.StopPause(this)));
+            }
         }
     }
 }

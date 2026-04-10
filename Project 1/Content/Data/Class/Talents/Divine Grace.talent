@@ -1,0 +1,1 @@
+{ "Id": 3, "Name": "Divine Grace", "GfxName": "Heal", "MaxRank": 5, "Required": [ { "Id": 1, "Amount": 1 } ], "SpellChanges": [ { "SpellDataId": 0, "Changes": [ { "Change": "Amount", "Amount": 0.03, "Flat": false } ] }, { "SpellDataId": 1, "Changes": [ { "Change": "Amount", "Amount": 0.03, "Flat": false } ] } ] }

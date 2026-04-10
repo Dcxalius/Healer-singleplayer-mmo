@@ -20,8 +20,6 @@ namespace Project_1.UI.HUD.PlateBoxes
         {
             numberLabel = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.One, Label.TextAllignment.Centred, Color.Pink, aText: "1");
             capturesClick = false;
-
-            AddChild(numberLabel);
         }
 
         public void Refresh(in EntityUiSnapshot snapshot)

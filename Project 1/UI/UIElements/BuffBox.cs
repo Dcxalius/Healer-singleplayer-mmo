@@ -40,7 +40,6 @@ namespace Project_1.UI.UIElements
         {
             fillDirection = aDir;
             buffs = new List<Buff>();
-            AddChildren(buffs);
             capturesClick = false;
         }
 
@@ -71,7 +70,6 @@ namespace Project_1.UI.UIElements
             }
 
             buffs.Add(new Buff(this, aBuff, RelativeScreenPosition.Zero, buffSize));
-            AddChild(buffs.Last());
             SortBuffs();
         }
 

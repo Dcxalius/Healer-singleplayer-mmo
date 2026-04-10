@@ -172,6 +172,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         public void ExpToParty(int aExpAmount)
         {
             ThreadAffinity.AssertSimThread();
+            if (aExpAmount == 0) return;
             if (PartyCount == 0)
             {
                 owner.GainExperience(aExpAmount);

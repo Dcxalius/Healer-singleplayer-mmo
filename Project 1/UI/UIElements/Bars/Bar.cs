@@ -27,12 +27,6 @@ namespace Project_1.UI.UIElements.Bars
         public Bar(UIElement aParent, BarTexture aBarGfx, UITexture aBackgroundGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, aBackgroundGfx, aPos, aSize)
         {
             barComponent = new BarComponent(this, aBarGfx, RelativeScreenPosition.Zero, RelativeScreenPosition.One);
-            AddChild(barComponent);
-        }
-        public override void Draw(SpriteBatch aBatch)
-        {
-            Project_1.Managers.ThreadAffinity.AssertMainThread();
-            base.Draw(aBatch);
         }
     }
 }

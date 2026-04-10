@@ -1,0 +1,1 @@
+{ "Id": 20, "Name": "Grace", "GfxName": "Heal", "MaxRank": 5, "Required": [ { "Id": 19, "Amount": 1 } ], "SpellChanges": [ { "SpellDataId": 0, "Changes": [ { "Change": "Amount", "Amount": 0.05, "Flat": false } ] }, { "SpellDataId": 1, "Changes": [ { "Change": "Amount", "Amount": 0.05, "Flat": false } ] } ] }

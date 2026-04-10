@@ -26,7 +26,7 @@ namespace Project_1.Textures
             return spriteFont.MeasureString(text.Substring(startIndex, length));
         }
 
-        public override void DrawString(SpriteBatch batch, string text, Vector2 position, Color color, Vector2 origin, float scale, float layerDepth)
+        public override void DrawString(SpriteBatch batch, string text, Vector2 position, Color color, Vector2 origin, float scale, float layerDepth, Color aBorderColor, float aBorderWidth)
         {
             if (spriteFont == null || string.IsNullOrEmpty(text)) return;
             batch.DrawString(spriteFont, text, position, color, 0f, origin, scale, SpriteEffects.None, layerDepth);

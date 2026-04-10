@@ -38,7 +38,6 @@ namespace Project_1.UI.UIElements.SelectBoxes
             selectedValue = aStartDisplayValue;
 
             allValues = new ScrollableBox<SelectBoxValue>(this, 5, UITexture.Null, Color.AliceBlue, new RelativeScreenPosition(ScrollableBox.WidthOfBar + ScrollableBox.WidthOfSpacing * 2, 1 / sizeMulti), new RelativeScreenPosition(1 - ScrollableBox.WidthOfBar - ScrollableBox.WidthOfSpacing * 3, 1 - 1 / sizeMulti));
-            AddChild(allValues);
             allValues.Visible = false;
         }
 

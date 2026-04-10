@@ -36,10 +36,8 @@ namespace Project_1.UI.HUD.Windows
             statReportBox = new CharacterStatReportBox(this, reportBoxPos, reportBoxSize);
 
             expBar = new ExpBar(this, expBarPos, expBarSize);
-            AddChild(nameLabel);
-            AddChild(equipmentPanel);
-            AddChild(statReportBox);
-            AddChild(expBar);
+
+            expBar.Visible = true;
         }
 
         public virtual void SetData(CharacterWindowSnapshot snapshot)

@@ -24,15 +24,13 @@ namespace Project_1.UI.LoadingMenu
             RelativeScreenPosition imgSize = new RelativeScreenPosition(1 - spacing.X - spacing.X, 1f / 3f - spacing.Y - spacing.Y);
 
             image = new RuntimeImage(this, spacing, imgSize);
-            AddChild(image);
 
             textDetails = new Label(this, imgSize.OnlyY + spacing, imgSize, Label.TextAllignment.TopLeft, Color.Black);
-            AddChild(textDetails);
 
             capturesClick = false;
             RelativeScreenPosition buttonSize = new RelativeScreenPosition(0.15f, 0.05f);
             loadButton = new Button(this, new List<Action> { LoadSave }, spacing.OnlyX + aSize.OnlyY - buttonSize.OnlyY - spacing.OnlyY, buttonSize, Color.White, "Load Save", Color.Black);
-            //AddChild(loadButton);
+            loadButton.Visible = false;
         }
 
         void LoadSave()
@@ -46,7 +44,7 @@ namespace Project_1.UI.LoadingMenu
             save = aSave;
             textDetails.Text = aSave.DetailsText;
             image.SetImage(aSave.ImagePath);
-            AddChild(loadButton);
+            loadButton.Visible = true;
         }
 
         public void Reset()
@@ -54,7 +52,7 @@ namespace Project_1.UI.LoadingMenu
             save = null;
             textDetails.Text = null;
             image.Clear();
-            KillChild(loadButton);
+            loadButton.Visible = false;
         }
     }
 }

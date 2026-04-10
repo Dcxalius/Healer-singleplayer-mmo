@@ -55,7 +55,6 @@ namespace Project_1.UI.HUD
             RelativeScreenPosition labelSpacing = new RelativeScreenPosition(0.025f);
 
             name = new Label(this, labelSpacing, RelativeScreenPosition.One - labelSpacing * 2, Label.TextAllignment.TopCentre, Color.White);
-            AddChild(name);
 
             directionButtons = new GFXButton[(int)Cardinals.Count];
 
@@ -70,15 +69,12 @@ namespace Project_1.UI.HUD
             directionButtons[3] = new GFXButton(this, new List<Action> { NudgeValues(Cardinals.Right) }, new GfxPath(GfxType.UI, "RightArrow"), pos + buttonSize.OnlyX + buttonSize.OnlyY / 2, buttonSize, Color.White);
 
 
-            AddChildren(directionButtons);
 
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f, Size);
             RelativeScreenPosition inputSize = new RelativeScreenPosition(1 - spacing.X * 2, 1 / 12f);
             directionBoxX = new InputBox(this, "X", Size, new InputBox.ValidInputs[] { InputBox.ValidInputs.Digits }, Color.Black, "", Color.White, false, Color.Black, Color.Black, RelativeScreenPosition.One - inputSize - inputSize.OnlyY - spacing - spacing.OnlyY, inputSize);
             directionBoxY = new InputBox(this, "Y", Size, new InputBox.ValidInputs[] { InputBox.ValidInputs.Digits }, Color.Black, "", Color.White, false, Color.Black, Color.Black, RelativeScreenPosition.One - inputSize - spacing, inputSize);
 
-            AddChild(directionBoxX);
-            AddChild(directionBoxY);
 
             AlwaysFullyOnScreen = true;
             Visible = false;

@@ -36,17 +36,12 @@ namespace Project_1.UI.HUD
             xMax = 0.15f;
 
             itemName = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopLeft);
-            AddChild(itemName);
             itemDescription = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopLeft);
-            AddChild(itemDescription);
             itemStats = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopLeft);
-            AddChild(itemStats);
             itemSellPrice = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreRight);
-            AddChild(itemSellPrice);
 
             goldImage = new Image(this, new UITexture("Gold", Color.White), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
 
-            AddChild(goldImage);
             Visible = false;
             AlwaysFullyOnScreen = true;
         }

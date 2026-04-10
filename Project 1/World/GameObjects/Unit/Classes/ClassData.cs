@@ -148,6 +148,7 @@ namespace Project_1.GameObjects.Unit.Classes
         //Warlock	2.0%	    20
         //Warrior	0.0%	    20
 
+        public TalentTree[] TalentTrees => talentTrees;
         TalentTree[] talentTrees;
 
         [JsonConstructor]
@@ -157,8 +158,9 @@ namespace Project_1.GameObjects.Unit.Classes
             float agilityDodgeScaling = float.NaN, float baseDodge = 0f, float meleeCritScaling = 0f,
             Weapon.WeaponType weaponsAllowed = Weapon.WeaponType.None, bool canDualWield = false, bool isCaster = false, bool canParry = false, float spellCritScaling = 0f, float dodgeScaling = float.NaN)
         {
+            talentTrees ??= Array.Empty<int>();
             this.name = name;
-            this.talentTrees = new TalentTree[talentTrees.Length];
+            this.talentTrees = talentTrees.Select(id => TalentFactory.GetTalentTree(id)).ToArray();
             this.resource = resource;
             this.baseStats = new PrimaryStats(baseStats);
             this.perLevelStats = new PrimaryStats(perLevelStats);

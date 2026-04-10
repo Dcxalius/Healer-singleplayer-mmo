@@ -16,7 +16,6 @@ namespace Project_1.UI.HUD.Inventory
             RelativeScreenPosition spacing = InventoryBox.AbsBagBoxSpacing.ToRelativeScreenPosition(Size);
             RelativeScreenPosition itemSize = InventoryBox.AbsItemSize.ToRelativeScreenPosition(Size);
             defaultBag = new Item(this, -1, 0, false, Color.White, new GfxPath(GfxType.Item, "DefaultBag"), spacing, itemSize);
-            AddChild(defaultBag);
         }
 
         public void SetBags(ItemUiSnapshot[] aBags, AbsoluteScreenPosition aItemSize, AbsoluteScreenPosition aSpacingSize)
@@ -26,7 +25,6 @@ namespace Project_1.UI.HUD.Inventory
             RelativeScreenPosition relSpacing = aSpacingSize.ToRelativeScreenPosition(Size);
             defaultBag.Move(relSpacing);
             defaultBag.Resize(relItemSize);
-            AddChild(defaultBag);
 
             if (aBags == null || aBags.Length <= 1)
             {
@@ -40,8 +38,6 @@ namespace Project_1.UI.HUD.Inventory
                 RelativeScreenPosition pos = new RelativeScreenPosition(i * (relItemSize.X + relSpacing.X) + relSpacing.X, relSpacing.Y);
                 bags[i - 1] = new Item(this, -1, i, true, aBags[i], pos, relItemSize);
             }
-
-            AddChildren(bags);
         }
     }
 }

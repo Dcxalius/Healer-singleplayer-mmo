@@ -18,14 +18,12 @@ namespace Project_1.UI.LoadingMenu
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.005f, Size);
             RelativeScreenPosition size = new RelativeScreenPosition(0.5f - spacing.X - spacing.X, 1 - spacing.Y - spacing.Y);
             savesToLoadFrom = new ScrollableBox<ExistingSave>(this, 3f, new UITexture("WhiteBackground", Color.AntiqueWhite), Color.AliceBlue, spacing, size);
-            AddChild(savesToLoadFrom);
+
             ExistingSave.callAtClick = SetSave;
 
-            saveDetails = new SaveDetails(this, new RelativeScreenPosition(size.X + spacing.X * 3, spacing.Y), size);
-            AddChild(saveDetails);
+            saveDetails = new SaveDetails(this, new RelativeScreenPosition(size.X + spacing.X * 3, spacing.Y), size);;
 
             RelativeScreenPosition square = RelativeScreenPosition.GetSquareFromY(0.07f, Size);
-            AddChild(new ExitButton(this, RelativeScreenPosition.One - square - spacing, square));
         }
 
         public void Setup(SaveUiSnapshot[] saves)

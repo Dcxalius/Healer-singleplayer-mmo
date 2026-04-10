@@ -16,7 +16,6 @@ namespace Project_1.UI.UIElements.Bars
         public BorderedBar(UIElement aParent, Color aBorderColor, BarTexture aBarGfx, UITexture aBackgroundGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, aBarGfx, aBackgroundGfx, aPos, aSize)
         {
             border = new Border(this, aBorderColor, RelativeScreenPosition.Zero, aSize);
-            AddChild(border);
         }
     }
 }

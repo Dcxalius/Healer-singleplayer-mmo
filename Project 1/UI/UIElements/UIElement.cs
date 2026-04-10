@@ -178,7 +178,11 @@ namespace Project_1.UI.UIElements
             }
 
             visible = true;
-            parent = aParent;
+            if (aParent != null)
+            {
+                parent = aParent;
+                parent.AddChild(this);
+            }
             gfx = aGfx;
             relativePos = aPos;
             relativeSize = aSize;

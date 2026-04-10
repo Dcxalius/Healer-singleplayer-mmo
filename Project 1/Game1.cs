@@ -18,6 +18,7 @@ using Project_1.Particles;
 using Project_1.Messaging;
 using Project_1.Textures;
 using Project_1.Tiles;
+using Project_1.World.GameObjects.Unit.Talents;
 using Project_1.UI;
 using Project_1.UI.CharacterCreator;
 using Project_1.UI.HUD.Managers;
@@ -168,6 +169,7 @@ namespace Project_1
             TextureManager.Init();
             TileFactory.Init();
             EffectManager.Init();
+            TalentFactory.Init();
             ObjectFactory.Init();
             ItemFactory.Init();
             InventoryCommandRouter.Init();
@@ -183,6 +185,7 @@ namespace Project_1
             StateManager.Init();
             WorldInteractionRouter.Init();
             LogicWindowSnapshotRouter.Init();
+            TalentWindowSnapshotRouter.Init();
             HUDManager.Init();
             ObjectManager.Init();
             SpawnerManager.Init();

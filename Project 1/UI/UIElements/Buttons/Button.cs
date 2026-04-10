@@ -47,7 +47,6 @@ namespace Project_1.UI.UIElements.Buttons
         {
             Color denullifiedTextColor = aTextColor ?? Color.White;
             label = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.One, Label.TextAllignment.Centred, denullifiedTextColor, aText: aText);
-            AddChild(label);
             pressedGfx = new UITexture("GrayBackground", aColor);
             hoverGfx = new UITexture("ButtonHover", Color.Yellow);
             usesPressedGfx = true;

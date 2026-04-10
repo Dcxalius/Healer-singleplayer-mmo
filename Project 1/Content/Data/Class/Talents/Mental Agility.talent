@@ -1,0 +1,1 @@
+{ "Id": 16, "Name": "Mental Agility", "GfxName": "Heal", "MaxRank": 5, "Required": [], "SpellChanges": [ { "SpellDataId": 0, "Changes": [ { "Change": "Cost", "Amount": 0.1, "Flat": false } ] } ] }

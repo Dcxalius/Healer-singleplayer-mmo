@@ -22,13 +22,11 @@ namespace Project_1.UI.UIElements.Buttons
         public GFXButton(UIElement aParent, GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColorOfBorder) : base(aParent, aPos, aSize, aColorOfBorder)
         {
             imageOnButton = new Image(this, new UITexture(aPath, Color.White), new RelativeScreenPosition(0.1f), new RelativeScreenPosition(0.8f));
-            AddChild(imageOnButton);
         }
 
         public GFXButton(UIElement aParent, List<Action> aActions, GfxPath aPath, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Color aColor, string aText = null, Color? aTextColor = null) : base(aParent, aActions, aPos, aSize, aColor, aText, aTextColor)
         {
             imageOnButton = new Image(this, new UITexture(aPath, Color.White), new RelativeScreenPosition(0.1f), new RelativeScreenPosition(0.8f));
-            AddChild(imageOnButton);
         }
         protected override void ClickedOnMe(ClickEvent aClick)
         {

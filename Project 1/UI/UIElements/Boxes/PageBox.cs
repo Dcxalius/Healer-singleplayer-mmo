@@ -25,20 +25,22 @@ namespace Project_1.UI.UIElements.Boxes
         Action<UIElement, int> bindPageElement;
         Action<UIElement> clearPageElement;
         Func<int, string> pageTitleProvider;
-        UIElement[] pageElements;
+        protected UIElement[] pageElements;
 
         int currentPage;
         int maxPages;
         int totalItems;
 
-        public PageBox(UIElement aParent, UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Point aPageDimensions)
+        public PageBox(UIElement aParent, Func<PageBox, UIElement[]> aPageElementFactory, UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Point aPageDimensions, Action<UIElement, int> aBindPageElement = null, Action<UIElement> aClearPageElement = null)
             : base(aParent, aGfx, aPos, aSize)
         {
             int pageX = Math.Max(1, aPageDimensions.X);
             int pageY = Math.Max(1, aPageDimensions.Y);
             pageDimensions = new Point(pageX, pageY);
             itemsPerPage = pageX * pageY;
-            pageElements = Array.Empty<UIElement>();
+            pageElements = aPageElementFactory.Invoke(this);
+            bindPageElement = aBindPageElement;
+            clearPageElement = aClearPageElement;
 
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.05f, Size);
             RelativeScreenPosition arrowSize = new RelativeScreenPosition(0.1f, 0.05f);
@@ -46,11 +48,6 @@ namespace Project_1.UI.UIElements.Boxes
             rightArrow = new GFXButton(this, new List<Action> { PressRightArrow }, new GfxPath(GfxType.UI, "RightArrow"), RelativeScreenPosition.One - spacing - arrowSize, arrowSize, Color.White);
             leftArrow = new GFXButton(this, new List<Action> { PressLeftArrow }, new GfxPath(GfxType.UI, "LeftArrow"), RelativeScreenPosition.One.OnlyY + spacing.OnlyX - spacing.OnlyY - arrowSize.OnlyY, arrowSize, Color.White);
             pageTitleProvider = DefaultPageTitle;
-
-            AddChild(pageTitle);
-            AddChild(rightArrow);
-            AddChild(leftArrow);
-
             Reset(0);
         }
 
@@ -60,31 +57,10 @@ namespace Project_1.UI.UIElements.Boxes
             UpdatePageTitle();
         }
 
-        public void SetPageElements(UIElement[] aElements, Action<UIElement, int> aBindPageElement, Action<UIElement> aClearPageElement = null)
+        public void SetBinders(Action<UIElement, int> aBindPageElement, Action<UIElement> aClearPageElement = null)
         {
-            for (int i = 0; i < pageElements.Length; i++)
-            {
-                KillChild(pageElements[i]);
-            }
-
-            pageElements = aElements ?? Array.Empty<UIElement>();
             bindPageElement = aBindPageElement;
             clearPageElement = aClearPageElement;
-
-            for (int i = 0; i < pageElements.Length; i++)
-            {
-                AddChild(pageElements[i]);
-            }
-
-            // Keep title visible above page content.
-            KillChild(pageTitle);
-            AddChild(pageTitle);
-
-            // Keep arrows on top and clickable.
-            KillChild(leftArrow);
-            KillChild(rightArrow);
-            AddChild(rightArrow);
-            AddChild(leftArrow);
 
             PopulateCurrentPage();
         }

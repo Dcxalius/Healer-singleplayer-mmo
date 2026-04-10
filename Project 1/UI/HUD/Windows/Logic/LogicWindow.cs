@@ -18,8 +18,6 @@ namespace Project_1.UI.HUD.Windows.Logic
         {
             nodeViewer = new NodeViewer(this, new RelativeScreenPosition(0.01f, 0.01f), new RelativeScreenPosition(0.98f, 0.48f));
             scenarioBox = new ScenarioBox(this);
-            AddChild(nodeViewer);
-            AddChild(scenarioBox);
         }
 
         public void SetData(int memberRenderId)

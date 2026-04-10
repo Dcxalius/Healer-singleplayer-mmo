@@ -1,0 +1,1 @@
+{ "Id": 13, "Name": "Lethality", "GfxName": "Backstab", "MaxRank": 5, "Required": [ { "Id": 10, "Amount": 1 } ], "SpellChanges": [ { "SpellDataId": 3, "Changes": [ { "Change": "Amount", "Amount": 0.08, "Flat": false } ] }, { "SpellDataId": 4, "Changes": [ { "Change": "Amount", "Amount": 0.08, "Flat": false } ] } ] }

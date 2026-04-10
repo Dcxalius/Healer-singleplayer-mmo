@@ -232,7 +232,12 @@ namespace Project_1.GameObjects
 
             string path = Game1.ContentManager.RootDirectory + "\\Data\\Class\\";
 
-            string[] folders = System.IO.Directory.GetDirectories(path);
+            string[] folders =
+                {
+                path + "Player",
+                path + "Ally",
+                path + "Mob"
+            };
 
             for (int i = 0; i < folders.Length; i++)
             {

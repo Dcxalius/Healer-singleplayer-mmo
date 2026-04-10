@@ -1,0 +1,1 @@
+{ "Id": 12, "Name": "Swift Execution", "GfxName": "Backstab", "MaxRank": 3, "Required": [ { "Id": 10, "Amount": 1 } ], "SpellChanges": [ { "SpellDataId": 3, "Changes": [ { "Change": "Cooldown", "Amount": 0.5, "Flat": true } ] } ] }

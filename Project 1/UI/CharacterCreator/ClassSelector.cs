@@ -36,7 +36,7 @@ namespace Project_1.UI.CharacterCreator
             for (int i = 0; i < classNames.Length; i++)
             {
                 DebugManager.Print("i == " + i + "  formula == " + i % (classNames.Length / lines));
-                AddChild(new ClassSelectButton(this, classNames[i], new RelativeScreenPosition(size.X * (i % (classNames.Length)), size.Y * MathF.Floor(i / (classNames.Length))), size));
+                new ClassSelectButton(this, classNames[i], new RelativeScreenPosition(size.X * (i % (classNames.Length)), size.Y * MathF.Floor(i / (classNames.Length))), size);
             }
         }
     }

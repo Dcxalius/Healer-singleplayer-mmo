@@ -21,7 +21,6 @@ namespace Project_1.UI.UIElements
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.05f, Size);
             description = new Label(this, RelativeScreenPosition.One.OnlyX + spacing.OnlyX, RelativeScreenPosition.One - CalculateSize(aSize.Y, aParentSize).OnlyX - spacing.OnlyX, Label.TextAllignment.CentreLeft, aTextColor, aText: aDescription);
             capturesClick = false;
-            AddChild(description);
         }
     }
 }

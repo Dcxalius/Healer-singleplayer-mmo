@@ -20,7 +20,7 @@ namespace Project_1.GameObjects.Spells.Buff
 
         //TODO: Check if this is the correct way to apply talent changes to periodic effects
         //Biggest concern is if this should be applying the talent changes to each tick or find a way to snapshot at cast of the buff
-        public override double Duration => (OverTime.Duration + spell.TalentFlatChange(TalentChange.Duration)) * spell.TalentPercentChange(TalentChange.Duration);
+        public override double Duration => (OverTime.Duration + spell.TalentFlatChange(TalentChange.Duration)) * (1.0 + spell.TalentPercentChange(TalentChange.Duration));
 
 
         public Periodic(Entity aCaster, OverTime aOverTime, Spell aSpell) : base(aCaster, aOverTime, aSpell)

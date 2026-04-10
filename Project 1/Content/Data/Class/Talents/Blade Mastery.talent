@@ -1,0 +1,1 @@
+{ "Id": 10, "Name": "Blade Mastery", "GfxName": "Backstab", "MaxRank": 5, "Required": [], "SpellChanges": [ { "SpellDataId": 3, "Changes": [ { "Change": "Amount", "Amount": 0.05, "Flat": false } ] } ] }

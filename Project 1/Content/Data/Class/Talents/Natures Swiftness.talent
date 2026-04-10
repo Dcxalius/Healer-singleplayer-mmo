@@ -1,0 +1,1 @@
+{ "Id": 8, "Name": "Nature's Swiftness", "GfxName": "Heal", "MaxRank": 3, "Required": [ { "Id": 5, "Amount": 1 } ], "SpellChanges": [ { "SpellDataId": 0, "Changes": [ { "Change": "CastSpeed", "Amount": 0.1, "Flat": true } ] } ] }

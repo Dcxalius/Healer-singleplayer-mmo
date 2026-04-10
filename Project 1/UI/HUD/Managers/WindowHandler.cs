@@ -11,6 +11,7 @@ using Project_1.UI.UIElements.Buttons;
 using Project_1.GameObjects.Unit;
 using Project_1.UI.HUD.Windows.Logic;
 using Project_1.Managers;
+using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.Items;
 
@@ -19,6 +20,7 @@ namespace Project_1.UI.HUD.Managers
     internal class WindowHandler
     {
         static CharacterWindow characterWindow;
+        static TalentWindow talentWindow;
         static SpellBookWindow spellBookWindow;
         static GuildWindow guildWindow;
         static InspectWindow inspectWindow;
@@ -34,6 +36,9 @@ namespace Project_1.UI.HUD.Managers
 
             characterWindow = new CharacterWindow();
             aHudElements.Add(characterWindow);
+
+            talentWindow = new TalentWindow();
+            aHudElements.Add(talentWindow);
 
             spellBookWindow = new SpellBookWindow();
             aHudElements.Add(spellBookWindow);
@@ -148,6 +153,27 @@ namespace Project_1.UI.HUD.Managers
         {
             ThreadAffinity.AssertUiThread();
             characterWindow.ToggleVisibilty();
+            HUDManager.InvalidateUi();
+        }
+
+        public void SetTalentWindow(TalentWindowSnapshot snapshot)
+        {
+            ThreadAffinity.AssertUiThread();
+            if (!talentWindow.Matches(snapshot.OwnerSnapshot)) return;
+            talentWindow.SetData(snapshot);
+            HUDManager.InvalidateUi();
+        }
+
+        public void ToggleTalentWindow(in EntityUiSnapshot member)
+        {
+            ThreadAffinity.AssertUiThread();
+            bool shouldRequestSnapshot = talentWindow.ToggleForMember(member);
+            if (shouldRequestSnapshot)
+            {
+                MailboxManager.PublishSimCommand(new TalentWindowSnapshotRequested(
+                    member.RelationToPlayer == RelationToPlayerKind.Self ? null : member.RenderId));
+            }
+
             HUDManager.InvalidateUi();
         }
 

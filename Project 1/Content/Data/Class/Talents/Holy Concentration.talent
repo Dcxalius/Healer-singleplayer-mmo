@@ -1,0 +1,1 @@
+{ "Id": 19, "Name": "Holy Concentration", "GfxName": "CircleOfHealing", "MaxRank": 3, "Required": [ { "Id": 17, "Amount": 1 } ], "SpellChanges": [ { "SpellDataId": 2, "Changes": [ { "Change": "Amount", "Amount": 0.05, "Flat": false } ] } ] }

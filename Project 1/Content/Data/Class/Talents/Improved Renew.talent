@@ -1,0 +1,1 @@
+{ "Id": 1, "Name": "Improved Renew", "GfxName": "Renew", "MaxRank": 5, "Required": [], "SpellChanges": [ { "SpellDataId": 1, "Changes": [ { "Change": "Amount", "Amount": 0.05, "Flat": false } ] } ] }

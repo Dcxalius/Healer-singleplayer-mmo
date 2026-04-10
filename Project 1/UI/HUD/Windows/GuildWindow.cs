@@ -29,6 +29,11 @@ namespace Project_1.UI.HUD.Windows
                     {
                         InspectWindow.Current.ToggleVisibilty();
                     }
+
+                    if (TalentWindow.Current?.Visible == true && TalentWindow.Current.ShowingGuildMember)
+                    {
+                        TalentWindow.Current.CloseWindow();
+                    }
                 }
             }
         }
@@ -37,8 +42,6 @@ namespace Project_1.UI.HUD.Windows
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.03f, Size);
             roster = new GuildRoster(this, spacing, new RelativeScreenPosition(1, 0.8f) - spacing * 2);
             visibleKey = Input.KeyBindManager.KeyListner.GuildRoster;
-
-            AddChild(roster);
         }
 
         public void SetGuildMemberInviteStatus(List<string> aName, List<TwoStateGFXButton.State> aState)

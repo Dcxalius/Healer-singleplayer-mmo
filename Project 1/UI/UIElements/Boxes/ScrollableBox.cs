@@ -94,12 +94,16 @@ namespace Project_1.UI.UIElements.Boxes
             RelativeScreenPosition sizeOfScrollBar = new RelativeScreenPosition(WidthOfBar, 1f - barSpacing.Y - barSpacing.Y);
             scrollBar = new ScrollBar(this, aBarColor, new RelativeScreenPosition(1f - sizeOfScrollBar.X - barSpacing.X, barSpacing.Y), sizeOfScrollBar);
             originalYPos = new List<float>();
-            AddChild(scrollBar);
 
             spacing = RelativeScreenPosition.GetSquareFromX(WidthOfSpacing, Size);
             capturesScroll = true;
 
             elementSize = new RelativeScreenPosition(1f - spacing.X - spacing.X - sizeOfScrollBar.X - barSpacing.X, (1f - spacing.Y) / visibleElements);
+
+            if (!TooMuchForWindow)
+            {
+                scrollBar.Visible = false;
+            }
         }
 
         public override void SetScrollValue(float aValue)
@@ -150,6 +154,9 @@ namespace Project_1.UI.UIElements.Boxes
             originalYPos.RemoveAt(scrollableID);
             int index = GetChildID(aUIElement);
             KillChild(index);
+
+            SizeCheck();
+
         }
 
         public void RemoveScrollableElement(int aIndex) => RemoveScrollableElement(scrollableElements[aIndex]);
@@ -160,10 +167,24 @@ namespace Project_1.UI.UIElements.Boxes
             aUIElement.Move(new RelativeScreenPosition(spacing.X, elementSize.Y * ScrollableElementsCount + spacing.Y * (ScrollableElementsCount + 1)));
             scrollableElements.Add(aUIElement);
             originalYPos.Add(aUIElement.RelativePos.Y);
-            AddChild(aUIElement);
 
-            if (!TooMuchForWindow) scrollBar.SetScrollPlimpSize(1f);
-            else scrollBar.SetScrollPlimpSize((elementSize.Y + spacing.Y) / (originalYPos.Last() + scrollableElements.Last().RelativeSize.Y + Spacing.Y));
+            SizeCheck();
+        }
+
+        void SizeCheck()
+        {
+            if (!TooMuchForWindow)
+            {
+                scrollBar.SetScrollPlimpSize(1f);
+                scrollBar.SetValue(0f);
+                scrollBar.Visible = false;
+            }
+            else
+            {
+                scrollBar.Visible = true;
+                scrollBar.SetScrollPlimpSize((elementSize.Y + spacing.Y) / (originalYPos.Last() + scrollableElements.Last().RelativeSize.Y + Spacing.Y));
+            }
+
         }
 
         public void AddScrollableElements(List<T> aList)

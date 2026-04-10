@@ -35,7 +35,6 @@ namespace Project_1.UI.UIElements.Boxes
             StateManager
         }
 
-        Action unPauseGame => new Action(() => TimeManager.StopPause(this));
 
 
         Label textToDisplay;
@@ -63,7 +62,6 @@ namespace Project_1.UI.UIElements.Boxes
 
 
             textToDisplay = new Label(this, defaultEdgeSpacing, RelativeScreenPosition.One - defaultEdgeSpacing * 2, Label.TextAllignment.TopCentre, aMessageColor, aText: aMessage);
-            AddChild(textToDisplay);
         }
     }
 }

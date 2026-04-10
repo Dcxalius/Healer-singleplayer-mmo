@@ -160,7 +160,7 @@ namespace Project_1.GameObjects.Entities
                         break;
                 }
 
-                SpawnFlyingText(resultString, GetDirOfFloatingText(aAttacker.FeetPosition), resultColor);
+                SpawnFlyingText(resultString, GetDirOfFloatingText(aAttacker.FeetPosition), resultColor, Color.White, 1f);
                 if (this is NonFriendly nf) nf.AddToAggroTable(aAttacker, 1);
                 return;
             }
@@ -180,7 +180,7 @@ namespace Project_1.GameObjects.Entities
                     if (fullyBlocked)
                     {
                         resultString = "Blocked";
-                        SpawnFlyingText(resultString, GetDirOfFloatingText(aAttacker.FeetPosition), resultColor);
+                        SpawnFlyingText(resultString, GetDirOfFloatingText(aAttacker.FeetPosition), resultColor, Color.Black, 1f);
                         PublishHitEvent(aAttacker, aDamagingThing, aHitResult, aDamageTaken);
                         if (this is NonFriendly nf) nf.AddToAggroTable(aAttacker, 1);
                         return;
@@ -252,7 +252,7 @@ namespace Project_1.GameObjects.Entities
 
                 if (RandomManager.RollDouble() > totalHit)
                 {
-                    SpawnFlyingText("Resist", GetDirOfFloatingText(aCaster.FeetPosition), Color.Gray);
+                    SpawnFlyingText("Resist", GetDirOfFloatingText(aCaster.FeetPosition), Color.LightGray, Color.Black, 1f);
                     PublishSpellResistEvent(aCaster, aSpellEffect, false);
                     PublishSpellResistedByTargetEvent(aCaster, aSpellEffect, false);
                     if (this is NonFriendly nf) nf.AddToAggroTable(aCaster, 1);
@@ -275,7 +275,7 @@ namespace Project_1.GameObjects.Entities
 
             if (RandomManager.RollDouble() > totalHit)
             {
-                SpawnFlyingText("Resist", GetDirOfFloatingText(aCaster.FeetPosition), Color.Gray);
+                SpawnFlyingText("Resist", GetDirOfFloatingText(aCaster.FeetPosition), Color.LightGray, Color.Black, 1f);
                 PublishSpellResistEvent(aCaster, aSpellEffect, false);
                 PublishSpellResistedByTargetEvent(aCaster, aSpellEffect, false);
                 if (this is NonFriendly nf) nf.AddToAggroTable(aCaster, 1);
@@ -319,7 +319,7 @@ namespace Project_1.GameObjects.Entities
                         else
                         {
                             resultString = "Immune";
-                            SpawnFlyingText(resultString, GetDirOfFloatingText(aCaster.FeetPosition), Color.Gray);
+                            SpawnFlyingText(resultString, GetDirOfFloatingText(aCaster.FeetPosition), Color.LightGray, Color.Black, 1f);
                             immune = true;
                             continue;
                         }
@@ -328,7 +328,7 @@ namespace Project_1.GameObjects.Entities
                         break;
                         
                 }
-                SpawnFlyingText(resultString, GetDirOfFloatingText(aCaster.FeetPosition), Color.Red);
+                SpawnFlyingText(resultString, GetDirOfFloatingText(aCaster.FeetPosition), Color.Red, Color.Black, 1f);
             }
 
             if (anyDamageApplied)
@@ -367,10 +367,10 @@ namespace Project_1.GameObjects.Entities
 
             //TODO: aCause.DpsMeter.RegisterDamageDone(this, aCauseName, aDamageTaken, aDamageType);
 
-            SpawnFlyingText(aPrefix + FormatHealthDelta(-appliedDelta) + aSuffix, GetDirOfFloatingText(aCause.FeetPosition), textColor);
+            SpawnFlyingText(aPrefix + FormatHealthDelta(-appliedDelta) + aSuffix, GetDirOfFloatingText(aCause.FeetPosition), textColor, aBorderColor, 10f);
         }
 
-        void SpawnFlyingText(string aHealthChangeValue, WorldSpace aDirOfFlyingStuff, Color aTextColor) => FloatingTextManager.AddFloatingText(new FloatingText(aHealthChangeValue, aTextColor, FeetPosition, aDirOfFlyingStuff));
+        void SpawnFlyingText(string aHealthChangeValue, WorldSpace aDirOfFlyingStuff, Color aTextColor, Color aBorderColor, float aBorderWidth) => FloatingTextManager.AddFloatingText(new FloatingText(aHealthChangeValue, aTextColor, FeetPosition, aDirOfFlyingStuff, aBorderColor: aBorderColor, aBorderWidth: aBorderWidth));
 
 
         WorldSpace GetDirOfFloatingText(WorldSpace aFeetPosOfTriggerer)

@@ -16,12 +16,12 @@ namespace Project_1.UI.StartMenu
 
         public MainMenu() : base(null, new UITexture("GrayBackground", Color.Red), new RelativeScreenPosition(0.6f, 0.4f), new RelativeScreenPosition(0.3f, 0.5f))
         {
-            AddChild(new ContinueLastSaveButton(this, GetStartPositionFromTop, ButtonSize));
-            AddChild(new NewGameButton(this, GetStartPositionFromTop, ButtonSize));
-            AddChild(new LoadGameButton(this, GetStartPositionFromTop, ButtonSize));
-            AddChild(new OptionMenuButton(this, GetStartPositionFromTop, ButtonSize));
+            new ContinueLastSaveButton(this, GetStartPositionFromTop, ButtonSize);
+            new NewGameButton(this, GetStartPositionFromTop, ButtonSize);
+            new LoadGameButton(this, GetStartPositionFromTop, ButtonSize);
+            new OptionMenuButton(this, GetStartPositionFromTop, ButtonSize);
 
-            AddChild(new ExitGameButton(this, GetStartPositionFromBottom, ButtonSize));
+            new ExitGameButton(this, GetStartPositionFromBottom, ButtonSize);
         }
     }
 }

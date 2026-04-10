@@ -23,7 +23,7 @@ namespace Project_1.UI.OptionMenu
             capturesClick = false;
             capturesRelease = false;
 
-            AddChild(new Label(this, new RelativeScreenPosition(0.03f, 0.02f), new RelativeScreenPosition(0.94f, HeaderHeight), Label.TextAllignment.CentreLeft, Color.Black, aText: "Chat Message Filters"));
+            new Label(this, new RelativeScreenPosition(0.03f, 0.02f), new RelativeScreenPosition(0.94f, HeaderHeight), Label.TextAllignment.CentreLeft, Color.Black, aText: "Chat Message Filters");
 
             nextRowY = 0.1f;
             AddMessageTypeToggle("Say", ChatMessageType.Say);
@@ -37,14 +37,14 @@ namespace Project_1.UI.OptionMenu
         void AddMessageTypeToggle(string aLabel, ChatMessageType aType)
         {
             bool startState = ChatSettings.IsVisible(aType);
-            AddChild(new ChatToggleRow(
+            new ChatToggleRow(
                 this,
                 aLabel,
                 startState,
                 () => SetMessageTypeVisibility(aType, true),
                 () => SetMessageTypeVisibility(aType, false),
                 new RelativeScreenPosition(0.03f, nextRowY),
-                new RelativeScreenPosition(0.94f, RowHeight)));
+                new RelativeScreenPosition(0.94f, RowHeight));
             nextRowY += RowHeight + RowSpacing;
         }
 
@@ -76,9 +76,6 @@ namespace Project_1.UI.OptionMenu
 
             CheckBox checkBox = new CheckBox(this, aStartState, aOnTicked, aOnUnticked, new RelativeScreenPosition(0.01f, 0.14f), new RelativeScreenPosition(0.075f, 0.72f));
             Label label = new Label(this, new RelativeScreenPosition(0.11f, 0), new RelativeScreenPosition(0.88f, 1), Label.TextAllignment.CentreLeft, Color.Black, aText: aLabel);
-
-            AddChild(checkBox);
-            AddChild(label);
         }
     }
 }

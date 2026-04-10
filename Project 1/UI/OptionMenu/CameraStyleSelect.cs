@@ -21,8 +21,6 @@ namespace Project_1.UI.OptionMenu
             allValues.AddScrollableElements(values);
 
             displayValue = new SelectBoxValueDisplay(this, RelativeScreenPosition.Zero, RelativeScreenPosition.One, values[(int)Camera.Camera.CurrentCameraSetting].DisplayText);
-
-            AddChild(displayValue);
         }
 
         protected override void ActionWhenSelected(int aSelectedValue)

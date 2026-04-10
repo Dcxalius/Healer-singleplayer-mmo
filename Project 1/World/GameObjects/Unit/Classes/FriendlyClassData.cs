@@ -1,4 +1,5 @@
-﻿using Project_1.GameObjects.Unit.Resources;
+﻿using Newtonsoft.Json;
+using Project_1.GameObjects.Unit.Resources;
 using Project_1.Items.SubTypes;
 using System;
 using System.Collections.Generic;
@@ -22,8 +23,9 @@ namespace Project_1.GameObjects.Unit.Classes
         public string[] LevelOneSpells => levelOneSpells;
         string[] levelOneSpells;
 
-        public FriendlyClassData(string name, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float spiritHp5Constant, float spiritHp5Scaling, float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed, MeleeAttackPowerBonus meleeAttackPowerBonus, float agilityDodgeScaling, float baseDodge, float meleeCritScaling, Weapon.WeaponType weaponsAllowed, string[] learnableSpells, string[] levelOneSpells, int[] gearAllowed, bool canDualWield, bool isCaster, bool canParry, float spellCritScaling)
-            : base(name, resource, baseStats, perLevelStats, baseHp, perLevelHp, spiritHp5Constant, spiritHp5Scaling, fistAttackSpeed, fistMinAttackDamage, fistMaxAttackDamage, speed, maxSpeed, meleeAttackPowerBonus, agilityDodgeScaling, baseDodge, meleeCritScaling, weaponsAllowed, canDualWield, isCaster, canParry, spellCritScaling)
+        [JsonConstructor]
+        public FriendlyClassData(string name, int[] talentTrees, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp, float spiritHp5Constant, float spiritHp5Scaling, float fistAttackSpeed, float fistMinAttackDamage, float fistMaxAttackDamage, float speed, float maxSpeed, MeleeAttackPowerBonus meleeAttackPowerBonus, float agilityDodgeScaling, float baseDodge, float meleeCritScaling, Weapon.WeaponType weaponsAllowed, string[] learnableSpells, string[] levelOneSpells, int[] gearAllowed, bool canDualWield, bool isCaster, bool canParry, float spellCritScaling)
+            : base(name, talentTrees, resource, baseStats, perLevelStats, baseHp, perLevelHp, spiritHp5Constant, spiritHp5Scaling, fistAttackSpeed, fistMinAttackDamage, fistMaxAttackDamage, speed, maxSpeed, meleeAttackPowerBonus, agilityDodgeScaling, baseDodge, meleeCritScaling, weaponsAllowed, canDualWield, isCaster, canParry, spellCritScaling)
         {
             this.gearAllowed = gearAllowed;
             this.learnableSpells = learnableSpells;

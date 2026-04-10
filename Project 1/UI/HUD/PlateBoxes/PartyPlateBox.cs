@@ -48,7 +48,6 @@ namespace Project_1.UI.HUD.PlateBoxes
             AddSegmentsToChildren();
 
             border = new CommandBorder(this, Color.YellowGreen, RelativeScreenPosition.Zero, aSize);
-            AddChild(border);
             VisibleBorder = false;
             Visible = false;
         }

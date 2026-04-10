@@ -26,9 +26,6 @@ namespace Project_1.UI.HUD.Windows
             iconImage = new Image(this, UITexture.Null, new RelativeScreenPosition(0.02f, 0.10f), iconSize);
             nameLabel = new Label(this, new RelativeScreenPosition(0.12f, 0f), new RelativeScreenPosition(0.63f, 1f), Label.TextAllignment.CentreLeft, Color.White, aTextSize: 11f);
             levelLabel = new Label(this, new RelativeScreenPosition(0.76f, 0f), new RelativeScreenPosition(0.20f, 1f), Label.TextAllignment.CentreRight, Color.White, aTextSize: 11f);
-            AddChild(iconImage);
-            AddChild(nameLabel);
-            AddChild(levelLabel);
             if (onSelected != null)
             {
                 AddAction(() => onSelected(snapshot));

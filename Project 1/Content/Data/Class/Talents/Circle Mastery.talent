@@ -1,0 +1,1 @@
+{ "Id": 2, "Name": "Circle Mastery", "GfxName": "CircleOfHealing", "MaxRank": 3, "Required": [ { "Id": 0, "Amount": 1 } ], "SpellChanges": [ { "SpellDataId": 2, "Changes": [ { "Change": "Cost", "Amount": 0.1, "Flat": false } ] } ] }

@@ -24,10 +24,6 @@ namespace Project_1.UI.OptionMenu
             nameOfButton = new Label(this, RelativeScreenPosition.Zero, new RelativeScreenPosition(1f / 3, 1f), Label.TextAllignment.Centred, Color.Black, aText: aListner.ToString());
             firstKeybindingButton = new KeybindingButton(this, true, aListner, new RelativeScreenPosition(1f/3, 0), new RelativeScreenPosition(1f / 3, 1f));
             secondKeybindingButton = new KeybindingButton(this, false, aListner, new RelativeScreenPosition(1f * 2 / 3 + spacingX, 0), new RelativeScreenPosition(1f / 3, 1f));
-
-            AddChild(nameOfButton);
-            AddChild(firstKeybindingButton);
-            AddChild(secondKeybindingButton);
         }
     }
 }

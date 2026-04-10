@@ -1,0 +1,1 @@
+{ "Id": 0, "Name": "Spiritual Focus", "GfxName": "Heal", "MaxRank": 5, "Required": [], "SpellChanges": [ { "SpellDataId": 0, "Changes": [ { "Change": "CastSpeed", "Amount": 0.1, "Flat": true } ] } ] }

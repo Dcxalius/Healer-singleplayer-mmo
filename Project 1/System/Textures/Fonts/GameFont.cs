@@ -15,6 +15,6 @@ namespace Project_1.Textures
         public virtual float MeasureDescenderDepth(string text) => 0f;
         public abstract Vector2 MeasureString(string text);
         public abstract Vector2 MeasurePartialString(string text, int startIndex, int length);
-        public abstract void DrawString(SpriteBatch batch, string text, Vector2 position, Color color, Vector2 origin, float scale, float layerDepth);
+        public abstract void DrawString(SpriteBatch batch, string text, Vector2 position, Color color, Vector2 origin, float scale, float layerDepth, Color aBorderColor, float aBorderWidth);
     }
 }

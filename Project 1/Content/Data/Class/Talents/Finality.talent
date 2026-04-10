@@ -1,0 +1,1 @@
+{ "Id": 14, "Name": "Finality", "GfxName": "Backstab", "MaxRank": 5, "Required": [ { "Id": 13, "Amount": 1 } ], "SpellChanges": [ { "SpellDataId": 3, "Changes": [ { "Change": "Amount", "Amount": 0.05, "Flat": false } ] }, { "SpellDataId": 4, "Changes": [ { "Change": "Amount", "Amount": 0.05, "Flat": false } ] } ] }

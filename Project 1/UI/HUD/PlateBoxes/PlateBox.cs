@@ -35,10 +35,9 @@ namespace Project_1.UI.HUD.PlateBoxes
 
         protected void AddSegmentsToChildren()
         {
-            AddChildren(leftVerticalSegments);
-            AddChildren(rightVerticalSegments);
-            AddChildren(horizontalSegments);
-            AddChild(levelCircle);
+            //AddChildren(leftVerticalSegments);
+            //AddChildren(rightVerticalSegments);
+            //AddChildren(horizontalSegments);
         }
 
     }

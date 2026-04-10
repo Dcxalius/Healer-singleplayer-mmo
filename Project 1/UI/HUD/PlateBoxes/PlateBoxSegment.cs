@@ -22,9 +22,6 @@ namespace Project_1.UI.HUD.PlateBoxes
         {
             bar = new ResourceBar(this, new BarTexture(fillingDirection, Color.Transparent), null, RelativeScreenPosition.Zero, RelativeScreenPosition.One);
 
-
-            AddChild(bar);
-
             bar.Visible = false;
             
             capturesClick = false;

@@ -25,13 +25,6 @@ namespace Project_1.UI.OptionMenu
             keybindingsOptionButton = new KeybindingsOptionButton(this, new RelativeScreenPosition(buttonSize.X, 0), buttonSize);
             chatOptionsButton = new ChatOptionsButton(this, new RelativeScreenPosition(buttonSize.X * 2, 0), buttonSize);
             debugOptionsButton = new DebugOptionsButton(this, new RelativeScreenPosition(buttonSize.X * 3, 0), buttonSize);
-
-            AddChild(videoOptionsButton);  
-            AddChild(keybindingsOptionButton);
-            AddChild(chatOptionsButton);
-            AddChild(debugOptionsButton);
-
-            Debug.Assert(ChildCount == aCountOfButtons, "Missing buttons in optionpagebox");
         }
     }
 }

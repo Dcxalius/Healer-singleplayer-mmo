@@ -20,8 +20,6 @@ namespace Project_1.UI.OptionMenu
             allValues.AddScrollableElements(values);
 
             displayValue = new SelectBoxValueDisplay(this, RelativeScreenPosition.Zero, RelativeScreenPosition.One, Camera.Camera.FullScreen.ToString());
-
-            AddChild(displayValue);
         }
 
         protected override void ActionWhenSelected(int aSelectedValue)

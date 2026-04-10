@@ -27,10 +27,7 @@ namespace Project_1.UI.HUD.Windows
             {
                 numberLabel = new Label(this, new RelativeScreenPosition(0f, 0f), new RelativeScreenPosition(0.45f, 1f), Label.TextAllignment.CentreRight, Color.Black);
                 textLabel = new Label(this, new RelativeScreenPosition(0.5f, 0f), new RelativeScreenPosition(0.5f, 1f), Label.TextAllignment.CentreLeft, Color.Black);
-                AddChild(numberLabel);
-                AddChild(textLabel);
 
-                Visible = false;
                 CapturesClick = false;
                 CapturesRelease = false;
                 CapturesScroll = false;
@@ -94,26 +91,37 @@ namespace Project_1.UI.HUD.Windows
         static readonly Point StatPageSize = new Point(1, StatRowsPerPage);
 
         readonly List<StatPage> statPages = new List<StatPage>(4);
-        readonly StatLineElement[] statLines;
 
         SpellReportDetailsSnapshot secondarySpellDetails = SpellReportDetailsSnapshot.Empty;
         string ownerClassName = string.Empty;
         RelationToPlayerKind ownerRelation = RelationToPlayerKind.Self;
 
-        public CharacterStatReportBox(UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize)
-            : base(aParent, new UITexture("WhiteBackground", Color.Transparent), aPos, aSize, StatPageSize)
-        {
-            statLines = new StatLineElement[StatRowsPerPage];
-            for (int i = 0; i < statLines.Length; i++)
-            {
-                float rowHeight = (1f - StatPageTopPadding) / StatRowsPerPage;
-                float y = StatPageTopPadding + rowHeight * i;
-                statLines[i] = new StatLineElement(this, new RelativeScreenPosition(0.05f, y), new RelativeScreenPosition(0.9f, rowHeight));
-            }
+        
 
-            SetPageElements(statLines, BindStatLine, ClearStatLine);
+        public CharacterStatReportBox(UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize)
+            : base(aParent, CreateElements(), new UITexture("WhiteBackground", Color.Transparent), aPos, aSize, StatPageSize)
+        {
+
+            SetBinders(BindStatLine, ClearStatLine);
             SetPageTitleProvider(GetCurrentPageTitle);
-            Visible = false;
+        }
+
+        static Func<PageBox, UIElement[]> CreateElements() 
+        {
+            Func<PageBox, UIElement[]> r = (x) =>
+            {
+                UIElement[] pageElements = new StatLineElement[StatRowsPerPage];
+                for (int i = 0; i < pageElements.Length; i++)
+                {
+                    float rowHeight = (1f - StatPageTopPadding) / StatRowsPerPage;
+                    float y = StatPageTopPadding + rowHeight * i;
+                    pageElements[i] = new StatLineElement(x, new RelativeScreenPosition(0.05f, y), new RelativeScreenPosition(0.9f, rowHeight));
+                }
+                return pageElements;
+
+            };
+            return r;
+
         }
 
         public void SetOwnerContext(in EntityUiSnapshot aOwnerSnapshot)

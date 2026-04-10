@@ -1,0 +1,1 @@
+{ "Id": 15, "Name": "Quick Strike", "GfxName": "Kill", "MaxRank": 5, "Required": [], "SpellChanges": [ { "SpellDataId": 4, "Changes": [ { "Change": "Amount", "Amount": 0.05, "Flat": false } ] } ] }

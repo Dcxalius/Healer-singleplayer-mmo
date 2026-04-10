@@ -29,7 +29,6 @@ namespace Project_1.UI.HUD
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.025f, Size);
             scrollableComponent = new ScrollableBox<Loot>(this, 3f, new UITexture("WhiteBackground", Color.White), Color.Yellow, spacing, RelativeScreenPosition.One - spacing - spacing);
             //capturesScroll = true;
-            AddChild(scrollableComponent);
             Dragable = true;
             hudMoveable = false;
         }

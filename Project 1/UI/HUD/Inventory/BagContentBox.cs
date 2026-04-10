@@ -33,7 +33,6 @@ namespace Project_1.UI.HUD.Inventory
             AbsoluteScreenPosition absSpacing = InventoryBox.AbsBagBoxSpacing;
             SetSize(aSlotCount, ref aColumnCount, absItem, absSpacing);
             SetItems(itemSnapshots, aColumnCount, absItem, absSpacing);
-            AddChildren(slots);
         }
 
         void SetSize(int aSlotCount, ref int aColumnCount, AbsoluteScreenPosition aItemSize, AbsoluteScreenPosition aSpacing)

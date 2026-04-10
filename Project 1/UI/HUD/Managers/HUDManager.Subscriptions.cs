@@ -80,6 +80,8 @@ namespace Project_1.UI.HUD.Managers
             MailboxManager.Ui.Subscribe<LogicWindowOpened>(OnLogicWindowOpened);
             MailboxManager.Ui.Subscribe<LogicWindowSnapshotSet>(OnLogicWindowSnapshotSet);
             MailboxManager.Ui.Subscribe<CharacterWindowToggled>(OnCharacterWindowToggled);
+            MailboxManager.Ui.Subscribe<TalentWindowToggled>(OnTalentWindowToggled);
+            MailboxManager.Ui.Subscribe<TalentWindowSet>(OnTalentWindowSet);
         }
 
         static void RegisterPlateAndPartySubscriptions()
@@ -350,6 +352,18 @@ namespace Project_1.UI.HUD.Managers
         static void OnCharacterWindowToggled(CharacterWindowToggled _)
         {
             windowHandler.ToggleCharacterWindow();
+            InvalidateUi();
+        }
+
+        static void OnTalentWindowToggled(TalentWindowToggled e)
+        {
+            windowHandler.ToggleTalentWindow(e.Member);
+            InvalidateUi();
+        }
+
+        static void OnTalentWindowSet(TalentWindowSet e)
+        {
+            windowHandler.SetTalentWindow(e.Snapshot);
             InvalidateUi();
         }
 
