@@ -39,6 +39,10 @@ namespace Project_1.GameObjects.Unit
         [JsonProperty(PropertyName = "ClassName")]
         string className => classData.Name;
 
+        public (int id, int rank)[] LearntTalents => learntTalents;
+        (int id, int rank)[] learntTalents;
+
+
         public UnitType UnitType => unitType;
         UnitType unitType;
 
@@ -191,6 +195,7 @@ namespace Project_1.GameObjects.Unit
             gfxPath = aData.GfxPath;
             corpseGfxPath = aData.CorpseGfxPath;
 
+            learntTalents = new (int id, int rank)[0];
             position = aSpawn;
             velocity = WorldSpace.Zero;
             momentum = WorldSpace.Zero;
@@ -202,7 +207,7 @@ namespace Project_1.GameObjects.Unit
 
 
         [JsonConstructor]
-        public UnitData(string name, string corpseGfxName, string className, Relation.RelationToPlayer? relation, int level, int experience,
+        public UnitData(string name, string corpseGfxName, string className, Relation.RelationToPlayer? relation, int level, int experience, (int, int)[] learntTalents,
             float currentHp, float currentResource, int?[] equipment, WorldSpace position, WorldSpace momentum, WorldSpace velocity, List<WorldSpace> destinations, int defenseSkill)
         {
             this.name = name;
@@ -210,6 +215,7 @@ namespace Project_1.GameObjects.Unit
             relationData = new Relation(relation);
             SetClassData(relation.Value, className);
             this.level = new Level(level, experience);
+            this.learntTalents = learntTalents ?? classData.GenerateEmptyTalents;
             SetEquipment(equipment);
             this.position = new WorldSpace(position);
             this.momentum = new WorldSpace(momentum);

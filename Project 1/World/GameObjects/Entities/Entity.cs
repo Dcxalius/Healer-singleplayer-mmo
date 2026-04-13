@@ -49,6 +49,7 @@ namespace Project_1.GameObjects.Entities
             velocity = unitData.Velocity;
             momentum = UnitData.Momentum;
 
+
             groundEffects.Add(new Shadow());
             groundEffects.Add(new SelectRing());
             CreateNamePlate();

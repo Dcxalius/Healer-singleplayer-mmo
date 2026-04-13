@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Entities.Friendlies;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
@@ -21,7 +23,9 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
             initialized = true;
 
             MailboxManager.RegisterSimCommandType<TalentWindowSnapshotRequested>();
+            MailboxManager.RegisterSimCommandType<TalentLearnRequested>();
             MailboxManager.Sim.Subscribe<TalentWindowSnapshotRequested>(HandleTalentWindowSnapshotRequested);
+            MailboxManager.Sim.Subscribe<TalentLearnRequested>(HandleTalentLearnRequested);
         }
 
         static void HandleTalentWindowSnapshotRequested(TalentWindowSnapshotRequested e)
@@ -32,6 +36,16 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
             if (owner == null) return;
 
             MailboxManager.PublishUiEvent(new TalentWindowSet(BuildSnapshot(owner)));
+        }
+
+        static void HandleTalentLearnRequested(TalentLearnRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+            if (!player.TryLearnTalent(e.TalentId)) return;
+
+            MailboxManager.PublishUiEvent(new TalentWindowSet(BuildSnapshot(player)));
         }
 
         static Entity ResolveOwner(int? memberRenderId)
@@ -53,6 +67,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
         {
             TalentTree[] sourceTrees = owner.ClassData?.TalentTrees ?? Array.Empty<TalentTree>();
             TalentTreeUiSnapshot[] trees = new TalentTreeUiSnapshot[ExpectedTreesPerClass];
+            int remainingTalentPoints = owner is Friendly friendly ? friendly.RemainingTalentPoints : 0;
 
             for (int i = 0; i < trees.Length; i++)
             {
@@ -61,7 +76,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
                     : BuildEmptyTreeSnapshot(i);
             }
 
-            return new TalentWindowSnapshot(owner.BuildUiSnapshot(), trees);
+            return new TalentWindowSnapshot(owner.BuildUiSnapshot(), trees, remainingTalentPoints);
         }
 
         static TalentTreeUiSnapshot BuildTreeSnapshot(Entity owner, TalentTree tree)
@@ -79,12 +94,13 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
                 .ToArray()
                 ?? Array.Empty<TalentUiSnapshot[]>();
 
-            return new TalentTreeUiSnapshot(tree.Name, tree.Background, rows);
+            int spentPoints = tree.GetIds.Sum(owner.GetTalentRank);
+            return new TalentTreeUiSnapshot(tree.Name, tree.Background, rows, spentPoints);
         }
 
         static TalentTreeUiSnapshot BuildEmptyTreeSnapshot(int index)
         {
-            return new TalentTreeUiSnapshot($"Tree {index + 1}", GfxPath.NullPath, Array.Empty<TalentUiSnapshot[]>());
+            return new TalentTreeUiSnapshot($"Tree {index + 1}", GfxPath.NullPath, Array.Empty<TalentUiSnapshot[]>(), 0);
         }
     }
 }

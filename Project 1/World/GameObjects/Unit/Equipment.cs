@@ -51,22 +51,6 @@ namespace Project_1.GameObjects.Unit
         Dictionary<string, int> aggregatedSecondaryStatsInt;
         Dictionary<string, double> aggregatedSecondaryStatsFloat;
 
-        public int GetBaseSpellPower
-        {
-            get
-            {
-                for (int i = 0; i < equipped.Length; i++)
-                {
-                    if (equipped[i] == null)
-                    {
-                        continue;
-                    }
-
-                    //equipped[i].SpellDamage
-                }
-                return 0; //TODO: Implement this
-            }
-        }
 
         public bool CanShieldBlock(DamageType aDamageType) => aDamageType == DamageType.Physical; //TODO: Implement shields that can block certain damage types
 

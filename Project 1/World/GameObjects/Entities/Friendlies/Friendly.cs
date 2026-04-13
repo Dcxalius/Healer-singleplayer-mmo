@@ -15,11 +15,55 @@ namespace Project_1.GameObjects.Entities.Friendlies
     {
         public override Color MinimapColor => Color.Pink;
         public new FriendlyClassData ClassData => base.ClassData as FriendlyClassData;
+        public int RemainingTalentPoints => Math.Max(0, CurrentTalentPoints - UnitData.LearntTalents.Sum(x => x.rank));
+
         public Friendly(UnitData aUnitData) : base(aUnitData)
         {
 
         }
 
+        int CurrentTalentPoints => Level.CurrentLevel - 9;
+
+        public bool TryLearnTalent(int aTalentId)
+        {
+            if (RemainingTalentPoints <= 0) return false;
+            if (ClassData?.TalentTrees == null) return false;
+
+            for (int treeIndex = 0; treeIndex < ClassData.TalentTrees.Length; treeIndex++)
+            {
+                var tree = ClassData.TalentTrees[treeIndex];
+                if (tree?.Talents == null) continue;
+
+                int pointsSpentInTree = tree.GetIds.Sum(GetTalentRank);
+                for (int rowIndex = 0; rowIndex < tree.Talents.Length; rowIndex++)
+                {
+                    var row = tree.Talents[rowIndex];
+                    if (row == null) continue;
+
+                    for (int talentIndex = 0; talentIndex < row.Length; talentIndex++)
+                    {
+                        var talent = row[talentIndex];
+                        if (talent == null || talent.Id != aTalentId) continue;
+
+                        if (GetTalentRank(aTalentId) >= talent.MaxRank) return false;
+                        if (pointsSpentInTree < rowIndex * 5) return false;
+                        if (talent.Required.Any(x => GetTalentRank(x.id) < x.amount)) return false;
+
+                        var learntTalents = UnitData.LearntTalents;
+                        for (int i = 0; i < learntTalents.Length; i++)
+                        {
+                            if (learntTalents[i].id != aTalentId) continue;
+                            learntTalents[i].rank++;
+                            return true;
+                        }
+
+                        return false;
+                    }
+                }
+            }
+
+            return false;
+        }
 
 
         public Friendlies.GuildMembers.GuildMember.GuildMemberData CreateGuildMemberData()

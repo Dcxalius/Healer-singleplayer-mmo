@@ -8,6 +8,11 @@ using System.Collections.Generic;
 
 namespace Project_1.UI.UIElements.Boxes
 {
+    internal interface IPageBoxLabeledElement
+    {
+        string PageBoxLabel { get; }
+    }
+
     internal class PageBox : Box
     {
         public int CurrentPage => currentPage;
@@ -20,6 +25,7 @@ namespace Project_1.UI.UIElements.Boxes
         readonly GFXButton leftArrow;
         readonly GFXButton rightArrow;
         readonly Label pageTitle;
+        readonly Label[] pageLabels;
         readonly Point pageDimensions;
         readonly int itemsPerPage;
         Action<UIElement, int> bindPageElement;
@@ -31,7 +37,7 @@ namespace Project_1.UI.UIElements.Boxes
         int maxPages;
         int totalItems;
 
-        public PageBox(UIElement aParent, Func<PageBox, UIElement[]> aPageElementFactory, UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Point aPageDimensions, Action<UIElement, int> aBindPageElement = null, Action<UIElement> aClearPageElement = null)
+        public PageBox(UIElement aParent, Func<PageBox, UIElement[]> aPageElementFactory, UITexture aGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize, Point aPageDimensions, Action<UIElement, int> aBindPageElement = null, Action<UIElement> aClearPageElement = null, Func<PageBox, Label[]> aPageLabelFactory = null)
             : base(aParent, aGfx, aPos, aSize)
         {
             int pageX = Math.Max(1, aPageDimensions.X);
@@ -39,6 +45,7 @@ namespace Project_1.UI.UIElements.Boxes
             pageDimensions = new Point(pageX, pageY);
             itemsPerPage = pageX * pageY;
             pageElements = aPageElementFactory.Invoke(this);
+            pageLabels = aPageLabelFactory?.Invoke(this);
             bindPageElement = aBindPageElement;
             clearPageElement = aClearPageElement;
 
@@ -128,6 +135,7 @@ namespace Project_1.UI.UIElements.Boxes
                     //TODO: This causes page elemts to be hoverable on creation
                     pageElement.Visible = true;
                     bindPageElement?.Invoke(pageElement, elementIndex);
+                    UpdatePageLabel(i, pageElement);
                     continue;
                 }
 
@@ -135,6 +143,7 @@ namespace Project_1.UI.UIElements.Boxes
                 {
                     clearPageElement(pageElement);
                 }
+                ClearPageLabel(i);
                 pageElement.Visible = false;
             }
         }
@@ -142,6 +151,28 @@ namespace Project_1.UI.UIElements.Boxes
         void UpdatePageTitle()
         {
             pageTitle.Text = pageTitleProvider?.Invoke(currentPage) ?? DefaultPageTitle(currentPage);
+        }
+
+        void UpdatePageLabel(int aPageIndex, UIElement aPageElement)
+        {
+            if (pageLabels == null || aPageIndex < 0 || aPageIndex >= pageLabels.Length) return;
+
+            Label pageLabel = pageLabels[aPageIndex];
+            if (pageLabel == null) return;
+
+            pageLabel.Visible = aPageElement.Visible;
+            pageLabel.Text = (aPageElement as IPageBoxLabeledElement)?.PageBoxLabel;
+        }
+
+        void ClearPageLabel(int aPageIndex)
+        {
+            if (pageLabels == null || aPageIndex < 0 || aPageIndex >= pageLabels.Length) return;
+
+            Label pageLabel = pageLabels[aPageIndex];
+            if (pageLabel == null) return;
+
+            pageLabel.Text = null;
+            pageLabel.Visible = false;
         }
 
         static string DefaultPageTitle(int aPageIndex) => $"Page {aPageIndex + 1}";

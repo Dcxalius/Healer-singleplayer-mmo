@@ -148,8 +148,45 @@ namespace Project_1.GameObjects.Unit.Classes
         //Warlock	2.0%	    20
         //Warrior	0.0%	    20
 
+        public int MaxTalents
+        {
+            get
+            {
+                int max = 0;
+                foreach (TalentTree tree in TalentTrees)
+                {
+                    for (global::System.Int32 i = 0; i < tree.Talents.Length; i++)
+                    {
+                        max += tree.Talents[i].Length;
+                    }
+                }
+                return max;
+            }
+        }
+
         public TalentTree[] TalentTrees => talentTrees;
         TalentTree[] talentTrees;
+
+        public (int id, int rank)[] GenerateEmptyTalents
+        {
+            get
+            {
+                (int id, int rank)[] returnable = new (int, int)[MaxTalents];
+                int index = 0;
+                for (int i = 0; i < talentTrees.Length; i++)
+                {
+                    int[] talents = talentTrees[i].GetIds;
+                    for (int j = 0; j < talents.Length; j++)
+                    {
+                        returnable[index].id = talents[j];
+                        returnable[index].rank = 0;
+                        index++;
+                    }
+                }
+                return returnable;
+            }
+        }
+
 
         [JsonConstructor]
         public ClassData(string name, int[] talentTrees, Resource.ResourceType resource, int[] baseStats, int[] perLevelStats, int baseHp, int perLevelHp,

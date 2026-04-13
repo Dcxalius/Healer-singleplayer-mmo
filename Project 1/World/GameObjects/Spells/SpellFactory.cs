@@ -16,6 +16,7 @@ namespace Project_1.GameObjects.Spells
     internal static class SpellFactory
     {
         static Dictionary<string, SpellData> spellData;
+        static Dictionary<int, SpellData> spellDataById;
         //static Dictionary<int, SpellEffect> spellEffect;
         static Instant[] instantData;
         static OverTime[] overTimeData;
@@ -32,6 +33,7 @@ namespace Project_1.GameObjects.Spells
         static void InitSpellData()
         {
             spellData = new Dictionary<string, SpellData>();
+            spellDataById = new Dictionary<int, SpellData>();
             string path = Game1.ContentManager.RootDirectory + "\\Data\\Spells\\";
             string[] files = Directory.GetFiles(path);
 
@@ -40,6 +42,7 @@ namespace Project_1.GameObjects.Spells
                 string rawData = File.ReadAllText(files[i]);
                 SpellData data = JsonConvert.DeserializeObject<SpellData>(rawData);
                 spellData.Add(data.Name, data);
+                spellDataById.Add(data.Id, data);
             }
         }
 
@@ -120,7 +123,14 @@ namespace Project_1.GameObjects.Spells
 
         public static SpellData GetSpell(String aName)
         {
+            Init();
             return spellData[aName];
+        }
+
+        public static SpellData GetSpell(int aId)
+        {
+            Init();
+            return spellDataById[aId];
         }
     }
 }

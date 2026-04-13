@@ -13,6 +13,16 @@ namespace Project_1.Messaging.Events
         public int? MemberRenderId { get; }
     }
 
+    internal readonly struct TalentLearnRequested
+    {
+        public TalentLearnRequested(int talentId)
+        {
+            TalentId = talentId;
+        }
+
+        public int TalentId { get; }
+    }
+
     internal readonly struct TalentWindowSet
     {
         public TalentWindowSet(TalentWindowSnapshot snapshot)
@@ -35,28 +45,32 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct TalentWindowSnapshot
     {
-        public TalentWindowSnapshot(EntityUiSnapshot ownerSnapshot, TalentTreeUiSnapshot[] trees)
+        public TalentWindowSnapshot(EntityUiSnapshot ownerSnapshot, TalentTreeUiSnapshot[] trees, int remainingTalentPoints)
         {
             OwnerSnapshot = ownerSnapshot;
             Trees = trees ?? Array.Empty<TalentTreeUiSnapshot>();
+            RemainingTalentPoints = remainingTalentPoints;
         }
 
         public EntityUiSnapshot OwnerSnapshot { get; }
         public TalentTreeUiSnapshot[] Trees { get; }
+        public int RemainingTalentPoints { get; }
     }
 
     internal readonly struct TalentTreeUiSnapshot
     {
-        public TalentTreeUiSnapshot(string name, GfxPath background, TalentUiSnapshot[][] rows)
+        public TalentTreeUiSnapshot(string name, GfxPath background, TalentUiSnapshot[][] rows, int spentPoints)
         {
             Name = name ?? string.Empty;
             Background = background ?? GfxPath.NullPath;
             Rows = rows ?? Array.Empty<TalentUiSnapshot[]>();
+            SpentPoints = spentPoints;
         }
 
         public string Name { get; }
         public GfxPath Background { get; }
         public TalentUiSnapshot[][] Rows { get; }
+        public int SpentPoints { get; }
     }
 
     internal readonly struct TalentUiSnapshot

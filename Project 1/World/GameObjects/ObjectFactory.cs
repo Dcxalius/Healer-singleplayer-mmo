@@ -51,7 +51,7 @@ namespace Project_1.GameObjects
         public static void AddGuildMember(string aName, string aClassName)
         {
             ThreadAffinity.AssertSimThread();
-            UnitData xdd = new UnitData(aName, "", aClassName, Relation.RelationToPlayer.Friendly, 1, 0, float.MaxValue, float.MaxValue, null, WorldSpace.Zero, WorldSpace.Zero, WorldSpace.Zero, null, 1);
+            UnitData xdd = new UnitData(aName, "", aClassName, Relation.RelationToPlayer.Friendly, 1, 0, null, float.MaxValue, float.MaxValue, null, WorldSpace.Zero, WorldSpace.Zero, WorldSpace.Zero, null, 1);
 
             guildData.Add(xdd);
         }

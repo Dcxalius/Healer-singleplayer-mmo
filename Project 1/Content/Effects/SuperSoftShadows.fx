@@ -128,7 +128,7 @@ VSOutput VS_SoftShadow(VSInput input)
     float2 proj_xy = lerp(delta - offset, endpoint - light_pos, w);
 
     // Transform to clip space in a stable affine form.
-    float4 clipPos = mul(float4(proj_xy + light_pos, 0.0f, w), u_matrix);
+    float4 clipPos = mul(float4(proj_xy + light_pos * w, 0.0f, w), u_matrix);
     o.Position = clipPos;
 
     // --------------------------------------------------------
@@ -197,7 +197,10 @@ float4 PS_SoftShadow(VSOutput input) : SV_Target
     // --------------------------------------------------------
 
     // Gradient coordinates in "uv" space.
-    float2 grad = input.Penumbras.xz / input.Penumbras.yw;
+    // Guard: at near vertices (w=1) the y-components degenerate to zero, causing 0/0 = NaN.
+    // When |yw| is tiny, force grad to 0 (mid-smoothstep, neutral contribution).
+    float2 valid = step(1e-6f, abs(input.Penumbras.yw));
+    float2 grad = input.Penumbras.xz * valid / max(abs(input.Penumbras.yw), 1e-6f);
 
     // Smooth falloff, clamp to [-1,1] and [0,1].
     float2 pen = smoothstep(-1.0f, 1.0f, grad);
@@ -237,6 +240,13 @@ float4 PS_SoftShadow(VSOutput input) : SV_Target
     // --------------------------------------------------------
 
     float shadow = bleed * (1.0f - penumbra) * step(input.Edges.z, 0.0f);
+
+    // Clip shadow to the light's radius.
+    // pixel_pos is in light-relative world space scaled by LightPenetration,
+    // so multiplying its length back by LightPenetration recovers the world distance.
+    float distFromLight = length(pixel_pos) * LightPenetration;
+    shadow *= step(distFromLight, u_light.z);
+
     shadow = saturate(shadow);
 
     // Output single-channel mask in RGB (alpha = 1).

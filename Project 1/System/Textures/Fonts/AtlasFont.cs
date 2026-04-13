@@ -79,6 +79,7 @@ namespace Project_1.Textures
 
         public override void DrawString(SpriteBatch batch, string text, Vector2 position, Color color, Vector2 origin, float scale, float layerDepth, Color aBorderColor, float aBorderWidth)
         {
+
             ThreadAffinity.AssertMainThread();
             if (batch == null || string.IsNullOrEmpty(text)) return;
 
@@ -120,6 +121,7 @@ namespace Project_1.Textures
                     {
                         float glyphX = basePosition.X + (penX + glyph.PlaneLeftPx) * scale;
                         float glyphY = basePosition.Y + (penY + ascenderPx - glyph.PlaneTopPx) * scale;
+
                         Rectangle destination = new Rectangle(
                             (int)MathF.Round(glyphX),
                             (int)MathF.Round(glyphY),

@@ -185,9 +185,18 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         public void DivideExpAmongParty(int aExpAmount)
         {
             ThreadAffinity.AssertSimThread();
-            int dividedExp = aExpAmount / (PartyCount + 1);
-            int bonusExp = 0;//TODO: Check what bonus exp should be
-            dividedExp += bonusExp;
+            //TODO: Calculate level penalty multiplier as well, currently the party exp is based on the average level, is this correct?
+            double multiplier = party.Count switch
+            {
+                1 => 1,
+                2 => 1.166,
+                3 => 1.3,
+                4 => 1.4,
+                _ => throw new Exception("How did you get here?")
+            };
+            //TODO: Ponder if exp should be double or float
+            int groupExp = (int)(aExpAmount * multiplier);
+            int dividedExp = groupExp / (PartyCount + 1);
             for (int i = 0; i < party.Count; i++)
             {
                 party[i].GainExperience(dividedExp);

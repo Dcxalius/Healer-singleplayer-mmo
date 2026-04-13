@@ -160,7 +160,7 @@ namespace Project_1.GameObjects.Entities
                         break;
                 }
 
-                SpawnFlyingText(resultString, GetDirOfFloatingText(aAttacker.FeetPosition), resultColor, Color.White, 1f);
+                SpawnFlyingText(resultString, GetDirOfFloatingText(aAttacker.FeetPosition), resultColor, Color.Black, 1f);
                 if (this is NonFriendly nf) nf.AddToAggroTable(aAttacker, 1);
                 return;
             }
@@ -195,7 +195,7 @@ namespace Project_1.GameObjects.Entities
                     resultColor = Color.Orange;
                     break;
                 case HitTable.HitResult.Hit:
-                    resultColor = Color.Red; //TODO: Instead of just using text color, have the text color depend on the damage type and glancing/blocked/crit/crushing/hit change the border color
+                    resultColor = Color.Black; //TODO: Instead of just using text color, have the text color depend on the damage type and glancing/blocked/crit/crushing/hit change the border color
                     break;
                 default:
                     break;
@@ -289,14 +289,14 @@ namespace Project_1.GameObjects.Entities
                 switch (damageType[i])
                 {
                     case DamageType.True:
-                        ProcessDamage(aCaster, aSpellEffect.Name, (float)aDamageTaken[DamageType.True], 1f, DamageType.True, Color.Red, aDamageTaken[DamageType.True].ToString());
+                        ProcessDamage(aCaster, aSpellEffect.Name, (float)aDamageTaken[DamageType.True], 1f, DamageType.True, Color.Black);
                         anyDamageApplied = true;
                         continue;
                     case DamageType.Physical:
                         float reduction = SecondaryStats.Defense.Armor.GetGetReductionPercentage(aCaster.Level.CurrentLevel);
                         float damageTaken = (float)(aDamageTaken[DamageType.Physical] * (1 - reduction));
                         resultString = damageTaken.ToString();
-                        ProcessDamage(aCaster, aSpellEffect.Name, damageTaken, 1f, DamageType.Physical, Color.Red);
+                        ProcessDamage(aCaster, aSpellEffect.Name, damageTaken, 1f, DamageType.Physical, Color.Black);
                         anyDamageApplied = true;
                         break;
                     default:
@@ -323,7 +323,7 @@ namespace Project_1.GameObjects.Entities
                             immune = true;
                             continue;
                         }
-                        ProcessDamage(aCaster, aSpellEffect.Name, damageTaken, 1f, damageType[i], Color.Red, preFix, suffix);
+                        ProcessDamage(aCaster, aSpellEffect.Name, damageTaken, 1f, damageType[i], Color.Black, preFix, suffix);
                         anyDamageApplied = true;
                         break;
                         
@@ -362,12 +362,23 @@ namespace Project_1.GameObjects.Entities
         //TODO: aCauseName should probably not be a string, but rather some kind of reference to the spell/ability/item that caused the damage
         protected virtual void ProcessDamage(Entity aCause, string aCauseName, float aDamageTaken, float aThreatMod, DamageType aDamageType, Color aBorderColor, string aPrefix = "", string aSuffix = "")
         {
-            Color textColor = Color.Red; //TODO: Different colors for different damage types
+            Color textColor = aDamageType switch
+            {
+                DamageType.Physical => Color.Red,
+                DamageType.Arcane => Color.LightBlue,
+                DamageType.Fire => Color.OrangeRed,
+                DamageType.Frost => Color.LightCyan,
+                DamageType.Holy => Color.LightYellow,
+                DamageType.Nature => Color.LightGreen,
+                DamageType.Shadow => Color.MediumPurple,
+                DamageType.True => Color.White,
+                _ => Color.White
+            };
             double appliedDelta = ApplyHealthDelta(-aDamageTaken);
 
             //TODO: aCause.DpsMeter.RegisterDamageDone(this, aCauseName, aDamageTaken, aDamageType);
 
-            SpawnFlyingText(aPrefix + FormatHealthDelta(-appliedDelta) + aSuffix, GetDirOfFloatingText(aCause.FeetPosition), textColor, aBorderColor, 10f);
+            SpawnFlyingText(aPrefix + FormatHealthDelta(-appliedDelta) + aSuffix, GetDirOfFloatingText(aCause.FeetPosition), textColor, aBorderColor, 1f);
         }
 
         void SpawnFlyingText(string aHealthChangeValue, WorldSpace aDirOfFlyingStuff, Color aTextColor, Color aBorderColor, float aBorderWidth) => FloatingTextManager.AddFloatingText(new FloatingText(aHealthChangeValue, aTextColor, FeetPosition, aDirOfFlyingStuff, aBorderColor: aBorderColor, aBorderWidth: aBorderWidth));

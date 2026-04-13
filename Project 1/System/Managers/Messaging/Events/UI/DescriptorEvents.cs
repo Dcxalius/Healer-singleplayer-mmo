@@ -234,6 +234,7 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct DescriptorBoxClear
     {
+        public DescriptorBoxClear() { }
     }
 
     internal readonly struct SpellDescriptorBoxSet

@@ -7,8 +7,8 @@
     #define PS_SHADERMODEL ps_4_0_level_9_1
 #endif
 
-float4 borderColor;
-float borderWidth;
+float4 BorderColor;
+float BorderWidth;
 
 Texture2D SpriteTexture;
 sampler2D SpriteTextureSampler = sampler_state
@@ -47,20 +47,20 @@ float4 MainPS(VertexShaderOutput input) : COLOR0
     
     float fillOpacity = saturate(screenPxDistance + 0.5);
 
-    if (borderWidth > 0.0)
+    if (BorderWidth > 0.0)
     {
-        float outerOpacity = saturate(screenPxDistance + borderWidth + 0.5);
-        
-        float borderOpacity = saturate(outerOpacity - fillOpacity) * borderColor.a;
+        float outerOpacity = saturate(screenPxDistance + BorderWidth + 0.5);
+
+        float borderOpacity = saturate(outerOpacity - fillOpacity) * BorderColor.a;
 
         float3 fillRgb = input.Color.rgb;
-        float3 borderRgb = borderColor.rgb;
+        float3 borderRgb = BorderColor.rgb;
 
         float3 finalRgb =
         borderRgb * borderOpacity +
-        fillRgb * fillOpacity;
+        fillRgb * fillOpacity * input.Color.a;
 
-        float finalA = max(fillOpacity * input.Color.a, borderOpacity);
+        float finalA = max(fillOpacity, borderOpacity);
         
         return float4(finalRgb, finalA);
     }

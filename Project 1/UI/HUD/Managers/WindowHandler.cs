@@ -147,6 +147,7 @@ namespace Project_1.UI.HUD.Managers
         public void SetCharacterWindow(CharacterWindowSnapshot snapshot)
         {
             ThreadAffinity.AssertUiThread();
+            talentWindow.SetPlayerLevel(snapshot.CurrentLevel);
             characterWindow.SetData(snapshot);
         }
         public void ToggleCharacterWindow()
@@ -225,6 +226,7 @@ namespace Project_1.UI.HUD.Managers
             ThreadAffinity.AssertUiThread();
             if (ownerRelation == RelationToPlayerKind.Self)
             {
+                talentWindow.SetPlayerLevel(currentLevel);
                 characterWindow.RefreshExp(currentLevel, currentExperience);
                 HUDManager.InvalidateUi();
                 return;

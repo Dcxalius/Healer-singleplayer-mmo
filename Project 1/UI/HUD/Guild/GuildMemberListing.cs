@@ -17,6 +17,8 @@ namespace Project_1.UI.HUD.Guild
 {
     internal class GuildMemberListing : Box, IComparable //TODO: Should this be button?
     {
+        const int TalentUnlockLevel = 10;
+
         EntityUiSnapshot data;
         Label name;
         Label level;
@@ -54,6 +56,7 @@ namespace Project_1.UI.HUD.Guild
             openInspectWindow = new OpenInspectWindow(this, aData, GetButtonPos, buttonSize);
             openInventory = new OpenInventory(this, GetButtonPos, buttonSize);
             talentButton = new Button(this, new List<Action> { OpenTalentWindow }, GetButtonPos, buttonSize, Color.LightGoldenrodYellow, "Tal", Color.Black);
+            talentButton.Visible = aData.Level >= TalentUnlockLevel;
             if (aData.RelationToPlayer != RelationToPlayerKind.Self)
             {
                 invite = new InviteButton(this, aData.RenderId, GetButtonPos, buttonSize);
@@ -90,6 +93,7 @@ namespace Project_1.UI.HUD.Guild
             name.Text = aGuildMember.Name;
             level.Text = aGuildMember.Level.ToString();
             @class.Text = aGuildMember.ClassName;
+            talentButton.Visible = aGuildMember.Level >= TalentUnlockLevel;
         }
 
         public bool BelongsTo(string aName)

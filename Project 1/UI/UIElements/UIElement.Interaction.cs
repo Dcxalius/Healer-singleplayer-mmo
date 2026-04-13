@@ -34,6 +34,7 @@ namespace Project_1.UI.UIElements
         protected virtual void HoldUpdate()
         {
             if (heldEvents == null) return;
+            if (!Visible) return;
 
             if (!heldEvents.IsStillHeld())
             {
@@ -107,7 +108,7 @@ namespace Project_1.UI.UIElements
 
         void HoverUpdate()
         {
-            if (!visible && (!hudMoveable && !hudMoving)) return;
+            if (!Visible && !(hudMoveable && hudMoving)) return;
             if (!isHovered && Hovered)
             {
                 isHovered = true;

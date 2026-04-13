@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.Input;
@@ -14,31 +15,35 @@ namespace Project_1.UI.HUD.Windows
 {
     internal sealed class TalentWindow : Window
     {
+        const int TalentUnlockLevel = 10;
+
         sealed class TalentTreePage : UIElement
         {
-            sealed class TalentSlotElement : UIElement
+            sealed class TalentSlotElement : UIElement, IPageBoxLabeledElement
             {
-                readonly TalentTreePage page;
+                readonly TalentWindow ownerWindow;
                 readonly Box frame;
                 readonly Image icon;
-                readonly Label nameLabel;
                 readonly Label rankLabel;
 
                 TalentUiSnapshot snapshot;
                 bool hasTalent;
+                public string PageBoxLabel => hasTalent ? snapshot.Name : null;
 
-                public TalentSlotElement(TalentTreePage aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize)
+                public TalentSlotElement(UIElement aParent, TalentWindow aWindow, RelativeScreenPosition aPos, RelativeScreenPosition aSize)
                     : base(aParent, null, aPos, aSize)
                 {
-                    page = aParent;
+                    ownerWindow = aWindow;
                     frame = new Box(this, new UITexture("GrayWhiteBorder", Color.White), RelativeScreenPosition.Zero, RelativeScreenPosition.One);
-                    icon = new Image(this, new UITexture(GfxPath.NullPath, Color.White), new RelativeScreenPosition(0.08f, 0.08f), new RelativeScreenPosition(0.84f, 0.54f));
-                    rankLabel = new Label(this, new RelativeScreenPosition(0.05f, 0.6f), new RelativeScreenPosition(0.9f, 0.12f), Label.TextAllignment.CentreRight, Color.White, aTextSize: 9f);
-                    nameLabel = new Label(this, new RelativeScreenPosition(0.05f, 0.7f), new RelativeScreenPosition(0.9f, 0.22f), Label.TextAllignment.TopCentre, Color.Black, aTextSize: 8f);
+                    icon = new Image(this, new UITexture(GfxPath.NullPath, Color.White), new RelativeScreenPosition(0.08f, 0.08f), new RelativeScreenPosition(0.84f, 0.7f));
+                    rankLabel = new Label(this, new RelativeScreenPosition(0.05f, 0.8f), new RelativeScreenPosition(0.9f, 0.14f), Label.TextAllignment.CentreRight, Color.White, aTextSize: 9f);
+                    frame.CapturesClick = false;
+                    frame.CapturesRelease = false;
+                    frame.CapturesScroll = false;
 
                     Visible = false;
-                    CapturesClick = false;
-                    CapturesRelease = false;
+                    CapturesClick = true;
+                    CapturesRelease = true;
                     CapturesScroll = false;
                 }
 
@@ -48,17 +53,20 @@ namespace Project_1.UI.HUD.Windows
                     hasTalent = true;
                     icon.SetImage(aSnapshot.GfxPath);
                     icon.Color = aSnapshot.Rank > 0 ? Color.White : Color.DarkGray;
-                    nameLabel.Text = aSnapshot.Name;
                     rankLabel.Text = $"{aSnapshot.Rank}/{aSnapshot.MaxRank}";
                     Visible = true;
                 }
 
                 public void ClearTalent()
                 {
+                    if (hasTalent && isHovered)
+                    {
+                        MailboxManager.PublishUiEvent(new DescriptorBoxClear());
+                    }
+
                     hasTalent = false;
                     icon.ClearImage();
                     icon.Color = Color.White;
-                    nameLabel.Text = null;
                     rankLabel.Text = null;
                     Visible = false;
                 }
@@ -67,53 +75,76 @@ namespace Project_1.UI.HUD.Windows
                 {
                     base.OnHover();
                     if (!hasTalent) return;
-                    page.ShowDescription(snapshot);
+                    MailboxManager.PublishUiEvent(new DescriptorBoxSet(BuildDescriptorSnapshot(snapshot), RelativePositionOnScreen.ToAbsoluteScreenPos()));
                 }
 
                 protected override void OnDeHover()
                 {
                     base.OnDeHover();
                     if (!hasTalent) return;
-                    page.ResetDescription();
+                    MailboxManager.PublishUiEvent(new DescriptorBoxClear());
+                }
+
+                static ItemDescriptorSnapshot BuildDescriptorSnapshot(TalentUiSnapshot aSnapshot)
+                {
+                    return new ItemDescriptorSnapshot(
+                        $"{aSnapshot.Name} ({aSnapshot.Rank}/{aSnapshot.MaxRank})",
+                        aSnapshot.Description,
+                        $"Current Rank: {aSnapshot.Rank}/{aSnapshot.MaxRank}",
+                        0,
+                        true,
+                        false);
+                }
+
+                public override void ClickedOnAndReleasedOnMe()
+                {
+                    if (hasTalent)
+                    {
+                        ownerWindow.TrySpendTalent(snapshot.Id);
+                    }
+
+                    base.ClickedOnAndReleasedOnMe();
                 }
             }
 
             const int MaxColumns = 4;
             const int MaxRows = 7;
-
+            const float GridTop = 0.08f;
+            const float GridHeight = 0.83f;
             readonly Image background;
             readonly Box backgroundShade;
-            readonly Box descriptionBox;
-            readonly Label descriptionLabel;
-            readonly TalentSlotElement[] slots;
+            readonly Label spentPointsLabel;
+            readonly PageBox talentGrid;
 
-            string defaultDescription;
+            TalentUiSnapshot[] talents = Array.Empty<TalentUiSnapshot>();
 
-            public TalentTreePage(UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize)
+            public TalentTreePage(UIElement aParent, TalentWindow aWindow, RelativeScreenPosition aPos, RelativeScreenPosition aSize)
                 : base(aParent, null, aPos, aSize)
             {
-                background = new Image(this, new UITexture(GfxPath.NullPath, new Color(255, 255, 255, 140)), new RelativeScreenPosition(0.04f, 0.03f), new RelativeScreenPosition(0.92f, 0.62f));
-                backgroundShade = new Box(this, new UITexture("WhiteBackground", new Color(255, 255, 255, 185)), new RelativeScreenPosition(0.04f, 0.03f), new RelativeScreenPosition(0.92f, 0.62f));
-                descriptionBox = new Box(this, new UITexture("WhiteBackground", new Color(245, 245, 220, 235)), new RelativeScreenPosition(0.04f, 0.69f), new RelativeScreenPosition(0.92f, 0.26f));
-                descriptionLabel = new Label(this, new RelativeScreenPosition(0.07f, 0.72f), new RelativeScreenPosition(0.86f, 0.2f), Label.TextAllignment.TopLeft, Color.Black, aTextSize: 10f);
+                background = new Image(this, new UITexture(GfxPath.NullPath, new Color(255, 255, 255, 140)), new RelativeScreenPosition(0.04f, 0.03f), new RelativeScreenPosition(0.92f, 0.88f));
+                backgroundShade = new Box(this, new UITexture("WhiteBackground", new Color(255, 255, 255, 185)), new RelativeScreenPosition(0.04f, 0.03f), new RelativeScreenPosition(0.92f, 0.88f));
+                spentPointsLabel = new Label(this, new RelativeScreenPosition(0.55f, 0.01f), new RelativeScreenPosition(0.35f, 0.06f), Label.TextAllignment.CentreRight, Color.Black, aText: "Spent: 0");
+                backgroundShade.CapturesClick = false;
+                backgroundShade.CapturesRelease = false;
+                backgroundShade.CapturesScroll = false;
+                CapturesClick = false;
+                CapturesRelease = false;
+                CapturesScroll = false;
 
-                slots = new TalentSlotElement[MaxColumns * MaxRows];
-                RelativeScreenPosition slotSize = new RelativeScreenPosition(0.18f, 0.07f);
-                RelativeScreenPosition slotSpacing = new RelativeScreenPosition(0.03f, 0.012f);
-                RelativeScreenPosition start = new RelativeScreenPosition(0.09f, 0.07f);
-
-                for (int row = 0; row < MaxRows; row++)
-                {
-                    for (int column = 0; column < MaxColumns; column++)
-                    {
-                        int index = row * MaxColumns + column;
-                        RelativeScreenPosition pos = new RelativeScreenPosition(
-                            start.X + column * (slotSize.X + slotSpacing.X),
-                            start.Y + row * (slotSize.Y + slotSpacing.Y));
-
-                        slots[index] = new TalentSlotElement(this, pos, slotSize);
-                    }
-                }
+                talentGrid = new PageBox(
+                    this,
+                    aPageBox => CreateTalentSlots(aPageBox, aWindow),
+                    new UITexture("WhiteBackground", Color.Transparent),
+                    new RelativeScreenPosition(0.05f, GridTop),
+                    new RelativeScreenPosition(0.9f, GridHeight),
+                    new Point(MaxColumns, MaxRows),
+                    BindTalentSlot,
+                    ClearTalentSlot,
+                    CreateTalentLabels);
+                talentGrid.SetPageTitleProvider(_ => string.Empty);
+                talentGrid.CapturesClick = false;
+                talentGrid.CapturesRelease = false;
+                talentGrid.CapturesScroll = false;
 
                 ResetTree();
             }
@@ -121,41 +152,102 @@ namespace Project_1.UI.HUD.Windows
             public void SetTree(TalentTreeUiSnapshot aSnapshot)
             {
                 background.SetImage(aSnapshot.Background);
-
-                for (int i = 0; i < slots.Length; i++)
-                {
-                    slots[i].ClearTalent();
-                }
-
-                TalentUiSnapshot[][] rows = aSnapshot.Rows ?? Array.Empty<TalentUiSnapshot[]>();
-                for (int row = 0; row < rows.Length && row < MaxRows; row++)
-                {
-                    TalentUiSnapshot[] talents = rows[row] ?? Array.Empty<TalentUiSnapshot>();
-                    for (int column = 0; column < talents.Length && column < MaxColumns; column++)
-                    {
-                        slots[row * MaxColumns + column].SetTalent(talents[column]);
-                    }
-                }
-
-                defaultDescription = rows.Length == 0
-                    ? "No talent tree data configured for this page yet."
-                    : "Hover a talent to inspect its effect.";
-                ResetDescription();
+                spentPointsLabel.Text = $"Spent: {aSnapshot.SpentPoints}";
+                MailboxManager.PublishUiEvent(new DescriptorBoxClear());
+                talents = FlattenTalents(aSnapshot.Rows);
+                talentGrid.Reset(talents.Length);
             }
 
             public void ResetTree()
             {
-                SetTree(new TalentTreeUiSnapshot("Tree", GfxPath.NullPath, Array.Empty<TalentUiSnapshot[]>()));
+                SetTree(new TalentTreeUiSnapshot("Tree", GfxPath.NullPath, Array.Empty<TalentUiSnapshot[]>(), 0));
             }
 
-            public void ShowDescription(TalentUiSnapshot aSnapshot)
+            void BindTalentSlot(UIElement aElement, int aIndex)
             {
-                descriptionLabel.Text = $"{aSnapshot.Name} ({aSnapshot.Rank}/{aSnapshot.MaxRank})\n{aSnapshot.Description}";
+                TalentSlotElement slot = aElement as TalentSlotElement;
+                if (slot == null) return;
+
+                if (aIndex < 0 || aIndex >= talents.Length)
+                {
+                    slot.ClearTalent();
+                    return;
+                }
+
+                slot.SetTalent(talents[aIndex]);
             }
 
-            public void ResetDescription()
+            static void ClearTalentSlot(UIElement aElement)
             {
-                descriptionLabel.Text = defaultDescription;
+                TalentSlotElement slot = aElement as TalentSlotElement;
+                slot?.ClearTalent();
+            }
+
+            static UIElement[] CreateTalentSlots(PageBox aPageBox, TalentWindow aWindow)
+            {
+                UIElement[] slots = new UIElement[MaxColumns * MaxRows];
+                RelativeScreenPosition slotSize = new RelativeScreenPosition(0.18f, 0.078f);
+                RelativeScreenPosition labelSize = new RelativeScreenPosition(0.22f, 0.042f);
+                RelativeScreenPosition start = new RelativeScreenPosition(0.02f, 0.02f);
+                RelativeScreenPosition step = new RelativeScreenPosition(0.24f, 0.115f);
+
+                for (int row = 0; row < MaxRows; row++)
+                {
+                    for (int column = 0; column < MaxColumns; column++)
+                    {
+                        int index = row * MaxColumns + column;
+                        RelativeScreenPosition pos = new RelativeScreenPosition(
+                            start.X + column * step.X + (labelSize.X - slotSize.X) / 2f,
+                            start.Y + row * step.Y);
+                        slots[index] = new TalentSlotElement(aPageBox, aWindow, pos, slotSize);
+                    }
+                }
+
+                return slots;
+            }
+
+            static Label[] CreateTalentLabels(PageBox aPageBox)
+            {
+                Label[] labels = new Label[MaxColumns * MaxRows];
+                RelativeScreenPosition labelSize = new RelativeScreenPosition(0.22f, 0.042f);
+                RelativeScreenPosition start = new RelativeScreenPosition(0.02f, 0.101f);
+                RelativeScreenPosition step = new RelativeScreenPosition(0.24f, 0.115f);
+
+                for (int row = 0; row < MaxRows; row++)
+                {
+                    for (int column = 0; column < MaxColumns; column++)
+                    {
+                        int index = row * MaxColumns + column;
+                        RelativeScreenPosition pos = new RelativeScreenPosition(start.X + column * step.X, start.Y + row * step.Y);
+                        labels[index] = new Label(aPageBox, pos, labelSize, Label.TextAllignment.TopCentre, Color.Black, aTextSize: 7f);
+                        labels[index].Visible = false;
+                        labels[index].CapturesClick = false;
+                        labels[index].CapturesRelease = false;
+                        labels[index].CapturesScroll = false;
+                    }
+                }
+
+                return labels;
+            }
+
+            static TalentUiSnapshot[] FlattenTalents(TalentUiSnapshot[][] aRows)
+            {
+                if (aRows == null || aRows.Length == 0)
+                {
+                    return Array.Empty<TalentUiSnapshot>();
+                }
+
+                List<TalentUiSnapshot> flattened = new List<TalentUiSnapshot>(MaxColumns * MaxRows);
+                for (int row = 0; row < aRows.Length && row < MaxRows; row++)
+                {
+                    TalentUiSnapshot[] rowTalents = aRows[row] ?? Array.Empty<TalentUiSnapshot>();
+                    for (int column = 0; column < rowTalents.Length && column < MaxColumns; column++)
+                    {
+                        flattened.Add(rowTalents[column]);
+                    }
+                }
+
+                return flattened.ToArray();
             }
         }
 
@@ -166,26 +258,28 @@ namespace Project_1.UI.HUD.Windows
         public bool ShowingGuildMember => !showingSelf && targetRenderId.HasValue;
 
         readonly Label nameLabel;
+        readonly Label talentPointsLabel;
         readonly PageBox treePages;
-        readonly TalentTreePage treePage;
 
         TalentTreeUiSnapshot[] trees;
         bool showingSelf;
         int? targetRenderId;
+        int playerLevel = 1;
+        int remainingTalentPoints;
 
         public TalentWindow() : base(new UITexture("WhiteBackground", Color.DarkSeaGreen))
         {
             showingSelf = true;
             trees = BuildDefaultTrees();
             visibleKey = KeyBindManager.KeyListner.TalentWindow;
-            Func<PageBox, UIElement[]> func; //TODO: This is really gross, but it needs to be here before the itemsForSale array is initialized, and the itemsForSale array needs to be initialized before the pageBox is initialized. Refactor this when possible.
+            Func<PageBox, UIElement[]> func; 
             func = (aPageBox) =>
             {
-                return new UIElement[] { new TalentTreePage(aPageBox, new RelativeScreenPosition(0f, 0.12f), new RelativeScreenPosition(1f, 0.88f)) };
+                return new UIElement[] { new TalentTreePage(aPageBox, this, new RelativeScreenPosition(0f, 0.12f), new RelativeScreenPosition(1f, 0.88f)) };
             };
             nameLabel = new Label(this, new RelativeScreenPosition(0f, 0f), new RelativeScreenPosition(1f, 0.08f), Label.TextAllignment.TopCentre, Color.Black, aText: "Talents");
-            treePages = new PageBox(this, func, new UITexture("WhiteBackground", new Color(255, 255, 255, 30)), new RelativeScreenPosition(0.02f, 0.07f), new RelativeScreenPosition(0.96f, 0.9f), new Point(1, 1), BindTreePage);
-            
+            treePages = new PageBox(this, func, new UITexture("WhiteBackground", new Color(255, 255, 255, 30)), new RelativeScreenPosition(0.02f, 0.07f), new RelativeScreenPosition(0.96f, 0.9f), new Point(1, 1), BindTreePage, ClearTreePage);
+            talentPointsLabel = new Label(this, new RelativeScreenPosition(0.05f, 0.08f), new RelativeScreenPosition(0.4f, 0.05f), Label.TextAllignment.CentreLeft, Color.Black, aText: "Talent Points: 0");
 
             treePages.SetPageTitleProvider(GetPageTitle);
 
@@ -197,7 +291,7 @@ namespace Project_1.UI.HUD.Windows
         {
             ThreadAffinity.AssertUiThread();
 
-            bool shouldRequestSnapshot = ToggleSelf();
+            bool shouldRequestSnapshot = ToggleSelfFromKeybind();
             if (shouldRequestSnapshot)
             {
                 MailboxManager.PublishSimCommand(new TalentWindowSnapshotRequested(null));
@@ -209,6 +303,7 @@ namespace Project_1.UI.HUD.Windows
         public bool ToggleForMember(in EntityUiSnapshot member)
         {
             ThreadAffinity.AssertUiThread();
+            if (member.Level < TalentUnlockLevel) return false;
 
             if (member.RelationToPlayer == RelationToPlayerKind.Self)
             {
@@ -246,14 +341,40 @@ namespace Project_1.UI.HUD.Windows
 
         public void SetData(TalentWindowSnapshot snapshot)
         {
+            if (snapshot.OwnerSnapshot.Level < TalentUnlockLevel)
+            {
+                MailboxManager.PublishUiEvent(new DescriptorBoxClear());
+                CloseWindow();
+                return;
+            }
+
+            MailboxManager.PublishUiEvent(new DescriptorBoxClear());
             nameLabel.Text = $"{snapshot.OwnerSnapshot.Name} Talents";
+            remainingTalentPoints = snapshot.RemainingTalentPoints;
+            talentPointsLabel.Text = $"Talent Points: {remainingTalentPoints}";
             SetTrees(snapshot.Trees);
+        }
+
+        public void SetPlayerLevel(int aLevel)
+        {
+            playerLevel = aLevel;
+            if (playerLevel >= TalentUnlockLevel || !Visible) return;
+
+            MailboxManager.PublishUiEvent(new DescriptorBoxClear());
+            CloseWindow();
         }
 
         bool ToggleSelf()
         {
+            if (playerLevel < TalentUnlockLevel)
+            {
+                MailboxManager.PublishUiEvent(new DescriptorBoxClear());
+                return false;
+            }
+
             if (Visible && showingSelf)
             {
+                MailboxManager.PublishUiEvent(new DescriptorBoxClear());
                 CloseWindow();
                 return false;
             }
@@ -269,11 +390,52 @@ namespace Project_1.UI.HUD.Windows
             return true;
         }
 
+        internal void TrySpendTalent(int talentId)
+        {
+            if (!showingSelf) return;
+            if (remainingTalentPoints <= 0) return;
+            MailboxManager.PublishSimCommand(new TalentLearnRequested(talentId));
+        }
+
+        bool ToggleSelfFromKeybind()
+        {
+            if (playerLevel < TalentUnlockLevel)
+            {
+                MailboxManager.PublishUiEvent(new DescriptorBoxClear());
+                return false;
+            }
+
+            if (Visible && showingSelf)
+            {
+                MailboxManager.PublishUiEvent(new DescriptorBoxClear());
+                CloseWindow();
+                return false;
+            }
+
+            showingSelf = true;
+            targetRenderId = null;
+            nameLabel.Text = "Talents";
+            MailboxManager.PublishUiEvent(new DescriptorBoxClear());
+            if (!Visible)
+            {
+                OpenWindow();
+            }
+
+            return true;
+        }
+
         void BindTreePage(UIElement aElement, int aIndex)
         {
             TalentTreePage page = aElement as TalentTreePage;
             if (page == null) return;
             page.SetTree(GetTree(aIndex));
+        }
+
+        void ClearTreePage(UIElement aElement)
+        {
+            TalentTreePage page = aElement as TalentTreePage;
+            if (page == null) return;
+            page.ResetTree();
         }
 
         string GetPageTitle(int aPageIndex)
@@ -321,7 +483,7 @@ namespace Project_1.UI.HUD.Windows
 
         static TalentTreeUiSnapshot BuildDefaultTree(int index)
         {
-            return new TalentTreeUiSnapshot($"Tree {index + 1}", GfxPath.NullPath, Array.Empty<TalentUiSnapshot[]>());
+            return new TalentTreeUiSnapshot($"Tree {index + 1}", GfxPath.NullPath, Array.Empty<TalentUiSnapshot[]>(), 0);
         }
     }
 }
