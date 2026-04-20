@@ -232,6 +232,9 @@ namespace Project_1.UI.HUD.Managers
                 return;
             }
 
+            //TODO: TEST THIS NOOOOW!
+            guildWindow.RefreshListing(ownerRenderId, currentLevel);
+
             if (!inspectWindow.BelongsTo(ownerRenderId)) return;
 
             inspectWindow.RefreshExp(currentLevel, currentExperience);

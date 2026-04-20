@@ -5,45 +5,59 @@ using Project_1.GameObjects.Spells;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Project_1.World.GameObjects.Spells.SpellEffects;
 
 namespace Project_1.Messaging.Events
 {
     internal readonly struct ItemDescriptorSnapshot
     {
         public ItemDescriptorSnapshot(string name, string description, string statReport, int sellPrice, bool hasStatReport, bool hasSellPrice)
+            : this(name, description, statReport, null, sellPrice, hasStatReport, false, hasSellPrice)
+        {
+        }
+
+        public ItemDescriptorSnapshot(string name, string description, string statReport, string bonusStatReport, int sellPrice, bool hasStatReport, bool hasBonusStatReport, bool hasSellPrice)
         {
             Name = name;
             Description = description;
             StatReport = statReport;
+            BonusStatReport = bonusStatReport;
             SellPrice = sellPrice;
             HasStatReport = hasStatReport;
+            HasBonusStatReport = hasBonusStatReport;
             HasSellPrice = hasSellPrice;
         }
 
         public string Name { get; }
         public string Description { get; }
         public string StatReport { get; }
+        public string BonusStatReport { get; }
         public int SellPrice { get; }
         public bool HasStatReport { get; }
+        public bool HasBonusStatReport { get; }
         public bool HasSellPrice { get; }
 
         public static ItemDescriptorSnapshot FromItem(Item item)
         {
             if (item == null) throw new ArgumentNullException(nameof(item));
             string statReport = null;
+            string bonusStatReport = null;
             if (item is Weapon weapon)
             {
                 statReport = BuildWeaponStatReport(weapon);
+                bonusStatReport = weapon.BonusStatReport.Value;
             }
             else if (item is Equipment equipment)
             {
                 statReport = equipment.StatReport.Value;
+                bonusStatReport = equipment.BonusStatReport.Value;
             }
 
             bool hasStatReport = !string.IsNullOrEmpty(statReport);
+            bool hasBonusStatReport = !string.IsNullOrEmpty(bonusStatReport);
             bool hasSellPrice = item.Cost > 0;
             int sellPrice = hasSellPrice ? item.SellPrice : 0;
-            return new ItemDescriptorSnapshot(item.Name, item.Description, statReport, sellPrice, hasStatReport, hasSellPrice);
+            return new ItemDescriptorSnapshot(item.Name, item.Description, statReport, bonusStatReport, sellPrice, hasStatReport, hasBonusStatReport, hasSellPrice);
         }
 
         public static ItemDescriptorSnapshot FromItemData(ItemData itemData)
@@ -62,7 +76,7 @@ namespace Project_1.Messaging.Events
             bool hasStatReport = !string.IsNullOrEmpty(statReport);
             bool hasSellPrice = itemData.Cost > 0;
             int sellPrice = hasSellPrice ? (int)MathF.Floor(itemData.Cost / 4f) : 0;
-            return new ItemDescriptorSnapshot(itemData.Name, itemData.Description, statReport, sellPrice, hasStatReport, hasSellPrice);
+            return new ItemDescriptorSnapshot(itemData.Name, itemData.Description, statReport, null, sellPrice, hasStatReport, false, hasSellPrice);
         }
 
         static string BuildWeaponStatReport(Weapon weapon)

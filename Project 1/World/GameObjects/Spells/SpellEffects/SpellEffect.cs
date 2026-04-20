@@ -1,14 +1,17 @@
 ﻿using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Unit.Stats;
 using Project_1.Managers;
+using Project_1.World.GameObjects.Spells;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Spell = Project_1.GameObjects.Spells.Spell;
 
-namespace Project_1.GameObjects.Spells
+namespace Project_1.World.GameObjects.Spells.SpellEffects
 {
     internal enum AbilityStatSource
     {
@@ -43,6 +46,9 @@ namespace Project_1.GameObjects.Spells
         public virtual AbilityStatSource StatSource => AbilityStatSource.Spell;
 
         public HashSet<SpellSchool> SpellSchools => spellSchools;
+
+        public double MovementSpeedModifier => throw new NotImplementedException();
+
         HashSet<SpellSchool> spellSchools;
 
         public SpellEffect(string aName, bool aIsBinary, HashSet<SpellSchool> aSpellSchools)

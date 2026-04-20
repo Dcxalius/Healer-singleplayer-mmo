@@ -5,12 +5,28 @@ using Project_1.Items.SubTypes;
 using Project_1.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
+using Project_1.World.Items.Enchantments;
 
 namespace Project_1.Items
 {
     internal static class InventoryCommandRouter
     {
         static bool initialized;
+        static PendingEnchantScroll? pendingEnchantScroll;
+
+        readonly struct PendingEnchantScroll
+        {
+            public PendingEnchantScroll((int, int) sourceIndex, int enchantmentId, string scrollName)
+            {
+                SourceIndex = sourceIndex;
+                EnchantmentId = enchantmentId;
+                ScrollName = scrollName;
+            }
+
+            public (int, int) SourceIndex { get; }
+            public int EnchantmentId { get; }
+            public string ScrollName { get; }
+        }
 
         public static void Init()
         {
@@ -27,6 +43,8 @@ namespace Project_1.Items
             SubscribeSimCommand<LootItemRequested>(HandleLootItemRequested);
             SubscribeSimCommand<InventoryEquipRequested>(HandleInventoryEquipRequested);
             SubscribeSimCommand<InventoryConsumeRequested>(HandleInventoryConsumeRequested);
+            SubscribeSimCommand<InventoryEnchantTargetRequested>(HandleInventoryEnchantTargetRequested);
+            SubscribeSimCommand<EquipmentEnchantRequested>(HandleEquipmentEnchantRequested);
             SubscribeSimCommand<EquipmentSwapRequested>(HandleEquipmentSwapRequested);
             SubscribeSimCommand<EquipmentMoveToInventoryRequested>(HandleEquipmentMoveToInventoryRequested);
         }
@@ -118,8 +136,62 @@ namespace Project_1.Items
             ThreadAffinity.AssertSimThread();
             Player player = ObjectManager.Player;
             if (player == null) return;
+
+            Item item = player.Inventory.GetItemInSlot(e.Index);
+            if (item is Consumable consumable && consumable.RequiresItemTarget)
+            {
+                BeginEnchantTargeting(e.Index, consumable);
+                return;
+            }
+
             Friendly target = ResolveFriendlyTarget(e.TargetRenderId, player);
             player.Inventory.ConsumeItem(e.Index, target);
+        }
+
+        static void HandleInventoryEnchantTargetRequested(InventoryEnchantTargetRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+            if (!pendingEnchantScroll.HasValue) return;
+
+            Item item = player.Inventory.GetItemInSlot(e.Index);
+            if (item is not Project_1.Items.SubTypes.Equipment equipment)
+            {
+                PublishEnchantSystemMessage("That item cannot be enchanted.");
+                return;
+            }
+
+            TryApplyPendingEnchantment(player, equipment, onApplied: () =>
+            {
+                if (!equipment.ApplyPermanentEnchantment(EnchantmentFactory.GetData(pendingEnchantScroll.Value.EnchantmentId)))
+                {
+                    return false;
+                }
+
+                player.Inventory.RefreshSlot(e.Index);
+                return true;
+            });
+        }
+
+        static void HandleEquipmentEnchantRequested(EquipmentEnchantRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+            if (!pendingEnchantScroll.HasValue) return;
+
+            Item item = player.Equipment.EquipedInSlot((GameObjects.Unit.Equipment.Slot)e.EquipmentSlot);
+            if (item is not Project_1.Items.SubTypes.Equipment equipment)
+            {
+                PublishEnchantSystemMessage("That item cannot be enchanted.");
+                return;
+            }
+
+            TryApplyPendingEnchantment(player, equipment, onApplied: () =>
+            {
+                return player.ApplyPermanentEnchantment((GameObjects.Unit.Equipment.Slot)e.EquipmentSlot, EnchantmentFactory.GetData(pendingEnchantScroll.Value.EnchantmentId));
+            });
         }
 
         static void HandleEquipmentSwapRequested(EquipmentSwapRequested e)
@@ -184,6 +256,87 @@ namespace Project_1.Items
                 return target;
             }
             return fallback;
+        }
+
+        static void BeginEnchantTargeting((int, int) sourceIndex, Consumable consumable)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (!consumable.TryGetEnchantmentData(out EnchantmentData enchantmentData))
+            {
+                PublishEnchantSystemMessage("That scroll is not configured correctly.");
+                ClearPendingEnchantTargeting();
+                return;
+            }
+
+            pendingEnchantScroll = new PendingEnchantScroll(sourceIndex, enchantmentData.Id, consumable.Name);
+            MailboxManager.PublishUiEvent(new InventoryEnchantTargetingChanged(true));
+            PublishEnchantSystemMessage($"Select an item to enchant with {consumable.Name}.");
+        }
+
+        static bool TryApplyPendingEnchantment(Player player, Project_1.Items.SubTypes.Equipment equipment, System.Func<bool> onApplied)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (!TryGetPendingEnchant(player, out PendingEnchantScroll pending, out EnchantmentData enchantmentData))
+            {
+                return false;
+            }
+
+            if (!equipment.CanApplyPermanentEnchantment(enchantmentData))
+            {
+                PublishEnchantSystemMessage($"That item cannot be enchanted with {pending.ScrollName}.");
+                return false;
+            }
+
+            if (onApplied == null)
+            {
+                return false;
+            }
+
+            if (!onApplied())
+            {
+                return false;
+            }
+
+            player.Inventory.ConsumeOneFromSlot(pending.SourceIndex);
+            PublishEnchantSystemMessage($"Applied {enchantmentData.Name} to {equipment.Name}.");
+            ClearPendingEnchantTargeting();
+            return true;
+        }
+
+        static bool TryGetPendingEnchant(Player player, out PendingEnchantScroll pending, out EnchantmentData enchantmentData)
+        {
+            ThreadAffinity.AssertSimThread();
+            enchantmentData = null;
+            if (!pendingEnchantScroll.HasValue)
+            {
+                pending = default;
+                return false;
+            }
+
+            pending = pendingEnchantScroll.Value;
+            Item item = player.Inventory.GetItemInSlot(pending.SourceIndex);
+            if (item is not Consumable consumable || !consumable.RequiresItemTarget || consumable.EnchantmentId != pending.EnchantmentId)
+            {
+                PublishEnchantSystemMessage("That enchantment scroll is no longer available.");
+                ClearPendingEnchantTargeting();
+                return false;
+            }
+
+            enchantmentData = EnchantmentFactory.GetData(pending.EnchantmentId);
+            return enchantmentData != null;
+        }
+
+        static void ClearPendingEnchantTargeting()
+        {
+            ThreadAffinity.AssertSimThread();
+            pendingEnchantScroll = null;
+            MailboxManager.PublishUiEvent(new InventoryEnchantTargetingChanged(false));
+        }
+
+        static void PublishEnchantSystemMessage(string message)
+        {
+            if (string.IsNullOrWhiteSpace(message)) return;
+            MailboxManager.PublishUiEvent(new ChatMessagePosted(ChatMessageType.System, message));
         }
     }
 }

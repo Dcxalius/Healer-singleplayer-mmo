@@ -13,6 +13,9 @@ namespace Project_1.GameObjects.Unit
         public float MaxSpeed => maxSpeed;
         float maxSpeed;
 
+        //TODO: Set this somewhere else? Also figure out what it should be
+        static float minSpeed = 1;
+
         public Movement(float aSpeed, float aMaxSpeed)
         {
             speed = aSpeed;

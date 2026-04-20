@@ -140,5 +140,10 @@ namespace Project_1.UI.HUD.Guild
                     throw new NotImplementedException();
             }
         }
+
+        internal void UpdateLevel(int level)
+        {
+            this.level.Text = level.ToString();
+        }
     }
 }

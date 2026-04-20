@@ -44,6 +44,11 @@ namespace Project_1.UI.HUD.Windows
             visibleKey = Input.KeyBindManager.KeyListner.GuildRoster;
         }
 
+        public void RefreshListing(int ownerRenderId, int level)
+        {
+            roster.UpdateListing(ownerRenderId, level);
+        }
+
         public void SetGuildMemberInviteStatus(List<string> aName, List<TwoStateGFXButton.State> aState)
         {
             roster.SetGuildMemberInviteStatus(aName, aState);

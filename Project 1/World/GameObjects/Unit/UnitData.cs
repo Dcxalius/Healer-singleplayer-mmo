@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spawners;
@@ -32,6 +33,10 @@ namespace Project_1.GameObjects.Unit
     class UnitData
     {
         static void AssertSimThread() => ThreadAffinity.AssertSimThread();
+        static readonly JsonSerializer equipmentSerializer = JsonSerializer.Create(new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.Auto
+        });
         
         public string Name => name;
         string name;
@@ -161,8 +166,8 @@ namespace Project_1.GameObjects.Unit
             weaponSkill.SetOwner(aOwner);
         }
 
-        [JsonProperty("Equipment")]
-        int?[] EquipmentAsId => equipment.GetEquipementAsIds;
+        [JsonProperty("Equipment", TypeNameHandling = TypeNameHandling.Auto)]
+        Items.SubTypes.Equipment[] SerializableEquipment => equipment.EquippedItems;
 
         [JsonIgnore]
         public Equipment Equipment =>  equipment;
@@ -208,7 +213,7 @@ namespace Project_1.GameObjects.Unit
 
         [JsonConstructor]
         public UnitData(string name, string corpseGfxName, string className, Relation.RelationToPlayer? relation, int level, int experience, (int, int)[] learntTalents,
-            float currentHp, float currentResource, int?[] equipment, WorldSpace position, WorldSpace momentum, WorldSpace velocity, List<WorldSpace> destinations, int defenseSkill)
+            float currentHp, float currentResource, object equipment, WorldSpace position, WorldSpace momentum, WorldSpace velocity, List<WorldSpace> destinations, int defenseSkill)
         {
             this.name = name;
             Debug.Assert(relation.HasValue);
@@ -242,7 +247,7 @@ namespace Project_1.GameObjects.Unit
             Assert();
         }
 
-        void SetEquipment(int?[] aEquipment)
+        void SetEquipment(object aEquipment)
         {
             if (aEquipment == null)
             {
@@ -253,12 +258,57 @@ namespace Project_1.GameObjects.Unit
                 else equipment = new Equipment();
                 return;
             }
-            
+
+            if (TryDeserializeEquippedItems(aEquipment, out Items.SubTypes.Equipment[] equippedItems))
+            {
+                if (relationData.ToPlayer == Unit.Relation.RelationToPlayer.Self || relationData.ToPlayer == Unit.Relation.RelationToPlayer.Friendly)
+                {
+                    equipment = new Equipment((classData as FriendlyClassData).GearAllowed, equippedItems);
+                }
+                else equipment = new Equipment(equippedItems);
+                return;
+            }
+
+            int?[] legacyEquipment = aEquipment switch
+            {
+                int?[] directIds => directIds,
+                JToken token => token.ToObject<int?[]>(),
+                _ => null
+            };
+            if (legacyEquipment == null)
+            {
+                if (relationData.ToPlayer == Unit.Relation.RelationToPlayer.Self || relationData.ToPlayer == Unit.Relation.RelationToPlayer.Friendly)
+                {
+                    equipment = new Equipment((classData as FriendlyClassData).GearAllowed);
+                }
+                else equipment = new Equipment();
+                return;
+            }
+
             if (relationData.ToPlayer == Unit.Relation.RelationToPlayer.Self || relationData.ToPlayer == Unit.Relation.RelationToPlayer.Friendly)
             {
-                equipment = new Equipment((classData as FriendlyClassData).GearAllowed, aEquipment);
+                equipment = new Equipment((classData as FriendlyClassData).GearAllowed, legacyEquipment);
             }
-            else equipment = new Equipment(aEquipment);
+            else equipment = new Equipment(legacyEquipment);
+        }
+
+        static bool TryDeserializeEquippedItems(object source, out Items.SubTypes.Equipment[] equippedItems)
+        {
+            equippedItems = source as Items.SubTypes.Equipment[];
+            if (equippedItems != null) return true;
+
+            if (source is not JToken token || token.Type != JTokenType.Array)
+            {
+                return false;
+            }
+
+            if (token.Children().Any(x => x?.Type == JTokenType.Object))
+            {
+                equippedItems = token.ToObject<Items.SubTypes.Equipment[]>(equipmentSerializer);
+                return equippedItems != null;
+            }
+
+            return false;
         }
 
         public void SetClassData(Relation.RelationToPlayer aRelation, string aClassName)

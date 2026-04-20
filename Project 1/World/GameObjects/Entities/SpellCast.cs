@@ -176,8 +176,15 @@ namespace Project_1.GameObjects.Entities
             if (!owner.Resource.isCastable(aSpell.ResourceCost)) return false;
             if (!OffGlobalCooldown) return false;
             if (!aSpell.OffCooldown) return false;
+            if (!MeetsCastCondition(aSpell)) return false;
             return true;
         }
+
+        bool MeetsCastCondition(Spell aSpell) => aSpell.CastCondition switch
+        {
+            CastCondition.AfterDodgeOrParry => owner.InDodgeOrParryWindow,
+            _ => true
+        };
 
         bool ValidateEntityTarget(Spell aSpell, Entity aTarget, float graceDistance)
         {
@@ -201,6 +208,8 @@ namespace Project_1.GameObjects.Entities
         {
             if (!aSpell.Cast(aTarget, owner)) return false;
             owner.Resource.CastSpell(aSpell.ResourceCost);
+            if (aSpell.CastCondition == CastCondition.AfterDodgeOrParry)
+                owner.ConsumeReactiveWindow();
             return true;
         }
 

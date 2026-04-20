@@ -2,7 +2,6 @@
 using Project_1.Camera;
 using Project_1.GameObjects.Entities.Corspes;
 using Project_1.GameObjects.FloatingTexts;
-using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Unit.Stats;
 using Project_1.Managers;
@@ -16,6 +15,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Project_1.GameObjects.Entities.Friendlies.Players;
+using Project_1.World.GameObjects.Spells.SpellEffects;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -374,11 +374,20 @@ namespace Project_1.GameObjects.Entities
                 DamageType.True => Color.White,
                 _ => Color.White
             };
-            double appliedDelta = ApplyHealthDelta(-aDamageTaken);
+
+            double afterAbsorb = buffList.ApplyAbsorb(aDamageTaken, aDamageType, this, out double absorbed);
+
+            if (afterAbsorb <= 0)
+            {
+                SpawnFlyingText("Absorbed", GetDirOfFloatingText(aCause.FeetPosition), Color.LightBlue, Color.Black, 1f);
+                return;
+            }
 
             //TODO: aCause.DpsMeter.RegisterDamageDone(this, aCauseName, aDamageTaken, aDamageType);
 
-            SpawnFlyingText(aPrefix + FormatHealthDelta(-appliedDelta) + aSuffix, GetDirOfFloatingText(aCause.FeetPosition), textColor, aBorderColor, 1f);
+            string absorbSuffix = absorbed > 0 ? $" ({FormatHealthDelta(absorbed)} Absorbed)" : string.Empty;
+            double appliedDelta = ApplyHealthDelta(-afterAbsorb);
+            SpawnFlyingText(aPrefix + FormatHealthDelta(-appliedDelta) + aSuffix + absorbSuffix, GetDirOfFloatingText(aCause.FeetPosition), textColor, aBorderColor, 1f);
         }
 
         void SpawnFlyingText(string aHealthChangeValue, WorldSpace aDirOfFlyingStuff, Color aTextColor, Color aBorderColor, float aBorderWidth) => FloatingTextManager.AddFloatingText(new FloatingText(aHealthChangeValue, aTextColor, FeetPosition, aDirOfFlyingStuff, aBorderColor: aBorderColor, aBorderWidth: aBorderWidth));

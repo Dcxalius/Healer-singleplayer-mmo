@@ -1,0 +1,451 @@
+# WoW Classic Era Class Spells Reference
+
+This file is a practical reference for **WoW Classic Era / Vanilla-style Classic** class spells.
+
+## Scope
+- Covers **player class spellbook spells and core class abilities** for the 9 original classes.
+- Uses **base spell names only**.
+- Uses **concise normalized descriptions** rather than every full rank-by-rank tooltip.
+- Omits professions, racials, item spells, NPC-only spells, and most hidden/passive backend effects.
+
+## Druid
+- **Abolish Poison** — Removes poison effects from the target and continues removing poison for a short duration.
+- **Aquatic Form** — Shapeshifts you into a sea lion for faster swimming.
+- **Barkskin** — Reduces physical damage taken and prevents spell pushback while active.
+- **Bear Form** — Shapeshifts you into Bear Form, increasing armor and allowing use of bear abilities.
+- **Cat Form** — Shapeshifts you into Cat Form, allowing stealth and energy-based melee abilities.
+- **Challenging Roar** — Forces nearby enemies to attack you for a short time.
+- **Claw** — A basic Cat Form attack that deals physical damage.
+- **Cower** — Reduces your threat while in Cat Form.
+- **Cure Poison** — Removes a poison effect from the target.
+- **Dash** — Greatly increases movement speed in Cat Form for a short duration.
+- **Demoralizing Roar** — Reduces the melee attack power of nearby enemies.
+- **Enrage** — Instantly generates rage in Bear Form at the cost of reduced armor for a short time.
+- **Entangling Roots** — Roots the target in place and deals periodic Nature damage.
+- **Faerie Fire** — Reduces the target's armor and prevents stealth or invisibility.
+- **Ferocious Bite** — Finishing move that consumes combo points and energy to deal burst damage.
+- **Frenzied Regeneration** — Converts rage into health over time in bear forms.
+- **Gift of the Wild** — Group version of Mark of the Wild.
+- **Growl** — Taunts the target to attack you.
+- **Healing Touch** — Large direct heal with a cast time.
+- **Hibernate** — Puts a Beast or Dragonkin target to sleep.
+- **Hurricane** — Channeled area Nature damage that also slows targets.
+- **Innervate** — Greatly increases mana regeneration on the target for a short duration.
+- **Maul** — A rage attack that replaces your next white hit in Bear Form.
+- **Mark of the Wild** — Buff that increases attributes and armor.
+- **Moonfire** — Instant Arcane damage plus an Arcane damage-over-time effect.
+- **Moonkin Form** — Shapeshifts you into Moonkin Form, increasing armor and boosting allied spell crit.
+- **Nature's Grasp** — Gives attackers a chance to be rooted when they hit you outdoors.
+- **Pounce** — Opens from stealth in Cat Form, stunning and bleeding the target.
+- **Prowl** — Allows Cat Form stealth.
+- **Rake** — Cat Form attack that deals damage and applies a bleed.
+- **Ravage** — Powerful Cat Form opener from stealth.
+- **Rebirth** — Combat resurrection that returns a dead target to life.
+- **Regrowth** — Direct heal plus a heal-over-time effect.
+- **Rejuvenation** — Heal-over-time spell.
+- **Remove Curse** — Removes one curse from the target.
+- **Rip** — Finishing move that uses combo points to apply a bleed.
+- **Shred** — Cat Form attack usable from behind for high damage.
+- **Soothe Animal** — Calms an animal target, reducing aggro range.
+- **Starfire** — Long-cast Arcane damage spell.
+- **Swipe** — Bear Form cleave hitting multiple nearby targets.
+- **Teleport: Moonglade** — Teleports you to Moonglade.
+- **Thorns** — Buff that damages attackers when they hit the target.
+- **Tiger's Fury** — Temporarily increases Cat Form attack power.
+- **Track Humanoids** — Shows humanoids on the minimap while in Cat Form.
+- **Tranquility** — Channeled group heal over time to nearby party members.
+- **Travel Form** — Shapeshifts you into a fast land-travel form.
+- **Wrath** — Basic casted Nature damage spell.
+
+## Hunter
+- **Arcane Shot** — Instant ranged Arcane shot.
+- **Aspect of the Beast** — Increases melee attack power and prevents tracking while active.
+- **Aspect of the Cheetah** — Greatly increases movement speed until you are hit.
+- **Aspect of the Hawk** — Increases ranged attack power.
+- **Aspect of the Monkey** — Increases dodge chance.
+- **Aspect of the Pack** — Group movement-speed aura until allies are hit.
+- **Aspect of the Wild** — Nature Resistance aura for your party.
+- **Auto Shot** — Basic ranged auto attack.
+- **Beast Lore** — Reveals information about a beast target.
+- **Call Pet** — Summons your active pet.
+- **Concussive Shot** — Instant ranged attack that slows the target.
+- **Dismiss Pet** — Sends your pet away.
+- **Distracting Shot** — Causes high threat without dealing extra utility beyond pulling aggro.
+- **Eagle Eye** — Temporarily shifts your viewpoint to a distant location.
+- **Eyes of the Beast** — Lets you control your pet directly.
+- **Feign Death** — Causes enemies to stop attacking you if the effect succeeds.
+- **Feed Pet** — Feeds your pet to restore happiness.
+- **Flare** — Reveals stealthed and invisible enemies in an area.
+- **Freezing Trap** — Trap that freezes the first enemy who triggers it.
+- **Frost Trap** — Trap that creates a slowing frost patch.
+- **Hunter's Mark** — Marks the target, increasing ranged attack power against it and allowing tracking.
+- **Mend Pet** — Heals your pet over time.
+- **Multi-Shot** — Hits multiple enemies with a single ranged shot.
+- **Raptor Strike** — Melee attack that modifies your next melee swing.
+- **Revive Pet** — Resurrects your dead pet.
+- **Scare Beast** — Causes a beast to flee.
+- **Scorpid Sting** — Sting that reduces the target's chance to hit.
+- **Serpent Sting** — Nature damage-over-time sting.
+- **Set Beast Free** — Permanently abandons your current pet.
+- **Snake Trap** — Trap that releases snakes when triggered.
+- **Track Beasts** — Shows beasts on the minimap.
+- **Track Demons** — Shows demons on the minimap.
+- **Track Dragonkin** — Shows dragonkin on the minimap.
+- **Track Elementals** — Shows elementals on the minimap.
+- **Track Giants** — Shows giants on the minimap.
+- **Track Hidden** — Helps reveal hidden enemies on the minimap.
+- **Track Humanoids** — Shows humanoids on the minimap.
+- **Track Undead** — Shows undead on the minimap.
+- **Tranquilizing Shot** — Removes an enrage or frenzy effect from the target.
+- **Viper Sting** — Drains mana from the target over time.
+- **Volley** — Channeled ranged area damage.
+- **Wing Clip** — Melee attack that slows the target.
+- **Wyvern Sting** — Ranged sting that puts the target to sleep and then applies damage over time.
+- **Immolation Trap** — Trap that burns the triggering target.
+- **Explosive Trap** — Trap that deals Fire damage in an area.
+- **Mongoose Bite** — Counterattack usable after dodging.
+
+### Hunter pet commands and core pet abilities
+- **Beast Training** — Opens pet training so you can teach learned pet abilities.
+- **Tame Beast** — Tames a beast as your pet.
+- **Tame Pet Passive** — Core taming/passive management functionality for hunter pets.
+- **Intimidation** — Orders your pet to stun and generate threat on the target.
+- **Bestial Wrath** — Sends your pet into a rage, increasing damage and making it harder to control.
+- **Rapid Fire** — Greatly increases ranged attack speed for a short duration.
+
+## Mage
+- **Amplify Magic** — Increases magic damage and healing received by the target.
+- **Arcane Brilliance** — Group version of Arcane Intellect.
+- **Arcane Explosion** — Instant area Arcane damage around you.
+- **Arcane Intellect** — Increases Intellect.
+- **Arcane Missiles** — Channeled Arcane bolts at the target.
+- **Blink** — Teleports you forward and removes stun and root effects in many cases.
+- **Blizzard** — Channeled area Frost damage that slows targets.
+- **Conjure Food** — Creates food.
+- **Conjure Mana Agate** — Creates a mana gem.
+- **Conjure Mana Citrine** — Creates a mana gem.
+- **Conjure Mana Jade** — Creates a mana gem.
+- **Conjure Mana Ruby** — Creates a mana gem.
+- **Conjure Water** — Creates water.
+- **Counterspell** — Interrupts spellcasting and locks that school briefly.
+- **Dampen Magic** — Reduces magic damage and healing received by the target.
+- **Detect Magic** — Shows magical buffs on the target.
+- **Evocation** — Rapidly restores mana while channeling.
+- **Fire Blast** — Instant Fire damage spell.
+- **Fire Ward** — Absorbs Fire damage.
+- **Fireball** — Casted Fire damage spell that also applies a damage-over-time effect.
+- **Flamestrike** — Calls down fire to damage enemies in an area and leave burning ground.
+- **Frost Armor** — Increases armor and slows enemies that hit you.
+- **Frost Nova** — Roots nearby enemies in place.
+- **Frost Ward** — Absorbs Frost damage.
+- **Frostbolt** — Casted Frost damage spell that slows the target.
+- **Ice Armor** — Stronger armor buff that slows attackers.
+- **Mage Armor** — Armor buff that improves mana regeneration and resistances.
+- **Mana Shield** — Uses mana to absorb incoming damage.
+- **Polymorph** — Turns the target into a harmless creature, incapacitating it and healing it over time.
+- **Portal: Darnassus** — Opens a portal to Darnassus.
+- **Portal: Ironforge** — Opens a portal to Ironforge.
+- **Portal: Orgrimmar** — Opens a portal to Orgrimmar.
+- **Portal: Stormwind** — Opens a portal to Stormwind.
+- **Portal: Thunder Bluff** — Opens a portal to Thunder Bluff.
+- **Portal: Undercity** — Opens a portal to Undercity.
+- **Presence of Mind** — Makes your next Mage spell with a cast time instant.
+- **Pyroblast** — Long-cast high-damage Fire spell with a burn effect.
+- **Remove Lesser Curse** — Removes one lesser curse from the target.
+- **Scorch** — Quick Fire damage spell.
+- **Slow Fall** — Reduces falling speed.
+- **Teleport: Darnassus** — Teleports you to Darnassus.
+- **Teleport: Ironforge** — Teleports you to Ironforge.
+- **Teleport: Orgrimmar** — Teleports you to Orgrimmar.
+- **Teleport: Stormwind** — Teleports you to Stormwind.
+- **Teleport: Thunder Bluff** — Teleports you to Thunder Bluff.
+- **Teleport: Undercity** — Teleports you to Undercity.
+
+## Paladin
+- **Blessing of Freedom** — Makes the target immune to movement impairing effects for a short duration.
+- **Blessing of Kings** — Increases all stats.
+- **Blessing of Light** — Increases the effect of Holy Light and Flash of Light on the target.
+- **Blessing of Might** — Increases attack power.
+- **Blessing of Protection** — Makes the target immune to physical attacks but unable to attack physically.
+- **Blessing of Sacrifice** — Transfers damage from the target to you.
+- **Blessing of Salvation** — Reduces the target's threat generation.
+- **Blessing of Sanctuary** — Reduces incoming damage and deals Holy damage to attackers on blocks.
+- **Blessing of Wisdom** — Increases mana regeneration.
+- **Cleanse** — Removes one poison, one disease, and one magic effect.
+- **Concentration Aura** — Reduces spell pushback for nearby allies.
+- **Consecration** — Consecrates the ground, dealing Holy damage over time.
+- **Devotion Aura** — Increases armor for nearby allies.
+- **Divine Favor** — Causes your next Holy Light, Flash of Light, or Holy Shock to crit.
+- **Divine Intervention** — Sacrifices yourself to shield a party member from harm for a time.
+- **Divine Protection** — Grants strong protection but prevents attacking and casting many actions.
+- **Divine Shield** — Makes you immune to most damage and effects for a short duration.
+- **Exorcism** — Holy damage against Undead or Demons.
+- **Fire Resistance Aura** — Fire Resistance aura for nearby allies.
+- **Flash of Light** — Fast, efficient direct heal.
+- **Frost Resistance Aura** — Frost Resistance aura for nearby allies.
+- **Hammer of Justice** — Stuns the target.
+- **Hammer of Wrath** — Execute-style ranged Holy damage attack usable on low-health targets.
+- **Holy Light** — Large direct heal.
+- **Holy Shock** — Instant Holy damage to enemies or instant heal to allies.
+- **Holy Wrath** — Area Holy damage and stun against Undead and Demons.
+- **Judgement** — Unleashes the active Seal on the target.
+- **Lay on Hands** — Sacrifices your mana to massively heal the target.
+- **Purify** — Removes one poison and one disease effect.
+- **Redemption** — Resurrects a dead target.
+- **Repentance** — Incapacitates a Humanoid target for a short duration.
+- **Retribution Aura** — Deals Holy damage to enemies that hit affected allies.
+- **Righteous Fury** — Increases threat from Holy spells and effects.
+- **Seal of Command** — Melee attacks have a chance to deal additional Holy damage; judgement applies holy burst.
+- **Seal of Justice** — Gives attacks a chance to stun; judgement prevents fleeing in many cases.
+- **Seal of Light** — Gives attackers a chance to heal themselves; judgement places healing-on-hit debuff.
+- **Seal of Righteousness** — Adds Holy damage to melee swings; judgement deals instant Holy damage.
+- **Seal of the Crusader** — Increases attack speed and lowers weapon damage; judgement increases Holy damage taken.
+- **Seal of Wisdom** — Gives attackers a chance to restore mana; judgement places mana-on-hit debuff.
+- **Sense Undead** — Tracks undead on the minimap.
+- **Shadow Resistance Aura** — Shadow Resistance aura for nearby allies.
+- **Summon Charger** — Summons your epic class mount.
+- **Summon Warhorse** — Summons your class mount.
+- **Turn Undead** — Causes an Undead target to flee.
+
+## Priest
+- **Abolish Disease** — Removes disease effects and continues cleansing disease for a short duration.
+- **Cure Disease** — Removes a disease.
+- **Desperate Prayer** — Instant self-heal.
+- **Devouring Plague** — Damages the target over time and heals you for part of the damage.
+- **Dispel Magic** — Removes magic effects from a friendly or hostile target.
+- **Elune's Grace** — Reduces ranged damage taken and increases dodge for a short duration.
+- **Fade** — Temporarily reduces your threat.
+- **Fear Ward** — Protects the target from the next fear effect.
+- **Feedback** — Burns mana from attackers when they cast spells on you.
+- **Flash Heal** — Fast direct heal.
+- **Greater Heal** — Large casted heal.
+- **Heal** — Standard direct heal.
+- **Hex of Weakness** — Weakens the enemy, reducing damage and healing received in some versions.
+- **Holy Fire** — Initial Holy damage plus a damage-over-time effect.
+- **Holy Nova** — Area Holy effect that damages enemies and heals allies nearby.
+- **Inner Fire** — Increases armor and spell power-like offensive capability depending on version/rank.
+- **Inner Focus** — Makes your next spell free and increases its crit chance.
+- **Lesser Heal** — Early low-level direct heal.
+- **Levitate** — Allows the target to float and avoid falling damage / terrain effects.
+- **Lightwell** — Summons a Lightwell allies can click for healing.
+- **Mana Burn** — Burns the target's mana and deals damage equal to part of the mana burned.
+- **Mind Blast** — Instant Shadow damage with a cooldown.
+- **Mind Control** — Takes control of the target humanoid for a short time.
+- **Mind Flay** — Channeled Shadow damage that slows the target.
+- **Mind Soothe** — Reduces a humanoid target's aggro radius.
+- **Mind Vision** — Lets you see through the eyes of the target.
+- **Power Infusion** — Greatly increases a friendly caster's spellcasting output for a short duration.
+- **Power Word: Fortitude** — Increases Stamina.
+- **Power Word: Shield** — Shields the target from damage and prevents spell pushback.
+- **Prayer of Fortitude** — Group version of Power Word: Fortitude.
+- **Prayer of Healing** — Heals your party members near the target.
+- **Prayer of Shadow Protection** — Group version of Shadow Protection.
+- **Prayer of Spirit** — Group version of Divine Spirit.
+- **Psychic Scream** — Causes nearby enemies to flee.
+- **Renew** — Heal-over-time spell.
+- **Resurrection** — Revives a dead ally.
+- **Shadow Protection** — Increases Shadow Resistance.
+- **Shadow Word: Pain** — Shadow damage-over-time effect.
+- **Shadowform** — Assumes Shadowform, increasing Shadow damage and reducing physical damage taken while limiting Holy casting.
+- **Shackle Undead** — Incapacitates an Undead target.
+- **Silence** — Silences the target, preventing spellcasting.
+- **Smite** — Basic Holy damage cast.
+- **Starshards** — Channeled Arcane damage-over-time racial priest spell.
+- **Touch of Weakness** — Buff that damages and weakens enemies that hit you.
+- **Vampiric Embrace** — Causes Shadow damage dealt to heal your party for a portion.
+
+### Priest buffs and support spells
+- **Divine Spirit** — Increases Spirit.
+- **Prayer of Spirit** — Group version of Divine Spirit.
+- **Power Word: Fortitude** — Increases Stamina.
+- **Prayer of Fortitude** — Group version of Power Word: Fortitude.
+
+## Rogue
+- **Ambush** — Heavy dagger opener from stealth.
+- **Backstab** — Dagger attack from behind that deals high damage.
+- **Blade Flurry** — Increases attack speed and cleaves melee attacks to a nearby target.
+- **Blind** — Incapacitates the target until damage is taken.
+- **Cheap Shot** — Stealth opener that stuns and generates combo points.
+- **Cold Blood** — Causes your next offensive ability to crit.
+- **Disarm Trap** — Disarms a trap.
+- **Distract** — Distracts enemies to face a target location.
+- **Evasion** — Greatly increases dodge chance.
+- **Eviscerate** — Finishing move that deals direct damage based on combo points.
+- **Expose Armor** — Finishing move that reduces the target's armor.
+- **Feint** — Reduces your threat.
+- **Garrote** — Stealth opener that silences briefly and applies a bleed.
+- **Gouge** — Incapacitates the target briefly, breaking on damage.
+- **Hemorrhage** — Weapon strike that adds a debuff causing bonus physical damage taken from attacks.
+- **Kick** — Interrupts spellcasting and may lock that school briefly.
+- **Kidney Shot** — Finishing move that stuns based on combo points.
+- **Pick Lock** — Opens locked chests and doors.
+- **Pick Pocket** — Steals loot from a humanoid target.
+- **Premeditation** — Adds combo points before engaging from stealth.
+- **Rupture** — Finishing move that applies a bleed.
+- **Sap** — Incapacitates a humanoid target out of combat.
+- **Sinister Strike** — Basic combo-point-generating melee attack.
+- **Slice and Dice** — Finishing move that increases attack speed.
+- **Sprint** — Greatly increases movement speed.
+- **Stealth** — Enter stealth.
+- **Vanish** — Drops combat and enters stealth if successful.
+
+### Rogue poisons and utility
+- **Anesthetic/utility note** — Classic rogue poison utility is provided through crafted poisons rather than spellbook-only actives.
+- **Apply Poison** — Class utility centered on weapon poisons such as Instant, Crippling, Deadly, Mind-numbing, and Wound Poison.
+- **Detect Traps** — Passive/utility trap detection support.
+
+## Shaman
+- **Ancestral Spirit** — Resurrects a dead ally.
+- **Astral Recall** — Returns you to your hearthstone bind point.
+- **Chain Heal** — Heals one target, then jumps to additional nearby allies.
+- **Chain Lightning** — Lightning attack that jumps to additional nearby enemies.
+- **Cure Disease** — Removes one disease from the target.
+- **Cure Poison** — Removes one poison from the target.
+- **Earth Shock** — Instant Nature damage shock that interrupts spellcasting.
+- **Earthbind Totem** — Totem that slows nearby enemies.
+- **Far Sight** — Allows you to see from a distant location.
+- **Fire Nova Totem** — Totem that explodes after a short delay to deal Fire damage nearby.
+- **Fire Resistance Totem** — Totem that grants Fire Resistance.
+- **Flame Shock** — Instant Fire damage plus a Fire damage-over-time effect.
+- **Flametongue Totem** — Totem that adds Fire damage to allied melee attacks.
+- **Frost Resistance Totem** — Totem that grants Frost Resistance.
+- **Frost Shock** — Instant Frost damage that slows the target.
+- **Ghost Wolf** — Shapeshifts you into a ghost wolf for faster movement.
+- **Grace of Air Totem** — Totem that increases Agility.
+- **Grounding Totem** — Totem that absorbs a harmful spell directed at party members.
+- **Healing Stream Totem** — Totem that heals nearby party members over time.
+- **Healing Wave** — Large direct heal.
+- **Lesser Healing Wave** — Fast direct heal.
+- **Lightning Bolt** — Basic casted Nature damage spell.
+- **Lightning Shield** — Orb shield that damages attackers.
+- **Magma Totem** — Totem that pulses Fire damage to nearby enemies.
+- **Mana Spring Totem** — Totem that restores mana over time.
+- **Mana Tide Totem** — Totem that greatly increases mana regeneration for nearby allies.
+- **Nature Resistance Totem** — Totem that grants Nature Resistance.
+- **Purge** — Removes beneficial magic effects from the target.
+- **Poison Cleansing Totem** — Totem that periodically removes poison from party members.
+- **Reincarnation** — Self-resurrection after death if ankhs are available.
+- **Rockbiter Weapon** — Weapon buff that increases threat and melee power.
+- **Searing Totem** — Totem that repeatedly shoots Fire bolts at enemies.
+- **Sentry Totem** — Totem that provides vision you can see through.
+- **Stoneclaw Totem** — Totem that taunts nearby enemies.
+- **Stoneskin Totem** — Totem that reduces incoming melee damage.
+- **Strength of Earth Totem** — Totem that increases Strength.
+- **Tremor Totem** — Totem that removes fear, charm, and sleep effects periodically.
+- **Water Breathing** — Allows the target to breathe underwater.
+- **Water Walking** — Lets the target walk on water.
+- **Windfury Totem** — Totem that grants extra attack procs to melee allies.
+- **Windfury Weapon** — Weapon buff that grants a chance for extra attacks.
+- **Windwall Totem** — Totem that reduces ranged damage taken.
+- **Tranquil Air Totem** — Totem that reduces threat generation.
+- **Totemic Recall** — Destroys your active totems and refunds part of their mana cost.
+
+## Warlock
+- **Banish** — Incapacitates a Demon or Elemental target.
+- **Conflagrate** — Instantly consumes your Immolate on the target to deal burst Fire damage.
+- **Corruption** — Shadow damage-over-time effect.
+- **Create Firestone** — Creates a Firestone for use on weapons or held items depending on rank/version.
+- **Create Healthstone** — Creates a Healthstone.
+- **Create Soulstone** — Creates a Soulstone for self-resurrection or resurrection support.
+- **Create Spellstone** — Creates a Spellstone.
+- **Curse of Agony** — Curse that deals increasing Shadow damage over time.
+- **Curse of Doom** — Long curse that deals a large burst of Shadow damage later.
+- **Curse of Exhaustion** — Curse that slows the target.
+- **Curse of Recklessness** — Increases melee attack power while reducing armor and preventing fear.
+- **Curse of Shadow** — Increases Shadow and Arcane damage taken.
+- **Curse of the Elements** — Increases Fire and Frost damage taken.
+- **Curse of Tongues** — Slows spellcasting.
+- **Curse of Weakness** — Reduces melee attack power.
+- **Dark Pact** — Drains mana from your demon pet to restore your mana.
+- **Death Coil** — Deals Shadow damage, horrifies the target, and heals you.
+- **Demon Armor** — Increases armor and health regeneration.
+- **Demon Skin** — Basic armor and regeneration buff.
+- **Detect Greater Invisibility** — Helps detect greater invisibility.
+- **Detect Invisibility** — Helps detect invisibility.
+- **Drain Life** — Channels health from the target to you.
+- **Drain Mana** — Channels mana from the target to you.
+- **Drain Soul** — Channels Shadow damage and generates a Soul Shard if the target dies.
+- **Enslave Demon** — Temporarily enslaves a demon.
+- **Eye of Kilrogg** — Summons an eye you can control to scout ahead.
+- **Fear** — Causes the target to flee in terror.
+- **Fel Armor note** — Not a Vanilla Classic spell; omitted intentionally.
+- **Health Funnel** — Transfers your health to your demon pet.
+- **Hellfire** — Channeled area Fire damage around you that also damages you.
+- **Howl of Terror** — Causes nearby enemies to flee in fear.
+- **Immolate** — Fire damage spell that also burns the target over time.
+- **Inferno** — Summons an Infernal by calling one down from the sky.
+- **Life Tap** — Converts health into mana.
+- **Rain of Fire** — Channeled area Fire damage.
+- **Ritual of Doom** — Summons a Doomguard through a ritual.
+- **Ritual of Summoning** — Summons a party member to your location.
+- **Searing Pain** — Fast-cast Fire damage spell with high threat.
+- **Sense Demons** — Tracks demons on the minimap.
+- **Shadow Bolt** — Basic casted Shadow damage spell.
+- **Shadow Ward** — Absorbs Shadow damage.
+- **Shadowburn** — Instant Shadow damage finisher that consumes a Soul Shard if it does not kill the target.
+- **Siphon Life** — Shadow damage-over-time effect that heals you for part of the damage.
+- **Soul Fire** — Long-cast heavy Fire damage spell.
+- **Soul Link** — Links you with your demon so you share damage.
+- **Soulstone Resurrection** — Allows the soulstoned target to resurrect after death.
+- **Summon Dreadsteed** — Summons your epic class mount.
+- **Summon Felhunter** — Summons a Felhunter.
+- **Summon Imp** — Summons an Imp.
+- **Summon Succubus** — Summons a Succubus.
+- **Summon Voidwalker** — Summons a Voidwalker.
+- **Summon Felsteed** — Summons your class mount.
+- **Unending Breath** — Allows underwater breathing.
+
+## Warrior
+- **Battle Shout** — Increases melee attack power for your party.
+- **Battle Stance** — Combat stance focused on general combat abilities.
+- **Berserker Rage** — Breaks and grants immunity to fear and incapacitate-like effects briefly while generating rage.
+- **Berserker Stance** — Offensive stance granting access to rage-heavy aggressive abilities.
+- **Bloodrage** — Instantly generates rage and more rage over a short duration at the cost of health.
+- **Bloodthirst** — Instant attack based on attack power that also heals you slightly.
+- **Challenging Shout** — Forces nearby enemies to attack you briefly.
+- **Charge** — Rushes an enemy, stunning briefly and generating rage.
+- **Cleave** — Replaces your next swing to hit an additional target.
+- **Concussion Blow** — Powerful attack that stuns the target.
+- **Death Wish** — Offensive cooldown increasing damage dealt while reducing fear effects / increasing damage taken depending on implementation.
+- **Defensive Stance** — Tanking stance that reduces damage taken and increases threat.
+- **Demoralizing Shout** — Reduces nearby enemies' melee attack power.
+- **Disarm** — Disarms the target's weapon.
+- **Execute** — Rage-finisher usable on low-health enemies.
+- **Hamstring** — Damages and slows the target.
+- **Heroic Strike** — Replaces your next melee swing with a stronger attack.
+- **Intercept** — Charges an enemy in Berserker Stance, stunning them.
+- **Intimidating Shout** — Causes enemies to flee in fear, with the main target cowering.
+- **Last Stand** — Temporarily increases your current and maximum health.
+- **Mocking Blow** — Taunts the target while in Battle Stance.
+- **Mortal Strike** — Heavy weapon attack that reduces healing received.
+- **Overpower** — Reactive attack usable after the target dodges.
+- **Piercing Howl** — Area slow around you.
+- **Pummel** — Interrupts spellcasting in Berserker Stance.
+- **Recklessness** — Greatly increases crit chance for a short time at the cost of taking more damage.
+- **Rend** — Bleed effect.
+- **Retaliation** — Counterattacks incoming melee attacks for a short duration.
+- **Revenge** — Reactive attack usable after blocking, dodging, or parrying.
+- **Shield Bash** — Interrupts spellcasting and can lock the school briefly.
+- **Shield Block** — Greatly increases chance to block and allows additional blocks.
+- **Shield Slam** — Slams with a shield for damage based partly on block value and dispels a magic effect.
+- **Shield Wall** — Strong defensive cooldown that greatly reduces incoming damage.
+- **Shoot Bow** — Uses a bow.
+- **Shoot Crossbow** — Uses a crossbow.
+- **Shoot Gun** — Uses a gun.
+- **Slam** — Heavy weapon attack with a cast time that resets swing timing.
+- **Sunder Armor** — Applies a stacking armor reduction debuff.
+- **Sweeping Strikes** — Causes melee attacks to strike an additional nearby target.
+- **Taunt** — Forces the target to attack you and matches threat.
+- **Thunder Clap** — Damages nearby enemies and slows their attack speed.
+- **Whirlwind** — Hits multiple nearby enemies.
+- **Berserker Stance Passive** — Grants increased critical strike chance in Berserker Stance.
+- **Defensive Stance Passive** — Increases threat and reduces damage dealt in Defensive Stance.
+
+## Notes
+- This reference intentionally groups by **base spell name** rather than listing every rank separately.
+- Some spells changed wording between original Vanilla and current Classic Era database presentations; descriptions here are normalized to stay readable.
+- Some class pages and calculators also include talent-granted actives. Those are included here where they function as player-usable spells or abilities.
+
+## Sources
+- Wowhead Classic spell and abilities database pages for each original class, which provide searchable Classic spell lists and are current to the active Classic Era database presentation. 
+- Warcraft Wiki Classic class ability pages, used as a secondary structure/reference point for class ability groupings.

@@ -195,7 +195,7 @@ namespace Project_1.UI.HUD.Windows
         {
             while (entriesBox.ScrollableElementsCount < count)
             {
-                SpellTrainingEntryButton button = new SpellTrainingEntryButton(this, SelectEntry);
+                SpellTrainingEntryButton button = new SpellTrainingEntryButton(entriesBox, SelectEntry);
                 entriesBox.AddScrollableElement(button);
             }
         }

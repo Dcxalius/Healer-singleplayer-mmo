@@ -40,5 +40,11 @@ namespace Project_1.GameObjects.Entities
             ThreadAffinity.AssertSimThread();
             return buffList.GetAllBuffs();
         }
+
+        public void RemoveFirstBuffOfType<T>() where T : Buff
+        {
+            ThreadAffinity.AssertSimThread();
+            buffList.RemoveFirstBuffOfType<T>(this);
+        }
     }
 }

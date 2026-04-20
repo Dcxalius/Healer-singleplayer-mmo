@@ -22,6 +22,7 @@ namespace Project_1.UI.HUD
         Label itemName;
         Label itemDescription;
         Label itemStats;
+        Label itemBonusStats;
         Label itemSellPrice;
 
         Image goldImage;
@@ -38,6 +39,7 @@ namespace Project_1.UI.HUD
             itemName = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopLeft);
             itemDescription = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopLeft);
             itemStats = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopLeft);
+            itemBonusStats = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopLeft, Color.LimeGreen);
             itemSellPrice = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreRight);
 
             goldImage = new Image(this, new UITexture("Gold", Color.White), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
@@ -71,6 +73,13 @@ namespace Project_1.UI.HUD
                 itemStats.Resize(new AbsoluteScreenPosition(Size.X, (int)itemStats.UnderlyingTextOffset.Y).ToRelativeScreenPosition(Size));
                 itemStats.Move(pos);
                 pos += itemStats.RelativeSize.OnlyY + spacingInBox.OnlyY;
+            }
+
+            if (itemBonusStats.Text != null)
+            {
+                itemBonusStats.Resize(new AbsoluteScreenPosition(Size.X, (int)itemBonusStats.UnderlyingTextOffset.Y).ToRelativeScreenPosition(Size));
+                itemBonusStats.Move(pos);
+                pos += itemBonusStats.RelativeSize.OnlyY + spacingInBox.OnlyY;
             }
 
             if (itemSellPrice.Text != null)
@@ -139,6 +148,14 @@ namespace Project_1.UI.HUD
             }
             else { itemStats.Text = null; }
 
+            if (snapshot.HasBonusStatReport)
+            {
+                itemBonusStats.Text = snapshot.BonusStatReport;
+                spacingNeeded += 1;
+                ySize += itemBonusStats.UnderlyingTextOffset.Y;
+            }
+            else { itemBonusStats.Text = null; }
+
             goldImage.Visible = false;
             if (snapshot.HasSellPrice)
             {
@@ -173,6 +190,7 @@ namespace Project_1.UI.HUD
                 itemStats.Text = null;
             }
 
+            itemBonusStats.Text = null;
             itemSellPrice.Text = null;
             goldImage.Visible = false;
         }
@@ -185,6 +203,7 @@ namespace Project_1.UI.HUD
             itemName.Text = null;
             itemDescription.Text = null;
             itemStats.Text = null;
+            itemBonusStats.Text = null;
             itemSellPrice.Text = null;
             Resize(RelativeScreenPosition.Zero);
             return;

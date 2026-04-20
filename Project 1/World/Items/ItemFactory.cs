@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Project_1.GameObjects.Spells;
 using Project_1.Managers;
 using Project_1.Items.SubTypes;
+using Project_1.World.Items.Enchantments;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,6 +32,7 @@ namespace Project_1.Items
             if (initialized) return;
             initialized = true;
             EquipmentData.Init();
+            EnchantmentFactory.Init();
             //itemData = new Dictionary<int, ItemData>();
             List<ItemData> itemList = new List<ItemData>();
 

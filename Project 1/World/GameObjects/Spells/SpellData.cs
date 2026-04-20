@@ -2,6 +2,7 @@
 using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Unit.Stats;
 using Project_1.Textures;
+using Project_1.World.GameObjects.Spells.SpellEffects;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -71,6 +72,9 @@ namespace Project_1.GameObjects.Spells
         public GroundTargetShapeType GroundTargetShape => groundTargetShape;
         GroundTargetShapeType groundTargetShape;
 
+        public CastCondition CastCondition => castCondition;
+        CastCondition castCondition;
+
         public bool IsBinary => isBinary;
         bool isBinary;
         public SpellSchool[] SpellSchools => spellSchools;
@@ -137,7 +141,8 @@ namespace Project_1.GameObjects.Spells
             bool requiresGroundTarget = false,
             float groundTargetWidth = 0,
             float groundTargetHeight = -1,
-            GroundTargetShapeType groundTargetShape = GroundTargetShapeType.Circle)
+            GroundTargetShapeType groundTargetShape = GroundTargetShapeType.Circle,
+            CastCondition castCondition = CastCondition.None)
         {
             this.name = name;
             this.description = description ?? string.Empty;
@@ -173,6 +178,7 @@ namespace Project_1.GameObjects.Spells
             this.groundTargetWidth = groundTargetWidth;
             this.groundTargetHeight = groundTargetHeight < 0 ? groundTargetWidth : groundTargetHeight;
             this.groundTargetShape = groundTargetShape;
+            this.castCondition = castCondition;
             Assert();
         }
 

@@ -1,6 +1,8 @@
-using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using System;
+using System.Reflection.Metadata;
 
 namespace Project_1.Managers
 {
@@ -26,6 +28,7 @@ namespace Project_1.Managers
             if (initialized) return;
             initialized = true;
             InitializeScissorState();
+            //Mouse.SetCursor(MouseCursor.FromTexture2D(Content.Load<Texture2D>(PATH_TO_IMAGE), 0, 0));
         }
 
         public static void SetManager(Microsoft.Xna.Framework.Game aGame)
@@ -37,6 +40,7 @@ namespace Project_1.Managers
             graphicsAdapter = GraphicsAdapter.DefaultAdapter;
             gameWindow = aGame.Window;
             game = aGame;
+
         }
 
         static void PublishWindowLayoutChanged(Point windowSize, Rectangle renderTargetDestination)

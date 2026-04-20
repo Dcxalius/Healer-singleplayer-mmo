@@ -16,6 +16,8 @@ namespace Project_1.UI.HUD.Inventory
 {
     internal class Item : GFXButton
     {
+        static bool enchantTargetingActive;
+
         bool isHeld;
         bool isEmpty = true;
         readonly bool holdable;
@@ -38,6 +40,11 @@ namespace Project_1.UI.HUD.Inventory
 
         static bool IsCharacterWindowOpen() => Window.IsWindowOpen(nameof(CharacterWindow));
         static bool IsShopOpen() => Window.IsWindowOpen(nameof(ShopWindow));
+
+        public static void SetEnchantTargetingActive(bool isActive)
+        {
+            enchantTargetingActive = isActive;
+        }
 
         public string ItemCount
         {
@@ -355,6 +362,12 @@ namespace Project_1.UI.HUD.Inventory
         {
             if (bagIndex >= 0)
             {
+                if (enchantTargetingActive && snapshot.HasValue && snapshot.IsEquipmentLike)
+                {
+                    MailboxManager.PublishSimCommand(new InventoryEnchantTargetRequested(Index));
+                    return;
+                }
+
                 bool shopOpen = IsShopOpen();
                 if (shopOpen)
                 {
@@ -386,6 +399,15 @@ namespace Project_1.UI.HUD.Inventory
                     default:
                         throw new NotImplementedException();
                 }
+            }
+
+            if (bagIndex == -3)
+            {
+                if (enchantTargetingActive && snapshot.HasValue && snapshot.IsEquipmentLike)
+                {
+                    MailboxManager.PublishSimCommand(new EquipmentEnchantRequested(slotIndex));
+                }
+                return;
             }
 
             if (bagIndex == -1)

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Unit.Stats;
 using Project_1.Managers;
 using System;
@@ -9,10 +10,11 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using Spell = Project_1.GameObjects.Spells.Spell;
 
-namespace Project_1.GameObjects.Spells
+namespace Project_1.World.GameObjects.Spells.SpellEffects
 {
-    internal class Instant : SpellEffect
+    internal class InstantEffect : SpellEffect
     {
         enum Type
         {
@@ -39,7 +41,7 @@ namespace Project_1.GameObjects.Spells
         }
 
         [JsonConstructor]
-        public Instant(string name, int minValue, int maxValue, DamageType damageType, bool isBinary, HashSet<SpellSchool> spellSchools) : base(name, isBinary, spellSchools)
+        public InstantEffect(string name, int minValue, int maxValue, DamageType damageType, bool isBinary, HashSet<SpellSchool> spellSchools) : base(name, isBinary, spellSchools)
         {
             Debug.Assert(maxValue != 0, "Tried to make Instant effect with no effect.");
             valueRange = (minValue, maxValue);

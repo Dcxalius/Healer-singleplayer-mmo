@@ -1,11 +1,8 @@
 ﻿using Project_1.GameObjects.Unit.Resources;
 using Project_1.GameObjects.Entities;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Project_1.World.Items.Enchantments;
 
 namespace Project_1.Items.SubTypes
 {
@@ -15,6 +12,8 @@ namespace Project_1.Items.SubTypes
         protected ConsumableData ItemData { get => itemData as ConsumableData; }
         ConsumableData.ConsumableType ConsumableType { get => ItemData.Consumable; }
         float Value { get => ItemData.Value; }
+        public int EnchantmentId => ItemData.EnchantmentId;
+        public bool RequiresItemTarget => ItemData.RequiresItemTarget;
 
         public Consumable(LootData aLoot) : base(aLoot)
         {
@@ -26,6 +25,15 @@ namespace Project_1.Items.SubTypes
         public Consumable(ConsumableData aData, int aCount) : base(aData, aCount)
         {
 
+        }
+
+        public bool TryGetEnchantmentData(out EnchantmentData enchantmentData)
+        {
+            enchantmentData = null;
+            if (!RequiresItemTarget) return false;
+
+            enchantmentData = EnchantmentFactory.GetData(EnchantmentId);
+            return enchantmentData != null;
         }
 
         public bool Use(Entity aUser)
@@ -50,6 +58,8 @@ namespace Project_1.Items.SubTypes
                     throw new NotImplementedException();
                 case ConsumableData.ConsumableType.Drink:
                     throw new NotImplementedException();
+                case ConsumableData.ConsumableType.EnchantScroll:
+                    return false;
                 default:
                     throw new NotImplementedException();
             }

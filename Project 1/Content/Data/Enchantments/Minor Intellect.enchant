@@ -1,0 +1,7 @@
+{
+  "Id": 1,
+  "Name": "Minor Intellect",
+  "Description": "Increases Intellect by 3.",
+  "PrimaryStats": [0, 0, 3, 0, 0],
+  "Target": 0
+}

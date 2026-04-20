@@ -9,13 +9,13 @@ using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.GameObjects.Entities.Friendlies.Players;
-using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Unit.Stats;
 using Project_1.Items;
 using Project_1.Items.SubTypes;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.Tiles;
+using Project_1.World.GameObjects.Spells.SpellEffects;
 
 namespace Project_1.Managers
 {

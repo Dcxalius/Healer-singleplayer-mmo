@@ -4,11 +4,11 @@ using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.Entities.Projectiles;
-using Project_1.GameObjects.Spells.Buff;
 using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Unit.Stats;
 using Project_1.Managers;
 using Project_1.Textures;
+using Project_1.World.GameObjects.Spells.SpellEffects;
 using Project_1.World.GameObjects.Unit.Talents;
 using System;
 using System.CodeDom;
@@ -46,6 +46,7 @@ namespace Project_1.GameObjects.Spells
         public double GroundTargetHeight => (spellData.GroundTargetHeight + TalentFlatChange(TalentChange.Radius)) * (1.0 + TalentPercentChange(TalentChange.Radius));
         public SpellData.GroundTargetShapeType GroundTargetShape => spellData.GroundTargetShape;
         public GfxPath HitEffectGfxPath => spellData.HitGfxPath;
+        public CastCondition CastCondition => spellData.CastCondition;
         public bool BinarySpell => spellData.IsBinary;
         public bool OffCooldown => Cooldown <= 0 || lastTimeCasted + Cooldown < TimeManager.TotalFrameTime;
         public double RatioOfCooldownDone => Cooldown <= 0 ? 1.0 : Math.Min((TimeManager.TotalFrameTime - lastTimeCasted) / Cooldown, 1);
@@ -149,12 +150,12 @@ namespace Project_1.GameObjects.Spells
             ThreadAffinity.AssertSimThread();
             if (!OffCooldown) return false;
             if (!spellData.Targetable(aTarget.RelationToPlayer)) return false;
-            if (spellData.Effects.Any(x => x is Instant)) return true;
+            if (spellData.Effects.Any(x => x is InstantEffect)) return true;
             List<Buff.Buff> targetBuffs = aTarget.GetAllBuffs();
             bool[] failures = new bool[spellData.Effects.Length];
             for (int i = 0; i < spellData.Effects.Length; i++)
             {
-                OverTime overTime = spellData.Effects[i] as OverTime;
+                OverTimeEffect overTime = spellData.Effects[i] as OverTimeEffect;
                 for (int j = 0; j < targetBuffs.Count; j++)
                 {
                     if (targetBuffs[j].EffectId != overTime.Id) continue;
@@ -190,11 +191,11 @@ namespace Project_1.GameObjects.Spells
             for (int i = 0; i < spellData.Effects.Length; i++)
             {
                 SpellEffect effect = spellData.Effects[i];
-                if (effect is Instant instant)
+                if (effect is InstantEffect instant)
                 {
                     instant.Trigger(aCaster, aTarget, this);
                 }
-                else if (effect is OverTime overTime)
+                else if (effect is OverTimeEffect overTime)
                 {
                     overTime.Trigger(aCaster, aTarget, this);
                 }
@@ -209,11 +210,11 @@ namespace Project_1.GameObjects.Spells
 
         public double GetScalar(SpellEffect aEffect)
         {
-            if (aEffect is Instant)
+            if (aEffect is InstantEffect)
             {
                 return GetDirectEffectScalarFromCastTime(CastTime);
             }
-            else if (aEffect is OverTime)
+            else if (aEffect is OverTimeEffect)
             {
                 return 1.0;
             }

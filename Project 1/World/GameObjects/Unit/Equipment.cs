@@ -9,6 +9,7 @@ using Project_1.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.UI.HUD.Managers;
+using Project_1.World.Items.Enchantments;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -50,7 +51,6 @@ namespace Project_1.GameObjects.Unit
         Items.SubTypes.Equipment[] equipped;
         Dictionary<string, int> aggregatedSecondaryStatsInt;
         Dictionary<string, double> aggregatedSecondaryStatsFloat;
-
 
         public bool CanShieldBlock(DamageType aDamageType) => aDamageType == DamageType.Physical; //TODO: Implement shields that can block certain damage types
 
@@ -138,6 +138,17 @@ namespace Project_1.GameObjects.Unit
         }
 
         [JsonIgnore]
+        public Items.SubTypes.Equipment[] EquippedItems
+        {
+            get
+            {
+                Items.SubTypes.Equipment[] snapshot = new Items.SubTypes.Equipment[equipped.Length];
+                Array.Copy(equipped, snapshot, equipped.Length);
+                return snapshot;
+            }
+        }
+
+        [JsonIgnore]
         public EquipmentStats EquipmentStats => equipmentStats;
         EquipmentStats equipmentStats;
 
@@ -171,7 +182,25 @@ namespace Project_1.GameObjects.Unit
             RefreshStatsFromEquipment();
         }
 
+        public Equipment(int[] aGearAllowed, Items.SubTypes.Equipment[] aItemsEquiped) : this(aGearAllowed)
+        {
+            if (aItemsEquiped == null) return;
+
+            Debug.Assert(aItemsEquiped.Length == equipped.Length);
+            for (int i = 0; i < aItemsEquiped.Length; i++)
+            {
+                Items.SubTypes.Equipment equipment = aItemsEquiped[i];
+                if (equipment == null) continue;
+
+                equipped[i] = equipment;
+                IncrementGearTypeCount(equipment);
+            }
+
+            RefreshStatsFromEquipment();
+        }
+
         public Equipment(int?[] aItemsEquiped) : this(new int[4] { int.MaxValue, int.MaxValue, int.MaxValue, int.MaxValue }, aItemsEquiped) { }
+        public Equipment(Items.SubTypes.Equipment[] aItemsEquiped) : this(new int[4] { int.MaxValue, int.MaxValue, int.MaxValue, int.MaxValue }, aItemsEquiped) { }
 
         public void SetOwner(Entity aOwner)
         {
@@ -648,6 +677,18 @@ namespace Project_1.GameObjects.Unit
             if (mh == null) return new AttackData(AttackData.AttackStyle.OneHander, null, oh);
 
             return new AttackData(AttackData.AttackStyle.DualWielding, mh, oh);
+        }
+
+        public bool ApplyPermanentEnchantment(Slot aSlot, EnchantmentData enchantmentData)
+        {
+            AssertSimThread();
+            Items.SubTypes.Equipment item = equipped[(int)aSlot];
+            if (item == null) return false;
+            if (!item.ApplyPermanentEnchantment(enchantmentData)) return false;
+
+            RefreshStatsFromEquipment();
+            MailboxManager.PublishUiEvent(new EquipmentSlotChanged(owner.RenderId, owner.RelationToPlayer.ToRelationToPlayerKind(), aSlot.ToEquipmentSlotKind(), BuildItemSnapshot(aSlot)));
+            return true;
         }
     }
 }

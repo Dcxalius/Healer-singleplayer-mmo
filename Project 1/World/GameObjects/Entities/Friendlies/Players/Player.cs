@@ -112,7 +112,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             if (down) velocity.Y += 1;
             if (velocity == WorldSpace.Zero) return;
             velocity.Normalize();
-            velocity *= (float)(UnitData.MovementData.Speed * TimeManager.SecondsSinceLastFrame);
+            velocity *= Speed * (float)TimeManager.SecondsSinceLastFrame;
         }
 
         public void ChangeGold(int aAmount)

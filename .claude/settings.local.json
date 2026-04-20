@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep \"\\\\.talent$\")"
+      "Bash(grep \"\\\\.talent$\")",
+      "Bash(cat:*)",
+      "Bash(grep:*)"
     ]
   }
 }

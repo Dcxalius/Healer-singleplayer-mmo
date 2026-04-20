@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Input;
 using Project_1.Managers;
@@ -29,6 +30,11 @@ namespace Project_1.UI.HUD.Windows
                 TalentUiSnapshot snapshot;
                 bool hasTalent;
                 public string PageBoxLabel => hasTalent ? snapshot.Name : null;
+                public bool HasTalent => hasTalent;
+                public int TalentId => snapshot.Id;
+                public int[] RequiredTalentIds => hasTalent ? snapshot.RequiredTalentIds : Array.Empty<int>();
+                public Point TopAnchor => new Point(AbsolutePos.Center.X, AbsolutePos.Top);
+                public Point BottomAnchor => new Point(AbsolutePos.Center.X, AbsolutePos.Bottom);
 
                 public TalentSlotElement(UIElement aParent, TalentWindow aWindow, RelativeScreenPosition aPos, RelativeScreenPosition aSize)
                     : base(aParent, null, aPos, aSize)
@@ -107,6 +113,100 @@ namespace Project_1.UI.HUD.Windows
                 }
             }
 
+            sealed class TalentArrowOverlay : UIElement
+            {
+                const int LineThickness = 3;
+                const int ArrowHeadSize = 12;
+                const int BaseSize = 6;
+
+                readonly TalentTreePage owner;
+                readonly UITexture lineTexture;
+                readonly UITexture arrowHeadTexture;
+
+                public TalentArrowOverlay(UIElement aParent, TalentTreePage aOwner, RelativeScreenPosition aPos, RelativeScreenPosition aSize)
+                    : base(aParent, null, aPos, aSize)
+                {
+                    owner = aOwner;
+                    lineTexture = new UITexture("WhiteBackground", new Color(60, 60, 60));
+                    arrowHeadTexture = new UITexture("DownArrow", new Color(60, 60, 60));
+                    CapturesClick = false;
+                    CapturesRelease = false;
+                    CapturesScroll = false;
+                }
+
+                public override void Draw(SpriteBatch aBatch)
+                {
+                    ThreadAffinity.AssertMainThread();
+                    if (!Visible) return;
+
+                    Dictionary<int, TalentSlotElement> slotsById = new Dictionary<int, TalentSlotElement>();
+                    for (int i = 0; i < owner.slots.Length; i++)
+                    {
+                        TalentSlotElement slot = owner.slots[i];
+                        if (!slot.HasTalent) continue;
+                        slotsById[slot.TalentId] = slot;
+                    }
+
+                    for (int i = 0; i < owner.slots.Length; i++)
+                    {
+                        TalentSlotElement target = owner.slots[i];
+                        if (!target.HasTalent) continue;
+
+                        int[] requiredIds = target.RequiredTalentIds;
+                        for (int j = 0; j < requiredIds.Length; j++)
+                        {
+                            if (slotsById.TryGetValue(requiredIds[j], out TalentSlotElement source))
+                            {
+                                DrawConnector(aBatch, source, target);
+                            }
+                        }
+                    }
+                }
+
+                void DrawConnector(SpriteBatch batch, TalentSlotElement source, TalentSlotElement target)
+                {
+                    Point from = source.BottomAnchor;
+                    Point tip = target.TopAnchor;
+                    int arrowTop = tip.Y - ArrowHeadSize;
+                    int shaftEndY = arrowTop + ArrowHeadSize / 2;
+                    int midY = from.Y + Math.Max(8, (shaftEndY - from.Y) / 2);
+
+                    DrawBase(batch, from);
+                    DrawVertical(batch, from.X, from.Y, midY);
+                    DrawHorizontal(batch, from.X, tip.X, midY);
+                    DrawVertical(batch, tip.X, midY, shaftEndY);
+                    DrawArrowHead(batch, tip.X, arrowTop);
+                }
+
+                void DrawBase(SpriteBatch batch, Point at)
+                {
+                    Rectangle rect = new Rectangle(at.X - BaseSize / 2, at.Y - BaseSize / 2, BaseSize, BaseSize);
+                    lineTexture.Draw(batch, rect);
+                }
+
+                void DrawVertical(SpriteBatch batch, int x, int startY, int endY)
+                {
+                    int top = Math.Min(startY, endY);
+                    int height = Math.Max(LineThickness, Math.Abs(endY - startY));
+                    Rectangle rect = new Rectangle(x - LineThickness / 2, top, LineThickness, height);
+                    lineTexture.Draw(batch, rect);
+                }
+
+                void DrawHorizontal(SpriteBatch batch, int startX, int endX, int y)
+                {
+                    int left = Math.Min(startX, endX);
+                    int width = Math.Max(LineThickness, Math.Abs(endX - startX));
+                    Rectangle rect = new Rectangle(left, y - LineThickness / 2, width, LineThickness);
+                    lineTexture.Draw(batch, rect);
+                }
+
+                void DrawArrowHead(SpriteBatch batch, int x, int top)
+                {
+                    Rectangle rect = new Rectangle(x - ArrowHeadSize / 2, top, ArrowHeadSize, ArrowHeadSize);
+                    arrowHeadTexture.Draw(batch, rect);
+                }
+            }
+
             const int MaxColumns = 4;
             const int MaxRows = 7;
             const float GridTop = 0.08f;
@@ -114,9 +214,11 @@ namespace Project_1.UI.HUD.Windows
             readonly Image background;
             readonly Box backgroundShade;
             readonly Label spentPointsLabel;
+            readonly TalentArrowOverlay arrowOverlay;
             readonly PageBox talentGrid;
+            readonly TalentSlotElement[] slots;
 
-            TalentUiSnapshot[] talents = Array.Empty<TalentUiSnapshot>();
+            TalentUiSnapshot?[] talents = CreateEmptyTalentGrid();
 
             public TalentTreePage(UIElement aParent, TalentWindow aWindow, RelativeScreenPosition aPos, RelativeScreenPosition aSize)
                 : base(aParent, null, aPos, aSize)
@@ -130,10 +232,12 @@ namespace Project_1.UI.HUD.Windows
                 CapturesClick = false;
                 CapturesRelease = false;
                 CapturesScroll = false;
+                slots = new TalentSlotElement[MaxColumns * MaxRows];
+                arrowOverlay = new TalentArrowOverlay(this, this, new RelativeScreenPosition(0.05f, GridTop), new RelativeScreenPosition(0.9f, GridHeight));
 
                 talentGrid = new PageBox(
                     this,
-                    aPageBox => CreateTalentSlots(aPageBox, aWindow),
+                    aPageBox => CreateTalentSlots(aPageBox, aWindow, slots),
                     new UITexture("WhiteBackground", Color.Transparent),
                     new RelativeScreenPosition(0.05f, GridTop),
                     new RelativeScreenPosition(0.9f, GridHeight),
@@ -154,8 +258,8 @@ namespace Project_1.UI.HUD.Windows
                 background.SetImage(aSnapshot.Background);
                 spentPointsLabel.Text = $"Spent: {aSnapshot.SpentPoints}";
                 MailboxManager.PublishUiEvent(new DescriptorBoxClear());
-                talents = FlattenTalents(aSnapshot.Rows);
-                talentGrid.Reset(talents.Length);
+                talents = BuildTalentGrid(aSnapshot.Rows);
+                talentGrid.Reset(slots.Length);
             }
 
             public void ResetTree()
@@ -168,13 +272,13 @@ namespace Project_1.UI.HUD.Windows
                 TalentSlotElement slot = aElement as TalentSlotElement;
                 if (slot == null) return;
 
-                if (aIndex < 0 || aIndex >= talents.Length)
+                if (aIndex < 0 || aIndex >= talents.Length || !talents[aIndex].HasValue)
                 {
                     slot.ClearTalent();
                     return;
                 }
 
-                slot.SetTalent(talents[aIndex]);
+                slot.SetTalent(talents[aIndex].Value);
             }
 
             static void ClearTalentSlot(UIElement aElement)
@@ -183,9 +287,8 @@ namespace Project_1.UI.HUD.Windows
                 slot?.ClearTalent();
             }
 
-            static UIElement[] CreateTalentSlots(PageBox aPageBox, TalentWindow aWindow)
+            static UIElement[] CreateTalentSlots(PageBox aPageBox, TalentWindow aWindow, TalentSlotElement[] slots)
             {
-                UIElement[] slots = new UIElement[MaxColumns * MaxRows];
                 RelativeScreenPosition slotSize = new RelativeScreenPosition(0.18f, 0.078f);
                 RelativeScreenPosition labelSize = new RelativeScreenPosition(0.22f, 0.042f);
                 RelativeScreenPosition start = new RelativeScreenPosition(0.02f, 0.02f);
@@ -203,7 +306,13 @@ namespace Project_1.UI.HUD.Windows
                     }
                 }
 
-                return slots;
+                UIElement[] elements = new UIElement[slots.Length];
+                for (int i = 0; i < slots.Length; i++)
+                {
+                    elements[i] = slots[i];
+                }
+
+                return elements;
             }
 
             static Label[] CreateTalentLabels(PageBox aPageBox)
@@ -230,24 +339,29 @@ namespace Project_1.UI.HUD.Windows
                 return labels;
             }
 
-            static TalentUiSnapshot[] FlattenTalents(TalentUiSnapshot[][] aRows)
+            static TalentUiSnapshot?[] BuildTalentGrid(TalentUiSnapshot[][] aRows)
             {
+                TalentUiSnapshot?[] grid = CreateEmptyTalentGrid();
                 if (aRows == null || aRows.Length == 0)
                 {
-                    return Array.Empty<TalentUiSnapshot>();
+                    return grid;
                 }
 
-                List<TalentUiSnapshot> flattened = new List<TalentUiSnapshot>(MaxColumns * MaxRows);
                 for (int row = 0; row < aRows.Length && row < MaxRows; row++)
                 {
                     TalentUiSnapshot[] rowTalents = aRows[row] ?? Array.Empty<TalentUiSnapshot>();
                     for (int column = 0; column < rowTalents.Length && column < MaxColumns; column++)
                     {
-                        flattened.Add(rowTalents[column]);
+                        grid[row * MaxColumns + column] = rowTalents[column];
                     }
                 }
 
-                return flattened.ToArray();
+                return grid;
+            }
+
+            static TalentUiSnapshot?[] CreateEmptyTalentGrid()
+            {
+                return new TalentUiSnapshot?[MaxColumns * MaxRows];
             }
         }
 

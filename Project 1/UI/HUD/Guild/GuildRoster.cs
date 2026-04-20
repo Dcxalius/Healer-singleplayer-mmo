@@ -53,6 +53,16 @@ namespace Project_1.UI.HUD.Guild
             }
         }
 
+        public void UpdateListing(int ownerRenderId, int level)
+        {
+            for (int i = 0; i < guildMembers.Count; i++)
+            {
+                if (!guildMembers[i].BelongsTo(ownerRenderId)) continue;
+                guildMembers[i].UpdateLevel(level);
+                break;
+            }
+        }
+
         public void SetData(EntityUiSnapshot[] aData)
         {
             guildMembers.Clear();

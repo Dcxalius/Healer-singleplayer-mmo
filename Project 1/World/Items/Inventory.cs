@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.Items.SubTypes;
 using Project_1.Managers;
@@ -14,37 +15,18 @@ namespace Project_1.Items
     internal partial class Inventory
     {
         static void AssertSimThread() => ThreadAffinity.AssertSimThread();
+        static readonly JsonSerializer itemSerializer = JsonSerializer.Create(new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.Auto
+        });
 
         public const int bagSlots = 5;
         public const int defaultSlots = 32;
 
-        [JsonProperty("Items")]
-        public (int, int)?[][] ItemsAsID
+        [JsonProperty("Items", TypeNameHandling = TypeNameHandling.Auto)]
+        public Item[][] SerializableItems
         {
-            get
-            {
-                (int, int)?[][] ids = new (int, int)?[items.Length][];
-
-                ids[0] = new (int, int)?[defaultSlots];
-                for (int i = 0; i < ids[0].Length; i++)
-                {
-                    if (items[0][i] == null) continue;
-                    ids[0][i] = (items[0][i].ID, items[0][i].Count);
-                }
-
-                for (int i = 1; i < ids.Length; i++)
-                {
-                    if (bags[i] == null) continue;
-
-                    ids[i] = new (int, int)?[bags[i].SlotCount];
-                    for (int j = 0; j < ids[i].Length; j++)
-                    {
-                        if (items[i][j] == null) continue;
-                        ids[i][j] = (items[i][j].ID, items[i][j].Count);
-                    }
-                }
-                return ids;
-            }
+            get => items;
         }
 
         [JsonProperty("Bags")]
@@ -85,7 +67,7 @@ namespace Project_1.Items
         }
 
         [JsonConstructor]
-        public Inventory(int?[] bags, (int, int)?[][] items)
+        public Inventory(int?[] bags, JToken items)
         {
             this.bags = new Container[bagSlots]; //Bag 0 is fornow always null
 
@@ -98,23 +80,13 @@ namespace Project_1.Items
 
             this.items = new Item[bagSlots][];
             this.items[0] = new Item[defaultSlots];
-            for (int i = 0; i < this.items[0].Length; i++)
-            {
-
-                if (!items[0][i].HasValue) continue;
-                this.items[0][i] = ItemFactory.CreateItem(ItemFactory.GetItemData(items[0][i].Value.Item1), items[0][i].Value.Item2);
-
-            }
+            DeserializeBagItems(items?[0], this.items[0]);
             for (int i = 1; i < bags.Length; i++)
             {
                 if (this.bags[i] != null)
                 {
                     this.items[i] = new Item[this.bags[i].SlotCount];
-                    for (int j = 0; j < items[i].Length; j++)
-                    {
-                        if (!items[i][j].HasValue) continue;
-                        this.items[i][j] = ItemFactory.CreateItem(ItemFactory.GetItemData(items[i][j].Value.Item1), items[i][j].Value.Item2);
-                    }
+                    DeserializeBagItems(items?[i], this.items[i]);
                 }
             }
         }
@@ -135,6 +107,23 @@ namespace Project_1.Items
             TrimStack(aBagIndex, aSlotIndex, 1);
             NotifySlotChanged(aBagIndex, aSlotIndex, this);
             return true;
+        }
+
+        internal bool ConsumeOneFromSlot((int, int) aBagAndSlotIndex)
+        {
+            AssertSimThread();
+            Item item = GetItemInSlot(aBagAndSlotIndex);
+            if (item == null) return false;
+
+            TrimStack(aBagAndSlotIndex.Item1, aBagAndSlotIndex.Item2, 1);
+            NotifySlotChanged(aBagAndSlotIndex, this);
+            return true;
+        }
+
+        internal void RefreshSlot((int, int) aBagAndSlotIndex)
+        {
+            AssertSimThread();
+            NotifySlotChanged(aBagAndSlotIndex, this);
         }
 
         public void LootItem(int aLootIndex)
@@ -248,6 +237,36 @@ namespace Project_1.Items
         // Temporary overloads to keep call sites compact during migration.
         void NotifySlotChanged(int bagIndex, int slotIndex, Inventory inventory) => NotifySlotChanged(bagIndex, slotIndex);
         void NotifySlotChanged((int, int) bagAndSlot, Inventory inventory) => NotifySlotChanged(bagAndSlot);
+
+        static void DeserializeBagItems(JToken bagToken, Item[] destination)
+        {
+            if (bagToken == null || destination == null) return;
+            if (bagToken.Type != JTokenType.Array) return;
+
+            int slotCount = Math.Min(destination.Length, bagToken.Count());
+            for (int i = 0; i < slotCount; i++)
+            {
+                destination[i] = DeserializeItemToken(bagToken[i]);
+            }
+        }
+
+        static Item DeserializeItemToken(JToken itemToken)
+        {
+            if (itemToken == null || itemToken.Type == JTokenType.Null) return null;
+
+            if (itemToken.Type == JTokenType.Array)
+            {
+                int?[] legacyItem = itemToken.ToObject<int?[]>();
+                if (legacyItem == null || legacyItem.Length < 2 || !legacyItem[0].HasValue || !legacyItem[1].HasValue)
+                {
+                    return null;
+                }
+
+                return ItemFactory.CreateItem(ItemFactory.GetItemData(legacyItem[0].Value), legacyItem[1].Value);
+            }
+
+            return itemToken.ToObject<Item>(itemSerializer);
+        }
 
     }
 }

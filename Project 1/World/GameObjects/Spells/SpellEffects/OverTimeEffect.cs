@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Spells;
+using Project_1.GameObjects.Spells.Buff;
 using Project_1.GameObjects.Unit.Stats;
 using Project_1.Managers;
 using Project_1.Textures;
@@ -10,19 +12,18 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Spell = Project_1.GameObjects.Spells.Spell;
 
-namespace Project_1.GameObjects.Spells.Buff
+namespace Project_1.World.GameObjects.Spells.SpellEffects
 {
-    internal class OverTime : SpellEffect
+    internal class OverTimeEffect : LastingEffect
     {
-        public double Duration => duration;
-        double duration;
 
         public double TickRate => tickRate;
         double tickRate;
 
-        public Instant[] Effects => effects;
-        Instant[] effects;
+        public InstantEffect[] Effects => effects;
+        InstantEffect[] effects;
 
         public GfxPath GfxPath => gfxPath;
         GfxPath gfxPath;
@@ -33,14 +34,14 @@ namespace Project_1.GameObjects.Spells.Buff
         public bool Numerable;
 
 
-        public int TickCount => (int)Math.Floor(duration / tickRate);
+        public int TickCount => (int)Math.Floor(Duration / tickRate);
 
         public override string Description
         {
             get
             {
-                string description = $"Applies the following effects every {tickRate / 1000} seconds for {duration / 1000} seconds:\n";
-                foreach (Instant effect in effects)
+                string description = $"Applies the following effects every {tickRate / 1000} seconds for {Duration / 1000} seconds:\n";
+                foreach (InstantEffect effect in effects)
                 {
                     description += $"- {effect.Description}\n";
                 }
@@ -52,12 +53,12 @@ namespace Project_1.GameObjects.Spells.Buff
         {
             List<string> lines = new List<string>
             {
-                $"Applies every {tickRate / 1000:0.##} seconds for {duration / 1000:0.##} seconds:"
+                $"Applies every {tickRate / 1000:0.##} seconds for {Duration / 1000:0.##} seconds:"
             };
 
             for (int i = 0; i < effects.Length; i++)
             {
-                Instant effect = effects[i];
+                InstantEffect effect = effects[i];
                 if (effect == null) continue;
                 lines.Add($"- {effect.GetRankDescriptionAsOverTimeTickWithTotal(spell, spellRank, TickCount)}");
             }
@@ -71,7 +72,7 @@ namespace Project_1.GameObjects.Spells.Buff
             double power = 0;
             for (int i = 0; i < effects.Length; i++)
             {
-                Instant effect = effects[i];
+                InstantEffect effect = effects[i];
                 if (effect == null) continue;
                 power += effect.CalculatePower(aSpellData, aRank);
             }
@@ -80,20 +81,19 @@ namespace Project_1.GameObjects.Spells.Buff
         }
 
         [JsonConstructor]
-        public OverTime(string name, string gfxName, string hitEffectGfx, string[] effectNames, double duration, double tickRate, bool isBinary, HashSet<SpellSchool> spellSchools) : base(name, isBinary, spellSchools)
+        public OverTimeEffect(string name, string gfxName, string hitEffectGfx, string[] effectNames, double duration, double tickRate, bool isBinary, HashSet<SpellSchool> spellSchools) : base(duration, name, isBinary, spellSchools)
         {
-            this.duration = duration * 1000;
             this.tickRate = tickRate * 1000;
-            effects = new Instant[effectNames.Length];
+            effects = new InstantEffect[effectNames.Length];
             for (int i = 0; i < effectNames.Length; i++)
             {
-                effects[i] = SpellFactory.GetSpellEffect(effectNames[i]) as Instant;
+                effects[i] = SpellFactory.GetSpellEffect(effectNames[i]) as InstantEffect;
             }
 
             gfxPath = new GfxPath(GfxType.SpellImage, gfxName);
             hitEffectPath = new GfxPath(GfxType.Effect, hitEffectGfx);
 
-            Debug.Assert(this.duration > this.tickRate && tickRate > 0);
+            Debug.Assert(Duration > TickRate && TickRate > 0);
             Debug.Assert(effects.Contains(null) == false);
         }
 

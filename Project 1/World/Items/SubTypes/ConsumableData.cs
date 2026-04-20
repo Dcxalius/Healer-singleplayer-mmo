@@ -1,10 +1,5 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project_1.Items.SubTypes
 {
@@ -17,7 +12,8 @@ namespace Project_1.Items.SubTypes
             Mana,
             Energy,
             Food,
-            Drink
+            Drink,
+            EnchantScroll
         }
 
         [JsonIgnore]
@@ -26,22 +22,33 @@ namespace Project_1.Items.SubTypes
         [JsonIgnore]
         public float Value { get => value; }
         float value;
+        [JsonIgnore]
+        public int EnchantmentId => enchantmentId;
+        int enchantmentId;
+        [JsonIgnore]
+        public bool RequiresItemTarget => type == ConsumableType.EnchantScroll;
 
 
         [JsonConstructor]
-        public ConsumableData(int id, string gfxName, string name, string description, int maxStack, ConsumableType type, Item.Quality quality, int cost, float value = -1, int itemLevel = 1) : base(id, gfxName, name, description, maxStack, ItemType.Consumable, quality, cost, itemLevel)
+        public ConsumableData(int id, string gfxName, string name, string description, int maxStack, ConsumableType type, Item.Quality quality, int cost, float value = -1, int enchantmentId = -1, int itemLevel = 1) : base(id, gfxName, name, description, maxStack, ItemType.Consumable, quality, cost, itemLevel)
         {
 
             this.type = type;
             this.value = value;
+            this.enchantmentId = enchantmentId;
             Assert();
         }
 
         void Assert()
         {
             Debug.Assert(type != ConsumableType.NONE, "Type not set.");
-            Debug.Assert(value != -1, "Value not set.");
+            if (type == ConsumableType.EnchantScroll)
+            {
+                Debug.Assert(enchantmentId >= 0, "EnchantmentId not set.");
+                return;
+            }
 
+            Debug.Assert(value != -1, "Value not set.");
         }
     }
 }

@@ -31,4 +31,14 @@ namespace Project_1.Messaging.Events
 
         public int Gold { get; }
     }
+
+    internal readonly struct InventoryEnchantTargetingChanged
+    {
+        public InventoryEnchantTargetingChanged(bool isActive)
+        {
+            IsActive = isActive;
+        }
+
+        public bool IsActive { get; }
+    }
 }

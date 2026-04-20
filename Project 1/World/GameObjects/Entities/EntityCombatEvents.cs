@@ -1,6 +1,6 @@
-using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Unit.Stats;
+using Project_1.World.GameObjects.Spells.SpellEffects;
 using Attack = Project_1.GameObjects.Unit.Attack;
 
 namespace Project_1.GameObjects.Entities
@@ -31,6 +31,16 @@ namespace Project_1.GameObjects.Entities
         SpellResistedByTarget = 21
     }
 
+    internal readonly struct KillEvent
+    {
+        public KillEvent(Entity killer, Entity victim)
+        {
+            Killer = killer;
+            Victim = victim;
+        }
+        public Entity Killer { get; }
+        public Entity Victim { get; }
+    }
     internal readonly struct AttackMissedEvent
     {
         public AttackMissedEvent(Entity attacker, Entity defender, Attack attack)

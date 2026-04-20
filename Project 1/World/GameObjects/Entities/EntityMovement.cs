@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Project_1.Camera;
+using Project_1.GameObjects.Spells.Buff;
 using Project_1.Tiles;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace Project_1.GameObjects.Entities
 {
     internal partial class Entity
     {
+
         public override WorldSpace FeetSize { get => new WorldSpace(Size.X, Size.Y / 2); }
         public override Rectangle WorldRectangle
         {
@@ -20,8 +22,40 @@ namespace Project_1.GameObjects.Entities
                 return new Rectangle(pos, FeetSize.ToPoint());
             }
         }
-        public bool HasControl => true; //TODO: Implement cc
+        public bool HasControl
+        {
+            get
+            {
+                Buff[] buffs = buffList.GetAllBuffs().ToArray();
+                for (int i = 0; i < buffs.Length; i++)
+                {
+                    if (buffs[i].EffectId == 1)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
 
+        public float Speed => unitData.MovementData.Speed * CalculateMovementSpeedMultiplier();
+
+        public float CalculateMovementSpeedMultiplier()
+        {
+            double biggestSlow = 1;
+            double msBuffs = 1;
+            Buff[] buffs = buffList.GetAllBuffs().ToArray();
+            for (int i = 0; i < buffs.Length; i++)
+            {
+                if (buffs[i].MovementSpeedModifier < biggestSlow)
+                {
+                    biggestSlow = buffs[i].MovementSpeedModifier;
+                }
+                msBuffs *= buffs[i].MovementSpeedModifier;
+            }
+
+            return 1 * (float)biggestSlow * (float)msBuffs;
+        }
 
         public void Movement()
         {
@@ -29,7 +63,7 @@ namespace Project_1.GameObjects.Entities
 
             float minAttackRange = GetMinAttackRange();
 
-            velocity += Destination.GetVelocity(minAttackRange, unitData.MovementData.Speed, new WorldSpace(FeetSize));
+            velocity += Destination.GetVelocity(minAttackRange, Speed, new WorldSpace(FeetSize));
             base.Update(); //TODO: This shouldnt be here
             CheckForCollisions();
 

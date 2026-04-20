@@ -4,6 +4,7 @@ using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
+using Project_1.World.GameObjects.Spells.SpellEffects;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -44,6 +45,8 @@ namespace Project_1.GameObjects.Spells.Buff
         public double Power => power;
         double power;
 
+        public double MovementSpeedModifier => effect.MovementSpeedModifier;
+
         public BuffUiSnapshot BuffUiSnapshot => new BuffUiSnapshot(Id, GfxPath, TimeManager.InstanceTotalFrameTime + DurationRemaining, count, MaxStackCount);
 
 
@@ -57,6 +60,17 @@ namespace Project_1.GameObjects.Spells.Buff
             rank = aSpell.Rank;
             createTime = TimeManager.TotalFrameTime;
             power = aSpell.GetPower(aEffect);
+        }
+
+        protected Buff(Entity aCaster, SpellEffect aEffect)
+        {
+            AssertSimThread();
+            id = buffIdCounter++;
+            effect = aEffect;
+            caster = aCaster;
+            rank = 0;
+            createTime = TimeManager.TotalFrameTime;
+            power = 0;
         }
 
         public virtual void Recast(Buff aBuff)

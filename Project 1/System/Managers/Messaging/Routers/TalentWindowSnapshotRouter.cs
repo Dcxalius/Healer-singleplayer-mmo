@@ -89,7 +89,8 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
                         talent.Description,
                         talent.GfxPath,
                         owner.GetTalentRank(talent.Id),
-                        talent.MaxRank))
+                        talent.MaxRank,
+                        talent.Required.Select(x => x.id).ToArray()))
                     .ToArray() ?? Array.Empty<TalentUiSnapshot>())
                 .ToArray()
                 ?? Array.Empty<TalentUiSnapshot[]>();

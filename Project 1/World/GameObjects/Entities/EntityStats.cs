@@ -21,6 +21,7 @@ using static Project_1.GameObjects.Unit.Equipment;
 using Project_1.GameObjects.Entities.Friendlies;
 using System.Globalization;
 using Project_1.Managers;
+using Project_1.World.Items.Enchantments;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -269,6 +270,16 @@ namespace Project_1.GameObjects.Entities
             FlagForRefresh();
 
             return returnable;
+        }
+
+        public bool ApplyPermanentEnchantment(Slot aSlot, EnchantmentData enchantmentData)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (!Equipment.ApplyPermanentEnchantment(aSlot, enchantmentData)) return false;
+
+            unitData.BaseStats.RefreshEquipmentStats(Equipment.EquipmentStats);
+            FlagForRefresh();
+            return true;
         }
     }
 }

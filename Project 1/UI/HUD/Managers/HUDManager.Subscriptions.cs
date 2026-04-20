@@ -45,6 +45,7 @@ namespace Project_1.UI.HUD.Managers
             MailboxManager.Ui.Subscribe<InventoryAssigned>(OnInventoryAssigned);
             MailboxManager.Ui.Subscribe<InventorySlotChanged>(OnInventorySlotChanged);
             MailboxManager.Ui.Subscribe<GoldChanged>(OnGoldChanged);
+            MailboxManager.Ui.Subscribe<InventoryEnchantTargetingChanged>(OnInventoryEnchantTargetingChanged);
             MailboxManager.Ui.Subscribe<DescriptorBoxSet>(OnDescriptorBoxSet);
             MailboxManager.Ui.Subscribe<SpellDescriptorBoxSet>(OnSpellDescriptorBoxSet);
             MailboxManager.Ui.Subscribe<DescriptorBoxClear>(OnDescriptorBoxClear);
@@ -185,6 +186,11 @@ namespace Project_1.UI.HUD.Managers
             RefreshGold(e.Gold);
         }
 
+        static void OnInventoryEnchantTargetingChanged(InventoryEnchantTargetingChanged e)
+        {
+            Project_1.UI.HUD.Inventory.Item.SetEnchantTargetingActive(e.IsActive);
+        }
+
         static void OnDescriptorBoxSet(DescriptorBoxSet e)
         {
             if (e.Position.HasValue)
@@ -264,6 +270,7 @@ namespace Project_1.UI.HUD.Managers
         static void OnExperienceRefreshed(ExperienceRefreshed e)
         {
             windowHandler.RefreshCharacterWindowExpBar(e.OwnerRenderId, e.OwnerRelation, e.CurrentLevel, e.CurrentExperience);
+            
             if (e.OwnerRelation == RelationToPlayerKind.Self)
             {
                 HandleSelfExperienceForChat(e.CurrentLevel, e.CurrentExperience);

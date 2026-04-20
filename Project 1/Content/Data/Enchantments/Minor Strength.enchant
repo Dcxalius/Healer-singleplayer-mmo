@@ -1,0 +1,7 @@
+{
+  "Id": 0,
+  "Name": "Minor Strength",
+  "Description": "Increases Strength by 3.",
+  "PrimaryStats": [3, 0, 0, 0, 0],
+  "Target": 6
+}

@@ -75,7 +75,7 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct TalentUiSnapshot
     {
-        public TalentUiSnapshot(int id, string name, string description, GfxPath gfxPath, int rank, int maxRank)
+        public TalentUiSnapshot(int id, string name, string description, GfxPath gfxPath, int rank, int maxRank, int[] requiredTalentIds)
         {
             Id = id;
             Name = name ?? string.Empty;
@@ -83,6 +83,7 @@ namespace Project_1.Messaging.Events
             GfxPath = gfxPath ?? GfxPath.NullPath;
             Rank = rank;
             MaxRank = maxRank;
+            RequiredTalentIds = requiredTalentIds ?? Array.Empty<int>();
         }
 
         public int Id { get; }
@@ -91,5 +92,6 @@ namespace Project_1.Messaging.Events
         public GfxPath GfxPath { get; }
         public int Rank { get; }
         public int MaxRank { get; }
+        public int[] RequiredTalentIds { get; }
     }
 }
