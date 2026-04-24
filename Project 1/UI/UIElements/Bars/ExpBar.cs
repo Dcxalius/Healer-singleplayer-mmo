@@ -12,10 +12,8 @@ namespace Project_1.UI.UIElements.Bars
     internal class ExpBar : ResourceBar
     {
         static Color backgroundColor = new Color(255, 211, 211, 120);
-        public ExpBar(UI.UIElements.UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, new BarTexture(BarTexture.FillingDirection.Right, Color.MediumPurple), new UITexture("WhiteBackground", backgroundColor), aPos, aSize)
+        public ExpBar(UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, new BarTexture(BarTexture.FillingDirection.Right, Color.MediumPurple), new UITexture("WhiteBackground", backgroundColor), aPos, aSize)
         {
-            Value = 0;
-            MaxValue = 1;
         }
     }
 }

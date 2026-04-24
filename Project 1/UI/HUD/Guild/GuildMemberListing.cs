@@ -95,11 +95,8 @@ namespace Project_1.UI.HUD.Guild
             @class.Text = aGuildMember.ClassName;
             talentButton.Visible = aGuildMember.Level >= TalentUnlockLevel;
         }
-
-        public bool BelongsTo(string aName)
-        {
-            return name.Text == aName;
-        }
+        public bool BelongsTo(int aId) => data.RenderId == aId;
+        public bool BelongsTo(string aName) => name.Text == aName;
         public int CompareTo(object obj)
         {
             Debug.Assert(obj.GetType() == GetType());

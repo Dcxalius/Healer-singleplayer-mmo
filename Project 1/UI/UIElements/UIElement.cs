@@ -14,6 +14,9 @@ namespace Project_1.UI.UIElements
 {
     internal abstract partial class UIElement
     {
+        List<UIElement> lastChildren;
+        List<UIElement> firstChildren;
+
         static int nextUiElementId;
         static readonly object uiElementRegistryLock = new object();
         static readonly Dictionary<int, WeakReference<UIElement>> uiElementRegistry = new Dictionary<int, WeakReference<UIElement>>();
@@ -194,6 +197,9 @@ namespace Project_1.UI.UIElements
             alwaysOnScreen = false;
             alwaysFullyOnScreen = false;
             hudMoveable = true;
+
+            firstChildren = new List<UIElement>();
+            lastChildren = new List<UIElement>();
         }
 
     }

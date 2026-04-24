@@ -25,7 +25,7 @@ namespace Project_1.UI.HUD
         Label itemBonusStats;
         Label itemSellPrice;
 
-        Image goldImage;
+        SquareImage goldImage;
 
         float xMax;
         readonly RelativeScreenPosition spacingFromItem = RelativeScreenPosition.GetSquareFromX(0.0005f);
@@ -42,7 +42,7 @@ namespace Project_1.UI.HUD
             itemBonusStats = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.TopLeft, Color.LimeGreen);
             itemSellPrice = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.Zero, Label.TextAllignment.CentreRight);
 
-            goldImage = new Image(this, new UITexture("Gold", Color.White), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
+            goldImage = new SquareImage(this, new UITexture("Gold", Color.White), RelativeScreenPosition.Zero, RelativeScreenPosition.Zero);
 
             Visible = false;
             AlwaysFullyOnScreen = true;
@@ -84,11 +84,11 @@ namespace Project_1.UI.HUD
 
             if (itemSellPrice.Text != null)
             {
-                itemSellPrice.Resize(new RelativeScreenPosition(1 - RelativeScreenPosition.GetSquareFromY(itemSellPrice.UnderlyingTextOffset.Y / Size.Y, Size).X - spacingInBox.X * 2, itemSellPrice.UnderlyingTextOffset.Y / Size.Y));
+                goldImage.Resize(new RelativeScreenPosition(0, itemSellPrice.UnderlyingTextOffset.Y / Size.Y));
+                itemSellPrice.Resize(new RelativeScreenPosition(1 - goldImage.RelativeSize.X - spacingInBox.X * 2, itemSellPrice.UnderlyingTextOffset.Y / Size.Y));
                 itemSellPrice.Move(pos);
                 //pos += itemSellPrice.RelativeSize.OnlyY + spacing.OnlyY;
 
-                goldImage.Resize(RelativeScreenPosition.GetSquareFromY(itemSellPrice.RelativeSize.Y, Size));
                 goldImage.Move(RelativeScreenPosition.One - goldImage.RelativeSize - spacingInBox); //TODO: Allign image better
             }
 
