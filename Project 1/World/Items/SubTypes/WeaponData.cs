@@ -23,6 +23,7 @@ namespace Project_1.Items.SubTypes
         const double RareShieldArmorMultiplier = 1.122;
         const double EpicShieldArmorMultiplier = 1.436;
 
+        [JsonIgnore]
         public Attack Attack => attack;
         Attack attack;
 

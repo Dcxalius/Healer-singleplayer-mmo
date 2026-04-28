@@ -41,11 +41,11 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
         static void HandleTalentLearnRequested(TalentLearnRequested e)
         {
             ThreadAffinity.AssertSimThread();
-            Player player = ObjectManager.Player;
-            if (player == null) return;
-            if (!player.TryLearnTalent(e.TalentId)) return;
+            Entity owner = ResolveOwner(e.MemberRenderId);
+            if (owner is not Friendly friendly) return;
+            if (!friendly.TryLearnTalent(e.TalentId)) return;
 
-            MailboxManager.PublishUiEvent(new TalentWindowSet(BuildSnapshot(player)));
+            MailboxManager.PublishUiEvent(new TalentWindowSet(BuildSnapshot(friendly)));
         }
 
         static Entity ResolveOwner(int? memberRenderId)

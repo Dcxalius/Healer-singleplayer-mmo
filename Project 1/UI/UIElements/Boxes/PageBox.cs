@@ -22,8 +22,8 @@ namespace Project_1.UI.UIElements.Boxes
         public int TotalItems => totalItems;
         public int StartIndex => currentPage * itemsPerPage;
 
-        readonly GFXButton leftArrow;
-        readonly GFXButton rightArrow;
+        readonly SquareGFXButton leftArrow;
+        readonly SquareGFXButton rightArrow;
         readonly Label pageTitle;
         readonly Label[] pageLabels;
         readonly Point pageDimensions;
@@ -50,10 +50,11 @@ namespace Project_1.UI.UIElements.Boxes
             clearPageElement = aClearPageElement;
 
             RelativeScreenPosition spacing = RelativeScreenPosition.GetSquareFromX(0.05f, Size);
-            RelativeScreenPosition arrowSize = new RelativeScreenPosition(0.1f, 0.05f);
+            RelativeScreenPosition arrowSize = new RelativeScreenPosition(0.1f, 0f);
             pageTitle = new Label(this, new RelativeScreenPosition(0f, 0f), new RelativeScreenPosition(1f, 0.1f), Label.TextAllignment.Centred, Color.Black);
-            rightArrow = new GFXButton(this, new List<Action> { PressRightArrow }, new GfxPath(GfxType.UI, "RightArrow"), RelativeScreenPosition.One - spacing - arrowSize, arrowSize, Color.White);
-            leftArrow = new GFXButton(this, new List<Action> { PressLeftArrow }, new GfxPath(GfxType.UI, "LeftArrow"), RelativeScreenPosition.One.OnlyY + spacing.OnlyX - spacing.OnlyY - arrowSize.OnlyY, arrowSize, Color.White);
+            rightArrow = new SquareGFXButton(this, new List<Action> { PressRightArrow }, new GfxPath(GfxType.UI, "RightArrow"), RelativeScreenPosition.Zero, arrowSize, Color.White);
+            leftArrow = new SquareGFXButton(this, new List<Action> { PressLeftArrow }, new GfxPath(GfxType.UI, "LeftArrow"), RelativeScreenPosition.Zero, arrowSize, Color.White);
+            LayoutArrows(spacing);
             pageTitleProvider = DefaultPageTitle;
             Reset(0);
         }
@@ -112,6 +113,12 @@ namespace Project_1.UI.UIElements.Boxes
         {
             if (currentPage <= 0) return;
             SetPage(currentPage - 1);
+        }
+
+        void LayoutArrows(RelativeScreenPosition spacing)
+        {
+            rightArrow.Move(RelativeScreenPosition.One - spacing - rightArrow.RelativeSize);
+            leftArrow.Move(new RelativeScreenPosition(spacing.X, 1f - spacing.Y - leftArrow.RelativeSize.Y));
         }
 
         void UpdateArrowVisiblity()

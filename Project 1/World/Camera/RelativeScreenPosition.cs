@@ -50,6 +50,7 @@ namespace Project_1.Camera
 
         static public RelativeScreenPosition GetSquareFromX(float aSizeInX, AbsoluteScreenPosition aParentSize)
         {
+            Debug.Assert(aParentSize.X != 0 && aParentSize.Y != 0);
             float a = aParentSize.X * aSizeInX;
             float b = a / aParentSize.Y;
             return new(aSizeInX, b);

@@ -221,6 +221,8 @@ namespace Project_1.UI.UIElements.Boxes
             }
         }
 
+        internal virtual void Sort() => Sort(Comparer<T>.Default);
+
         internal void Sort(IComparer<T> comparer)
         {
             scrollableElements.Sort(comparer);

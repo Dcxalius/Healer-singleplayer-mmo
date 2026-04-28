@@ -44,6 +44,7 @@ namespace Project_1.Items.SubTypes
         [JsonIgnore]
         public GameObjects.Unit.Attack Attack => (itemData as WeaponData).Attack;
 
+        [JsonIgnore]
         public WeaponData WeaponData => itemData as WeaponData;
 
         [JsonIgnore]

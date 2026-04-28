@@ -352,9 +352,14 @@ namespace Project_1.GameObjects.Unit
         public void GainExp(int aExpAmount)
         {
             AssertSimThread();
+            int previousLevel = level.CurrentLevel;
             if (!level.GainExp(aExpAmount)) return;
-            //Level up
-            baseStats.LevelUp();
+
+            int levelsGained = level.CurrentLevel - previousLevel;
+            for (int i = 0; i < levelsGained; i++)
+            {
+                baseStats.LevelUp();
+            }
         }
 
     

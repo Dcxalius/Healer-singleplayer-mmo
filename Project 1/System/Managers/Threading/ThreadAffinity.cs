@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Project_1.Managers
 {
@@ -51,6 +52,7 @@ namespace Project_1.Managers
             }
         }
 
+        [DebuggerStepThrough]
         public static void AssertSimThread()
         {
             if (simThreadId.HasValue && simThreadId != Environment.CurrentManagedThreadId)
@@ -59,6 +61,7 @@ namespace Project_1.Managers
             }
         }
 
+        [DebuggerStepThrough]
         public static void AssertUiThread()
         {
             if (uiThreadId.HasValue && uiThreadId != Environment.CurrentManagedThreadId)
@@ -67,6 +70,7 @@ namespace Project_1.Managers
             }
         }
 
+        [DebuggerStepThrough]
         public static void AssertGameThread()
         {
             if (IsGameThread) return;

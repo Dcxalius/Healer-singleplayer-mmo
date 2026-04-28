@@ -54,6 +54,25 @@ namespace Project_1.Messaging.Events
         public WorldSpace FeetPosition { get; }
         public int WorldHeight { get; }
         public WorldSpace3D NamePlateAnchorWorldPosition { get; }
+
+        public EntityUiSnapshot WithLevel(int level)
+        {
+            return new EntityUiSnapshot(
+                RenderId,
+                Name,
+                ClassName,
+                RelationToPlayer,
+                RelationColor,
+                level,
+                CurrentHealth,
+                MaxHealth,
+                CurrentResource,
+                MaxResource,
+                ResourceColor,
+                FeetPosition,
+                WorldHeight,
+                NamePlateAnchorWorldPosition);
+        }
     }
 
     internal readonly struct SpellUiSnapshot

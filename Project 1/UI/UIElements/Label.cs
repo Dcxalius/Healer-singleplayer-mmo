@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
+using Project_1.Input;
 using Project_1.Managers;
 using Project_1.Textures;
 using System;
@@ -73,7 +74,79 @@ namespace Project_1.UI.UIElements
         public Vector2 UnderlyingTextOffset => underlyingText.Offset;
         public Vector2 CalculatePartialOffset(int aIndexToCalculateTo) => underlyingText.CalculatePartialOffset(aIndexToCalculateTo);
 
-        TextAllignment textAlignment;
+        public bool MouseOverText => TextBounds.Contains(UiMouseStateCache.Absolute.ToPoint());
+
+        public Rectangle TextBounds
+        {
+            get
+            {
+                Vector2 offset = underlyingText.Offset;
+                if (offset == Vector2.Zero) return Rectangle.Empty;
+
+                AbsoluteScreenPosition drawPos;
+                Vector2 drawOffset;
+                GetDrawTransform(out drawPos, out drawOffset);
+
+                Point location = new Point(
+                    drawPos.X - (int)MathF.Ceiling(drawOffset.X),
+                    drawPos.Y - (int)MathF.Ceiling(drawOffset.Y));
+
+                Point size = new Point(
+                    (int)MathF.Ceiling(offset.X),
+                    (int)MathF.Ceiling(offset.Y));
+
+                return new Rectangle(location, size);
+            }
+        }
+
+        void GetDrawTransform(out AbsoluteScreenPosition drawPos, out Vector2 drawOffset)
+        {
+            Vector2 textOffset = underlyingText.Offset;
+            float centeredYOffset = underlyingText.CenteredYOffset;
+            switch (textAlignment)
+            {
+                case TextAllignment.CentreLeft:
+                    drawPos = Location + Size.OnlyY / 2;
+                    drawOffset = new Vector2(0, centeredYOffset);
+                    return;
+                case TextAllignment.CentreRight:
+                    drawPos = Location + new AbsoluteScreenPosition(Size.X, Size.Y / 2);
+                    drawOffset = new Vector2(textOffset.X, centeredYOffset);
+                    return;
+                case TextAllignment.Centred:
+                    drawPos = Location + Size / 2;
+                    drawOffset = new Vector2(textOffset.X / 2, centeredYOffset);
+                    return;
+                case TextAllignment.TopLeft:
+                    drawPos = Location;
+                    drawOffset = Vector2.Zero;
+                    return;
+                case TextAllignment.TopCentre:
+                    drawPos = Location + new AbsoluteScreenPosition(Size.X / 2, 0);
+                    drawOffset = new Vector2(textOffset.X / 2, 0);
+                    return;
+                case TextAllignment.TopRight:
+                    drawPos = Location + new AbsoluteScreenPosition(Size.X, 0);
+                    drawOffset = new Vector2(textOffset.X, 0);
+                    return;
+                case TextAllignment.BottomLeft:
+                    drawPos = Location + new AbsoluteScreenPosition(0, Size.Y);
+                    drawOffset = new Vector2(0, textOffset.Y);
+                    return;
+                case TextAllignment.BottomCentre:
+                    drawPos = Location + new AbsoluteScreenPosition(Size.X / 2, Size.Y);
+                    drawOffset = new Vector2(textOffset.X / 2, textOffset.Y);
+                    return;
+                case TextAllignment.BottomRight:
+                    drawPos = Location + new AbsoluteScreenPosition(Size.X, Size.Y);
+                    drawOffset = new Vector2(textOffset.X, textOffset.Y);
+                    return;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+
 
         public override Color Color
         {
@@ -86,7 +159,6 @@ namespace Project_1.UI.UIElements
                 underlyingText.Color = value;
             }
         }
-        Text  underlyingText;
 
         public float TextSize
         {
@@ -98,9 +170,12 @@ namespace Project_1.UI.UIElements
             }
         }
 
-        public Label(UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize, TextAllignment aTextAlignment, Color? aTextColor = null, string aFontname = "Comfortaa-msdf", float aTextSize = 12f, string aText = "", UITexture aBackground = null) : base(aParent, aBackground, aPos, aSize)
+        TextAllignment textAlignment;
+        Text  underlyingText;
+
+        public Label(UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize, TextAllignment aTextAlignment, Color? aTextColor = null, string aFontname = "Comfortaa-msdf", float aTextSize = 12f, string aText = "", UITexture aBackground = null, float aBorderWidthPx = 0f, Color? aBorderColor = null) : base(aParent, aBackground, aPos, aSize)
         {
-            underlyingText = aTextColor.HasValue ? new Text(aFontname, aText, aTextColor.Value, aTextSize) : new Text(aFontname, aText, aTextSize);
+            underlyingText = aTextColor.HasValue ? new Text(aFontname, aText, aTextColor.Value, aTextSize, aBorderColor, aBorderWidthPx) : new Text(aFontname, aText, aTextSize, aBorderColor, aBorderWidthPx);
             textAlignment = aTextAlignment;
             capturesClick = false;
             capturesRelease = false;

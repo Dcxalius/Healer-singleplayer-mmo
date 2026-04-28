@@ -4,6 +4,7 @@ using Project_1.Camera;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
+using Project_1.UI.UIElements.Boxes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.UI.HUD.PlateBoxes
 {
-    internal class LevelCircle : UIElement
+    internal class LevelCircle : Square
     {
         Label numberLabel;
 

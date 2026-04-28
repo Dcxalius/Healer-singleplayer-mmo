@@ -118,17 +118,41 @@ namespace Project_1.UI.HUD.Windows
                 const int LineThickness = 3;
                 const int ArrowHeadSize = 12;
                 const int BaseSize = 6;
+                const int ParallelSpacing = 5;
+                const int MinimumLaneSpacing = 7;
 
                 readonly TalentTreePage owner;
                 readonly UITexture lineTexture;
                 readonly UITexture arrowHeadTexture;
 
+                readonly struct Connector
+                {
+                    public Connector(TalentSlotElement source, TalentSlotElement target, int sourceIndex, int targetIndex, int order)
+                    {
+                        Source = source;
+                        Target = target;
+                        SourceIndex = sourceIndex;
+                        TargetIndex = targetIndex;
+                        Order = order;
+                    }
+
+                    public TalentSlotElement Source { get; }
+                    public TalentSlotElement Target { get; }
+                    public int SourceIndex { get; }
+                    public int TargetIndex { get; }
+                    public int Order { get; }
+                    public int SourceRow => SourceIndex / MaxColumns;
+                    public int TargetRow => TargetIndex / MaxColumns;
+                    public int SourceColumn => SourceIndex % MaxColumns;
+                    public int TargetColumn => TargetIndex % MaxColumns;
+                }
+
                 public TalentArrowOverlay(UIElement aParent, TalentTreePage aOwner, RelativeScreenPosition aPos, RelativeScreenPosition aSize)
                     : base(aParent, null, aPos, aSize)
                 {
                     owner = aOwner;
-                    lineTexture = new UITexture("WhiteBackground", new Color(60, 60, 60));
-                    arrowHeadTexture = new UITexture("DownArrow", new Color(60, 60, 60));
+                    lineTexture = new UITexture("WhiteBackground", Color.White);
+                    arrowHeadTexture = new UITexture("DownArrow", Color.White);
                     CapturesClick = false;
                     CapturesRelease = false;
                     CapturesScroll = false;
@@ -139,14 +163,15 @@ namespace Project_1.UI.HUD.Windows
                     ThreadAffinity.AssertMainThread();
                     if (!Visible) return;
 
-                    Dictionary<int, TalentSlotElement> slotsById = new Dictionary<int, TalentSlotElement>();
+                    Dictionary<int, (TalentSlotElement slot, int index)> slotsById = new Dictionary<int, (TalentSlotElement slot, int index)>();
                     for (int i = 0; i < owner.slots.Length; i++)
                     {
                         TalentSlotElement slot = owner.slots[i];
                         if (!slot.HasTalent) continue;
-                        slotsById[slot.TalentId] = slot;
+                        slotsById[slot.TalentId] = (slot, i);
                     }
 
+                    List<Connector> connectors = new List<Connector>();
                     for (int i = 0; i < owner.slots.Length; i++)
                     {
                         TalentSlotElement target = owner.slots[i];
@@ -155,55 +180,139 @@ namespace Project_1.UI.HUD.Windows
                         int[] requiredIds = target.RequiredTalentIds;
                         for (int j = 0; j < requiredIds.Length; j++)
                         {
-                            if (slotsById.TryGetValue(requiredIds[j], out TalentSlotElement source))
+                            if (slotsById.TryGetValue(requiredIds[j], out var source))
                             {
-                                DrawConnector(aBatch, source, target);
+                                connectors.Add(new Connector(source.slot, target, source.index, i, connectors.Count));
                             }
                         }
                     }
+
+                    connectors.Sort(CompareConnectorsForDrawing);
+                    for (int i = 0; i < connectors.Count; i++)
+                    {
+                        DrawConnector(aBatch, connectors[i], connectors);
+                    }
                 }
 
-                void DrawConnector(SpriteBatch batch, TalentSlotElement source, TalentSlotElement target)
+                static int CompareConnectorsForDrawing(Connector a, Connector b)
                 {
-                    Point from = source.BottomAnchor;
-                    Point tip = target.TopAnchor;
-                    int arrowTop = tip.Y - ArrowHeadSize;
-                    int shaftEndY = arrowTop + ArrowHeadSize / 2;
-                    int midY = from.Y + Math.Max(8, (shaftEndY - from.Y) / 2);
-
-                    DrawBase(batch, from);
-                    DrawVertical(batch, from.X, from.Y, midY);
-                    DrawHorizontal(batch, from.X, tip.X, midY);
-                    DrawVertical(batch, tip.X, midY, shaftEndY);
-                    DrawArrowHead(batch, tip.X, arrowTop);
+                    int targetRowCompare = a.TargetRow.CompareTo(b.TargetRow);
+                    if (targetRowCompare != 0) return targetRowCompare;
+                    int sourceCompare = a.SourceIndex.CompareTo(b.SourceIndex);
+                    if (sourceCompare != 0) return sourceCompare;
+                    return a.TargetIndex.CompareTo(b.TargetIndex);
                 }
 
-                void DrawBase(SpriteBatch batch, Point at)
+                void DrawConnector(SpriteBatch batch, Connector connector, List<Connector> connectors)
+                {
+                    Point sourceAnchor = connector.Source.BottomAnchor;
+                    Point targetAnchor = connector.Target.TopAnchor;
+                    int arrowTop = targetAnchor.Y - ArrowHeadSize;
+                    int shaftEndY = arrowTop + ArrowHeadSize / 2;
+                    int laneY = GetLaneY(connector, connectors, sourceAnchor.Y, shaftEndY);
+                    int sourceX = sourceAnchor.X + GetParallelOffset(connector, connectors, c => c.SourceIndex == connector.SourceIndex);
+                    int targetX = targetAnchor.X + GetParallelOffset(connector, connectors, c => c.TargetIndex == connector.TargetIndex);
+                    Color color = GetConnectorColor(connector);
+
+                    DrawBase(batch, sourceAnchor, color);
+                    DrawHorizontal(batch, sourceAnchor.X, sourceX, sourceAnchor.Y, color);
+                    DrawVertical(batch, sourceX, sourceAnchor.Y, laneY, color);
+                    DrawHorizontal(batch, sourceX, targetX, laneY, color);
+                    DrawVertical(batch, targetX, laneY, shaftEndY, color);
+                    DrawHorizontal(batch, targetX, targetAnchor.X, shaftEndY, color);
+                    DrawArrowHead(batch, targetAnchor.X, arrowTop, color);
+                }
+
+                static int GetLaneY(Connector connector, List<Connector> connectors, int sourceBottomY, int targetShaftEndY)
+                {
+                    int targetRowLaneCount = 0;
+                    int targetRowLaneIndex = 0;
+
+                    for (int i = 0; i < connectors.Count; i++)
+                    {
+                        if (connectors[i].TargetRow != connector.TargetRow) continue;
+                        if (connectors[i].Order == connector.Order) targetRowLaneIndex = targetRowLaneCount;
+                        targetRowLaneCount++;
+                    }
+
+                    int bandTop = sourceBottomY;
+                    for (int i = 0; i < connectors.Count; i++)
+                    {
+                        if (connectors[i].TargetRow != connector.TargetRow) continue;
+                        bandTop = Math.Max(bandTop, connectors[i].Source.BottomAnchor.Y);
+                    }
+
+                    int bandHeight = Math.Max(MinimumLaneSpacing, targetShaftEndY - bandTop);
+                    int laneSpacing = Math.Max(MinimumLaneSpacing, bandHeight / (targetRowLaneCount + 1));
+                    return Math.Min(targetShaftEndY - MinimumLaneSpacing, bandTop + laneSpacing * (targetRowLaneIndex + 1));
+                }
+
+                static int GetParallelOffset(Connector connector, List<Connector> connectors, Func<Connector, bool> predicate)
+                {
+                    int count = 0;
+                    int index = 0;
+                    for (int i = 0; i < connectors.Count; i++)
+                    {
+                        if (!predicate(connectors[i])) continue;
+                        if (connectors[i].Order == connector.Order) index = count;
+                        count++;
+                    }
+
+                    return ((index * 2) - (count - 1)) * ParallelSpacing / 2;
+                }
+
+                static Color GetConnectorColor(Connector connector)
+                {
+                    Color baseColor = GetTalentColor(connector.Source.TalentId);
+                    int variant = (connector.SourceColumn * 11 + connector.TargetColumn * 17 + connector.TargetRow * 7) % 5;
+                    float amount = 0.08f + variant * 0.04f;
+                    return Color.Lerp(baseColor, Color.White, amount);
+                }
+
+                static Color GetTalentColor(int talentId)
+                {
+                    Color[] palette =
+                    {
+                        new Color(196, 76, 76),
+                        new Color(216, 146, 62),
+                        new Color(198, 177, 65),
+                        new Color(93, 164, 88),
+                        new Color(76, 154, 181),
+                        new Color(99, 112, 197),
+                        new Color(153, 91, 184),
+                        new Color(199, 91, 142)
+                    };
+
+                    int index = Math.Abs(talentId * 37) % palette.Length;
+                    return palette[index];
+                }
+
+                void DrawBase(SpriteBatch batch, Point at, Color color)
                 {
                     Rectangle rect = new Rectangle(at.X - BaseSize / 2, at.Y - BaseSize / 2, BaseSize, BaseSize);
-                    lineTexture.Draw(batch, rect);
+                    lineTexture.Draw(batch, rect, color);
                 }
 
-                void DrawVertical(SpriteBatch batch, int x, int startY, int endY)
+                void DrawVertical(SpriteBatch batch, int x, int startY, int endY, Color color)
                 {
                     int top = Math.Min(startY, endY);
                     int height = Math.Max(LineThickness, Math.Abs(endY - startY));
                     Rectangle rect = new Rectangle(x - LineThickness / 2, top, LineThickness, height);
-                    lineTexture.Draw(batch, rect);
+                    lineTexture.Draw(batch, rect, color);
                 }
 
-                void DrawHorizontal(SpriteBatch batch, int startX, int endX, int y)
+                void DrawHorizontal(SpriteBatch batch, int startX, int endX, int y, Color color)
                 {
                     int left = Math.Min(startX, endX);
                     int width = Math.Max(LineThickness, Math.Abs(endX - startX));
                     Rectangle rect = new Rectangle(left, y - LineThickness / 2, width, LineThickness);
-                    lineTexture.Draw(batch, rect);
+                    lineTexture.Draw(batch, rect, color);
                 }
 
-                void DrawArrowHead(SpriteBatch batch, int x, int top)
+                void DrawArrowHead(SpriteBatch batch, int x, int top, Color color)
                 {
                     Rectangle rect = new Rectangle(x - ArrowHeadSize / 2, top, ArrowHeadSize, ArrowHeadSize);
-                    arrowHeadTexture.Draw(batch, rect);
+                    arrowHeadTexture.Draw(batch, rect, color);
                 }
             }
 
@@ -506,9 +615,8 @@ namespace Project_1.UI.HUD.Windows
 
         internal void TrySpendTalent(int talentId)
         {
-            if (!showingSelf) return;
             if (remainingTalentPoints <= 0) return;
-            MailboxManager.PublishSimCommand(new TalentLearnRequested(talentId));
+            MailboxManager.PublishSimCommand(new TalentLearnRequested(talentId, showingSelf ? null : targetRenderId));
         }
 
         bool ToggleSelfFromKeybind()

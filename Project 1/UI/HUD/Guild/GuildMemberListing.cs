@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.Messaging.Events;
 using Project_1.Messaging;
@@ -97,17 +97,8 @@ namespace Project_1.UI.HUD.Guild
             @class.Text = aGuildMember.ClassName;
             talentButton.Visible = aGuildMember.Level >= TalentUnlockLevel;
         }
-
-        public bool BelongsTo(string aName)
-        {
-            return name.Text == aName;
-        }
-
-        public bool BelongsTo(int aRenderId)
-        {
-            return renderId == aRenderId;
-        }
-
+        public bool BelongsTo(int aId) => data.RenderId == aId;
+        public bool BelongsTo(string aName) => name.Text == aName;
         public int CompareTo(object obj)
         {
             Debug.Assert(obj.GetType() == GetType());
@@ -151,7 +142,9 @@ namespace Project_1.UI.HUD.Guild
 
         internal void UpdateLevel(int level)
         {
+            data = data.WithLevel(level); //TODO: ECH Ugly af
             this.level.Text = level.ToString();
+            talentButton.Visible = level >= TalentUnlockLevel;
         }
     }
 }

@@ -10,6 +10,7 @@ namespace Project_1.GameObjects.Unit
 {
     internal class Level
     {
+        public const int MaxLevel = 60;
         static void AssertSimThread() => ThreadAffinity.AssertSimThread();
         public int CurrentLevel => level;
         int level;
@@ -32,21 +33,28 @@ namespace Project_1.GameObjects.Unit
             Debug.Assert(level > 0);
         }
 
-        public static int ExpToNextLevel(int aLevel) => experienceToLevel[aLevel];
+        public static int ExpToNextLevel(int aLevel)
+        {
+            if (aLevel >= MaxLevel) return 0;
+            if (aLevel <= 0) return 0;
+            return experienceToLevel[aLevel];
+        }
 
         public bool GainExp(int aExpAmount)
         {
             AssertSimThread();
-            if (level >= 60 || level <= 0 ) return false;
+            if (level >= MaxLevel || level <= 0 ) return false;
             experience += aExpAmount;
 
-            if (experience >= experienceToLevel[level])
+            bool leveledUp = false;
+            while (level < MaxLevel && experience >= experienceToLevel[level])
             {
                 experience -= experienceToLevel[level];
                 level++;
-                return true;
+                leveledUp = true;
             }
-            return false;
+            if (level >= MaxLevel) experience = 0;
+            return leveledUp;
         }
 
         static public int ZD(int aLevelOfMob)
@@ -70,7 +78,7 @@ namespace Project_1.GameObjects.Unit
         public int ExpReward(int aLevelOfKiller)
         {
             AssertSimThread();
-            if (aLevelOfKiller >= 60) return 0;
+            if (aLevelOfKiller >= MaxLevel) return 0;
 
             int levelOfMob = CurrentLevel;
             int xp = levelOfMob * 5 + 45;

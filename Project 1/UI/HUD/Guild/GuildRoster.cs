@@ -70,19 +70,21 @@ namespace Project_1.UI.HUD.Guild
 
             for (int i = 0; i < aData.Length; i++)
             {
-                AddScrollableElement(new GuildMemberListing(this, aData[i], ElementSize.ToAbsoluteScreenPos(Size)));
-                //guildMembers.Add(new GuildMemberListing(aData[i], firstPosition + changeInY * i, size));
+                GuildMemberListing gm = new GuildMemberListing(this, aData[i], ElementSize.ToAbsoluteScreenPos(Size));
+
+                AddScrollableElement(gm);
+                guildMembers.Add(gm);
             }
             Sort();
         }
 
         public void AddMember(EntityUiSnapshot aData)
         {
-            AddScrollableElement(new GuildMemberListing(this, aData, ElementSize.ToAbsoluteScreenPos(Size)));
+            GuildMemberListing gm = new GuildMemberListing(this, aData, ElementSize.ToAbsoluteScreenPos(Size));
+            AddScrollableElement(gm);
 
-            //guildMembers.Add(new GuildMemberListing(aData, firstPosition, size));
-            //AddChild(guildMembers.Last());
-            //Sort();
+            guildMembers.Add(gm);
+            Sort();
         }
 
         public void RemoveMember()
@@ -90,9 +92,10 @@ namespace Project_1.UI.HUD.Guild
             throw new NotImplementedException();
         }
 
-        public void Sort()
+        internal override void Sort()
         {
             guildMembers.Sort();
+            base.Sort();
             //for (int i = 0; i < guildMembers.Count; i++)
             //{
             //    guildMembers[i].Move(firstPosition + changeInY * i);

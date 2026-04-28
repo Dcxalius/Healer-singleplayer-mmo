@@ -16,7 +16,7 @@ namespace Project_1.UI.HUD
         BagHolderBox bagHolderBox;
         BagContentBox[] bagContentBoxes;
         Label gold;
-        Image goldImage;
+        SquareImage goldImage;
 
         const float itemSizeX = 0.022f;
         const float spacingX = 0.0025f;
@@ -84,9 +84,10 @@ namespace Project_1.UI.HUD
                 bagContentBoxes[i] = new BagContentBox(this, i);
             }
 
-            RelativeScreenPosition imgSize = RelativeScreenPosition.GetSquareFromY(bagHolderBox.RelativeSize.Y / 2, Size);
-            goldImage = new Image(this, new UITexture("Gold", Color.White), RelativeScreenPosition.One - imgSize - bagBoxSpacingInInventoryScope.OnlyX, imgSize);
-            RelativeScreenPosition goldSize = new RelativeScreenPosition(1 - imgSize.X - bagBoxSpacingInInventoryScope.X * 2, bhSize.Y);
+            RelativeScreenPosition imgSize = new RelativeScreenPosition(0, bagHolderBox.RelativeSize.Y / 2);
+            goldImage = new SquareImage(this, new UITexture("Gold", Color.White), RelativeScreenPosition.Zero, imgSize);
+            goldImage.Move(RelativeScreenPosition.One - goldImage.RelativeSize - bagBoxSpacingInInventoryScope.OnlyX);
+            RelativeScreenPosition goldSize = new RelativeScreenPosition(1 - goldImage.RelativeSize.X - bagBoxSpacingInInventoryScope.X * 2, bhSize.Y);
             gold = new Label(this, RelativeScreenPosition.One.OnlyY - goldSize.OnlyY - bagBoxSpacingInInventoryScope.OnlyY, goldSize, Label.TextAllignment.CentreRight, aText: "0");
         }
 
@@ -206,7 +207,7 @@ namespace Project_1.UI.HUD
 
             }
 
-            goldImage.Resize(RelativeScreenPosition.GetSquareFromY(bagHolderBox.RelativeSize.Y / 2, Size));
+            goldImage.Resize(new RelativeScreenPosition(0, bagHolderBox.RelativeSize.Y / 2));
             //goldImage.Move(RelativeScreenPosition.One - goldImage.RelativeSize - outerSpacingInScreenSpace.OnlyX);
             goldImage.Move(RelativeScreenPosition.One - bagHolderBox.RelativeSize.OnlyY / 2 - goldImage.RelativeSize.OnlyY / 2 - goldImage.RelativeSize.OnlyX - outerSpacingInScreenSpace.OnlyX);
             //
@@ -237,7 +238,7 @@ namespace Project_1.UI.HUD
 
         void LayoutGold(RelativeScreenPosition spacingInScope)
         {
-            goldImage.Resize(RelativeScreenPosition.GetSquareFromY(bagHolderBox.RelativeSize.Y / 2, Size));
+            goldImage.Resize(new RelativeScreenPosition(0, bagHolderBox.RelativeSize.Y / 2));
             goldImage.Move(RelativeScreenPosition.One - bagHolderBox.RelativeSize.OnlyY / 2 - goldImage.RelativeSize.OnlyY / 2 - goldImage.RelativeSize.OnlyX - spacingInScope.OnlyX);
             gold.Resize(new RelativeScreenPosition(1 - goldImage.RelativeSize.X - spacingInScope.X * 2, bagHolderBox.RelativeSize.Y));
             gold.Move(RelativeScreenPosition.One.OnlyY - gold.RelativeSize.OnlyY - spacingInScope.OnlyY);

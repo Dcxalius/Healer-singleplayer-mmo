@@ -22,6 +22,7 @@ namespace Project_1.UI.HUD.Windows
             readonly Label textLabel;
             ItemDescriptorSnapshot hoverSnapshot;
             bool hasHoverSnapshot;
+            bool descriptorVisible;
 
             public StatLineElement(UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, null, aPos, aSize)
             {
@@ -38,20 +39,17 @@ namespace Project_1.UI.HUD.Windows
                 numberLabel.Text = aNumber;
                 textLabel.Text = aText;
                 hoverSnapshot = aHoverSnapshot;
-                if (!aHasHoverSnapshot && hasHoverSnapshot && isHovered)
-                {
-                    MailboxManager.PublishUiEvent(new DescriptorBoxClear());
-                }
-
                 hasHoverSnapshot = aHasHoverSnapshot;
+
+                if (isHovered)
+                {
+                    RefreshHoverDescriptor(true);
+                }
             }
 
             public void Clear()
             {
-                if (hasHoverSnapshot && isHovered)
-                {
-                    MailboxManager.PublishUiEvent(new DescriptorBoxClear());
-                }
+                HideHoverDescriptor();
 
                 numberLabel.Text = null;
                 textLabel.Text = null;
@@ -59,18 +57,48 @@ namespace Project_1.UI.HUD.Windows
                 hasHoverSnapshot = false;
             }
 
+            public override void Update()
+            {
+                base.Update();
+                if (!isHovered) return;
+                RefreshHoverDescriptor();
+            }
+
             protected override void OnHover()
             {
                 base.OnHover();
-                if (!Visible || !hasHoverSnapshot) return;
-                MailboxManager.PublishUiEvent(new DescriptorBoxSet(hoverSnapshot));
+                RefreshHoverDescriptor();
             }
 
             protected override void OnDeHover()
             {
                 base.OnDeHover();
-                if (!hasHoverSnapshot) return;
+                HideHoverDescriptor();
+            }
+
+            void RefreshHoverDescriptor(bool forcePublish = false)
+            {
+                bool shouldShow = Visible && hasHoverSnapshot && (numberLabel.MouseOverText || textLabel.MouseOverText);
+                if (shouldShow)
+                {
+                    if (!descriptorVisible || forcePublish)
+                    {
+                        MailboxManager.PublishUiEvent(new DescriptorBoxSet(hoverSnapshot));
+                    }
+
+                    descriptorVisible = true;
+                    return;
+                }
+
+                if (!descriptorVisible) return;
+                HideHoverDescriptor();
+            }
+
+            void HideHoverDescriptor()
+            {
+                if (!descriptorVisible) return;
                 MailboxManager.PublishUiEvent(new DescriptorBoxClear());
+                descriptorVisible = false;
             }
         }
 

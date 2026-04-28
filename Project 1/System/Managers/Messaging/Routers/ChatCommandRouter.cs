@@ -72,9 +72,9 @@ namespace Project_1.Managers
             new ChatCommandSpec("where", "/where <friendly name>", "Prints world position for a friendly.", ChatCommandAccess.System),
             new ChatCommandSpec("chunklevels", "/chunklevels", "Prints chunk average levels (10x10 near player, or all generated if under 100 chunks).", ChatCommandAccess.System),
             new ChatCommandSpec("damage", "/damage [friendly name] <amount>", "Deals true damage to a friendly. Defaults to the player.", ChatCommandAccess.Debug),
-            new ChatCommandSpec("gold", "/gold <amount>", "Adds the given amount of gold to the player.", ChatCommandAccess.Debug),
+            new ChatCommandSpec("gold", "/gold|/givegold|/give gold <amount>", "Adds the given amount of gold to the player.", ChatCommandAccess.Debug),
             new ChatCommandSpec("setgold", "/setgold <amount>", "Sets the player's gold to the given amount.", ChatCommandAccess.Debug),
-            new ChatCommandSpec("exp", "/exp [friendly name] <amount>", "Gives experience to a friendly. Defaults to the player.", ChatCommandAccess.Debug),
+            new ChatCommandSpec("exp", "/exp|/giveexp|/give exp [friendly name] <amount>", "Gives experience to a friendly. Defaults to the player.", ChatCommandAccess.Debug),
             new ChatCommandSpec("tp", "/tp <friendly name> <x> <y>", "Teleports a friendly to world coordinates.", ChatCommandAccess.Debug),
             new ChatCommandSpec("createitem", "/createitem <friendly name> <item id> <count>", "Creates item(s) and gives them to a friendly with inventory.", ChatCommandAccess.Debug)
         };
@@ -118,6 +118,8 @@ namespace Project_1.Managers
             string command = tokens[0].ToLowerInvariant();
             string[] args = new string[tokens.Length - 1];
             Array.Copy(tokens, 1, args, 0, args.Length);
+            NormalizeCommandAlias(ref command, ref args);
+
             ChatCommandSpec? spec = TryGetChatCommandSpec(command);
             if (!spec.HasValue)
             {
@@ -164,6 +166,39 @@ namespace Project_1.Managers
                     HandleChatCreateItem(args);
                     break;
             }
+        }
+
+        static void NormalizeCommandAlias(ref string command, ref string[] args)
+        {
+            switch (command)
+            {
+                case "giveexp":
+                    command = "exp";
+                    return;
+                case "givegold":
+                    command = "gold";
+                    return;
+                case "give":
+                    NormalizeGiveCommandAlias(ref command, ref args);
+                    return;
+            }
+        }
+
+        static void NormalizeGiveCommandAlias(ref string command, ref string[] args)
+        {
+            if (args.Length == 0) return;
+
+            string targetCommand = args[0].ToLowerInvariant();
+            if (targetCommand != "exp" && targetCommand != "gold") return;
+
+            string[] shiftedArgs = new string[args.Length - 1];
+            if (shiftedArgs.Length > 0)
+            {
+                Array.Copy(args, 1, shiftedArgs, 0, shiftedArgs.Length);
+            }
+
+            command = targetCommand;
+            args = shiftedArgs;
         }
 
         static void HandleChatSayRequested(ChatSayRequested e)

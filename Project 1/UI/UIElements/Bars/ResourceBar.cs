@@ -23,15 +23,18 @@ namespace Project_1.UI.UIElements.Bars
                 if (value == 0)
                 {
                     maxValue = 0;
+                    currentValue = 0;
                     base.Value = 1f;
                     fractionText.Text = null;
                     percentageText.Text = null;
                     return;
                 }
                 maxValue = value;
-                base.Value = currentValue / maxValue;
-                fractionText.Text = currentValue + "/" + maxValue;
-                percentageText.Text = (int)(currentValue / maxValue * 100) + "%";
+                currentValue = Math.Clamp(currentValue, 0f, maxValue);
+                float ratio = currentValue / maxValue;
+                base.Value = ratio;
+                fractionText.Text = Math.Round(currentValue) + "/" + Math.Round(maxValue);
+                percentageText.Text = (int)(ratio * 100) + "%";
             }
         }
         public override float Value
@@ -39,19 +42,20 @@ namespace Project_1.UI.UIElements.Bars
             set
             {
                 if (value < 0) value = 0;
+                currentValue = maxValue > 0 ? Math.Clamp(value, 0f, maxValue) : 0f;
 
-                if (value == 0 && maxValue == 0)
+                if (maxValue == 0)
                 {
-                    //currentValue = 0;
                     base.Value = 1f;
                     fractionText.Text = null;
                     percentageText.Text = null;
                     return;
                 }
-                currentValue = value;
-                base.Value = currentValue / maxValue;
-                fractionText.Text = Math.Round(currentValue) + "/" + maxValue;
-                percentageText.Text = (int)(currentValue / maxValue * 100) + "%";
+
+                float ratio = currentValue / maxValue;
+                base.Value = ratio;
+                fractionText.Text = Math.Round(currentValue) + "/" + Math.Round(maxValue);
+                percentageText.Text = (int)(ratio * 100) + "%";
             }
         }
 
@@ -70,8 +74,8 @@ namespace Project_1.UI.UIElements.Bars
 
         public ResourceBar(UIElement aParent, BarTexture aBarGfx, UITexture aBackgroundGfx, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, aBarGfx, aBackgroundGfx, aPos, aSize)
         {
-            fractionText = new Label(this, RelativeScreenPosition.Zero, aSize, Label.TextAllignment.CentreLeft, Color.Black, "Comforaa-msdf", 13, "");
-            percentageText = new Label(this, RelativeScreenPosition.Zero, aSize, Label.TextAllignment.CentreRight, Color.Black, "Comforaa-msdf", 14, "");
+            fractionText = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.One, Label.TextAllignment.CentreLeft, Color.Black, "Comfortaa-msdf", 13, "");
+            percentageText = new Label(this, RelativeScreenPosition.Zero, RelativeScreenPosition.One, Label.TextAllignment.CentreRight, Color.Black, "Comfortaa-msdf", 14, "");
             maxValue = 0f;
             currentValue = 0f;
         }
