@@ -18,6 +18,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Project_1.Tiles;
 using Project_1.GameObjects.Entities.Friendlies.Players;
+using System.Threading;
+using Path = System.IO.Path;
 
 namespace Project_1.Managers
 {
@@ -27,20 +29,20 @@ namespace Project_1.Managers
         static JsonSerializerSettings serializerSettings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto};
         static string saveFolder;
 
-        public static string Effects => System.IO.Path.Combine(contentRootDirectory, "Effects");
-        public static string Settings => System.IO.Path.Combine(contentRootDirectory, "Settings");
-        public static string HudSettings => System.IO.Path.Combine(Settings, "Hud.set");
-        public static string CameraSettings => System.IO.Path.Combine(Settings, "Camera.set");
-        public static string KeyBindSettings => System.IO.Path.Combine(Settings, "KeyBind.set");
-        public static string DebugSettings => System.IO.Path.Combine(Settings, "Debug.set");
+        public static string Effects => Path.Combine(contentRootDirectory, "Effects");
+        public static string Settings => Path.Combine(contentRootDirectory, "Settings");
+        public static string HudSettings => Path.Combine(Settings, "Hud.set");
+        public static string CameraSettings => Path.Combine(Settings, "Camera.set");
+        public static string KeyBindSettings => Path.Combine(Settings, "KeyBind.set");
+        public static string DebugSettings => Path.Combine(Settings, "Debug.set");
 
 
 
-        public static string DefaultSettings => System.IO.Path.Combine(Settings, "Default");
-        public static string DefaultHudSettings => System.IO.Path.Combine(DefaultSettings, "Hud.def");
-        public static string DefaultCameraSettings => System.IO.Path.Combine(DefaultSettings, "Camera.def");
-        public static string DefaultKeyBindSettings => System.IO.Path.Combine(DefaultSettings, "KeyBind.def");
-        public static string DefaultDebugSettings => System.IO.Path.Combine(DefaultSettings, "Debug.def");
+        public static string DefaultSettings => Path.Combine(Settings, "Default");
+        public static string DefaultHudSettings => Path.Combine(DefaultSettings, "Hud.def");
+        public static string DefaultCameraSettings => Path.Combine(DefaultSettings, "Camera.def");
+        public static string DefaultKeyBindSettings => Path.Combine(DefaultSettings, "KeyBind.def");
+        public static string DefaultDebugSettings => Path.Combine(DefaultSettings, "Debug.def");
         public static Save[] Saves
         {
             get
@@ -69,12 +71,12 @@ namespace Project_1.Managers
             initialized = true;
             contentRootDirectory = Game1.ContentManager.RootDirectory;
 
-            saveFolder = System.IO.Path.Combine(contentRootDirectory, "Saves");
+            saveFolder = Path.Combine(contentRootDirectory, "Saves");
 
             InitSaveFolder();
 
             saves = new List<Save>();
-            string[] folders = System.IO.Directory.GetDirectories(saveFolder);
+            string[] folders = Directory.GetDirectories(saveFolder);
             lock (savesLock)
             {
                 for (int i = 0; i < folders.Length; i++)
@@ -122,23 +124,49 @@ namespace Project_1.Managers
             }
         }
 
-        public static void CreateNewSave(string aName)
+        public static Save CreateNewSave(string aName)
         {
             ThreadAffinity.AssertSimThread();
             aName = aName.ToUpper();
             lock (savesLock)
             {
-                saves.Add(new Save(aName, false));
-                currentSave = saves.Last();
+                Save save = new Save(aName, false);
+                saves.Add(save);
+                currentSave = save;
                 saves.Sort();
+                return save;
             }
+        }
+
+        public static void DeleteSave(Save save)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (save == null) return;
+
+            lock (savesLock)
+            {
+                saves.Remove(save);
+                if (ReferenceEquals(currentSave, save))
+                {
+                    currentSave = null;
+                }
+            }
+
+            RemovePendingScreenshots(save);
+            save.DeleteFiles();
+        }
+
+        public static void SetCurrentSave(Save save)
+        {
+            ThreadAffinity.AssertSimThread();
+            currentSave = save;
         }
 
         static void InitSaveFolder()
         {
-            if (System.IO.Directory.Exists(saveFolder)) return;
+            if (Directory.Exists(saveFolder)) return;
 
-            System.IO.Directory.CreateDirectory(saveFolder);
+            Directory.CreateDirectory(saveFolder);
         }
 
         public static bool RequestContinueLastSave()
@@ -158,8 +186,8 @@ namespace Project_1.Managers
             ThreadAffinity.AssertSimThread();
             if (save == null) return false;
             currentSave = save;
-            int requestId = System.Threading.Interlocked.Increment(ref nextLoadRequestId);
-            System.Threading.Volatile.Write(ref currentLoadRequestId, requestId);
+            int requestId = Interlocked.Increment(ref nextLoadRequestId);
+            Volatile.Write(ref currentLoadRequestId, requestId);
             if (!ThreadingSettings.UseWorkerThreads || !WorkerPool.IsRunning)
             {
                 SaveLoadPayload payload = SaveLoadPayload.Parse(save);
@@ -178,7 +206,7 @@ namespace Project_1.Managers
         {
             ThreadAffinity.AssertSimThread();
             if (payload == null) return false;
-            if (requestId != System.Threading.Volatile.Read(ref currentLoadRequestId))
+            if (requestId != Volatile.Read(ref currentLoadRequestId))
             {
                 // Stale async load completion. A newer load request has already replaced this token.
                 return false;
@@ -237,19 +265,20 @@ namespace Project_1.Managers
             if (currentSave == null) return;
             if (!ThreadingSettings.UseWorkerThreads || !WorkerPool.IsRunning)
             {
-                MailboxManager.PublishUiEvent(new SaveDataStarted());
+                MailboxManager.PublishUiEvent(new SaveDataStarted("Saving..."));
                 try
                 {
                     currentSave.SaveData();
+                    MailboxManager.PublishUiEvent(new SaveDataFinished("Saved"));
                 }
-                finally
+                catch (Exception ex) when (TryBuildSaveFailureMessage(ex, out _))
                 {
-                    MailboxManager.PublishUiEvent(new SaveDataFinished());
+                    NotifySaveFailed(ex);
                 }
                 return;
             }
 
-            MailboxManager.PublishUiEvent(new SaveDataStarted());
+            MailboxManager.PublishUiEvent(new SaveDataStarted("Saving..."));
             SaveWritePayload payload = SaveWritePayload.Capture(currentSave);
             RequestScreenshot(currentSave);
             WorkerPool.Enqueue(() =>
@@ -257,10 +286,11 @@ namespace Project_1.Managers
                 try
                 {
                     payload.Write();
+                    MailboxManager.PublishUiEvent(new SaveDataFinished("Saved"));
                 }
-                finally
+                catch (Exception ex) when (TryBuildSaveFailureMessage(ex, out _))
                 {
-                    MailboxManager.PublishUiEvent(new SaveDataFinished());
+                    NotifySaveFailed(ex);
                 }
             });
         }
@@ -274,12 +304,11 @@ namespace Project_1.Managers
         static double lastScreenshotMs;
 
         public static ScreenshotQueueStats ScreenshotQueueStats => new ScreenshotQueueStats(
-            System.Threading.Volatile.Read(ref pendingScreenshotCount),
-            System.Threading.Volatile.Read(ref pendingScreenshotPeak),
-            System.Threading.Interlocked.Read(ref totalScreenshotsEnqueued),
-            System.Threading.Interlocked.Read(ref totalScreenshotsProcessed),
-            System.Threading.Volatile.Read(ref lastScreenshotMs));
-
+            Volatile.Read(ref pendingScreenshotCount),
+            Volatile.Read(ref pendingScreenshotPeak),
+            Interlocked.Read(ref totalScreenshotsEnqueued),
+            Interlocked.Read(ref totalScreenshotsProcessed),
+            Volatile.Read(ref lastScreenshotMs));
         public static void RequestScreenshot(Save save)
         {
             ThreadAffinity.AssertSimThread();
@@ -288,12 +317,12 @@ namespace Project_1.Managers
             {
                 pendingScreenshots.Enqueue(save);
             }
-            int pending = System.Threading.Interlocked.Increment(ref pendingScreenshotCount);
-            System.Threading.Interlocked.Increment(ref totalScreenshotsEnqueued);
+            int pending = Interlocked.Increment(ref pendingScreenshotCount);
+            Interlocked.Increment(ref totalScreenshotsEnqueued);
             int snapshotPeak;
-            while (pending > (snapshotPeak = System.Threading.Volatile.Read(ref pendingScreenshotPeak)))
+            while (pending > (snapshotPeak = Volatile.Read(ref pendingScreenshotPeak)))
             {
-                if (System.Threading.Interlocked.CompareExchange(ref pendingScreenshotPeak, pending, snapshotPeak) == snapshotPeak)
+                if (Interlocked.CompareExchange(ref pendingScreenshotPeak, pending, snapshotPeak) == snapshotPeak)
                 {
                     break;
                 }
@@ -311,19 +340,97 @@ namespace Project_1.Managers
                     if (pendingScreenshots.Count == 0) return;
                     save = pendingScreenshots.Dequeue();
                 }
-                System.Threading.Interlocked.Decrement(ref pendingScreenshotCount);
-                long startTicks = Stopwatch.GetTimestamp();
-                save.SaveScreenshot();
-                double elapsedMs = (Stopwatch.GetTimestamp() - startTicks) * 1000d / Stopwatch.Frequency;
-                System.Threading.Volatile.Write(ref lastScreenshotMs, elapsedMs);
-                System.Threading.Interlocked.Increment(ref totalScreenshotsProcessed);
+                Interlocked.Decrement(ref pendingScreenshotCount);
+                if (save == null) continue;
+                try
+                {
+                    long startTicks = Stopwatch.GetTimestamp();
+                    save.SaveScreenshot();
+                    double elapsedMs = (Stopwatch.GetTimestamp() - startTicks) * 1000d / Stopwatch.Frequency;
+                    Volatile.Write(ref lastScreenshotMs, elapsedMs);
+                    Interlocked.Increment(ref totalScreenshotsProcessed);
+                }
+                catch (Exception ex) when (TryBuildSaveFailureMessage(ex, out _))
+                {
+                    NotifySaveFailed(ex);
+                }
+            }
+        }
+
+        static void RemovePendingScreenshots(Save save)
+        {
+            lock (screenshotLock)
+            {
+                if (pendingScreenshots.Count == 0) return;
+
+                Queue<Save> remainingScreenshots = new Queue<Save>(pendingScreenshots.Count);
+                int removedCount = 0;
+                while (pendingScreenshots.Count > 0)
+                {
+                    Save pendingSave = pendingScreenshots.Dequeue();
+                    if (ReferenceEquals(pendingSave, save))
+                    {
+                        removedCount++;
+                        continue;
+                    }
+
+                    remainingScreenshots.Enqueue(pendingSave);
+                }
+
+                while (remainingScreenshots.Count > 0)
+                {
+                    pendingScreenshots.Enqueue(remainingScreenshots.Dequeue());
+                }
+
+                if (removedCount > 0)
+                {
+                    Interlocked.Add(ref pendingScreenshotCount, -removedCount);
+                }
             }
         }
 
         public static void ExportData(string aDestination, object aObjectToExport)
         {
             string json = JsonConvert.SerializeObject(aObjectToExport, serializerSettings);
-            System.IO.File.WriteAllText(aDestination, json);
+            File.WriteAllText(aDestination, json);
+        }
+
+        internal static bool TryBuildSaveFailureMessage(Exception exception, out string message)
+        {
+            Exception baseException = exception?.GetBaseException();
+            if (baseException is IOException ioException)
+            {
+                int errorCode = ioException.HResult & 0xFFFF;
+                if (errorCode == 0x70 || errorCode == 0x27)
+                {
+                    message = "Save failed: the drive is out of free space.";
+                    return true;
+                }
+
+                message = "Save failed: the save files could not be written.";
+                return true;
+            }
+
+            if (baseException is UnauthorizedAccessException)
+            {
+                message = "Save failed: the game does not have permission to write save files.";
+                return true;
+            }
+
+            message = null;
+            return false;
+        }
+
+        internal static void NotifySaveFailed(Exception exception)
+        {
+            string message;
+            if (!TryBuildSaveFailureMessage(exception, out message))
+            {
+                message = "Save failed.";
+            }
+
+            MailboxManager.PublishUiEvent(new SaveDataFailed(message));
+            MailboxManager.PublishUiEvent(new ChatMessagePosted(ChatMessageType.System, message));
         }
 
         public static T ImportData<T>(string aJsonString)
@@ -333,8 +440,8 @@ namespace Project_1.Managers
 
         public static string TrimToNameOnly(string aFile)
         {
-            string fileOnly = System.IO.Path.GetFileName(aFile);
-            return System.IO.Path.GetFileNameWithoutExtension(fileOnly);
+            string fileOnly = Path.GetFileName(aFile);
+            return Path.GetFileNameWithoutExtension(fileOnly);
         }
     }
 

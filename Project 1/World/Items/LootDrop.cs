@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Project_1.GameObjects.Entities.Friendlies.Players;
+using System.Threading;
 
 namespace Project_1.Items
 {
@@ -44,7 +45,7 @@ namespace Project_1.Items
         {
             if (@object == null) throw new ArgumentNullException(nameof(@object));
             this.drop = drop ?? Array.Empty<Item>();
-            Id = System.Threading.Interlocked.Increment(ref nextId);
+            Id = Interlocked.Increment(ref nextId);
             dropperFeet = @object.FeetPosition;
             dropperHalfHeight = (float)@object.FeetSize.Y / 2f;
         }
@@ -53,7 +54,7 @@ namespace Project_1.Items
         public LootDrop(Item[] drop, WorldSpace dropperFeet, float dropperHalfHeight, int id)
         {
             this.drop = drop ?? Array.Empty<Item>();
-            Id = id > 0 ? id : System.Threading.Interlocked.Increment(ref nextId);
+            Id = id > 0 ? id : Interlocked.Increment(ref nextId);
             if (Id > nextId) nextId = Id;
             this.dropperFeet = dropperFeet;
             this.dropperHalfHeight = dropperHalfHeight;

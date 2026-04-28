@@ -4,6 +4,7 @@ using Project_1.Camera;
 using Project_1.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
+using System;
 
 namespace Project_1.Input
 {
@@ -58,7 +59,7 @@ namespace Project_1.Input
         static void CreateScrollEvent()
         {
             byte modifiersMask = GetHoldModifierMask();
-            int amount = System.Math.Abs(oldMouseState.ScrollWheelValue - newMouseState.ScrollWheelValue) / 120;
+            int amount = Math.Abs(oldMouseState.ScrollWheelValue - newMouseState.ScrollWheelValue) / 120;
             ScrollEvent.Direction direction = oldMouseState.ScrollWheelValue > newMouseState.ScrollWheelValue
                 ? ScrollEvent.Direction.Up
                 : ScrollEvent.Direction.Down;
@@ -91,8 +92,8 @@ namespace Project_1.Input
         static AbsoluteScreenPosition BoundsCheckOnMouse(AbsoluteScreenPosition aMousePos)
         {
             Rectangle bounds = Camera.Camera.ScreenRectangle;
-            int clampedX = System.Math.Clamp(aMousePos.X, bounds.Left, bounds.Right - 1);
-            int clampedY = System.Math.Clamp(aMousePos.Y, bounds.Top, bounds.Bottom - 1);
+            int clampedX = Math.Clamp(aMousePos.X, bounds.Left, bounds.Right - 1);
+            int clampedY = Math.Clamp(aMousePos.Y, bounds.Top, bounds.Bottom - 1);
             return new AbsoluteScreenPosition(clampedX, clampedY);
         }
 

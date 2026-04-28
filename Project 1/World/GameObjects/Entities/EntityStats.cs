@@ -22,6 +22,7 @@ using Project_1.GameObjects.Entities.Friendlies;
 using System.Globalization;
 using Project_1.Managers;
 using Project_1.World.Items.Enchantments;
+using Project_1.Tiles;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -97,7 +98,43 @@ namespace Project_1.GameObjects.Entities
                 MaxResource,
                 ResourceColor,
                 FeetPosition,
-                WorldRectangle.Height);
+                WorldRectangle.Height,
+                ResolveNamePlateAnchorWorldPosition());
+        }
+
+        WorldSpace3D ResolveNamePlateAnchorWorldPosition()
+        {
+            float heightInWorldUnits = Math.Max(0f, WorldRectangle.Height / (float)Math.Max(1, Tile.Size.Y));
+            return new WorldSpace3D(
+                FeetPosition.X / Tile.Size.X,
+                ResolveSurfaceHeight(FeetPosition) + heightInWorldUnits,
+                FeetPosition.Y / Tile.Size.Y);
+        }
+
+        static float ResolveSurfaceHeight(WorldSpace aFeetPosition)
+        {
+            Chunk chunk = TileManager.GetChunk(aFeetPosition);
+            if (chunk == null) return 0f;
+
+            Point gridPosition = TileManager.GetGridPos(aFeetPosition);
+            int localX = PositiveModulo(gridPosition.X, Chunk.ChunkSize.X);
+            int localY = PositiveModulo(gridPosition.Y, Chunk.ChunkSize.Y);
+
+            for (int z = Chunk.ChunkHeight - 1; z >= 0; z--)
+            {
+                if (chunk.GetBlock(localX, localY, z) != null)
+                {
+                    return z + 1f;
+                }
+            }
+
+            return 0f;
+        }
+
+        static int PositiveModulo(int aValue, int aDivisor)
+        {
+            int result = aValue % aDivisor;
+            return result < 0 ? result + aDivisor : result;
         }
 
 

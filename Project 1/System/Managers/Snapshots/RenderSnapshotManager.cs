@@ -90,13 +90,18 @@ namespace Project_1.Managers
                 Volatile.Write(ref lastDrawnBuildVersion, currentBuildVersion);
             }
 
-            TileManager.DrawSnapshots(batch);
             ProjectileManager.DrawSnapshots(batch);
             ObjectManager.DrawSnapshots(batch);
             TileManager.DrawDoodadSnapshots(batch);
             CorpseManager.DrawSnapshots(batch);
             SpawnerManager.DrawSnapshots(batch);
             Interlocked.Increment(ref totalDraws);
+        }
+
+        public static void DrawTerrainSnapshots()
+        {
+            ThreadAffinity.AssertMainThread();
+            TileManager.DrawSnapshots();
         }
 
         static double TicksToMs(double ticks)

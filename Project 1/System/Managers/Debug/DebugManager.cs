@@ -10,6 +10,7 @@ namespace Project_1.Managers
     {
         DebugShapes,
         DebugOverlay,
+        ModelPreview,
         Print,
         ShadowMaskPreview,
         ShadowMagentaClear,
@@ -113,6 +114,7 @@ namespace Project_1.Managers
             SetMode(DebugMode.Console, true);
             SetMode(DebugMode.LearnKill, true);
             SetMode(DebugMode.ChatCheats, true);
+            SetMode(DebugMode.ModelPreview, true);
 #endif
 
             if (Mode(DebugMode.Console))

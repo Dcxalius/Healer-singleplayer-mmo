@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Project_1.Camera;
@@ -28,7 +29,7 @@ namespace Project_1.GameObjects
         public static Entity[] GetAllEntitiesSnapshot()
         {
             ThreadAffinity.AssertSimThread();
-            System.Collections.Generic.List<Entity> all = BuildAllScratch();
+            List<Entity> all = BuildAllScratch();
             if (all == null || all.Count == 0) return Array.Empty<Entity>();
             return all.ToArray();
         }

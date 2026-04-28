@@ -23,6 +23,7 @@ namespace Project_1.UI.HUD.Guild
         Label name;
         Label level;
         Label @class;
+        int renderId;
         OpenInventory openInventory;
         OpenInspectWindow openInspectWindow;
         Button talentButton;
@@ -90,6 +91,7 @@ namespace Project_1.UI.HUD.Guild
         public void RefreshData(in EntityUiSnapshot aGuildMember)
         {
             data = aGuildMember;
+            renderId = aGuildMember.RenderId;
             name.Text = aGuildMember.Name;
             level.Text = aGuildMember.Level.ToString();
             @class.Text = aGuildMember.ClassName;
@@ -100,6 +102,12 @@ namespace Project_1.UI.HUD.Guild
         {
             return name.Text == aName;
         }
+
+        public bool BelongsTo(int aRenderId)
+        {
+            return renderId == aRenderId;
+        }
+
         public int CompareTo(object obj)
         {
             Debug.Assert(obj.GetType() == GetType());

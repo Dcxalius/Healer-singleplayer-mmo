@@ -4,6 +4,7 @@ using Project_1.Camera;
 using Project_1.GameObjects.Entities;
 using Project_1.Managers;
 using Project_1.Textures;
+using System;
 using GfxTexture = Project_1.Textures.Texture;
 
 namespace Project_1.GameObjects
@@ -60,8 +61,8 @@ namespace Project_1.GameObjects
 
         static Point ScaledSize(Point rawSize)
         {
-            return new Point((int)System.Math.Ceiling(rawSize.X * Camera.Camera.Scale),
-                (int)System.Math.Ceiling(rawSize.Y * Camera.Camera.Scale));
+            return new Point((int)Math.Ceiling(rawSize.X * Camera.Camera.Scale),
+                (int)Math.Ceiling(rawSize.Y * Camera.Camera.Scale));
         }
 
         void DrawShadow(SpriteBatch batch, Rectangle screenRect)

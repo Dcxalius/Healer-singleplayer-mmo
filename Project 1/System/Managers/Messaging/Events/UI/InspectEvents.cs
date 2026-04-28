@@ -1,3 +1,5 @@
+using System;
+
 namespace Project_1.Messaging.Events
 {
     internal readonly struct LogicWindowSnapshotRequested
@@ -31,7 +33,7 @@ namespace Project_1.Messaging.Events
         public LogicWindowSnapshotSet(int memberRenderId, LogicNodeUiSnapshot[] nodes)
         {
             MemberRenderId = memberRenderId;
-            Nodes = nodes ?? System.Array.Empty<LogicNodeUiSnapshot>();
+            Nodes = nodes ?? Array.Empty<LogicNodeUiSnapshot>();
         }
 
         public int MemberRenderId { get; }

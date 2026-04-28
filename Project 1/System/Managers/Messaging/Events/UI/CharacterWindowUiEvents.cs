@@ -1,4 +1,5 @@
 using Project_1.Camera;
+using System;
 
 namespace Project_1.Messaging.Events
 {
@@ -44,7 +45,7 @@ namespace Project_1.Messaging.Events
             PlayerFeet = playerFeet;
             HasTarget = hasTarget;
             TargetFeet = targetFeet;
-            SpellSnapshots = spellSnapshots ?? System.Array.Empty<SpellUiSnapshot>();
+            SpellSnapshots = spellSnapshots ?? Array.Empty<SpellUiSnapshot>();
         }
 
         public bool Valid { get; }

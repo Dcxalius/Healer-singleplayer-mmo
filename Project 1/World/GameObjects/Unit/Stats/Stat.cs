@@ -53,7 +53,7 @@ namespace Project_1.GameObjects.Unit.Stats
                 return false;
             }
 
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public void Decrease(int aAmount)
@@ -63,7 +63,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public override int GetHashCode()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         internal void Increase(int aAmount)

@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.Managers;
+using Project_1.WorldGeneration;
 using System;
 
 namespace Project_1.Tiles
@@ -10,6 +11,11 @@ namespace Project_1.Tiles
         public static WorldSpace FindSpawnPointNearChunkLevel(int targetAverageLevel, int maxSearchRadius = 96)
         {
             ThreadAffinity.AssertSimThread();
+            if (targetAverageLevel <= 10 && NodeWorldManager.TryGetStarterSpawnPoint(out WorldSpace starterSpawn))
+            {
+                return starterSpawn;
+            }
+
             int targetLevel = Math.Clamp(targetAverageLevel, 1, 60);
             int radius = Math.Max(0, maxSearchRadius);
             Point origin = Point.Zero;
@@ -25,9 +31,9 @@ namespace Project_1.Tiles
             {
                 if (radius == 0)
                 {
-                    if (Chunk.GetAverageLevelForChunkPosition(origin) == targetAverageLevel)
+                    if (ChunkGenerator.GetAverageLevelForChunkPosition(origin) == targetAverageLevel)
                     {
-                        return Chunk.GetChunkId(origin);
+                        return ChunkAddressing.GetChunkId(origin);
                     }
                     continue;
                 }
@@ -40,23 +46,23 @@ namespace Project_1.Tiles
                 for (int x = minX; x <= maxX; x++)
                 {
                     Point top = new Point(x, minY);
-                    if (Chunk.GetAverageLevelForChunkPosition(top) == targetAverageLevel) return Chunk.GetChunkId(top);
+                    if (ChunkGenerator.GetAverageLevelForChunkPosition(top) == targetAverageLevel) return ChunkAddressing.GetChunkId(top);
 
                     Point bottom = new Point(x, maxY);
-                    if (Chunk.GetAverageLevelForChunkPosition(bottom) == targetAverageLevel) return Chunk.GetChunkId(bottom);
+                    if (ChunkGenerator.GetAverageLevelForChunkPosition(bottom) == targetAverageLevel) return ChunkAddressing.GetChunkId(bottom);
                 }
 
                 for (int y = minY + 1; y <= maxY - 1; y++)
                 {
                     Point left = new Point(minX, y);
-                    if (Chunk.GetAverageLevelForChunkPosition(left) == targetAverageLevel) return Chunk.GetChunkId(left);
+                    if (ChunkGenerator.GetAverageLevelForChunkPosition(left) == targetAverageLevel) return ChunkAddressing.GetChunkId(left);
 
                     Point right = new Point(maxX, y);
-                    if (Chunk.GetAverageLevelForChunkPosition(right) == targetAverageLevel) return Chunk.GetChunkId(right);
+                    if (ChunkGenerator.GetAverageLevelForChunkPosition(right) == targetAverageLevel) return ChunkAddressing.GetChunkId(right);
                 }
             }
 
-            return Chunk.GetChunkId(origin);
+            return ChunkAddressing.GetChunkId(origin);
         }
 
         static WorldSpace FindBestSpawnInChunk(Chunk chunk)

@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.Entities.Friendlies.Npcs;
+using System.IO;
 
 namespace Project_1.GameObjects
 {
@@ -42,6 +43,7 @@ namespace Project_1.GameObjects
             ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
+            guildData = new List<UnitData>();
             ImportClassData();
             ImportMobData();
             ImportNpcData();
@@ -51,6 +53,7 @@ namespace Project_1.GameObjects
         public static void AddGuildMember(string aName, string aClassName)
         {
             ThreadAffinity.AssertSimThread();
+            guildData ??= new List<UnitData>();
             UnitData xdd = new UnitData(aName, "", aClassName, Relation.RelationToPlayer.Friendly, 1, 0, null, float.MaxValue, float.MaxValue, null, WorldSpace.Zero, WorldSpace.Zero, WorldSpace.Zero, null, 1);
 
             guildData.Add(xdd);
@@ -69,7 +72,7 @@ namespace Project_1.GameObjects
             ThreadAffinity.AssertSimThread();
             ResetUnitData();
             playerData = loadedPlayer;
-            guildData = loadedGuild ?? new List<UnitData>();
+            guildData = loadedGuild != null ? new List<UnitData>(loadedGuild) : new List<UnitData>();
         }
 
         public static UnitData[] GetGuildDataSnapshot()
@@ -83,7 +86,7 @@ namespace Project_1.GameObjects
         {
             ThreadAffinity.AssertSimThread();
             playerData = null;
-            guildData?.Clear();
+            guildData = new List<UnitData>();
         }
 
         public static MobData GetMobData(string aName)
@@ -105,6 +108,7 @@ namespace Project_1.GameObjects
         {
             ThreadAffinity.AssertSimThread();
             List<GuildMember> returnable = new List<GuildMember>();
+            if (guildData == null || guildData.Count == 0) return returnable;
             for (int i = 0; i < guildData.Count; i++)
             {
                 returnable.Add(new GuildMember(guildData[i]));
@@ -152,10 +156,10 @@ namespace Project_1.GameObjects
             gossipData = new Dictionary<string, GossipData>();
             string path = Game1.ContentManager.RootDirectory + "\\Data\\NpcData\\Gossip\\";
 
-            string[] files = System.IO.Directory.GetFiles(path);
+            string[] files = Directory.GetFiles(path);
             for (int i = 0; i < files.Length; i++)
             {
-                string rawData = System.IO.File.ReadAllText(files[i]);
+                string rawData = File.ReadAllText(files[i]);
                 
                 GossipData data = JsonConvert.DeserializeObject<GossipData>(rawData);
                 gossipData.Add(SaveManager.TrimToNameOnly(files[i]), data);
@@ -171,10 +175,10 @@ namespace Project_1.GameObjects
             string path = Game1.ContentManager.RootDirectory + "\\Data\\MobData\\";
 
            
-            string[] files = System.IO.Directory.GetFiles(path);
+            string[] files = Directory.GetFiles(path);
             for (int i = 0; i < files.Length; i++)
             {
-                string rawData = System.IO.File.ReadAllText(files[i]);
+                string rawData = File.ReadAllText(files[i]);
                 MobData data = JsonConvert.DeserializeObject<MobData>(rawData);
                 mobData.Add(data.Name.ToUpper(), data);
                 
@@ -188,10 +192,10 @@ namespace Project_1.GameObjects
             string path = Game1.ContentManager.RootDirectory + "\\Data\\NpcData\\";
 
 
-            string[] files = System.IO.Directory.GetFiles(path);
+            string[] files = Directory.GetFiles(path);
             for (int i = 0; i < files.Length; i++)
             {
-                string rawData = System.IO.File.ReadAllText(files[i]);
+                string rawData = File.ReadAllText(files[i]);
                 NpcData data = JsonConvert.DeserializeObject<NpcData>(rawData);
                 npcData.Add(data);
 
@@ -201,7 +205,7 @@ namespace Project_1.GameObjects
         static void ImportPlayerData(Save aSave)
         {
             ThreadAffinity.AssertSimThread();
-            string rawData = System.IO.File.ReadAllText(aSave.Units + "\\PlayerData.unit");
+            string rawData = File.ReadAllText(aSave.Units + "\\PlayerData.unit");
             playerData = JsonConvert.DeserializeObject<PlayerData>(rawData);
         }
 
@@ -212,12 +216,12 @@ namespace Project_1.GameObjects
 
             string path = aSave.Guild + "\\";
 
-            string[] files = System.IO.Directory.GetFiles(path);
+            string[] files = Directory.GetFiles(path);
 
 
             for (int j = 0; j < files.Length; j++)
             {
-                string rawData = System.IO.File.ReadAllText(files[j]);
+                string rawData = File.ReadAllText(files[j]);
                 UnitData data = JsonConvert.DeserializeObject<UnitData>(rawData);
                 guildData.Add(data);
             }
@@ -241,11 +245,11 @@ namespace Project_1.GameObjects
 
             for (int i = 0; i < folders.Length; i++)
             {
-                string[] files = System.IO.Directory.GetFiles(folders[i]);
+                string[] files = Directory.GetFiles(folders[i]);
                 string type = folders[i].Substring(path.Length);
                 for (int j = 0; j < files.Length; j++)
                 {
-                    string rawData = System.IO.File.ReadAllText(files[j]);
+                    string rawData = File.ReadAllText(files[j]);
                     AddToClassData(rawData, Enum.Parse<ClassData.Type>(type));
                 }
             }
@@ -289,6 +293,7 @@ namespace Project_1.GameObjects
 
             aSave.ClearFolder(aSave.Guild);
 
+            if (guildData == null || guildData.Count == 0) return;
             for (int i = 0; i < guildData.Count; i++)
             {
                 SaveManager.ExportData(aSave.Guild + "\\" + guildData[i].Name + ".unit", guildData[i]);

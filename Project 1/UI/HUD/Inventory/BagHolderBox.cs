@@ -3,13 +3,14 @@ using Project_1.Camera;
 using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.UIElements.Boxes;
+using System;
 
 namespace Project_1.UI.HUD.Inventory
 {
     internal class BagHolderBox : Box
     {
         readonly Item defaultBag;
-        Item[] bags = System.Array.Empty<Item>();
+        Item[] bags = Array.Empty<Item>();
 
         public BagHolderBox(UI.UIElements.UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, new UITexture("WhiteBackground", Color.White), aPos, aSize)
         {
@@ -28,7 +29,7 @@ namespace Project_1.UI.HUD.Inventory
 
             if (aBags == null || aBags.Length <= 1)
             {
-                bags = System.Array.Empty<Item>();
+                bags = Array.Empty<Item>();
                 return;
             }
 

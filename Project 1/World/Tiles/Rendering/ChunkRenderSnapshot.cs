@@ -2,70 +2,60 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Managers;
-using GfxTexture = Project_1.Textures.Texture;
 using System;
 
 namespace Project_1.Tiles
 {
+    [Flags]
+    internal enum BlockFaceMask : byte
+    {
+        None = 0,
+        Up = 1 << 0,
+        Down = 1 << 1,
+        North = 1 << 2,
+        West = 1 << 3,
+        South = 1 << 4,
+        East = 1 << 5
+    }
+
+    internal readonly struct ChunkBlockRenderSnapshot
+    {
+        public ChunkBlockRenderSnapshot(int tileId, WorldSpace3D worldPosition, BlockFaceMask exposedFaces)
+        {
+            TileId = tileId;
+            WorldPosition = worldPosition;
+            ExposedFaces = exposedFaces;
+        }
+
+        public int TileId { get; }
+        public WorldSpace3D WorldPosition { get; }
+        public BlockFaceMask ExposedFaces { get; }
+    }
+
     internal readonly struct ChunkRenderSnapshot : IRenderSnapshot
     {
         readonly int id;
         readonly WorldSpace position;
-        readonly GfxTexture.TextureRenderSnapshot[] tiles;
+        readonly Point chunkPosition;
+        readonly ChunkBlockRenderSnapshot[] blocks;
 
-        public ChunkRenderSnapshot(int id, WorldSpace position, GfxTexture.TextureRenderSnapshot[] tiles)
+        public ChunkRenderSnapshot(int id, WorldSpace position, Point chunkPosition, ChunkBlockRenderSnapshot[] blocks)
         {
             this.id = id;
             this.position = position;
-            this.tiles = tiles ?? System.Array.Empty<GfxTexture.TextureRenderSnapshot>();
+            this.chunkPosition = chunkPosition;
+            this.blocks = blocks ?? Array.Empty<ChunkBlockRenderSnapshot>();
         }
 
         public int RenderId => id;
 
         public Rectangle WorldRectangle => new Rectangle(position.ToPoint(), Chunk.ChunkSize * Tile.Size);
+        public Point ChunkPosition => chunkPosition;
 
-        public void Draw(SpriteBatch batch)
+        public void Draw()
         {
             ThreadAffinity.AssertMainThread();
-            Rectangle cameraBounds = Camera.Camera.WorldRectangle;
-            int minI = 0;
-            int minJ = 0;
-            int maxJ = Chunk.ChunkSize.Y;
-
-            for (int i = minI; i < Chunk.ChunkSize.X; i++)
-            {
-                for (int j = minJ; j < maxJ; j++)
-                {
-                    Rectangle tileRect = new Rectangle(
-                        (int)position.X + Tile.Size.X * i,
-                        (int)position.Y + Tile.Size.Y * j,
-                        Tile.Size.X,
-                        Tile.Size.Y);
-
-                    if (tileRect.Bottom < cameraBounds.Top)
-                    {
-                        minJ = j + 1;
-                        continue;
-                    }
-                    if (tileRect.Right < cameraBounds.Left)
-                    {
-                        minI = i;
-                        break;
-                    }
-                    if (tileRect.Left > cameraBounds.Right)
-                    {
-                        return;
-                    }
-                    if (tileRect.Top > cameraBounds.Bottom)
-                    {
-                        maxJ = j;
-                        break;
-                    }
-
-                    int index = i + j * Chunk.ChunkSize.X;
-                    GfxTexture.DrawSnapshot(batch, tiles[index], new WorldSpace(tileRect.Location), Camera.Camera.WorldRectangle.Top);
-                }
-            }
+            WorldBlockRenderer.DrawBlocks(chunkPosition, blocks);
         }
 
         public void MinimapDraw(SpriteBatch batch, WorldSpace origin, AbsoluteScreenPosition minimapOffset, AbsoluteScreenPosition minimapSize)

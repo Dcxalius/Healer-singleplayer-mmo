@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 using System.Reflection.Metadata;
 
 namespace Project_1.Managers
@@ -49,6 +50,43 @@ namespace Project_1.Managers
             currentWindowSize = windowSize;
             currentRenderTargetDestination = renderTargetDestination;
             WindowLayoutChanged?.Invoke(windowSize, renderTargetDestination);
+        }
+
+        public static Point CurrentDisplayModeSize
+        {
+            get
+            {
+                if (graphicsAdapter == null) return Point.Zero;
+                return new Point(graphicsAdapter.CurrentDisplayMode.Width, graphicsAdapter.CurrentDisplayMode.Height);
+            }
+        }
+
+        public static Point[] GetSupportedFullscreenSizes()
+        {
+            if (graphicsAdapter == null) return Array.Empty<Point>();
+
+            List<Point> sizes = new List<Point>();
+            foreach (DisplayMode displayMode in graphicsAdapter.SupportedDisplayModes)
+            {
+                Point size = new Point(displayMode.Width, displayMode.Height);
+                if (sizes.Contains(size)) continue;
+                sizes.Add(size);
+            }
+
+            sizes.Sort((a, b) =>
+            {
+                long areaA = (long)a.X * a.Y;
+                long areaB = (long)b.X * b.Y;
+                int areaComparison = areaB.CompareTo(areaA);
+                if (areaComparison != 0) return areaComparison;
+
+                int widthComparison = b.X.CompareTo(a.X);
+                if (widthComparison != 0) return widthComparison;
+
+                return b.Y.CompareTo(a.Y);
+            });
+
+            return sizes.ToArray();
         }
     }
 }

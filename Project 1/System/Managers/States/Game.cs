@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects;
@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 using Project_1.Input;
 using Project_1.Camera;
 using System.Diagnostics;
+using Project_1.System.Models.BaseModels;
 
 namespace Project_1.Managers.States
 {
@@ -34,7 +35,7 @@ namespace Project_1.Managers.States
         {
             spriteBatch = GraphicsManager.CreateSpriteBatch();
 
-            renderTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize);
+            renderTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize, withDepth: true);
         }
 
         public override void Update()
@@ -89,10 +90,14 @@ namespace Project_1.Managers.States
         {
             long frameStartTicks = Stopwatch.GetTimestamp();
             UpdateVfx();
-            PrepRender(Color.White, SpriteSortMode.Immediate, samplerState: SamplerState.PointClamp); //TODO: Should this be immediate?
+            GraphicsManager.SetRenderTarget(renderTarget);
+            GraphicsManager.ClearScreen(Color.White);
+            RenderSnapshotManager.DrawTerrainSnapshots();
+            PlayerModelRenderer.DrawPlayer();
+            GraphicsManager.BeginSpriteBatch(spriteBatch, SpriteSortMode.Immediate, samplerState: SamplerState.PointClamp); //TODO: Should this be immediate?
 
             long worldStartTicks = Stopwatch.GetTimestamp();
-            DrawList(spriteBatch);
+            DrawWorld(spriteBatch);
             long worldDrawTicks = Stopwatch.GetTimestamp() - worldStartTicks;
 
             GraphicsManager.EndSpriteBatch(spriteBatch);
@@ -112,9 +117,13 @@ namespace Project_1.Managers.States
             long uiBuildStartTicks = Stopwatch.GetTimestamp();
             UIDraw();
             long uiBuildTicks = Stopwatch.GetTimestamp() - uiBuildStartTicks;
-            PrepRender(Color.White, SpriteSortMode.FrontToBack, samplerState: SamplerState.PointClamp);
+            GraphicsManager.SetRenderTarget(renderTarget);
+            GraphicsManager.ClearScreen(Color.White);
+            RenderSnapshotManager.DrawTerrainSnapshots();
+            PlayerModelRenderer.DrawPlayer();
+            GraphicsManager.BeginSpriteBatch(spriteBatch, SpriteSortMode.FrontToBack, samplerState: SamplerState.PointClamp);
             long worldStartTicks = Stopwatch.GetTimestamp();
-            DrawList(spriteBatch);
+            DrawWorld(spriteBatch);
             long worldDrawTicks = Stopwatch.GetTimestamp() - worldStartTicks;
             long compositeStartTicks = Stopwatch.GetTimestamp();
             GraphicsManager.EndSpriteBatch(spriteBatch);
@@ -146,6 +155,21 @@ namespace Project_1.Managers.States
 
             ParticleManager.Draw(aBatch);
             FloatingTextManager.Draw(aBatch);
+        }
+
+        void DrawWorld(SpriteBatch aBatch)
+        {
+            ThreadAffinity.AssertMainThread();
+            if (DebugManager.Mode(DebugMode.ModelPreview)) return;
+
+            DrawList(aBatch);
+        }
+
+        public override void Rescale()
+        {
+            ThreadAffinity.AssertMainThread();
+            base.Rescale();
+            renderTarget = GraphicsManager.CreateRenderTarget(Camera.Camera.WindowSize, withDepth: true);
         }
 
     }

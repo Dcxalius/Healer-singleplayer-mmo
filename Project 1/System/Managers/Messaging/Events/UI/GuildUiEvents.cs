@@ -1,4 +1,5 @@
 using Project_1.Textures;
+using System;
 
 namespace Project_1.Messaging.Events
 {
@@ -12,8 +13,8 @@ namespace Project_1.Messaging.Events
     {
         public GuildInviteStatusUpdated(string[] memberNames, InviteStatus[] statuses)
         {
-            MemberNames = memberNames ?? System.Array.Empty<string>();
-            Statuses = statuses ?? System.Array.Empty<InviteStatus>();
+            MemberNames = memberNames ?? Array.Empty<string>();
+            Statuses = statuses ?? Array.Empty<InviteStatus>();
         }
 
         public string[] MemberNames { get; }

@@ -23,6 +23,11 @@ namespace Project_1.UI.UIElements.SelectBoxes
             
         }
 
+        public void SetToNewText(string aText)
+        {
+            text.Value = aText;
+        }
+
         public override void Rescale()
         {
             base.Rescale();

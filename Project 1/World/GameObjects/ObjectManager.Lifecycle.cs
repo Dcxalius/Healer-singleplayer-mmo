@@ -11,6 +11,7 @@ using Project_1.Particles;
 using Project_1.Tiles;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
+using System.Collections.Generic;
 
 namespace Project_1.GameObjects
 {
@@ -21,15 +22,15 @@ namespace Project_1.GameObjects
             ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
-            entities = new System.Collections.Generic.List<Entity>();
-            guild = new System.Collections.Generic.List<Entities.Friendlies.GuildMembers.GuildMember>();
-            npcs = new System.Collections.Generic.List<Entities.Friendlies.Npcs.Npc>();
+            entities = new List<Entity>();
+            guild = new List<Entities.Friendlies.GuildMembers.GuildMember>();
+            npcs = new List<Entities.Friendlies.Npcs.Npc>();
         }
 
         public static void Update()
         {
             ThreadAffinity.AssertSimThread();
-            System.Collections.Generic.List<Entity> all = BuildAllScratch();
+            List<Entity> all = BuildAllScratch();
             for (int i = all.Count - 1; i >= 0; i--)
             {
                 all[i].Update();
@@ -50,7 +51,7 @@ namespace Project_1.GameObjects
         public static void RefreshPlates()
         {
             ThreadAffinity.AssertSimThread();
-            System.Collections.Generic.List<Entity> all = BuildAllScratch();
+            List<Entity> all = BuildAllScratch();
             for (int i = 0; i < all.Count; i++)
             {
                 all[i].RefreshPlates();

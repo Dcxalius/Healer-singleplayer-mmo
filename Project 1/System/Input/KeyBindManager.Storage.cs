@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Microsoft.Xna.Framework.Input;
 
 namespace Project_1.Input
 {
@@ -48,15 +49,63 @@ namespace Project_1.Input
         {
             string dataAsString = File.ReadAllText(aKeyBindSetting);
             KeySet[] importedBinds = SaveManager.ImportData<KeySet[]>(dataAsString);
-            if (importedBinds.Length != (int)KeyListner.Count * 2)
+            if (importedBinds == null || importedBinds.Length == 0 || importedBinds.Length % 2 != 0)
             {
-                throw new MissingDataException($"Invalid number of keybinds in both files. Expected {(int)KeyListner.Count * 2} but got {importedBinds.Length}");
+                throw new MissingDataException("Invalid keybind data.");
             }
 
-            for (int i = 0; i < (int)KeyListner.Count; i++)
+            int listenerCount = (int)KeyListner.Count;
+            int importedListenerCount = importedBinds.Length / 2;
+            bool loadingDefaultFile = string.Equals(aKeyBindSetting, SaveManager.DefaultKeyBindSettings, StringComparison.OrdinalIgnoreCase);
+            if (loadingDefaultFile && importedListenerCount != listenerCount)
             {
-                firstButtons[i] = importedBinds[i];
-                secondButtons[i] = importedBinds[i + (int)KeyListner.Count];
+                throw new MissingDataException($"Invalid number of default keybinds. Expected {listenerCount * 2} but got {importedBinds.Length}");
+            }
+
+            KeySet[] defaultBinds = loadingDefaultFile
+                ? importedBinds
+                : SaveManager.ImportData<KeySet[]>(File.ReadAllText(SaveManager.DefaultKeyBindSettings));
+            if (defaultBinds == null || defaultBinds.Length != listenerCount * 2)
+            {
+                throw new MissingDataException("Invalid default keybind data.");
+            }
+
+            for (int i = 0; i < listenerCount; i++)
+            {
+                firstButtons[i] = ResolveBinding(importedBinds, importedListenerCount, defaultBinds, listenerCount, i, false);
+                secondButtons[i] = ResolveBinding(importedBinds, importedListenerCount, defaultBinds, listenerCount, i, true);
+            }
+
+            if (!loadingDefaultFile && importedListenerCount < listenerCount)
+            {
+                MigrateLegacyBindings(defaultBinds);
+            }
+        }
+
+        static KeySet ResolveBinding(KeySet[] aImportedBinds, int aImportedListenerCount, KeySet[] aDefaultBinds, int aListenerCount, int aIndex, bool aSecondary)
+        {
+            int importedIndex = aSecondary ? aIndex + aImportedListenerCount : aIndex;
+            if (aIndex < aImportedListenerCount)
+            {
+                return aImportedBinds[importedIndex];
+            }
+
+            int defaultIndex = aSecondary ? aIndex + aListenerCount : aIndex;
+            return aDefaultBinds[defaultIndex];
+        }
+
+        static void MigrateLegacyBindings(KeySet[] aDefaultBinds)
+        {
+            int debugTeleportIndex = (int)KeyListner.DebugTeleport;
+            if (firstButtons[debugTeleportIndex].Key == Keys.Q && firstButtons[debugTeleportIndex].Modifiers.Length == 0)
+            {
+                firstButtons[debugTeleportIndex] = aDefaultBinds[debugTeleportIndex];
+            }
+
+            int rotateCameraRightIndex = (int)KeyListner.RotateCameraRight;
+            if (firstButtons[rotateCameraRightIndex].Key == Keys.R && firstButtons[rotateCameraRightIndex].Modifiers.Length == 0)
+            {
+                firstButtons[rotateCameraRightIndex] = aDefaultBinds[rotateCameraRightIndex];
             }
         }
 

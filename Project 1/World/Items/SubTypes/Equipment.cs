@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace Project_1.Items.SubTypes
 {
@@ -430,7 +431,7 @@ namespace Project_1.Items.SubTypes
                 return text ?? string.Empty;
             }
 
-            System.Text.StringBuilder builder = new System.Text.StringBuilder(text.Length + 8);
+            StringBuilder builder = new StringBuilder(text.Length + 8);
             builder.Append(text[0]);
             for (int i = 1; i < text.Length; i++)
             {

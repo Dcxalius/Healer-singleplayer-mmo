@@ -4,6 +4,7 @@ using Project_1.Managers.States;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.Tiles;
+using System;
 
 namespace Project_1.Managers
 {
@@ -26,7 +27,7 @@ namespace Project_1.Managers
             SubscribeSimCommand<SaveLoadParsed>(HandleSaveLoadParsed);
         }
 
-        static void SubscribeSimCommand<T>(System.Action<T> handler)
+        static void SubscribeSimCommand<T>(Action<T> handler)
         {
             MailboxManager.RegisterSimCommandType<T>();
             MailboxManager.Sim.Subscribe(handler);
@@ -44,9 +45,34 @@ namespace Project_1.Managers
             ThreadAffinity.AssertSimThread();
             if (string.IsNullOrWhiteSpace(e.Name) || string.IsNullOrWhiteSpace(e.ClassName)) return;
 
-            ObjectManager.CreateNewPlayer(e.Name, e.ClassName);
-            SaveManager.CreateNewSave(e.Name);
-            StateManager.SetState(StateManager.States.Game);
+            Save previousSave = SaveManager.CurrentSave;
+            Save createdSave = null;
+            MailboxManager.PublishUiEvent(new SaveDataStarted("Creating character..."));
+            try
+            {
+                ObjectManager.CreateNewPlayer(e.Name, e.ClassName);
+                createdSave = SaveManager.CreateNewSave(e.Name);
+                StateManager.SetState(StateManager.States.Game);
+                MailboxManager.PublishUiEvent(new SaveDataFinished("Character created"));
+            }
+            catch (Exception ex)
+            {
+                if (createdSave != null)
+                {
+                    SaveManager.DeleteSave(createdSave);
+                }
+
+                SaveManager.SetCurrentSave(previousSave);
+                ObjectManager.Reset();
+
+                if (SaveManager.TryBuildSaveFailureMessage(ex, out _))
+                {
+                    SaveManager.NotifySaveFailed(ex);
+                    return;
+                }
+
+                throw;
+            }
         }
 
         static void HandleSaveDataRequested()

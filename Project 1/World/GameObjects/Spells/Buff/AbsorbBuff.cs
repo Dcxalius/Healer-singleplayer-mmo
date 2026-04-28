@@ -4,6 +4,7 @@ using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.World.GameObjects.Spells.SpellEffects;
 using Project_1.World.GameObjects.Unit.Talents;
+using System;
 
 namespace Project_1.GameObjects.Spells.Buff
 {
@@ -42,7 +43,7 @@ namespace Project_1.GameObjects.Spells.Buff
             if (AbsorbEffect.SchoolFilter.HasValue && AbsorbEffect.SchoolFilter.Value != damageType)
                 return 0;
 
-            double absorbed = System.Math.Min(remainingAbsorb, incoming);
+            double absorbed = Math.Min(remainingAbsorb, incoming);
             remainingAbsorb -= absorbed;
             return absorbed;
         }

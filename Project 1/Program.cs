@@ -1,6 +1,7 @@
 namespace Project_1;
 
 using System;
+using global::System;
 using Project_1.Managers;
 
 internal static class Program

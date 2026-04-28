@@ -19,10 +19,16 @@ namespace Project_1.Managers
             return new SpriteBatch(graphicsDeviceManager.GraphicsDevice);
         }
 
-        public static RenderTarget2D CreateRenderTarget(Point aSize)
+        public static RenderTarget2D CreateRenderTarget(Point aSize, bool withDepth = false)
         {
             ThreadAffinity.AssertMainThread();
-            return new RenderTarget2D(graphicsDeviceManager.GraphicsDevice, aSize.X, aSize.Y);
+            return new RenderTarget2D(
+                graphicsDeviceManager.GraphicsDevice,
+                aSize.X,
+                aSize.Y,
+                false,
+                SurfaceFormat.Color,
+                withDepth ? DepthFormat.Depth24 : DepthFormat.None);
         }
 
         public static Texture2D CreateTextureFromFile(string aPath)

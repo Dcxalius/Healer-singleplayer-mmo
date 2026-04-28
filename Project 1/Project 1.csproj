@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
@@ -19,6 +19,7 @@
     <PackageReference Include="SpriteFontPlus.MonoGame" Version="0.7.0.22" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="artifacts\**\*.cs" />
     <Content Include="Content/Settings/**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -40,8 +41,22 @@
   <ItemGroup>
     <Content Remove="Content\Settings\Content.mgcb.backup" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="bin\**" />
+    <Compile Remove="obj\**" />
+    <Compile Remove="artifacts\**" />
+    <EmbeddedResource Remove="bin\**" />
+    <EmbeddedResource Remove="obj\**" />
+    <EmbeddedResource Remove="artifacts\**" />
+    <None Remove="bin\**" />
+    <None Remove="obj\**" />
+    <None Remove="artifacts\**" />
+    <Content Remove="bin\**" />
+    <Content Remove="obj\**" />
+    <Content Remove="artifacts\**" />
+  </ItemGroup>
   <Target Name="BuildMonoGameContent" BeforeTargets="Build">
-    <Exec Command="dotnet mgcb --@=&quot;$(MSBuildProjectDirectory)/Content/Content.mgcb&quot; --platform=DesktopGL --outputDir=&quot;$(TargetDir)Content&quot; --intermediateDir=&quot;$(MSBuildProjectDirectory)/Content/obj/DesktopGL/$(TargetFramework)/Content&quot; --workingDir=&quot;$(MSBuildProjectDirectory)/Content&quot; --quiet" />
+    <Exec Command="dotnet mgcb --@=&quot;$(MSBuildProjectDirectory)/Content/Content.mgcb&quot; --platform=DesktopGL --outputDir=&quot;$(TargetDir)Content&quot; --intermediateDir=&quot;$(MSBuildProjectDirectory)/Content/obj/DesktopGL/$(TargetFramework)/Content&quot; --workingDir=&quot;$(MSBuildProjectDirectory)/Content&quot;" />
   </Target>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
     <Message Text="Restoring dotnet tools" Importance="High" />

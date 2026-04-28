@@ -5,6 +5,7 @@ using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.HUD.Inventory;
 using Project_1.UI.UIElements;
+using System;
 
 namespace Project_1.UI.HUD.Windows
 {
@@ -47,7 +48,7 @@ namespace Project_1.UI.HUD.Windows
         {
             if (aItems == null) return;
 
-            int count = System.Math.Min(aItems.Length, equippedItems.Length);
+            int count = Math.Min(aItems.Length, equippedItems.Length);
             for (int i = 0; i < count; i++)
             {
                 equippedItems[i].AssignItem(aItems[i]);

@@ -129,7 +129,7 @@ namespace Project_1.UI.HUD.Managers
             minimap = new Minimap(new RelativeScreenPosition(0.75f, 0.05f), mmSize);
             hudElements.Add(minimap);
 
-            RelativeScreenPosition saveSize = RelativeScreenPosition.GetSquareFromX(0.03f);
+            RelativeScreenPosition saveSize = new RelativeScreenPosition(0.24f, 0.045f);
             RelativeScreenPosition savePos = RelativeScreenPosition.One - saveSize - new RelativeScreenPosition(0.02f, 0.02f);
             saveStatusIndicator = new SaveStatusIndicator(savePos, saveSize);
             hudElements.Add(saveStatusIndicator);

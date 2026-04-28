@@ -2,9 +2,11 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
+using Project_1.GameObjects;
 using Project_1.Managers.Saves;
 using Project_1.Messaging;
 using Project_1.Textures;
+using Project_1.Tiles;
 using Project_1.UI;
 
 namespace Project_1.Managers
@@ -146,7 +148,29 @@ namespace Project_1.Managers
                 $"  Shadow draw calls last/avg/max: {shadowStats.LastDrawCalls,4} / {shadowStats.AvgDrawCalls,4:0.0} / {shadowStats.MaxDrawCalls,4}\n" +
                 $"  Diagnostics preview/magenta: {(Mode(DebugMode.ShadowMaskPreview) ? "on" : "off")} / {(Mode(DebugMode.ShadowMagentaClear) ? "on" : "off")}";
 
+            if (Mode(DebugMode.ModelPreview))
+            {
+                renderSyncText.Value += BuildModelPreviewOverlayText();
+            }
+
             EmitDiagnosticsWarnings(mainStats, uiStats, simStats, workerStats, simThreadStats, uiThreadStats, renderSyncStats, renderStats, shadowStats);
+        }
+
+        static string BuildModelPreviewOverlayText()
+        {
+            var player = ObjectManager.Player;
+            if (player == null) return "\nModel Preview\n  Player: <none>";
+
+            WorldSpace3D playerWorldPosition = WorldBlockRenderer.ResolvePreviewWorldPosition(player.FeetPosition);
+            string topDirection = WorldBlockRenderer.ResolveCompassName(WorldBlockRenderer.CameraGroundForward);
+            string rightDirection = WorldBlockRenderer.ResolveCompassName(WorldBlockRenderer.CameraGroundRight);
+            float yawDegrees = MathHelper.ToDegrees(WorldBlockRenderer.CameraYawRadians);
+
+            return
+                "\nModel Preview\n" +
+                $"  Top/Right: {topDirection} / {rightDirection}\n" +
+                $"  Camera yaw/zoom: {yawDegrees,6:0.0} deg / {WorldBlockRenderer.CameraZoom,4:0.00}\n" +
+                $"  Player 3D XYZ: {playerWorldPosition.X,6:0.00}, {playerWorldPosition.Y,6:0.00}, {playerWorldPosition.Z,6:0.00}";
         }
 
         static void EmitDiagnosticsWarnings(

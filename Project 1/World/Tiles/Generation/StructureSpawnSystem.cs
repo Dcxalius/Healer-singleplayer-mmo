@@ -33,15 +33,15 @@ namespace Project_1.Tiles
             public Point CenterTile { get; }
         }
 
-        public static void ApplyToChunkTiles(int chunkId, int[,] tileIds)
+        public static void ApplyToChunkBlocks(int chunkId, Block[,,] blocks)
         {
-            if (tileIds == null) return;
+            if (blocks == null) return;
             int dirtId = TileFactory.GetTileData("Dirt").ID;
             List<CampPlacement> camps = GetCampPlacements(chunkId);
 
             for (int i = 0; i < camps.Count; i++)
             {
-                StampCamp(tileIds, camps[i], dirtId);
+                StampCamp(blocks, camps[i], dirtId);
             }
         }
 
@@ -58,7 +58,7 @@ namespace Project_1.Tiles
 
         static List<CampPlacement> GetCampPlacements(int chunkId)
         {
-            Point chunkPos = Chunk.GetChunkPosition(chunkId);
+            Point chunkPos = ChunkAddressing.GetChunkPosition(chunkId);
             int seed = HashCode.Combine(chunkId, chunkPos.X, chunkPos.Y, 14891);
             Random rng = new Random(seed);
             int desiredCampCount = rng.Next(5);
@@ -98,7 +98,7 @@ namespace Project_1.Tiles
             return true;
         }
 
-        static void StampCamp(int[,] tileIds, CampPlacement camp, int dirtId)
+        static void StampCamp(Block[,,] blocks, CampPlacement camp, int dirtId)
         {
             Point center = camp.CenterTile;
             for (int x = center.X - 3; x <= center.X + 3; x++)
@@ -110,7 +110,20 @@ namespace Project_1.Tiles
                     int dx = Math.Abs(x - center.X);
                     int dy = Math.Abs(y - center.Y);
                     if (dx == 3 && dy == 3) continue;
-                    tileIds[x, y] = dirtId;
+
+                    bool replaced = false;
+                    for (int z = Chunk.ChunkHeight - 1; z >= 0; z--)
+                    {
+                        if (blocks[x, y, z] == null) continue;
+                        blocks[x, y, z] = BlockTileBridge.CreateBlockFromTileId(dirtId);
+                        replaced = true;
+                        break;
+                    }
+
+                    if (!replaced)
+                    {
+                        blocks[x, y, 0] = BlockTileBridge.CreateBlockFromTileId(dirtId);
+                    }
                 }
             }
         }

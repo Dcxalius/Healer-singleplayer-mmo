@@ -8,6 +8,7 @@ using Project_1.GameObjects.Unit;
 using Project_1.Managers;
 using Project_1.Tiles;
 using Project_1.GameObjects.Entities.Friendlies.Players;
+using Path = System.IO.Path;
 
 namespace Project_1.Managers.Saves
 {
@@ -59,7 +60,7 @@ namespace Project_1.Managers.Saves
 
             if (PlayerData != null)
             {
-                SaveManager.ExportData(System.IO.Path.Combine(Save.Units, "PlayerData.unit"), PlayerData);
+                SaveManager.ExportData(Path.Combine(Save.Units, "PlayerData.unit"), PlayerData);
             }
 
             Save.ClearFolder(Save.Guild);
@@ -68,7 +69,7 @@ namespace Project_1.Managers.Saves
                 for (int i = 0; i < GuildData.Length; i++)
                 {
                     if (GuildData[i] == null) continue;
-                    SaveManager.ExportData(System.IO.Path.Combine(Save.Guild, GuildData[i].Name + ".unit"), GuildData[i]);
+                    SaveManager.ExportData(Path.Combine(Save.Guild, GuildData[i].Name + ".unit"), GuildData[i]);
                 }
             }
 
@@ -77,7 +78,7 @@ namespace Project_1.Managers.Saves
                 for (int i = 0; i < Chunks.Length; i++)
                 {
                     if (Chunks[i] == null) continue;
-                    SaveManager.ExportData(System.IO.Path.Combine(Save.Tiles, Chunks[i].Id + ".tilemap"), Chunks[i]);
+                    SaveManager.ExportData(Path.Combine(Save.Tiles, Chunks[i].Id + ".tilemap"), Chunks[i]);
                 }
             }
 
@@ -87,7 +88,7 @@ namespace Project_1.Managers.Saves
                 for (int i = 0; i < Corpses.Length; i++)
                 {
                     if (Corpses[i] == null) continue;
-                    SaveManager.ExportData(System.IO.Path.Combine(Save.Corpses, i + ".corpse"), Corpses[i]);
+                    SaveManager.ExportData(Path.Combine(Save.Corpses, i + ".corpse"), Corpses[i]);
                 }
             }
 
@@ -97,7 +98,7 @@ namespace Project_1.Managers.Saves
                 for (int i = 0; i < SpawnZones.Length; i++)
                 {
                     if (SpawnZones[i] == null) continue;
-                    SaveManager.ExportData(System.IO.Path.Combine(Save.SpawnZones, i + ".spawn"), SpawnZones[i]);
+                    SaveManager.ExportData(Path.Combine(Save.SpawnZones, i + ".spawn"), SpawnZones[i]);
                 }
             }
 
@@ -119,7 +120,7 @@ namespace Project_1.Managers.Saves
                     {
                         savedMobNames.Add(name, 1);
                     }
-                    SaveManager.ExportData(System.IO.Path.Combine(Save.NonFriendly, name + nrOfCopies + ".unit"), data);
+                    SaveManager.ExportData(Path.Combine(Save.NonFriendly, name + nrOfCopies + ".unit"), data);
                 }
             }
         }

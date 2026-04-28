@@ -17,14 +17,15 @@ namespace Project_1.Tiles
             }
         }
 
-        internal static void DrawSnapshots(SpriteBatch aBatch)
+        internal static void DrawSnapshots()
         {
             ThreadAffinity.AssertMainThread();
             renderChunks.ApplyUpdates();
+            WorldBlockRenderer.PrepareFrame();
             foreach (ChunkRenderSnapshot chunk in renderChunks.Values)
             {
-                if (!Camera.Camera.WorldspaceBoundsCheck(chunk.WorldRectangle)) continue;
-                chunk.Draw(aBatch);
+                if (!WorldBlockRenderer.ShouldDrawChunk(chunk.ChunkPosition)) continue;
+                chunk.Draw();
             }
         }
 

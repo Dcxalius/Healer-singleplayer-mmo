@@ -1,4 +1,5 @@
 using Project_1.Textures;
+using System;
 
 namespace Project_1.Messaging.Events
 {
@@ -36,7 +37,7 @@ namespace Project_1.Messaging.Events
     {
         public SpellTrainingOpened(SpellTrainingEntrySnapshot[] entries, string trainerName)
         {
-            Entries = entries ?? System.Array.Empty<SpellTrainingEntrySnapshot>();
+            Entries = entries ?? Array.Empty<SpellTrainingEntrySnapshot>();
             TrainerName = trainerName ?? string.Empty;
         }
 

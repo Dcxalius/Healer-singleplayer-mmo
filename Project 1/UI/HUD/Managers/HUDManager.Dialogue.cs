@@ -3,6 +3,7 @@ using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.UIElements.Boxes;
 using System.Collections.Generic;
+using System;
 
 namespace Project_1.UI.HUD.Managers
 {
@@ -19,7 +20,7 @@ namespace Project_1.UI.HUD.Managers
         {
             AssertUiThreadOrMainFallback();
             UITexture background = e.Background == null ? UITexture.Null : new UITexture(e.Background, Color.White);
-            DialogueBox box = new DialogueBox(null, e.Text, e.TextColor, e.Location.ToDialogueBoxLocation(), e.Pauses.ToDialogueBoxPause(), new List<System.Action>(), background, e.Pos, e.Size, e.CloseText);
+            DialogueBox box = new DialogueBox(null, e.Text, e.TextColor, e.Location.ToDialogueBoxLocation(), e.Pauses.ToDialogueBoxPause(), new List<Action>(), background, e.Pos, e.Size, e.CloseText);
             dialogueBoxes.Add(box);
             InvalidateUi();
         }

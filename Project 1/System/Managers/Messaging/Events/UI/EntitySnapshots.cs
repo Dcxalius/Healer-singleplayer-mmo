@@ -21,7 +21,8 @@ namespace Project_1.Messaging.Events
             float maxResource,
             Color resourceColor,
             WorldSpace feetPosition,
-            int worldHeight)
+            int worldHeight,
+            WorldSpace3D namePlateAnchorWorldPosition)
         {
             RenderId = renderId;
             Name = name;
@@ -36,6 +37,7 @@ namespace Project_1.Messaging.Events
             ResourceColor = resourceColor;
             FeetPosition = feetPosition;
             WorldHeight = worldHeight;
+            NamePlateAnchorWorldPosition = namePlateAnchorWorldPosition;
         }
 
         public int RenderId { get; }
@@ -51,6 +53,7 @@ namespace Project_1.Messaging.Events
         public Color ResourceColor { get; }
         public WorldSpace FeetPosition { get; }
         public int WorldHeight { get; }
+        public WorldSpace3D NamePlateAnchorWorldPosition { get; }
     }
 
     internal readonly struct SpellUiSnapshot

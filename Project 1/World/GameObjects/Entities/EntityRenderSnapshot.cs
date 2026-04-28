@@ -7,6 +7,7 @@ using Project_1.UI.UIElements;
 using Project_1.Tiles;
 using Project_1.Textures;
 using Project_1.GameObjects;
+using System;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -84,8 +85,8 @@ namespace Project_1.GameObjects.Entities
 
         static Point ScaledSize(Point rawSize)
         {
-            return new Point((int)System.Math.Ceiling(rawSize.X * Camera.Camera.Scale),
-                (int)System.Math.Ceiling(rawSize.Y * Camera.Camera.Scale));
+            return new Point((int)Math.Ceiling(rawSize.X * Camera.Camera.Scale),
+                (int)Math.Ceiling(rawSize.Y * Camera.Camera.Scale));
         }
 
         void DrawShadow(SpriteBatch batch, Rectangle screenRect)

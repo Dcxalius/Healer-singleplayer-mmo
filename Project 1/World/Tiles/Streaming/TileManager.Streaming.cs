@@ -2,11 +2,13 @@ using Microsoft.Xna.Framework;
 using Project_1.GameObjects;
 using Project_1.Managers;
 using Project_1.Managers.Saves;
+using Project_1.WorldGeneration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using System.Threading;
+using System.IO;
 
 namespace Project_1.Tiles
 {
@@ -18,7 +20,7 @@ namespace Project_1.Tiles
             const int surroundingChunkCheckSize = 3;
             Debug.Assert(surroundingChunkCheckSize % 2 == 1);
             const int maxQueuedPrefetch = 4;
-            int centreChunkId = Chunk.GetChunkId(
+            int centreChunkId = ChunkAddressing.GetChunkId(
                 (int)MathF.Floor(ObjectManager.Player.FeetPosition.X / Tile.Size.X / Chunk.ChunkSize.X),
                 (int)MathF.Floor(ObjectManager.Player.FeetPosition.Y / Tile.Size.Y / Chunk.ChunkSize.Y));
             Chunk centreChunk = EnsureChunkLoaded(centreChunkId);
@@ -32,7 +34,7 @@ namespace Project_1.Tiles
                 for (int y = -immediateRadius; y <= immediateRadius; y++)
                 {
                     if (x == 0 && y == 0) continue;
-                    int newId = Chunk.GetChunkId(centreChunkPos + new Point(x, y));
+                    int newId = ChunkAddressing.GetChunkId(centreChunkPos + new Point(x, y));
                     EnsureChunkLoaded(newId);
                 }
             }
@@ -44,7 +46,7 @@ namespace Project_1.Tiles
                     for (int y = -prefetchRadius; y <= prefetchRadius && queuedPrefetch < maxQueuedPrefetch; y++)
                     {
                         if (Math.Abs(x) <= immediateRadius && Math.Abs(y) <= immediateRadius) continue;
-                        int id = Chunk.GetChunkId(centreChunkPos + new Point(x, y));
+                        int id = ChunkAddressing.GetChunkId(centreChunkPos + new Point(x, y));
                         if (IsChunkAvailable(id)) continue;
 
                         GetOrQueueChunkBuild(id);
@@ -59,11 +61,12 @@ namespace Project_1.Tiles
         public static void New()
         {
             ThreadAffinity.AssertSimThread();
+            NodeWorldManager.GenerateNewWorld();
             TileRenderCache.ResetMinimapSnapshotTracking();
             ClearRenderCache();
             chunks.Clear();
             ResetChunkBuildState();
-            chunks[0] = CreateStructuredChunk(0, Chunk.GenerateTileIds(0));
+            chunks[0] = CreateStructuredChunk(0, ChunkGenerator.GenerateBlocks(0));
         }
 
         public static void Load(Save aSave)
@@ -74,10 +77,10 @@ namespace Project_1.Tiles
             chunks.Clear();
             ResetChunkBuildState();
 
-            string[] files = System.IO.Directory.GetFiles(aSave.Tiles);
+            string[] files = Directory.GetFiles(aSave.Tiles);
             for (int i = 0; i < files.Length; i++)
             {
-                string json = System.IO.File.ReadAllText(files[i]);
+                string json = File.ReadAllText(files[i]);
                 Chunk chunk = SaveManager.ImportData<Chunk>(json);
                 int id = int.Parse(SaveManager.TrimToNameOnly(files[i]));
                 chunks[id] = chunk;
@@ -124,7 +127,7 @@ namespace Project_1.Tiles
         {
             try
             {
-                Chunk chunk = CreateStructuredChunk(chunkId, Chunk.GenerateTileIds(chunkId));
+                Chunk chunk = CreateStructuredChunk(chunkId, ChunkGenerator.GenerateBlocks(chunkId));
                 if (buildJob.Epoch == Volatile.Read(ref chunkBuildEpoch))
                 {
                     unpublishedChunks[chunkId] = chunk;
@@ -202,7 +205,7 @@ namespace Project_1.Tiles
                     try
                     {
                         if (chunks.TryGetValue(chunkId, out existing)) return existing;
-                        Chunk synchronousChunk = CreateStructuredChunk(chunkId, Chunk.GenerateTileIds(chunkId));
+                        Chunk synchronousChunk = CreateStructuredChunk(chunkId, ChunkGenerator.GenerateBlocks(chunkId));
                         chunks[chunkId] = synchronousChunk;
                         return synchronousChunk;
                     }

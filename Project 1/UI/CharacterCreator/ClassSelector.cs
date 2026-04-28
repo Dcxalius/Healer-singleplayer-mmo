@@ -4,6 +4,7 @@ using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.UI.UIElements.Boxes;
 using System;
+using System.IO;
 
 namespace Project_1.UI.CharacterCreator
 {
@@ -18,7 +19,7 @@ namespace Project_1.UI.CharacterCreator
             if (initialized) return;
             initialized = true;
             string root = Game1.ContentManager.RootDirectory;
-            classNames = System.IO.Directory.GetFiles(root + "\\Data\\Class\\Player");
+            classNames = Directory.GetFiles(root + "\\Data\\Class\\Player");
             for (int i = 0; i < classNames.Length; i++)
             {
                 classNames[i] = SaveManager.TrimToNameOnly(classNames[i]);

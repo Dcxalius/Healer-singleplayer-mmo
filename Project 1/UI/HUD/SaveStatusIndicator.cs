@@ -1,25 +1,38 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Managers;
 using Project_1.Textures;
-using Project_1.UI.UIElements;
+using Project_1.UI.UIElements.Boxes;
 
 namespace Project_1.UI.HUD
 {
-    internal class SaveStatusIndicator : UIElement
+    internal class SaveStatusIndicator : Box
     {
         const double SavedDisplayMs = 5000d;
+        const double FailedDisplayMs = 7000d;
+        static readonly Color SavingColor = new Color(45, 45, 45, 210);
+        static readonly Color SavedColor = new Color(45, 120, 65, 220);
+        static readonly Color FailedColor = new Color(155, 55, 55, 220);
+        static readonly RelativeScreenPosition IconRelativePos = new RelativeScreenPosition(0.04f, 0.15f);
+        static readonly RelativeScreenPosition IconRelativeSize = new RelativeScreenPosition(0.14f, 0.7f);
+        static readonly RelativeScreenPosition TextRelativePos = new RelativeScreenPosition(0.24f, 0f);
 
-        readonly UITexture savingTexture;
-        readonly UITexture savedTexture;
+        readonly UITexture savingTexture = new UITexture("LeftSwirl", Color.White);
+        readonly UITexture savedTexture = new UITexture("CheckMark", Color.White);
+        readonly UITexture failedTexture = new UITexture("LeftSwirl", Color.IndianRed);
+        readonly Text statusText = new Text("Comfortaa-msdf", Color.White, 12f);
+
+        UITexture currentIcon;
         int activeSaves;
-        double savedUntilMs;
+        double stateUntilMs;
+        bool pendingFailure;
+        string pendingFailureMessage;
 
         public SaveStatusIndicator(RelativeScreenPosition aPos, RelativeScreenPosition aSize)
-            : base(null, new UITexture("LeftSwirl", Color.White), aPos, aSize)
+            : base(null, new UITexture("GrayBackground", SavingColor), aPos, aSize)
         {
-            savingTexture = gfx;
-            savedTexture = new UITexture("CheckMark", Color.White);
+            currentIcon = savingTexture;
             Visible = false;
             Dragable = false;
             capturesClick = false;
@@ -29,22 +42,40 @@ namespace Project_1.UI.HUD
             AlwaysOnScreen = true;
         }
 
-        public void NotifySaveStarted()
+        public void NotifySaveStarted(string message)
         {
-            activeSaves++;
-            savedUntilMs = 0;
-            gfx = savingTexture;
-            Visible = true;
-        }
-
-        public void NotifySaveFinished()
-        {
-            if (activeSaves > 0) activeSaves--;
             if (activeSaves == 0)
             {
-                savedUntilMs = TimeManager.InstanceTotalFrameTimeAsTimeSpan.TotalMilliseconds + SavedDisplayMs;
-                gfx = savedTexture;
-                Visible = true;
+                pendingFailure = false;
+                pendingFailureMessage = null;
+            }
+
+            activeSaves++;
+            stateUntilMs = 0;
+            ShowSaving(message);
+        }
+
+        public void NotifySaveFinished(string message)
+        {
+            if (activeSaves > 0) activeSaves--;
+            if (activeSaves != 0) return;
+            if (pendingFailure)
+            {
+                ShowFailed(pendingFailureMessage);
+                return;
+            }
+
+            ShowSaved(message);
+        }
+
+        public void NotifySaveFailed(string message)
+        {
+            if (activeSaves > 0) activeSaves--;
+            pendingFailure = true;
+            pendingFailureMessage = string.IsNullOrWhiteSpace(message) ? "Save failed" : message;
+            if (activeSaves == 0)
+            {
+                ShowFailed(pendingFailureMessage);
             }
         }
 
@@ -53,30 +84,81 @@ namespace Project_1.UI.HUD
             ThreadAffinity.AssertUiThread();
             if (activeSaves > 0)
             {
-                if (!ReferenceEquals(gfx, savingTexture))
-                {
-                    gfx = savingTexture;
-                }
                 Visible = true;
                 return;
             }
 
-            if (savedUntilMs > 0)
+            if (stateUntilMs > 0)
             {
                 double now = TimeManager.InstanceTotalFrameTimeAsTimeSpan.TotalMilliseconds;
-                if (now <= savedUntilMs)
+                if (now <= stateUntilMs)
                 {
-                    if (!ReferenceEquals(gfx, savedTexture))
-                    {
-                        gfx = savedTexture;
-                    }
                     Visible = true;
                     return;
                 }
-                savedUntilMs = 0;
+
+                stateUntilMs = 0;
             }
 
             Visible = false;
+        }
+
+        public override void Rescale()
+        {
+            base.Rescale();
+            statusText.Rescale();
+        }
+
+        public override void Draw(SpriteBatch aBatch)
+        {
+            ThreadAffinity.AssertMainThread();
+            if (!Visible) return;
+
+            base.Draw(aBatch);
+            if (currentIcon != null)
+            {
+                currentIcon.Draw(aBatch, BuildIconRectangle());
+            }
+
+            statusText.CentreLeftDraw(aBatch, BuildTextAnchor());
+        }
+
+        Rectangle BuildIconRectangle()
+        {
+            AbsoluteScreenPosition iconLocation = Location + (IconRelativePos * Size.ToRelativeScreenPosition()).ToAbsoluteScreenPos();
+            AbsoluteScreenPosition iconSize = (IconRelativeSize * Size.ToRelativeScreenPosition()).ToAbsoluteScreenPos();
+            return new Rectangle(iconLocation, iconSize);
+        }
+
+        AbsoluteScreenPosition BuildTextAnchor()
+        {
+            return Location + (TextRelativePos * Size.ToRelativeScreenPosition()).ToAbsoluteScreenPos() + new AbsoluteScreenPosition(0, Size.Y / 2);
+        }
+
+        void ShowSaving(string message)
+        {
+            gfx.Color = SavingColor;
+            currentIcon = savingTexture;
+            statusText.Value = string.IsNullOrWhiteSpace(message) ? "Saving..." : message;
+            Visible = true;
+        }
+
+        void ShowSaved(string message)
+        {
+            gfx.Color = SavedColor;
+            currentIcon = savedTexture;
+            statusText.Value = string.IsNullOrWhiteSpace(message) ? "Saved" : message;
+            stateUntilMs = TimeManager.InstanceTotalFrameTimeAsTimeSpan.TotalMilliseconds + SavedDisplayMs;
+            Visible = true;
+        }
+
+        void ShowFailed(string message)
+        {
+            gfx.Color = FailedColor;
+            currentIcon = failedTexture;
+            statusText.Value = string.IsNullOrWhiteSpace(message) ? "Save failed" : message;
+            stateUntilMs = TimeManager.InstanceTotalFrameTimeAsTimeSpan.TotalMilliseconds + FailedDisplayMs;
+            Visible = true;
         }
     }
 }

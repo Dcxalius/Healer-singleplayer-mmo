@@ -1,5 +1,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Managers;
+using System;
+using System.Diagnostics;
 
 namespace Project_1.UI.UIElements
 {
@@ -32,9 +34,11 @@ namespace Project_1.UI.UIElements
             if (children.Count == 0) return;
             //TODO: Lock this or change draw system
             GraphicsManager.CaptureScissor(this, AbsolutePos);
-            foreach (UIElement child in children)
+            try
             {
-                //TODO: This collection is not thread safe, we should lock it or change the draw system
+                foreach (UIElement child in children)
+                {
+                    //TODO: This collection is not thread safe, we should lock it or change the draw system
                     /*System.InvalidOperationException
                     HResult=0x80131509
                     Message=Collection was modified; enumeration operation may not execute.
@@ -54,10 +58,21 @@ namespace Project_1.UI.UIElements
                     at Microsoft.Xna.Framework.SdlGamePlatform.RunLoop()
                     at Microsoft.Xna.Framework.Game.Run(GameRunBehavior runBehavior)
                     at Project_1.Program.Main(String[] args) in C:\Users\Cassandra\source\repos\Project 1\Project 1\Program.cs:line 16*/
-                child.Draw(aBatch);
-}
-
-GraphicsManager.ReleaseScissor(this);
-}
-}
+                    try
+                    {
+                        child.Draw(aBatch);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"UI child draw failed '{child?.GetType().Name ?? "<null>"}': {ex.GetType().Name}: {ex.Message}");
+                        Debug.WriteLine($"UI child draw failed '{child?.GetType().Name ?? "<null>"}' and was skipped: {ex}");
+                    }
+                }
+            }
+            finally
+            {
+                GraphicsManager.ReleaseScissor(this);
+            }
+        }
+    }
 }

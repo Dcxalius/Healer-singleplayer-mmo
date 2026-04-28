@@ -1,7 +1,9 @@
 using Project_1.GameObjects.Doodads;
 using Project_1.Managers;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -59,8 +61,8 @@ namespace Project_1.Tiles
         public static Chunk[] GetChunksSnapshot()
         {
             ThreadAffinity.AssertSimThread();
-            if (chunks == null || chunks.Count == 0) return System.Array.Empty<Chunk>();
-            return System.Linq.Enumerable.ToArray(chunks.Values);
+            if (chunks == null || chunks.Count == 0) return Array.Empty<Chunk>();
+            return Enumerable.ToArray(chunks.Values);
         }
     }
 }

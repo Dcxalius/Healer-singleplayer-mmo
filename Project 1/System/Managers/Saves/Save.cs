@@ -22,6 +22,7 @@ namespace Project_1.Managers.Saves
         static int currentVersion = 0; //TODO: Increment this whenever major changes to the save system is implemented
         public string Name => name;
         string name;
+        bool isDeleted;
         public int Version => version;
         public string nameAsPath => contentRootDirectory + name.ToUpper();
 
@@ -64,12 +65,16 @@ namespace Project_1.Managers.Saves
             }
             else
             {
-                CreateNewSaveFolder();
-
-                SaveData();
-                //saveDetails = new SaveDetails(name, "className", 0);
-                //SaveManager.ExportData(SaveDetailsPath, saveDetails);
-                //Camera.Camera.Save(this);
+                try
+                {
+                    CreateNewSaveFolder();
+                    SaveData();
+                }
+                catch
+                {
+                    DeleteFiles();
+                    throw;
+                }
             }
         }
 
@@ -81,24 +86,28 @@ namespace Project_1.Managers.Saves
             TimeSpan timeSpan = TimeManager.TotalFrameTimeAsTimeSpan;
             saveDetails = new SaveDetails(name, className, level, timeSpan);
             SaveManager.ExportData(SaveDetailsPath, saveDetails);
-            if (ThreadAffinity.IsMainThread)
-            {
-                SaveScreenshot();
-            }
-            else
-            {
-                SaveManager.RequestScreenshot(this);
-            }
         }
 
         internal void SaveScreenshot()
         {
             ThreadAffinity.AssertMainThread();
+            if (isDeleted || !Directory.Exists(nameAsPath)) return;
             AbsoluteScreenPosition windowSize = Camera.Camera.WindowSize;
-            using Stream imageStream = File.Create(ImagePath);
-            if (StateManager.FinalGameFrame != null)
+            try
             {
-                StateManager.FinalGameFrame.SaveAsPng(imageStream, windowSize.X, windowSize.Y);
+                using Stream imageStream = File.Create(ImagePath);
+                if (StateManager.FinalGameFrame != null)
+                {
+                    StateManager.FinalGameFrame.SaveAsPng(imageStream, windowSize.X, windowSize.Y);
+                }
+            }
+            catch
+            {
+                if (File.Exists(ImagePath))
+                {
+                    File.Delete(ImagePath);
+                }
+                throw;
             }
         }
 
@@ -113,6 +122,14 @@ namespace Project_1.Managers.Saves
             TileManager.SaveData(this);
             SpawnerManager.SaveData(this);
             //TimeManager.Save(this); //Done through savedetails atm
+            if (ThreadAffinity.IsMainThread)
+            {
+                SaveScreenshot();
+            }
+            else
+            {
+                SaveManager.RequestScreenshot(this);
+            }
         }
 
         public void ClearFolder(string aPath)
@@ -123,22 +140,29 @@ namespace Project_1.Managers.Saves
             }
         }
 
+        internal void DeleteFiles()
+        {
+            isDeleted = true;
+            if (!Directory.Exists(nameAsPath)) return;
+            Directory.Delete(nameAsPath, true);
+        }
+
         void CreateNewSaveFolder()
         {
-            if (System.IO.Directory.Exists(nameAsPath)) return;
+            if (Directory.Exists(nameAsPath)) return;
             //TODO: Load version from file
             version = 0;
-            System.IO.Directory.CreateDirectory(nameAsPath);
-            System.IO.Directory.CreateDirectory(World);
-            System.IO.Directory.CreateDirectory(SpawnZones);
-            System.IO.Directory.CreateDirectory(Tiles);
+            Directory.CreateDirectory(nameAsPath);
+            Directory.CreateDirectory(World);
+            Directory.CreateDirectory(SpawnZones);
+            Directory.CreateDirectory(Tiles);
 
-            System.IO.Directory.CreateDirectory(Units);
-            System.IO.Directory.CreateDirectory(Guild);
-            System.IO.Directory.CreateDirectory(InWorld);
-            System.IO.Directory.CreateDirectory(Friendly);
-            System.IO.Directory.CreateDirectory(NonFriendly);
-            System.IO.Directory.CreateDirectory(Corpses);
+            Directory.CreateDirectory(Units);
+            Directory.CreateDirectory(Guild);
+            Directory.CreateDirectory(InWorld);
+            Directory.CreateDirectory(Friendly);
+            Directory.CreateDirectory(NonFriendly);
+            Directory.CreateDirectory(Corpses);
         }
 
         bool VersionCheck(int aVersion)

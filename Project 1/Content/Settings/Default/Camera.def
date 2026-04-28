@@ -1,0 +1,8 @@
+{
+  "followSetting": "RectangleSoftBound",
+  "windowSize": {
+    "X": 1500,
+    "Y": 900
+  },
+  "fullscreen": "Windowed"
+}

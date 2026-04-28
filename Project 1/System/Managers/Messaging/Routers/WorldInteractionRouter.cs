@@ -13,6 +13,7 @@ using Project_1.Managers.States;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.Tiles;
+using System;
 
 namespace Project_1.GameObjects
 {
@@ -40,7 +41,7 @@ namespace Project_1.GameObjects
             SubscribeSimCommand<InteractRequested>(HandleInteractRequested);
         }
 
-        static void SubscribeSimCommand<T>(System.Action<T> handler)
+        static void SubscribeSimCommand<T>(Action<T> handler)
         {
             MailboxManager.RegisterSimCommandType<T>();
             MailboxManager.Sim.Subscribe(handler);

@@ -74,26 +74,28 @@ namespace Project_1.Managers
 
         static void ApplyWindowSize(Point aSize, CameraSettings.WindowType aFullscreen)
         {
-            if (!AllowedSize(aSize))
-            {
-                return;
-            }
-
+            Point appliedSize;
             Rectangle renderTargetDestination;
-            if (aFullscreen <= CameraSettings.WindowType.Borderless)
+            if (aFullscreen == CameraSettings.WindowType.Fullscreen)
             {
-                graphicsDeviceManager.PreferredBackBufferWidth = graphicsAdapter.CurrentDisplayMode.Width;
-                graphicsDeviceManager.PreferredBackBufferHeight = graphicsAdapter.CurrentDisplayMode.Height;
-                renderTargetDestination = GetRenderTargetDestination(
-                    Camera.Camera.ScreenRectangle.Size,
-                    graphicsDeviceManager.PreferredBackBufferWidth,
-                    graphicsDeviceManager.PreferredBackBufferHeight);
+                appliedSize = NormalizeFullscreenSize(aSize);
+                graphicsDeviceManager.PreferredBackBufferWidth = appliedSize.X;
+                graphicsDeviceManager.PreferredBackBufferHeight = appliedSize.Y;
+                renderTargetDestination = new Rectangle(Point.Zero, appliedSize);
+            }
+            else if (aFullscreen == CameraSettings.WindowType.Borderless)
+            {
+                appliedSize = CurrentDisplayModeSize;
+                graphicsDeviceManager.PreferredBackBufferWidth = appliedSize.X;
+                graphicsDeviceManager.PreferredBackBufferHeight = appliedSize.Y;
+                renderTargetDestination = new Rectangle(Point.Zero, appliedSize);
             }
             else
             {
-                graphicsDeviceManager.PreferredBackBufferWidth = aSize.X;
-                graphicsDeviceManager.PreferredBackBufferHeight = aSize.Y;
-                renderTargetDestination = new Rectangle(0, 0, aSize.X, aSize.Y);
+                appliedSize = NormalizeAllowedSize(aSize);
+                graphicsDeviceManager.PreferredBackBufferWidth = appliedSize.X;
+                graphicsDeviceManager.PreferredBackBufferHeight = appliedSize.Y;
+                renderTargetDestination = new Rectangle(Point.Zero, appliedSize);
             }
 
             switch (aFullscreen)
@@ -115,11 +117,44 @@ namespace Project_1.Managers
             fullscreen = aFullscreen != CameraSettings.WindowType.Windowed;
             graphicsDeviceManager.ApplyChanges();
 
-            Camera.Camera.SetWindowSize(new Camera.AbsoluteScreenPosition(aSize));
-            MailboxManager.PublishUiEvent(new HudRescaleRequested(aSize));
-            PublishWindowLayoutChanged(aSize, renderTargetDestination);
+            Camera.Camera.SetWindowSize(new Camera.AbsoluteScreenPosition(appliedSize));
+            MailboxManager.PublishUiEvent(new HudRescaleRequested(appliedSize));
+            PublishWindowLayoutChanged(appliedSize, renderTargetDestination);
             uncapturedScissorRect = graphicsDeviceManager.GraphicsDevice.ScissorRectangle;
             graphicsDeviceManager.GraphicsDevice.ScissorRectangle = uncapturedScissorRect;
+        }
+
+        static Point NormalizeAllowedSize(Point aSize)
+        {
+            int maxX = Math.Max(windowTitleBarMinSize.X, graphicsAdapter.CurrentDisplayMode.Width);
+            int maxY = Math.Max(windowTitleBarMinSize.Y, graphicsAdapter.CurrentDisplayMode.Height - windowTitleBarMinSize.Y);
+
+            Point normalized = new Point(
+                Math.Clamp(aSize.X, windowTitleBarMinSize.X, maxX),
+                Math.Clamp(aSize.Y, windowTitleBarMinSize.Y, maxY));
+
+            if (normalized != aSize)
+            {
+                DebugManager.Print($"Adjusted window size from {aSize} to {normalized}");
+            }
+
+            return normalized;
+        }
+
+        static Point NormalizeFullscreenSize(Point aSize)
+        {
+            Point[] supportedSizes = GetSupportedFullscreenSizes();
+            for (int i = 0; i < supportedSizes.Length; i++)
+            {
+                if (supportedSizes[i] == aSize)
+                {
+                    return aSize;
+                }
+            }
+
+            Point fallback = CurrentDisplayModeSize;
+            DebugManager.Print($"Adjusted fullscreen size from {aSize} to {fallback}");
+            return fallback;
         }
 
         static Rectangle GetRenderTargetDestination(Point resolution, int preferredBackBufferWidth, int preferredBackBufferHeight)

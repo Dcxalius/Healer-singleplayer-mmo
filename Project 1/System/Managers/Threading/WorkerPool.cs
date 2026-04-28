@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
@@ -47,21 +48,21 @@ namespace Project_1.Managers
         {
             get
             {
-                long completed = System.Threading.Interlocked.Read(ref totalCompleted);
+                long completed = Interlocked.Read(ref totalCompleted);
                 return new WorkerPoolStats(
-                    System.Threading.Volatile.Read(ref pendingCount),
-                    System.Threading.Volatile.Read(ref peakCount),
-                    System.Threading.Interlocked.Read(ref totalEnqueued),
+                    Volatile.Read(ref pendingCount),
+                    Volatile.Read(ref peakCount),
+                    Interlocked.Read(ref totalEnqueued),
                     completed,
-                    TicksToMs(System.Threading.Volatile.Read(ref lastQueueWaitTicks)),
-                    TicksToMs(System.Threading.Volatile.Read(ref lastWorkTicks)),
-                    TicksToMs(System.Threading.Volatile.Read(ref lastLatencyTicks)),
-                    completed == 0 ? 0d : TicksToMs((double)System.Threading.Interlocked.Read(ref totalQueueWaitTicks) / completed),
-                    completed == 0 ? 0d : TicksToMs((double)System.Threading.Interlocked.Read(ref totalWorkTicks) / completed),
-                    completed == 0 ? 0d : TicksToMs((double)System.Threading.Interlocked.Read(ref totalLatencyTicks) / completed),
-                    TicksToMs(System.Threading.Volatile.Read(ref maxQueueWaitTicks)),
-                    TicksToMs(System.Threading.Volatile.Read(ref maxWorkTicks)),
-                    TicksToMs(System.Threading.Volatile.Read(ref maxLatencyTicks)));
+                    TicksToMs(Volatile.Read(ref lastQueueWaitTicks)),
+                    TicksToMs(Volatile.Read(ref lastWorkTicks)),
+                    TicksToMs(Volatile.Read(ref lastLatencyTicks)),
+                    completed == 0 ? 0d : TicksToMs((double)Interlocked.Read(ref totalQueueWaitTicks) / completed),
+                    completed == 0 ? 0d : TicksToMs((double)Interlocked.Read(ref totalWorkTicks) / completed),
+                    completed == 0 ? 0d : TicksToMs((double)Interlocked.Read(ref totalLatencyTicks) / completed),
+                    TicksToMs(Volatile.Read(ref maxQueueWaitTicks)),
+                    TicksToMs(Volatile.Read(ref maxWorkTicks)),
+                    TicksToMs(Volatile.Read(ref maxLatencyTicks)));
             }
         }
 
@@ -132,13 +133,13 @@ namespace Project_1.Managers
                 return;
             }
 
-            queue.Add(new WorkItem(work, System.Diagnostics.Stopwatch.GetTimestamp()));
-            int pending = System.Threading.Interlocked.Increment(ref pendingCount);
-            System.Threading.Interlocked.Increment(ref totalEnqueued);
+            queue.Add(new WorkItem(work, Stopwatch.GetTimestamp()));
+            int pending = Interlocked.Increment(ref pendingCount);
+            Interlocked.Increment(ref totalEnqueued);
             int snapshotPeak;
-            while (pending > (snapshotPeak = System.Threading.Volatile.Read(ref peakCount)))
+            while (pending > (snapshotPeak = Volatile.Read(ref peakCount)))
             {
-                if (System.Threading.Interlocked.CompareExchange(ref peakCount, pending, snapshotPeak) == snapshotPeak)
+                if (Interlocked.CompareExchange(ref peakCount, pending, snapshotPeak) == snapshotPeak)
                 {
                     break;
                 }
@@ -172,27 +173,27 @@ namespace Project_1.Managers
             {
                 try
                 {
-                    System.Threading.Interlocked.Decrement(ref pendingCount);
-                    long startTicks = System.Diagnostics.Stopwatch.GetTimestamp();
+                    Interlocked.Decrement(ref pendingCount);
+                    long startTicks = Stopwatch.GetTimestamp();
                     long queueWaitTicks = Math.Max(0, startTicks - item.EnqueueTicks);
                     item.Action?.Invoke();
-                    long endTicks = System.Diagnostics.Stopwatch.GetTimestamp();
+                    long endTicks = Stopwatch.GetTimestamp();
                     long workTicks = Math.Max(0, endTicks - startTicks);
                     long latencyTicks = Math.Max(0, endTicks - item.EnqueueTicks);
 
-                    System.Threading.Volatile.Write(ref lastQueueWaitTicks, queueWaitTicks);
-                    System.Threading.Volatile.Write(ref lastWorkTicks, workTicks);
-                    System.Threading.Volatile.Write(ref lastLatencyTicks, latencyTicks);
-                    System.Threading.Interlocked.Add(ref totalQueueWaitTicks, queueWaitTicks);
-                    System.Threading.Interlocked.Add(ref totalWorkTicks, workTicks);
-                    System.Threading.Interlocked.Add(ref totalLatencyTicks, latencyTicks);
+                    Volatile.Write(ref lastQueueWaitTicks, queueWaitTicks);
+                    Volatile.Write(ref lastWorkTicks, workTicks);
+                    Volatile.Write(ref lastLatencyTicks, latencyTicks);
+                    Interlocked.Add(ref totalQueueWaitTicks, queueWaitTicks);
+                    Interlocked.Add(ref totalWorkTicks, workTicks);
+                    Interlocked.Add(ref totalLatencyTicks, latencyTicks);
                     UpdateMax(ref maxQueueWaitTicks, queueWaitTicks);
                     UpdateMax(ref maxWorkTicks, workTicks);
                     UpdateMax(ref maxLatencyTicks, latencyTicks);
 
                     double elapsedMs = TicksToMs(workTicks);
-                    System.Threading.Volatile.Write(ref lastWorkMs, elapsedMs);
-                    System.Threading.Interlocked.Increment(ref totalCompleted);
+                    Volatile.Write(ref lastWorkMs, elapsedMs);
+                    Interlocked.Increment(ref totalCompleted);
                 }
                 catch (Exception ex)
                 {
@@ -204,9 +205,9 @@ namespace Project_1.Managers
         static void UpdateMax(ref long target, long value)
         {
             long snapshot;
-            while (value > (snapshot = System.Threading.Volatile.Read(ref target)))
+            while (value > (snapshot = Volatile.Read(ref target)))
             {
-                if (System.Threading.Interlocked.CompareExchange(ref target, value, snapshot) == snapshot)
+                if (Interlocked.CompareExchange(ref target, value, snapshot) == snapshot)
                 {
                     break;
                 }
@@ -215,7 +216,7 @@ namespace Project_1.Managers
 
         static double TicksToMs(double ticks)
         {
-            return ticks * 1000d / System.Diagnostics.Stopwatch.Frequency;
+            return ticks * 1000d / Stopwatch.Frequency;
         }
     }
 

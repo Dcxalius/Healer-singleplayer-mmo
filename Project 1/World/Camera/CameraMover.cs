@@ -9,11 +9,14 @@ using System.Text;
 using System.Threading.Tasks;
 using static Project_1.Camera.Camera;
 using Project_1.GameObjects;
+using Project_1.Tiles;
+using Project_1.Rendering;
 
 namespace Project_1.Camera
 {
     internal class CameraMover
     {
+        const float CameraRotationSpeedRadians = MathHelper.PiOver2;
         public WorldSpace CentreInWorldSpace { get => centreInWorldSpace; set => centreInWorldSpace = value; }
         WorldSpace centreInWorldSpace = new WorldSpace(100, 100);
 
@@ -107,13 +110,34 @@ namespace Project_1.Camera
                 return;
             }
             mouseAbsoluteToCentre.Normalize();
-            velocity = (WorldSpace)(mouseAbsoluteToCentre * (float)(baseSpeed * TimeManager.SecondsSinceLastFrame) * movementFactor);
+            Vector2 worldDirection = ResolveMouseMoveDirection(mouseAbsoluteToCentre);
+            velocity = new WorldSpace(worldDirection * (float)(baseSpeed * TimeManager.SecondsSinceLastFrame) * movementFactor);
             //DebugManager.Print("Velocity = " + velocity.ToString());
+        }
+
+        Vector2 ResolveMouseMoveDirection(Vector2 aNormalizedMouseDirection)
+        {
+            if (!DebugManager.Mode(DebugMode.ModelPreview))
+            {
+                return aNormalizedMouseDirection;
+            }
+
+            Vector2 right = WorldBlockRenderer.CameraGroundRight;
+            Vector2 forward = WorldBlockRenderer.CameraGroundForward;
+            Vector2 worldDirection = right * aNormalizedMouseDirection.X - forward * aNormalizedMouseDirection.Y;
+            if (worldDirection.LengthSquared() <= float.Epsilon)
+            {
+                return Vector2.Zero;
+            }
+
+            worldDirection.Normalize();
+            return worldDirection;
         }
 
         public void Move()
         {
             ThreadAffinity.AssertSimThread();
+            ApplyCameraRotationInput();
             switch (CurrentCameraSetting)
             {
                 case CameraSettings.Follow.Free:
@@ -180,6 +204,12 @@ namespace Project_1.Camera
 
         void CheckIfCameraTriesToLeavePlayer()
         {
+            if (DebugManager.Mode(DebugMode.ModelPreview))
+            {
+                CheckIfCameraTriesToLeavePlayerInCameraSpace();
+                return;
+            }
+
             bindingRectangle.Location = (boundObject.FeetPosition - bindingRectangle.Size.ToVector2() / 2).ToPoint();
 
             if (!bindingRectangle.Contains(CentreInWorldSpace))
@@ -188,6 +218,140 @@ namespace Project_1.Camera
 
                 CentreInWorldSpace = boundObject.FeetPosition - (WorldSpace)cameraRectIntersection;
             }
+        }
+
+        void CheckIfCameraTriesToLeavePlayerInCameraSpace()
+        {
+            Rectangle screenBindingRectangle = BuildScreenBindingRectangle();
+            WorldSpace3D playerWorldPosition = ResolveBoundObjectWorldPosition();
+
+            for (int i = 0; i < 3; i++)
+            {
+                Camera3D previewCamera = WorldBlockRenderer.CreatePreviewCamera(CentreInWorldSpace);
+                AbsoluteScreenPosition playerScreenPosition = previewCamera.WorldToScreen(playerWorldPosition);
+                Point clampedPoint = new Point(
+                    Math.Clamp(playerScreenPosition.X, screenBindingRectangle.Left, screenBindingRectangle.Right),
+                    Math.Clamp(playerScreenPosition.Y, screenBindingRectangle.Top, screenBindingRectangle.Bottom));
+                if (clampedPoint.X == playerScreenPosition.X && clampedPoint.Y == playerScreenPosition.Y)
+                {
+                    return;
+                }
+
+                Vector2 desiredScreenDelta = new Vector2(
+                    clampedPoint.X - playerScreenPosition.X,
+                    clampedPoint.Y - playerScreenPosition.Y);
+                if (!TryResolveCameraCorrection(previewCamera, playerWorldPosition, desiredScreenDelta, out Vector2 worldCorrection))
+                {
+                    return;
+                }
+
+                CentreInWorldSpace = new WorldSpace(CentreInWorldSpace.ToVector2() + worldCorrection);
+            }
+        }
+
+        void ApplyCameraRotationInput()
+        {
+            float rotationDelta = 0f;
+            if (KeyBindStateCache.GetHold(KeyBindManager.KeyListner.RotateCameraLeft))
+            {
+                rotationDelta -= CameraRotationSpeedRadians * (float)TimeManager.SecondsSinceLastFrame;
+            }
+            if (KeyBindStateCache.GetHold(KeyBindManager.KeyListner.RotateCameraRight))
+            {
+                rotationDelta += CameraRotationSpeedRadians * (float)TimeManager.SecondsSinceLastFrame;
+            }
+            if (Math.Abs(rotationDelta) <= float.Epsilon)
+            {
+                return;
+            }
+
+            WorldBlockRenderer.RotateCameraYaw(rotationDelta);
+            ReadjustBindingAfterRotation();
+        }
+
+        void ReadjustBindingAfterRotation()
+        {
+            if (boundObject == null) return;
+            if (CurrentCameraSetting != CameraSettings.Follow.RectangleSoftBound) return;
+
+            CheckIfCameraTriesToLeavePlayerInCameraSpace();
+            velocity = WorldSpace.Zero;
+            momentum = WorldSpace.Zero;
+        }
+
+        Rectangle BuildScreenBindingRectangle()
+        {
+            AbsoluteScreenPosition screenCentre = CentrePointInScreenSpace;
+            Point halfSize = new Point(bindingRectangle.Width / 2, bindingRectangle.Height / 2);
+            return new Rectangle(
+                new Point(screenCentre.X - halfSize.X, screenCentre.Y - halfSize.Y),
+                bindingRectangle.Size);
+        }
+
+        bool TryResolveCameraCorrection(Camera3D aPreviewCamera, WorldSpace3D aPlayerWorldPosition, Vector2 aDesiredScreenDelta, out Vector2 aWorldCorrection)
+        {
+            const float sampleDistanceInTiles = 1f;
+            Vector2 rightPixels = new Vector2(WorldBlockRenderer.CameraGroundRight.X * Tile.Size.X, WorldBlockRenderer.CameraGroundRight.Y * Tile.Size.Y) * sampleDistanceInTiles;
+            Vector2 forwardPixels = new Vector2(WorldBlockRenderer.CameraGroundForward.X * Tile.Size.X, WorldBlockRenderer.CameraGroundForward.Y * Tile.Size.Y) * sampleDistanceInTiles;
+
+            Vector2 screenDeltaPerRight = SampleScreenDelta(aPlayerWorldPosition, rightPixels, aPreviewCamera);
+            Vector2 screenDeltaPerForward = SampleScreenDelta(aPlayerWorldPosition, forwardPixels, aPreviewCamera);
+
+            float determinant = screenDeltaPerRight.X * screenDeltaPerForward.Y - screenDeltaPerRight.Y * screenDeltaPerForward.X;
+            if (Math.Abs(determinant) <= 0.0001f)
+            {
+                aWorldCorrection = Vector2.Zero;
+                return false;
+            }
+
+            float rightScale = (aDesiredScreenDelta.X * screenDeltaPerForward.Y - aDesiredScreenDelta.Y * screenDeltaPerForward.X) / determinant;
+            float forwardScale = (screenDeltaPerRight.X * aDesiredScreenDelta.Y - screenDeltaPerRight.Y * aDesiredScreenDelta.X) / determinant;
+            aWorldCorrection = rightPixels * rightScale + forwardPixels * forwardScale;
+            return !float.IsNaN(aWorldCorrection.X) && !float.IsNaN(aWorldCorrection.Y) && !float.IsInfinity(aWorldCorrection.X) && !float.IsInfinity(aWorldCorrection.Y);
+        }
+
+        Vector2 SampleScreenDelta(WorldSpace3D aPlayerWorldPosition, Vector2 aCameraOffsetPixels, Camera3D aCurrentCamera)
+        {
+            AbsoluteScreenPosition currentScreen = aCurrentCamera.WorldToScreen(aPlayerWorldPosition);
+            WorldSpace shiftedCentre = new WorldSpace(CentreInWorldSpace.ToVector2() + aCameraOffsetPixels);
+            Camera3D shiftedCamera = WorldBlockRenderer.CreatePreviewCamera(shiftedCentre);
+            AbsoluteScreenPosition shiftedScreen = shiftedCamera.WorldToScreen(aPlayerWorldPosition);
+            return new Vector2(shiftedScreen.X - currentScreen.X, shiftedScreen.Y - currentScreen.Y);
+        }
+
+        WorldSpace3D ResolveBoundObjectWorldPosition()
+        {
+            WorldSpace feetPosition = boundObject?.FeetPosition ?? WorldSpace.Zero;
+            return new WorldSpace3D(
+                feetPosition.X / Tile.Size.X,
+                ResolveSurfaceHeight(feetPosition),
+                feetPosition.Y / Tile.Size.Y);
+        }
+
+        float ResolveSurfaceHeight(WorldSpace aFeetPosition)
+        {
+            Chunk chunk = TileManager.GetChunk(aFeetPosition);
+            if (chunk == null) return 0f;
+
+            Point gridPosition = TileManager.GetGridPos(aFeetPosition);
+            int localX = PositiveModulo(gridPosition.X, Chunk.ChunkSize.X);
+            int localY = PositiveModulo(gridPosition.Y, Chunk.ChunkSize.Y);
+
+            for (int z = Chunk.ChunkHeight - 1; z >= 0; z--)
+            {
+                if (chunk.GetBlock(localX, localY, z) != null)
+                {
+                    return z + 1f;
+                }
+            }
+
+            return 0f;
+        }
+
+        int PositiveModulo(int aValue, int aDivisor)
+        {
+            int result = aValue % aDivisor;
+            return result < 0 ? result + aDivisor : result;
         }
 
         Vector2 CalculateIntersection() //TODO: split this function more

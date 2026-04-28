@@ -1,10 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using Project_1.Camera;
 using Project_1.GameObjects.Doodads;
-using Project_1.GameObjects.Spawners;
-using Project_1.GameObjects.Spawners.Pathing;
 using Project_1.Managers;
 using System;
 
@@ -14,142 +12,136 @@ namespace Project_1.Tiles
     {
         static readonly Point TileSize = Tiles.Tile.Size;
         public static readonly Point ChunkSize = new Point(100);
+        public const int ChunkHeight = 16;
+
+        Block[,,] blocks;
         [JsonIgnore]
-        public Rectangle WorldRectangle => new Rectangle(Position.ToPoint(), ChunkSize * TileSize);
-
+        Tile[,] surfaceTiles;
         [JsonIgnore]
-        public Point ChunkPosition { get; private set; }
-
-        [JsonIgnore]
-        public WorldSpace Position { get; private set; }
-        [JsonIgnore]
-        public DoodadManager Doodads { get; }
-
-        public Tile Tile((int, int) aXY) => Tile(aXY.Item1, aXY.Item2);
-        public Tile Tile(int aX, int aY)
-        {
-            if (aX < 0 || aX >= ChunkSize.X || aY < 0 || aY >= ChunkSize.Y) throw new IndexOutOfRangeException();
-            return tiles[aX, aY];
-        }
-
-        internal void FillMinimapColors(Color[] buffer)
-        {
-            for (int i = 0; i < buffer.Length; i++)
-            {
-                buffer[i] = tiles[i % ChunkSize.X, i / ChunkSize.Y].MinimapColor;
-            }
-        }
-
-        [JsonProperty]
-        int[,] tilesAsIDs
-        {
-            get
-            {
-                int[,] tilesAsId = new int[ChunkSize.X, ChunkSize.Y];
-                //int?[,] tilesAsId = new int?[tiles.GetLength(0),tiles.GetLength(1)];
-                for (int i = 0; i < tilesAsId.GetLength(0); i++)
-                {
-                    for (int j = 0; j < tilesAsId.GetLength(1); j++)
-                    {
-                        tilesAsId[i, j] = Tile(i, j).ID;
-                        //tilesAsId[i, j] = tiles[i, j].ID;
-
-                    }
-                }
-                return tilesAsId;
-            }
-        }
-
-
-
-        Tile[,] tiles;
+        bool surfaceTilesBuilt;
         [JsonIgnore]
         ChunkRenderSnapshot renderSnapshot;
         [JsonIgnore]
         bool renderSnapshotBuilt;
-        public int Id => id;
         int id;
-        public int AverageLevel => averageLevel;
         [JsonProperty]
         int averageLevel;
 
-        public static int[,] GenerateTileIds(int chunkId)
-        {
-            Point chunkPos = GetChunkPosition(chunkId);
-            int dirtId = TileFactory.GetTileData("Dirt").ID;
-            int grassId = TileFactory.GetTileData("Grass").ID;
+        [JsonIgnore]
+        public Rectangle WorldRectangle => new Rectangle(Position.ToPoint(), ChunkSize * TileSize);
+        [JsonIgnore]
+        public Point ChunkPosition { get; private set; }
+        [JsonIgnore]
+        public WorldSpace Position { get; private set; }
+        [JsonIgnore]
+        public DoodadManager Doodads { get; }
+        public int Id => id;
+        public int AverageLevel => averageLevel;
 
-            int[,] ids = new int[ChunkSize.X, ChunkSize.Y];
-            int chunkTileX = chunkPos.X * ChunkSize.X;
-            int chunkTileY = chunkPos.Y * ChunkSize.Y;
+        [JsonProperty("blocks")]
+        Block[,,] SerializedBlocks => blocks;
 
-            for (int i = 0; i < ChunkSize.X; i++)
-            {
-                for (int j = 0; j < ChunkSize.Y; j++)
-                {
-                    int globalX = chunkTileX + i;
-                    int globalY = chunkTileY + j;
-
-                    float broadNoise = PerlinNoiseGenerator.Fractal01(globalX, globalY, seed: 4871, scale: 56f, octaves: 4, persistence: 0.5f, lacunarity: 2f);
-                    float detailNoise = PerlinNoiseGenerator.Fractal01(globalX, globalY, seed: 9323, scale: 24f, octaves: 3, persistence: 0.55f, lacunarity: 2f);
-                    float dirtBlend = (broadNoise * 0.75f) + (detailNoise * 0.25f);
-
-                    ids[i, j] = dirtBlend < 0.5f ? dirtId : grassId;
-                }
-            }
-
-            return ids;
-        }
-        public Chunk(Point aLeftUppermostTile, int aId) 
+        public Chunk(Point aLeftUppermostTile, int aId)
         {
             id = aId;
             Doodads = new DoodadManager();
-            tiles = new Tile[ChunkSize.X, ChunkSize.Y];
             Position = new WorldSpace(aLeftUppermostTile);
-            ChunkPosition = GetChunkPosition(aId);
-            averageLevel = GenerateAverageLevel(ChunkPosition);
-            int[,] tileIds = GenerateTileIds(aId);
-
-            Point pos;
-
-
-            for (int i = 0; i < ChunkSize.X; i++)
-            {
-                for (int j = 0; j < ChunkSize.Y; j++)
-                {
-                    pos = new Point(aLeftUppermostTile.X + TileSize.X * i, aLeftUppermostTile.Y + TileSize.Y * j);
-                    int tileId = tileIds[i, j];
-                    tiles[i, j] = new Tile(TileFactory.GetTileData(tileId), pos, new Point(i, j));
-                }
-            }
-            //SpawnerManager.CreateNewSpawnZone(new string[] { "sheep" });
-            //for (int i = 0; i < 10; i++)
-            //{
-            //    Point size = new Point(10 + RandomManager.RollInt(500), 10 + RandomManager.RollInt(500));
-            //    Rectangle r = new Rectangle(new Point(RandomManager.RollInt(size.X), RandomManager.RollInt(size.Y)), size);
-            //    SpawnerManager.CreateNewSpawner(0, new Wander(r));
-
-            //} 
+            ChunkPosition = ChunkAddressing.GetChunkPosition(aId);
+            averageLevel = ChunkGenerator.GetAverageLevelForChunkPosition(ChunkPosition);
+            InitializeBlocks(ChunkGenerator.GenerateBlocks(aId));
         }
 
         [JsonConstructor]
-        public Chunk(int[,] tilesAsIDs, int id, int? averageLevel = null)
+        public Chunk(Block[,,] blocks = null, int id = 0, int? averageLevel = null, BlockColumn[,] blocksAsColumns = null, int[,] tilesAsIDs = null)
         {
-            ChunkPosition = GetChunkPosition(id);
+            ChunkPosition = ChunkAddressing.GetChunkPosition(id);
             Position = new WorldSpace(ChunkPosition * ChunkSize * TileSize);
             this.id = id;
             Doodads = new DoodadManager();
-            this.averageLevel = Math.Clamp(averageLevel ?? GenerateAverageLevel(ChunkPosition), 1, 60);
-            tiles = new Tile[tilesAsIDs.GetLength(0), tilesAsIDs.GetLength(1)];
+            this.averageLevel = Math.Clamp(averageLevel ?? ChunkGenerator.GetAverageLevelForChunkPosition(ChunkPosition), 1, 60);
+            InitializeBlocks(blocks ?? ConvertLegacyColumns(blocksAsColumns) ?? ConvertLegacyTileIds(tilesAsIDs));
+        }
 
-            for (int i = 0; i < tiles.GetLength(0); i++)
+        public Tile Tile((int, int) aXY) => Tile(aXY.Item1, aXY.Item2);
+
+        // Temporary surface bridge for current 2D runtime systems.
+        public Tile Tile(int aX, int aY)
+        {
+            ValidateXY(aX, aY);
+            return GetSurfaceTiles()[aX, aY];
+        }
+
+        public Block GetBlock(int aX, int aY, int aZ)
+        {
+            ValidateXYZ(aX, aY, aZ);
+            return blocks[aX, aY, aZ];
+        }
+
+        public Block GetTopBlock(int aX, int aY)
+        {
+            ValidateXY(aX, aY);
+            return BlockTileBridge.FindTopBlock(blocks, aX, aY);
+        }
+
+        public bool SetBlock(int aX, int aY, int aZ, Block block)
+        {
+            ValidateXYZ(aX, aY, aZ);
+            if (block == null) return false;
+            blocks[aX, aY, aZ] = block;
+            InvalidateDerivedState();
+            return true;
+        }
+
+        public bool ClearBlock(int aX, int aY, int aZ)
+        {
+            ValidateXYZ(aX, aY, aZ);
+            if (blocks[aX, aY, aZ] == null) return false;
+            blocks[aX, aY, aZ] = null;
+            InvalidateDerivedState();
+            return true;
+        }
+
+        public bool AddBlock(int aX, int aY, Block block)
+        {
+            ValidateXY(aX, aY);
+            if (block == null) return false;
+
+            for (int z = 0; z < ChunkHeight; z++)
             {
-                for (int j = 0; j < tiles.GetLength(1); j++)
-                {
-                    Point pos = new Point((int)Position.X + TileSize.X * i, (int)Position.Y + TileSize.Y * j);
+                if (blocks[aX, aY, z] != null) continue;
+                blocks[aX, aY, z] = block;
+                InvalidateDerivedState();
+                return true;
+            }
 
-                    tiles[i, j] = new Tile(TileFactory.GetTileData(tilesAsIDs[i, j]), pos, new Point(i, j));
-                }
+            return false;
+        }
+
+        public bool SetTopBlock(int aX, int aY, Block block)
+        {
+            ValidateXY(aX, aY);
+            if (block == null) return false;
+
+            for (int z = ChunkHeight - 1; z >= 0; z--)
+            {
+                if (blocks[aX, aY, z] == null) continue;
+                blocks[aX, aY, z] = block;
+                InvalidateDerivedState();
+                return true;
+            }
+
+            blocks[aX, aY, 0] = block;
+            InvalidateDerivedState();
+            return true;
+        }
+
+        internal void FillMinimapColors(Color[] buffer)
+        {
+            Tile[,] tiles = GetSurfaceTiles();
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                Tile tile = tiles[i % ChunkSize.X, i / ChunkSize.Y];
+                buffer[i] = tile?.MinimapColor ?? Color.Transparent;
             }
         }
 
@@ -167,24 +159,69 @@ namespace Project_1.Tiles
             {
                 int width = ChunkSize.X;
                 int height = ChunkSize.Y;
-                var snapshots = new Textures.Texture.TextureRenderSnapshot[width * height];
+                ChunkBlockRenderSnapshot[] blockSnapshots = new ChunkBlockRenderSnapshot[width * height * ChunkHeight];
+                int count = 0;
+                Point chunkGridOrigin = ChunkPosition * ChunkSize;
                 for (int i = 0; i < width; i++)
                 {
                     for (int j = 0; j < height; j++)
                     {
-                        snapshots[i + j * width] = tiles[i, j].BuildRenderSnapshot();
+                        for (int z = 0; z < ChunkHeight; z++)
+                        {
+                            Block block = blocks[i, j, z];
+                            if (block == null) continue;
+
+                            TileData tileData = BlockTileBridge.ResolveTileData(block);
+                            if (tileData == null) continue;
+
+                            BlockFaceMask exposedFaces = ResolveExposedFaces(i, j, z);
+                            if (exposedFaces == BlockFaceMask.None) continue;
+
+                            WorldSpace3D worldPosition = new WorldSpace3D(
+                                chunkGridOrigin.X + i + 0.5f,
+                                z + 0.5f,
+                                chunkGridOrigin.Y + j + 0.5f);
+                            blockSnapshots[count++] = new ChunkBlockRenderSnapshot(tileData.ID, worldPosition, exposedFaces);
+                        }
                     }
                 }
-                renderSnapshot = new ChunkRenderSnapshot(id, Position, snapshots);
+
+                if (count != blockSnapshots.Length)
+                {
+                    Array.Resize(ref blockSnapshots, count);
+                }
+
+                renderSnapshot = new ChunkRenderSnapshot(id, Position, ChunkPosition, blockSnapshots);
                 renderSnapshotBuilt = true;
             }
 
             return renderSnapshot;
         }
 
+        BlockFaceMask ResolveExposedFaces(int x, int y, int z)
+        {
+            BlockFaceMask mask = BlockFaceMask.None;
+            if (IsEmpty(x, y, z + 1)) mask |= BlockFaceMask.Up;
+            if (IsEmpty(x, y, z - 1)) mask |= BlockFaceMask.Down;
+            if (IsEmpty(x, y - 1, z)) mask |= BlockFaceMask.North;
+            if (IsEmpty(x - 1, y, z)) mask |= BlockFaceMask.West;
+            if (IsEmpty(x, y + 1, z)) mask |= BlockFaceMask.South;
+            if (IsEmpty(x + 1, y, z)) mask |= BlockFaceMask.East;
+            return mask;
+        }
+
+        bool IsEmpty(int x, int y, int z)
+        {
+            if (x < 0 || x >= ChunkSize.X) return true;
+            if (y < 0 || y >= ChunkSize.Y) return true;
+            if (z < 0 || z >= ChunkHeight) return true;
+            return blocks[x, y, z] == null;
+        }
+
         public void Draw(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();
+            Tile[,] tiles = GetSurfaceTiles();
             int minI = 0;
             int minJ = 0;
             int maxJ = tiles.GetLength(1);
@@ -192,143 +229,147 @@ namespace Project_1.Tiles
             {
                 for (int j = minJ; j < maxJ; j++)
                 {
-                    if (tiles[i, j].WorldRectangle.Bottom < Camera.Camera.WorldRectangle.Top)
+                    Tile tile = tiles[i, j];
+                    if (tile == null) continue;
+
+                    if (tile.WorldRectangle.Bottom < Camera.Camera.WorldRectangle.Top)
                     {
                         minJ = j + 1;
                         continue;
                     }
-                    if (tiles[i, j].WorldRectangle.Right < Camera.Camera.WorldRectangle.Left)
+
+                    if (tile.WorldRectangle.Right < Camera.Camera.WorldRectangle.Left)
                     {
                         minI = i;
                         break;
                     }
-                    if (tiles[i, j].WorldRectangle.Left > Camera.Camera.WorldRectangle.Right)
+
+                    if (tile.WorldRectangle.Left > Camera.Camera.WorldRectangle.Right)
                     {
                         return;
                     }
-                    if (tiles[i, j].WorldRectangle.Top > Camera.Camera.WorldRectangle.Bottom)
+
+                    if (tile.WorldRectangle.Top > Camera.Camera.WorldRectangle.Bottom)
                     {
                         maxJ = j;
                         break;
                     }
 
-                    tiles[i, j].Draw(aBatch);
-
+                    tile.Draw(aBatch);
                 }
             }
         }
 
-        public static int GetChunkId(Point pos) => GetChunkId(pos.X, pos.Y);
-
-        public static int GetChunkId(int x, int y)
+        void InitializeBlocks(Block[,,] blocks)
         {
-            if (x == 0 && y == 0) return 0;
-
-            int dirInt;
-            int furthestDir;
-            int shortestDir;
-
-            if (Math.Abs(x) >= Math.Abs(y))
-            {
-                if (x < 0) //Left
-                {
-                    dirInt = 3;
-                    shortestDir = y;
-                }
-                else //Right
-                {
-                    dirInt = 7;
-                    shortestDir = -y;
-                }
-
-                furthestDir = x;
-            }
-            else
-            {
-                if (y < 0) //Up
-                {
-                    dirInt = 1;
-                    shortestDir = -x;
-                }
-                else //Down
-                {
-                    dirInt = 5;
-                    shortestDir = x;
-                }
-
-                furthestDir = y;
-            }
-
-            return dirInt * Math.Abs(furthestDir) + HighestNrInCircle(Math.Abs(furthestDir) - 1) + shortestDir;
+            this.blocks = NormalizeBlocks(blocks);
+            InvalidateDerivedState();
         }
 
-        public static Point GetChunkPosition(int id)
+        Tile[,] GetSurfaceTiles()
         {
-            int circle = (int)Math.Ceiling((Math.Sqrt(id + 1) - 1) / 2);
-            int highestNrInCircle = HighestNrInCircle(circle);
-            int dif = highestNrInCircle - id;
-            if (dif == 0)
+            if (!surfaceTilesBuilt)
             {
-                return new Point(circle, -circle);
+                surfaceTiles = new Tile[ChunkSize.X, ChunkSize.Y];
+                Point chunkOrigin = Position.ToPoint();
+                for (int i = 0; i < ChunkSize.X; i++)
+                {
+                    for (int j = 0; j < ChunkSize.Y; j++)
+                    {
+                        Point worldPos = new Point(chunkOrigin.X + TileSize.X * i, chunkOrigin.Y + TileSize.Y * j);
+                        surfaceTiles[i, j] = BlockTileBridge.BuildSurfaceTile(blocks, i, j, worldPos, new Point(i, j));
+                    }
+                }
+
+                surfaceTilesBuilt = true;
             }
 
-            int sideLength = circle * 2;
-            if (dif % sideLength == 0)
-            {
-                if (dif / sideLength == 1) return new Point(circle, circle);
-                if (dif / sideLength == 2) return new Point(-circle, circle);
-                if (dif / sideLength == 3) return new Point(-circle, -circle);
-                throw new Exception("ohno");
-            }
-
-            Point returnPoint = new Point();
-
-            if ((float)dif / sideLength < 1f)//Right
-            {
-                returnPoint.X = circle;
-                returnPoint.Y = -circle + dif;
-            }
-            else if ((float)dif / sideLength < 2f)//Down
-            {
-                returnPoint.X = circle - (dif - sideLength);
-                returnPoint.Y = circle;
-            }
-            else if ((float)dif / sideLength < 3f)//Left
-            {
-                returnPoint.X = -circle;
-                returnPoint.Y = circle - (dif - sideLength * 2);
-            }
-            else if ((float)dif / sideLength < 4f)//Up
-            {
-                returnPoint.X = -circle + (dif - sideLength * 3);
-                returnPoint.Y = -circle;
-            }
-            else throw new Exception("ohno");
-
-            return returnPoint;
+            return surfaceTiles;
         }
 
-        static int HighestNrInCircle(int circleSize) => 4 * (((circleSize + 1) * (circleSize + 1)) - (circleSize + 1));
-
-        public static int GetAverageLevelForChunkPosition(Point chunkPos) => GenerateAverageLevel(chunkPos);
-        public static int GetAverageLevelForChunkId(int chunkId) => GenerateAverageLevel(GetChunkPosition(chunkId));
-
-        static int GenerateAverageLevel(Point chunkPos)
+        void InvalidateDerivedState()
         {
-            float macroNoise = PerlinNoiseGenerator.Fractal01(chunkPos.X, chunkPos.Y, seed: 14717, scale: 46f, octaves: 4, persistence: 0.5f, lacunarity: 2f);
-            float detailNoise = PerlinNoiseGenerator.Fractal01(chunkPos.X, chunkPos.Y, seed: 21341, scale: 16f, octaves: 3, persistence: 0.55f, lacunarity: 2f);
-            float worldLevelSignal = MathHelper.Clamp((macroNoise * 0.72f) + (detailNoise * 0.28f), 0f, 1f);
+            surfaceTiles = null;
+            surfaceTilesBuilt = false;
+            renderSnapshot = default;
+            renderSnapshotBuilt = false;
+        }
 
-            float starterZoneNoise = PerlinNoiseGenerator.Fractal01(chunkPos.X, chunkPos.Y, seed: 38183, scale: 24f, octaves: 2, persistence: 0.5f, lacunarity: 2f);
-            const float starterZoneThreshold = 0.11f;
-            if (starterZoneNoise < starterZoneThreshold)
+        static Block[,,] NormalizeBlocks(Block[,,] source)
+        {
+            Block[,,] normalized = new Block[ChunkSize.X, ChunkSize.Y, ChunkHeight];
+            if (source == null) return normalized;
+
+            int maxX = Math.Min(source.GetLength(0), ChunkSize.X);
+            int maxY = Math.Min(source.GetLength(1), ChunkSize.Y);
+            int maxZ = Math.Min(source.GetLength(2), ChunkHeight);
+
+            for (int x = 0; x < maxX; x++)
             {
-                float pocketSignal = starterZoneNoise / starterZoneThreshold;
-                float starterLevelSignal = pocketSignal * pocketSignal;
-                return 1 + (int)MathF.Round(starterLevelSignal * 9f);
+                for (int y = 0; y < maxY; y++)
+                {
+                    for (int z = 0; z < maxZ; z++)
+                    {
+                        normalized[x, y, z] = source[x, y, z];
+                    }
+                }
             }
 
-            return 2 + (int)MathF.Round(worldLevelSignal * 58f);
+            return normalized;
+        }
+
+        static Block[,,] ConvertLegacyColumns(BlockColumn[,] blocksAsColumns)
+        {
+            if (blocksAsColumns == null) return null;
+
+            Block[,,] converted = new Block[ChunkSize.X, ChunkSize.Y, ChunkHeight];
+            int maxX = Math.Min(blocksAsColumns.GetLength(0), ChunkSize.X);
+            int maxY = Math.Min(blocksAsColumns.GetLength(1), ChunkSize.Y);
+
+            for (int x = 0; x < maxX; x++)
+            {
+                for (int y = 0; y < maxY; y++)
+                {
+                    if (blocksAsColumns[x, y]?.Blocks == null) continue;
+
+                    int maxZ = Math.Min(blocksAsColumns[x, y].Blocks.Count, ChunkHeight);
+                    for (int z = 0; z < maxZ; z++)
+                    {
+                        converted[x, y, z] = blocksAsColumns[x, y].Blocks[z];
+                    }
+                }
+            }
+
+            return converted;
+        }
+
+        static Block[,,] ConvertLegacyTileIds(int[,] tilesAsIDs)
+        {
+            if (tilesAsIDs == null) return null;
+
+            Block[,,] converted = new Block[ChunkSize.X, ChunkSize.Y, ChunkHeight];
+            int maxX = Math.Min(tilesAsIDs.GetLength(0), ChunkSize.X);
+            int maxY = Math.Min(tilesAsIDs.GetLength(1), ChunkSize.Y);
+
+            for (int x = 0; x < maxX; x++)
+            {
+                for (int y = 0; y < maxY; y++)
+                {
+                    converted[x, y, 0] = BlockTileBridge.CreateBlockFromTileId(tilesAsIDs[x, y]);
+                }
+            }
+
+            return converted;
+        }
+
+        static void ValidateXY(int x, int y)
+        {
+            if (x < 0 || x >= ChunkSize.X || y < 0 || y >= ChunkSize.Y) throw new IndexOutOfRangeException();
+        }
+
+        static void ValidateXYZ(int x, int y, int z)
+        {
+            if (x < 0 || x >= ChunkSize.X || y < 0 || y >= ChunkSize.Y || z < 0 || z >= ChunkHeight) throw new IndexOutOfRangeException();
         }
     }
 }

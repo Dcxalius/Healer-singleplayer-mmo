@@ -6,6 +6,7 @@ using Project_1.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.World.Items.Enchantments;
+using System;
 
 namespace Project_1.Items
 {
@@ -49,7 +50,7 @@ namespace Project_1.Items
             SubscribeSimCommand<EquipmentMoveToInventoryRequested>(HandleEquipmentMoveToInventoryRequested);
         }
 
-        static void SubscribeSimCommand<T>(System.Action<T> handler)
+        static void SubscribeSimCommand<T>(Action<T> handler)
         {
             MailboxManager.RegisterSimCommandType<T>();
             MailboxManager.Sim.Subscribe(handler);
@@ -273,7 +274,7 @@ namespace Project_1.Items
             PublishEnchantSystemMessage($"Select an item to enchant with {consumable.Name}.");
         }
 
-        static bool TryApplyPendingEnchantment(Player player, Project_1.Items.SubTypes.Equipment equipment, System.Func<bool> onApplied)
+        static bool TryApplyPendingEnchantment(Player player, Project_1.Items.SubTypes.Equipment equipment, Func<bool> onApplied)
         {
             ThreadAffinity.AssertSimThread();
             if (!TryGetPendingEnchant(player, out PendingEnchantScroll pending, out EnchantmentData enchantmentData))

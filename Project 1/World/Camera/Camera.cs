@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Spawners;
@@ -93,6 +93,11 @@ namespace Project_1.Camera
         {
             get => WindowSize.ToPoint();
             set => cameraSettings.WindowSize = value;
+        }
+
+        public static void SetWindowSize(int width, int height)
+        {
+            cameraSettings.WindowSize = new Point(width, height);
         }
 
         static float scale = 1f;
@@ -211,6 +216,12 @@ namespace Project_1.Camera
         internal static void Scroll(ScrollEvent aScrollEvent)
         {
             ThreadAffinity.AssertSimThread();
+            if (DebugManager.Mode(DebugMode.ModelPreview))
+            {
+                WorldBlockRenderer.AdjustCameraZoom(aScrollEvent.DirectionAndSteps);
+                return;
+            }
+
             float before = scale;
             ZoomIn(aScrollEvent);
             ZoomOut(aScrollEvent);

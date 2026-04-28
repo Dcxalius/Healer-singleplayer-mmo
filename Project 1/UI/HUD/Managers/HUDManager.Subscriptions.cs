@@ -128,6 +128,7 @@ namespace Project_1.UI.HUD.Managers
         {
             MailboxManager.Ui.Subscribe<SaveDataStarted>(OnSaveDataStarted);
             MailboxManager.Ui.Subscribe<SaveDataFinished>(OnSaveDataFinished);
+            MailboxManager.Ui.Subscribe<SaveDataFailed>(OnSaveDataFailed);
         }
 
         static void RegisterMiscSubscriptions()
@@ -517,15 +518,21 @@ namespace Project_1.UI.HUD.Managers
             RemoveDialogueBox(e.DialogueBoxId);
         }
 
-        static void OnSaveDataStarted(SaveDataStarted _)
+        static void OnSaveDataStarted(SaveDataStarted e)
         {
-            saveStatusIndicator.NotifySaveStarted();
+            saveStatusIndicator.NotifySaveStarted(e.Message);
             InvalidateUi();
         }
 
-        static void OnSaveDataFinished(SaveDataFinished _)
+        static void OnSaveDataFinished(SaveDataFinished e)
         {
-            saveStatusIndicator.NotifySaveFinished();
+            saveStatusIndicator.NotifySaveFinished(e.Message);
+            InvalidateUi();
+        }
+
+        static void OnSaveDataFailed(SaveDataFailed e)
+        {
+            saveStatusIndicator.NotifySaveFailed(e.Message);
             InvalidateUi();
         }
 

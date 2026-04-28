@@ -5,6 +5,7 @@ using Project_1.DebugTools;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,7 +32,7 @@ namespace Project_1.Tiles
         static void ImportData()
         {
             List<TileData> tiles = new List<TileData>();
-            string[] dataAsString = System.IO.File.ReadAllLines(Game1.ContentManager.RootDirectory + "\\Data\\TileData.json");
+            string[] dataAsString = File.ReadAllLines(Game1.ContentManager.RootDirectory + "\\Data\\TileData.json");
 
             for (int i = 0; i < dataAsString.Length; i++)
             {

@@ -59,13 +59,13 @@ namespace Project_1.Tiles
         }
 
         public static Chunk GetChunk(int aId) => chunks.TryGetValue(aId, out Chunk chunk) ? chunk : null;
-        public static Chunk GetChunk(int aX, int aY) => GetChunk(Chunk.GetChunkId(aX, aY));
+        public static Chunk GetChunk(int aX, int aY) => GetChunk(ChunkAddressing.GetChunkId(aX, aY));
         public static Chunk GetChunk(Point aPos) => GetChunk(aPos.X, aPos.Y);
         public static Chunk GetChunk(WorldSpace aSpaceInWorld) => GetChunk(new Point((int)MathF.Floor(aSpaceInWorld.X / Chunk.ChunkSize.X / Tile.Size.X), (int)MathF.Floor(aSpaceInWorld.Y / Chunk.ChunkSize.Y / Tile.Size.Y)));
 
         public static Chunk GetChunkUnder(WorldSpace aWorldSpace)
         {
-            int id = Chunk.GetChunkId((int)MathF.Floor(aWorldSpace.X / Tile.Size.X / Chunk.ChunkSize.X), (int)MathF.Floor(aWorldSpace.Y / Tile.Size.Y / Chunk.ChunkSize.Y));
+            int id = ChunkAddressing.GetChunkId((int)MathF.Floor(aWorldSpace.X / Tile.Size.X / Chunk.ChunkSize.X), (int)MathF.Floor(aWorldSpace.Y / Tile.Size.Y / Chunk.ChunkSize.Y));
             return GetChunk(id);
         }
 

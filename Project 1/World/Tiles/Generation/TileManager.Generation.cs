@@ -2,10 +2,10 @@ namespace Project_1.Tiles
 {
     internal static partial class TileManager
     {
-        static Chunk CreateStructuredChunk(int chunkId, int[,] tileIds)
+        static Chunk CreateStructuredChunk(int chunkId, Block[,,] blocks)
         {
-            StructureSpawnSystem.ApplyToChunkTiles(chunkId, tileIds);
-            Chunk chunk = new Chunk(tileIds, chunkId);
+            StructureSpawnSystem.ApplyToChunkBlocks(chunkId, blocks);
+            Chunk chunk = new Chunk(blocks, chunkId);
             chunk.Doodads.EnsureStructureDoodads(chunk);
             return chunk;
         }

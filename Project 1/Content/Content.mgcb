@@ -41,6 +41,13 @@
 /build:Effects/MsdfText.fx
 #end
 
+#begin Effects/ModelRender.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/ModelRender.fx
+#end
+
 #begin Font/Comfortaa.ttf
 /copy:Font/Comfortaa.ttf
 #end

@@ -70,6 +70,8 @@ namespace Project_1.UI.HUD.Managers
             namePlateScratch.Clear();
             foreach (NamePlate plate in namePlates.Values)
             {
+                if (!plate.Visible) continue;
+                if (!Camera.Camera.ScreenRectangle.Intersects(plate.AbsolutePos)) continue;
                 namePlateScratch.Add(plate);
             }
 

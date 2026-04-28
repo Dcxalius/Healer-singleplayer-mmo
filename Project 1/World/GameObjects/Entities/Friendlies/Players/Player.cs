@@ -106,10 +106,26 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         {
             ThreadAffinity.AssertSimThread();
             if (HasDestination && LockedMovement) return;
-            if (left) velocity.X -= 1;
-            if (right) velocity.X += 1;
-            if (up) velocity.Y -= 1;
-            if (down) velocity.Y += 1;
+
+            if (DebugManager.Mode(DebugMode.ModelPreview))
+            {
+                Vector2 movementDirection = Vector2.Zero;
+                Vector2 cameraRight = WorldBlockRenderer.CameraGroundRight;
+                Vector2 cameraForward = WorldBlockRenderer.CameraGroundForward;
+                if (left) movementDirection -= cameraRight;
+                if (right) movementDirection += cameraRight;
+                if (up) movementDirection += cameraForward;
+                if (down) movementDirection -= cameraForward;
+                velocity += new WorldSpace(movementDirection);
+            }
+            else
+            {
+                if (left) velocity.X -= 1;
+                if (right) velocity.X += 1;
+                if (up) velocity.Y -= 1;
+                if (down) velocity.Y += 1;
+            }
+
             if (velocity == WorldSpace.Zero) return;
             velocity.Normalize();
             velocity *= Speed * (float)TimeManager.SecondsSinceLastFrame;

@@ -4,6 +4,7 @@ using Project_1.Camera;
 using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 using Project_1.Tiles;
 using Project_1.Managers;
+using System;
 
 namespace Project_1.GameObjects
 {
@@ -43,7 +44,7 @@ namespace Project_1.GameObjects
 
         static WorldSpace FindTileAroundPlayer()
         {
-            Tile[] tiles = System.Array.Empty<Tile>();
+            Tile[] tiles = Array.Empty<Tile>();
             float start = DistanceOfCircleAroundPlayer;
             const float step = 50;
             while (tiles.Length == 0)
