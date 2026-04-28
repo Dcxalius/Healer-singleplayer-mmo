@@ -43,6 +43,7 @@ namespace Project_1.Textures
 
         public Vector2 Offset => offset;
         Vector2 offset;
+        public float CenteredYOffset => GetCenteredYOffset();
 
         public Vector2 CalculatePartialOffset(int aIndexToCalculateTo) => CalculatePartialOffset(0, aIndexToCalculateTo);
         public Vector2 CalculatePartialOffset(int aStartIndex, int aIndexToCalculateTo) => MeasureScaledPartial(textToDisplay, font, scale, aStartIndex, aIndexToCalculateTo);

@@ -234,6 +234,7 @@ namespace Project_1.UI.HUD.Managers
 
             //TODO: TEST THIS NOOOOW!
             guildWindow.RefreshListing(ownerRenderId, currentLevel);
+            HUDManager.InvalidateUi();
 
             if (!inspectWindow.BelongsTo(ownerRenderId)) return;
 

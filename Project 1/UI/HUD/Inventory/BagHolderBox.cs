@@ -20,7 +20,7 @@ namespace Project_1.UI.HUD.Inventory
 
         public void SetBags(ItemUiSnapshot[] aBags, AbsoluteScreenPosition aItemSize, AbsoluteScreenPosition aSpacingSize)
         {
-            KillAllChildren();
+            KillAllChildren(defaultBag);
             RelativeScreenPosition relItemSize = aItemSize.ToRelativeScreenPosition(Size);
             RelativeScreenPosition relSpacing = aSpacingSize.ToRelativeScreenPosition(Size);
             defaultBag.Move(relSpacing);

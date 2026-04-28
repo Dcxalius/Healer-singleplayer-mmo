@@ -18,6 +18,7 @@ namespace Project_1.GameObjects.Unit
             Range
         }
 
+        [Newtonsoft.Json.JsonIgnore]
         public float GetAttackDamage
         {
             get

@@ -7,6 +7,23 @@ namespace Project_1.UI.UIElements
 {
     internal abstract partial class UIElement
     {
+        protected void KillAllChildren(UIElement child) => KillAllChildren(new List<UIElement>() { child });
+
+        protected void KillAllChildren(List<UIElement> sparedChildren)
+        {
+            List<UIElement> remainingLast = new List<UIElement>();
+            List<UIElement> remainingFirst = new List<UIElement>();
+            foreach (UIElement child in sparedChildren)
+            {
+                if (lastChildren.Contains(child)) remainingLast.Add(child);
+                if (firstChildren.Contains(child)) remainingFirst.Add(child);
+            }
+            KillAllChildren();
+            children.AddRange(sparedChildren);
+            firstChildren.AddRange(remainingFirst);
+            lastChildren.AddRange(remainingLast);
+        }
+
         protected virtual void KillAllChildren()
         {
             children.Clear();

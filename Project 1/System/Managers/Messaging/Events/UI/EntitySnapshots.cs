@@ -51,6 +51,24 @@ namespace Project_1.Messaging.Events
         public Color ResourceColor { get; }
         public WorldSpace FeetPosition { get; }
         public int WorldHeight { get; }
+
+        public EntityUiSnapshot WithLevel(int level)
+        {
+            return new EntityUiSnapshot(
+                RenderId,
+                Name,
+                ClassName,
+                RelationToPlayer,
+                RelationColor,
+                level,
+                CurrentHealth,
+                MaxHealth,
+                CurrentResource,
+                MaxResource,
+                ResourceColor,
+                FeetPosition,
+                WorldHeight);
+        }
     }
 
     internal readonly struct SpellUiSnapshot

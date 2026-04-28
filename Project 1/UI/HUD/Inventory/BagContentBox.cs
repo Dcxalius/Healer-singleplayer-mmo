@@ -88,11 +88,5 @@ namespace Project_1.UI.HUD.Inventory
             if (aSlot < 0 || aSlot >= slots.Length) return;
             slots[aSlot].AssignItem(snapshot);
         }
-
-        public override void Draw(SpriteBatch aBatch)
-        {
-            ThreadAffinity.AssertMainThread();
-            base.Draw(aBatch);
-        }
     }
 }

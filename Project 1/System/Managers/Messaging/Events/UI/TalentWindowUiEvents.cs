@@ -15,12 +15,14 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct TalentLearnRequested
     {
-        public TalentLearnRequested(int talentId)
+        public TalentLearnRequested(int talentId, int? memberRenderId)
         {
             TalentId = talentId;
+            MemberRenderId = memberRenderId;
         }
 
         public int TalentId { get; }
+        public int? MemberRenderId { get; }
     }
 
     internal readonly struct TalentWindowSet

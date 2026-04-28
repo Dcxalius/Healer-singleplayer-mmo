@@ -140,7 +140,9 @@ namespace Project_1.UI.HUD.Guild
 
         internal void UpdateLevel(int level)
         {
+            data = data.WithLevel(level);
             this.level.Text = level.ToString();
+            talentButton.Visible = level >= TalentUnlockLevel;
         }
     }
 }

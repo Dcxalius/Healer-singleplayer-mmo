@@ -34,8 +34,6 @@ namespace Project_1.UI.HUD.PlateBoxes
             rightVerticalSegments = new PlateBoxSegment[] { };
             horizontalSegments = new PlateBoxSegment[] { name, health, resource };
 
-            AddSegmentsToChildren();
-
             health.SetTextSize(UIElements.Bars.ResourceBar.Labels.Percentage, health.Size.Y - 2);
         }
 
