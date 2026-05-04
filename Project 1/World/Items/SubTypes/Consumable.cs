@@ -1,4 +1,4 @@
-﻿using Project_1.GameObjects.Unit.Resources;
+using Project_1.GameObjects.Unit.Resources;
 using Project_1.GameObjects.Entities;
 using System;
 using Newtonsoft.Json;

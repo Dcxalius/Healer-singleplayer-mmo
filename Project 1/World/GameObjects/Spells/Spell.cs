@@ -1,14 +1,14 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.Entities.Projectiles;
 using Project_1.GameObjects.Unit;
-using Project_1.GameObjects.Unit.Stats;
 using Project_1.Managers;
 using Project_1.Textures;
 using Project_1.World.GameObjects.Spells.SpellEffects;
+using Project_1.World.GameObjects.Unit.Stats.Secondary;
 using Project_1.World.GameObjects.Unit.Talents;
 using System;
 using System.CodeDom;

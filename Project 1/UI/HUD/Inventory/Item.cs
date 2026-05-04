@@ -193,7 +193,7 @@ namespace Project_1.UI.HUD.Inventory
         {
             if (bagIndex != -1) return false;
             if (aItemDroppedOnMe.bagIndex == -2) return true; //Drop from loot
-            if (!aItemDroppedOnMe.snapshot.HasValue || aItemDroppedOnMe.snapshot.ItemType != ItemData.ItemType.Container) return true; //Dropped is not bag
+            if (!aItemDroppedOnMe.snapshot.HasValue || aItemDroppedOnMe.snapshot.ItemType != ItemData.ItemType.Bag) return true; //Dropped is not bag
 
             MailboxManager.PublishSimCommand(new InventorySwapBagsRequested(aItemDroppedOnMe.Index, slotIndex));
             return true;
@@ -366,13 +366,7 @@ namespace Project_1.UI.HUD.Inventory
                 {
                     MailboxManager.PublishSimCommand(new InventoryEnchantTargetRequested(Index));
                     return;
-                }
-
-                bool shopOpen = IsShopOpen();
-                if (shopOpen)
-                {
-                    //TODO: Add refund system instead of direct deletion.
-                }
+                }   
 
                 int? inspectTargetRenderId = GetInspectTargetRenderId();
                 int? targetRenderId = !inspectTargetRenderId.HasValue || IsCharacterWindowOpen()
@@ -383,14 +377,17 @@ namespace Project_1.UI.HUD.Inventory
                 switch (snapshot.ItemType)
                 {
                     case ItemData.ItemType.NotSet:
+                    case ItemData.ItemType.Reagent:
+                    case ItemData.ItemType.Trash:
                         return;
                     case ItemData.ItemType.Container:
-                        MailboxManager.PublishSimCommand(new InventoryEquipBagRequested(Index));
-                        return;
-                    case ItemData.ItemType.Trash:
+                        MailboxManager.PublishSimCommand(new InventoryOpenContainerRequested(Index));
                         return;
                     case ItemData.ItemType.Consumable:
                         MailboxManager.PublishSimCommand(new InventoryConsumeRequested(Index, targetRenderId));
+                        return;
+                    case ItemData.ItemType.Bag:
+                        MailboxManager.PublishSimCommand(new InventoryEquipBagRequested(Index));
                         return;
                     case ItemData.ItemType.Equipment:
                     case ItemData.ItemType.Weapon:

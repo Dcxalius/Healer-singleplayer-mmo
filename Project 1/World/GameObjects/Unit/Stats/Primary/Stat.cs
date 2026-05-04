@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.CodeDom;
 using System.Diagnostics;
 
-namespace Project_1.GameObjects.Unit.Stats
+namespace Project_1.World.GameObjects.Unit.Stats.Primary
 {
     internal abstract class Stat
     {

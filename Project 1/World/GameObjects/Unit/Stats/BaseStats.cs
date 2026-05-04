@@ -1,4 +1,4 @@
-﻿using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.GameObjects.Unit.Classes;
 using Project_1.GameObjects.Unit.Resources;
@@ -11,7 +11,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Project_1.GameObjects.Unit.Stats.BasePrimaryStats;
+using static Project_1.World.GameObjects.Unit.Stats.Primary.BasePrimaryStats;
+using Project_1.World.GameObjects.Unit.Stats.Primary;
+using Project_1.World.GameObjects.Unit.Stats.Secondary;
 
 namespace Project_1.GameObjects.Unit.Stats
 {

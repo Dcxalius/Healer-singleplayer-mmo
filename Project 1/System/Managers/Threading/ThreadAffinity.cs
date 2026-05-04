@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 
 namespace Project_1.Managers
@@ -44,6 +44,7 @@ namespace Project_1.Managers
             uiThreadId = Environment.CurrentManagedThreadId;
         }
 
+        [DebuggerStepThrough]
         public static void AssertMainThread()
         {
             if (mainThreadId.HasValue && mainThreadId != Environment.CurrentManagedThreadId)

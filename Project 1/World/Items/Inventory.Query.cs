@@ -42,13 +42,13 @@ namespace Project_1.Items
             return items[aBagSlot].Count(item => item != null);
         }
 
-        public Container GetBag(int aSlotIndex)
+        public Bag GetBag(int aSlotIndex)
         {
             Debug.Assert(aSlotIndex > 0, "Incorrect slot given");
             return bags[aSlotIndex];
         }
 
-        public Container[] GetBags()
+        public Bag[] GetBags()
         {
             return bags;
         }

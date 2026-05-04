@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
+using Project_1.GameObjects.Unit;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.Unit.Stats
+namespace Project_1.World.GameObjects.Unit.Stats.Secondary
 {
     public enum SpellSchool
     {
@@ -87,9 +88,14 @@ namespace Project_1.GameObjects.Unit.Stats
 
         public void Refresh(UnitData aUnitData)
         {
+            bool isBaseSchool = spellSchool == SpellSchool.Base;
             spellDamage = aUnitData.Equipment.GetSecondaryStat<int>(spellSchool.ToString() + "SpellDamage");
-            critChance = Math.Clamp(BASE_CRIT_CHANCE + aUnitData.BaseStats.TotalPrimaryStats.Intellect * aUnitData.ClassData.SpellCritChanceScaler + aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellCritChance"), 0d, 1d);
-            critDamage = BASE_CRIT_DAMAGE + aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellCritDamage");
+            double baseCritChance = isBaseSchool
+                ? BASE_CRIT_CHANCE + aUnitData.BaseStats.TotalPrimaryStats.Intellect * aUnitData.ClassData.SpellCritChanceScaler
+                : 0d;
+            double baseCritDamage = isBaseSchool ? BASE_CRIT_DAMAGE : 0d;
+            critChance = Math.Clamp(baseCritChance + aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellCritChance"), 0d, 1d);
+            critDamage = baseCritDamage + aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellCritDamage");
             flatPenetration = aUnitData.Equipment.GetSecondaryStat<int>(spellSchool.ToString() + "SpellFlatPenetration");
             percentPenetration = Math.Clamp(aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellPercentPenetration"), 0d, 1d);
             haste = Math.Clamp(aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellHaste"), 0d, 1d);
@@ -101,8 +107,8 @@ namespace Project_1.GameObjects.Unit.Stats
         {
             spellSchool = aSchool;
             spellDamage = 0;
-            critChance = BASE_CRIT_CHANCE;
-            critDamage = BASE_CRIT_DAMAGE;
+            critChance = aSchool == SpellSchool.Base ? BASE_CRIT_CHANCE : 0d;
+            critDamage = aSchool == SpellSchool.Base ? BASE_CRIT_DAMAGE : 0d;
             flatPenetration = 0;
             percentPenetration = 0;
             haste = 0;

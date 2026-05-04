@@ -1,4 +1,4 @@
-﻿using Project_1.GameObjects;
+using Project_1.GameObjects;
 using Project_1.Items;
 using Project_1.Items.SubTypes;
 using Project_1.Managers;
@@ -129,9 +129,9 @@ namespace Project_1.Messaging
                 return new Equipment(equipment.EquipmentData, equipment.Hash);
             }
 
-            if (source is Container container)
+            if (source is Bag container)
             {
-                return new Container(ItemFactory.GetItemData<ContainerData>(container.ID));
+                return new Bag(ItemFactory.GetItemData<BagData>(container.ID));
             }
 
             return ItemFactory.CreateItem(source.ID, source.Count);
@@ -140,7 +140,7 @@ namespace Project_1.Messaging
         static Item CloneItemWithCount(Item source, int count)
         {
             if (source == null) return null;
-            if (source is Weapon || source is Equipment || source is Container)
+            if (source is Weapon || source is Equipment || source is Bag)
             {
                 return CloneItem(source);
             }

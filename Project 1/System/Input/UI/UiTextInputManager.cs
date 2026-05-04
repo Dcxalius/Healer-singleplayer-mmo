@@ -50,6 +50,15 @@ namespace Project_1.Input
             RemoveTextInputRegistration();
         }
 
+        public static void ReplaceActiveInput(InputBox input, string text)
+        {
+            ThreadAffinity.AssertUiThread();
+            if (activeInput != input) return;
+
+            activeInput.Input = text ?? string.Empty;
+            cursorPosition = activeInput.Input.Length;
+        }
+
         public static void Update()
         {
             ThreadAffinity.AssertUiThread();
@@ -75,6 +84,7 @@ namespace Project_1.Input
             {
                 Keys key = downKeys[i];
                 if (key == Keys.None || !UiKeyboardStateCache.IsNewlyPressed(key)) continue;
+                if (activeInput.HandleControlKey(key)) continue;
                 if (HandleRemove(key)) continue;
                 if (key == Keys.Enter)
                 {

@@ -48,6 +48,7 @@ namespace Project_1.UI.UIElements.Boxes
         ValidInputs[] validInputs;
 
         List<Action> enterActions;
+        Func<Keys, bool> controlKeyHandler;
 
 
         public bool ValidInput(Keys aKey)
@@ -204,6 +205,16 @@ namespace Project_1.UI.UIElements.Boxes
 
         public void AddToEnter(Action aAction) => enterActions.Add(aAction);
         public void AddToEnter(List<Action> aSetOfActions) => enterActions.AddRange(aSetOfActions);
+
+        public void SetControlKeyHandler(Func<Keys, bool> aHandler)
+        {
+            controlKeyHandler = aHandler;
+        }
+
+        public bool HandleControlKey(Keys aKey)
+        {
+            return controlKeyHandler != null && controlKeyHandler(aKey);
+        }
 
         public void Enter()
         {

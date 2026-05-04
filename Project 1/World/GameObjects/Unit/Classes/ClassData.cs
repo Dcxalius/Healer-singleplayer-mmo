@@ -1,6 +1,5 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Project_1.GameObjects.Unit.Resources;
-using Project_1.GameObjects.Unit.Stats;
 using Project_1.Items.SubTypes;
 using System;
 using System.Collections.Generic;
@@ -10,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.World.GameObjects.Unit.Talents;
+using Project_1.World.GameObjects.Unit.Stats.Primary;
 
 namespace Project_1.GameObjects.Unit.Classes
 {

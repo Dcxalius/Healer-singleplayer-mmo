@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Project_1.Camera;
@@ -20,6 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.Managers;
+using Project_1.World.GameObjects.Unit.Stats.Primary;
 
 namespace Project_1.GameObjects.Unit
 {

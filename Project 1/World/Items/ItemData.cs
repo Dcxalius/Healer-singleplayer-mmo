@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using Project_1.Textures;
@@ -13,14 +13,16 @@ namespace Project_1.Items
 {
     internal class ItemData : IComparable<ItemData>
     {
-        public enum ItemType
+        public enum ItemType //TODO: This should probably be removed
         {
-            NotSet,
-            Container,
-            Trash,
-            Consumable,
-            Equipment,
-            Weapon
+            NotSet = 0,
+            Container = 1,
+            Trash = 2,
+            Consumable = 3,
+            Equipment = 4,
+            Weapon = 5,
+            Reagent = 6,
+            Bag = 7
         }
 
 

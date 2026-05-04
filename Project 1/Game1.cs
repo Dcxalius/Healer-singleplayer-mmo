@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -47,6 +47,8 @@ namespace Project_1
         {
 
             //DEBUG
+
+            
 
             if (DebugManager.Mode(DebugMode.InstantlyContinue))
             {
@@ -142,7 +144,9 @@ namespace Project_1
             ThreadAffinity.AssertMainThread();
 
             // Deterministic thread shutdown order:
-            // 1) stop UI producer, 2) stop worker jobs, 3) stop sim loop.
+            // 1) stop UI producer, 2) stop worker jobs, 3) stop sim loop
+
+            //TODO: Make sure saving happens properly before shutting down threads
             UiThread.Stop();
             WorkerPool.Stop();
             SimThread.Stop();

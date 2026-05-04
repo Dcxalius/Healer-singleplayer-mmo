@@ -20,14 +20,18 @@ namespace Project_1.UI.HUD.Chat
     internal sealed class ChatPanel : Box
     {
         const int MaxMessages = 100;
+        const int MaxInputHistory = 100;
         const float VisibleRows = 9f;
         const float ChatTextSize = Text.DefaultTextSize;
 
         readonly ScrollableBox<ChatLineElement> messageLog;
         readonly InputBox inputBox;
         readonly ChatMessageBuffer messageBuffer = new ChatMessageBuffer(MaxMessages);
+        readonly List<string> inputHistory = new List<string>();
 
         bool suppressOpenUntilEnterReleased;
+        int inputHistoryIndex;
+        string inputHistoryDraft = string.Empty;
 
         public ChatPanel(RelativeScreenPosition aPos, RelativeScreenPosition aSize)
             : base(null, new UITexture("GrayBackground", new Color(50, 50, 50, 165)), aPos, aSize)
@@ -67,6 +71,7 @@ namespace Project_1.UI.HUD.Chat
                 inputSize);
             inputBox.Visible = false;
             inputBox.SetEnter(new List<Action> { SubmitInput });
+            inputBox.SetControlKeyHandler(HandleInputControlKey);
         }
 
         public override void Update()
@@ -114,6 +119,7 @@ namespace Project_1.UI.HUD.Chat
         {
             inputBox.Input = string.Empty;
             inputBox.Visible = true;
+            ResetInputHistoryNavigation();
             UiTextInputManager.Begin(inputBox);
             HUDManager.InvalidateUi();
         }
@@ -129,6 +135,54 @@ namespace Project_1.UI.HUD.Chat
             HUDManager.InvalidateUi();
         }
 
+        bool HandleInputControlKey(Keys aKey)
+        {
+            if (!UiKeyboardStateCache.GetHold(Keys.LeftShift) && !UiKeyboardStateCache.GetHold(Keys.RightShift)) return false;
+            if (aKey != Keys.Up && aKey != Keys.Down) return false;
+
+            NavigateInputHistory(aKey == Keys.Up ? -1 : 1);
+            return true;
+        }
+
+        void NavigateInputHistory(int aDirection)
+        {
+            if (inputHistory.Count == 0) return;
+
+            if (inputHistoryIndex == inputHistory.Count)
+            {
+                inputHistoryDraft = inputBox.Input ?? string.Empty;
+            }
+
+            inputHistoryIndex += aDirection;
+            if (inputHistoryIndex < 0) inputHistoryIndex = 0;
+            if (inputHistoryIndex > inputHistory.Count) inputHistoryIndex = inputHistory.Count;
+
+            string text = inputHistoryIndex == inputHistory.Count
+                ? inputHistoryDraft
+                : inputHistory[inputHistoryIndex];
+            UiTextInputManager.ReplaceActiveInput(inputBox, text);
+            HUDManager.InvalidateUi();
+        }
+
+        void ResetInputHistoryNavigation()
+        {
+            inputHistoryIndex = inputHistory.Count;
+            inputHistoryDraft = string.Empty;
+        }
+
+        void AddInputHistory(string aText)
+        {
+            if (string.IsNullOrWhiteSpace(aText)) return;
+            if (inputHistory.Count > 0 && inputHistory[inputHistory.Count - 1] == aText) return;
+
+            inputHistory.Add(aText);
+            if (inputHistory.Count > MaxInputHistory)
+            {
+                inputHistory.RemoveAt(0);
+            }
+            ResetInputHistoryNavigation();
+        }
+
         void SubmitInput()
         {
             ThreadAffinity.AssertUiThread();
@@ -138,6 +192,8 @@ namespace Project_1.UI.HUD.Chat
             CloseInput();
 
             if (string.IsNullOrWhiteSpace(text)) return;
+
+            AddInputHistory(text);
 
             if (text.StartsWith("/"))
             {

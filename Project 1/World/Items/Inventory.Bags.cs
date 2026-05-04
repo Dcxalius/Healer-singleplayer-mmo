@@ -7,7 +7,7 @@ namespace Project_1.Items
 {
     internal partial class Inventory
     {
-        public bool EquipBag(Container aBag)
+        public bool EquipBag(Bag aBag)
         {
             AssertSimThread();
             DebugManager.Print("Depricated Method used");
@@ -28,11 +28,11 @@ namespace Project_1.Items
             AssertSimThread();
             Item slotItem = items[aBagAndSlot.Item1][aBagAndSlot.Item2];
             if (slotItem == null) return false;
-            Debug.Assert(slotItem.ItemType == ItemData.ItemType.Container);
-            if (slotItem.ItemType != ItemData.ItemType.Container) return false;
+            Debug.Assert(slotItem.ItemType == ItemData.ItemType.Bag);
+            if (slotItem.ItemType != ItemData.ItemType.Bag) return false;
 
-            Container container = slotItem as Container;
-            Debug.Assert(container != null, $"Inventory slot ({aBagAndSlot.Item1},{aBagAndSlot.Item2}) has ItemType.Container but runtime type {slotItem.GetType().Name}.");
+            Bag container = slotItem as Bag;
+            Debug.Assert(container != null, $"Inventory slot ({aBagAndSlot.Item1},{aBagAndSlot.Item2}) has ItemType.Bag but runtime type {slotItem.GetType().Name}.");
             if (container == null) return false;
 
             for (int i = 1; i < bags.Length; i++)
@@ -51,7 +51,7 @@ namespace Project_1.Items
             return false;
         }
 
-        public void AddBag(Container aBag, int aEmptySlotToAddTo)
+        public void AddBag(Bag aBag, int aEmptySlotToAddTo)
         {
             AssertSimThread();
             Debug.Assert(aEmptySlotToAddTo != 0, "Tried to Add a bag to default bagslot.");
@@ -97,7 +97,7 @@ namespace Project_1.Items
         {
             AssertSimThread();
             Item[] tempItems = items[aBagSlot];
-            Container tempBag = bags[aBagSlot];
+            Bag tempBag = bags[aBagSlot];
             items[aBagSlot] = items[aSlotToSwapWith];
             bags[aBagSlot] = bags[aSlotToSwapWith];
             items[aSlotToSwapWith] = tempItems;
@@ -124,7 +124,7 @@ namespace Project_1.Items
                 return;
             }
 
-            Container tempBag = bags[aBagSlot];
+            Bag tempBag = bags[aBagSlot];
             Item[] tempItems = items[aBagSlot];
 
             bags[aBagSlot] = bags[aSlotToSwapWith];
@@ -142,11 +142,11 @@ namespace Project_1.Items
             AssertSimThread();
             Item slotItem = items[aSlot.Item1][aSlot.Item2];
             if (slotItem == null) return;
-            Debug.Assert(slotItem.ItemType == ItemData.ItemType.Container, "Tried to treat non bag as a bag.");
-            if (slotItem.ItemType != ItemData.ItemType.Container) return;
+            Debug.Assert(slotItem.ItemType == ItemData.ItemType.Bag, "Tried to treat non bag as a bag.");
+            if (slotItem.ItemType != ItemData.ItemType.Bag) return;
 
-            Container slotContainer = slotItem as Container;
-            Debug.Assert(slotContainer != null, $"Inventory slot ({aSlot.Item1},{aSlot.Item2}) has ItemType.Container but runtime type {slotItem.GetType().Name}.");
+            Bag slotContainer = slotItem as Bag;
+            Debug.Assert(slotContainer != null, $"Inventory slot ({aSlot.Item1},{aSlot.Item2}) has ItemType.Bag but runtime type {slotItem.GetType().Name}.");
             if (slotContainer == null) return;
 
             if (bags[aSlotToSwapWith] == null)
@@ -164,7 +164,7 @@ namespace Project_1.Items
                 return;
             }
 
-            Container tempBag = bags[aSlotToSwapWith];
+            Bag tempBag = bags[aSlotToSwapWith];
             Item[] tempItems = items[aSlotToSwapWith].Skip(tempBag.SlotCount).ToArray();
             bags[aSlotToSwapWith] = slotContainer;
             items[aSlotToSwapWith] = new Item[bags[aSlotToSwapWith].SlotCount];

@@ -157,6 +157,27 @@ namespace Project_1.UI.HUD.Managers
             HUDManager.InvalidateUi();
         }
 
+        public void ToggleSpellBookWindow()
+        {
+            ThreadAffinity.AssertUiThread();
+            spellBookWindow.ToggleVisibilty();
+            HUDManager.InvalidateUi();
+        }
+
+        public void TogglePlayerTalentWindow()
+        {
+            ThreadAffinity.AssertUiThread();
+            talentWindow.ToggleVisibilty();
+            HUDManager.InvalidateUi();
+        }
+
+        public void ToggleGuildWindow()
+        {
+            ThreadAffinity.AssertUiThread();
+            guildWindow.ToggleVisibilty();
+            HUDManager.InvalidateUi();
+        }
+
         public void SetTalentWindow(TalentWindowSnapshot snapshot)
         {
             ThreadAffinity.AssertUiThread();

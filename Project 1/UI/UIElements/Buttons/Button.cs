@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Input;
@@ -97,6 +97,7 @@ namespace Project_1.UI.UIElements.Buttons
             else
             {
                 pressedGfx.Draw(aBatch, AbsolutePos);
+                DrawChildren(aBatch);
             }
 
             //if (text.Value == null)

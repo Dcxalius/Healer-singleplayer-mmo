@@ -6,6 +6,7 @@ using Project_1.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.World.Items.Enchantments;
+using Project_1.World.Items.SubTypes;
 using System;
 
 namespace Project_1.Items
@@ -42,6 +43,7 @@ namespace Project_1.Items
             SubscribeSimCommand<InventorySwapBagsRequested>(HandleInventorySwapBagsRequested);
             SubscribeSimCommand<InventorySwapBagSlotsRequested>(HandleInventorySwapBagSlotsRequested);
             SubscribeSimCommand<LootItemRequested>(HandleLootItemRequested);
+            SubscribeSimCommand<InventoryOpenContainerRequested>(HandleInventoryOpenContainerRequested);
             SubscribeSimCommand<InventoryEquipRequested>(HandleInventoryEquipRequested);
             SubscribeSimCommand<InventoryConsumeRequested>(HandleInventoryConsumeRequested);
             SubscribeSimCommand<InventoryEnchantTargetRequested>(HandleInventoryEnchantTargetRequested);
@@ -121,6 +123,25 @@ namespace Project_1.Items
                 return;
             }
             player.Inventory.LootItem(e.LootSlotIndex);
+        }
+
+        static void HandleInventoryOpenContainerRequested(InventoryOpenContainerRequested e)
+        {
+            ThreadAffinity.AssertSimThread();
+            Player player = ObjectManager.Player;
+            if (player == null) return;
+
+            Item item = player.Inventory.GetItemInSlot(e.Index);
+            if (item is not Container container) return;
+
+            Item[] loot = container.GetLoot();
+            if (loot == null || loot.Length == 0) return;
+
+            LootDrop drop = new LootDrop(loot, player);
+            ItemUiSnapshot[] snapshot = LootState.Open(drop);
+            LootContext context = LootState.BuildContext(drop);
+            player.Inventory.ConsumeOneFromSlot(e.Index);
+            MailboxManager.PublishUiEvent(new LootOpened(snapshot, context));
         }
 
         static void HandleInventoryEquipRequested(InventoryEquipRequested e)

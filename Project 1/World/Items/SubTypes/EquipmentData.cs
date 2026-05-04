@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Project_1.GameObjects.Unit;
-using Project_1.GameObjects.Unit.Stats;
+using Project_1.World.GameObjects.Unit.Stats.Primary;
 using System;
 
 namespace Project_1.Items.SubTypes

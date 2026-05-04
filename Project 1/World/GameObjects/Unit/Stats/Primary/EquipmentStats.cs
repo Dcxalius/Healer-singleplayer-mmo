@@ -1,4 +1,6 @@
-﻿namespace Project_1.GameObjects.Unit.Stats
+using Project_1.GameObjects.Unit.Stats;
+
+namespace Project_1.World.GameObjects.Unit.Stats.Primary
 {
     internal class EquipmentStats : PrimaryStats //TODO: Shouldn't this be in items? Also I dont think I like that both items and the units both uses this
     {

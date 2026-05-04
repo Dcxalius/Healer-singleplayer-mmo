@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -29,7 +29,7 @@ namespace Project_1.Items
         public int MaxDrops { get => maxDrops; }
         int maxDrops;
 
-        public LootData(string itemName, int weight, (int, int) countRange, int maxDrops)
+        public LootData(string itemName, int weight, (int, int) countRange, int maxDrops) //TODO: This shouldnt use name
         {
             this.itemName = itemName;
             Debug.Assert(ItemFactory.DoesDataExist(itemName), "No item by given name detected.");

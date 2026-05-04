@@ -1,5 +1,6 @@
-﻿using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spells;
+using Project_1.World.GameObjects.Unit.Stats.Secondary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace Project_1.World.GameObjects.Spells.SpellEffects
     {
         Type type;
 
-        public CrowdControlEffect(double aDuration, string aName, bool aIsBinary, HashSet<Project_1.GameObjects.Unit.Stats.SpellSchool> aSpellSchools) : base(aDuration, aName, aIsBinary, aSpellSchools)
+        public CrowdControlEffect(double aDuration, string aName, bool aIsBinary, HashSet<SpellSchool> aSpellSchools) : base(aDuration, aName, aIsBinary, aSpellSchools)
         {
         }
 

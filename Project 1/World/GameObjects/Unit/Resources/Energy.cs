@@ -1,4 +1,4 @@
-﻿using Project_1.Managers;
+using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Project_1.GameObjects.Unit.Stats;
+using Project_1.World.GameObjects.Unit.Stats.Primary;
 
 namespace Project_1.GameObjects.Unit.Resources
 {

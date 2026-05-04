@@ -31,6 +31,11 @@ namespace Project_1.UI.UIElements
                 gfx.Draw(aBatch, AbsolutePos);
             }
 
+            DrawChildren(aBatch);
+        }
+        protected void DrawChildren(SpriteBatch aBatch)
+        {
+            ThreadAffinity.AssertMainThread();
             if (children.Count == 0) return;
             //TODO: Lock this or change draw system
             GraphicsManager.CaptureScissor(this, AbsolutePos);
@@ -74,5 +79,6 @@ namespace Project_1.UI.UIElements
                 GraphicsManager.ReleaseScissor(this);
             }
         }
-    }
+
+    }   
 }

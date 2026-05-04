@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities.Corspes;
 using Project_1.GameObjects.FloatingTexts;
@@ -23,6 +23,7 @@ using System.Globalization;
 using Project_1.Managers;
 using Project_1.World.Items.Enchantments;
 using Project_1.Tiles;
+using Project_1.World.GameObjects.Unit.Stats.Primary;
 
 namespace Project_1.GameObjects.Entities
 {

@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Project_1.GameObjects.Unit;
-using Project_1.GameObjects.Unit.Stats;
 using Project_1.Textures;
 using Project_1.World.GameObjects.Spells.SpellEffects;
+using Project_1.World.GameObjects.Unit.Stats.Secondary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

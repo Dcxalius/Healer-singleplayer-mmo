@@ -1,5 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using Project_1.GameObjects.Unit.Stats;
+using Microsoft.Xna.Framework;
+using Project_1.World.GameObjects.Unit.Stats.Primary;
 using System;
 using System.Collections.Generic;
 using System.Linq;

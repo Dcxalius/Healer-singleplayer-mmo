@@ -1,7 +1,7 @@
 using Project_1.GameObjects.Entities;
-using Project_1.GameObjects.Unit.Stats;
 using Project_1.Textures;
 using Project_1.World.GameObjects.Spells.SpellEffects;
+using Project_1.World.GameObjects.Unit.Stats.Secondary;
 using System.Collections.Generic;
 
 namespace Project_1.GameObjects.Spells.Buff

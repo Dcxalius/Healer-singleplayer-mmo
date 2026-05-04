@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Project_1.GameObjects.Unit;
-using Project_1.GameObjects.Unit.Stats;
 using Project_1.Managers;
+using Project_1.World.GameObjects.Unit.Stats.Primary;
 using Project_1.World.Items.Enchantments;
 using System;
 using System.Collections.Generic;

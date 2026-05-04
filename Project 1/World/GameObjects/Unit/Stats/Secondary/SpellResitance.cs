@@ -1,11 +1,13 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Unit;
+using Project_1.GameObjects.Unit.Stats;
 using Project_1.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Project_1.GameObjects.Unit.Stats
+namespace Project_1.World.GameObjects.Unit.Stats.Secondary
 {
     internal class SpellResitance
     {
@@ -121,7 +123,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
             int cap = aCaster.Level.CurrentLevel * 5;
             int totalResistance = GetResitance(spellSchools);
-            double resistReduction = 1.0 - (0.75 * Math.Clamp((double)totalResistance / cap, 0, 1));
+            double resistReduction = 1.0 - 0.75 * Math.Clamp((double)totalResistance / cap, 0, 1);
 
             float totalHit = levelHit * (float)resistReduction + (float)aCaster.SecondaryStats.Spell.BonusHitChanceForSchools(spellSchools);
             return Math.Clamp(totalHit, 0.01f, 0.99f);
@@ -141,7 +143,7 @@ namespace Project_1.GameObjects.Unit.Stats
             int effectiveResistance = totalResistance + Math.Max(levelDifference * 5, 0) - flatPenetration - percentPenetration;
             if (aTarget.UnitType >= UnitType.Normal && levelDifference > 0)
             {
-                effectiveResistance += (2 / 15 * aCaster.Level.CurrentLevel * levelDifference);
+                effectiveResistance += 2 / 15 * aCaster.Level.CurrentLevel * levelDifference;
             }
 
             if (effectiveResistance <= 0)

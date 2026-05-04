@@ -37,6 +37,7 @@ namespace Project_1.UI.HUD.Managers
         static Minimap minimap;
         static SaveStatusIndicator saveStatusIndicator;
         static ChatPanel chatPanel;
+        static InGameMenu inGameMenu;
 
         static HeldItem heldItem;
         static HeldSpell heldSpell;
@@ -146,6 +147,14 @@ namespace Project_1.UI.HUD.Managers
             chatPanel = new ChatPanel(chatDefaultPos, chatDefaultSize);
             hudElements.Add(chatPanel);
 
+            inGameMenu = new InGameMenu();
+            inGameMenu.AddButton("Char", Input.KeyBindManager.KeyListner.Character, ToggleCharacterWindowFromMenu);
+            inGameMenu.AddButton("Bags", Input.KeyBindManager.KeyListner.Inventory, ToggleInventoryFromMenu);
+            inGameMenu.AddButton("Spells", Input.KeyBindManager.KeyListner.SpellBook, ToggleSpellBookFromMenu);
+            inGameMenu.AddButton("Talents", Input.KeyBindManager.KeyListner.TalentWindow, ToggleTalentWindowFromMenu);
+            inGameMenu.AddButton("Guild", Input.KeyBindManager.KeyListner.GuildRoster, ToggleGuildWindowFromMenu);
+            hudElements.Add(inGameMenu);
+
             RegisterUiSubscriptions();
 
             uiDrawListDirty = true;
@@ -153,6 +162,36 @@ namespace Project_1.UI.HUD.Managers
             BuildDrawLists();
             InvalidateUi();
             InvalidatePlates();
+        }
+
+        static void ToggleCharacterWindowFromMenu()
+        {
+            windowHandler.ToggleCharacterWindow();
+            InvalidateUi();
+        }
+
+        static void ToggleInventoryFromMenu()
+        {
+            inventoryBox.ToggleVisibilty();
+            InvalidateUi();
+        }
+
+        static void ToggleSpellBookFromMenu()
+        {
+            windowHandler.ToggleSpellBookWindow();
+            InvalidateUi();
+        }
+
+        static void ToggleTalentWindowFromMenu()
+        {
+            windowHandler.TogglePlayerTalentWindow();
+            InvalidateUi();
+        }
+
+        static void ToggleGuildWindowFromMenu()
+        {
+            windowHandler.ToggleGuildWindow();
+            InvalidateUi();
         }
 
         static void ImportSettings()

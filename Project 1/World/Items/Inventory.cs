@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.Items.SubTypes;
@@ -46,15 +46,15 @@ namespace Project_1.Items
         }
 
         [JsonIgnore]
-        public Container[] Bags => bags;
-        Container[] bags;
+        public Bag[] Bags => bags;
+        Bag[] bags;
 
         [JsonIgnore]
         public Item[][] Items => items;
         Item[][] items;
         public Inventory()
         {
-            bags = new Container[bagSlots]; //Bag 0 is fornow always null
+            bags = new Bag[bagSlots]; //Bag 0 is fornow always null
             items = new Item[bagSlots][];
             items[0] = new Item[defaultSlots];
             for (int i = 1; i < bags.Length; i++)
@@ -69,13 +69,13 @@ namespace Project_1.Items
         [JsonConstructor]
         public Inventory(int?[] bags, JToken items)
         {
-            this.bags = new Container[bagSlots]; //Bag 0 is fornow always null
+            this.bags = new Bag[bagSlots]; //Bag 0 is fornow always null
 
 
             for (int i = 1; i < bags.Length; i++)
             {
                 if (bags[i] == null) continue;
-                this.bags[i] = new Container(ItemFactory.GetItemData<ContainerData>(bags[i].Value));
+                this.bags[i] = new Bag(ItemFactory.GetItemData<BagData>(bags[i].Value));
             }
 
             this.items = new Item[bagSlots][];

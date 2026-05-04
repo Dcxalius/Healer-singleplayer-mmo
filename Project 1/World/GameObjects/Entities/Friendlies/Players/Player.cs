@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -18,11 +18,11 @@ using Project_1.Camera;
 using System.Diagnostics;
 using Project_1.UI.HUD.Managers;
 using Project_1.GameObjects.Unit;
-using Project_1.GameObjects.Unit.Stats;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 using Project_1.GameObjects.Entities.Friendlies.Players;
+using Project_1.World.GameObjects.Unit.Stats.Secondary;
 
 namespace Project_1.GameObjects.Entities.Friendlies.Players
 {

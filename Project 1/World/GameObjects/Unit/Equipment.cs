@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Entities.Friendlies;
 using Project_1.GameObjects.Unit.Classes;
@@ -9,6 +9,7 @@ using Project_1.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.UI.HUD.Managers;
+using Project_1.World.GameObjects.Unit.Stats.Primary;
 using Project_1.World.Items.Enchantments;
 using System;
 using System.Collections.Generic;

@@ -1,9 +1,26 @@
 using Project_1.Managers;
+using System;
 
 namespace Project_1.Input
 {
     internal static partial class KeyBindManager
     {
+        public readonly struct KeyBindingChangedEvent
+        {
+            public KeyBindingChangedEvent(bool firstButton, KeyListner listner, KeySet key)
+            {
+                FirstButton = firstButton;
+                Listner = listner;
+                Key = key;
+            }
+
+            public bool FirstButton { get; }
+            public KeyListner Listner { get; }
+            public KeySet Key { get; }
+        }
+
+        public static event Action<KeyBindingChangedEvent> KeyBindingChanged;
+
         public static bool GetPress(KeyListner aListner)
         {
             ThreadAffinity.AssertMainThread();
@@ -32,6 +49,8 @@ namespace Project_1.Input
             {
                 secondButtons[(int)aListner] = aKey;
             }
+
+            KeyBindingChanged?.Invoke(new KeyBindingChangedEvent(aFirstButton, aListner, aKey));
         }
 
         public static bool CheckForNoDupeKeys(KeySet aKeySet)

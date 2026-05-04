@@ -1,5 +1,7 @@
-﻿using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Spawners;
+using Project_1.GameObjects.Unit;
+using Project_1.GameObjects.Unit.Stats;
 using Project_1.Items.SubTypes;
 using Project_1.Managers;
 using System;
@@ -8,14 +10,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.Unit.Stats
+namespace Project_1.World.GameObjects.Unit.Stats.Primary
 {
     internal class SecondaryStats
     {
         static void AssertSimThread() => ThreadAffinity.AssertSimThread();
         public SecondaryStats(UnitData aUnitData)
         {
-            attack = new Attack(aUnitData);
+            attack = new Project_1.GameObjects.Unit.Stats.Attack(aUnitData);
             spell = aUnitData.ClassData.IsCaster
                 ? new Spell(aUnitData)
                 : new Spell(attack);
@@ -34,7 +36,7 @@ namespace Project_1.GameObjects.Unit.Stats
         Spell spell;
         public Defense Defense => defense;
         Defense defense;
-        public Attack Attack => attack;
-        Attack attack;
+        public Project_1.GameObjects.Unit.Stats.Attack Attack => attack;
+        Project_1.GameObjects.Unit.Stats.Attack attack;
     }
 }

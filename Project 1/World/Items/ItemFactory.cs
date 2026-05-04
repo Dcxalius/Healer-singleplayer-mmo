@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Content;
 using Newtonsoft.Json;
 using Project_1.GameObjects.Spells;
 using Project_1.Managers;
@@ -13,6 +13,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Project_1.World.Items.SubTypes;
 
 namespace Project_1.Items
 {
@@ -61,8 +62,12 @@ namespace Project_1.Items
             {
                 case "Trash":
                     return JsonConvert.DeserializeObject<ItemData>(aRawData);
+                case "Bags":
+                    return JsonConvert.DeserializeObject<BagData>(aRawData);
                 case "Container":
                     return JsonConvert.DeserializeObject<ContainerData>(aRawData);
+                case "Reagents":
+                    return JsonConvert.DeserializeObject<ReagentData>(aRawData);
                 case "Consumable":
                     return JsonConvert.DeserializeObject<ConsumableData>(aRawData);
                 case "Equipment":
@@ -115,15 +120,23 @@ namespace Project_1.Items
                 case ItemData.ItemType.NotSet:
                     throw new NotImplementedException();
                 case ItemData.ItemType.Container:
+                    Debug.Assert(aCount == 1, "Containers cannot be stacked. Count should be 1.");
                     return new Container(aData as ContainerData);
+                case ItemData.ItemType.Bag:
+                    Debug.Assert(aCount == 1, "Bags cannot be stacked. Count should be 1.");
+                    return new Bag(aData as BagData);
                 case ItemData.ItemType.Trash:
                     return new Item(aData, aCount);
                 case ItemData.ItemType.Consumable:
                     return new Consumable(aData as ConsumableData, aCount);
                 case ItemData.ItemType.Equipment:
+                    Debug.Assert(aCount == 1, "Equipment cannot be stacked. Count should be 1.");
                     return new Equipment(aData as EquipmentData);
                 case ItemData.ItemType.Weapon:
+                    Debug.Assert(aCount == 1, "Equipment cannot be stacked. Count should be 1.");
                     return new Weapon(aData as WeaponData);
+                case ItemData.ItemType.Reagent:
+                    return new Reagent(aData, aCount);
                 default:
                     throw new NotImplementedException();
             }
@@ -139,6 +152,8 @@ namespace Project_1.Items
                     throw new NotImplementedException();
                 case ItemData.ItemType.Container:
                     return new Container(aLoot);
+                case ItemData.ItemType.Bag:
+                    return new Bag(aLoot);
                 case ItemData.ItemType.Trash:
                     return new Item(aLoot);
                 case ItemData.ItemType.Consumable:
@@ -147,6 +162,8 @@ namespace Project_1.Items
                     return new Weapon(aLoot);
                 case ItemData.ItemType.Equipment:
                     return new Equipment(aLoot);
+                case ItemData.ItemType.Reagent:
+                    return new Reagent(aLoot);
                 default:
                     throw new NotImplementedException();
             }

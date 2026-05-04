@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities.Corspes;
 using Project_1.GameObjects.FloatingTexts;
@@ -16,6 +16,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.World.GameObjects.Spells.SpellEffects;
+using Project_1.World.GameObjects.Unit.Stats.Secondary;
 
 namespace Project_1.GameObjects.Entities
 {

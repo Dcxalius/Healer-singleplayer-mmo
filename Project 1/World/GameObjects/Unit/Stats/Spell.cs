@@ -1,4 +1,5 @@
-﻿using Project_1.Items.SubTypes;
+using Project_1.Items.SubTypes;
+using Project_1.World.GameObjects.Unit.Stats.Secondary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -77,7 +78,7 @@ namespace Project_1.GameObjects.Unit.Stats
                 return Clamp01(attackFallback.CriticalChance);
             }
 
-            return Clamp01((float)GetValueWithBase<double>(aSchool, "SpellCritChance"));
+            return Clamp01((float)GetValueWithBase<double>(new[] { aSchool }, "SpellCritChance"));
         }
 
         public float CriticalChanceForSchools(HashSet<SpellSchool> aSchools)
@@ -87,14 +88,7 @@ namespace Project_1.GameObjects.Unit.Stats
                 return Clamp01(attackFallback.CriticalChance);
             }
 
-            SpellSchool[] schools = GetEffectiveSchools(aSchools);
-            double sum = 0;
-            for (int i = 0; i < schools.Length; i++)
-            {
-                sum += GetValueWithBase<double>(schools[i], "SpellCritChance");
-            }
-
-            return Clamp01((float)(sum / schools.Length));
+            return Clamp01((float)GetValueWithBase<double>(aSchools, "SpellCritChance"));
         }
 
         public float CriticalDamageForSchool(SpellSchool aSchool)
@@ -104,7 +98,7 @@ namespace Project_1.GameObjects.Unit.Stats
                 return attackFallback.CriticalDamage;
             }
 
-            return (float)GetValueWithBase<double>(aSchool, "SpellCritDamage");
+            return (float)GetValueWithBase<double>(new[] { aSchool }, "SpellCritDamage");
         }
 
         public float CriticalDamageForSchools(HashSet<SpellSchool> aSchools)
@@ -114,14 +108,7 @@ namespace Project_1.GameObjects.Unit.Stats
                 return attackFallback.CriticalDamage;
             }
 
-            SpellSchool[] schools = GetEffectiveSchools(aSchools);
-            double sum = 0;
-            for (int i = 0; i < schools.Length; i++)
-            {
-                sum += GetValueWithBase<double>(schools[i], "SpellCritDamage");
-            }
-
-            return (float)(sum / schools.Length);
+            return (float)GetValueWithBase<double>(aSchools, "SpellCritDamage");
         }
 
         public int FlatPenetrationForSchool(SpellSchool aSchool)
@@ -131,7 +118,7 @@ namespace Project_1.GameObjects.Unit.Stats
                 return attackFallback.FlatPenetration;
             }
 
-            return GetValueWithBase<int>(aSchool, "SpellFlatPenetration");
+            return GetValueWithBase<int>(new[] { aSchool }, "SpellFlatPenetration");
         }
 
         public int SpellDamageForSchool(SpellSchool aSchool)
@@ -141,7 +128,7 @@ namespace Project_1.GameObjects.Unit.Stats
                 return 0;
             }
 
-            return GetValueWithBase<int>(aSchool, "SpellDamage");
+            return GetValueWithBase<int>(new[] { aSchool }, "SpellDamage");
         }
 
         public int SpellDamageForSchools(HashSet<SpellSchool> aSchools)
@@ -151,14 +138,7 @@ namespace Project_1.GameObjects.Unit.Stats
                 return 0;
             }
 
-            SpellSchool[] schools = GetEffectiveSchools(aSchools);
-            double sum = 0;
-            for (int i = 0; i < schools.Length; i++)
-            {
-                sum += GetValueWithBase<int>(schools[i], "SpellDamage");
-            }
-
-            return (int)Math.Round(sum / schools.Length, MidpointRounding.AwayFromZero);
+            return GetValueWithBase<int>(aSchools, "SpellDamage");
         }
 
         public int FlatPenetrationForSchools(HashSet<SpellSchool> aSchools)
@@ -168,14 +148,7 @@ namespace Project_1.GameObjects.Unit.Stats
                 return attackFallback.FlatPenetration;
             }
 
-            SpellSchool[] schools = GetEffectiveSchools(aSchools);
-            double sum = 0;
-            for (int i = 0; i < schools.Length; i++)
-            {
-                sum += GetValueWithBase<int>(schools[i], "SpellFlatPenetration");
-            }
-
-            return (int)Math.Round(sum / schools.Length, MidpointRounding.AwayFromZero);
+            return GetValueWithBase<int>(aSchools, "SpellFlatPenetration");
         }
 
         public float PercentPenetrationForSchool(SpellSchool aSchool)
@@ -185,7 +158,7 @@ namespace Project_1.GameObjects.Unit.Stats
                 return Clamp01(attackFallback.PercentPenetration);
             }
 
-            return Clamp01((float)GetValueWithBase<double>(aSchool, "SpellPercentPenetration"));
+            return Clamp01((float)GetValueWithBase<double>(new[] { aSchool }, "SpellPercentPenetration"));
         }
 
         public float PercentPenetrationForSchools(HashSet<SpellSchool> aSchools)
@@ -195,14 +168,7 @@ namespace Project_1.GameObjects.Unit.Stats
                 return Clamp01(attackFallback.PercentPenetration);
             }
 
-            SpellSchool[] schools = GetEffectiveSchools(aSchools);
-            double sum = 0;
-            for (int i = 0; i < schools.Length; i++)
-            {
-                sum += GetValueWithBase<double>(schools[i], "SpellPercentPenetration");
-            }
-
-            return Clamp01((float)(sum / schools.Length));
+            return Clamp01((float)GetValueWithBase<double>(aSchools, "SpellPercentPenetration"));
         }
 
         public double BonusHitChanceForSchool(SpellSchool aSchool)
@@ -212,7 +178,7 @@ namespace Project_1.GameObjects.Unit.Stats
                 return Clamp01(attackFallback.BonusHitChance);
             }
 
-            return Clamp01(GetSpellBonusHitChance(aSchool));
+            return Clamp01(GetValueWithBase<double>(new[] { aSchool }, "SpellBonusHitChance"));
         }
 
         public double BonusHitChanceForSchools(HashSet<SpellSchool> aSchools)
@@ -222,14 +188,7 @@ namespace Project_1.GameObjects.Unit.Stats
                 return Clamp01(attackFallback.BonusHitChance);
             }
 
-            SpellSchool[] schools = GetEffectiveSchools(aSchools);
-            double sum = 0;
-            for (int i = 0; i < schools.Length; i++)
-            {
-                sum += GetSpellBonusHitChance(schools[i]);
-            }
-
-            return Clamp01(sum / schools.Length);
+            return Clamp01(GetValueWithBase<double>(aSchools, "SpellBonusHitChance"));
         }
 
         public SecondayStatBonus<T> GetSecondaryStat<T>(string aSecondaryStat)
@@ -248,7 +207,7 @@ namespace Project_1.GameObjects.Unit.Stats
                 }
 
                 string key = aSecondaryStat.Substring(prefix.Length);
-                T value = GetValueWithBase<T>(school, key);
+                T value = GetValueWithBase<T>(new[] { school }, key);
                 return new SecondayStatBonus<T>(aSecondaryStat, value);
             }
 
@@ -262,34 +221,30 @@ namespace Project_1.GameObjects.Unit.Stats
                 return new SecondayStatBonus<T>(aSecondaryStat, GetFallbackValue<T>(aSecondaryStat));
             }
 
-            T value = GetValueWithBase<T>(aSpellSchool, aSecondaryStat);
+            T value = GetValueWithBase<T>(new[] { aSpellSchool }, aSecondaryStat);
             return new SecondayStatBonus<T>(aSecondaryStat, value);
         }
 
-        double GetSpellBonusHitChance(SpellSchool school)
-        {
-            SpellStats baseStats = GetSpellStats(SpellSchool.Base);
-            if (school == SpellSchool.Base)
-            {
-                return baseStats.BonusHitChance;
-            }
-
-            SpellStats schoolStats = GetSpellStats(school);
-            return baseStats.BonusHitChance + schoolStats.BonusHitChance;
-        }
-
-        T GetValueWithBase<T>(SpellSchool school, string key)
+        T GetValueWithBase<T>(IEnumerable<SpellSchool> schools, string key)
         {
             SpellStats baseStats = GetSpellStats(SpellSchool.Base);
             T baseValue = baseStats.GetValue<T>(key);
-            if (school == SpellSchool.Base)
+            dynamic total = (dynamic)(object)baseValue;
+
+            SpellSchool[] effectiveSchools = GetEffectiveSchools(schools);
+            for (int i = 0; i < effectiveSchools.Length; i++)
             {
-                return baseValue;
+                if (effectiveSchools[i] == SpellSchool.Base)
+                {
+                    continue;
+                }
+
+                SpellStats schoolStats = GetSpellStats(effectiveSchools[i]);
+                T schoolValue = schoolStats.GetValue<T>(key);
+                total += (dynamic)(object)schoolValue;
             }
 
-            SpellStats schoolStats = GetSpellStats(school);
-            T schoolValue = schoolStats.GetValue<T>(key);
-            return (T)(object)((dynamic)(object)baseValue + (dynamic)(object)schoolValue);
+            return (T)(object)total;
         }
 
         SpellStats GetSpellStats(SpellSchool school)
@@ -307,7 +262,12 @@ namespace Project_1.GameObjects.Unit.Stats
 
         static SpellSchool[] GetEffectiveSchools(HashSet<SpellSchool> aSchools)
         {
-            if (aSchools == null || aSchools.Count == 0)
+            return GetEffectiveSchools((IEnumerable<SpellSchool>)aSchools);
+        }
+
+        static SpellSchool[] GetEffectiveSchools(IEnumerable<SpellSchool> aSchools)
+        {
+            if (aSchools == null || !aSchools.Any())
             {
                 return new[] { SpellSchool.Base };
             }
