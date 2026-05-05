@@ -208,10 +208,12 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             ThreadAffinity.AssertSimThread();
             List<SpellSchoolBonusSnapshot> damageBonuses = new List<SpellSchoolBonusSnapshot>();
             List<SpellSchoolBonusSnapshot> critChanceBonuses = new List<SpellSchoolBonusSnapshot>();
+            List<SpellSchoolBonusSnapshot> critDamageBonuses = new List<SpellSchoolBonusSnapshot>();
             List<SpellSchoolBonusSnapshot> hitChanceBonuses = new List<SpellSchoolBonusSnapshot>();
 
             int baseSpellDamage = SecondaryStats.Spell.SpellDamageForSchool(SpellSchool.Base);
             double baseSpellCritChance = SecondaryStats.Spell.CriticalChanceForSchool(SpellSchool.Base);
+            double baseSpellCritDamage = SecondaryStats.Spell.CriticalDamageForSchool(SpellSchool.Base);
             double baseSpellHitChance = SecondaryStats.Spell.BonusHitChanceForSchool(SpellSchool.Base);
 
             foreach (SpellSchool school in Enum.GetValues(typeof(SpellSchool)))
@@ -223,6 +225,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
                 int schoolDamageBonus = SecondaryStats.Spell.SpellDamageForSchool(school) - baseSpellDamage;
                 double schoolCritBonus = SecondaryStats.Spell.CriticalChanceForSchool(school) - baseSpellCritChance;
+                double schoolCritDamageBonus = SecondaryStats.Spell.CriticalDamageForSchool(school) - baseSpellCritDamage;
                 double schoolHitBonus = SecondaryStats.Spell.BonusHitChanceForSchool(school) - baseSpellHitChance;
 
                 if (schoolDamageBonus != 0)
@@ -235,6 +238,11 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
                     critChanceBonuses.Add(new SpellSchoolBonusSnapshot(school.ToString(), schoolCritBonus));
                 }
 
+                if (Math.Abs(schoolCritDamageBonus) > 0.000001d)
+                {
+                    critDamageBonuses.Add(new SpellSchoolBonusSnapshot(school.ToString(), schoolCritDamageBonus));
+                }
+
                 if (Math.Abs(schoolHitBonus) > 0.000001d)
                 {
                     hitChanceBonuses.Add(new SpellSchoolBonusSnapshot(school.ToString(), schoolHitBonus));
@@ -244,6 +252,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             return new SpellReportDetailsSnapshot(
                 damageBonuses.ToArray(),
                 critChanceBonuses.ToArray(),
+                critDamageBonuses.ToArray(),
                 hitChanceBonuses.ToArray());
         }
 

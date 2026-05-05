@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Unit.Classes;
@@ -54,10 +54,11 @@ namespace Project_1.GameObjects.Entities.Friendlies
                         {
                             if (learntTalents[i].id != aTalentId) continue;
                             learntTalents[i].rank++;
+                            UnitData.BaseStats.RefreshStats();
+                            FlagForRefresh();
                             return true;
                         }
-
-                        return false;
+                        throw new Exception("Talent not found in learnt talents");
                     }
                 }
             }

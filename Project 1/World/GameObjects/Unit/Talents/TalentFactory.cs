@@ -28,6 +28,13 @@ namespace Project_1.World.GameObjects.Unit.Talents
             public ChangeEntry[] Changes { get; set; }
         }
 
+        class StatChangeEntry
+        {
+            public string Stat { get; set; }
+            public float Amount { get; set; }
+            public bool Flat { get; set; }
+        }
+
         class RequiredEntry
         {
             public int Id { get; set; }
@@ -42,6 +49,7 @@ namespace Project_1.World.GameObjects.Unit.Talents
             public int MaxRank { get; set; }
             public RequiredEntry[] Required { get; set; }
             public SpellChangeEntry[] SpellChanges { get; set; }
+            public StatChangeEntry[] StatChanges { get; set; }
         }
 
         class TalentTreeData
@@ -120,7 +128,12 @@ namespace Project_1.World.GameObjects.Unit.Talents
                 .ToList()
                 ?? new List<((TalentChange, float, bool)[], int)>();
 
-            return new Talent(data.Id, data.Name, data.GfxName, data.MaxRank, required, changes);
+            List<(string stat, float amount, bool flat)> statChanges = data.StatChanges?
+                .Select(sc => (sc.Stat, sc.Amount, sc.Flat))
+                .ToList()
+                ?? new List<(string, float, bool)>();
+
+            return new Talent(data.Id, data.Name, data.GfxName, data.MaxRank, required, changes, statChanges);
         }
 
         static TalentTree BuildTalentTree(TalentTreeData data)

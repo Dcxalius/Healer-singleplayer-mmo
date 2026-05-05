@@ -34,6 +34,7 @@ namespace Project_1.GameObjects.Unit.Stats
         Armor baseArmor;
 
         ClassData classData;
+        UnitData unitData;
 
         public TotalPrimaryStats TotalPrimaryStats => totalPrimaryStats;
         TotalPrimaryStats totalPrimaryStats;
@@ -58,13 +59,14 @@ namespace Project_1.GameObjects.Unit.Stats
         }
 
 
-        public BaseStats(ClassData aClassData, int aLevel, EquipmentStats aEquipmentStats, float aCurrentHealth = float.MaxValue, float aCurrentResource = float.MaxValue)
+        public BaseStats(UnitData aUnitData, ClassData aClassData, int aLevel, EquipmentStats aEquipmentStats, float aCurrentHealth = float.MaxValue, float aCurrentResource = float.MaxValue)
         {
+            unitData = aUnitData;
             basePrimaryStats = new BasePrimaryStats(aClassData.BaseStats, aClassData.PerLevelStats, aLevel);
             baseArmor = new Armor(aEquipmentStats.Armor);
             health = new Health(aClassData, basePrimaryStats, aLevel, aCurrentHealth);
             classData = aClassData;
-            totalPrimaryStats = new TotalPrimaryStats(basePrimaryStats, aEquipmentStats);
+            totalPrimaryStats = new TotalPrimaryStats(basePrimaryStats, aEquipmentStats, unitData);
             switch (aClassData.Resource)
             {
                 case Resource.ResourceType.Mana:
@@ -129,6 +131,7 @@ namespace Project_1.GameObjects.Unit.Stats
         public void RefreshStats()
         {
             AssertSimThread();
+            totalPrimaryStats.UpdateBaseStats(basePrimaryStats);
             health.Refresh(TotalPrimaryStats);
             resource.Refresh(TotalPrimaryStats);
             owner.RefreshSecondaryStats();
@@ -211,10 +214,12 @@ namespace Project_1.GameObjects.Unit.Stats
 
             List<SpellSchoolBonusSnapshot> damageBonuses = new List<SpellSchoolBonusSnapshot>();
             List<SpellSchoolBonusSnapshot> critChanceBonuses = new List<SpellSchoolBonusSnapshot>();
+            List<SpellSchoolBonusSnapshot> critDamageBonuses = new List<SpellSchoolBonusSnapshot>();
             List<SpellSchoolBonusSnapshot> hitChanceBonuses = new List<SpellSchoolBonusSnapshot>();
 
             int baseSpellDamage = aSpell.SpellDamageForSchool(SpellSchool.Base);
             double baseSpellCritChance = aSpell.CriticalChanceForSchool(SpellSchool.Base);
+            double baseSpellCritDamage = aSpell.CriticalDamageForSchool(SpellSchool.Base);
             double baseSpellHitChance = aSpell.BonusHitChanceForSchool(SpellSchool.Base);
 
             foreach (SpellSchool school in Enum.GetValues(typeof(SpellSchool)))
@@ -226,6 +231,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
                 int schoolDamageBonus = aSpell.SpellDamageForSchool(school) - baseSpellDamage;
                 double schoolCritBonus = aSpell.CriticalChanceForSchool(school) - baseSpellCritChance;
+                double schoolCritDamageBonus = aSpell.CriticalDamageForSchool(school) - baseSpellCritDamage;
                 double schoolHitBonus = aSpell.BonusHitChanceForSchool(school) - baseSpellHitChance;
 
                 if (schoolDamageBonus != 0)
@@ -238,6 +244,11 @@ namespace Project_1.GameObjects.Unit.Stats
                     critChanceBonuses.Add(new SpellSchoolBonusSnapshot(school.ToString(), schoolCritBonus));
                 }
 
+                if (Math.Abs(schoolCritDamageBonus) > 0.000001d)
+                {
+                    critDamageBonuses.Add(new SpellSchoolBonusSnapshot(school.ToString(), schoolCritDamageBonus));
+                }
+
                 if (Math.Abs(schoolHitBonus) > 0.000001d)
                 {
                     hitChanceBonuses.Add(new SpellSchoolBonusSnapshot(school.ToString(), schoolHitBonus));
@@ -247,6 +258,7 @@ namespace Project_1.GameObjects.Unit.Stats
             return new SpellReportDetailsSnapshot(
                 damageBonuses.ToArray(),
                 critChanceBonuses.ToArray(),
+                critDamageBonuses.ToArray(),
                 hitChanceBonuses.ToArray());
         }
     }

@@ -16,6 +16,8 @@ namespace Project_1.World.Items.SubTypes
 
         public Item[] GenerateLoot(int aHash) //TODO: Change this entire function
         {
+            //Issues with this. Certain Containers should always drop one item, for example clams should always drop meat
+            //Other containers shouldn't always drop one particular item
             List<Item> loot = new List<Item>();
             int totalWeight = drops.Sum(d => d.weight);
             Random rand = new Random(aHash); //TODO: Don't do this xdd, RandomManager should properly be implemented instead
