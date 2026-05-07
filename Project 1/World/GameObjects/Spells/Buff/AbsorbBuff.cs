@@ -16,7 +16,7 @@ namespace Project_1.GameObjects.Spells.Buff
         AbsorbEffect AbsorbEffect => effect as AbsorbEffect;
 
         public double RemainingAbsorb => remainingAbsorb;
-        public bool IsDepleted => remainingAbsorb <= 0;
+        public override bool IsDepleted => remainingAbsorb <= 0;
 
         public override GfxPath GfxPath => AbsorbEffect.GfxPath;
         public override double Duration =>
@@ -37,7 +37,7 @@ namespace Project_1.GameObjects.Spells.Buff
         }
 
         // Returns how much damage was absorbed. Reduces remainingAbsorb accordingly.
-        public double AbsorbDamage(double incoming, DamageType damageType)
+        public override double AbsorbDamage(double incoming, DamageType damageType)
         {
             ThreadAffinity.AssertSimThread();
             if (AbsorbEffect.SchoolFilter.HasValue && AbsorbEffect.SchoolFilter.Value != damageType)

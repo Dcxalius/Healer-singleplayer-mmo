@@ -47,15 +47,15 @@ namespace Project_1.World.GameObjects.Unit.Stats.Primary
         static int[] BuildStats(BasePrimaryStats aBaseStats, EquipmentStats aEquipmentStats, UnitData aUnitData)
         {
             int[] stats = new int[(int)PrimaryStat.Count];
-            stats[(int)PrimaryStat.Strength] = ApplyTalentBonus(aBaseStats.Strength + aEquipmentStats.Strength, PrimaryStat.Strength, aUnitData);
-            stats[(int)PrimaryStat.Agility] = ApplyTalentBonus(aBaseStats.Agility + aEquipmentStats.Agility, PrimaryStat.Agility, aUnitData);
-            stats[(int)PrimaryStat.Intellect] = ApplyTalentBonus(aBaseStats.Intellect + aEquipmentStats.Intellect, PrimaryStat.Intellect, aUnitData);
-            stats[(int)PrimaryStat.Spirit] = ApplyTalentBonus(aBaseStats.Spirit + aEquipmentStats.Spirit, PrimaryStat.Spirit, aUnitData);
-            stats[(int)PrimaryStat.Stamina] = ApplyTalentBonus(aBaseStats.Stamina + aEquipmentStats.Stamina, PrimaryStat.Stamina, aUnitData);
+            stats[(int)PrimaryStat.Strength] = ApplyModifiers(aBaseStats.Strength + aEquipmentStats.Strength, PrimaryStat.Strength, aUnitData);
+            stats[(int)PrimaryStat.Agility] = ApplyModifiers(aBaseStats.Agility + aEquipmentStats.Agility, PrimaryStat.Agility, aUnitData);
+            stats[(int)PrimaryStat.Intellect] = ApplyModifiers(aBaseStats.Intellect + aEquipmentStats.Intellect, PrimaryStat.Intellect, aUnitData);
+            stats[(int)PrimaryStat.Spirit] = ApplyModifiers(aBaseStats.Spirit + aEquipmentStats.Spirit, PrimaryStat.Spirit, aUnitData);
+            stats[(int)PrimaryStat.Stamina] = ApplyModifiers(aBaseStats.Stamina + aEquipmentStats.Stamina, PrimaryStat.Stamina, aUnitData);
             return stats;
         }
 
-        static int ApplyTalentBonus(int aValue, PrimaryStat aStat, UnitData aUnitData)
+        static int ApplyModifiers(int aValue, PrimaryStat aStat, UnitData aUnitData)
         {
             if (aUnitData == null)
             {
@@ -64,6 +64,8 @@ namespace Project_1.World.GameObjects.Unit.Stats.Primary
 
             double flat = aUnitData.GetTalentPrimaryStatFlat(aStat);
             double percent = aUnitData.GetTalentPrimaryStatPercent(aStat);
+            flat += aUnitData.GetStatusStatFlat(aStat.ToString());
+            percent += aUnitData.GetStatusStatPercent(aStat.ToString());
             return (int)Math.Round((aValue + flat) * (1d + percent), MidpointRounding.AwayFromZero);
         }
     }

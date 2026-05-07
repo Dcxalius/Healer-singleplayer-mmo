@@ -47,7 +47,7 @@ namespace Project_1.World.GameObjects.Spells.SpellEffects
 
         public HashSet<SpellSchool> SpellSchools => spellSchools;
 
-        public double MovementSpeedModifier => throw new NotImplementedException();
+        public virtual double MovementSpeedModifier => 1d;
 
         HashSet<SpellSchool> spellSchools;
 

@@ -50,7 +50,6 @@ namespace Project_1.Managers
             ThreadAffinity.AssertSimThread();
             TileManager.BuildRenderSnapshot();
             ObjectManager.BuildRenderSnapshot();
-            ShadowSnapshotManager.BuildSnapshot(ObjectManager.RenderLightSnapshot);
             Camera.Camera.BuildMinimapSnapshot();
             ProjectileManager.BuildRenderSnapshot();
             TileManager.BuildDoodadRenderSnapshots();

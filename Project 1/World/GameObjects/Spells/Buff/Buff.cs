@@ -5,6 +5,7 @@ using Project_1.Messaging.Events;
 using Project_1.Textures;
 using Project_1.UI.UIElements;
 using Project_1.World.GameObjects.Spells.SpellEffects;
+using Project_1.GameObjects.Unit.Stats;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -30,10 +31,10 @@ namespace Project_1.GameObjects.Spells.Buff
 
         protected double createTime;
 
-        public virtual double Duration { get; }
+        public virtual double Duration => effect is LastingEffect lasting ? lasting.Duration : 0d;
         public virtual double DurationRemaining { get => Duration - (TimeManager.TotalFrameTime - createTime); }
 
-        public bool IsOver { get => createTime + Duration < TimeManager.TotalFrameTime; }
+        public bool IsOver { get => Duration > 0 && createTime + Duration < TimeManager.TotalFrameTime; }
 
         public bool MultipleSourceStackable => effect.sourceStackable;
         public int MaxStackCount => effect.MaxStackCount;
@@ -45,7 +46,14 @@ namespace Project_1.GameObjects.Spells.Buff
         public double Power => power;
         double power;
 
-        public double MovementSpeedModifier => effect.MovementSpeedModifier;
+        public double MovementSpeedModifier => effect is StatusEffect status ? status.StatusMovementSpeedModifier : effect.MovementSpeedModifier;
+        public bool HasControl => effect is not StatusEffect status || status.HasControl;
+        public bool HasStatModifiers => effect is StatusEffect status && status.HasStatModifiers;
+        public StatusModifier[] StatusModifiers => effect is StatusEffect status ? status.StatModifiers : Array.Empty<StatusModifier>();
+        public string StackingCategory => effect is StatusEffect status && !string.IsNullOrWhiteSpace(status.StackingCategory)
+            ? status.StackingCategory
+            : effect.Name;
+        public virtual bool IsDepleted => false;
 
         public BuffUiSnapshot BuffUiSnapshot => new BuffUiSnapshot(Id, GfxPath, TimeManager.InstanceTotalFrameTime + DurationRemaining, count, MaxStackCount);
 
@@ -60,6 +68,7 @@ namespace Project_1.GameObjects.Spells.Buff
             rank = aSpell.Rank;
             createTime = TimeManager.TotalFrameTime;
             power = aSpell.GetPower(aEffect);
+            count = 1;
         }
 
         protected Buff(Entity aCaster, SpellEffect aEffect)
@@ -71,6 +80,7 @@ namespace Project_1.GameObjects.Spells.Buff
             rank = 0;
             createTime = TimeManager.TotalFrameTime;
             power = 0;
+            count = 1;
         }
 
         public virtual void Recast(Buff aBuff)
@@ -104,6 +114,12 @@ namespace Project_1.GameObjects.Spells.Buff
         {
             AssertSimThread();
             MailboxManager.PublishUiEvent(new BuffRemoved(aOwner.RenderId, id));
+        }
+
+        public virtual double AbsorbDamage(double incoming, DamageType damageType)
+        {
+            AssertSimThread();
+            return 0;
         }
 
         public bool SameCaster(Entity aCaster) => caster == aCaster;

@@ -51,6 +51,25 @@ namespace Project_1.GameObjects.Unit
 
         public double GetTalentPrimaryStatFlat(PrimaryStats.PrimaryStat aStat) => GetTalentPrimaryStatChange(aStat, true);
         public double GetTalentPrimaryStatPercent(PrimaryStats.PrimaryStat aStat) => GetTalentPrimaryStatChange(aStat, false);
+        Entity owner;
+
+        internal void SetOwner(Entity aOwner)
+        {
+            owner = aOwner;
+        }
+
+        public double GetStatusStatFlat(string aStat) => owner?.GetStatusStatFlat(aStat) ?? 0d;
+        public double GetStatusStatPercent(string aStat) => owner?.GetStatusStatPercent(aStat) ?? 0d;
+
+        public double ApplyStatusModifiers(string aStat, double aValue)
+        {
+            return (aValue + GetStatusStatFlat(aStat)) * (1d + GetStatusStatPercent(aStat));
+        }
+
+        public int ApplyStatusModifiersInt(string aStat, double aValue)
+        {
+            return (int)Math.Round(ApplyStatusModifiers(aStat, aValue), MidpointRounding.AwayFromZero);
+        }
 
         public T GetTalentSecondaryStat<T>(string aSecondaryStat)
         {

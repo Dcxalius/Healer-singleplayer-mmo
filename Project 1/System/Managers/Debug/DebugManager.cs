@@ -12,8 +12,6 @@ namespace Project_1.Managers
         DebugOverlay,
         ModelPreview,
         Print,
-        ShadowMaskPreview,
-        ShadowMagentaClear,
         FalseRandom,
         TileCoords,
         InvCheats,

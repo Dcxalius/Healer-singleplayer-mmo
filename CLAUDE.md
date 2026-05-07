@@ -66,7 +66,6 @@ Spells support instant casts, channeled casts, and area effects. Buffs carry a `
 - `EffectManager` — shader/effect management
 - `TileRenderCache` — cached tile rendering
 - `RenderSnapshotManager` — deferred render snapshots collected during update, flushed during draw
-- `SuperSoftShadowRenderer` — shadow pass
 
 ### Data-Driven Content
 

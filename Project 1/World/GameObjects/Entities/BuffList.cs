@@ -5,6 +5,7 @@ using Project_1.Managers;
 using Project_1.UI.HUD.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
+using Project_1.World.GameObjects.Spells.SpellEffects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,8 +31,10 @@ namespace Project_1.GameObjects.Entities
                 buffs[i].Update(aOwner);
                 if (buffs[i].IsOver)
                 {
+                    bool hadStatModifiers = buffs[i].HasStatModifiers;
                     buffs[i].OnRemoved(aOwner);
                     buffs.RemoveAt(i);
+                    RefreshOwnerStatsIfNeeded(aOwner, hadStatModifiers);
                 }
             }
         }
@@ -39,6 +42,7 @@ namespace Project_1.GameObjects.Entities
         public void AddBuff(Buff aBuff, Entity aOwner)
         {
             ThreadAffinity.AssertSimThread();
+            bool hadStatModifiers = HasStatModifiers;
             for (int i = 0; i < buffs.Count; i++)
             {
                 if (buffs[i] != aBuff) continue;
@@ -52,12 +56,14 @@ namespace Project_1.GameObjects.Entities
                 }
                 buffs[i].Recast(aBuff);
                 MailboxManager.PublishUiEvent(new BuffAdded(aOwner.RenderId, buffs[i].BuffUiSnapshot));
+                RefreshOwnerStatsIfNeeded(aOwner, hadStatModifiers || buffs[i].HasStatModifiers);
                 return;
             }
 
             buffs.Add(aBuff);
             aBuff.OnApplied(aOwner);
             MailboxManager.PublishUiEvent(new BuffAdded(aOwner.RenderId, buffs.Last().BuffUiSnapshot));
+            RefreshOwnerStatsIfNeeded(aOwner, hadStatModifiers || aBuff.HasStatModifiers);
         }
 
         // Chains through all AbsorbBuffs, depleting them in order until damage is exhausted.
@@ -69,14 +75,16 @@ namespace Project_1.GameObjects.Entities
             double remaining = incomingDamage;
             for (int i = buffs.Count - 1; i >= 0 && remaining > 0; i--)
             {
-                if (buffs[i] is not AbsorbBuff absorb) continue;
-                double absorbed = absorb.AbsorbDamage(remaining, damageType);
+                double absorbed = buffs[i].AbsorbDamage(remaining, damageType);
+                if (absorbed <= 0) continue;
                 totalAbsorbed += absorbed;
                 remaining -= absorbed;
-                if (absorb.IsDepleted)
+                if (buffs[i].IsDepleted)
                 {
-                    absorb.OnRemoved(aOwner);
+                    bool hadStatModifiers = buffs[i].HasStatModifiers;
+                    buffs[i].OnRemoved(aOwner);
                     buffs.RemoveAt(i);
+                    RefreshOwnerStatsIfNeeded(aOwner, hadStatModifiers);
                 }
             }
             return remaining;
@@ -88,8 +96,10 @@ namespace Project_1.GameObjects.Entities
             for (int i = 0; i < buffs.Count; i++)
             {
                 if (buffs[i] is not T) continue;
+                bool hadStatModifiers = buffs[i].HasStatModifiers;
                 buffs[i].OnRemoved(aOwner);
                 buffs.RemoveAt(i);
+                RefreshOwnerStatsIfNeeded(aOwner, hadStatModifiers);
                 return;
             }
         }
@@ -98,6 +108,70 @@ namespace Project_1.GameObjects.Entities
         {
             ThreadAffinity.AssertSimThread();
             return buffs;
+        }
+
+        public double GetStatusFlat(string aStat)
+        {
+            ThreadAffinity.AssertSimThread();
+            return SumStatusModifiers(aStat, true);
+        }
+
+        public double GetStatusPercent(string aStat)
+        {
+            ThreadAffinity.AssertSimThread();
+            return SumStatusModifiers(aStat, false);
+        }
+
+        public bool HasControl()
+        {
+            ThreadAffinity.AssertSimThread();
+            for (int i = 0; i < buffs.Count; i++)
+            {
+                if (!buffs[i].HasControl)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        bool HasStatModifiers => buffs.Any(x => x.HasStatModifiers);
+
+        void RefreshOwnerStatsIfNeeded(Entity aOwner, bool aMaybeChangedStats)
+        {
+            if (!aMaybeChangedStats)
+            {
+                return;
+            }
+
+            aOwner.RefreshStatsFromStatusChange();
+        }
+
+        double SumStatusModifiers(string aStat, bool aFlat)
+        {
+            Dictionary<string, double> strongestByCategory = new Dictionary<string, double>(StringComparer.Ordinal);
+            for (int i = 0; i < buffs.Count; i++)
+            {
+                StatusModifier[] modifiers = buffs[i].StatusModifiers;
+                for (int j = 0; j < modifiers.Length; j++)
+                {
+                    if (modifiers[j].Flat != aFlat) continue;
+                    if (!string.Equals(modifiers[j].Stat, aStat, StringComparison.Ordinal)) continue;
+
+                    double value = modifiers[j].Amount * Math.Max(1, buffs[i].Count);
+                    string modifierCategory = string.IsNullOrWhiteSpace(modifiers[j].Category)
+                        ? buffs[i].StackingCategory
+                        : modifiers[j].Category;
+                    string key = modifierCategory + "|" + modifiers[j].Stat + "|" + aFlat;
+                    if (!strongestByCategory.TryGetValue(key, out double current) || Math.Abs(value) > Math.Abs(current))
+                    {
+                        strongestByCategory[key] = value;
+                    }
+                }
+            }
+
+            return strongestByCategory.Values.Sum();
         }
     }
 }

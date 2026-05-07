@@ -1,0 +1,1 @@
+{"Name":"Test Strength Aura","GfxName":"Renew","Duration":30.0,"StackingCategory":"TestPrimaryBuff","StatModifiers":[{"Stat":"Strength","Amount":10,"Flat":true}]}

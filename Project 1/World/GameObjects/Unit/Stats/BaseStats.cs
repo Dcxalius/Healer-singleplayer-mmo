@@ -30,7 +30,7 @@ namespace Project_1.GameObjects.Unit.Stats
         public AttackData FistAttack => fistAttack;
         AttackData fistAttack;
 
-        public Armor TotalArmor => baseArmor + totalPrimaryStats.Agility.Armor;
+        public Armor TotalArmor => new Armor(unitData.ApplyStatusModifiersInt("Armor", baseArmor + totalPrimaryStats.Agility.Armor));
         Armor baseArmor;
 
         ClassData classData;
@@ -55,7 +55,7 @@ namespace Project_1.GameObjects.Unit.Stats
             AssertSimThread();
             int baseAttackPower = totalPrimaryStats.Agility.GetMeleeAttackPower(aClassData) + totalPrimaryStats.Strength.GetMeleeAttackPower(aClassData);
             int equipmentAttackPower = owner?.Equipment.GetSecondaryStat<int>("AttackPower") ?? 0;
-            return baseAttackPower + equipmentAttackPower;
+            return unitData.ApplyStatusModifiersInt("AttackPower", baseAttackPower + equipmentAttackPower);
         }
 
 
@@ -98,6 +98,7 @@ namespace Project_1.GameObjects.Unit.Stats
         {
             AssertSimThread();
             owner = aEntity;
+            unitData.SetOwner(aEntity);
             resource.SetOwner(aEntity);
             owner.Equipment.SetMeleeAttackPower = GetAttackPower(classData);
             fistAttack.AttackPower = GetAttackPower(classData);
@@ -202,7 +203,8 @@ namespace Project_1.GameObjects.Unit.Stats
             int fromStrength = aOwner.ClassData.MeleeAttackBonus == ClassData.MeleeAttackPowerBonus.Strength ? strength * 2 : strength;
             int fromAgility = aOwner.ClassData.MeleeAttackBonus == ClassData.MeleeAttackPowerBonus.Agility ? agility : 0;
             int fromEquipment = aOwner.Equipment.GetSecondaryStat<int>("AttackPower");
-            return fromStrength + fromAgility + fromEquipment;
+            double total = fromStrength + fromAgility + fromEquipment;
+            return (int)Math.Round((total + aOwner.GetStatusStatFlat("AttackPower")) * (1d + aOwner.GetStatusStatPercent("AttackPower")), MidpointRounding.AwayFromZero);
         }
 
         static SpellReportDetailsSnapshot BuildSpellReportDetails(Spell aSpell)

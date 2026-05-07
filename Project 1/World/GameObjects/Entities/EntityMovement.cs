@@ -26,15 +26,7 @@ namespace Project_1.GameObjects.Entities
         {
             get
             {
-                Buff[] buffs = buffList.GetAllBuffs().ToArray();
-                for (int i = 0; i < buffs.Length; i++)
-                {
-                    if (buffs[i].EffectId == 1)
-                    {
-                        return false;
-                    }
-                }
-                return true;
+                return buffList.HasControl();
             }
         }
 

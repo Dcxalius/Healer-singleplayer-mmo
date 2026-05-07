@@ -1,0 +1,1 @@
+{"Name":"Test Dodge Debuff","GfxName":"Kill","Duration":20.0,"StackingCategory":"TestDefenseDebuff","StatModifiers":[{"Stat":"DodgeChance","Amount":-0.05,"Flat":true}]}

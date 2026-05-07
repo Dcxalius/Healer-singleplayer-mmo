@@ -40,18 +40,18 @@ namespace Project_1.GameObjects.Unit.Stats
             AssertSimThread();
 
             //TODO: Implement spell stats calculations bellow, Don't forget adding racials and talents.
-            criticalChance = Math.Clamp(BASE_CRIT_CHANCE + aUnitData.BaseStats.TotalPrimaryStats.Agility * aUnitData.ClassData.AttackCritChanceScaler, 0f, 1f);
-            criticalDamage = BASE_CRIT_DAMAGE + 0/* + unitData.AttackCriticalDamageMultiplier*/;
-            percentPenetration = Math.Clamp(0 /*+ unitData.Equipment.GetPercentAttackPen*/, 0f, 1f);
-            flatPenetration = 0 /*+ unitData.Equipment.GetFlatAttackPen*/;
-            vampirism = Math.Clamp(0 /*+ unitData.Equipment.GetPercentAttackVamp*/, 0f, 1f);
+            criticalChance = (float)Math.Clamp(aUnitData.ApplyStatusModifiers("CritChance", BASE_CRIT_CHANCE + aUnitData.BaseStats.TotalPrimaryStats.Agility * aUnitData.ClassData.AttackCritChanceScaler), 0d, 1d);
+            criticalDamage = (float)aUnitData.ApplyStatusModifiers("CritDamage", BASE_CRIT_DAMAGE + 0/* + unitData.AttackCriticalDamageMultiplier*/);
+            percentPenetration = (float)Math.Clamp(aUnitData.ApplyStatusModifiers("PercentPenetration", 0 /*+ unitData.Equipment.GetPercentAttackPen*/), 0d, 1d);
+            flatPenetration = aUnitData.ApplyStatusModifiersInt("FlatPenetration", 0 /*+ unitData.Equipment.GetFlatAttackPen*/);
+            vampirism = (float)Math.Clamp(aUnitData.ApplyStatusModifiers("Vampirism", 0 /*+ unitData.Equipment.GetPercentAttackVamp*/), 0d, 1d);
 
 
             //Against level 60 targets, you need a total of 5% Hit Chance to never miss a target.
             //Dual Wielders need 24 % Hit Chance to never miss on every single auto-attack.
             //Against level 63(or Boss level) targets, you need a total of 9 % Hit Chance to never miss a target.
             //Dual Wielders need 25 % Hit Chance to never miss on every single auto-attack
-            bonusHitChance = Math.Clamp(0/*+ unitData.Equipment.GetBonusHitAttack*/, 0f, 1f);
+            bonusHitChance = (float)Math.Clamp(aUnitData.ApplyStatusModifiers("BonusHitChance", 0/*+ unitData.Equipment.GetBonusHitAttack*/), 0d, 1d);
 
         }
 

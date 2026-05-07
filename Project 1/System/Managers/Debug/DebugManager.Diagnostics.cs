@@ -258,7 +258,6 @@ namespace Project_1.Managers
                 UiThreadStats uiThreadStats = UiThread.Stats;
                 RenderSnapshotSyncStats renderSyncStats = RenderSnapshotManager.SyncStats;
                 MainRenderStats renderStats = MainRenderTelemetry.Stats;
-                ShadowRenderStats shadowStats = ShadowRenderTelemetry.Stats;
                 string saveName = SaveManager.CurrentSave?.Name ?? "<none>";
 
                 WriteDiagnosticsLine(
@@ -281,9 +280,6 @@ namespace Project_1.Managers
                     Mode(DebugMode.Print));
                 WriteDiagnosticsLine(
                     $"[LIFECYCLE] [{phase}] render snapshot age/stale:{renderSyncStats.LastSnapshotAgeMs:0.0}ms/{renderSyncStats.StaleDrawStreak} render frame last:{renderStats.LastFrameMs:0.0}ms",
-                    Mode(DebugMode.Print));
-                WriteDiagnosticsLine(
-                    $"[LIFECYCLE] [{phase}] shadows lights candidate/active/dropped:{shadowStats.CandidateLights}/{shadowStats.ActiveLights}/{shadowStats.DroppedLights} segments total/avg/max:{shadowStats.TotalSegments}/{shadowStats.AvgSegmentsPerLight:0.0}/{shadowStats.MaxSegmentsPerLight} pass last/avg/max:{shadowStats.LastShadowPassMs:0.0}/{shadowStats.AvgShadowPassMs:0.0}/{shadowStats.MaxShadowPassMs:0.0}ms drawCalls last/avg/max:{shadowStats.LastDrawCalls}/{shadowStats.AvgDrawCalls:0.0}/{shadowStats.MaxDrawCalls}",
                     Mode(DebugMode.Print));
             }
             catch (Exception ex)
