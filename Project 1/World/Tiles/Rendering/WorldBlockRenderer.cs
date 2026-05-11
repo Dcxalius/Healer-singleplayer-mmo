@@ -121,6 +121,11 @@ namespace Project_1.Tiles
             cameraYawRadians = NormalizeAngle(cameraYawRadians + aDeltaRadians);
         }
 
+        public static void SetCameraYaw(float aYawRadians)
+        {
+            cameraYawRadians = NormalizeAngle(aYawRadians);
+        }
+
         public static void AdjustCameraZoom(int aDirectionAndSteps)
         {
             if (aDirectionAndSteps == 0) return;

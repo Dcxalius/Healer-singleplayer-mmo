@@ -9,13 +9,15 @@ namespace Project_1.System.Models.BaseModels
     internal static class BaseModelGeometryFactory
     {
         const int FrustumSegments = 24;
+        static readonly GfxPath baseTexturePath = new GfxPath(GfxType.Object, "BaseModel");
+        static readonly GfxPath facingIndicatorTexturePath = new GfxPath(GfxType.Object, "BaseModelArrow");
 
         public static Model3D CreateGameplayBase(float aFrameHeight, float aPictureLength)
         {
             float baseHeight = ResolveBaseHeight(aFrameHeight, aPictureLength);
             float bottomRadius = Math.Max(0.15f, aPictureLength * 0.42f);
             float topRadius = bottomRadius * 0.76f;
-            Material material = new Material("BaseModelGameplayBase", new GfxPath(GfxType.Debug, "MissingTexture"), new Color(186, 155, 118));
+            Material material = new Material("BaseModelGameplayBase", baseTexturePath, Color.White);
             return CreateCircularFrustum("GameplayBase", material, baseHeight, bottomRadius, topRadius);
         }
 
@@ -32,7 +34,7 @@ namespace Project_1.System.Models.BaseModels
             float outerWidth = pictureWidth + borderThickness * 2f;
             float outerHeight = pictureHeight + borderThickness * 2f;
 
-            Material material = new Material("BaseModelPictureFrame", new GfxPath(GfxType.Debug, "MissingTexture"), new Color(210, 195, 150));
+            Material material = new Material("BaseModelPictureFrame", baseTexturePath, Color.White);
             List<VertexPositionColorTexture> vertices = new List<VertexPositionColorTexture>();
             List<short> indices = new List<short>();
 
@@ -42,6 +44,29 @@ namespace Project_1.System.Models.BaseModels
             AppendBox(vertices, indices, new Vector3(outerWidth * 0.5f - borderThickness * 0.5f, frameCenterY, 0f), new Vector3(borderThickness * 0.5f, pictureHeight * 0.5f, depth * 0.5f), material.Tint);
 
             return new ProceduralModel3D(0, "PictureFrame", material, vertices.ToArray(), indices.ToArray());
+        }
+
+        public static Model3D CreateFacingIndicator(float aFrameHeight, float aPictureLength)
+        {
+            float baseHeight = ResolveBaseHeight(aFrameHeight, aPictureLength);
+            float bottomRadius = Math.Max(0.15f, aPictureLength * 0.42f);
+            float topRadius = bottomRadius * 0.76f;
+            float overlayHalfExtent = Math.Max(0.06f, topRadius * 0.7f);
+            float overlayY = baseHeight + 0.01f;
+            Material material = new Material("BaseModelFacingIndicator", facingIndicatorTexturePath, Color.White);
+
+            List<VertexPositionColorTexture> vertices = new List<VertexPositionColorTexture>(4);
+            List<short> indices = new List<short>(6);
+            AppendQuad(
+                vertices,
+                indices,
+                new Vector3(-overlayHalfExtent, overlayY, -overlayHalfExtent),
+                new Vector3(overlayHalfExtent, overlayY, -overlayHalfExtent),
+                new Vector3(-overlayHalfExtent, overlayY, overlayHalfExtent),
+                new Vector3(overlayHalfExtent, overlayY, overlayHalfExtent),
+                material.Tint);
+
+            return new ProceduralModel3D(0, "FacingIndicator", material, vertices.ToArray(), indices.ToArray());
         }
 
         public static Model3D CreatePresentationPlane(float aFrameHeight, float aPictureLength, float aPictureAspectRatio, Material aMaterial, Point aTextureSize, Rectangle aSourceRectangle)

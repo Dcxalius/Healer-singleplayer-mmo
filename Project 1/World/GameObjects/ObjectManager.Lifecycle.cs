@@ -135,6 +135,7 @@ namespace Project_1.GameObjects
             renderPlayers.RequestClear();
             renderEntities.RequestClear();
             renderNpcs.RequestClear();
+            renderModelEntities.RequestClear();
             renderLightSnapshot = LightSnapshot.Empty;
             if (player != null) player.Delete();
         }

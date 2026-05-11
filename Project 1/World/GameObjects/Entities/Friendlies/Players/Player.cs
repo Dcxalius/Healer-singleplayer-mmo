@@ -20,6 +20,7 @@ using Project_1.UI.HUD.Managers;
 using Project_1.GameObjects.Unit;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
+using Project_1.System.Models.BaseModels;
 using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.World.GameObjects.Unit.Stats.Secondary;
@@ -28,8 +29,24 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 {
     internal class Player : Friendly, ILightEmitter
     {
+        const float PreviewTurnSpeedRadians = MathHelper.PiOver2;
+        static readonly string[] presentationDirectionNames =
+        {
+            "Behind",
+            "BackRight",
+            "Right",
+            "FrontRight",
+            "Front",
+            "FrontLeft",
+            "Left",
+            "BackLeft"
+        };
+
         public float LightRadiusTiles => 6f;
         public override Color MinimapColor => Color.White;
+        internal override bool FaceCameraInPreview => false;
+        internal override bool FrameFacesCameraInPreview => true;
+        internal override bool PresentationFacesCameraInPreview => true;
         public PlayerData PlayerData => UnitData as PlayerData;
         public Inventory Inventory => PlayerData.Inventory;
 
@@ -42,8 +59,22 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         Guild guild;
         public bool LockedMovement => lockedMovement;
         bool lockedMovement = false;
+        float previewFacingYawRadians;
+        bool previewFacingYawInitialized;
+        float previewLastFreeMoveYawRadians;
+        bool previewLastFreeMoveYawInitialized;
 
         public int Gold => PlayerData.Gold;
+        internal float PreviewBodyFacingYawRadians
+        {
+            get
+            {
+                EnsurePreviewFacingYawInitialized();
+                return previewFacingYawRadians;
+            }
+        }
+        internal int PreviewPresentationDirectionIndex => ResolvePreviewPresentationDirectionIndexCore();
+        internal string PreviewPresentationDirectionName => presentationDirectionNames[PreviewPresentationDirectionIndex];
 
 
         public bool InCombatOrPartyInCombat => party.IsInCombat || InCombat;
@@ -109,13 +140,28 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
             if (DebugManager.Mode(DebugMode.ModelPreview))
             {
+                ApplyPreviewRotationInput();
                 Vector2 movementDirection = Vector2.Zero;
-                Vector2 cameraRight = WorldBlockRenderer.CameraGroundRight;
-                Vector2 cameraForward = WorldBlockRenderer.CameraGroundForward;
-                if (left) movementDirection -= cameraRight;
-                if (right) movementDirection += cameraRight;
-                if (up) movementDirection += cameraForward;
-                if (down) movementDirection -= cameraForward;
+                if (Camera.Camera.CurrentPreviewCameraMode == PreviewCameraMode.OverTheShoulder)
+                {
+                    Vector2 forward = BuildPreviewForward();
+                    Vector2 rightVector = new Vector2(-forward.Y, forward.X);
+                    if (left) movementDirection -= rightVector;
+                    if (right) movementDirection += rightVector;
+                    if (up) movementDirection += forward;
+                    if (down) movementDirection -= forward;
+                }
+                else
+                {
+                    Vector2 forward = WorldBlockRenderer.CameraGroundForward;
+                    Vector2 rightVector = WorldBlockRenderer.CameraGroundRight;
+                    if (left) movementDirection -= rightVector;
+                    if (right) movementDirection += rightVector;
+                    if (up) movementDirection += forward;
+                    if (down) movementDirection -= forward;
+                }
+
+                TrackPreviewFreeMoveDirection(movementDirection);
                 velocity += new WorldSpace(movementDirection);
             }
             else
@@ -129,6 +175,121 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             if (velocity == WorldSpace.Zero) return;
             velocity.Normalize();
             velocity *= Speed * (float)TimeManager.SecondsSinceLastFrame;
+        }
+
+        protected override bool TryResolvePreviewFacingYawRadians(out float aFacingYawRadians)
+        {
+            EnsurePreviewFacingYawInitialized();
+            aFacingYawRadians = previewFacingYawRadians;
+            return true;
+        }
+
+        protected override int ResolvePreviewPresentationDirectionIndex()
+        {
+            return ResolvePreviewPresentationDirectionIndexCore();
+        }
+
+        void ApplyPreviewRotationInput()
+        {
+            float rotationDelta = 0f;
+            if (KeyBindStateCache.GetHold(KeyBindManager.KeyListner.RotatePlayerLeft))
+            {
+                rotationDelta -= PreviewTurnSpeedRadians * (float)TimeManager.SecondsSinceLastFrame;
+            }
+            if (KeyBindStateCache.GetHold(KeyBindManager.KeyListner.RotatePlayerRight))
+            {
+                rotationDelta += PreviewTurnSpeedRadians * (float)TimeManager.SecondsSinceLastFrame;
+            }
+            if (Math.Abs(rotationDelta) <= float.Epsilon)
+            {
+                return;
+            }
+
+            RotatePreviewFacing(rotationDelta);
+        }
+
+        internal void RotatePreviewFacing(float aRotationDeltaRadians)
+        {
+            EnsurePreviewFacingYawInitialized();
+            if (Math.Abs(aRotationDeltaRadians) <= float.Epsilon)
+            {
+                return;
+            }
+
+            previewFacingYawRadians += aRotationDeltaRadians;
+            while (previewFacingYawRadians <= -MathF.PI) previewFacingYawRadians += MathHelper.TwoPi;
+            while (previewFacingYawRadians > MathF.PI) previewFacingYawRadians -= MathHelper.TwoPi;
+
+            if (Camera.Camera.CurrentPreviewCameraMode == PreviewCameraMode.OverTheShoulder)
+            {
+                WorldBlockRenderer.RotateCameraYaw(aRotationDeltaRadians);
+            }
+        }
+
+        void EnsurePreviewFacingYawInitialized()
+        {
+            if (previewFacingYawInitialized) return;
+
+            Vector2 forward = WorldBlockRenderer.CameraGroundForward;
+            if (forward.LengthSquared() <= float.Epsilon)
+            {
+                forward = -Vector2.UnitY;
+            }
+            else
+            {
+                forward.Normalize();
+            }
+
+            previewFacingYawRadians = MathF.Atan2(forward.X, forward.Y);
+            previewFacingYawInitialized = true;
+        }
+
+        Vector2 BuildPreviewForward()
+        {
+            EnsurePreviewFacingYawInitialized();
+            return new Vector2(MathF.Sin(previewFacingYawRadians), MathF.Cos(previewFacingYawRadians));
+        }
+
+        void TrackPreviewFreeMoveDirection(Vector2 aMovementDirection)
+        {
+            if (Camera.Camera.CurrentPreviewCameraMode != PreviewCameraMode.Free) return;
+            if (aMovementDirection.LengthSquared() <= float.Epsilon) return;
+
+            Vector2 normalized = Vector2.Normalize(aMovementDirection);
+            previewLastFreeMoveYawRadians = MathF.Atan2(normalized.X, normalized.Y);
+            previewLastFreeMoveYawInitialized = true;
+        }
+
+        int ResolvePreviewPresentationDirectionIndexCore()
+        {
+            if (Camera.Camera.CurrentPreviewCameraMode == PreviewCameraMode.OverTheShoulder)
+            {
+                return 0;
+            }
+
+            Vector2 worldDirection = ResolvePresentationWorldDirection();
+            if (worldDirection.LengthSquared() <= float.Epsilon)
+            {
+                return 0;
+            }
+
+            Vector2 right = WorldBlockRenderer.CameraGroundRight;
+            Vector2 forward = WorldBlockRenderer.CameraGroundForward;
+            float x = Vector2.Dot(worldDirection, right);
+            float y = Vector2.Dot(worldDirection, forward);
+            float angle = MathF.Atan2(x, y);
+            int sector = ((int)MathF.Round(angle / MathHelper.PiOver4) % 8 + 8) % 8;
+            return sector;
+        }
+
+        Vector2 ResolvePresentationWorldDirection()
+        {
+            if (previewLastFreeMoveYawInitialized)
+            {
+                return new Vector2(MathF.Sin(previewLastFreeMoveYawRadians), MathF.Cos(previewLastFreeMoveYawRadians));
+            }
+
+            return BuildPreviewForward();
         }
 
         public void ChangeGold(int aAmount)

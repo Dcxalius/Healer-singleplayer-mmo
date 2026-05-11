@@ -7,6 +7,7 @@ using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
 using Project_1.GameObjects.Entities.Friendlies.Npcs;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.Managers;
+using Project_1.System.Models.BaseModels;
 
 namespace Project_1.GameObjects
 {
@@ -18,12 +19,15 @@ namespace Project_1.GameObjects
         static readonly RenderCache<EntityRenderSnapshot> renderPlayers = new RenderCache<EntityRenderSnapshot>();
         static readonly RenderCache<EntityRenderSnapshot> renderEntities = new RenderCache<EntityRenderSnapshot>();
         static readonly RenderCache<EntityRenderSnapshot> renderNpcs = new RenderCache<EntityRenderSnapshot>();
+        static readonly RenderCache<EntityModelRenderSnapshot> renderModelEntities = new RenderCache<EntityModelRenderSnapshot>();
         static readonly HashSet<int> knownPlayerIds = new HashSet<int>();
         static readonly HashSet<int> currentPlayerIds = new HashSet<int>();
         static readonly HashSet<int> knownEntityIds = new HashSet<int>();
         static readonly HashSet<int> currentEntityIds = new HashSet<int>();
         static readonly HashSet<int> knownNpcIds = new HashSet<int>();
         static readonly HashSet<int> currentNpcIds = new HashSet<int>();
+        static readonly HashSet<int> knownModelIds = new HashSet<int>();
+        static readonly HashSet<int> currentModelIds = new HashSet<int>();
         static volatile LightSnapshot renderLightSnapshot = LightSnapshot.Empty;
         static readonly int[] lightRenderIdScratch = new int[LightSnapshot.MaxLights];
         static readonly WorldSpace[] lightPositionScratch = new WorldSpace[LightSnapshot.MaxLights];

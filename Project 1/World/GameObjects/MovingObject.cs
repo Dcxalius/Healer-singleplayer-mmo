@@ -20,6 +20,7 @@ namespace Project_1.GameObjects
 
         public WorldSpace Velocity { get => velocity; protected set => velocity = value; }
         public WorldSpace Momentum { get => momentum; protected set => velocity = momentum; }
+        internal FacingDirection HorizontalFacing => facing;
         public abstract float MaxSpeed { get; }
 
         FacingDirection facing;

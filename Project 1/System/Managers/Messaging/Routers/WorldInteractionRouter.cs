@@ -13,13 +13,37 @@ using Project_1.Managers.States;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using Project_1.Tiles;
+using Microsoft.Xna.Framework;
 using System;
 
 namespace Project_1.GameObjects
 {
     internal static class WorldInteractionRouter
     {
+        enum WorldDragMode
+        {
+            None,
+            OtsCameraRotate,
+            OtsPlayerRotate,
+            FreeCameraRotate,
+            SuppressOnly
+        }
+
+        struct PendingWorldInteraction
+        {
+            public bool Active;
+            public WorldClickRequested Click;
+            public AbsoluteScreenPosition PressAbsolute;
+            public AbsoluteScreenPosition LastAbsolute;
+            public bool DragRecognized;
+            public WorldDragMode DragMode;
+        }
+
+        const int DragThresholdPixels = 8;
+        const float MouseRotationRadiansPerPixel = 0.01f;
+
         static bool initialized;
+        static PendingWorldInteraction pendingInteraction;
 
         public static void Init()
         {
@@ -39,6 +63,7 @@ namespace Project_1.GameObjects
             SubscribeSimCommand<TargetClearedRequested>(_ => HandleTargetClearedRequested());
             SubscribeSimCommand<PartyCommandRequested>(HandlePartyCommandRequested);
             SubscribeSimCommand<InteractRequested>(HandleInteractRequested);
+            MailboxManager.Sim.Subscribe<MouseSnapshot>(HandleMouseSnapshot);
         }
 
         static void SubscribeSimCommand<T>(Action<T> handler)
@@ -85,8 +110,7 @@ namespace Project_1.GameObjects
         {
             ThreadAffinity.AssertSimThread();
             if (StateManager.CurrentState != StateManager.States.Game) return;
-            if (GroundTargetingController.TryHandleWorldClick(e)) return;
-            RouteWorldClick(e);
+            ArmPendingInteraction(e);
         }
 
         static void HandleWorldReleaseRequested(WorldReleaseRequested e)
@@ -94,6 +118,7 @@ namespace Project_1.GameObjects
             ThreadAffinity.AssertSimThread();
             ReleaseEvent releaseEvent = new ReleaseEvent(null, e.RelativePos, e.Button.ToInputClickType(), e.ModifiersMask);
             StateManager.Release(releaseEvent);
+            ResolvePendingInteractionOnRelease(e);
         }
 
         static void HandleWorldScrollRequested(WorldScrollRequested e)
@@ -102,6 +127,120 @@ namespace Project_1.GameObjects
             ScrollEvent.Direction direction = e.Up ? ScrollEvent.Direction.Up : ScrollEvent.Direction.Down;
             ScrollEvent scrollEvent = new ScrollEvent(e.RelativePos, e.Steps, direction, e.ModifiersMask);
             StateManager.Scroll(scrollEvent);
+        }
+
+        static void HandleMouseSnapshot(MouseSnapshot snapshot)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (!pendingInteraction.Active) return;
+            if (StateManager.CurrentState != StateManager.States.Game)
+            {
+                ClearPendingInteraction();
+                return;
+            }
+
+            AbsoluteScreenPosition previousAbsolute = pendingInteraction.LastAbsolute;
+            if (!DebugManager.Mode(DebugMode.ModelPreview))
+            {
+                pendingInteraction.LastAbsolute = snapshot.Absolute;
+                return;
+            }
+
+            if (!pendingInteraction.DragRecognized)
+            {
+                Vector2 dragVector = (snapshot.Absolute - pendingInteraction.PressAbsolute).ToVector2();
+                if (dragVector.LengthSquared() < DragThresholdPixels * DragThresholdPixels)
+                {
+                    pendingInteraction.LastAbsolute = snapshot.Absolute;
+                    return;
+                }
+
+                pendingInteraction.DragRecognized = true;
+                pendingInteraction.DragMode = ResolveDragMode(pendingInteraction.Click.Button);
+                if (pendingInteraction.DragMode == WorldDragMode.None)
+                {
+                    pendingInteraction.DragRecognized = false;
+                    return;
+                }
+            }
+
+            int deltaX = snapshot.Absolute.X - previousAbsolute.X;
+            pendingInteraction.LastAbsolute = snapshot.Absolute;
+            if (deltaX == 0)
+            {
+                return;
+            }
+
+            float yawDelta = deltaX * MouseRotationRadiansPerPixel;
+            switch (pendingInteraction.DragMode)
+            {
+                case WorldDragMode.OtsCameraRotate:
+                    Camera.Camera.RotatePreviewCamera(yawDelta, false);
+                    break;
+                case WorldDragMode.OtsPlayerRotate:
+                    ObjectManager.Player?.RotatePreviewFacing(yawDelta);
+                    break;
+                case WorldDragMode.FreeCameraRotate:
+                    Camera.Camera.RotatePreviewCamera(yawDelta, true);
+                    break;
+                case WorldDragMode.SuppressOnly:
+                    break;
+            }
+
+        }
+
+        static void ArmPendingInteraction(in WorldClickRequested clickEvent)
+        {
+            AbsoluteScreenPosition absolute = AbsoluteScreenPosition.FromRelativeScreenPosition(clickEvent.RelativePos, Camera.Camera.WindowSize);
+            pendingInteraction = new PendingWorldInteraction
+            {
+                Active = true,
+                Click = clickEvent,
+                PressAbsolute = absolute,
+                LastAbsolute = absolute,
+                DragRecognized = false,
+                DragMode = WorldDragMode.None
+            };
+        }
+
+        static void ResolvePendingInteractionOnRelease(in WorldReleaseRequested releaseEvent)
+        {
+            if (!pendingInteraction.Active) return;
+            if (releaseEvent.Button != pendingInteraction.Click.Button) return;
+
+            WorldClickRequested clickEvent = pendingInteraction.Click;
+            bool dragRecognized = pendingInteraction.DragRecognized;
+            WorldDragMode dragMode = pendingInteraction.DragMode;
+            ClearPendingInteraction();
+            if (dragRecognized || StateManager.CurrentState != StateManager.States.Game)
+            {
+                if (dragRecognized && dragMode == WorldDragMode.OtsCameraRotate)
+                {
+                    Camera.Camera.SnapPreviewCameraBehindPlayer();
+                }
+                return;
+            }
+
+            if (GroundTargetingController.TryHandleWorldClick(clickEvent)) return;
+            RouteWorldClick(clickEvent);
+        }
+
+        static void ClearPendingInteraction()
+        {
+            pendingInteraction = default;
+        }
+
+        static WorldDragMode ResolveDragMode(ClickKind aButton)
+        {
+            PreviewCameraMode previewMode = Camera.Camera.CurrentPreviewCameraMode;
+            return (previewMode, aButton) switch
+            {
+                (PreviewCameraMode.OverTheShoulder, ClickKind.Left) => WorldDragMode.OtsCameraRotate,
+                (PreviewCameraMode.OverTheShoulder, ClickKind.Right) => WorldDragMode.OtsPlayerRotate,
+                (PreviewCameraMode.Free, ClickKind.Left) => WorldDragMode.FreeCameraRotate,
+                (PreviewCameraMode.Free, ClickKind.Right) => WorldDragMode.SuppressOnly,
+                _ => WorldDragMode.None
+            };
         }
 
         static void RouteWorldClick(in WorldClickRequested clickEvent)

@@ -22,6 +22,9 @@ namespace Project_1.System.Models.BaseModels
         public Model3D GameplayModel => gameplayModel;
         readonly Model3D gameplayModel;
 
+        public Model3D FacingIndicatorModel => facingIndicatorModel;
+        readonly Model3D facingIndicatorModel;
+
         public Model2D PresentationModel => presentationModel;
         readonly Model2D presentationModel;
 
@@ -36,6 +39,7 @@ namespace Project_1.System.Models.BaseModels
             float aspectRatio = presentationModel?.AspectRatio ?? 1f;
             frameModel = aFrameModel ?? BaseModelGeometryFactory.CreateFrame(aFrameHeight, aPictureLength, aspectRatio);
             gameplayModel = aGameplayModel ?? BaseModelGeometryFactory.CreateGameplayBase(aFrameHeight, aPictureLength);
+            facingIndicatorModel = BaseModelGeometryFactory.CreateFacingIndicator(aFrameHeight, aPictureLength);
         }
 
         protected BaseModel(float aFrameHeight, float aPictureLength, string aPresentationModelName, Model3D aFrameModel = null, Model3D aGameplayModel = null)

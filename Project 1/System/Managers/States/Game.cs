@@ -23,7 +23,6 @@ using System.Threading.Tasks;
 using Project_1.Input;
 using Project_1.Camera;
 using System.Diagnostics;
-using Project_1.System.Models.BaseModels;
 
 namespace Project_1.Managers.States
 {
@@ -93,7 +92,7 @@ namespace Project_1.Managers.States
             GraphicsManager.SetRenderTarget(renderTarget);
             GraphicsManager.ClearScreen(Color.White);
             RenderSnapshotManager.DrawTerrainSnapshots();
-            PlayerModelRenderer.DrawPlayer();
+            ObjectManager.DrawModelSnapshots();
             GraphicsManager.BeginSpriteBatch(spriteBatch, SpriteSortMode.Immediate, samplerState: SamplerState.PointClamp); //TODO: Should this be immediate?
 
             long worldStartTicks = Stopwatch.GetTimestamp();
@@ -120,7 +119,7 @@ namespace Project_1.Managers.States
             GraphicsManager.SetRenderTarget(renderTarget);
             GraphicsManager.ClearScreen(Color.White);
             RenderSnapshotManager.DrawTerrainSnapshots();
-            PlayerModelRenderer.DrawPlayer();
+            ObjectManager.DrawModelSnapshots();
             GraphicsManager.BeginSpriteBatch(spriteBatch, SpriteSortMode.FrontToBack, samplerState: SamplerState.PointClamp);
             long worldStartTicks = Stopwatch.GetTimestamp();
             DrawWorld(spriteBatch);

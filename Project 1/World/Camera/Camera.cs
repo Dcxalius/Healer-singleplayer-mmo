@@ -22,6 +22,11 @@ using System.Threading;
 
 namespace Project_1.Camera
 {
+    internal enum PreviewCameraMode
+    {
+        OverTheShoulder,
+        Free
+    }
 
     internal static class Camera
     {
@@ -52,6 +57,25 @@ namespace Project_1.Camera
             {
                 //TODO: CameraStyleSelect.instance.SetValueFromOutside((int)aCameraSettings);
                 cameraSettings.FollowSetting = value;
+            }
+        }
+
+        public static PreviewCameraMode CurrentPreviewCameraMode
+        {
+            get => currentPreviewCameraMode;
+            internal set => currentPreviewCameraMode = value;
+        }
+
+        public static CameraSettings.Follow PreviewFreeStyleSetting
+        {
+            get
+            {
+                return CurrentCameraSetting switch
+                {
+                    CameraSettings.Follow.CircleSoftBound => CameraSettings.Follow.CircleSoftBound,
+                    CameraSettings.Follow.RectangleSoftBound => CameraSettings.Follow.RectangleSoftBound,
+                    _ => CameraSettings.Follow.RectangleSoftBound
+                };
             }
         }
 
@@ -109,6 +133,7 @@ namespace Project_1.Camera
 
         static CameraMover cameraMover;
         static bool initialized;
+        static PreviewCameraMode currentPreviewCameraMode = PreviewCameraMode.OverTheShoulder;
         static Rectangle minimapWorldRectangle;
         static volatile bool minimapWorldRectangleValid;
         static volatile CameraRenderSnapshot renderSnapshot;
@@ -256,6 +281,27 @@ namespace Project_1.Camera
         {
             ThreadAffinity.AssertSimThread();
             cameraMover.BindCamera(aBinder);
+        }
+
+        internal static void TogglePreviewCameraMode()
+        {
+            ThreadAffinity.AssertSimThread();
+            cameraMover?.TogglePreviewMode();
+            PublishRenderSnapshot();
+        }
+
+        internal static void RotatePreviewCamera(float aDeltaRadians, bool aPreservePlayerScreenPosition)
+        {
+            ThreadAffinity.AssertSimThread();
+            cameraMover?.RotatePreviewCamera(aDeltaRadians, aPreservePlayerScreenPosition);
+            PublishRenderSnapshot();
+        }
+
+        internal static void SnapPreviewCameraBehindPlayer()
+        {
+            ThreadAffinity.AssertSimThread();
+            cameraMover?.SnapPreviewCameraBehindPlayer();
+            PublishRenderSnapshot();
         }
 
         public static void SetWindowSize(AbsoluteScreenPosition aSize)

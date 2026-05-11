@@ -10,6 +10,7 @@ using Project_1.GameObjects.Spells;
 using Project_1.Managers;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
+using Project_1.System.Models.BaseModels;
 using Project_1.Tiles;
 using Project_1.UI.HUD.Managers;
 
@@ -53,6 +54,13 @@ namespace Project_1.GameObjects
             }
         }
 
+        internal static void DrawModelSnapshots()
+        {
+            ThreadAffinity.AssertMainThread();
+            renderModelEntities.ApplyUpdates();
+            EntityModelRenderer.DrawSnapshots(renderModelEntities.Values);
+        }
+
         public static LightSnapshot RenderLightSnapshot => renderLightSnapshot;
 
         internal static void BuildRenderSnapshot()
@@ -61,6 +69,7 @@ namespace Project_1.GameObjects
             PublishPlayerSnapshot();
             PublishEntitySnapshots(entities, renderEntities, knownEntityIds, currentEntityIds);
             PublishEntitySnapshots(npcs, renderNpcs, knownNpcIds, currentNpcIds);
+            PublishModelSnapshots();
         }
 
         static void ApplyRenderUpdates()
@@ -86,6 +95,30 @@ namespace Project_1.GameObjects
             }
 
             PublishRemovals(renderPlayers, knownPlayerIds, currentPlayerIds);
+        }
+
+        static void PublishModelSnapshots()
+        {
+            if (!DebugManager.Mode(DebugMode.ModelPreview))
+            {
+                renderModelEntities.RequestClear();
+                knownModelIds.Clear();
+                currentModelIds.Clear();
+                return;
+            }
+
+            currentModelIds.Clear();
+            List<Entity> all = BuildAllScratch();
+            for (int i = 0; i < all.Count; i++)
+            {
+                Entity entity = all[i];
+                if (entity == null) continue;
+                EntityModelRenderSnapshot snapshot = entity.BuildModelRenderSnapshot();
+                renderModelEntities.EnqueueUpdate(snapshot);
+                currentModelIds.Add(snapshot.RenderId);
+            }
+
+            PublishRemovals(renderModelEntities, knownModelIds, currentModelIds);
         }
 
         static LightSnapshot BuildRenderLightSnapshot()
@@ -170,7 +203,7 @@ namespace Project_1.GameObjects
             PublishRemovals(cache, knownIds, currentIds);
         }
 
-        static void PublishRemovals(RenderCache<EntityRenderSnapshot> cache, HashSet<int> knownIds, HashSet<int> currentIds)
+        static void PublishRemovals<TSnapshot>(RenderCache<TSnapshot> cache, HashSet<int> knownIds, HashSet<int> currentIds) where TSnapshot : struct, IRenderSnapshot
         {
             foreach (int id in knownIds)
             {

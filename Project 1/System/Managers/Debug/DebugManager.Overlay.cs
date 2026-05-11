@@ -5,6 +5,7 @@ using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.Managers.Saves;
 using Project_1.Messaging;
+using Project_1.System.Models.BaseModels;
 using Project_1.Textures;
 using Project_1.Tiles;
 using Project_1.UI;
@@ -165,11 +166,16 @@ namespace Project_1.Managers
             string topDirection = WorldBlockRenderer.ResolveCompassName(WorldBlockRenderer.CameraGroundForward);
             string rightDirection = WorldBlockRenderer.ResolveCompassName(WorldBlockRenderer.CameraGroundRight);
             float yawDegrees = MathHelper.ToDegrees(WorldBlockRenderer.CameraYawRadians);
+            float bodyYawDegrees = MathHelper.ToDegrees(player.PreviewBodyFacingYawRadians);
 
             return
                 "\nModel Preview\n" +
                 $"  Top/Right: {topDirection} / {rightDirection}\n" +
+                $"  Preview mode: {Camera.Camera.CurrentPreviewCameraMode}\n" +
+                $"  Free style: {Camera.Camera.PreviewFreeStyleSetting}\n" +
                 $"  Camera yaw/zoom: {yawDegrees,6:0.0} deg / {WorldBlockRenderer.CameraZoom,4:0.00}\n" +
+                $"  Player body yaw: {bodyYawDegrees,6:0.0} deg\n" +
+                $"  Player presentation: {player.PreviewPresentationDirectionName}\n" +
                 $"  Player 3D XYZ: {playerWorldPosition.X,6:0.00}, {playerWorldPosition.Y,6:0.00}, {playerWorldPosition.Z,6:0.00}";
         }
 

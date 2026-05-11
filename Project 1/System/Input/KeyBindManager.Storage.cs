@@ -102,10 +102,23 @@ namespace Project_1.Input
                 firstButtons[debugTeleportIndex] = aDefaultBinds[debugTeleportIndex];
             }
 
+            int rotateCameraLeftIndex = (int)KeyListner.RotateCameraLeft;
+            if (firstButtons[rotateCameraLeftIndex].Key == Keys.Q && firstButtons[rotateCameraLeftIndex].Modifiers.Length == 0)
+            {
+                firstButtons[rotateCameraLeftIndex] = aDefaultBinds[rotateCameraLeftIndex];
+            }
+
             int rotateCameraRightIndex = (int)KeyListner.RotateCameraRight;
-            if (firstButtons[rotateCameraRightIndex].Key == Keys.R && firstButtons[rotateCameraRightIndex].Modifiers.Length == 0)
+            if ((firstButtons[rotateCameraRightIndex].Key == Keys.R || firstButtons[rotateCameraRightIndex].Key == Keys.E) &&
+                firstButtons[rotateCameraRightIndex].Modifiers.Length == 0)
             {
                 firstButtons[rotateCameraRightIndex] = aDefaultBinds[rotateCameraRightIndex];
+            }
+
+            int togglePlayerFacingIndex = (int)KeyListner.TogglePlayerCameraFacing;
+            if (firstButtons[togglePlayerFacingIndex].Key == Keys.F && firstButtons[togglePlayerFacingIndex].Modifiers.Length == 0)
+            {
+                firstButtons[togglePlayerFacingIndex] = aDefaultBinds[togglePlayerFacingIndex];
             }
         }
 

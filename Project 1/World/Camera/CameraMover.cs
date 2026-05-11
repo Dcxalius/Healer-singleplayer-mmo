@@ -41,7 +41,12 @@ namespace Project_1.Camera
 
         void ApplyMouseVelocity()
         {
-            if (CurrentCameraSetting == CameraSettings.Follow.Hardbound)
+            if (DebugManager.Mode(DebugMode.ModelPreview) && Camera.CurrentPreviewCameraMode == PreviewCameraMode.OverTheShoulder)
+            {
+                return;
+            }
+
+            if (!DebugManager.Mode(DebugMode.ModelPreview) && CurrentCameraSetting == CameraSettings.Follow.Hardbound)
             {
                 return;
             }
@@ -137,7 +142,15 @@ namespace Project_1.Camera
         public void Move()
         {
             ThreadAffinity.AssertSimThread();
+            CheckForPreviewModeTogglePress();
             ApplyCameraRotationInput();
+            if (DebugManager.Mode(DebugMode.ModelPreview))
+            {
+                MovePreviewCamera();
+                CheckForSpacePress();
+                return;
+            }
+
             switch (CurrentCameraSetting)
             {
                 case CameraSettings.Follow.Free:
@@ -162,6 +175,59 @@ namespace Project_1.Camera
 
             CheckForSpacePress();
         }
+
+        internal void TogglePreviewMode()
+        {
+            if (!DebugManager.Mode(DebugMode.ModelPreview))
+            {
+                return;
+            }
+
+            if (Camera.CurrentPreviewCameraMode == PreviewCameraMode.OverTheShoulder)
+            {
+                Camera.CurrentPreviewCameraMode = PreviewCameraMode.Free;
+                velocity = WorldSpace.Zero;
+                momentum = WorldSpace.Zero;
+                ReadjustBindingAfterRotation();
+                return;
+            }
+
+            Camera.CurrentPreviewCameraMode = PreviewCameraMode.OverTheShoulder;
+            velocity = WorldSpace.Zero;
+            momentum = WorldSpace.Zero;
+            SnapPreviewCameraBehindPlayer();
+        }
+
+        internal void RotatePreviewCamera(float aDeltaRadians, bool aPreservePlayerScreenPosition)
+        {
+            if (Math.Abs(aDeltaRadians) <= float.Epsilon)
+            {
+                return;
+            }
+
+            if (aPreservePlayerScreenPosition && boundObject != null)
+            {
+                RotatePreviewCameraPreservingPlayerScreenPosition(aDeltaRadians);
+                return;
+            }
+
+            WorldBlockRenderer.RotateCameraYaw(aDeltaRadians);
+            ReadjustBindingAfterRotation();
+        }
+
+        internal void SnapPreviewCameraBehindPlayer()
+        {
+            if (boundObject is not Project_1.GameObjects.Entities.Friendlies.Players.Player player)
+            {
+                return;
+            }
+
+            CentreInWorldSpace = boundObject.FeetPosition;
+            WorldBlockRenderer.SetCameraYaw(player.PreviewBodyFacingYawRadians - MathF.PI);
+            velocity = WorldSpace.Zero;
+            momentum = WorldSpace.Zero;
+        }
+
         public void BindCamera(MovingObject aBinder)
         {
             ThreadAffinity.AssertSimThread();
@@ -184,6 +250,12 @@ namespace Project_1.Camera
             }
         }
 
+        void CheckForPreviewModeTogglePress()
+        {
+            if (!KeyBindStateCache.GetPress(KeyBindManager.KeyListner.ToggleCameraFollow)) return;
+            TogglePreviewMode();
+        }
+
         void MoveRectangleSoftBound()
         {
             if (boundObject == null)
@@ -199,6 +271,70 @@ namespace Project_1.Camera
 
 
 
+            ApplyMovementToCamera();
+        }
+
+        void MovePreviewCamera()
+        {
+            switch (Camera.CurrentPreviewCameraMode)
+            {
+                case PreviewCameraMode.OverTheShoulder:
+                    MovePreviewOverTheShoulder();
+                    break;
+                case PreviewCameraMode.Free:
+                    MovePreviewFree();
+                    break;
+            }
+        }
+
+        void MovePreviewOverTheShoulder()
+        {
+            if (boundObject == null)
+            {
+                return;
+            }
+
+            CentreInWorldSpace = boundObject.FeetPosition;
+            velocity = WorldSpace.Zero;
+            momentum = WorldSpace.Zero;
+        }
+
+        void MovePreviewFree()
+        {
+            switch (Camera.PreviewFreeStyleSetting)
+            {
+                case CameraSettings.Follow.CircleSoftBound:
+                    MovePreviewCircleSoftBound();
+                    break;
+                default:
+                    MovePreviewRectangleSoftBound();
+                    break;
+            }
+        }
+
+        void MovePreviewRectangleSoftBound()
+        {
+            if (boundObject == null)
+            {
+                MoveFree();
+                return;
+            }
+
+            ApplyMouseVelocity();
+            CheckIfCameraTriesToLeavePlayer();
+            ApplyMovementToCamera();
+        }
+
+        void MovePreviewCircleSoftBound()
+        {
+            if (boundObject == null)
+            {
+                MoveFree();
+                return;
+            }
+
+            ApplyMouseVelocity();
+            StayWithinCircleBind();
             ApplyMovementToCamera();
         }
 
@@ -265,6 +401,12 @@ namespace Project_1.Camera
                 return;
             }
 
+            if (DebugManager.Mode(DebugMode.ModelPreview))
+            {
+                RotatePreviewCamera(rotationDelta, false);
+                return;
+            }
+
             WorldBlockRenderer.RotateCameraYaw(rotationDelta);
             ReadjustBindingAfterRotation();
         }
@@ -272,7 +414,15 @@ namespace Project_1.Camera
         void ReadjustBindingAfterRotation()
         {
             if (boundObject == null) return;
-            if (CurrentCameraSetting != CameraSettings.Follow.RectangleSoftBound) return;
+            if (DebugManager.Mode(DebugMode.ModelPreview))
+            {
+                if (Camera.CurrentPreviewCameraMode != PreviewCameraMode.Free) return;
+                if (Camera.PreviewFreeStyleSetting != CameraSettings.Follow.RectangleSoftBound) return;
+            }
+            else if (CurrentCameraSetting != CameraSettings.Follow.RectangleSoftBound)
+            {
+                return;
+            }
 
             CheckIfCameraTriesToLeavePlayerInCameraSpace();
             velocity = WorldSpace.Zero;
@@ -308,6 +458,37 @@ namespace Project_1.Camera
             float forwardScale = (screenDeltaPerRight.X * aDesiredScreenDelta.Y - screenDeltaPerRight.Y * aDesiredScreenDelta.X) / determinant;
             aWorldCorrection = rightPixels * rightScale + forwardPixels * forwardScale;
             return !float.IsNaN(aWorldCorrection.X) && !float.IsNaN(aWorldCorrection.Y) && !float.IsInfinity(aWorldCorrection.X) && !float.IsInfinity(aWorldCorrection.Y);
+        }
+
+        void RotatePreviewCameraPreservingPlayerScreenPosition(float aDeltaRadians)
+        {
+            WorldSpace3D playerWorldPosition = ResolveBoundObjectWorldPosition();
+            Camera3D beforeCamera = WorldBlockRenderer.CreatePreviewCamera(CentreInWorldSpace);
+            AbsoluteScreenPosition targetScreenPosition = beforeCamera.WorldToScreen(playerWorldPosition);
+
+            WorldBlockRenderer.RotateCameraYaw(aDeltaRadians);
+
+            for (int i = 0; i < 3; i++)
+            {
+                Camera3D previewCamera = WorldBlockRenderer.CreatePreviewCamera(CentreInWorldSpace);
+                AbsoluteScreenPosition currentScreenPosition = previewCamera.WorldToScreen(playerWorldPosition);
+                Vector2 desiredScreenDelta = new Vector2(
+                    targetScreenPosition.X - currentScreenPosition.X,
+                    targetScreenPosition.Y - currentScreenPosition.Y);
+                if (desiredScreenDelta.LengthSquared() <= 1f)
+                {
+                    break;
+                }
+
+                if (!TryResolveCameraCorrection(previewCamera, playerWorldPosition, desiredScreenDelta, out Vector2 worldCorrection))
+                {
+                    break;
+                }
+
+                CentreInWorldSpace = new WorldSpace(CentreInWorldSpace.ToVector2() + worldCorrection);
+            }
+
+            ReadjustBindingAfterRotation();
         }
 
         Vector2 SampleScreenDelta(WorldSpace3D aPlayerWorldPosition, Vector2 aCameraOffsetPixels, Camera3D aCurrentCamera)
