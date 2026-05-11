@@ -2,7 +2,7 @@
 
 ## Overview
 - **Intent:** this rework is laying groundwork for a more general rendering stack built around reusable cameras, model primitives, and shader-driven model rendering instead of only sprite and tile draw code.
-- **Current reality:** the live game still renders through the existing snapshot-based 2D pipeline, with shadows composited by the current shadow renderer. The new stack is mostly exposed through a debug-only preview path.
+- **Current reality:** the live game still renders through the existing snapshot-based 2D pipeline. The old soft-shadow render pass has been removed, and the new stack is mostly exposed through a debug-only preview path.
 - **Why adjacent files changed:** block world data, chunk generation, resolution handling, and option UI changes are supporting pieces for that preview path and future migration, even when they are not replacing the old renderer yet.
 
 ## New Rendering Foundations
@@ -36,6 +36,6 @@ The actual branch point is `DrawWorld()`. If `DebugManager.Mode(DebugMode.ModelP
 The graphics and UI changes support that workflow. `Project 1/System/Managers/Graphics/GraphicsManager.cs` now exposes display mode information and supported fullscreen sizes. `GraphicsManager.Windowing.cs` normalizes requested window or fullscreen resolutions and applies safer fallback behavior. `Project 1/UI/OptionMenu/ScreenSizeSelect.cs` was rewritten to use numeric inputs for windowed mode, a live fullscreen resolution list, and a borderless information state. Together those changes make the new camera and preview behavior less fragile across window modes and monitor sizes.
 
 ## Current Status
-- The existing snapshot and shadow pipeline is still the real production renderer. `RenderSnapshotManager` still builds and draws world snapshots, and `SuperSoftShadowRenderer` still composites the live shadow pass.
+- The existing snapshot pipeline is still the real production renderer. `RenderSnapshotManager` still builds and draws world snapshots, but the old soft-shadow pass has been removed.
 - The new rendering stack currently reads as **foundation + debug visualization path**, not a full replacement renderer.
 - The likely direction is a gradual migration away from purely tile and sprite-oriented rendering toward a block and model-aware pipeline, with compatibility layers kept in place until more runtime systems move over.

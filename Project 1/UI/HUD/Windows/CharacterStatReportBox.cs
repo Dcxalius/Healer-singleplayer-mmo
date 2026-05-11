@@ -200,7 +200,7 @@ namespace Project_1.UI.HUD.Windows
 
             StatLineSnapshot pair = lines[lineOnPage];
             bool hasHoverSnapshot = TryBuildStatHoverSnapshot(pair, out ItemDescriptorSnapshot hoverSnapshot);
-            line.Set(FormatValue(pair.Value), pair.Name, hoverSnapshot, hasHoverSnapshot);
+            line.Set(FormatStatLineValue(pair), pair.Name, hoverSnapshot, hasHoverSnapshot);
         }
 
         string GetCurrentPageTitle(int aPageIndex)
@@ -234,6 +234,28 @@ namespace Project_1.UI.HUD.Windows
         static string FormatPercent(double aRateValue)
         {
             return (aRateValue * 100d).ToString("0.##", CultureInfo.InvariantCulture) + "%";
+        }
+
+        static string FormatStatLineValue(StatLineSnapshot aLine)
+        {
+            return IsPercentStatLine(aLine.Name)
+                ? FormatPercent(aLine.Value)
+                : FormatValue(aLine.Value);
+        }
+
+        static bool IsPercentStatLine(string aName)
+        {
+            return aName switch
+            {
+                "Crit Chance" or
+                "Hit Chance" or
+                "Spell Crit Chance" or
+                "Spell Hit Chance" or
+                "Dodge Chance" or
+                "Parry Chance" or
+                "Block Chance" => true,
+                _ => false
+            };
         }
 
         static string FormatSignedPercent(double aRateValue)
@@ -426,7 +448,8 @@ namespace Project_1.UI.HUD.Windows
                     }
                 case "Spell Crit Damage":
                     {
-                        aSnapshot = new ItemDescriptorSnapshot("Spell Crit Damage", "Damage multiplier applied on spell crits.", $"Base Spell Crit Damage: {FormatValue(aLine.Value)}", 0, true, false);
+                        string report = BuildSpellBreakdownReport(aLine.Value, secondarySpellDetails.CritDamageBonuses, "Spell Crit Damage", false);
+                        aSnapshot = new ItemDescriptorSnapshot("Spell Crit Damage", "Base spell crit damage plus school-specific bonuses.", report, 0, true, false);
                         return true;
                     }
                 case "Spell Hit Chance":

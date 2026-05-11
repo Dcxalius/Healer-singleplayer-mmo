@@ -21,7 +21,6 @@ namespace Project_1.Textures
         static ContentManager contentManager;
         static bool initialized;
 
-        public static Effect textOutline;
         public static Effect MsdfTextEffect { get; private set; }
 
         public static void Init()
@@ -35,7 +34,6 @@ namespace Project_1.Textures
             InitArrays();
             InitFonts();
             TextureCatalog.Init(textureSizes, avgColors);
-            textOutline = contentManager.Load<Effect>("Effects\\TextOutline");
             MsdfTextEffect = contentManager.Load<Effect>("Effects\\MsdfText");
         }
 
@@ -44,9 +42,8 @@ namespace Project_1.Textures
             string currentRoot = Path.Combine(AppContext.BaseDirectory, "Content");
             contentManager.RootDirectory = currentRoot;
 
-            bool hasTextOutline = File.Exists(Path.Combine(currentRoot, "Effects", "TextOutline.xnb"));
             bool hasMsdfText = File.Exists(Path.Combine(currentRoot, "Effects", "MsdfText.xnb"));
-            if (hasTextOutline && hasMsdfText) return;
+            if (hasMsdfText) return;
 
             throw new DirectoryNotFoundException(
                 $"Compiled content was not found in the active build output directory '{currentRoot}'.");

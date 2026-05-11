@@ -44,27 +44,27 @@ namespace Project_1.GameObjects.Unit.Stats
         public void Refresh(UnitData aUnitData)
         {
             AssertSimThread();
-            armor.Value = aUnitData.Equipment.GetArmor + aUnitData.BaseStats.TotalPrimaryStats.Agility * 2;
+            armor.Value = aUnitData.ApplyStatusModifiersInt("Armor", aUnitData.Equipment.GetArmor + aUnitData.BaseStats.TotalPrimaryStats.Agility * 2);
             dodgeChance = Math.Clamp(
-                aUnitData.ClassData.BaseDodge
+                aUnitData.ApplyStatusModifiers("DodgeChance", aUnitData.ClassData.BaseDodge
                 + aUnitData.BaseStats.TotalPrimaryStats.Agility * aUnitData.ClassData.AgilityDodgeChanceScaler
-                + aUnitData.Equipment.GetSecondaryStat<double>("DodgeChance"),
+                + aUnitData.Equipment.GetSecondaryStat<double>("DodgeChance")),
                 0d,
                 1d);
 
             parryChance = aUnitData.ClassData.CanParry
-                ? Math.Clamp(0.05d + aUnitData.Equipment.GetSecondaryStat<double>("ParryChance"), 0d, 1d)
+                ? Math.Clamp(aUnitData.ApplyStatusModifiers("ParryChance", 0.05d + aUnitData.Equipment.GetSecondaryStat<double>("ParryChance")), 0d, 1d)
                 : 0d;
 
-            blockChance = Math.Clamp(aUnitData.Equipment.HasShield ? 0.05d + aUnitData.Equipment.GetSecondaryStat<double>("BlockChance") : 0d, 0d, 1d);
+            blockChance = Math.Clamp(aUnitData.ApplyStatusModifiers("BlockChance", aUnitData.Equipment.HasShield ? 0.05d + aUnitData.Equipment.GetSecondaryStat<double>("BlockChance") : 0d), 0d, 1d);
 
-            blockValue = aUnitData.Equipment.HasShield ? aUnitData.Equipment.GetSecondaryStat<double>("BlockValue") + (aUnitData.BaseStats.TotalPrimaryStats.Strength / 2) : 0d;
-            hp5 = aUnitData.Equipment.GetSecondaryStat<double>("Hp5")
-                + aUnitData.Equipment.GetSecondaryStat<int>("Hp5");
-            spiritHp5 = aUnitData.ClassData.SpiritHp5Constant
+            blockValue = aUnitData.ApplyStatusModifiers("BlockValue", aUnitData.Equipment.HasShield ? aUnitData.Equipment.GetSecondaryStat<double>("BlockValue") + (aUnitData.BaseStats.TotalPrimaryStats.Strength / 2) : 0d);
+            hp5 = aUnitData.ApplyStatusModifiers("Hp5", aUnitData.Equipment.GetSecondaryStat<double>("Hp5")
+                + aUnitData.Equipment.GetSecondaryStat<int>("Hp5"));
+            spiritHp5 = aUnitData.ApplyStatusModifiers("SpiritHp5", aUnitData.ClassData.SpiritHp5Constant
                 + aUnitData.BaseStats.TotalPrimaryStats.Spirit * aUnitData.ClassData.SpiritHp5Scaling
                 + aUnitData.Equipment.GetSecondaryStat<double>("SpiritHp5")
-                + aUnitData.Equipment.GetSecondaryStat<int>("SpiritHp5");
+                + aUnitData.Equipment.GetSecondaryStat<int>("SpiritHp5"));
             RefreshSpellResitance(aUnitData);
         }
 
@@ -73,12 +73,12 @@ namespace Project_1.GameObjects.Unit.Stats
             AssertSimThread();
             Dictionary<SpellSchool, int> resitanceBySchool = new Dictionary<SpellSchool, int>
             {
-                [SpellSchool.Arcane] = aUnitData.Equipment.GetSecondaryStat<int>("ArcaneResist"),
-                [SpellSchool.Fire] = aUnitData.Equipment.GetSecondaryStat<int>("FireResist"),
-                [SpellSchool.Frost] = aUnitData.Equipment.GetSecondaryStat<int>("FrostResist"),
-                [SpellSchool.Holy] = aUnitData.Equipment.GetSecondaryStat<int>("HolyResist"),
-                [SpellSchool.Nature] = aUnitData.Equipment.GetSecondaryStat<int>("NatureResist"),
-                [SpellSchool.Shadow] = aUnitData.Equipment.GetSecondaryStat<int>("ShadowResist")
+                [SpellSchool.Arcane] = aUnitData.ApplyStatusModifiersInt("ArcaneResist", aUnitData.Equipment.GetSecondaryStat<int>("ArcaneResist")),
+                [SpellSchool.Fire] = aUnitData.ApplyStatusModifiersInt("FireResist", aUnitData.Equipment.GetSecondaryStat<int>("FireResist")),
+                [SpellSchool.Frost] = aUnitData.ApplyStatusModifiersInt("FrostResist", aUnitData.Equipment.GetSecondaryStat<int>("FrostResist")),
+                [SpellSchool.Holy] = aUnitData.ApplyStatusModifiersInt("HolyResist", aUnitData.Equipment.GetSecondaryStat<int>("HolyResist")),
+                [SpellSchool.Nature] = aUnitData.ApplyStatusModifiersInt("NatureResist", aUnitData.Equipment.GetSecondaryStat<int>("NatureResist")),
+                [SpellSchool.Shadow] = aUnitData.ApplyStatusModifiersInt("ShadowResist", aUnitData.Equipment.GetSecondaryStat<int>("ShadowResist"))
             };
 
             spellResitance.SetValues(0, resitanceBySchool);

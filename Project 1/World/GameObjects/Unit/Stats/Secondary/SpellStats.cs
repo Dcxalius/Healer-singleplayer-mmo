@@ -89,18 +89,21 @@ namespace Project_1.World.GameObjects.Unit.Stats.Secondary
         public void Refresh(UnitData aUnitData)
         {
             bool isBaseSchool = spellSchool == SpellSchool.Base;
-            spellDamage = aUnitData.Equipment.GetSecondaryStat<int>(spellSchool.ToString() + "SpellDamage");
+            string statPrefix = spellSchool.ToString();
+            spellDamage = aUnitData.ApplyStatusModifiersInt(statPrefix + "SpellDamage", aUnitData.Equipment.GetSecondaryStat<int>(statPrefix + "SpellDamage")
+                + aUnitData.GetTalentSecondaryStat<int>(statPrefix + "SpellDamage"));
             double baseCritChance = isBaseSchool
                 ? BASE_CRIT_CHANCE + aUnitData.BaseStats.TotalPrimaryStats.Intellect * aUnitData.ClassData.SpellCritChanceScaler
                 : 0d;
             double baseCritDamage = isBaseSchool ? BASE_CRIT_DAMAGE : 0d;
-            critChance = Math.Clamp(baseCritChance + aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellCritChance"), 0d, 1d);
-            critDamage = baseCritDamage + aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellCritDamage");
-            flatPenetration = aUnitData.Equipment.GetSecondaryStat<int>(spellSchool.ToString() + "SpellFlatPenetration");
-            percentPenetration = Math.Clamp(aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellPercentPenetration"), 0d, 1d);
-            haste = Math.Clamp(aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellHaste"), 0d, 1d);
-            vampirism = Math.Clamp(aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellVampirism"), 0d, 1d);
-            bonusHitChance = Math.Clamp(aUnitData.Equipment.GetSecondaryStat<double>(spellSchool.ToString() + "SpellBonusHitChance"), 0d, 1d);
+            critChance = Math.Clamp(aUnitData.ApplyStatusModifiers(statPrefix + "SpellCritChance", baseCritChance + aUnitData.Equipment.GetSecondaryStat<double>(statPrefix + "SpellCritChance") + aUnitData.GetTalentSecondaryStat<double>(statPrefix + "SpellCritChance")), 0d, 1d);
+            critDamage = aUnitData.ApplyStatusModifiers(statPrefix + "SpellCritDamage", baseCritDamage + aUnitData.Equipment.GetSecondaryStat<double>(statPrefix + "SpellCritDamage") + aUnitData.GetTalentSecondaryStat<double>(statPrefix + "SpellCritDamage"));
+            flatPenetration = aUnitData.ApplyStatusModifiersInt(statPrefix + "SpellFlatPenetration", aUnitData.Equipment.GetSecondaryStat<int>(statPrefix + "SpellFlatPenetration")
+                + aUnitData.GetTalentSecondaryStat<int>(statPrefix + "SpellFlatPenetration"));
+            percentPenetration = Math.Clamp(aUnitData.ApplyStatusModifiers(statPrefix + "SpellPercentPenetration", aUnitData.Equipment.GetSecondaryStat<double>(statPrefix + "SpellPercentPenetration") + aUnitData.GetTalentSecondaryStat<double>(statPrefix + "SpellPercentPenetration")), 0d, 1d);
+            haste = Math.Clamp(aUnitData.ApplyStatusModifiers(statPrefix + "SpellHaste", aUnitData.Equipment.GetSecondaryStat<double>(statPrefix + "SpellHaste") + aUnitData.GetTalentSecondaryStat<double>(statPrefix + "SpellHaste")), 0d, 1d);
+            vampirism = Math.Clamp(aUnitData.ApplyStatusModifiers(statPrefix + "SpellVampirism", aUnitData.Equipment.GetSecondaryStat<double>(statPrefix + "SpellVampirism") + aUnitData.GetTalentSecondaryStat<double>(statPrefix + "SpellVampirism")), 0d, 1d);
+            bonusHitChance = Math.Clamp(aUnitData.ApplyStatusModifiers(statPrefix + "SpellBonusHitChance", aUnitData.Equipment.GetSecondaryStat<double>(statPrefix + "SpellBonusHitChance") + aUnitData.GetTalentSecondaryStat<double>(statPrefix + "SpellBonusHitChance")), 0d, 1d);
         }
 
         public SpellStats(SpellSchool aSchool) 

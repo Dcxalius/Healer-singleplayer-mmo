@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Project_1.GameObjects.Spells;
 using Project_1.Textures;
+using Project_1.World.GameObjects.Unit.Stats.Primary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,6 +29,27 @@ namespace Project_1.World.GameObjects.Unit.Talents
         public double GetChanges(int id, int rank, TalentChange change, bool flat) => changes.Where(x => x.spellDataId == id).SelectMany(x => x.changes).Where(x => x.change == change && flat == x.flat).Sum(x => x.amount * rank);
         List<((TalentChange change, float amount, bool flat)[] changes, int spellDataId)> changes;
 
+        public double GetPrimaryStatChange(PrimaryStats.PrimaryStat aStat, int aRank, bool aFlat)
+        {
+            return statChanges
+                .Where(x => x.stat == aStat.ToString() && x.flat == aFlat)
+                .Sum(x => x.amount * aRank);
+        }
+
+        public double GetSecondaryStatChange(string aStat, int aRank)
+        {
+            if (string.IsNullOrWhiteSpace(aStat))
+            {
+                return 0d;
+            }
+
+            return statChanges
+                .Where(x => x.stat == aStat)
+                .Sum(x => x.amount * aRank);
+        }
+
+        List<(string stat, float amount, bool flat)> statChanges;
+
 
         public string Name => name;
         string name;
@@ -35,7 +57,7 @@ namespace Project_1.World.GameObjects.Unit.Talents
         public string Description => description ??= GenerateDescription();
 
         [JsonConstructor]
-        public Talent(int id, string name, string gfxName, int maxRank, (int id, int amount)[] required, List<((TalentChange change, float amount, bool flat)[] changes, int spellId)> changes)
+        public Talent(int id, string name, string gfxName, int maxRank, (int id, int amount)[] required, List<((TalentChange change, float amount, bool flat)[] changes, int spellId)> changes, List<(string stat, float amount, bool flat)> statChanges)
         {
             //TODO: Should the gfxtype be spell image? Maybe talents should have their own gfx type?
             gfxPath = new GfxPath(GfxType.SpellImage, gfxName);
@@ -45,6 +67,7 @@ namespace Project_1.World.GameObjects.Unit.Talents
             this.maxRank = maxRank;
             this.required = required ?? Array.Empty<(int, int)>();
             this.changes = changes ?? new List<((TalentChange, float, bool)[], int)>();
+            this.statChanges = statChanges ?? new List<(string, float, bool)>();
 
             for (int i = 0; i < this.changes.Count; i++)
             {
@@ -83,6 +106,15 @@ namespace Project_1.World.GameObjects.Unit.Talents
                 }
             }
 
+            if (statChanges.Count > 0)
+            {
+                List<string> clauses = BuildStatChangeClauses();
+                if (clauses.Count > 0)
+                {
+                    sections.Add(CapitalizeFirst(JoinWithAnd(clauses)) + ".");
+                }
+            }
+
             return string.Join("\n\n", sections);
         }
 
@@ -109,6 +141,13 @@ namespace Project_1.World.GameObjects.Unit.Talents
             }
 
             return order.Select(key => FormatChangeClause(key.change, key.flat, groupedChanges[key])).ToList();
+        }
+
+        List<string> BuildStatChangeClauses()
+        {
+            return statChanges
+                .Select(x => $"increase {FormatStatName(x.stat)} by {FormatStatAmount(x.stat, x.amount, x.flat)}")
+                .ToList();
         }
 
         string FormatRequirements()
@@ -163,6 +202,46 @@ namespace Project_1.World.GameObjects.Unit.Talents
                     => $"{magnitude.ToString("0.##", CultureInfo.InvariantCulture)} seconds",
                 _ => magnitude.ToString("0.##", CultureInfo.InvariantCulture)
             };
+        }
+
+        static string FormatStatAmount(string stat, float amount, bool flat)
+        {
+            float magnitude = Math.Abs(amount);
+            if (!flat || IsRateStat(stat))
+            {
+                return $"{(magnitude * 100f).ToString("0.##", CultureInfo.InvariantCulture)}%";
+            }
+
+            return magnitude.ToString("0.##", CultureInfo.InvariantCulture);
+        }
+
+        static bool IsRateStat(string stat)
+        {
+            if (string.IsNullOrWhiteSpace(stat)) return false;
+
+            return stat.EndsWith("Chance", StringComparison.Ordinal)
+                || stat.EndsWith("PercentPenetration", StringComparison.Ordinal)
+                || stat.EndsWith("Haste", StringComparison.Ordinal)
+                || stat.EndsWith("Vampirism", StringComparison.Ordinal);
+        }
+
+        static string FormatStatName(string stat)
+        {
+            if (string.IsNullOrWhiteSpace(stat)) return string.Empty;
+
+            StringBuilder builder = new StringBuilder(stat.Length + 8);
+            builder.Append(stat[0]);
+            for (int i = 1; i < stat.Length; i++)
+            {
+                if (char.IsUpper(stat[i]) && !char.IsUpper(stat[i - 1]))
+                {
+                    builder.Append(' ');
+                }
+
+                builder.Append(stat[i]);
+            }
+
+            return builder.ToString();
         }
 
         static bool SameAmount(float left, float right)

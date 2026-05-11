@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.Managers;
 using Project_1.World.GameObjects.Unit.Stats.Primary;
+using Project_1.World.GameObjects.Unit.Talents;
 
 namespace Project_1.GameObjects.Unit
 {
@@ -47,6 +48,77 @@ namespace Project_1.GameObjects.Unit
 
         public (int id, int rank)[] LearntTalents => learntTalents;
         (int id, int rank)[] learntTalents;
+
+        public double GetTalentPrimaryStatFlat(PrimaryStats.PrimaryStat aStat) => GetTalentPrimaryStatChange(aStat, true);
+        public double GetTalentPrimaryStatPercent(PrimaryStats.PrimaryStat aStat) => GetTalentPrimaryStatChange(aStat, false);
+        Entity owner;
+
+        internal void SetOwner(Entity aOwner)
+        {
+            owner = aOwner;
+        }
+
+        public double GetStatusStatFlat(string aStat) => owner?.GetStatusStatFlat(aStat) ?? 0d;
+        public double GetStatusStatPercent(string aStat) => owner?.GetStatusStatPercent(aStat) ?? 0d;
+
+        public double ApplyStatusModifiers(string aStat, double aValue)
+        {
+            return (aValue + GetStatusStatFlat(aStat)) * (1d + GetStatusStatPercent(aStat));
+        }
+
+        public int ApplyStatusModifiersInt(string aStat, double aValue)
+        {
+            return (int)Math.Round(ApplyStatusModifiers(aStat, aValue), MidpointRounding.AwayFromZero);
+        }
+
+        public T GetTalentSecondaryStat<T>(string aSecondaryStat)
+        {
+            double value = 0d;
+            if (learntTalents == null)
+            {
+                return default;
+            }
+
+            for (int i = 0; i < learntTalents.Length; i++)
+            {
+                if (learntTalents[i].rank <= 0) continue;
+                value += TalentFactory.GetTalent(learntTalents[i].id).GetSecondaryStatChange(aSecondaryStat, learntTalents[i].rank);
+            }
+
+            if (typeof(T) == typeof(int))
+            {
+                return (T)(object)(int)Math.Round(value, MidpointRounding.AwayFromZero);
+            }
+
+            if (typeof(T) == typeof(float))
+            {
+                return (T)(object)(float)value;
+            }
+
+            if (typeof(T) == typeof(double))
+            {
+                return (T)(object)value;
+            }
+
+            throw new NotImplementedException();
+        }
+
+        double GetTalentPrimaryStatChange(PrimaryStats.PrimaryStat aStat, bool aFlat)
+        {
+            double value = 0d;
+            if (learntTalents == null)
+            {
+                return 0d;
+            }
+
+            for (int i = 0; i < learntTalents.Length; i++)
+            {
+                if (learntTalents[i].rank <= 0) continue;
+                value += TalentFactory.GetTalent(learntTalents[i].id).GetPrimaryStatChange(aStat, learntTalents[i].rank, aFlat);
+            }
+
+            return value;
+        }
 
 
         public UnitType UnitType => unitType;
@@ -196,7 +268,7 @@ namespace Project_1.GameObjects.Unit
             level = aData.Level;
             equipment = aData.Equipment;
 
-            baseStats = new BaseStats(classData, level.CurrentLevel, equipment.EquipmentStats);
+            baseStats = new BaseStats(this, classData, level.CurrentLevel, equipment.EquipmentStats);
 
             gfxPath = aData.GfxPath;
             corpseGfxPath = aData.CorpseGfxPath;
@@ -221,14 +293,14 @@ namespace Project_1.GameObjects.Unit
             relationData = new Relation(relation);
             SetClassData(relation.Value, className);
             this.level = new Level(level, experience);
-            this.learntTalents = learntTalents ?? classData.GenerateEmptyTalents;
+            SetTalents(learntTalents);
             SetEquipment(equipment);
             this.position = new WorldSpace(position);
             this.momentum = new WorldSpace(momentum);
             this.velocity = new WorldSpace(velocity);
             this.destination = new Destination(destinations);
             this.defenseSkill = defenseSkill;
-            baseStats = new BaseStats(classData, this.level.CurrentLevel, this.equipment.EquipmentStats, currentHp, currentResource);
+            baseStats = new BaseStats(this, classData, this.level.CurrentLevel, this.equipment.EquipmentStats, currentHp, currentResource);
             this.unitType = UnitType.Player;
 
             gfxPath = new GfxPath(GfxType.Object, className);
@@ -248,6 +320,35 @@ namespace Project_1.GameObjects.Unit
             Assert();
         }
 
+        void SetTalents((int id, int rank)[] aLearntTalents)
+        {
+            if (aLearntTalents == null)
+            {
+                this.learntTalents = classData.GenerateEmptyTalents;
+                return;
+            }
+            
+            (int id, int rank)[] emptyTalents = classData.GenerateEmptyTalents;
+            if (emptyTalents.Length == aLearntTalents.Length)
+            {
+                this.learntTalents = aLearntTalents;
+                return;
+            }
+            (int, int)[] newTalents = new (int, int)[emptyTalents.Length];
+
+            for (int i = 0; i < emptyTalents.Length; i++)
+            {
+                (int id, int rank) emptyTalent = emptyTalents[i];
+                if (aLearntTalents.Contains(emptyTalent))
+                {
+                    newTalents[i] = aLearntTalents.Single(x => x.id == emptyTalent.id);
+                    continue;
+                }
+                newTalents[i] = emptyTalent;
+            }
+
+            learntTalents = newTalents;
+        }
         void SetEquipment(object aEquipment)
         {
             if (aEquipment == null)

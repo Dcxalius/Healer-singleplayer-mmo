@@ -1,4 +1,4 @@
 [
-  { "Id": 0, "Name": "Holy",       "GfxName": "TalentTreeBg", "Rows": [ [0, 1], [2, 3], [4] ] },
+  { "Id": 0, "Name": "Holy",       "GfxName": "TalentTreeBg", "Rows": [ [0, 1, 21], [2, 3], [4] ] },
   { "Id": 3, "Name": "Discipline", "GfxName": "TalentTreeBg", "Rows": [ [16, 17], [18, 19], [20] ] }
 ]

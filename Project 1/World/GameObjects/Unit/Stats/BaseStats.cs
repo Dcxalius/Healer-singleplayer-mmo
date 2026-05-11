@@ -30,10 +30,11 @@ namespace Project_1.GameObjects.Unit.Stats
         public AttackData FistAttack => fistAttack;
         AttackData fistAttack;
 
-        public Armor TotalArmor => baseArmor + totalPrimaryStats.Agility.Armor;
+        public Armor TotalArmor => new Armor(unitData.ApplyStatusModifiersInt("Armor", baseArmor + totalPrimaryStats.Agility.Armor));
         Armor baseArmor;
 
         ClassData classData;
+        UnitData unitData;
 
         public TotalPrimaryStats TotalPrimaryStats => totalPrimaryStats;
         TotalPrimaryStats totalPrimaryStats;
@@ -54,17 +55,18 @@ namespace Project_1.GameObjects.Unit.Stats
             AssertSimThread();
             int baseAttackPower = totalPrimaryStats.Agility.GetMeleeAttackPower(aClassData) + totalPrimaryStats.Strength.GetMeleeAttackPower(aClassData);
             int equipmentAttackPower = owner?.Equipment.GetSecondaryStat<int>("AttackPower") ?? 0;
-            return baseAttackPower + equipmentAttackPower;
+            return unitData.ApplyStatusModifiersInt("AttackPower", baseAttackPower + equipmentAttackPower);
         }
 
 
-        public BaseStats(ClassData aClassData, int aLevel, EquipmentStats aEquipmentStats, float aCurrentHealth = float.MaxValue, float aCurrentResource = float.MaxValue)
+        public BaseStats(UnitData aUnitData, ClassData aClassData, int aLevel, EquipmentStats aEquipmentStats, float aCurrentHealth = float.MaxValue, float aCurrentResource = float.MaxValue)
         {
+            unitData = aUnitData;
             basePrimaryStats = new BasePrimaryStats(aClassData.BaseStats, aClassData.PerLevelStats, aLevel);
             baseArmor = new Armor(aEquipmentStats.Armor);
             health = new Health(aClassData, basePrimaryStats, aLevel, aCurrentHealth);
             classData = aClassData;
-            totalPrimaryStats = new TotalPrimaryStats(basePrimaryStats, aEquipmentStats);
+            totalPrimaryStats = new TotalPrimaryStats(basePrimaryStats, aEquipmentStats, unitData);
             switch (aClassData.Resource)
             {
                 case Resource.ResourceType.Mana:
@@ -96,6 +98,7 @@ namespace Project_1.GameObjects.Unit.Stats
         {
             AssertSimThread();
             owner = aEntity;
+            unitData.SetOwner(aEntity);
             resource.SetOwner(aEntity);
             owner.Equipment.SetMeleeAttackPower = GetAttackPower(classData);
             fistAttack.AttackPower = GetAttackPower(classData);
@@ -129,6 +132,7 @@ namespace Project_1.GameObjects.Unit.Stats
         public void RefreshStats()
         {
             AssertSimThread();
+            totalPrimaryStats.UpdateBaseStats(basePrimaryStats);
             health.Refresh(TotalPrimaryStats);
             resource.Refresh(TotalPrimaryStats);
             owner.RefreshSecondaryStats();
@@ -199,7 +203,8 @@ namespace Project_1.GameObjects.Unit.Stats
             int fromStrength = aOwner.ClassData.MeleeAttackBonus == ClassData.MeleeAttackPowerBonus.Strength ? strength * 2 : strength;
             int fromAgility = aOwner.ClassData.MeleeAttackBonus == ClassData.MeleeAttackPowerBonus.Agility ? agility : 0;
             int fromEquipment = aOwner.Equipment.GetSecondaryStat<int>("AttackPower");
-            return fromStrength + fromAgility + fromEquipment;
+            double total = fromStrength + fromAgility + fromEquipment;
+            return (int)Math.Round((total + aOwner.GetStatusStatFlat("AttackPower")) * (1d + aOwner.GetStatusStatPercent("AttackPower")), MidpointRounding.AwayFromZero);
         }
 
         static SpellReportDetailsSnapshot BuildSpellReportDetails(Spell aSpell)
@@ -211,10 +216,12 @@ namespace Project_1.GameObjects.Unit.Stats
 
             List<SpellSchoolBonusSnapshot> damageBonuses = new List<SpellSchoolBonusSnapshot>();
             List<SpellSchoolBonusSnapshot> critChanceBonuses = new List<SpellSchoolBonusSnapshot>();
+            List<SpellSchoolBonusSnapshot> critDamageBonuses = new List<SpellSchoolBonusSnapshot>();
             List<SpellSchoolBonusSnapshot> hitChanceBonuses = new List<SpellSchoolBonusSnapshot>();
 
             int baseSpellDamage = aSpell.SpellDamageForSchool(SpellSchool.Base);
             double baseSpellCritChance = aSpell.CriticalChanceForSchool(SpellSchool.Base);
+            double baseSpellCritDamage = aSpell.CriticalDamageForSchool(SpellSchool.Base);
             double baseSpellHitChance = aSpell.BonusHitChanceForSchool(SpellSchool.Base);
 
             foreach (SpellSchool school in Enum.GetValues(typeof(SpellSchool)))
@@ -226,6 +233,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
                 int schoolDamageBonus = aSpell.SpellDamageForSchool(school) - baseSpellDamage;
                 double schoolCritBonus = aSpell.CriticalChanceForSchool(school) - baseSpellCritChance;
+                double schoolCritDamageBonus = aSpell.CriticalDamageForSchool(school) - baseSpellCritDamage;
                 double schoolHitBonus = aSpell.BonusHitChanceForSchool(school) - baseSpellHitChance;
 
                 if (schoolDamageBonus != 0)
@@ -238,6 +246,11 @@ namespace Project_1.GameObjects.Unit.Stats
                     critChanceBonuses.Add(new SpellSchoolBonusSnapshot(school.ToString(), schoolCritBonus));
                 }
 
+                if (Math.Abs(schoolCritDamageBonus) > 0.000001d)
+                {
+                    critDamageBonuses.Add(new SpellSchoolBonusSnapshot(school.ToString(), schoolCritDamageBonus));
+                }
+
                 if (Math.Abs(schoolHitBonus) > 0.000001d)
                 {
                     hitChanceBonuses.Add(new SpellSchoolBonusSnapshot(school.ToString(), schoolHitBonus));
@@ -247,6 +260,7 @@ namespace Project_1.GameObjects.Unit.Stats
             return new SpellReportDetailsSnapshot(
                 damageBonuses.ToArray(),
                 critChanceBonuses.ToArray(),
+                critDamageBonuses.ToArray(),
                 hitChanceBonuses.ToArray());
         }
     }

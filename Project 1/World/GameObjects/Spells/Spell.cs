@@ -155,16 +155,23 @@ namespace Project_1.GameObjects.Spells
             bool[] failures = new bool[spellData.Effects.Length];
             for (int i = 0; i < spellData.Effects.Length; i++)
             {
-                OverTimeEffect overTime = spellData.Effects[i] as OverTimeEffect;
+                if (spellData.Effects[i] is not StatusEffect statusEffect && spellData.Effects[i] is not OverTimeEffect)
+                {
+                    continue;
+                }
+
                 for (int j = 0; j < targetBuffs.Count; j++)
                 {
-                    if (targetBuffs[j].EffectId != overTime.Id) continue;
+                    if (targetBuffs[j].EffectId != spellData.Effects[i].Id) continue;
                     Buff.Buff existing = targetBuffs[j];
                     if (existing.MultipleSourceStackable && !existing.SameCaster(aCaster)) continue;
                     //Check if spell weak
-                    if ((!overTime.Numerable && existing.Rank > rank) || (overTime.Numerable && existing.Power > overTime.CalculatePower(this, rank))) failures[i] = true;
+                    bool numerable = spellData.Effects[i] is OverTimeEffect overTime && overTime.Numerable;
+                    double effectPower = spellData.Effects[i].CalculatePower(this, rank);
+                    double effectDuration = spellData.Effects[i] is LastingEffect lasting ? lasting.Duration : 0;
+                    if ((!numerable && existing.Rank > rank) || (numerable && existing.Power > effectPower)) failures[i] = true;
                     //Check if time would increase or stack count would increase
-                    if ((!overTime.Numerable && existing.Rank == rank) || (overTime.Numerable && existing.Power == overTime.CalculatePower(this, rank)) && (existing.DurationRemaining > overTime.Duration && existing.MaxStackCount == existing.Count)) failures[i] = true;
+                    if (((!numerable && existing.Rank == rank) || (numerable && existing.Power == effectPower)) && (existing.DurationRemaining > effectDuration && existing.MaxStackCount == existing.Count)) failures[i] = true;
                 }
             }
             //TODO: Think about how failures should be handled when there are multiple effects.
@@ -214,7 +221,7 @@ namespace Project_1.GameObjects.Spells
             {
                 return GetDirectEffectScalarFromCastTime(CastTime);
             }
-            else if (aEffect is OverTimeEffect)
+            else if (aEffect is OverTimeEffect || aEffect is StatusEffect)
             {
                 return 1.0;
             }

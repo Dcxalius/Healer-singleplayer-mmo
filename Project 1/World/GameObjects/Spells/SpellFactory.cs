@@ -21,6 +21,7 @@ namespace Project_1.GameObjects.Spells
         static InstantEffect[] instantData;
         static OverTimeEffect[] overTimeData;
         static AbsorbEffect[] absorbData;
+        static StatusEffect[] statusData;
         static bool initialized;
 
         public static void Init()
@@ -53,8 +54,9 @@ namespace Project_1.GameObjects.Spells
             //string[] folders = Directory.GetDirectories(path);
             
             InitInstant();
-            InitOverTime();
-            InitAbsorb();
+            InitStatus();
+            overTimeData = Array.Empty<OverTimeEffect>();
+            absorbData = Array.Empty<AbsorbEffect>();
         }
 
         static void InitInstant() //TODO: Ugly AF so find a better way
@@ -100,6 +102,33 @@ namespace Project_1.GameObjects.Spells
             absorbData = effects.ToArray();
         }
 
+        static void InitStatus()
+        {
+            List<StatusEffect> effects = new List<StatusEffect>();
+            LoadStatusFolder(Game1.ContentManager.RootDirectory + "\\Data\\Effects\\Status", effects);
+            LoadStatusFolder(Game1.ContentManager.RootDirectory + "\\Data\\Effects\\OverTime", effects);
+            LoadStatusFolder(Game1.ContentManager.RootDirectory + "\\Data\\Effects\\Absorb", effects);
+            statusData = effects.ToArray();
+        }
+
+        static void LoadStatusFolder(string path, List<StatusEffect> effects)
+        {
+            if (!Directory.Exists(path))
+            {
+                return;
+            }
+
+            string[] files = Directory.GetFiles(path);
+            for (int i = 0; i < files.Length; i++)
+            {
+                string rawData = File.ReadAllText(files[i]);
+                StatusEffect data = JsonConvert.DeserializeObject<StatusEffect>(rawData);
+                Debug.Assert(!instantData.Any(x => x.Name == data.Name), "Status effect name conflicts with an instant effect: " + data.Name);
+                Debug.Assert(!effects.Any(x => x.Name == data.Name), "Duplicate status effect name: " + data.Name);
+                effects.Add(data);
+            }
+        }
+
         static void InitOverTime()
         {
             List<OverTimeEffect> effects = new List<OverTimeEffect>();
@@ -136,6 +165,9 @@ namespace Project_1.GameObjects.Spells
             if (effect != null) return effect;
 
             effect = absorbData.SingleOrDefault(e => e.Name == aName);
+            if (effect != null) return effect;
+
+            effect = statusData.SingleOrDefault(e => e.Name == aName);
             if (effect != null) return effect;
 
             effect = overTimeData.SingleOrDefault(e => e.Name == aName);

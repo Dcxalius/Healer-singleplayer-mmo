@@ -100,7 +100,6 @@ namespace Project_1.Managers.States
             long worldDrawTicks = Stopwatch.GetTimestamp() - worldStartTicks;
 
             GraphicsManager.EndSpriteBatch(spriteBatch);
-            SuperSoftShadowRenderer.DrawAndComposite(renderTarget);
             GraphicsManager.BeginSpriteBatch(spriteBatch, SpriteSortMode.Immediate, samplerState: SamplerState.PointClamp);
 
             CleanRender();
@@ -126,7 +125,6 @@ namespace Project_1.Managers.States
             long worldDrawTicks = Stopwatch.GetTimestamp() - worldStartTicks;
             long compositeStartTicks = Stopwatch.GetTimestamp();
             GraphicsManager.EndSpriteBatch(spriteBatch);
-            SuperSoftShadowRenderer.DrawAndComposite(renderTarget);
             GraphicsManager.BeginSpriteBatch(spriteBatch, SpriteSortMode.Deferred);
             GroundTargetingController.DrawSpellEffects(spriteBatch);
             GroundTargetingController.DrawTargetPreview(spriteBatch);

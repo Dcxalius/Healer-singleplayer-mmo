@@ -581,7 +581,17 @@ namespace Project_1.UI.HUD.Windows
         public void SetPlayerLevel(int aLevel)
         {
             playerLevel = aLevel;
-            if (playerLevel >= TalentUnlockLevel || !Visible) return;
+            if (!Visible) return;
+
+            if (playerLevel >= TalentUnlockLevel)
+            {
+                if (showingSelf)
+                {
+                    MailboxManager.PublishSimCommand(new TalentWindowSnapshotRequested(null));
+                }
+
+                return;
+            }
 
             MailboxManager.PublishUiEvent(new DescriptorBoxClear());
             CloseWindow();

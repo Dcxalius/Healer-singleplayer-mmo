@@ -14,8 +14,8 @@ namespace Project_1.GameObjects.Spells.Buff
         const double windowDurationMs = 5000;
 
         // Lazy singleton — always created on the sim thread so AssertSimThread() passes.
-        static ReactiveSpellEffect effect;
-        static ReactiveSpellEffect GetEffect() => effect ??= new ReactiveSpellEffect();
+        static ReactiveSpellEffect reactiveEffect;
+        static ReactiveSpellEffect GetEffect() => reactiveEffect ??= new ReactiveSpellEffect();
 
         public override double Duration => windowDurationMs;
         public override GfxPath GfxPath => new GfxPath(GfxType.SpellImage, "Riposte");

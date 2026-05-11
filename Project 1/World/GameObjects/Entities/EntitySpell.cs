@@ -46,5 +46,24 @@ namespace Project_1.GameObjects.Entities
             ThreadAffinity.AssertSimThread();
             buffList.RemoveFirstBuffOfType<T>(this);
         }
+
+        public double GetStatusStatFlat(string aStat)
+        {
+            ThreadAffinity.AssertSimThread();
+            return buffList.GetStatusFlat(aStat);
+        }
+
+        public double GetStatusStatPercent(string aStat)
+        {
+            ThreadAffinity.AssertSimThread();
+            return buffList.GetStatusPercent(aStat);
+        }
+
+        public void RefreshStatsFromStatusChange()
+        {
+            ThreadAffinity.AssertSimThread();
+            unitData.BaseStats.RefreshStats();
+            FlagForRefresh();
+        }
     }
 }

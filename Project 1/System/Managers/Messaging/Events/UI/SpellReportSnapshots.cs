@@ -19,20 +19,24 @@ namespace Project_1.Messaging.Events
         public static SpellReportDetailsSnapshot Empty => new SpellReportDetailsSnapshot(
             Array.Empty<SpellSchoolBonusSnapshot>(),
             Array.Empty<SpellSchoolBonusSnapshot>(),
+            Array.Empty<SpellSchoolBonusSnapshot>(),
             Array.Empty<SpellSchoolBonusSnapshot>());
 
         public SpellReportDetailsSnapshot(
             SpellSchoolBonusSnapshot[] damageBonuses,
             SpellSchoolBonusSnapshot[] critChanceBonuses,
+            SpellSchoolBonusSnapshot[] critDamageBonuses,
             SpellSchoolBonusSnapshot[] hitChanceBonuses)
         {
             DamageBonuses = damageBonuses ?? Array.Empty<SpellSchoolBonusSnapshot>();
             CritChanceBonuses = critChanceBonuses ?? Array.Empty<SpellSchoolBonusSnapshot>();
+            CritDamageBonuses = critDamageBonuses ?? Array.Empty<SpellSchoolBonusSnapshot>();
             HitChanceBonuses = hitChanceBonuses ?? Array.Empty<SpellSchoolBonusSnapshot>();
         }
 
         public SpellSchoolBonusSnapshot[] DamageBonuses { get; }
         public SpellSchoolBonusSnapshot[] CritChanceBonuses { get; }
+        public SpellSchoolBonusSnapshot[] CritDamageBonuses { get; }
         public SpellSchoolBonusSnapshot[] HitChanceBonuses { get; }
     }
 }

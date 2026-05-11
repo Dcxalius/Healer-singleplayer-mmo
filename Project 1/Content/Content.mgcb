@@ -20,20 +20,6 @@
 /build:Effects/CooldownSwirl.fx
 #end
 
-#begin Effects/SuperSoftShadows.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Effects/SuperSoftShadows.fx
-#end
-
-#begin Effects/TextOutline.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Effects/TextOutline.fx
-#end
-
 #begin Effects/MsdfText.fx
 /importer:EffectImporter
 /processor:EffectProcessor
