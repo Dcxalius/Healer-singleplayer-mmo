@@ -297,6 +297,13 @@ namespace Project_1.Camera
             PublishRenderSnapshot();
         }
 
+        internal static void TransformPreviewCamera(float aYawDeltaRadians, float aPitchDeltaRadians, bool aPreservePlayerScreenPosition)
+        {
+            ThreadAffinity.AssertSimThread();
+            cameraMover?.TransformPreviewCamera(aYawDeltaRadians, aPitchDeltaRadians, aPreservePlayerScreenPosition);
+            PublishRenderSnapshot();
+        }
+
         internal static void SnapPreviewCameraBehindPlayer()
         {
             ThreadAffinity.AssertSimThread();

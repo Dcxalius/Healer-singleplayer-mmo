@@ -21,6 +21,7 @@ namespace Project_1.Managers
         TeleportStuckThings,
         LearnKill,
         ChatCheats,
+        DumpPerlinNoisePngs,
         Count
     }
 
@@ -113,6 +114,7 @@ namespace Project_1.Managers
             SetMode(DebugMode.LearnKill, true);
             SetMode(DebugMode.ChatCheats, true);
             SetMode(DebugMode.ModelPreview, true);
+            SetMode(DebugMode.DumpPerlinNoisePngs, true);
 #endif
 
             if (Mode(DebugMode.Console))

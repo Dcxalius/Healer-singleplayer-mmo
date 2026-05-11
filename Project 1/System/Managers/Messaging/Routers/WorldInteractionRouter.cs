@@ -26,7 +26,7 @@ namespace Project_1.GameObjects
             OtsCameraRotate,
             OtsPlayerRotate,
             FreeCameraRotate,
-            SuppressOnly
+            FreeCameraYawOnly
         }
 
         struct PendingWorldInteraction
@@ -41,6 +41,7 @@ namespace Project_1.GameObjects
 
         const int DragThresholdPixels = 8;
         const float MouseRotationRadiansPerPixel = 0.01f;
+        const float MousePitchRadiansPerPixel = 0.01f;
 
         static bool initialized;
         static PendingWorldInteraction pendingInteraction;
@@ -56,6 +57,7 @@ namespace Project_1.GameObjects
             SubscribeSimCommand<PartyMemberKickRequested>(HandlePartyMemberKickRequested);
             SubscribeSimCommand<WorldClickRequested>(HandleWorldClickRequested);
             SubscribeSimCommand<WorldReleaseRequested>(HandleWorldReleaseRequested);
+            SubscribeSimCommand<WorldReleaseConsumed>(HandleWorldReleaseConsumed);
             SubscribeSimCommand<WorldScrollRequested>(HandleWorldScrollRequested);
             SubscribeSimCommand<PlayerMovementRequested>(HandlePlayerMovementRequested);
             SubscribeSimCommand<MoveOrderRequested>(HandleMoveOrderRequested);
@@ -121,6 +123,12 @@ namespace Project_1.GameObjects
             ResolvePendingInteractionOnRelease(e);
         }
 
+        static void HandleWorldReleaseConsumed(WorldReleaseConsumed e)
+        {
+            ThreadAffinity.AssertSimThread();
+            CancelPendingInteractionOnConsumedRelease(e.Button);
+        }
+
         static void HandleWorldScrollRequested(WorldScrollRequested e)
         {
             ThreadAffinity.AssertSimThread();
@@ -165,25 +173,29 @@ namespace Project_1.GameObjects
             }
 
             int deltaX = snapshot.Absolute.X - previousAbsolute.X;
+            int deltaY = snapshot.Absolute.Y - previousAbsolute.Y;
             pendingInteraction.LastAbsolute = snapshot.Absolute;
-            if (deltaX == 0)
+            if (deltaX == 0 && deltaY == 0)
             {
                 return;
             }
 
             float yawDelta = deltaX * MouseRotationRadiansPerPixel;
+            // TODO: Add a player setting to choose between inverted and non-inverted mouse pitch.
+            float pitchDelta = -deltaY * MousePitchRadiansPerPixel;
             switch (pendingInteraction.DragMode)
             {
                 case WorldDragMode.OtsCameraRotate:
-                    Camera.Camera.RotatePreviewCamera(yawDelta, false);
+                    Camera.Camera.TransformPreviewCamera(yawDelta, pitchDelta, false);
                     break;
                 case WorldDragMode.OtsPlayerRotate:
                     ObjectManager.Player?.RotatePreviewFacing(yawDelta);
                     break;
                 case WorldDragMode.FreeCameraRotate:
-                    Camera.Camera.RotatePreviewCamera(yawDelta, true);
+                    Camera.Camera.TransformPreviewCamera(yawDelta, pitchDelta, true);
                     break;
-                case WorldDragMode.SuppressOnly:
+                case WorldDragMode.FreeCameraYawOnly:
+                    Camera.Camera.TransformPreviewCamera(yawDelta, 0f, true);
                     break;
             }
 
@@ -225,6 +237,21 @@ namespace Project_1.GameObjects
             RouteWorldClick(clickEvent);
         }
 
+        static void CancelPendingInteractionOnConsumedRelease(ClickKind aButton)
+        {
+            if (!pendingInteraction.Active) return;
+            if (aButton != pendingInteraction.Click.Button) return;
+
+            bool dragRecognized = pendingInteraction.DragRecognized;
+            WorldDragMode dragMode = pendingInteraction.DragMode;
+            ClearPendingInteraction();
+
+            if (dragRecognized && dragMode == WorldDragMode.OtsCameraRotate)
+            {
+                Camera.Camera.SnapPreviewCameraBehindPlayer();
+            }
+        }
+
         static void ClearPendingInteraction()
         {
             pendingInteraction = default;
@@ -238,7 +265,7 @@ namespace Project_1.GameObjects
                 (PreviewCameraMode.OverTheShoulder, ClickKind.Left) => WorldDragMode.OtsCameraRotate,
                 (PreviewCameraMode.OverTheShoulder, ClickKind.Right) => WorldDragMode.OtsPlayerRotate,
                 (PreviewCameraMode.Free, ClickKind.Left) => WorldDragMode.FreeCameraRotate,
-                (PreviewCameraMode.Free, ClickKind.Right) => WorldDragMode.SuppressOnly,
+                (PreviewCameraMode.Free, ClickKind.Right) => WorldDragMode.FreeCameraYawOnly,
                 _ => WorldDragMode.None
             };
         }

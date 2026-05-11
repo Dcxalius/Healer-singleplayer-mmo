@@ -200,18 +200,23 @@ namespace Project_1.Camera
 
         internal void RotatePreviewCamera(float aDeltaRadians, bool aPreservePlayerScreenPosition)
         {
-            if (Math.Abs(aDeltaRadians) <= float.Epsilon)
+            TransformPreviewCamera(aDeltaRadians, 0f, aPreservePlayerScreenPosition);
+        }
+
+        internal void TransformPreviewCamera(float aYawDeltaRadians, float aPitchDeltaRadians, bool aPreservePlayerScreenPosition)
+        {
+            if (Math.Abs(aYawDeltaRadians) <= float.Epsilon && Math.Abs(aPitchDeltaRadians) <= float.Epsilon)
             {
                 return;
             }
 
             if (aPreservePlayerScreenPosition && boundObject != null)
             {
-                RotatePreviewCameraPreservingPlayerScreenPosition(aDeltaRadians);
+                TransformPreviewCameraPreservingPlayerScreenPosition(aYawDeltaRadians, aPitchDeltaRadians);
                 return;
             }
 
-            WorldBlockRenderer.RotateCameraYaw(aDeltaRadians);
+            ApplyPreviewCameraTransform(aYawDeltaRadians, aPitchDeltaRadians);
             ReadjustBindingAfterRotation();
         }
 
@@ -460,13 +465,13 @@ namespace Project_1.Camera
             return !float.IsNaN(aWorldCorrection.X) && !float.IsNaN(aWorldCorrection.Y) && !float.IsInfinity(aWorldCorrection.X) && !float.IsInfinity(aWorldCorrection.Y);
         }
 
-        void RotatePreviewCameraPreservingPlayerScreenPosition(float aDeltaRadians)
+        void TransformPreviewCameraPreservingPlayerScreenPosition(float aYawDeltaRadians, float aPitchDeltaRadians)
         {
             WorldSpace3D playerWorldPosition = ResolveBoundObjectWorldPosition();
             Camera3D beforeCamera = WorldBlockRenderer.CreatePreviewCamera(CentreInWorldSpace);
             AbsoluteScreenPosition targetScreenPosition = beforeCamera.WorldToScreen(playerWorldPosition);
 
-            WorldBlockRenderer.RotateCameraYaw(aDeltaRadians);
+            ApplyPreviewCameraTransform(aYawDeltaRadians, aPitchDeltaRadians);
 
             for (int i = 0; i < 3; i++)
             {
@@ -489,6 +494,12 @@ namespace Project_1.Camera
             }
 
             ReadjustBindingAfterRotation();
+        }
+
+        void ApplyPreviewCameraTransform(float aYawDeltaRadians, float aPitchDeltaRadians)
+        {
+            WorldBlockRenderer.RotateCameraYaw(aYawDeltaRadians);
+            WorldBlockRenderer.AdjustCameraPitch(aPitchDeltaRadians);
         }
 
         Vector2 SampleScreenDelta(WorldSpace3D aPlayerWorldPosition, Vector2 aCameraOffsetPixels, Camera3D aCurrentCamera)

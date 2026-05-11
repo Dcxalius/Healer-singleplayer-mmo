@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using Project_1.Managers;
 using Project_1.WorldGeneration;
 using System;
 
@@ -11,18 +12,32 @@ namespace Project_1.Tiles
             Point chunkPos = ChunkAddressing.GetChunkPosition(chunkId);
             int[,] tileIds = GenerateTileIds(chunkId);
             Block[,,] blocks = new Block[tileIds.GetLength(0), tileIds.GetLength(1), Chunk.ChunkHeight];
+            float[,] height01Samples = DebugManager.ShouldDumpPerlinNoisePngs
+                ? new float[tileIds.GetLength(0), tileIds.GetLength(1)]
+                : null;
 
             for (int i = 0; i < tileIds.GetLength(0); i++)
             {
                 for (int j = 0; j < tileIds.GetLength(1); j++)
                 {
-                    int columnHeight = SampleColumnHeight(chunkPos, i, j);
+                    float height01 = SampleColumnHeight01(chunkPos, i, j);
+                    if (height01Samples != null)
+                    {
+                        height01Samples[i, j] = height01;
+                    }
+
+                    int columnHeight = SampleColumnHeight(height01);
                     int topZ = Math.Max(0, columnHeight - 1);
                     for (int z = 0; z < columnHeight; z++)
                     {
                         blocks[i, j, z] = CreateColumnBlock(tileIds[i, j], z, topZ);
                     }
                 }
+            }
+
+            if (height01Samples != null)
+            {
+                DebugManager.QueuePerlinHeightmapExport(chunkId, chunkPos, height01Samples);
             }
 
             return blocks;
@@ -103,9 +118,8 @@ namespace Project_1.Tiles
             return Block.CreateSolid(BlockMaterialType.Stone, elevation: z);
         }
 
-        static int SampleColumnHeight(Point chunkPos, int localX, int localY)
+        static int SampleColumnHeight(float height01)
         {
-            float height01 = SampleColumnHeight01(chunkPos, localX, localY);
             int height = 1 + (int)MathF.Round(height01 * (Chunk.ChunkHeight - 1));
             return Math.Clamp(height, 1, Chunk.ChunkHeight);
         }

@@ -116,6 +116,7 @@ namespace Project_1
                 FloatingTextManager.Update();
             }
             SaveManager.ProcessPendingScreenshots();
+            DebugManager.ProcessPendingPerlinNoiseExports();
 
             base.Update(gameTime);
         }

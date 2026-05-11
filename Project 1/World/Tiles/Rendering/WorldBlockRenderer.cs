@@ -60,6 +60,7 @@ namespace Project_1.Tiles
 
         public static Camera3D CurrentCamera => worldCamera;
         public static float CameraYawRadians => cameraYawRadians;
+        public static float CameraPitchFromTopRadians => cameraPitchFromTopRadians;
         public static float CameraZoom => cameraZoom;
         public static Vector2 CameraGroundForward => BuildGroundForward(cameraYawRadians);
         public static Vector2 CameraGroundRight
@@ -74,6 +75,8 @@ namespace Project_1.Tiles
         const int MaxVerticesPerDraw = 30000;
         const float BaseCameraOrbitHeight = 18f;
         const float BaseCameraOrbitRadius = 19.79899f;
+        const float MinCameraPitchFromTopRadians = 0f;
+        static readonly float MaxCameraPitchFromTopRadians = MathHelper.PiOver2 - MathHelper.ToRadians(3f);
         const float MinCameraZoom = 0.55f;
         const float MaxCameraZoom = 1.75f;
         const float CameraZoomStep = 0.08f;
@@ -102,10 +105,13 @@ namespace Project_1.Tiles
         static readonly SamplerState samplerState = SamplerState.LinearClamp;
         static readonly DepthStencilState depthStencilState = DepthStencilState.Default;
         static readonly Matrix identityWorld = Matrix.Identity;
+        static readonly float baseCameraOrbitDistance = MathF.Sqrt(BaseCameraOrbitHeight * BaseCameraOrbitHeight + BaseCameraOrbitRadius * BaseCameraOrbitRadius);
+        static readonly float defaultCameraPitchFromTopRadians = MathF.Atan2(BaseCameraOrbitRadius, BaseCameraOrbitHeight);
         static Camera3D worldCamera;
         static BoundingFrustum worldFrustum;
         static int renderDistanceInChunks = 1;
         static volatile float cameraYawRadians = MathHelper.PiOver4;
+        static volatile float cameraPitchFromTopRadians = defaultCameraPitchFromTopRadians;
         static volatile float cameraZoom = 1f;
 
         public static void PrepareFrame()
@@ -124,6 +130,14 @@ namespace Project_1.Tiles
         public static void SetCameraYaw(float aYawRadians)
         {
             cameraYawRadians = NormalizeAngle(aYawRadians);
+        }
+
+        public static void AdjustCameraPitch(float aDeltaRadians)
+        {
+            if (Math.Abs(aDeltaRadians) <= float.Epsilon) return;
+
+            float updatedPitch = cameraPitchFromTopRadians + aDeltaRadians;
+            cameraPitchFromTopRadians = MathHelper.Clamp(updatedPitch, MinCameraPitchFromTopRadians, MaxCameraPitchFromTopRadians);
         }
 
         public static void AdjustCameraZoom(int aDirectionAndSteps)
@@ -160,9 +174,11 @@ namespace Project_1.Tiles
             float centreX = aCameraCentre.X / Tile.Size.X;
             float centreZ = aCameraCentre.Y / Tile.Size.Y;
             float yaw = cameraYawRadians;
+            float pitchFromTop = cameraPitchFromTopRadians;
             float targetY = ResolvePreviewTargetHeight(aCameraCentre);
-            float orbitRadius = BaseCameraOrbitRadius * cameraZoom;
-            float orbitHeight = BaseCameraOrbitHeight * cameraZoom;
+            float orbitDistance = baseCameraOrbitDistance * cameraZoom;
+            float orbitRadius = MathF.Sin(pitchFromTop) * orbitDistance;
+            float orbitHeight = MathF.Cos(pitchFromTop) * orbitDistance;
 
             WorldSpace3D cameraPosition = new WorldSpace3D(
                 centreX + MathF.Sin(yaw) * orbitRadius,

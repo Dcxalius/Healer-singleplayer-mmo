@@ -194,11 +194,11 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             float rotationDelta = 0f;
             if (KeyBindStateCache.GetHold(KeyBindManager.KeyListner.RotatePlayerLeft))
             {
-                rotationDelta -= PreviewTurnSpeedRadians * (float)TimeManager.SecondsSinceLastFrame;
+                rotationDelta += PreviewTurnSpeedRadians * (float)TimeManager.SecondsSinceLastFrame;
             }
             if (KeyBindStateCache.GetHold(KeyBindManager.KeyListner.RotatePlayerRight))
             {
-                rotationDelta += PreviewTurnSpeedRadians * (float)TimeManager.SecondsSinceLastFrame;
+                rotationDelta -= PreviewTurnSpeedRadians * (float)TimeManager.SecondsSinceLastFrame;
             }
             if (Math.Abs(rotationDelta) <= float.Epsilon)
             {

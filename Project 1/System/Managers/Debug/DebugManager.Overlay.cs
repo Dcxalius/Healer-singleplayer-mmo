@@ -157,6 +157,7 @@ namespace Project_1.Managers
             string topDirection = WorldBlockRenderer.ResolveCompassName(WorldBlockRenderer.CameraGroundForward);
             string rightDirection = WorldBlockRenderer.ResolveCompassName(WorldBlockRenderer.CameraGroundRight);
             float yawDegrees = MathHelper.ToDegrees(WorldBlockRenderer.CameraYawRadians);
+            float pitchDegrees = MathHelper.ToDegrees(WorldBlockRenderer.CameraPitchFromTopRadians);
             float bodyYawDegrees = MathHelper.ToDegrees(player.PreviewBodyFacingYawRadians);
 
             return
@@ -164,7 +165,7 @@ namespace Project_1.Managers
                 $"  Top/Right: {topDirection} / {rightDirection}\n" +
                 $"  Preview mode: {Camera.Camera.CurrentPreviewCameraMode}\n" +
                 $"  Free style: {Camera.Camera.PreviewFreeStyleSetting}\n" +
-                $"  Camera yaw/zoom: {yawDegrees,6:0.0} deg / {WorldBlockRenderer.CameraZoom,4:0.00}\n" +
+                $"  Camera yaw/pitch/zoom: {yawDegrees,6:0.0} / {pitchDegrees,6:0.0} / {WorldBlockRenderer.CameraZoom,4:0.00}\n" +
                 $"  Player body yaw: {bodyYawDegrees,6:0.0} deg\n" +
                 $"  Player presentation: {player.PreviewPresentationDirectionName}\n" +
                 $"  Player 3D XYZ: {playerWorldPosition.X,6:0.00}, {playerWorldPosition.Y,6:0.00}, {playerWorldPosition.Z,6:0.00}";

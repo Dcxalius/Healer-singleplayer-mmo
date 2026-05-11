@@ -23,11 +23,21 @@ namespace Project_1.Input
         static void HandleRelease(ReleaseEvent releaseEvent)
         {
             ThreadAffinity.AssertUiThread();
-            RoutePointerEvent(
-                releaseEvent,
-                StateManager.UiRelease,
-                HUDManager.Release,
-                static e => MailboxManager.PublishSimCommand(WorldReleaseRequested.FromReleaseEvent(e)));
+            if (StateManager.UiRelease(releaseEvent))
+            {
+                MailboxManager.PublishSimCommand(WorldReleaseConsumed.FromReleaseEvent(releaseEvent));
+                StateManager.UiInvalidate();
+                return;
+            }
+
+            if (HUDManager.Release(releaseEvent))
+            {
+                MailboxManager.PublishSimCommand(WorldReleaseConsumed.FromReleaseEvent(releaseEvent));
+                HUDManager.InvalidateUi();
+                return;
+            }
+
+            MailboxManager.PublishSimCommand(WorldReleaseRequested.FromReleaseEvent(releaseEvent));
         }
 
         static void HandleScroll(ScrollEvent scrollEvent)

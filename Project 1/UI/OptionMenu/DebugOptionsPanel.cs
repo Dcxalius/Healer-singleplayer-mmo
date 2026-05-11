@@ -29,6 +29,11 @@ namespace Project_1.UI.OptionMenu
                 DebugManager.Mode(DebugMode.DebugOverlay),
                 () => SetDebugOverlayEnabled(true),
                 () => SetDebugOverlayEnabled(false));
+            AddToggleRow(
+                "Dump Perlin Heightmaps",
+                DebugManager.Mode(DebugMode.DumpPerlinNoisePngs),
+                () => SetDebugMode(DebugMode.DumpPerlinNoisePngs, true),
+                () => SetDebugMode(DebugMode.DumpPerlinNoisePngs, false));
 
             nextRowY += 0.02f;
             new Label(this, new RelativeScreenPosition(0.03f, nextRowY), new RelativeScreenPosition(0.94f, HeaderHeight), Label.TextAllignment.CentreLeft, Color.Black, aText: "Visible Overlay Info");
