@@ -26,6 +26,9 @@ namespace Project_1.World.GameObjects.Spells.SpellEffects
         readonly double movementSpeedModifier;
         readonly bool hasMovementSpeedModifier;
         readonly bool hasControl;
+        readonly string[] statusTags;
+        readonly float? visualOpacity;
+        readonly string[] removeStatusTags;
 
         public GfxPath GfxPath => gfxPath;
         public GfxPath HitGfxPath => hitGfxPath;
@@ -41,6 +44,11 @@ namespace Project_1.World.GameObjects.Spells.SpellEffects
         public bool HasMovementSpeedModifier => hasMovementSpeedModifier;
         public double StatusMovementSpeedModifier => hasMovementSpeedModifier ? movementSpeedModifier : 1d;
         public bool HasControl => hasControl;
+        public string[] StatusTags => statusTags;
+        public bool HasStatusTag(string tag) => !string.IsNullOrWhiteSpace(tag) && Array.IndexOf(statusTags, tag) >= 0;
+        public bool HasVisualOpacity => visualOpacity.HasValue;
+        public float VisualOpacity => visualOpacity ?? 1f;
+        public string[] RemoveStatusTags => removeStatusTags;
 
         public override string Description => BuildDescription();
 
@@ -60,6 +68,9 @@ namespace Project_1.World.GameObjects.Spells.SpellEffects
             string category,
             double? movementSpeedModifier,
             bool? hasControl,
+            string[] statusTags,
+            float? visualOpacity,
+            string[] removeStatusTags,
             bool sourceStackable,
             int maxStackCount,
             bool isBinary,
@@ -74,6 +85,9 @@ namespace Project_1.World.GameObjects.Spells.SpellEffects
             this.movementSpeedModifier = movementSpeedModifier ?? 1d;
             this.hasMovementSpeedModifier = movementSpeedModifier.HasValue;
             this.hasControl = hasControl ?? true;
+            this.statusTags = statusTags ?? Array.Empty<string>();
+            this.visualOpacity = visualOpacity.HasValue ? Math.Clamp(visualOpacity.Value, 0f, 1f) : null;
+            this.removeStatusTags = removeStatusTags ?? Array.Empty<string>();
             this.sourceStackable = sourceStackable;
             MaxStackCount = Math.Max(1, maxStackCount);
 
@@ -172,6 +186,17 @@ namespace Project_1.World.GameObjects.Spells.SpellEffects
         public override bool Trigger(Entity aCaster, Entity aTarget, Spell aSpell)
         {
             ThreadAffinity.AssertSimThread();
+            for (int i = 0; i < removeStatusTags.Length; i++)
+            {
+                aTarget.RemoveStatusBuffsByTag(removeStatusTags[i]);
+            }
+
+            if (HasStatusTag("Stealth") && aTarget.HasStatusTag("Stealth"))
+            {
+                aTarget.RemoveStatusBuffsByTag("Stealth");
+                return true;
+            }
+
             aTarget.AddBuff(new StatusBuff(aCaster, this, aSpell));
             return true;
         }

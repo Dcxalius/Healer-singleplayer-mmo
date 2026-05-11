@@ -41,7 +41,7 @@ namespace Project_1.World.Items.SubTypes
         }
 
         [JsonConstructor]
-        public ContainerData(int id, string gfxName, string name, string description, Item.Quality quality, int cost, (int id, int weight, int min, int max)[] drops, int itemLevel = 1) : base(id, gfxName, name, description, 1, ItemType.Container, quality, cost, itemLevel)
+        public ContainerData(int id, string gfxName, string name, string description, Item.Quality quality, int cost, (int id, int weight, int min, int max)[] drops, int itemLevel = 1, string[] tags = null) : base(id, gfxName, name, description, 1, ItemType.Container, quality, cost, itemLevel, tags)
         {
             this.drops = drops;
         }

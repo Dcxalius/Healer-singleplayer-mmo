@@ -319,6 +319,12 @@ namespace Project_1.Items
                 return false;
             }
 
+            Item sourceItem = player.Inventory.GetItemInSlot(pending.SourceIndex);
+            if (sourceItem != null && !sourceItem.HasTag("Stealthable"))
+            {
+                player.RemoveStatusBuffsByTag("Stealth");
+            }
+
             player.Inventory.ConsumeOneFromSlot(pending.SourceIndex);
             PublishEnchantSystemMessage($"Applied {enchantmentData.Name} to {equipment.Name}.");
             ClearPendingEnchantTargeting();

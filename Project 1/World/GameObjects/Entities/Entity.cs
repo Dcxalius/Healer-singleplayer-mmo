@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json.Linq;
 using Project_1.Camera;
@@ -35,6 +35,7 @@ namespace Project_1.GameObjects.Entities
         public Entity(UnitData aUnitData) : base(new RandomAnimatedTexture(aUnitData.GfxPath, new Point(32), 0, TimeSpan.FromMilliseconds(500)), aUnitData.Position)
         {
             unitData = aUnitData;
+            buffList = new BuffList();
             unitData.Equipment.SetOwner(this);
             unitData.BaseStats.SetOwner(this);
             unitData.Destination.SetOwner(this);
@@ -43,7 +44,6 @@ namespace Project_1.GameObjects.Entities
             namePlateRequiresUpdate = false;
             
             spellCast = new SpellCast(this);
-            buffList = new BuffList();
             aggroTablesIAmOn = new List<NonFriendly>();
 
             velocity = unitData.Velocity;

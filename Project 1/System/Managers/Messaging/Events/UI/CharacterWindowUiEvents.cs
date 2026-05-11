@@ -1,4 +1,5 @@
 using Project_1.Camera;
+using Project_1.Items.SubTypes;
 using System;
 
 namespace Project_1.Messaging.Events
@@ -15,7 +16,7 @@ namespace Project_1.Messaging.Events
 
     internal readonly struct CharacterWindowSnapshot
     {
-        public CharacterWindowSnapshot(EntityUiSnapshot ownerSnapshot, StatReportSnapshot primaryStats, StatReportSnapshot secondaryStats, int currentLevel, int currentExperience, ItemUiSnapshot[] equippedItems)
+        public CharacterWindowSnapshot(EntityUiSnapshot ownerSnapshot, StatReportSnapshot primaryStats, StatReportSnapshot secondaryStats, int currentLevel, int currentExperience, ItemUiSnapshot[] equippedItems, WeaponSkillUiSnapshot[] weaponSkills)
         {
             OwnerSnapshot = ownerSnapshot;
             PrimaryStats = primaryStats;
@@ -23,6 +24,7 @@ namespace Project_1.Messaging.Events
             CurrentLevel = currentLevel;
             CurrentExperience = currentExperience;
             EquippedItems = equippedItems;
+            WeaponSkills = weaponSkills ?? Array.Empty<WeaponSkillUiSnapshot>();
         }
 
         public EntityUiSnapshot OwnerSnapshot { get; }
@@ -31,6 +33,23 @@ namespace Project_1.Messaging.Events
         public int CurrentLevel { get; }
         public int CurrentExperience { get; }
         public ItemUiSnapshot[] EquippedItems { get; }
+        public WeaponSkillUiSnapshot[] WeaponSkills { get; }
+    }
+
+    internal readonly struct WeaponSkillUiSnapshot
+    {
+        public WeaponSkillUiSnapshot(Weapon.WeaponType weaponType, string displayName, int value, int maxValue)
+        {
+            WeaponType = weaponType;
+            DisplayName = displayName ?? weaponType.ToString();
+            Value = value;
+            MaxValue = Math.Max(1, maxValue);
+        }
+
+        public Weapon.WeaponType WeaponType { get; }
+        public string DisplayName { get; }
+        public int Value { get; }
+        public int MaxValue { get; }
     }
 
     internal readonly struct PlayerUiSnapshot

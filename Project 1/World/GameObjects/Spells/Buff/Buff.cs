@@ -50,6 +50,9 @@ namespace Project_1.GameObjects.Spells.Buff
         public bool HasControl => effect is not StatusEffect status || status.HasControl;
         public bool HasStatModifiers => effect is StatusEffect status && status.HasStatModifiers;
         public StatusModifier[] StatusModifiers => effect is StatusEffect status ? status.StatModifiers : Array.Empty<StatusModifier>();
+        public string[] StatusTags => effect is StatusEffect status ? status.StatusTags : Array.Empty<string>();
+        public bool HasVisualOpacity => effect is StatusEffect status && status.HasVisualOpacity;
+        public float VisualOpacity => effect is StatusEffect status ? status.VisualOpacity : 1f;
         public string StackingCategory => effect is StatusEffect status && !string.IsNullOrWhiteSpace(status.StackingCategory)
             ? status.StackingCategory
             : effect.Name;

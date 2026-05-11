@@ -47,6 +47,28 @@ namespace Project_1.GameObjects.Entities
             buffList.RemoveFirstBuffOfType<T>(this);
         }
 
+        public void RemoveStatusBuffsByTag(string aStatusTag)
+        {
+            ThreadAffinity.AssertSimThread();
+            buffList.RemoveBuffsWithStatusTag(this, aStatusTag);
+            FlagForRefresh();
+        }
+
+        public bool HasStatusTag(string aStatusTag)
+        {
+            ThreadAffinity.AssertSimThread();
+            return buffList.HasStatusTag(aStatusTag);
+        }
+
+        public float VisualOpacity
+        {
+            get
+            {
+                ThreadAffinity.AssertSimThread();
+                return buffList.GetVisualOpacity();
+            }
+        }
+
         public double GetStatusStatFlat(string aStat)
         {
             ThreadAffinity.AssertSimThread();
@@ -63,6 +85,12 @@ namespace Project_1.GameObjects.Entities
         {
             ThreadAffinity.AssertSimThread();
             unitData.BaseStats.RefreshStats();
+            FlagForRefresh();
+        }
+
+        public void RefreshVisualsFromStatusChange()
+        {
+            ThreadAffinity.AssertSimThread();
             FlagForRefresh();
         }
     }

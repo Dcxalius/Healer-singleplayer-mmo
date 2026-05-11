@@ -12,6 +12,8 @@ namespace Project_1.UI.UIElements
 {
     internal class RuntimeImage : Box
     {
+        string currentPath;
+
         public RuntimeImage(UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, null, aPos, aSize)
         {
         }
@@ -22,12 +24,18 @@ namespace Project_1.UI.UIElements
 
         public void SetImage(string aPath)
         {
+            if (currentPath == aPath) return;
+            currentPath = aPath;
             gfx = new AssignableImage(aPath);
+            MarkRenderStale();
         }
 
         public void Clear()
         {
+            if (currentPath == null && gfx == null) return;
+            currentPath = null;
             gfx = null;
+            MarkRenderStale();
         }
     }
 }

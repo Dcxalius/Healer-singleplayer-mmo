@@ -26,6 +26,7 @@ namespace Project_1.UI.UIElements
             }
 
             TouchInteraction();
+            MarkRenderStale();
         }
 
         public void ResetHudMoveable()
@@ -35,12 +36,14 @@ namespace Project_1.UI.UIElements
             if (!hudMoveable) return;
             Move(oldPosition);
             TouchInteraction();
+            MarkRenderStale();
         }
 
         public virtual void ToggleVisibilty()
         {
             Visible = !visible;
             TouchInteraction();
+            MarkRenderStale();
         }
 
         public virtual void Rescale()
@@ -51,6 +54,7 @@ namespace Project_1.UI.UIElements
             }
 
             nameText.Rescale();
+            MarkRenderStale();
         }
 
         public void Move(RelativeScreenPosition aNewPos)
@@ -63,6 +67,7 @@ namespace Project_1.UI.UIElements
             if (relativePos != oldPos)
             {
                 TouchInteraction();
+                MarkRenderStale();
             }
         }
 
@@ -151,6 +156,7 @@ namespace Project_1.UI.UIElements
             if (relativeSize == aSize) return;
             relativeSize = aSize;
             TouchInteraction();
+            MarkRenderStale();
         }
 
         public virtual void Resize(AbsoluteScreenPosition aSize) => Resize(aSize.ToRelativeScreenPosition(ParentSize));

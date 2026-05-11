@@ -95,6 +95,7 @@ namespace Project_1.UI
                 elements[i].Draw(batch);
             }
         }
+
     }
 
     internal sealed class UiDrawList
@@ -175,6 +176,7 @@ namespace Project_1.UI
             heldItem.Draw(batch);
             heldSpell.Draw(batch);
         }
+
     }
 
     internal sealed class PlateDrawList
@@ -217,6 +219,7 @@ namespace Project_1.UI
                 elements[i].Draw(batch);
             }
         }
+
     }
 
     internal sealed class HudMoveDrawList
@@ -307,5 +310,6 @@ namespace Project_1.UI
 
             sizeChanger.Draw(batch);
         }
+
     }
 }

@@ -55,10 +55,13 @@ namespace Project_1.System.Models.BaseModels
             Matrix frameWorldTransform = Matrix.CreateRotationY(frameFacingYaw + BillboardFacingOffsetRadians) * Matrix.CreateTranslation(worldPosition);
             Matrix presentationWorldTransform = Matrix.CreateRotationY(presentationFacingYaw + BillboardFacingOffsetRadians) * Matrix.CreateTranslation(worldPosition);
 
-            RenderModel(baseModel.GameplayModel, baseWorldTransform, aCamera);
-            RenderModel(baseModel.FacingIndicatorModel, facingIndicatorWorldTransform, aCamera);
-            RenderModel(baseModel.FrameModel, frameWorldTransform, aCamera);
-            RenderModel(GetOrCreatePresentationModel(aSnapshot, baseModel), presentationWorldTransform, aCamera);
+            Color renderTint = Color.White;
+            renderTint.A = (byte)Math.Round(renderTint.A * Math.Clamp(aSnapshot.Opacity, 0f, 1f), MidpointRounding.AwayFromZero);
+
+            RenderModel(baseModel.GameplayModel, baseWorldTransform, aCamera, renderTint);
+            RenderModel(baseModel.FacingIndicatorModel, facingIndicatorWorldTransform, aCamera, renderTint);
+            RenderModel(baseModel.FrameModel, frameWorldTransform, aCamera, renderTint);
+            RenderModel(GetOrCreatePresentationModel(aSnapshot, baseModel), presentationWorldTransform, aCamera, renderTint);
         }
 
         static UnitModel GetOrCreateBaseModel(in EntityModelRenderSnapshot aSnapshot)
@@ -126,12 +129,13 @@ namespace Project_1.System.Models.BaseModels
                 .Replace(':', '_');
         }
 
-        static void RenderModel(Model3D aModel, Matrix aWorldTransform, Camera3D aCamera)
+        static void RenderModel(Model3D aModel, Matrix aWorldTransform, Camera3D aCamera, Color aRenderTint)
         {
             if (aModel is not ProceduralModel3D proceduralModel) return;
 
             proceduralModel.WorldTransform = aWorldTransform;
             proceduralModel.RenderCamera = aCamera;
+            proceduralModel.RenderTint = aRenderTint;
             proceduralModel.Render();
         }
 

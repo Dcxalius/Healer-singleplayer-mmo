@@ -61,6 +61,7 @@ namespace Project_1.UI.UIElements.Buttons
 
             if (state == State.First) state = State.Second;
             else if (state == State.Second) state = State.First;
+            MarkRenderStale();
         }
 
         protected void AddAction(Action aAction, State aState)
@@ -84,10 +85,10 @@ namespace Project_1.UI.UIElements.Buttons
             base.Rescale();
         }
 
-        public override void Draw(SpriteBatch aBatch)
+        protected override void DrawSelf(SpriteBatch aBatch)
         {
             Project_1.Managers.ThreadAffinity.AssertMainThread();
-            base.Draw(aBatch);
+            base.DrawSelf(aBatch);
 
             if (state == State.First)
             {

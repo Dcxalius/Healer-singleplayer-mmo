@@ -158,7 +158,7 @@ namespace Project_1.UI.HUD.Windows
                     CapturesScroll = false;
                 }
 
-                public override void Draw(SpriteBatch aBatch)
+                protected override void DrawSelf(SpriteBatch aBatch)
                 {
                     ThreadAffinity.AssertMainThread();
                     if (!Visible) return;

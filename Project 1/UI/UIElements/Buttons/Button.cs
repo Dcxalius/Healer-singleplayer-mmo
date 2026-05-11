@@ -18,13 +18,22 @@ namespace Project_1.UI.UIElements.Buttons
         public string ButtonText //TODO: Bring this out to a class called TextButton
         {
             get => label.Text;
-            set { label.Text = value; }
+            set
+            {
+                label.Text = value;
+                MarkRenderStale();
+            }
         }
 
         protected bool Pressed
         {
             get => pressed;
-            set => pressed = value;
+            set
+            {
+                if (pressed == value) return;
+                pressed = value;
+                MarkRenderStale();
+            }
         }
 
         UITexture hoverGfx;
@@ -59,12 +68,14 @@ namespace Project_1.UI.UIElements.Buttons
         protected override void ClickedOnMe(ClickEvent aClick)
         {
             pressed = true;
+            MarkRenderStale();
             base.ClickedOnMe(aClick);
         }
 
         public override void ClickedOnAndReleasedOnMe()
         {
             pressed = false;
+            MarkRenderStale();
 
             if (Actions.Count != 0)
             {
@@ -83,21 +94,21 @@ namespace Project_1.UI.UIElements.Buttons
         protected override void HoldReleaseAwayFromMe()
         {
             pressed = false;
+            MarkRenderStale();
             base.HoldReleaseAwayFromMe();
         }
 
 
-        public override void Draw(SpriteBatch aBatch)
+        protected override void DrawSelf(SpriteBatch aBatch)
         {
             Project_1.Managers.ThreadAffinity.AssertMainThread();
             if (!pressed || !usesPressedGfx)
             {
-                base.Draw(aBatch);
+                base.DrawSelf(aBatch);
             }
             else
             {
                 pressedGfx.Draw(aBatch, AbsolutePos);
-                DrawChildren(aBatch);
             }
 
             //if (text.Value == null)

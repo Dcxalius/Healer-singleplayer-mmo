@@ -13,7 +13,16 @@ namespace Project_1.UI.UIElements.SelectBoxes
 {
     internal abstract class SelectBoxValue : UIElement
     {
-        public string DisplayText { get => text.Value; set => text.Value = value; }
+        public string DisplayText
+        {
+            get => text.Value;
+            set
+            {
+                if (text.Value == value) return;
+                text.Value = value;
+                MarkRenderStale();
+            }
+        }
 
 
         protected SelectBox selectBoxParent;
@@ -43,10 +52,10 @@ namespace Project_1.UI.UIElements.SelectBoxes
         }
 
 
-        public override void Draw(SpriteBatch aBatch)
+        protected override void DrawSelf(SpriteBatch aBatch)
         {
             Project_1.Managers.ThreadAffinity.AssertMainThread();
-            base.Draw(aBatch);
+            base.DrawSelf(aBatch);
 
             text.CentredDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Center));
         }

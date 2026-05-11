@@ -16,6 +16,9 @@ namespace Project_1.System.Models.BaseModels
         public Camera3D RenderCamera { get => renderCamera; set => renderCamera = value; }
         Camera3D renderCamera;
 
+        public Color RenderTint { get => renderTint; set => renderTint = value; }
+        Color renderTint = Color.White;
+
         readonly Material material;
         readonly VertexPositionColorTexture[] geometryVertices;
         readonly short[] indices;
@@ -64,7 +67,13 @@ namespace Project_1.System.Models.BaseModels
             effect.Parameters["World"]?.SetValue(worldTransform);
             effect.Parameters["View"]?.SetValue(renderCamera.View);
             effect.Parameters["Projection"]?.SetValue(renderCamera.Projection);
-            effect.Parameters["TintColor"]?.SetValue(material.Tint.ToVector4());
+            Vector4 materialTint = material.Tint.ToVector4();
+            Vector4 modelTint = renderTint.ToVector4();
+            effect.Parameters["TintColor"]?.SetValue(new Vector4(
+                materialTint.X * modelTint.X,
+                materialTint.Y * modelTint.Y,
+                materialTint.Z * modelTint.Z,
+                materialTint.W * modelTint.W));
             effect.Parameters["DiffuseTexture"]?.SetValue(texture);
 
             device.BlendState = blendState;

@@ -102,7 +102,13 @@ namespace Project_1.Items
             AssertSimThread();
             Debug.Assert(items[aBagIndex][aSlotIndex].ItemType == ItemData.ItemType.Consumable, "Tried to consume nonconcumable.");
 
-            if (!(items[aBagIndex][aSlotIndex] as Consumable).Use(aFriendly)) return false;
+            Item item = items[aBagIndex][aSlotIndex];
+            if (!(item as Consumable).Use(aFriendly)) return false;
+
+            if (!item.HasTag("Stealthable"))
+            {
+                aFriendly.RemoveStatusBuffsByTag("Stealth");
+            }
 
             TrimStack(aBagIndex, aSlotIndex, 1);
             NotifySlotChanged(aBagIndex, aSlotIndex, this);

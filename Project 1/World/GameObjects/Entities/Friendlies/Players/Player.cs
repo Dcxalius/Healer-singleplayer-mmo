@@ -316,7 +316,52 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
                 BuildSecondaryReport(),
                 CurrentLevel,
                 Level.Experience,
-                equippedItems);
+                equippedItems,
+                BuildWeaponSkillSnapshots());
+        }
+
+        WeaponSkillUiSnapshot[] BuildWeaponSkillSnapshots()
+        {
+            ThreadAffinity.AssertSimThread();
+            List<WeaponSkillUiSnapshot> snapshots = new List<WeaponSkillUiSnapshot>();
+            int maxSkill = Math.Max(1, CurrentLevel * 5);
+
+            foreach (Items.SubTypes.Weapon.WeaponType weaponType in Enum.GetValues<Items.SubTypes.Weapon.WeaponType>())
+            {
+                if (!ShouldShowWeaponSkill(weaponType)) continue;
+
+                snapshots.Add(new WeaponSkillUiSnapshot(
+                    weaponType,
+                    FormatWeaponSkillName(weaponType),
+                    UnitData.WeaponSkill?.GetSkill(weaponType) ?? 0,
+                    maxSkill));
+            }
+
+            return snapshots.ToArray();
+        }
+
+        bool ShouldShowWeaponSkill(Items.SubTypes.Weapon.WeaponType weaponType)
+        {
+            if (weaponType == Items.SubTypes.Weapon.WeaponType.None ||
+                weaponType == Items.SubTypes.Weapon.WeaponType.Shield ||
+                weaponType == Items.SubTypes.Weapon.WeaponType.Holdable)
+            {
+                return false;
+            }
+
+            return ClassData.WeaponUsuable(weaponType);
+        }
+
+        static string FormatWeaponSkillName(Items.SubTypes.Weapon.WeaponType weaponType)
+        {
+            return weaponType switch
+            {
+                Items.SubTypes.Weapon.WeaponType.TwoHandedSword => "Two-Handed Sword",
+                Items.SubTypes.Weapon.WeaponType.TwoHandedAxe => "Two-Handed Axe",
+                Items.SubTypes.Weapon.WeaponType.TwoHandedMace => "Two-Handed Mace",
+                Items.SubTypes.Weapon.WeaponType.Fist => "Fist Weapon",
+                _ => weaponType.ToString()
+            };
         }
 
         StatReportSnapshot BuildSecondaryReport()

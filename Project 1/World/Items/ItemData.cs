@@ -53,8 +53,17 @@ namespace Project_1.Items
         public int Cost => cost;
         int cost;
 
+        public string[] Tags => tags;
+        string[] tags;
+
+        public bool HasTag(string tag)
+        {
+            if (string.IsNullOrWhiteSpace(tag) || tags == null) return false;
+            return Array.IndexOf(tags, tag) >= 0;
+        }
+
         [JsonConstructor]
-        public ItemData(int id, string gfxName, string name, string description, int maxStack, ItemType itemType, Item.Quality quality, int cost, int itemLevel = 1)
+        public ItemData(int id, string gfxName, string name, string description, int maxStack, ItemType itemType, Item.Quality quality, int cost, int itemLevel = 1, string[] tags = null)
         {
             this.id = id;
             gfx = new GfxPath(GfxType.Item, gfxName);
@@ -65,6 +74,7 @@ namespace Project_1.Items
             this.quality = quality;
             this.cost = cost;
             this.itemLevel = itemLevel;
+            this.tags = tags ?? Array.Empty<string>();
             Assert();
         }
 

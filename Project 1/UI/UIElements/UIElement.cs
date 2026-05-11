@@ -136,6 +136,30 @@ namespace Project_1.UI.UIElements
         readonly TimeSpan timeBeforeDragRegisters = TimeSpan.FromSeconds(0.2);
         public HoldEvent heldEvents;
 
+        enum ClipSide
+        {
+            None,
+            Left,
+            Right,
+            Top,
+            Bottom
+        }
+
+        readonly struct ClipAttachment
+        {
+            public ClipAttachment(UIElement owner, ClipSide side, float start)
+            {
+                Owner = owner;
+                Side = side;
+                Start = start;
+            }
+
+            public UIElement Owner { get; }
+            public ClipSide Side { get; }
+            public float Start { get; }
+            public bool IsAttached => Owner != null && Side != ClipSide.None;
+        }
+
         public RelativeScreenPosition RelativePos => relativePos;
         RelativeScreenPosition relativePos;
         public RelativeScreenPosition RelativeSize => relativeSize;
@@ -156,19 +180,31 @@ namespace Project_1.UI.UIElements
 
         public AbsoluteScreenPosition Location => ParentPos + (RelativePos * ParentRelativeSize).ToAbsoluteScreenPos();
         public AbsoluteScreenPosition Size => (RelativeSize * ParentRelativeSize).ToAbsoluteScreenPos();
+        AbsoluteScreenPosition NormalLocation => ParentPos + (RelativePos * ParentRelativeSize).ToAbsoluteScreenPos();
 
         protected UIElement parent;
-        protected AbsoluteScreenPosition ParentPos => parent == null ? AbsoluteScreenPosition.Zero : parent.Location;
+        ClipAttachment clipAttachment;
+        protected AbsoluteScreenPosition ParentPos => clipAttachment.IsAttached ? clipAttachment.Owner.GetClipParentLocation(clipAttachment) : parent == null ? AbsoluteScreenPosition.Zero : parent.NormalLocation;
         protected RelativeScreenPosition ParentRelativePos => parent == null ? RelativeScreenPosition.Zero : parent.RelativePos;
-        protected AbsoluteScreenPosition ParentSize => parent == null ? Camera.Camera.WindowSize : parent.Size;
-        protected RelativeScreenPosition ParentRelativeSize => parent == null ? new RelativeScreenPosition(1) : parent.RelativeSize * parent.ParentRelativeSize;
+        protected AbsoluteScreenPosition ParentSize => clipAttachment.IsAttached ? clipAttachment.Owner.GetClipParentSize(clipAttachment) : parent == null ? Camera.Camera.WindowSize : parent.Size;
+        protected RelativeScreenPosition ParentRelativeSize => ParentSize.ToRelativeScreenPosition();
 
         List<UIElement> children = new List<UIElement>();
+        readonly List<UIElement> clipChildren = new List<UIElement>();
         protected int ChildCount => children.Count;
 
         public UITexture Gfx => gfx;
         protected UITexture gfx;
-        public virtual Color Color { get => gfx.Color; set => gfx.Color = value; }
+        public virtual Color Color
+        {
+            get => gfx.Color;
+            set
+            {
+                if (gfx.Color == value) return;
+                gfx.Color = value;
+                MarkRenderStale();
+            }
+        }
 
         public (string, RelativeScreenPosition, RelativeScreenPosition) Save => (GetType().Name, RelativePos, RelativeSize);
 

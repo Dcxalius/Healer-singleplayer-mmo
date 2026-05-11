@@ -34,14 +34,17 @@ namespace Project_1.GameObjects.Unit.Classes
 
         public bool WeaponUsuable(Weapon.WeaponType aType) => WeaponsAllowed.HasFlag(aType);
         
+        [JsonIgnore]
         public bool[] skillAsBools
         {
             get
             {
-                bool[] bools = new bool[Enum.GetValues<Weapon.WeaponType>().Length];
-                for (int i = 0; i < bools.Length; i++)
+                int maxIndex = Enum.GetValues<Weapon.WeaponType>().Max(x => (int)x);
+                bool[] bools = new bool[maxIndex + 1];
+                foreach (Weapon.WeaponType weaponType in Enum.GetValues<Weapon.WeaponType>())
                 {
-                    bools[i] = (int)weaponsAllowed % (Math.Pow(2, i)) == 0;
+                    int index = (int)weaponType;
+                    bools[index] = weaponType != Weapon.WeaponType.None && weaponsAllowed.HasFlag(weaponType);
                 }
 
                 return bools;

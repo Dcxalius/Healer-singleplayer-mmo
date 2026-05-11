@@ -42,7 +42,8 @@ namespace Project_1.GameObjects.Entities
                 baseFacingYaw,
                 FrameFacesCameraInPreview,
                 PresentationFacesCameraInPreview,
-                ResolvePreviewPresentationDirectionIndex());
+                ResolvePreviewPresentationDirectionIndex(),
+                VisualOpacity);
         }
 
         float ResolveModelFacingYawRadians()

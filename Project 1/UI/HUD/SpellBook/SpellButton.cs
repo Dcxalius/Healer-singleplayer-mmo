@@ -27,6 +27,7 @@ namespace Project_1.UI.HUD.SpellBook
         string spellName;
         bool spellOffCooldown = true;
         double spellCooldownRatio = 1d;
+        float drawnCooldownRatio;
 
         public SpellButton(UIElement aParent, KeyBindManager.KeyListner aKeyListner, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, GfxPath.NullPath, aPos, aSize, Color.Gray)
         {
@@ -40,9 +41,11 @@ namespace Project_1.UI.HUD.SpellBook
             if (string.IsNullOrWhiteSpace(spellName))
             {
                 imageOnButton.ClearImage();
-                gfx.Color = Color.Gray;
+                Color = Color.Gray;
                 spellOffCooldown = true;
                 spellCooldownRatio = 1d;
+                drawnCooldownRatio = 0f;
+                MarkRenderStale();
                 return;
             }
 
@@ -58,7 +61,8 @@ namespace Project_1.UI.HUD.SpellBook
                 spellOffCooldown = true;
                 spellCooldownRatio = 1d;
             }
-            gfx.Color = Color.White;
+            Color = Color.White;
+            MarkRenderStale();
         }
 
         public override void Update()
@@ -70,13 +74,23 @@ namespace Project_1.UI.HUD.SpellBook
             if (UiPlayerStateCache.TryGetSpellSnapshot(spellName, out SpellUiSnapshot snapshot))
             {
                 imageOnButton.SetImage(snapshot.GfxPath);
-                spellOffCooldown = snapshot.OffCooldown;
-                spellCooldownRatio = snapshot.CooldownRatio01;
+                if (spellOffCooldown != snapshot.OffCooldown || Math.Abs(spellCooldownRatio - snapshot.CooldownRatio01) > 0.001d)
+                {
+                    spellOffCooldown = snapshot.OffCooldown;
+                    spellCooldownRatio = snapshot.CooldownRatio01;
+                    MarkRenderStale();
+                }
             }
 
+            float cooldownRatio = (float)Math.Min(spellCooldownRatio, UiPlayerStateCache.GlobalCooldownRatio);
+            if (spellOffCooldown && UiPlayerStateCache.OffGlobalCooldown) cooldownRatio = 0f;
+            if (Math.Abs(drawnCooldownRatio - cooldownRatio) > 0.001f)
+            {
+                drawnCooldownRatio = cooldownRatio;
+                MarkRenderStale();
+            }
+            onCooldownGfx.Ratio = cooldownRatio;
             onCooldownGfx.Update();
-            onCooldownGfx.Ratio = (float)Math.Min(spellCooldownRatio, UiPlayerStateCache.GlobalCooldownRatio);
-            if (spellOffCooldown && UiPlayerStateCache.OffGlobalCooldown) onCooldownGfx.Ratio = 0;
 
 
             if (UiKeyBindStateCache.GetPress(keyListner))
@@ -129,10 +143,10 @@ namespace Project_1.UI.HUD.SpellBook
             //emptyBorder.Rescale();
         }
 
-        public override void Draw(SpriteBatch aBatch)
+        protected override void DrawSelf(SpriteBatch aBatch)
         {
             Project_1.Managers.ThreadAffinity.AssertMainThread();
-            base.Draw(aBatch);
+            base.DrawSelf(aBatch);
 
             if (string.IsNullOrWhiteSpace(spellName))
             {

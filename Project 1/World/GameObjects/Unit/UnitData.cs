@@ -237,6 +237,7 @@ namespace Project_1.GameObjects.Unit
                 return;
             }
             weaponSkill.SetOwner(aOwner);
+            weaponSkill.EnsureClassSkills(classData);
         }
 
         [JsonProperty("Equipment", TypeNameHandling = TypeNameHandling.Auto)]
@@ -286,7 +287,7 @@ namespace Project_1.GameObjects.Unit
 
         [JsonConstructor]
         public UnitData(string name, string corpseGfxName, string className, Relation.RelationToPlayer? relation, int level, int experience, (int, int)[] learntTalents,
-            float currentHp, float currentResource, object equipment, WorldSpace position, WorldSpace momentum, WorldSpace velocity, List<WorldSpace> destinations, int defenseSkill)
+            float currentHp, float currentResource, object equipment, WorldSpace position, WorldSpace momentum, WorldSpace velocity, List<WorldSpace> destinations, int defenseSkill, WeaponSkill weaponSkill = null)
         {
             this.name = name;
             Debug.Assert(relation.HasValue);
@@ -300,6 +301,7 @@ namespace Project_1.GameObjects.Unit
             this.velocity = new WorldSpace(velocity);
             this.destination = new Destination(destinations);
             this.defenseSkill = defenseSkill;
+            this.weaponSkill = weaponSkill;
             baseStats = new BaseStats(this, classData, this.level.CurrentLevel, this.equipment.EquipmentStats, currentHp, currentResource);
             this.unitType = UnitType.Player;
 
