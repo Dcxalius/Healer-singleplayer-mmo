@@ -41,6 +41,7 @@ namespace Project_1.GameObjects.Spells
         public bool Targetable(Relation.RelationToPlayer aTarget) => spellData.Targetable(aTarget);
         public GfxPath GfxPath => spellData.ButtonGfxPath;
         public SpellSchool[] SpellSchools => spellData.SpellSchools;
+        public bool HasTag(string tag) => spellData.HasTag(tag);
         public bool RequiresGroundTarget => spellData.RequiresGroundTarget;
         public double GroundTargetWidth => (spellData.GroundTargetWidth + TalentFlatChange(TalentChange.Radius)) * (1.0 + TalentPercentChange(TalentChange.Radius));
         public double GroundTargetHeight => (spellData.GroundTargetHeight + TalentFlatChange(TalentChange.Radius)) * (1.0 + TalentPercentChange(TalentChange.Radius));

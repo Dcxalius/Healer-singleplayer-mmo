@@ -32,9 +32,11 @@ namespace Project_1.GameObjects.Entities
                 if (buffs[i].IsOver)
                 {
                     bool hadStatModifiers = buffs[i].HasStatModifiers;
+                    bool hadVisualOpacity = buffs[i].HasVisualOpacity;
                     buffs[i].OnRemoved(aOwner);
                     buffs.RemoveAt(i);
                     RefreshOwnerStatsIfNeeded(aOwner, hadStatModifiers);
+                    RefreshOwnerRenderIfNeeded(aOwner, hadVisualOpacity);
                 }
             }
         }
@@ -57,6 +59,7 @@ namespace Project_1.GameObjects.Entities
                 buffs[i].Recast(aBuff);
                 MailboxManager.PublishUiEvent(new BuffAdded(aOwner.RenderId, buffs[i].BuffUiSnapshot));
                 RefreshOwnerStatsIfNeeded(aOwner, hadStatModifiers || buffs[i].HasStatModifiers);
+                RefreshOwnerRenderIfNeeded(aOwner, aBuff.HasVisualOpacity || buffs[i].HasVisualOpacity);
                 return;
             }
 
@@ -64,6 +67,7 @@ namespace Project_1.GameObjects.Entities
             aBuff.OnApplied(aOwner);
             MailboxManager.PublishUiEvent(new BuffAdded(aOwner.RenderId, buffs.Last().BuffUiSnapshot));
             RefreshOwnerStatsIfNeeded(aOwner, hadStatModifiers || aBuff.HasStatModifiers);
+            RefreshOwnerRenderIfNeeded(aOwner, aBuff.HasVisualOpacity);
         }
 
         // Chains through all AbsorbBuffs, depleting them in order until damage is exhausted.
@@ -82,9 +86,11 @@ namespace Project_1.GameObjects.Entities
                 if (buffs[i].IsDepleted)
                 {
                     bool hadStatModifiers = buffs[i].HasStatModifiers;
+                    bool hadVisualOpacity = buffs[i].HasVisualOpacity;
                     buffs[i].OnRemoved(aOwner);
                     buffs.RemoveAt(i);
                     RefreshOwnerStatsIfNeeded(aOwner, hadStatModifiers);
+                    RefreshOwnerRenderIfNeeded(aOwner, hadVisualOpacity);
                 }
             }
             return remaining;
@@ -97,10 +103,30 @@ namespace Project_1.GameObjects.Entities
             {
                 if (buffs[i] is not T) continue;
                 bool hadStatModifiers = buffs[i].HasStatModifiers;
+                bool hadVisualOpacity = buffs[i].HasVisualOpacity;
                 buffs[i].OnRemoved(aOwner);
                 buffs.RemoveAt(i);
                 RefreshOwnerStatsIfNeeded(aOwner, hadStatModifiers);
+                RefreshOwnerRenderIfNeeded(aOwner, hadVisualOpacity);
                 return;
+            }
+        }
+
+        public void RemoveBuffsWithStatusTag(Entity aOwner, string aStatusTag)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (string.IsNullOrWhiteSpace(aStatusTag)) return;
+
+            for (int i = buffs.Count - 1; i >= 0; i--)
+            {
+                if (!HasStatusTag(buffs[i], aStatusTag)) continue;
+
+                bool hadStatModifiers = buffs[i].HasStatModifiers;
+                bool hadVisualOpacity = buffs[i].HasVisualOpacity;
+                buffs[i].OnRemoved(aOwner);
+                buffs.RemoveAt(i);
+                RefreshOwnerStatsIfNeeded(aOwner, hadStatModifiers);
+                RefreshOwnerRenderIfNeeded(aOwner, hadVisualOpacity);
             }
         }
 
@@ -136,7 +162,44 @@ namespace Project_1.GameObjects.Entities
             return true;
         }
 
+        public bool HasStatusTag(string aStatusTag)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (string.IsNullOrWhiteSpace(aStatusTag)) return false;
+
+            for (int i = 0; i < buffs.Count; i++)
+            {
+                if (HasStatusTag(buffs[i], aStatusTag)) return true;
+            }
+
+            return false;
+        }
+
+        public float GetVisualOpacity()
+        {
+            ThreadAffinity.AssertSimThread();
+            float opacity = 1f;
+            for (int i = 0; i < buffs.Count; i++)
+            {
+                if (!buffs[i].HasVisualOpacity) continue;
+                opacity = Math.Min(opacity, Math.Clamp(buffs[i].VisualOpacity, 0f, 1f));
+            }
+
+            return opacity;
+        }
+
         bool HasStatModifiers => buffs.Any(x => x.HasStatModifiers);
+
+        static bool HasStatusTag(Buff aBuff, string aStatusTag)
+        {
+            string[] tags = aBuff.StatusTags;
+            for (int i = 0; i < tags.Length; i++)
+            {
+                if (tags[i] == aStatusTag) return true;
+            }
+
+            return false;
+        }
 
         void RefreshOwnerStatsIfNeeded(Entity aOwner, bool aMaybeChangedStats)
         {
@@ -146,6 +209,16 @@ namespace Project_1.GameObjects.Entities
             }
 
             aOwner.RefreshStatsFromStatusChange();
+        }
+
+        void RefreshOwnerRenderIfNeeded(Entity aOwner, bool aMaybeChangedVisuals)
+        {
+            if (!aMaybeChangedVisuals)
+            {
+                return;
+            }
+
+            aOwner.RefreshVisualsFromStatusChange();
         }
 
         double SumStatusModifiers(string aStat, bool aFlat)

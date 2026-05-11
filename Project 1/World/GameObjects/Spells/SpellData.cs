@@ -80,6 +80,15 @@ namespace Project_1.GameObjects.Spells
         public SpellSchool[] SpellSchools => spellSchools;
         SpellSchool[] spellSchools;
 
+        public string[] Tags => tags;
+        string[] tags;
+
+        public bool HasTag(string tag)
+        {
+            if (string.IsNullOrWhiteSpace(tag) || tags == null) return false;
+            return Array.IndexOf(tags, tag) >= 0;
+        }
+
         public int FirstLevel => firstLevel;
         int firstLevel;
 
@@ -142,7 +151,8 @@ namespace Project_1.GameObjects.Spells
             float groundTargetWidth = 0,
             float groundTargetHeight = -1,
             GroundTargetShapeType groundTargetShape = GroundTargetShapeType.Circle,
-            CastCondition castCondition = CastCondition.None)
+            CastCondition castCondition = CastCondition.None,
+            string[] tags = null)
         {
             this.name = name;
             this.description = description ?? string.Empty;
@@ -179,6 +189,7 @@ namespace Project_1.GameObjects.Spells
             this.groundTargetHeight = groundTargetHeight < 0 ? groundTargetWidth : groundTargetHeight;
             this.groundTargetShape = groundTargetShape;
             this.castCondition = castCondition;
+            this.tags = tags ?? Array.Empty<string>();
             Assert();
         }
 

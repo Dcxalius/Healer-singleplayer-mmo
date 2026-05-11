@@ -18,7 +18,10 @@ namespace Project_1.UI.UIElements.Bars
         public new Color Color { get => barComponent.Color; set => barComponent.Color = value; }
         public virtual float Value
         {
-            set { barComponent.UpdateBar(value, RelativeSize.X); }
+            set
+            {
+                barComponent.UpdateBar(value, RelativeSize.X);
+            }
         }
 
         BarComponent barComponent;

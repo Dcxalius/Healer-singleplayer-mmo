@@ -177,6 +177,7 @@ namespace Project_1.GameObjects.Entities
             if (!OffGlobalCooldown) return false;
             if (!aSpell.OffCooldown) return false;
             if (!MeetsCastCondition(aSpell)) return false;
+            if (aSpell.HasTag("Hidden") && !owner.HasStatusTag("Stealth")) return false;
             return true;
         }
 
@@ -210,6 +211,7 @@ namespace Project_1.GameObjects.Entities
             owner.Resource.CastSpell(aSpell.ResourceCost);
             if (aSpell.CastCondition == CastCondition.AfterDodgeOrParry)
                 owner.ConsumeReactiveWindow();
+            BreakStealthIfNeeded(aSpell);
             return true;
         }
 
@@ -217,7 +219,14 @@ namespace Project_1.GameObjects.Entities
         {
             if (!aSpell.CastAt(aTargetPosition, owner)) return false;
             owner.Resource.CastSpell(aSpell.ResourceCost);
+            BreakStealthIfNeeded(aSpell);
             return true;
+        }
+
+        void BreakStealthIfNeeded(Spell aSpell)
+        {
+            if (aSpell.HasTag("Stealthable")) return;
+            owner.RemoveStatusBuffsByTag("Stealth");
         }
     }
 }

@@ -72,12 +72,13 @@ namespace Project_1.UI.UIElements
             base.ClickedOnAndReleasedOnMe();
 
             Ticked = !Ticked;
+            MarkRenderStale();
         }
 
-        public override void Draw(SpriteBatch aBatch)
+        protected override void DrawSelf(SpriteBatch aBatch)
         {
             Project_1.Managers.ThreadAffinity.AssertMainThread();
-            base.Draw(aBatch);
+            base.DrawSelf(aBatch);
 
             if (!ticked) return;
 

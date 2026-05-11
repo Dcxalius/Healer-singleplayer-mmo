@@ -40,6 +40,7 @@ namespace Project_1.UI.HUD
             capturesScroll = false;
             hudMoveable = false;
             AlwaysOnScreen = true;
+            ForceVolatileRender = true;
         }
 
         public void NotifySaveStarted(string message)
@@ -109,12 +110,12 @@ namespace Project_1.UI.HUD
             statusText.Rescale();
         }
 
-        public override void Draw(SpriteBatch aBatch)
+        protected override void DrawSelf(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();
             if (!Visible) return;
 
-            base.Draw(aBatch);
+            base.DrawSelf(aBatch);
             if (currentIcon != null)
             {
                 currentIcon.Draw(aBatch, BuildIconRectangle());

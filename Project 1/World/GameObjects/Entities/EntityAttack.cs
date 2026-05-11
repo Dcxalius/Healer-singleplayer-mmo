@@ -97,6 +97,7 @@ namespace Project_1.GameObjects.Entities
 
         void HitTarget(Unit.Attack aAttack)
         {
+            RemoveStatusBuffsByTag("Stealth");
             HitTable.HitResult hitResult = HitTable.GenerateTable(aAttack, this, target);
 
             //TODO: Proc onhits,
@@ -388,6 +389,10 @@ namespace Project_1.GameObjects.Entities
 
             string absorbSuffix = absorbed > 0 ? $" ({FormatHealthDelta(absorbed)} Absorbed)" : string.Empty;
             double appliedDelta = ApplyHealthDelta(-afterAbsorb);
+            if (appliedDelta < 0)
+            {
+                RemoveStatusBuffsByTag("Stealth");
+            }
             SpawnFlyingText(aPrefix + FormatHealthDelta(-appliedDelta) + aSuffix + absorbSuffix, GetDirOfFloatingText(aCause.FeetPosition), textColor, aBorderColor, 1f);
         }
 

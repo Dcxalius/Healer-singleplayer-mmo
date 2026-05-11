@@ -118,6 +118,7 @@ namespace Project_1.UI.UIElements.Boxes
             scrollValue = MaxScroll * aValue;
             CapScroll();
             UpdateScrollableComponentPosition();
+            MarkRenderStale();
         }
 
         protected override void ScrolledOnMe(ScrollEvent aScrollEvent)
@@ -129,6 +130,7 @@ namespace Project_1.UI.UIElements.Boxes
 
             CapScroll();
             UpdateScrollableComponentPosition();
+            MarkRenderStale();
 
             if (MaxScroll > 0)
             {

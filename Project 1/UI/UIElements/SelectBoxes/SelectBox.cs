@@ -110,10 +110,10 @@ namespace Project_1.UI.UIElements.SelectBoxes
             allValues.Visible = true;
         }
 
-        public override void Draw(SpriteBatch aBatch)
+        protected override void DrawSelf(SpriteBatch aBatch)
         {
             Project_1.Managers.ThreadAffinity.AssertMainThread();
-            base.Draw(aBatch);
+            base.DrawSelf(aBatch);
          
             //displayValue.Draw(aBatch); 
 

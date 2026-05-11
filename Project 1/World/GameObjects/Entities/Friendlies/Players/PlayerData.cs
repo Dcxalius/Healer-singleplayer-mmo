@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Project_1.Camera;
 using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Unit;
+using Project_1.GameObjects.Unit.Stats;
 using Project_1.Items;
 using Project_1.Managers;
 using Project_1.UI.HUD.Managers;
@@ -51,8 +52,8 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         [JsonConstructor]
         public PlayerData(string name, string corpseGfxName, string className, Relation.RelationToPlayer? relation, string[] party, 
             int level, int experience, (int, int)[] learntTalents, int gold, float currentHp, float currentResource, int?[] equipment, Inventory inventory, string[] learntSpells, string[] spellOnBar, 
-            WorldSpace position, WorldSpace momentum, WorldSpace velocity, List<WorldSpace> destinations, int defenseSkill)
-            : base(name, corpseGfxName, className, relation, level, experience, learntTalents, currentHp, currentResource, equipment, position, momentum, velocity, destinations, defenseSkill)
+            WorldSpace position, WorldSpace momentum, WorldSpace velocity, List<WorldSpace> destinations, int defenseSkill, WeaponSkill weaponSkill = null)
+            : base(name, corpseGfxName, className, relation, level, experience, learntTalents, currentHp, currentResource, equipment, position, momentum, velocity, destinations, defenseSkill, weaponSkill)
         {
             spellBook = new SpellBook(learntSpells);
             learntSpellNames = learntSpells ?? Array.Empty<string>();

@@ -445,10 +445,10 @@ namespace Project_1.UI.HUD.Inventory
             itemCount.Rescale();
         }
 
-        public override void Draw(SpriteBatch aBatch)
+        protected override void DrawSelf(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();
-            base.Draw(aBatch);
+            base.DrawSelf(aBatch);
             itemCount.CentreRightDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Location + AbsolutePos.Size) - new AbsoluteScreenPosition(0, (int)itemCount.Offset.Y / 2));
         }
     }

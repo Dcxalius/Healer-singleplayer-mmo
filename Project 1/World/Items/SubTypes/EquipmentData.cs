@@ -163,8 +163,8 @@ namespace Project_1.Items.SubTypes
         public Equipment.Type Slot => slot;
         Equipment.Type slot;
 
-        public EquipmentData(int id, string gfxName, string name, string description, Equipment.Type slot, ItemType itemType, Item.Quality quality, int cost, Equipment.GearType material, SecondayStatBonus<int>[] secondaryStatsInt, SecondayStatBonus<float>[] secondaryStatsFloat, int itemLevel = 1)
-            : base(id, gfxName, name, description, 1, itemType, quality, cost, itemLevel)
+        public EquipmentData(int id, string gfxName, string name, string description, Equipment.Type slot, ItemType itemType, Item.Quality quality, int cost, Equipment.GearType material, SecondayStatBonus<int>[] secondaryStatsInt, SecondayStatBonus<float>[] secondaryStatsFloat, int itemLevel = 1, string[] tags = null)
+            : base(id, gfxName, name, description, 1, itemType, quality, cost, itemLevel, tags)
         {
             this.slot = slot;
             int calculatedArmor = itemType == ItemType.Equipment
@@ -179,8 +179,8 @@ namespace Project_1.Items.SubTypes
         }
 
         [JsonConstructor]
-        public EquipmentData(int id, string gfxName, string name, string description, Equipment.Type slot, Item.Quality quality, int cost, Equipment.GearType material, SecondayStatBonus<int>[] secondaryStatsInt, SecondayStatBonus<float>[] secondayStatFloat, int itemLevel = 1)
-            : this(id, gfxName, name, description, slot, ItemType.Equipment, quality, cost, material, secondaryStatsInt, secondayStatFloat, itemLevel)
+        public EquipmentData(int id, string gfxName, string name, string description, Equipment.Type slot, Item.Quality quality, int cost, Equipment.GearType material, SecondayStatBonus<int>[] secondaryStatsInt, SecondayStatBonus<float>[] secondayStatFloat, int itemLevel = 1, string[] tags = null)
+            : this(id, gfxName, name, description, slot, ItemType.Equipment, quality, cost, material, secondaryStatsInt, secondayStatFloat, itemLevel, tags)
         {
         }
 

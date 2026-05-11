@@ -31,7 +31,13 @@ namespace Project_1.UI.UIElements
         public string Text
         {
             get => underlyingText.Value;
-            set => underlyingText.Value = TextWidthFixer(value); //TODO: If length is longer than Size.Y and a toggle is on then the text should become scrollable.
+            set
+            {
+                string fixedValue = TextWidthFixer(value); //TODO: If length is longer than Size.Y and a toggle is on then the text should become scrollable.
+                if (underlyingText.Value == fixedValue) return;
+                underlyingText.Value = fixedValue;
+                MarkRenderStale();
+            }
         }
 
         public string TextWidthFixer(string s)
@@ -156,7 +162,9 @@ namespace Project_1.UI.UIElements
             }
             set
             {
+                if (underlyingText.Color == value) return;
                 underlyingText.Color = value;
+                MarkRenderStale();
             }
         }
 
@@ -167,6 +175,7 @@ namespace Project_1.UI.UIElements
             {
                 underlyingText.TextSize = value;
                 Text = underlyingText.Value;
+                MarkRenderStale();
             }
         }
 
@@ -187,10 +196,10 @@ namespace Project_1.UI.UIElements
             underlyingText.Rescale();
         }
 
-        public override void Draw(SpriteBatch aBatch)
+        protected override void DrawSelf(SpriteBatch aBatch)
         {
             Project_1.Managers.ThreadAffinity.AssertMainThread();
-            base.Draw(aBatch);
+            base.DrawSelf(aBatch);
 
 
             GraphicsManager.CaptureScissor(this, AbsolutePos);

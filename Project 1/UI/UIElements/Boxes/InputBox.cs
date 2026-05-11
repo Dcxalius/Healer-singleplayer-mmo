@@ -249,10 +249,10 @@ namespace Project_1.UI.UIElements.Boxes
             return new AbsoluteScreenPosition(inputLabel.CalculatePartialOffset(aCursorPosition).ToPoint()).OnlyX + inputLabel.Location + inputLabel.Size.OnlyY / 2;
         }
 
-        public override void Draw(SpriteBatch aBatch)
+        protected override void DrawSelf(SpriteBatch aBatch)
         {
             Project_1.Managers.ThreadAffinity.AssertMainThread();
-            base.Draw(aBatch);
+            base.DrawSelf(aBatch);
 
             if (UiTextInputManager.ActiveInput != this) return;
             if (TimeManager.InstanceTotalFrameTimeAsTimeSpan.TotalMilliseconds % 750 < 250) return;

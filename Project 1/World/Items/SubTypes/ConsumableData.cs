@@ -30,7 +30,7 @@ namespace Project_1.Items.SubTypes
 
 
         [JsonConstructor]
-        public ConsumableData(int id, string gfxName, string name, string description, int maxStack, ConsumableType type, Item.Quality quality, int cost, float value = -1, int enchantmentId = -1, int itemLevel = 1) : base(id, gfxName, name, description, maxStack, ItemType.Consumable, quality, cost, itemLevel)
+        public ConsumableData(int id, string gfxName, string name, string description, int maxStack, ConsumableType type, Item.Quality quality, int cost, float value = -1, int enchantmentId = -1, int itemLevel = 1, string[] tags = null) : base(id, gfxName, name, description, maxStack, ItemType.Consumable, quality, cost, itemLevel, tags)
         {
 
             this.type = type;

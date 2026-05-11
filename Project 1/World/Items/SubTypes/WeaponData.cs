@@ -54,8 +54,9 @@ namespace Project_1.Items.SubTypes
             Item.Quality quality = Item.Quality.Uncommon,
             Weapon.WeaponType weaponType = Weapon.WeaponType.None,
             int cost = 0,
-            int itemLevel = 1)
-            : base(id, gfxName, name, description, slot, ItemType.Weapon, quality, cost, Equipment.GearType.None, Array.Empty<SecondayStatBonus<int>>(), Array.Empty<SecondayStatBonus<float>>(), itemLevel)
+            int itemLevel = 1,
+            string[] tags = null)
+            : base(id, gfxName, name, description, slot, ItemType.Weapon, quality, cost, Equipment.GearType.None, Array.Empty<SecondayStatBonus<int>>(), Array.Empty<SecondayStatBonus<float>>(), itemLevel, tags)
         {
             this.weaponType = weaponType;
             this.attackSpeed = attackSpeed;

@@ -29,12 +29,13 @@ namespace Project_1.UI.UIElements
         public Minimap(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, new UITexture("GrayBackground", Color.White), aPos, aSize)
         {
             Init();
+            ForceVolatileRender = true;
         }
 
-        public override void Draw(SpriteBatch aBatch)
+        protected override void DrawSelf(SpriteBatch aBatch)
         {
             Project_1.Managers.ThreadAffinity.AssertMainThread();
-            base.Draw(aBatch);
+            base.DrawSelf(aBatch);
             GraphicsManager.CaptureScissor(this, AbsolutePos);
 
             if (!MinimapSnapshotManager.TryGetSnapshot(out MinimapDotSnapshot[] dots, out int dotCount, out WorldSpace ws))

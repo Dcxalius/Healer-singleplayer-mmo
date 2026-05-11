@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Project_1.GameObjects.Entities.Friendlies.Players;
+using Project_1.GameObjects.Unit.Classes;
 using Project_1.Managers;
 
 namespace Project_1.GameObjects.Unit.Stats
@@ -21,7 +22,8 @@ namespace Project_1.GameObjects.Unit.Stats
         {
             get
             {
-                int[] returnable = new int[Enum.GetValues<Weapon.WeaponType>().Count()];
+                int maxIndex = Enum.GetValues<Weapon.WeaponType>().Max(x => (int)x);
+                int[] returnable = new int[maxIndex + 1];
                 foreach (var skill in skills)
                 {
                     returnable[(int)skill.Key] = skill.Value;
@@ -33,15 +35,15 @@ namespace Project_1.GameObjects.Unit.Stats
         Dictionary<Weapon.WeaponType, int> bonuses;
         
         [JsonConstructor]
-        public WeaponSkill(int[] aWeaponSkill)
+        public WeaponSkill(int[] skills)
         {
-            skills = new Dictionary<Weapon.WeaponType, int>();
+            this.skills = new Dictionary<Weapon.WeaponType, int>();
             bonuses = new Dictionary<Weapon.WeaponType, int>();
-            if (aWeaponSkill == null) return;
-            for (int i = 0; i < aWeaponSkill.Count(); i++)
+            if (skills == null) return;
+            for (int i = 0; i < skills.Count(); i++)
             {
-                if (aWeaponSkill[i] == 0) continue;
-                skills.Add((Weapon.WeaponType)i, aWeaponSkill[i]);
+                if (skills[i] == 0) continue;
+                this.skills.Add((Weapon.WeaponType)i, skills[i]);
             }
         }
 
@@ -50,16 +52,12 @@ namespace Project_1.GameObjects.Unit.Stats
             entity = aEntity;
         }
 
-        public WeaponSkill(Entity aEntity, Classes.ClassData aClass)
+        public WeaponSkill(Entity aEntity, ClassData aClass)
         {
             skills = new Dictionary<Weapon.WeaponType, int>();
             bonuses = new Dictionary<Weapon.WeaponType, int>();
 
-            for (int i = 0; i < aClass.skillAsBools.Length; i++)
-            {
-                if (!aClass.skillAsBools[i]) continue;
-                skills.Add((Weapon.WeaponType)i, 1);
-            }
+            EnsureClassSkills(aClass);
             entity = aEntity;
         }
 
@@ -69,11 +67,23 @@ namespace Project_1.GameObjects.Unit.Stats
             entity = aEntity;
         }
 
+        public void EnsureClassSkills(ClassData aClass)
+        {
+            AssertSimThread();
+            foreach (Weapon.WeaponType weaponType in Enum.GetValues<Weapon.WeaponType>())
+            {
+                if (weaponType == Weapon.WeaponType.None) continue;
+                if (!aClass.WeaponUsuable(weaponType)) continue;
+                if (skills.ContainsKey(weaponType)) continue;
+                skills.Add(weaponType, 1);
+            }
+        }
+
         public void LevelUpSkill(Weapon.WeaponType aType)
         {
             AssertSimThread();
             if (!skills.ContainsKey(aType)) throw new Exception("Player does not have skill for weapon type " + aType);
-            if (skills[aType] < entity.CurrentLevel * 5) return;
+            if (skills[aType] >= entity.CurrentLevel * 5) return;
             skills[aType]++;
         }
 

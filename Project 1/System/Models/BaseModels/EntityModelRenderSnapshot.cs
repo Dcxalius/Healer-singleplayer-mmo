@@ -19,6 +19,7 @@ namespace Project_1.System.Models.BaseModels
         readonly bool frameFacesCameraInPreview;
         readonly bool presentationFacesCameraInPreview;
         readonly int presentationDirectionIndex;
+        readonly float opacity;
 
         public EntityModelRenderSnapshot(
             int aRenderId,
@@ -33,7 +34,8 @@ namespace Project_1.System.Models.BaseModels
             float aPresentationFacingYawRadians,
             bool aFrameFacesCameraInPreview,
             bool aPresentationFacesCameraInPreview,
-            int aPresentationDirectionIndex)
+            int aPresentationDirectionIndex,
+            float aOpacity)
         {
             renderId = aRenderId;
             worldPosition = aWorldPosition;
@@ -48,6 +50,7 @@ namespace Project_1.System.Models.BaseModels
             frameFacesCameraInPreview = aFrameFacesCameraInPreview;
             presentationFacesCameraInPreview = aPresentationFacesCameraInPreview;
             presentationDirectionIndex = aPresentationDirectionIndex;
+            opacity = aOpacity;
         }
 
         public int RenderId => renderId;
@@ -64,5 +67,6 @@ namespace Project_1.System.Models.BaseModels
         public bool FrameFacesCameraInPreview => frameFacesCameraInPreview;
         public bool PresentationFacesCameraInPreview => presentationFacesCameraInPreview;
         public int PresentationDirectionIndex => presentationDirectionIndex;
+        public float Opacity => opacity;
     }
 }

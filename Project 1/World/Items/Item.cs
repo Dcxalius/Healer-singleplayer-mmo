@@ -43,6 +43,7 @@ namespace Project_1.Items
         public int SellPrice => (int)MathF.Floor((float)itemData.Cost / 4);
         [JsonIgnore]
         public int Cost => itemData.Cost;
+        public bool HasTag(string tag) => itemData.HasTag(tag);
         [JsonIgnore]
         public Color ItemQualityColor
         {

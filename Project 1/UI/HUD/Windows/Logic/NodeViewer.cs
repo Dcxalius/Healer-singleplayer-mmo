@@ -40,10 +40,10 @@ namespace Project_1.UI.HUD.Windows.Logic
             nodes = snapshotNodes ?? Array.Empty<LogicNodeUiSnapshot>();
         }
 
-        public override void Draw(SpriteBatch aBatch)
+        protected override void DrawSelf(SpriteBatch aBatch)
         {
             Project_1.Managers.ThreadAffinity.AssertMainThread();
-            base.Draw(aBatch);
+            base.DrawSelf(aBatch);
 
             if (!currentTargetRenderId.HasValue || nodes.Length == 0) return;
 

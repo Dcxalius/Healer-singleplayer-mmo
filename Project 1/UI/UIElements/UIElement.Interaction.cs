@@ -29,6 +29,11 @@ namespace Project_1.UI.UIElements
             {
                 children[i].Update();
             }
+
+            for (int i = 0; i < clipChildren.Count; i++)
+            {
+                clipChildren[i].Update();
+            }
         }
 
         protected virtual void HoldUpdate()
@@ -61,7 +66,7 @@ namespace Project_1.UI.UIElements
         public virtual bool ReleasedOn(ReleaseEvent aRelease)
         {
             if (!visible) return false;
-            if (!AbsolutePos.Contains(aRelease.AbsolutePos)) return false;
+            if (!ContainsInputPoint(aRelease.AbsolutePos.ToPoint())) return false;
             if (ReleasedOnChildren(aRelease)) return true;
 
             ReleaseOnMe(aRelease);
@@ -74,6 +79,14 @@ namespace Project_1.UI.UIElements
             for (int i = 0; i < children.Count; i++)
             {
                 if (!children[i].ReleasedOn(aRelease)) continue;
+
+                ReleasedOnChild(aRelease);
+                return true;
+            }
+
+            for (int i = 0; i < clipChildren.Count; i++)
+            {
+                if (!clipChildren[i].ReleasedOn(aRelease)) continue;
 
                 ReleasedOnChild(aRelease);
                 return true;
@@ -138,7 +151,7 @@ namespace Project_1.UI.UIElements
         public virtual bool ClickedOn(ClickEvent aClick)
         {
             if (!visible && !(hudMoveable && hudMoving)) return false;
-            if (!AbsolutePos.Contains(aClick.AbsolutePos)) return false;
+            if (!ContainsInputPoint(aClick.AbsolutePos.ToPoint())) return false;
             if (ClickedOnChildren(aClick)) return true;
 
             ClickedOnMe(aClick);
@@ -155,6 +168,14 @@ namespace Project_1.UI.UIElements
 
                 ClickedOnChild(aClick);
                 return children[i].capturesClick;
+            }
+
+            for (int i = 0; i < clipChildren.Count; i++)
+            {
+                if (!clipChildren[i].ClickedOn(aClick)) continue;
+
+                ClickedOnChild(aClick);
+                return clipChildren[i].capturesClick;
             }
 
             return false;
@@ -175,7 +196,7 @@ namespace Project_1.UI.UIElements
         internal virtual bool ScrolledOn(ScrollEvent aScrollEvent)
         {
             if (!visible) return false;
-            if (!AbsolutePos.Contains(aScrollEvent.AbsolutePos)) return false;
+            if (!ContainsInputPoint(aScrollEvent.AbsolutePos.ToPoint())) return false;
             if (ScrolledOnChildren(aScrollEvent)) return true;
 
             ScrolledOnMe(aScrollEvent);
@@ -198,11 +219,31 @@ namespace Project_1.UI.UIElements
                 return children[i].capturesScroll;
             }
 
+            for (int i = 0; i < clipChildren.Count; i++)
+            {
+                if (!clipChildren[i].ScrolledOn(aScrollEvent)) continue;
+
+                ScrolledOnChild(aScrollEvent);
+                return clipChildren[i].capturesScroll;
+            }
+
             return false;
         }
 
         protected virtual void ScrolledOnChild(ScrollEvent aScrollEvent)
         {
+        }
+
+        bool ContainsInputPoint(Microsoft.Xna.Framework.Point point)
+        {
+            if (AbsolutePos.Contains(point)) return true;
+
+            for (int i = 0; i < clipChildren.Count; i++)
+            {
+                if (clipChildren[i].AbsolutePos.Contains(point)) return true;
+            }
+
+            return false;
         }
     }
 }

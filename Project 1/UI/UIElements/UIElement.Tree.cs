@@ -22,6 +22,7 @@ namespace Project_1.UI.UIElements
             children.AddRange(sparedChildren);
             firstChildren.AddRange(remainingFirst);
             lastChildren.AddRange(remainingLast);
+            MarkRenderStale();
         }
 
         protected virtual void KillAllChildren()
@@ -29,6 +30,8 @@ namespace Project_1.UI.UIElements
             children.Clear();
             lastChildren.Clear();
             firstChildren.Clear();
+            clipChildren.Clear();
+            MarkRenderStale();
         }
 
         protected virtual void KillChild(int aIndex)
@@ -37,6 +40,9 @@ namespace Project_1.UI.UIElements
             children.RemoveAt(aIndex);
             lastChildren.Remove(child);
             firstChildren.Remove(child);
+            clipChildren.Remove(child);
+            child.clipAttachment = default;
+            MarkRenderStale();
         }
 
         protected virtual void KillChild(UIElement aChild)
@@ -45,6 +51,9 @@ namespace Project_1.UI.UIElements
             children.Remove(aChild);
             lastChildren.Remove(aChild);
             firstChildren.Remove(aChild);
+            clipChildren.Remove(aChild);
+            aChild.clipAttachment = default;
+            MarkRenderStale();
         }
 
         protected UIElement GetChild(int aIndex) => children[aIndex];
@@ -114,6 +123,7 @@ namespace Project_1.UI.UIElements
             }
             children.Add(aUIElement);
             Sort();
+            MarkRenderStale();
         }
 
         void Sort()
@@ -131,6 +141,44 @@ namespace Project_1.UI.UIElements
             sortedChildren.AddRange(lastChildren);
 
             children = sortedChildren;
+            MarkRenderStale();
+        }
+
+        public T ClipLeft<T>(T child, float startingHeight) where T : UIElement, IClipChild => Clip(child, ClipSide.Left, startingHeight);
+        public T ClipRight<T>(T child, float startingHeight) where T : UIElement, IClipChild => Clip(child, ClipSide.Right, startingHeight);
+        public T ClipTop<T>(T child, float startingWidth) where T : UIElement, IClipChild => Clip(child, ClipSide.Top, startingWidth);
+        public T ClipBottom<T>(T child, float startingWidth) where T : UIElement, IClipChild => Clip(child, ClipSide.Bottom, startingWidth);
+
+        T Clip<T>(T child, ClipSide side, float start) where T : UIElement, IClipChild
+        {
+            Debug.Assert(child != null, "Cannot add null ClipChild.");
+            Debug.Assert(child.parent == this, "ClipChild must be constructed with this UIElement as parent.");
+            Debug.Assert(start >= 0f, "ClipChild start cannot be negative.");
+
+            children.Remove(child);
+            firstChildren.Remove(child);
+            lastChildren.Remove(child);
+            if (!clipChildren.Contains(child))
+            {
+                clipChildren.Add(child);
+            }
+
+            child.clipAttachment = new ClipAttachment(this, side, start);
+            AssertClipChildFits(child, side, start);
+            child.MarkRenderStale();
+            MarkRenderStale();
+            return child;
+        }
+
+        void AssertClipChildFits(UIElement child, ClipSide side, float start)
+        {
+            if (side == ClipSide.Left || side == ClipSide.Right)
+            {
+                Debug.Assert(start + child.Size.Y <= Size.Y, "ClipChild height exceeds the vertical clip strip.");
+                return;
+            }
+
+            Debug.Assert(start + child.Size.X <= Size.X, "ClipChild width exceeds the horizontal clip strip.");
         }
     }
 }

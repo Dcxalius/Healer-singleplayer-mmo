@@ -23,6 +23,7 @@ namespace Project_1.UI.UIElements.Bars
                 remainingCast.Value = Math.Round((castDurationMs - castDurationMs * value) / 1000, 1).ToString();
 
                 base.Value = value;
+                MarkRenderStale();
             }
         }
         public CastBar(RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(null, new BarTexture(BarTexture.FillingDirection.Right, Color.White), new UITexture(new GfxPath(GfxType.UI, "WhiteBackground"), Color.Black), aPos, aSize)
@@ -37,25 +38,28 @@ namespace Project_1.UI.UIElements.Bars
         {
             castDurationMs = 0;
             spellTexture = null;
+            MarkRenderStale();
         }
 
         public void FinishCast()
         {
             castDurationMs = 0;
             spellTexture = null;
+            MarkRenderStale();
         }
 
         public void CastSpell(GfxPath spellGfxPath, double durationMs)
         {
             spellTexture = new UITexture(spellGfxPath, Color.White);
             castDurationMs = durationMs;
+            MarkRenderStale();
         }
 
-        public override void Draw(SpriteBatch aBatch)
+        protected override void DrawSelf(SpriteBatch aBatch)
         {
             Project_1.Managers.ThreadAffinity.AssertMainThread();
             if (spellTexture == null) return;
-            base.Draw(aBatch);
+            base.DrawSelf(aBatch);
             spellTexture.Draw(aBatch, new Rectangle(AbsolutePos.Location, new Point(AbsolutePos.Size.Y)));
             remainingCast.CentreRightDraw(aBatch, new AbsoluteScreenPosition(AbsolutePos.Right - 5, AbsolutePos.Center.Y));
         }
