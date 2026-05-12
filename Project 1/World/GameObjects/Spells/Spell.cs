@@ -102,6 +102,7 @@ namespace Project_1.GameObjects.Spells
                 throw new ArgumentException("Spell identifier was invalid.", nameof(aName));
             }
 
+            this.owner = owner;
             spellData = SpellFactory.GetSpell(spellName);
             rank = spellData.ClampRank(aRank);
             lastTimeCasted = double.NegativeInfinity;

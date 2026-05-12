@@ -29,6 +29,10 @@ namespace Project_1.World.GameObjects.Spells.SpellEffects
         readonly string[] statusTags;
         readonly float? visualOpacity;
         readonly string[] removeStatusTags;
+        readonly bool consumeStackOnAttackDamage;
+        readonly int initialStackCount;
+        readonly bool modifiersScaleWithStacks;
+        readonly bool applyToCaster;
 
         public GfxPath GfxPath => gfxPath;
         public GfxPath HitGfxPath => hitGfxPath;
@@ -49,6 +53,10 @@ namespace Project_1.World.GameObjects.Spells.SpellEffects
         public bool HasVisualOpacity => visualOpacity.HasValue;
         public float VisualOpacity => visualOpacity ?? 1f;
         public string[] RemoveStatusTags => removeStatusTags;
+        public bool ConsumeStackOnAttackDamage => consumeStackOnAttackDamage;
+        public int InitialStackCount => initialStackCount;
+        public bool ModifiersScaleWithStacks => modifiersScaleWithStacks;
+        public bool ApplyToCaster => applyToCaster;
 
         public override string Description => BuildDescription();
 
@@ -71,6 +79,10 @@ namespace Project_1.World.GameObjects.Spells.SpellEffects
             string[] statusTags,
             float? visualOpacity,
             string[] removeStatusTags,
+            bool consumeStackOnAttackDamage,
+            int initialStackCount,
+            bool? modifiersScaleWithStacks,
+            bool applyToCaster,
             bool sourceStackable,
             int maxStackCount,
             bool isBinary,
@@ -88,8 +100,12 @@ namespace Project_1.World.GameObjects.Spells.SpellEffects
             this.statusTags = statusTags ?? Array.Empty<string>();
             this.visualOpacity = visualOpacity.HasValue ? Math.Clamp(visualOpacity.Value, 0f, 1f) : null;
             this.removeStatusTags = removeStatusTags ?? Array.Empty<string>();
+            this.consumeStackOnAttackDamage = consumeStackOnAttackDamage;
             this.sourceStackable = sourceStackable;
             MaxStackCount = Math.Max(1, maxStackCount);
+            this.initialStackCount = Math.Clamp(initialStackCount <= 0 ? 1 : initialStackCount, 1, MaxStackCount);
+            this.modifiersScaleWithStacks = modifiersScaleWithStacks ?? true;
+            this.applyToCaster = applyToCaster;
 
             if (effectNames == null || effectNames.Length == 0)
             {
@@ -186,18 +202,19 @@ namespace Project_1.World.GameObjects.Spells.SpellEffects
         public override bool Trigger(Entity aCaster, Entity aTarget, Spell aSpell)
         {
             ThreadAffinity.AssertSimThread();
+            Entity statusTarget = applyToCaster ? aCaster : aTarget;
             for (int i = 0; i < removeStatusTags.Length; i++)
             {
-                aTarget.RemoveStatusBuffsByTag(removeStatusTags[i]);
+                statusTarget.RemoveStatusBuffsByTag(removeStatusTags[i]);
             }
 
-            if (HasStatusTag("Stealth") && aTarget.HasStatusTag("Stealth"))
+            if (HasStatusTag("Stealth") && statusTarget.HasStatusTag("Stealth"))
             {
-                aTarget.RemoveStatusBuffsByTag("Stealth");
+                statusTarget.RemoveStatusBuffsByTag("Stealth");
                 return true;
             }
 
-            aTarget.AddBuff(new StatusBuff(aCaster, this, aSpell));
+            statusTarget.AddBuff(new StatusBuff(aCaster, this, aSpell));
             return true;
         }
 

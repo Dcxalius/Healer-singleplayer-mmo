@@ -130,6 +130,32 @@ namespace Project_1.GameObjects.Entities
             }
         }
 
+        public void ConsumeStack(Buff aBuff, Entity aOwner)
+        {
+            ThreadAffinity.AssertSimThread();
+            int index = buffs.IndexOf(aBuff);
+            if (index < 0)
+            {
+                return;
+            }
+
+            bool hadStatModifiers = aBuff.HasStatModifiers;
+            bool hadVisualOpacity = aBuff.HasVisualOpacity;
+            bool modifiersChanged = aBuff.HasStatModifiers && aBuff.ModifiersScaleWithStacks;
+            bool remove = aBuff.ConsumeStack();
+            if (remove)
+            {
+                aBuff.OnRemoved(aOwner);
+                buffs.RemoveAt(index);
+                RefreshOwnerStatsIfNeeded(aOwner, hadStatModifiers);
+                RefreshOwnerRenderIfNeeded(aOwner, hadVisualOpacity);
+                return;
+            }
+
+            MailboxManager.PublishUiEvent(new BuffAdded(aOwner.RenderId, aBuff.BuffUiSnapshot));
+            RefreshOwnerStatsIfNeeded(aOwner, modifiersChanged);
+        }
+
         public List<Buff> GetAllBuffs()
         {
             ThreadAffinity.AssertSimThread();
@@ -232,7 +258,7 @@ namespace Project_1.GameObjects.Entities
                     if (modifiers[j].Flat != aFlat) continue;
                     if (!string.Equals(modifiers[j].Stat, aStat, StringComparison.Ordinal)) continue;
 
-                    double value = modifiers[j].Amount * Math.Max(1, buffs[i].Count);
+                    double value = modifiers[j].Amount * (buffs[i].ModifiersScaleWithStacks ? Math.Max(1, buffs[i].Count) : 1);
                     string modifierCategory = string.IsNullOrWhiteSpace(modifiers[j].Category)
                         ? buffs[i].StackingCategory
                         : modifiers[j].Category;

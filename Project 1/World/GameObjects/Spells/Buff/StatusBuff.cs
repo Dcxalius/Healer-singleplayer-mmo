@@ -13,6 +13,7 @@ namespace Project_1.GameObjects.Spells.Buff
         int tickCounter;
         double remainingAbsorb;
         readonly Spell spell;
+        IDisposable hitTakenSubscription;
 
         StatusEffect Status => effect as StatusEffect;
 
@@ -38,6 +39,27 @@ namespace Project_1.GameObjects.Spells.Buff
             {
                 remainingAbsorb = Power;
             }
+        }
+
+        public override void OnApplied(Entity aOwner)
+        {
+            ThreadAffinity.AssertSimThread();
+            base.OnApplied(aOwner);
+            if (!Status.ConsumeStackOnAttackDamage)
+            {
+                return;
+            }
+
+            hitTakenSubscription?.Dispose();
+            hitTakenSubscription = aOwner.Events.Subscribe<HitTakenEvent>(e => OnHitTaken(aOwner, e));
+        }
+
+        public override void OnRemoved(Entity aOwner)
+        {
+            ThreadAffinity.AssertSimThread();
+            hitTakenSubscription?.Dispose();
+            hitTakenSubscription = null;
+            base.OnRemoved(aOwner);
         }
 
         public override void Update(Entity aEntity)
@@ -74,6 +96,15 @@ namespace Project_1.GameObjects.Spells.Buff
             double absorbed = Math.Min(remainingAbsorb, incoming);
             remainingAbsorb -= absorbed;
             return absorbed;
+        }
+
+        void OnHitTaken(Entity aOwner, HitTakenEvent e)
+        {
+            ThreadAffinity.AssertSimThread();
+            if (!Status.ConsumeStackOnAttackDamage) return;
+            if (e.Attack == null || !e.Damage.ContainsDamage) return;
+
+            aOwner.ConsumeBuffStack(this);
         }
     }
 }

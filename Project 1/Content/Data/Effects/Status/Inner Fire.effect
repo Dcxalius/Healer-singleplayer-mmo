@@ -1,0 +1,1 @@
+{"Name":"Inner Fire","GfxName":"Hand","Duration":1800.0,"StackingCategory":"InnerFireArmor","MaxStackCount":20,"InitialStackCount":20,"ModifiersScaleWithStacks":false,"ConsumeStackOnAttackDamage":true,"ApplyToCaster":true,"StatModifiers":[{"Stat":"Armor","Amount":100,"Flat":true}]}

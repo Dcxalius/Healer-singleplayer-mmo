@@ -50,14 +50,14 @@ namespace Project_1.GameObjects.Entities
         public void RemoveStatusBuffsByTag(string aStatusTag)
         {
             ThreadAffinity.AssertSimThread();
-            buffList.RemoveBuffsWithStatusTag(this, aStatusTag);
+            buffList?.RemoveBuffsWithStatusTag(this, aStatusTag);
             FlagForRefresh();
         }
 
         public bool HasStatusTag(string aStatusTag)
         {
             ThreadAffinity.AssertSimThread();
-            return buffList.HasStatusTag(aStatusTag);
+            return buffList?.HasStatusTag(aStatusTag) ?? false;
         }
 
         public float VisualOpacity
@@ -65,20 +65,26 @@ namespace Project_1.GameObjects.Entities
             get
             {
                 ThreadAffinity.AssertSimThread();
-                return buffList.GetVisualOpacity();
+                return buffList?.GetVisualOpacity() ?? 1f;
             }
         }
 
         public double GetStatusStatFlat(string aStat)
         {
             ThreadAffinity.AssertSimThread();
-            return buffList.GetStatusFlat(aStat);
+            return buffList?.GetStatusFlat(aStat) ?? 0d;
         }
 
         public double GetStatusStatPercent(string aStat)
         {
             ThreadAffinity.AssertSimThread();
-            return buffList.GetStatusPercent(aStat);
+            return buffList?.GetStatusPercent(aStat) ?? 0d;
+        }
+
+        public void ConsumeBuffStack(Buff aBuff)
+        {
+            ThreadAffinity.AssertSimThread();
+            buffList?.ConsumeStack(aBuff, this);
         }
 
         public void RefreshStatsFromStatusChange()

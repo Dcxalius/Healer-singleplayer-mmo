@@ -53,6 +53,7 @@ namespace Project_1.GameObjects.Spells.Buff
         public string[] StatusTags => effect is StatusEffect status ? status.StatusTags : Array.Empty<string>();
         public bool HasVisualOpacity => effect is StatusEffect status && status.HasVisualOpacity;
         public float VisualOpacity => effect is StatusEffect status ? status.VisualOpacity : 1f;
+        public bool ModifiersScaleWithStacks => effect is not StatusEffect status || status.ModifiersScaleWithStacks;
         public string StackingCategory => effect is StatusEffect status && !string.IsNullOrWhiteSpace(status.StackingCategory)
             ? status.StackingCategory
             : effect.Name;
@@ -71,7 +72,7 @@ namespace Project_1.GameObjects.Spells.Buff
             rank = aSpell.Rank;
             createTime = TimeManager.TotalFrameTime;
             power = aSpell.GetPower(aEffect);
-            count = 1;
+            count = aEffect is StatusEffect status ? status.InitialStackCount : 1;
         }
 
         protected Buff(Entity aCaster, SpellEffect aEffect)
@@ -89,7 +90,7 @@ namespace Project_1.GameObjects.Spells.Buff
         public virtual void Recast(Buff aBuff)
         {
             AssertSimThread();
-            if (MaxStackCount > count) count++;
+            if (MaxStackCount > count) count = Math.Min(MaxStackCount, Math.Max(count + 1, aBuff.Count));
             createTime = TimeManager.TotalFrameTime /*TODO: + a remaider of time so a tick is not lost*/;
                                                     //This is currently handled by periodic reseting tickcounter but that feels clunky, but if above mentioned remainder is added that shouldn't reset anymore
             caster = aBuff.caster;
@@ -123,6 +124,18 @@ namespace Project_1.GameObjects.Spells.Buff
         {
             AssertSimThread();
             return 0;
+        }
+
+        public bool ConsumeStack()
+        {
+            AssertSimThread();
+            if (count <= 0)
+            {
+                return true;
+            }
+
+            count--;
+            return count <= 0;
         }
 
         public bool SameCaster(Entity aCaster) => caster == aCaster;
