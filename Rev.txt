@@ -1,0 +1,3 @@
+Game1, checked and commented. A lot of todos and qs
+ThreadAffinity, check and commented. Only 1 q
+GraphicsManager, A lot of questions, Some todos added, biggest concern is how we handle drawing effects mid batch which is currently pretty bad

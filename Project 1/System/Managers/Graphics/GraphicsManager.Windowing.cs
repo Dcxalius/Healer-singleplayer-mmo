@@ -33,13 +33,7 @@ namespace Project_1.Managers
         {
             ThreadAffinity.AssertMainThread();
 
-            cursorClipRect.Location = gameWindow.Position;
-            //Monogame rect is left, top, width, height but Windows API is left, top, right, bottom hence we add the size to the location to get the right and bottom values.
-            cursorClipRect.Size = gameWindow.ClientBounds.Size + cursorClipRect.Location;
-            if (isWindows && ApplicationIsActivated())
-            {
-                ClipCursor(ref cursorClipRect);
-            }
+            ClipCursor();
 
             if (!pendingWindowSizeChange || !ThreadAffinity.IsMainThread) return;
 
@@ -54,6 +48,17 @@ namespace Project_1.Managers
             }
 
             ApplyWindowSize(size, mode);
+        }
+
+        static void ClipCursor()
+        {
+            cursorClipRect.Location = gameWindow.Position;
+            //Monogame rect is left, top, width, height but Windows API is left, top, right, bottom hence we add the size to the location to get the right and bottom values.
+            cursorClipRect.Size = gameWindow.ClientBounds.Size + cursorClipRect.Location;
+            if (isWindows && ApplicationIsActivated())
+            {
+                ClipCursor(ref cursorClipRect);
+            }
         }
 
         public static void SetWindowSize(Point aSize, CameraSettings.WindowType aFullscreen)
@@ -74,30 +79,50 @@ namespace Project_1.Managers
 
         static void ApplyWindowSize(Point aSize, CameraSettings.WindowType aFullscreen)
         {
-            Point appliedSize;
-            Rectangle renderTargetDestination;
+            SetExternalWindowSize(aSize, aFullscreen, out Point appliedSize, out Rectangle renderTargetDestination);
+            SetFullScreen(aFullscreen);
+
+            graphicsDeviceManager.ApplyChanges();
+            SetInternals(appliedSize, renderTargetDestination);
+        }
+
+        static void SetInternals(Point aSize, Rectangle aRenderTargetDestination)
+        {
+
+            Camera.Camera.SetWindowSize(new AbsoluteScreenPosition(aSize));
+            MailboxManager.PublishUiEvent(new HudRescaleRequested(aSize));
+            PublishWindowLayoutChanged(aSize, aRenderTargetDestination);
+            uncapturedScissorRect = graphicsDeviceManager.GraphicsDevice.ScissorRectangle;
+            graphicsDeviceManager.GraphicsDevice.ScissorRectangle = uncapturedScissorRect;
+        }
+
+        static void SetExternalWindowSize(Point aSize, CameraSettings.WindowType aFullscreen, out Point oAppliedSize, out Rectangle oRenderTargetDestination)
+        {
             if (aFullscreen == CameraSettings.WindowType.Fullscreen)
             {
-                appliedSize = NormalizeFullscreenSize(aSize);
-                graphicsDeviceManager.PreferredBackBufferWidth = appliedSize.X;
-                graphicsDeviceManager.PreferredBackBufferHeight = appliedSize.Y;
-                renderTargetDestination = new Rectangle(Point.Zero, appliedSize);
+                oAppliedSize = NormalizeFullscreenSize(aSize);
+                graphicsDeviceManager.PreferredBackBufferWidth = oAppliedSize.X;
+                graphicsDeviceManager.PreferredBackBufferHeight = oAppliedSize.Y;
+                oRenderTargetDestination = new Rectangle(Point.Zero, oAppliedSize);
             }
             else if (aFullscreen == CameraSettings.WindowType.Borderless)
             {
-                appliedSize = CurrentDisplayModeSize;
-                graphicsDeviceManager.PreferredBackBufferWidth = appliedSize.X;
-                graphicsDeviceManager.PreferredBackBufferHeight = appliedSize.Y;
-                renderTargetDestination = new Rectangle(Point.Zero, appliedSize);
+                oAppliedSize = CurrentDisplayModeSize;
+                graphicsDeviceManager.PreferredBackBufferWidth = oAppliedSize.X;
+                graphicsDeviceManager.PreferredBackBufferHeight = oAppliedSize.Y;
+                oRenderTargetDestination = new Rectangle(Point.Zero, oAppliedSize);
             }
             else
             {
-                appliedSize = NormalizeAllowedSize(aSize);
-                graphicsDeviceManager.PreferredBackBufferWidth = appliedSize.X;
-                graphicsDeviceManager.PreferredBackBufferHeight = appliedSize.Y;
-                renderTargetDestination = new Rectangle(Point.Zero, appliedSize);
+                oAppliedSize = NormalizeAllowedSize(aSize);
+                graphicsDeviceManager.PreferredBackBufferWidth = oAppliedSize.X;
+                graphicsDeviceManager.PreferredBackBufferHeight = oAppliedSize.Y;
+                oRenderTargetDestination = new Rectangle(Point.Zero, oAppliedSize);
             }
+        }
 
+        static void SetFullScreen(CameraSettings.WindowType aFullscreen)
+        {
             switch (aFullscreen)
             {
                 case CameraSettings.WindowType.Fullscreen:
@@ -115,13 +140,6 @@ namespace Project_1.Managers
             }
 
             fullscreen = aFullscreen != CameraSettings.WindowType.Windowed;
-            graphicsDeviceManager.ApplyChanges();
-
-            Camera.Camera.SetWindowSize(new Camera.AbsoluteScreenPosition(appliedSize));
-            MailboxManager.PublishUiEvent(new HudRescaleRequested(appliedSize));
-            PublishWindowLayoutChanged(appliedSize, renderTargetDestination);
-            uncapturedScissorRect = graphicsDeviceManager.GraphicsDevice.ScissorRectangle;
-            graphicsDeviceManager.GraphicsDevice.ScissorRectangle = uncapturedScissorRect;
         }
 
         static Point NormalizeAllowedSize(Point aSize)
@@ -159,6 +177,7 @@ namespace Project_1.Managers
 
         static Rectangle GetRenderTargetDestination(Point resolution, int preferredBackBufferWidth, int preferredBackBufferHeight)
         {
+            //Q: What is/was this for? Why isnt is used?
             float resolutionRatio = (float)resolution.X / resolution.Y;
             Point bounds = new Point(preferredBackBufferWidth, preferredBackBufferHeight);
             float screenRatio = (float)bounds.X / bounds.Y;
@@ -229,7 +248,9 @@ namespace Project_1.Managers
                 return activeProcId == procId;
             }
 
-            if (game != null)
+            //TODO: Implement other platforms
+
+            if (game != null) //Q: Is there a scenario where game could be null at this point? If not, should we throw an exception instead of just returning true?
             {
                 return game.IsActive;
             }

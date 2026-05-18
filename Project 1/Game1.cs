@@ -45,11 +45,6 @@ namespace Project_1
 
         protected override void Initialize()
         {
-
-            //DEBUG
-
-            
-
             if (DebugManager.Mode(DebugMode.InstantlyContinue))
             {
                 MailboxManager.PublishSimCommand(new Messaging.Events.ContinueLastSaveRequested());
@@ -59,6 +54,7 @@ namespace Project_1
 
         protected override void LoadContent()
         {
+            //Q: Should anything else be loaded here? What are the benefits using this vs just initing?
             DebugManager.LoadContent();
             //GraphicsManager.LoadContent(Content);
         }
@@ -70,6 +66,26 @@ namespace Project_1
 
             GraphicsManager.Update();
             InputManager.Update();
+
+            PulseUiThread();
+            UpdateSimThread();
+            UpdateUiThread();
+
+            //TODO: Investigate if this is actually wanted
+            //if (StateManager.CurrentState != StateManager.States.Game)
+            //{
+            //    ParticleManager.Update();
+            //    FloatingTextManager.Update();
+            //}
+
+            SaveManager.ProcessPendingScreenshots();
+            DebugManager.ProcessPendingPerlinNoiseExports();
+
+            base.Update(gameTime);
+        }
+
+        void PulseUiThread()
+        {
             if (UiThread.IsRunning)
             {
                 UiThread.PulseAndWait(true);
@@ -79,6 +95,10 @@ namespace Project_1
                 // Single-thread mode: process UI input before sim update.
                 MailboxManager.Ui.DispatchAll();
             }
+        }
+
+        void UpdateSimThread()
+        {
             if (!SimThread.IsRunning)
             {
                 MailboxManager.Main.DispatchAll();
@@ -88,6 +108,10 @@ namespace Project_1
                 MailboxManager.Sim.DispatchAll();
                 DebugManager.Update();
             }
+        }
+
+        void UpdateUiThread()
+        {
             if (!UiThread.IsRunning)
             {
                 if (SimThread.IsRunning)
@@ -110,15 +134,6 @@ namespace Project_1
                     HUDManager.BuildDrawLists();
                 }
             }
-            if (StateManager.CurrentState != StateManager.States.Game)
-            {
-                ParticleManager.Update();
-                FloatingTextManager.Update();
-            }
-            SaveManager.ProcessPendingScreenshots();
-            DebugManager.ProcessPendingPerlinNoiseExports();
-
-            base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -134,7 +149,7 @@ namespace Project_1
 
                 base.Draw(gameTime);
             }
-            finally
+            finally //Q: Why is this necessary?
             {
                 Camera.Camera.EndMainThreadRenderFrame();
             }
@@ -160,7 +175,12 @@ namespace Project_1
         {
             ThreadAffinity.InitMainThread();
             ThreadAffinity.AssertMainThread();
-            MailboxManager.InitMainThread();
+            MailboxManager.Init();
+
+            //TODO: This should be properly sorted and organized.
+            //Dependencies should be noted
+            //Most of these don't have dependencies, but some do and it would be good to have that be clear.
+            //Inits where there is no dependency should be in a method that is called before any of the others, to make it clear that there are no dependencies.
             GraphicsManager.Init();
             SaveManager.Init();
             DebugManager.Init();

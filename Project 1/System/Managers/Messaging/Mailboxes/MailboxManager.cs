@@ -48,7 +48,7 @@ namespace Project_1.Messaging
             throw new InvalidOperationException($"{publishApi} cannot publish registered sim-command '{typeof(T).Name}'. Use {nameof(PublishSimCommand)}.");
         }
 
-        public static void InitMainThread()
+        public static void Init()
         {
             ThreadAffinity.AssertMainThread();
             _ = Main;
@@ -59,10 +59,20 @@ namespace Project_1.Messaging
 
         static void RegisterDefaultCoalescedTypes()
         {
+            //Q: Why are only these registered here? Should they be registered in their respective systems instead?
+            InitCoalescedUI();
+            InitCoalescedSim();
+        }
+
+        static void InitCoalescedUI()
+        {
             Ui.RegisterCoalescedType<KeyboardSnapshot>();
             Ui.RegisterCoalescedType<KeyBindSnapshot>();
             Ui.RegisterCoalescedType<MouseSnapshot>();
+        }
 
+        static void InitCoalescedSim()
+        {
             Sim.RegisterCoalescedType<KeyboardSnapshot>();
             Sim.RegisterCoalescedType<KeyBindSnapshot>();
             Sim.RegisterCoalescedType<MouseSnapshot>();

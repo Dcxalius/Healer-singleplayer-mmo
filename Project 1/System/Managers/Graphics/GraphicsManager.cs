@@ -17,7 +17,7 @@ namespace Project_1.Managers
         public static Rectangle CurrentRenderTargetDestination => currentRenderTargetDestination;
         public static event Action<Point, Rectangle> WindowLayoutChanged;
         static GameWindow gameWindow;
-        static Microsoft.Xna.Framework.Game game;
+        static Game game;
         static bool initialized;
         static bool hasWindowLayout;
         static Point currentWindowSize;
@@ -29,10 +29,11 @@ namespace Project_1.Managers
             if (initialized) return;
             initialized = true;
             InitializeScissorState();
-            //Mouse.SetCursor(MouseCursor.FromTexture2D(Content.Load<Texture2D>(PATH_TO_IMAGE), 0, 0));
+            //TODO: Load custom cursor textures and set up a custom cursor system. //Q: How should custom cursors be changed?
+            //TODO: Set mouse to custom cursor and hide system cursor
         }
 
-        public static void SetManager(Microsoft.Xna.Framework.Game aGame)
+        public static void SetManager(Game aGame)
         {
             ThreadAffinity.AssertMainThread();
             graphicsDeviceManager = new GraphicsDeviceManager(aGame);
@@ -41,7 +42,6 @@ namespace Project_1.Managers
             graphicsAdapter = GraphicsAdapter.DefaultAdapter;
             gameWindow = aGame.Window;
             game = aGame;
-
         }
 
         static void PublishWindowLayoutChanged(Point windowSize, Rectangle renderTargetDestination)
@@ -56,7 +56,7 @@ namespace Project_1.Managers
         {
             get
             {
-                if (graphicsAdapter == null) return Point.Zero;
+                if (graphicsAdapter == null) return Point.Zero; //Q: Is this even possible? And if so shouldn't we throw an exception instead?
                 return new Point(graphicsAdapter.CurrentDisplayMode.Width, graphicsAdapter.CurrentDisplayMode.Height);
             }
         }
@@ -65,6 +65,13 @@ namespace Project_1.Managers
         {
             if (graphicsAdapter == null) return Array.Empty<Point>();
 
+            List<Point> sizes = GetDisplaySizes();
+            sizes.Sort(SizeComparerer);
+            return sizes.ToArray();
+        }
+
+        static List<Point> GetDisplaySizes()
+        {
             List<Point> sizes = new List<Point>();
             foreach (DisplayMode displayMode in graphicsAdapter.SupportedDisplayModes)
             {
@@ -73,20 +80,20 @@ namespace Project_1.Managers
                 sizes.Add(size);
             }
 
-            sizes.Sort((a, b) =>
-            {
-                long areaA = (long)a.X * a.Y;
-                long areaB = (long)b.X * b.Y;
-                int areaComparison = areaB.CompareTo(areaA);
-                if (areaComparison != 0) return areaComparison;
+            return sizes;
+        }
 
-                int widthComparison = b.X.CompareTo(a.X);
-                if (widthComparison != 0) return widthComparison;
-
-                return b.Y.CompareTo(a.Y);
-            });
-
-            return sizes.ToArray();
+        static int SizeComparerer(Point a, Point b)
+        {
+            long areaA = (long)a.X * a.Y;
+            long areaB = (long)b.X * b.Y;
+            int areaComparison = areaB.CompareTo(areaA);
+            if (areaComparison != 0) return areaComparison;
+    
+            int widthComparison = b.X.CompareTo(a.X);
+            if (widthComparison != 0) return widthComparison;
+    
+            return b.Y.CompareTo(a.Y);
         }
     }
 }

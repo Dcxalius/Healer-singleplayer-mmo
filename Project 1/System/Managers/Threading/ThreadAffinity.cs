@@ -6,6 +6,8 @@ namespace Project_1.Managers
     /// <summary>
     /// Centralized thread identity/affinity checks to keep GPU and UI work on their intended threads.
     /// </summary>
+    
+    [DebuggerStepThrough]
     internal static class ThreadAffinity
     {
         static int? mainThreadId;
@@ -20,10 +22,11 @@ namespace Project_1.Managers
         {
             get
             {
+                //Q: Is this purely to catch worker threads touching things that is shouldnt?
                 int current = Environment.CurrentManagedThreadId;
                 if (mainThreadId.HasValue && mainThreadId.Value == current) return true;
                 if (simThreadId.HasValue && simThreadId.Value == current) return true;
-                if (uiThreadId.HasValue && uiThreadId.Value == current) return true;
+                if (uiThreadId.HasValue && uiThreadId.Value == current) return true; 
                 return false;
             }
         }
@@ -44,7 +47,6 @@ namespace Project_1.Managers
             uiThreadId = Environment.CurrentManagedThreadId;
         }
 
-        [DebuggerStepThrough]
         public static void AssertMainThread()
         {
             if (mainThreadId.HasValue && mainThreadId != Environment.CurrentManagedThreadId)
@@ -53,7 +55,6 @@ namespace Project_1.Managers
             }
         }
 
-        [DebuggerStepThrough]
         public static void AssertSimThread()
         {
             if (simThreadId.HasValue && simThreadId != Environment.CurrentManagedThreadId)
@@ -62,7 +63,6 @@ namespace Project_1.Managers
             }
         }
 
-        [DebuggerStepThrough]
         public static void AssertUiThread()
         {
             if (uiThreadId.HasValue && uiThreadId != Environment.CurrentManagedThreadId)
@@ -71,7 +71,6 @@ namespace Project_1.Managers
             }
         }
 
-        [DebuggerStepThrough]
         public static void AssertGameThread()
         {
             if (IsGameThread) return;

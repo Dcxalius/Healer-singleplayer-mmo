@@ -75,7 +75,9 @@ namespace Project_1.Managers
                 draw(spriteBatch);
                 return;
             }
-
+            //TODO: This is too hacky.
+            //The alternatives I can think of in the moment is either drawing the text seperately to a render target before the main draw call. Say whenever text is changed
+            //Alternatively, use a Master shader that has all the effects and use shader parameters to control which effects are active.
             spriteBatch.End();
             spriteBatch.Begin(state.SortMode, state.BlendState, state.SamplerState, state.DepthStencilState, state.RasterizerState, effect, state.TransformMatrix);
             draw(spriteBatch);

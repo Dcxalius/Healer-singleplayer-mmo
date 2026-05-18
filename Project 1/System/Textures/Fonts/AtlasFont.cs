@@ -86,8 +86,10 @@ namespace Project_1.Textures
             Effect effect = TextureManager.MsdfTextEffect;
             if (effect != null)
             {
+                //Q: Should these parameters be cached in an effect per AtlasFont instance to avoid setting them every draw call?   
                 effect.Parameters["TextureSize"]?.SetValue(new Vector2(textureSize.X, textureSize.Y));
                 effect.Parameters["PxRange"]?.SetValue(pxRange);
+                //
                 effect.Parameters["BorderColor"]?.SetValue(aBorderColor.ToVector4());
                 effect.Parameters["BorderWidth"]?.SetValue(aBorderWidth);
             }
@@ -141,6 +143,7 @@ namespace Project_1.Textures
             if (string.IsNullOrEmpty(text) || length <= 0) return Vector2.Zero;
             int end = Math.Min(text.Length, startIndex + length);
             if (startIndex < 0 || startIndex >= end) return Vector2.Zero;
+
 
             float penX = 0f;
             float penY = 0f;

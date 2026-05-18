@@ -21,6 +21,7 @@ namespace Project_1.Managers
             Rectangle r = aRect;
             for (int i = 0; i < scissors.Count; i++)
             {
+                //Q: If this is the desired behaviour, why not just assert that the smaller rect is fully contained within the larger one.
                 r = Rectangle.Intersect(r, scissors[i].rectangle);
             }
 
