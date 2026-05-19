@@ -102,10 +102,27 @@ namespace Project_1.Managers
             if (initialized) return;
             initialized = true;
 
-            modeMask = 0;
-            overlayMask = AllOverlayMask;
+            CreateMasks();
             ImportSettings();
+            InitDebugToggles();
+            CreateConsole();
+        }
 
+        static void CreateMasks()
+        {
+            modeMask = 0;
+            overlayMask = 0;
+        }
+
+        static void CreateConsole()
+        {
+            if (!Mode(DebugMode.Console)) return;
+            
+            AllocConsole();
+        }
+
+        static void InitDebugToggles()
+        {
 #if DEBUG
             SetMode(DebugMode.Print, true);
             SetMode(DebugMode.Teleport, true);
@@ -116,16 +133,6 @@ namespace Project_1.Managers
             SetMode(DebugMode.ModelPreview, true);
             SetMode(DebugMode.DumpPerlinNoisePngs, true);
 #endif
-
-            if (Mode(DebugMode.Console))
-            {
-                AllocConsole();
-            }
-
-            InitializeDiagnosticsSession();
-            AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
-            AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
-            EmitLifecycleSnapshot("STARTUP");
         }
 
         static void ImportSettings()
@@ -152,9 +159,14 @@ namespace Project_1.Managers
                 Volatile.Write(ref overlayMask, importedOverlayMask);
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return false;
+                if (ex is FileNotFoundException || ex is DirectoryNotFoundException)
+                {
+                    Print("Debug settings file not found, using defaults.");
+                    return false;
+                }
+                throw;
             }
         }
 
@@ -175,7 +187,7 @@ namespace Project_1.Managers
             RunStatValidationOnce();
             InventoryCheats();
             TeleportPlayer();
-            ClearDebugShapes();
+            CheckForClearingDebugShapes();
             UpdateOverlayText();
         }
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Project_1.Camera
 {
     [DebuggerStepThrough]
-    internal struct WorldSpace
+    internal struct WorldSpace //Q: Should this still exist since the game is 3D now?
     {
         [JsonProperty]
         Vector2 position;

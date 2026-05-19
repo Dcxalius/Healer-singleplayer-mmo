@@ -30,6 +30,11 @@ namespace Project_1.Camera
 
     internal static class Camera
     {
+        //TODO: This class is a giant mess and needs to be refactored. Probably by butchering and moving into the new camera classes and systems that are being built for the 3D Engine.
+        //It has multiple responsibilities that should be split up.
+        //What does this offer that the new camera classes doesn't? 
+        //And if it offers something useful, can that be refactored into the new camera system instead of maintaining this mess?
+
         sealed class CameraRenderSnapshot
         {
             public CameraRenderSnapshot(WorldSpace centreInWorldSpace, AbsoluteScreenPosition windowSize, float scale, Rectangle worldRectangle, AbsoluteScreenPosition centrePointInScreenSpace)

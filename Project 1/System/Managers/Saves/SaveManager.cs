@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Content;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Project_1.Camera;
@@ -71,13 +71,17 @@ namespace Project_1.Managers
             initialized = true;
             contentRootDirectory = Game1.ContentManager.RootDirectory;
 
-            saveFolder = Path.Combine(contentRootDirectory, "Saves");
 
             InitSaveFolder();
 
+            InitSaves();
+        }
+
+        static void InitSaves()
+        {
             saves = new List<Save>();
             string[] folders = Directory.GetDirectories(saveFolder);
-            lock (savesLock)
+            lock (savesLock) //Q: What could possible race this during init?
             {
                 for (int i = 0; i < folders.Length; i++)
                 {
@@ -164,6 +168,8 @@ namespace Project_1.Managers
 
         static void InitSaveFolder()
         {
+            saveFolder = Path.Combine(contentRootDirectory, "Saves");
+
             if (Directory.Exists(saveFolder)) return;
 
             Directory.CreateDirectory(saveFolder);

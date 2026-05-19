@@ -60,6 +60,7 @@ namespace Project_1.Managers
         public static void LoadContent()
         {
             ThreadAffinity.AssertMainThread();
+            //TODO: This shouldn't use a msdf font as it looking pretty is a very low concern
             fpsText = new Text("Comfortaa-msdf", Color.Chartreuse);
             frameTimeText = new Text("Comfortaa-msdf", Color.Chartreuse);
             totalTimeText = new Text("Comfortaa-msdf", Color.Chartreuse);
@@ -75,6 +76,7 @@ namespace Project_1.Managers
 
         static void UpdateOverlayText()
         {
+            //TODO: Break this up and generalize it, a lot of duplicate code
             if (!Mode(DebugMode.DebugOverlay)) return;
 
             double deltaSeconds = TimeManager.SecondsSinceLastFrame;

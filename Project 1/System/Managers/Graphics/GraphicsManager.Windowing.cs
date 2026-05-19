@@ -35,13 +35,17 @@ namespace Project_1.Managers
 
             ClipCursor();
 
-            if (!pendingWindowSizeChange || !ThreadAffinity.IsMainThread) return;
+            CheckWindowSize();
+        }
+
+        static void CheckWindowSize()
+        {
+            if (!pendingWindowSizeChange) return;
 
             Point size;
             CameraSettings.WindowType mode;
             lock (windowSizeLock)
             {
-                if (!pendingWindowSizeChange) return;
                 size = pendingWindowSize;
                 mode = pendingWindowMode;
                 pendingWindowSizeChange = false;

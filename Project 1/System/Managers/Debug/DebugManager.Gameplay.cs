@@ -31,7 +31,7 @@ namespace Project_1.Managers
             pendingDebugShapes.Enqueue(aShape);
         }
 
-        static void ClearDebugShapes()
+        static void CheckForClearingDebugShapes()
         {
             if (!KeyBindStateCache.GetPress(KeyBindManager.KeyListner.DebugDeleteShapes)) return;
             clearDebugShapesRequested = true;
@@ -59,7 +59,7 @@ namespace Project_1.Managers
                 new GfxPath(GfxType.UI, "GrayBackground"),
                 new RelativeScreenPosition(0.5f) - dialogueBoxSize / 2,
                 dialogueBoxSize,
-                "Close"));
+                "Close")); //TODO: This should be removed at some point but only place that currently uses DialogueBoxes so it stays for now
 
             ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("ZweiHander"), 1));
             ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("Axe"), 1));
@@ -81,12 +81,12 @@ namespace Project_1.Managers
             ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("thrd"), 1));
             ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("FORSTA"), 1));
             ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("Andra"), 1));
-            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("tredg"), 1));
+            ObjectManager.Player.Inventory.AddItem(ItemFactory.CreateItem(ItemFactory.GetItemData("tredg"), 1)); //TODO: Ponder if this should be handled another way, fine for now though
         }
 
         static void SpawnHealthPotion()
         {
-            if (!KeyBindStateCache.GetPress(KeyBindManager.KeyListner.DebugHealthPotion)) return;
+            if (!KeyBindStateCache.GetPress(KeyBindManager.KeyListner.DebugHealthPotion)) return; //TODO: This should be removed and handled by chat system instead
 
             Item hpPot = ItemFactory.CreateItem(ItemFactory.GetItemData("Health Potion"), 1);
             ObjectManager.Player.Inventory.AddItem(hpPot);
@@ -94,7 +94,7 @@ namespace Project_1.Managers
 
         static void SpawnManaPotion()
         {
-            if (!KeyBindStateCache.GetPress(KeyBindManager.KeyListner.DebugManaPotion)) return;
+            if (!KeyBindStateCache.GetPress(KeyBindManager.KeyListner.DebugManaPotion)) return;//TODO: This should be removed and handled by chat system instead
 
             Item mpPot = ItemFactory.CreateItem(ItemFactory.GetItemData("Mana Potion"), 1);
             ObjectManager.Player.Inventory.AddItem(mpPot);
@@ -111,45 +111,48 @@ namespace Project_1.Managers
         public static void Draw(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();
-            bool drawShapes = Mode(DebugMode.DebugShapes);
-            bool drawOverlay = Mode(DebugMode.DebugOverlay);
+            DrawShapes(aBatch);
+            DrawOverlay(aBatch);
+        }
 
-            if (!drawShapes && !drawOverlay) return;
-
-            if (drawShapes)
+        static void DrawShapes(SpriteBatch aBatch)
+        {
+            if (!Mode(DebugMode.DebugShapes)) return; 
+            
+            if (clearDebugShapesRequested)
             {
-                if (clearDebugShapesRequested)
-                {
-                    debugShapes.Clear();
-                    clearDebugShapesRequested = false;
-                    while (pendingDebugShapes.TryDequeue(out _)) { }
-                }
-
-                while (pendingDebugShapes.TryDequeue(out DebugShape pending))
-                {
-                    debugShapes.Add(pending);
-                }
-
-                for (int i = 0; i < debugShapes.Count; i++)
-                {
-                    debugShapes[i].Draw(aBatch);
-                }
+                debugShapes.Clear();
+                clearDebugShapesRequested = false;
+                while (pendingDebugShapes.TryDequeue(out _)) { }
             }
 
-            if (drawOverlay)
+            while (pendingDebugShapes.TryDequeue(out DebugShape pending))
             {
-                AbsoluteScreenPosition cursor = debugTextOrigin;
-                DrawOverlayInfo(aBatch, fpsText, DebugOverlayInfo.Fps, ref cursor);
-                DrawOverlayInfo(aBatch, frameTimeText, DebugOverlayInfo.FrameTime, ref cursor);
-                DrawOverlayInfo(aBatch, totalTimeText, DebugOverlayInfo.TotalTime, ref cursor);
-                DrawOverlayInfo(aBatch, mailboxText, DebugOverlayInfo.MailboxQueue, ref cursor);
-                DrawOverlayInfo(aBatch, dispatchText, DebugOverlayInfo.MailboxDispatch, ref cursor);
-                DrawOverlayInfo(aBatch, workerText, DebugOverlayInfo.Worker, ref cursor);
-                DrawOverlayInfo(aBatch, screenshotText, DebugOverlayInfo.ScreenshotQueue, ref cursor);
-                DrawOverlayInfo(aBatch, simThreadText, DebugOverlayInfo.SimThread, ref cursor);
-                DrawOverlayInfo(aBatch, uiThreadText, DebugOverlayInfo.UiThread, ref cursor);
-                DrawOverlayInfo(aBatch, renderSyncText, DebugOverlayInfo.RenderSync, ref cursor);
+                debugShapes.Add(pending);
             }
+
+            for (int i = 0; i < debugShapes.Count; i++)
+            {
+                debugShapes[i].Draw(aBatch);
+            }
+            
+        }
+
+        static void DrawOverlay(SpriteBatch aBatch)
+        {
+            if (!Mode(DebugMode.DebugOverlay)) return;
+            
+            AbsoluteScreenPosition cursor = debugTextOrigin;
+            DrawOverlayInfo(aBatch, fpsText, DebugOverlayInfo.Fps, ref cursor);
+            DrawOverlayInfo(aBatch, frameTimeText, DebugOverlayInfo.FrameTime, ref cursor);
+            DrawOverlayInfo(aBatch, totalTimeText, DebugOverlayInfo.TotalTime, ref cursor);
+            DrawOverlayInfo(aBatch, mailboxText, DebugOverlayInfo.MailboxQueue, ref cursor);
+            DrawOverlayInfo(aBatch, dispatchText, DebugOverlayInfo.MailboxDispatch, ref cursor);
+            DrawOverlayInfo(aBatch, workerText, DebugOverlayInfo.Worker, ref cursor);
+            DrawOverlayInfo(aBatch, screenshotText, DebugOverlayInfo.ScreenshotQueue, ref cursor);
+            DrawOverlayInfo(aBatch, simThreadText, DebugOverlayInfo.SimThread, ref cursor);
+            DrawOverlayInfo(aBatch, uiThreadText, DebugOverlayInfo.UiThread, ref cursor);
+            DrawOverlayInfo(aBatch, renderSyncText, DebugOverlayInfo.RenderSync, ref cursor);
         }
     }
 }

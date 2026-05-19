@@ -1,3 +1,16 @@
 Game1, checked and commented. A lot of todos and qs
 ThreadAffinity, check and commented. Only 1 q
 GraphicsManager, A lot of questions, Some todos added, biggest concern is how we handle drawing effects mid batch which is currently pretty bad
+SaveManager, this file is a distaster on multiple levels. Need to review this when more brainpower is available. Alert if this hasnt been reviewed again
+DebugManager, removed old exception handling since the vs one works again, mostly questions about how we handle writing debug
+ThreadingSettings, checked
+RandomManager, checked and commented. Most pressing concerns are the locks and that each type of random generation should have seperate seeds
+TimeManager, checked. Only real concern is we currently never save the time.
+
+Camera.Camera, a big TODO at the start explains what is wrong
+
+WorldSpace, check. Should that still exist?
+
+Unrelated bug: Left dragging + esc into release leaves the camera stuck at an offangle. 
+
+Unrelated note: Fps should be uncapped and a setting for fps cap should be added

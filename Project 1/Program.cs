@@ -9,18 +9,10 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
-        try
-        {
-            ThreadAffinity.InitMainThread();
+        ThreadAffinity.InitMainThread();
 
-            using var game = new Game1();
-            game.Run();
-            return 0;
-        }
-        catch (Exception ex)
-        {
-            DebugManager.ReportFatalException(ex, "Program.Main");
-            throw;
-        }
+        using var game = new Game1();
+        game.Run();
+        return 0;
     }
 }
