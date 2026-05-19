@@ -7,7 +7,7 @@ ThreadingSettings, checked
 RandomManager, checked and commented. Most pressing concerns are the locks and that each type of random generation should have seperate seeds
 TimeManager, checked. Only real concern is we currently never save the time.
 
-Camera.Camera, a big TODO at the start explains what is wrong
+Camera.Camera, a big TODO at the start explains what is wrong	
 
 WorldSpace, check. Should that still exist?
 
