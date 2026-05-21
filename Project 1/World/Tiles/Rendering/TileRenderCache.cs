@@ -30,6 +30,8 @@ namespace Project_1.Tiles
             ThreadAffinity.AssertSimThread();
             if (chunk == null) return;
             if (!publishedMinimapIds.Add(chunk.Id)) return;
+            //TODO: Calculate the size of each chunk's minimap based on its actual dimensions on the minimap, not just the max chunk size. If the minimap is zoomed out and only 4 pixels are visible we are doing a lot of unnecessary work here.
+            //TODO: Rather than calculate this per render, we should calculate and store the top values for each chunk and only update them when the chunk changes
 
             Color[] colors = new Color[Chunk.ChunkSize.X * Chunk.ChunkSize.Y];
             chunk.FillMinimapColors(colors);

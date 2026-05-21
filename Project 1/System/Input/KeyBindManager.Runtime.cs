@@ -1,5 +1,6 @@
 using Project_1.Managers;
 using System;
+using System.Linq;
 
 namespace Project_1.Input
 {
@@ -55,22 +56,9 @@ namespace Project_1.Input
 
         public static bool CheckForNoDupeKeys(KeySet aKeySet)
         {
-            for (int i = 0; i < firstButtons.Length; i++)
-            {
-                if (firstButtons[i].Equals(aKeySet))
-                {
-                    return false;
-                }
-            }
+            //TODO: Consider complexing this, what keys can be doubled?
 
-            for (int i = 0; i < secondButtons.Length; i++)
-            {
-                if (secondButtons[i].Equals(aKeySet))
-                {
-                    return false;
-                }
-            }
-
+            if (firstButtons.Contains(aKeySet) || secondButtons.Contains(aKeySet)) return false;
             return true;
         }
     }

@@ -292,7 +292,7 @@ namespace Project_1.Managers
                 return;
             }
 
-            Chunk[] chunks = TileManager.GetChunksSnapshot();
+            Chunk[] chunks = TileManager.GetChunks();
             if (chunks.Length == 0)
             {
                 PublishChatSystemMessage("No chunks are currently generated.");

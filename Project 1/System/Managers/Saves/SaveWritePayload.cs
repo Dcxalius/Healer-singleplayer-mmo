@@ -44,7 +44,7 @@ namespace Project_1.Managers.Saves
             payload.PlayerData = ObjectFactory.PlayerData;
             payload.PlayerData?.CaptureSaveState();
             payload.GuildData = ObjectFactory.GetGuildDataSnapshot();
-            payload.Chunks = TileManager.GetChunksSnapshot();
+            payload.Chunks = TileManager.GetChunks();
             payload.Corpses = CorpseManager.GetSnapshot();
             SpawnerManager.GetSaveSnapshot(out SpawnZone[] zones, out SavedMobData[] mobs);
             payload.SpawnZones = zones;

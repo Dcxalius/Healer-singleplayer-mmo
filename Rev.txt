@@ -6,10 +6,10 @@ DebugManager, removed old exception handling since the vs one works again, mostl
 ThreadingSettings, checked
 RandomManager, checked and commented. Most pressing concerns are the locks and that each type of random generation should have seperate seeds
 TimeManager, checked. Only real concern is we currently never save the time.
-
 Camera.Camera, a big TODO at the start explains what is wrong	
-
 WorldSpace, check. Should that still exist?
+Keybind, checked. Only a TODO in runtime.
+TileManager, NOT FINISHED KEEP GOING HERE
 
 Unrelated bug: Left dragging + esc into release leaves the camera stuck at an offangle. 
 

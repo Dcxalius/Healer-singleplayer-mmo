@@ -16,8 +16,10 @@ namespace Project_1.Tiles
     {
         public static void Update()
         {
+            //TODO: Break this up
             ThreadAffinity.AssertSimThread();
-            const int surroundingChunkCheckSize = 3;
+            const int surroundingChunkCheckSize = 3; //TODO: This should be based on render distance, which should be an option available to the player
+                                                     //Q: Should this instead be a single side? As in 3 => 1 (surroundingChunkCheckSize - 1) / 2?
             Debug.Assert(surroundingChunkCheckSize % 2 == 1);
             const int maxQueuedPrefetch = 4;
             int centreChunkId = ChunkAddressing.GetChunkId(
@@ -39,7 +41,7 @@ namespace Project_1.Tiles
                 }
             }
 
-            if (WorkerPool.IsRunning)
+            if (WorkerPool.IsRunning) //TODO: If we are keeping the single threaded fallback we need to do something other than just skipping fetching here.
             {
                 for (int x = -prefetchRadius; x <= prefetchRadius && queuedPrefetch < maxQueuedPrefetch; x++)
                 {

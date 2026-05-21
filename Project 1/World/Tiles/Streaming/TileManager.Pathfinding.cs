@@ -6,7 +6,7 @@ namespace Project_1.Tiles
 {
     internal static partial class TileManager
     {
-        static Path GeneratePathThreadSafe(WorldSpace aStartPosition, WorldSpace aTargetPosition, WorldSpace aSize)
+        static Path GeneratePath(WorldSpace aStartPosition, WorldSpace aTargetPosition, WorldSpace aSize)
         {
             chunkLock.EnterReadLock();
             try
@@ -32,11 +32,11 @@ namespace Project_1.Tiles
 
             if (!WorkerPool.IsRunning)
             {
-                Complete(GeneratePathThreadSafe(aStartPosition, aTargetPosition, aSize));
+                Complete(GeneratePath(aStartPosition, aTargetPosition, aSize));
                 return;
             }
 
-            WorkerPool.Enqueue(() => GeneratePathThreadSafe(aStartPosition, aTargetPosition, aSize), Complete);
+            WorkerPool.Enqueue(() => GeneratePath(aStartPosition, aTargetPosition, aSize), Complete);
         }
     }
 }

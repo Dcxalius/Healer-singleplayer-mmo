@@ -9,6 +9,7 @@ namespace Project_1.Tiles
     {
         static void UpdateChunkDoodads()
         {
+            //TODO: Rather than doing this, each chunk should keep track of its own doodads and update should be called on chunk basis
             chunkLock.EnterReadLock();
             try
             {
@@ -27,6 +28,7 @@ namespace Project_1.Tiles
         {
             ThreadAffinity.AssertSimThread();
             doodad = null;
+            //Q: Rather than locking, since the main thread is the one that resolves click, shouldn't this data just be sent as part of the render snapshot and then the main thread can resolve the click without needing to lock?
             chunkLock.EnterReadLock();
             try
             {
@@ -47,6 +49,7 @@ namespace Project_1.Tiles
 
         public static bool TryGetDoodadByRenderId(int renderId, out Doodad doodad)
         {
+            //Q: Rather than locking, since the main thread is the one that resolves click, shouldn't this data just be sent as part of the render snapshot and then the main thread can resolve the click without needing to lock?
             ThreadAffinity.AssertSimThread();
             doodad = null;
             chunkLock.EnterReadLock();
@@ -68,6 +71,7 @@ namespace Project_1.Tiles
 
         internal static void DrawDoodadSnapshots(SpriteBatch aBatch)
         {
+            //Q: Should this be inside chunks? Very possible it should not, either way this should probably not be in TileManager
             ThreadAffinity.AssertMainThread();
             chunkLock.EnterReadLock();
             try
