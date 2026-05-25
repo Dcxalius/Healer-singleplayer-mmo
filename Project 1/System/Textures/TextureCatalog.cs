@@ -7,6 +7,8 @@ namespace Project_1.Textures
 {
     internal static class TextureCatalog
     {
+        //Q: Unsure what the purpose of this is, since the things in it are dupes of whats in texturemanager?
+        //Should this be where we store all texture info, including the textures themselves once they are loaded?
         static Dictionary<string, Point>[] sizes;
         static Dictionary<string, Color>[] avgColors;
         static bool initialized;

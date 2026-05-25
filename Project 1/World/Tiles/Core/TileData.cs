@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using Project_1.Textures;
 using System;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Project_1.Tiles
 {
-    internal class TileData : IComparable<TileData>
+    internal class TileData : IComparable<TileData> //TODO: Change name
     {
         static readonly Point tileVisibleSize = Tile.Size;
         public int ID => id;
@@ -26,7 +26,7 @@ namespace Project_1.Tiles
         [JsonIgnore]
         internal Texture Texture => texture;
         [JsonIgnore]
-        readonly Texture texture;
+        readonly Texture texture; //TODO: Currently the same texture is used for all sides, we should have the option to specify different textures for each side
         [JsonIgnore]
         readonly GfxPath texturePath;
         [JsonIgnore]
@@ -54,12 +54,18 @@ namespace Project_1.Tiles
             this.dragCoeficient = dragCoeficient;
             this.transparent = transparent;
             texturePath = new GfxPath(GfxType.Tile, name);
-            texture = new Texture(texturePath, tileVisibleSize);
+            texture = new Texture(texturePath, tileVisibleSize); //TODO: Currently each 
             textureSheetSize = TextureCatalog.GetSize(texturePath);
         }
 
+        /// <summary>
+        /// Uses the hash of the tiles id and position to generate a consistent random offset for the tile's texture. This allows us to have some variation in the appearance of tiles without needing to create separate textures for each variation.
+        /// </summary>
+        /// <param name="worldTile"></param>
+        /// <returns></returns>
         internal Point GetRandomTextureOffset(Point worldTile)
         {
+            //TODO: Ponder if we should do more to create variation, like rotation of the texture or flipping it.
             int maxOffsetX = Math.Max(0, textureSheetSize.X - tileVisibleSize.X);
             int maxOffsetY = Math.Max(0, textureSheetSize.Y - tileVisibleSize.Y);
             if (maxOffsetX == 0 && maxOffsetY == 0) return Point.Zero;
@@ -75,7 +81,7 @@ namespace Project_1.Tiles
             return texture.BuildRenderSnapshot(new Rectangle(textureOffset, tileVisibleSize));
         }
 
-        static int PositiveModulo(int value, int modulo)
+        static int PositiveModulo(int value, int modulo) //TODO: Move this to a math utility class if we need it anywhere else
         {
             int result = value % modulo;
             return result < 0 ? result + modulo : result;

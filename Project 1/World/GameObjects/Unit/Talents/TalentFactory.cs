@@ -87,6 +87,7 @@ namespace Project_1.World.GameObjects.Unit.Talents
                 list.Add(BuildTalent(data));
             }
 
+            //TODO: This should throw if multiple ids are found; DuplicateIDException
             list.Sort((a, b) => a.Id.CompareTo(b.Id));
             talents = list.ToArray();
         }
@@ -106,7 +107,7 @@ namespace Project_1.World.GameObjects.Unit.Talents
                 foreach (TalentTreeData data in treeArray)
                     list.Add(BuildTalentTree(data));
             }
-
+            //TODO: This should throw if multiple ids are found; DuplicateIDException
             list.Sort((a, b) => a.Id.CompareTo(b.Id));
             talentTrees = list.ToArray();
         }
@@ -115,46 +116,26 @@ namespace Project_1.World.GameObjects.Unit.Talents
 
         static Talent BuildTalent(TalentData data)
         {
-            (int id, int amount)[] required = data.Required?
-                .Select(r => (r.Id, r.Amount))
-                .ToArray()
-                ?? Array.Empty<(int, int)>();
+            (int id, int amount)[] required = data.Required?.Select(r => (r.Id, r.Amount)).ToArray() ?? Array.Empty<(int, int)>();
 
-            List<((TalentChange change, float amount, bool flat)[] changes, int spellDataId)> changes = data.SpellChanges?
-                .Select(sc => (
-                    sc.Changes.Select(c => (c.Change, c.Amount, c.Flat)).ToArray(),
-                    sc.SpellDataId
-                ))
-                .ToList()
-                ?? new List<((TalentChange, float, bool)[], int)>();
+            List<((TalentChange change, float amount, bool flat)[] changes, int spellDataId)> changes = data.SpellChanges?.Select(sc => (sc.Changes.Select(c => (c.Change, c.Amount, c.Flat)).ToArray(),sc.SpellDataId)).ToList() ?? new List<((TalentChange, float, bool)[], int)>();
 
-            List<(string stat, float amount, bool flat)> statChanges = data.StatChanges?
-                .Select(sc => (sc.Stat, sc.Amount, sc.Flat))
-                .ToList()
-                ?? new List<(string, float, bool)>();
+            List<(string stat, float amount, bool flat)> statChanges = data.StatChanges?.Select(sc => (sc.Stat, sc.Amount, sc.Flat)).ToList() ?? new List<(string, float, bool)>();
 
             return new Talent(data.Id, data.Name, data.GfxName, data.MaxRank, required, changes, statChanges);
         }
 
         static TalentTree BuildTalentTree(TalentTreeData data)
         {
-            Talent[][] rows = data.Rows
-                .Select(row => row.Select(id => GetTalent(id)).ToArray())
-                .ToArray();
+            Talent[][] rows = data.Rows.Select(row => row.Select(id => GetTalent(id)).ToArray()).ToArray();
 
             return new TalentTree(data.Id, rows, data.Name, data.GfxName);
         }
 
         // ── Queries ───────────────────────────────────────────────────────
 
-        public static Talent GetTalent(int id)
-        {
-            return talents.Single(t => t.Id == id);
-        }
+        public static Talent GetTalent(int id) => talents.Single(t => t.Id == id);
 
-        public static TalentTree GetTalentTree(int id)
-        {
-            return talentTrees.Single(t => t.Id == id);
-        }
+        public static TalentTree GetTalentTree(int id) => talentTrees.Single(t => t.Id == id);
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Newtonsoft.Json;
 using Project_1.DebugTools;
@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 
 namespace Project_1.Tiles
 {
-    internal static class TileFactory
+    internal static class TileFactory //TODO: Rename
     {
-        static TileData[] tileData;
+        static TileData[] tileData; //Q: Is the right data structure to use here?
         static bool initialized;
 
         public static void Init()

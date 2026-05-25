@@ -10,8 +10,11 @@ using System.Threading.Tasks;
 
 namespace Project_1.Tiles
 {
-    internal static partial class TileManager //TODO: This should probably be renamed to ChunkManager
+    internal static partial class TileManager //TODO: This should be renamed to ChunkManager
     {
+        //TODO: Each region should have its own manager.
+        //TODO: We need a way to track what chunks are loaded and send that info only to the main thread for renders.
+        //TODO: Unsure if we should have a seperate update list as well. Allowing for the seperation of loaded and updating chunks and loaded and rendered chunks
         static Dictionary<int, Chunk> chunks;
 
         //Q: These are all related no?
@@ -33,7 +36,7 @@ namespace Project_1.Tiles
         public static CollisionManager CollisionManager;
 
 
-        sealed class ChunkBuildJob
+        sealed class ChunkBuildJob //Q: Should this be in chunks instead?
         {
             public ChunkBuildJob(int epoch)
             {
@@ -56,6 +59,7 @@ namespace Project_1.Tiles
 
         public static Chunk[] GetChunks()
         {
+            //Q: Since chunk should always be loaded on load/new game, is the check needed? Shouldn't it just be an assert if we want to be safe?
             ThreadAffinity.AssertSimThread();
             if (chunks == null || chunks.Count == 0) return Array.Empty<Chunk>();
             return Enumerable.ToArray(chunks.Values);

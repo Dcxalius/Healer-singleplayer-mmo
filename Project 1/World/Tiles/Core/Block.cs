@@ -52,8 +52,11 @@ namespace Project_1.Tiles
         }
     }
 
-    internal sealed class Block
+    internal sealed class Block //TODO: This use use a system similar to Tile and TileData. Everything that is the same for all blocks of a given material should be in a BlockData class, and the Block class should just have a reference to its BlockData and any properties that can vary between blocks of the same material (like elevation and surface data). This will save a lot of memory as currently each block has its own copy of all its properties, even if they are the same as many other blocks. It will also make it easier to change properties of all blocks of a given material at once, and to add new materials without needing to change the Block class. The current implementation is very simple and straightforward, but it is not very efficient or flexible.
     {
+        //TODO: Thinking about if we want blocks to be combination of materials and properties for visual purposes.
+        //TODO: This also helps with construction of structures, like creating a wall that has stone on the outside but wood on the inside.
+        
         public BlockMaterialType Material => material;
         BlockMaterialType material;
 

@@ -114,7 +114,7 @@ namespace Project_1.GameObjects.Entities
 
         static float ResolveSurfaceHeight(WorldSpace aFeetPosition)
         {
-            Chunk chunk = TileManager.GetChunk(aFeetPosition);
+            Chunk chunk = TileManager.GetChunkUnder(aFeetPosition);
             if (chunk == null) return 0f;
 
             Point gridPosition = TileManager.GetGridPos(aFeetPosition);

@@ -20,12 +20,8 @@ namespace Project_1.Items
     internal static class ItemFactory
     {
         //static Dictionary<int, ItemData> itemData;
-        static ItemData[] itemData;
+        static ItemData[] itemData; //TODO: Remember why this is used instead of the above outcommented dict
         static bool initialized;
-
-
-        //static int Id { get => nextId++; }
-        //static int nextId = 0;
 
         public static void Init()
         {

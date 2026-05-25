@@ -8,6 +8,7 @@ namespace Project_1.Tiles
     {
         static Path GeneratePath(WorldSpace aStartPosition, WorldSpace aTargetPosition, WorldSpace aSize)
         {
+            //TODO: Could we bypass locking by creating a copy of the current close chunks that is maintained by pathfinder and only updated when chunks are added/removed? This would allow pathfinding to run without locking the chunk data, but it would require careful management of the copy to ensure it stays up to date.
             chunkLock.EnterReadLock();
             try
             {

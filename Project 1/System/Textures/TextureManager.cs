@@ -16,7 +16,7 @@ namespace Project_1.Textures
         static Dictionary<string, Texture2D>[] texturesDict;
         static Dictionary<string, Point>[] textureSizes;
         static Dictionary<string, Color>[] avgColors;
-        static Dictionary<string, GameFont> fontDict;
+        static Dictionary<string, GameFont> fontDict; //TODO: Currently fonts are hard coded. The player should be able to select what fonts to use for what things
 
         static ContentManager contentManager;
         static bool initialized;
@@ -31,10 +31,10 @@ namespace Project_1.Textures
 
             contentManager = Game1.ContentManager;
             EnsureContentRoot();
-            InitArrays();
+            InitDictionaries();
             InitFonts();
             TextureCatalog.Init(textureSizes, avgColors);
-            MsdfTextEffect = contentManager.Load<Effect>("Effects\\MsdfText");
+            MsdfTextEffect = contentManager.Load<Effect>("Effects\\MsdfText"); //TODO: Hack. Should create an effect manager instead
         }
 
         static void EnsureContentRoot()
@@ -42,16 +42,15 @@ namespace Project_1.Textures
             string currentRoot = Path.Combine(AppContext.BaseDirectory, "Content");
             contentManager.RootDirectory = currentRoot;
 
-            bool hasMsdfText = File.Exists(Path.Combine(currentRoot, "Effects", "MsdfText.xnb"));
+            bool hasMsdfText = File.Exists(Path.Combine(currentRoot, "Effects", "MsdfText.xnb")); //Q: Why are we checking for this specific file? Shouldn't we just check for folder intergrety and if issues are found return a more detailed report?
             if (hasMsdfText) return;
 
             throw new DirectoryNotFoundException(
                 $"Compiled content was not found in the active build output directory '{currentRoot}'.");
         }
 
-        static void InitFonts()
+        static void InitFonts() //TODO: We should probably have a seperate font manager class instead of shoehorning it into the texture manager.
         {
-            //TODO: Move fonts out of proj and into monogame pipeline
             string fontDir = Path.Combine(contentManager.RootDirectory, "Font");
             fontDict = AtlasFontLoader.LoadFonts(fontDir);
             if (!Directory.Exists(fontDir))
@@ -79,8 +78,11 @@ namespace Project_1.Textures
             FontCache.Init(fontDict, FALLBACK_FONT);
         }
 
-        static void LoadRuntimeComfortaa(string fontDir)
+        static void LoadRuntimeComfortaa(string fontDir) //Q: Name??
         {
+            //TODO: Should be moved with the rest of the font loading code to a seperate font manager class instead of shoehorning it into the texture manager.
+            //Should also be renamed to something more descriptive. Maybe LoadFallbackFont or LoadDefaultFont or something like that.
+            //We should also allow for more fonts, and have a set of instructions for the player on how to generate their own seperate msdf fonts using the msdfgen tool, and then load them if they are in the folder
             string ttfPath = Path.Combine(fontDir, "Comfortaa.ttf");
             if (!File.Exists(ttfPath)) return;
 
@@ -98,8 +100,9 @@ namespace Project_1.Textures
             }
         }
 
-        static void InitArrays()
+        static void InitDictionaries() 
         {
+            //TODO: Break this up into smaller methods.
             texturesDict = new Dictionary<string, Texture2D>[(int)GfxType.Count];
             textureSizes = new Dictionary<string, Point>[(int)GfxType.Count];
             avgColors = new Dictionary<string, Color>[(int)GfxType.Count];
@@ -159,6 +162,8 @@ namespace Project_1.Textures
 
         static Color ComputeAvgColor(Texture2D texture)
         {
+            //TODO: Ponder if we should cache this value per texture here instead of relying on the caller to manage that whenever it is called
+            //Q: Should this be remade into a Worker job? Don't think it touches anything that isn't thread safe, and it could be a bit expensive for larger textures, so it might be worth it to do it on a worker thread instead of the main thread.
             Point bounds = texture.Bounds.Size;
             Color[] data = new Color[bounds.X * bounds.Y];
             texture.GetData(data);
@@ -173,7 +178,7 @@ namespace Project_1.Textures
             return avg;
         }
 
-        static string TrimContentFolderAndImageFileExtention(string aPath)
+        static string TrimContentFolderAndImageFileExtention(string aPath) //TODO: Name is a bit wonky but might be ok. Either way should probably not be here and in a more utility place
         {
             string filePath = aPath.Substring(contentManager.RootDirectory.Length + 1);
             return filePath.Substring(0, filePath.Length - 4);
@@ -189,6 +194,10 @@ namespace Project_1.Textures
 
         public static GameFont GetFont(string fontName)
         {
+            //TODO: Make a decision if we should keep the old monogame fonts or if we are confident in our msdf font implementation and just switch to that entirely.
+            //If we keep both we should probably move the font management code to a seperate font manager class instead of shoehorning it into the texture manager.
+            //We should probably keep one font for debug text as msdf is more expensive to render.
+            //If we keep it it shouldn't be in the general font dictionary though, as it is only used for debug text, and we don't want to accidentally use it for regular text and cause performance issues. We could just have a seperate property for the debug font instead of putting it in the general font dictionary.
             if (fontDict == null)
                 throw new InvalidOperationException("TextureManager fonts not initialized.");
 
@@ -210,7 +219,7 @@ namespace Project_1.Textures
                 throw new InvalidOperationException("TextureManager: texturesDict is null. InitArrays() / static ctor did not run.");
 
             int typeIndex = (int)aGfxPath.Type;
-            if (typeIndex < 0 || typeIndex >= texturesDict.Length)
+            if (typeIndex < 0 || typeIndex >= texturesDict.Length) //TODO: I think we can move this check to init and just check vs the enum if all the directories have been found
                 throw new ArgumentOutOfRangeException(nameof(aGfxPath), $"Invalid GfxType index: {typeIndex}");
 
             var dict = texturesDict[typeIndex];
@@ -221,7 +230,7 @@ namespace Project_1.Textures
 
                 var debugDict = texturesDict[(int)GfxType.Debug];
 
-                if (!debugDict.TryGetValue("MissingTexture", out texture))
+                if (!debugDict.TryGetValue("MissingTexture", out texture)) //TODO: Move this check to init as well. If the fallback texture is not loaded we have bigger issues
                     throw new KeyNotFoundException("Fallback texture 'MissingTexture' not found in GfxType.Debug.");
             }
 
@@ -230,12 +239,14 @@ namespace Project_1.Textures
 
         public static Point GetTextureSize(GfxPath aGfxPath)
         {
+            //Q: I think this should probably be depricated. 
             ThreadAffinity.AssertMainThread();
             return TextureCatalog.GetSize(aGfxPath);
         }
 
         public static Color GetAvgColor(GfxPath aGfxPath)
         {
+            //Q: No calls to this. Is it depricated?
             ThreadAffinity.AssertMainThread();
             return TextureCatalog.GetAvgColor(aGfxPath);
         }

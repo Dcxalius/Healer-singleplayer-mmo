@@ -195,6 +195,7 @@ namespace Project_1
             EffectManager.Init();
             TalentFactory.Init();
             ObjectFactory.Init();
+            //u are here
             ItemFactory.Init();
             InventoryCommandRouter.Init();
             ShopCommandRouter.Init();

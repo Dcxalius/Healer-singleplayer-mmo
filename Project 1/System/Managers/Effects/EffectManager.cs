@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
@@ -14,6 +14,8 @@ namespace Project_1.Managers
 {
     internal static class EffectManager
     {
+        //TODO: Collect all the Effects and use them through here instead of live in code 
+
         static Dictionary<string, Effect> effects;
 
         public static Effect GetEffect(string aName)
@@ -35,6 +37,10 @@ namespace Project_1.Managers
 
         public static void EffectDraw()
         {
+            //TODO: Break this up
+            //TODO: Should probably be refactored into a system that handles the entire effects pipeline differently
+            //Possible that entire idea of what was tried should be removed, letting the caller worry about assigning parameters
+            //Assigning parameters is pretty expensive though, so we should probably keep copies of the most called effects and just change the parameters if they are different
             ThreadAffinity.AssertMainThread();
             if (pendingEffects.IsEmpty) return;
 

@@ -10,6 +10,8 @@ namespace Project_1.Tiles
 {
     internal class Chunk : IComparable<Chunk>
     {
+        //TODO: This needs an update to at least pass along to the DoodadManager
+        //TODO: How do we best animate textures? What animations do we want to support?
         static readonly Point TileSize = Tiles.Tile.Size;
         public static readonly Point ChunkSize = new Point(100);
         public const int ChunkHeight = 16;

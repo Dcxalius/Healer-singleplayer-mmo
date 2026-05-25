@@ -16,30 +16,41 @@ namespace Project_1.Tiles
     {
         public static void Update()
         {
-            //TODO: Break this up
             ThreadAffinity.AssertSimThread();
             const int surroundingChunkCheckSize = 3; //TODO: This should be based on render distance, which should be an option available to the player
                                                      //Q: Should this instead be a single side? As in 3 => 1 (surroundingChunkCheckSize - 1) / 2?
             Debug.Assert(surroundingChunkCheckSize % 2 == 1);
-            const int maxQueuedPrefetch = 4;
             int centreChunkId = ChunkAddressing.GetChunkId(
                 (int)MathF.Floor(ObjectManager.Player.FeetPosition.X / Tile.Size.X / Chunk.ChunkSize.X),
                 (int)MathF.Floor(ObjectManager.Player.FeetPosition.Y / Tile.Size.Y / Chunk.ChunkSize.Y));
             Chunk centreChunk = EnsureChunkLoaded(centreChunkId);
             Point centreChunkPos = centreChunk.ChunkPosition;
-            int queuedPrefetch = 0;
             int immediateRadius = surroundingChunkCheckSize / 2;
-            int prefetchRadius = immediateRadius + 1;
 
-            for (int x = -immediateRadius; x <= immediateRadius; x++)
+            EnsureLoaded(centreChunkPos, immediateRadius);
+            PreFetch(centreChunkPos, immediateRadius);
+
+            UpdateChunkDoodads();
+        }
+
+        static void EnsureLoaded(Point aCentreChunkPos, int aImmediateRadius)
+        {
+            for (int x = -aImmediateRadius; x <= aImmediateRadius; x++)
             {
-                for (int y = -immediateRadius; y <= immediateRadius; y++)
+                for (int y = -aImmediateRadius; y <= aImmediateRadius; y++)
                 {
                     if (x == 0 && y == 0) continue;
-                    int newId = ChunkAddressing.GetChunkId(centreChunkPos + new Point(x, y));
+                    int newId = ChunkAddressing.GetChunkId(aCentreChunkPos + new Point(x, y));
                     EnsureChunkLoaded(newId);
                 }
             }
+        }
+
+        static void PreFetch(Point aCentreChunkPos, int aImmediateRadius)
+        {
+            const int maxQueuedPrefetch = 4;
+            int queuedPrefetch = 0;
+            int prefetchRadius = aImmediateRadius + 1;
 
             if (WorkerPool.IsRunning) //TODO: If we are keeping the single threaded fallback we need to do something other than just skipping fetching here.
             {
@@ -47,8 +58,8 @@ namespace Project_1.Tiles
                 {
                     for (int y = -prefetchRadius; y <= prefetchRadius && queuedPrefetch < maxQueuedPrefetch; y++)
                     {
-                        if (Math.Abs(x) <= immediateRadius && Math.Abs(y) <= immediateRadius) continue;
-                        int id = ChunkAddressing.GetChunkId(centreChunkPos + new Point(x, y));
+                        if (Math.Abs(x) <= aImmediateRadius && Math.Abs(y) <= aImmediateRadius) continue;
+                        int id = ChunkAddressing.GetChunkId(aCentreChunkPos + new Point(x, y));
                         if (IsChunkAvailable(id)) continue;
 
                         GetOrQueueChunkBuild(id);
@@ -56,8 +67,6 @@ namespace Project_1.Tiles
                     }
                 }
             }
-
-            UpdateChunkDoodads();
         }
 
         public static void New()
@@ -73,6 +82,7 @@ namespace Project_1.Tiles
 
         public static void Load(Save aSave)
         {
+            //Q: Why is this not called? What is the difference between this and LoadFromChunks? Should we even have both?
             ThreadAffinity.AssertSimThread();
             TileRenderCache.ResetMinimapSnapshotTracking();
             ClearRenderCache();
@@ -108,7 +118,7 @@ namespace Project_1.Tiles
             }
         }
 
-        static ChunkBuildJob GetOrQueueChunkBuild(int chunkId)
+        static ChunkBuildJob GetOrQueueChunkBuild(int chunkId) //Q: Shouldnt this be somewhere else? Like in ChunkBuildJob?
         {
             while (true)
             {
@@ -183,6 +193,7 @@ namespace Project_1.Tiles
 
         static Chunk EnsureChunkLoaded(int chunkId)
         {
+            //TODO: Break this up
             chunkLock.EnterUpgradeableReadLock();
             try
             {

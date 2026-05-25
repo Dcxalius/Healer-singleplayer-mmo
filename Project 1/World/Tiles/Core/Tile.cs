@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Textures;
 using Project_1.GameObjects;
@@ -13,7 +13,7 @@ using Newtonsoft.Json;
 
 namespace Project_1.Tiles
 {
-    internal class Tile
+    internal class Tile //TODO: Depricate and remove this
     {
         public static readonly Point Size = new Point(32, 32);
         [JsonProperty("id")]

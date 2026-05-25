@@ -21,6 +21,7 @@ namespace Project_1.Tiles
 
         internal static void DrawSnapshots()
         {
+            //Q: Should we create a seperate manager for managing the render side?
             ThreadAffinity.AssertMainThread();
             renderChunks.ApplyUpdates();
             WorldBlockRenderer.PrepareFrame();

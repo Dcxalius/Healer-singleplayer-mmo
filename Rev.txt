@@ -1,15 +1,24 @@
-Game1, checked and commented. A lot of todos and qs
-ThreadAffinity, check and commented. Only 1 q
-GraphicsManager, A lot of questions, Some todos added, biggest concern is how we handle drawing effects mid batch which is currently pretty bad
-SaveManager, this file is a distaster on multiple levels. Need to review this when more brainpower is available. Alert if this hasnt been reviewed again
-DebugManager, removed old exception handling since the vs one works again, mostly questions about how we handle writing debug
+Game1; checked and commented. A lot of todos and qs
+ThreadAffinity; check and commented. Only 1 q
+GraphicsManager; A lot of questions, Some todos added, biggest concern is how we handle drawing effects mid batch which is currently pretty bad
+SaveManager!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! this file is a distaster on multiple levels. Need to review this when more brainpower is available. Alert if this hasnt been reviewed again
+DebugManager; removed old exception handling since the vs one works again, mostly questions about how we handle writing debug
 ThreadingSettings, checked
-RandomManager, checked and commented. Most pressing concerns are the locks and that each type of random generation should have seperate seeds
-TimeManager, checked. Only real concern is we currently never save the time.
-Camera.Camera, a big TODO at the start explains what is wrong	
-WorldSpace, check. Should that still exist?
-Keybind, checked. Only a TODO in runtime.
-TileManager, NOT FINISHED KEEP GOING HERE
+RandomManager; checked and commented. Most pressing concerns are the locks and that each type of random generation should have seperate seeds
+TimeManager; checked. Only real concern is we currently never save the time.
+Camera.Camera; a big TODO at the start explains what is wrong	
+WorldSpace, check; Should that still exist?
+Keybind, checked; Only a TODO in runtime.
+TileManager, Tile, Chunk (and more); A lot of work to do in all aspects of the system. Biggest concerns are the renaming and removal of the old tile remnants, the second biggest is move into the new Continent system
+TextureManager; Biggest concern is why is this managing fonts as well, second is the amount of safety checks we do live that could probably be cleaned up and be done during init
+TextureDictonary; Unsure of what the purpose of this class is but could be made into the offical place for textures
+EffectManager; Unsure how this should be changed for now. But at the moment we just call effects ad hoc which is definitly wrong. If nothing else this should at least load them, make sure they are loaded, and hand them out
+TalentFactory; Only thing of note is asserts should be done to ensure duplicate ids aren't a thing
+ObjectFactory; Should be refactored into seperate classes for the different types. The factory shouldn't have to worry about live data and just the objects loaded from files
+ItemFactory; Unsure why we use a list instead of the out commented dict. Also unsure how we should handle fetching by name incase of collitions
+EnchantmentFactory; A weird doulbe load is currently being done
+EquipmentData!!!!!!!!! Start here
+
 
 Unrelated bug: Left dragging + esc into release leaves the camera stuck at an offangle. 
 

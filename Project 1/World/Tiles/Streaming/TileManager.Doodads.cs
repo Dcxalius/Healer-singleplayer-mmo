@@ -89,6 +89,7 @@ namespace Project_1.Tiles
 
         internal static void BuildDoodadRenderSnapshots()
         {
+            //Q: Should this be inside chunks and the chunks having the responsibilty to build their own snapshots?
             ThreadAffinity.AssertSimThread();
             chunkLock.EnterReadLock();
             try

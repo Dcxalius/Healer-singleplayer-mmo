@@ -11,7 +11,7 @@ namespace Project_1.Tiles
     /// Render-side cache for tile-derived GPU resources.
     /// Main-thread only for GPU operations; sim thread prepares data snapshots.
     /// </summary>
-    internal static class TileRenderCache
+    internal static class TileRenderCache //TODO: Change name
     {
         static readonly Dictionary<int, Texture2D> minimapTargets = new Dictionary<int, Texture2D>();
         static readonly ConcurrentQueue<ChunkMinimapSnapshot> pendingMinimapSnapshots = new ConcurrentQueue<ChunkMinimapSnapshot>();
@@ -60,6 +60,7 @@ namespace Project_1.Tiles
             {
                 return cached;
             }
+            //Q: Should this really fail silently? Maybe we should return a placeholder texture or throw an exception?
             return null;
         }
 

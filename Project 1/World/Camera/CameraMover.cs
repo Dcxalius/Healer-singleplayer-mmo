@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Project_1.Input;
 using Project_1.Managers;
 using System;
@@ -522,7 +522,7 @@ namespace Project_1.Camera
 
         float ResolveSurfaceHeight(WorldSpace aFeetPosition)
         {
-            Chunk chunk = TileManager.GetChunk(aFeetPosition);
+            Chunk chunk = TileManager.GetChunkUnder(aFeetPosition);
             if (chunk == null) return 0f;
 
             Point gridPosition = TileManager.GetGridPos(aFeetPosition);

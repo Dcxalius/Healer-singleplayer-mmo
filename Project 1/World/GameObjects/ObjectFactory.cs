@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Content;
 using Newtonsoft.Json;
 using Project_1.Camera;
 using Project_1.GameObjects.Spawners;
@@ -19,8 +19,11 @@ using System.IO;
 
 namespace Project_1.GameObjects
 {
-    internal static class ObjectFactory  //TODO: Split this in two, one to handle static data like classes and one to handle dynamic data
+    internal static class ObjectFactory  
     {
+        //TODO: Split this in two, one to handle static data like classes and one to handle dynamic data
+        //TODO: Should also probably be split into lines along UnitTypes. A PlayerFactory, GuildMemberFactory, PlayerManager, GuildMemberManager etc
+        //That refactor should also rework ObjectManager along similar lines and it's responsibilties broken up by the same logic
         public static PlayerData PlayerData { get => playerData; set => playerData = value; }
 
         static PlayerData playerData;
@@ -31,10 +34,10 @@ namespace Project_1.GameObjects
         //static UnitData defaultData = new UnitData();
 
         static Dictionary<string, FriendlyClassData> playerClassData;
-        static Dictionary<string, FriendlyClassData> allyClassData;
-        static Dictionary<string, MobClassData> mobClassData;
+        static Dictionary<string, FriendlyClassData> guildMemberClassData; //TODO: Check for missed renames
+        static Dictionary<string, MobClassData> npcClassData; //TODO: Check for other references to mob. Should be called npc in the future
 
-        static Dictionary<string, GossipData> gossipData;
+        static Dictionary<string, GossipData> gossipData; //Q: Unsure where this should be in the afformentioned refactor.
 
         static bool initialized;
 
@@ -45,13 +48,14 @@ namespace Project_1.GameObjects
             initialized = true;
             guildData = new List<UnitData>();
             ImportClassData();
-            ImportMobData();
             ImportNpcData();
+            ImportGuildMemberData();
             ImportGossipData();
         }
 
         public static void AddGuildMember(string aName, string aClassName)
         {
+            //TODO: Should be developed further, current implementation is a fine placeholder for now
             ThreadAffinity.AssertSimThread();
             guildData ??= new List<UnitData>();
             UnitData xdd = new UnitData(aName, "", aClassName, Relation.RelationToPlayer.Friendly, 1, 0, null, float.MaxValue, float.MaxValue, null, WorldSpace.Zero, WorldSpace.Zero, WorldSpace.Zero, null, 1);
@@ -125,13 +129,13 @@ namespace Project_1.GameObjects
         public static ClassData GetAllyClass(string aName)
         {
             ThreadAffinity.AssertGameThread();
-            return allyClassData[aName];
+            return guildMemberClassData[aName];
         }
 
         public static ClassData GetMobClass(string aName)
         {
             ThreadAffinity.AssertGameThread();
-            return mobClassData[aName];
+            return npcClassData[aName];
         }
 
         public static GossipData GetGossip(string aName)
@@ -168,7 +172,7 @@ namespace Project_1.GameObjects
         }
 
 
-        static void ImportMobData()
+        static void ImportNpcData()
         {
             ThreadAffinity.AssertMainThread();
             mobData = new Dictionary<string, MobData>();
@@ -185,7 +189,7 @@ namespace Project_1.GameObjects
             }
         }
 
-        static void ImportNpcData()
+        static void ImportGuildMemberData()
         {
             ThreadAffinity.AssertMainThread();
             npcData = new List<UnitData>();
@@ -231,8 +235,8 @@ namespace Project_1.GameObjects
         {
             ThreadAffinity.AssertMainThread();
             playerClassData = new Dictionary<string, FriendlyClassData>();
-            allyClassData = new Dictionary<string, FriendlyClassData>();
-            mobClassData = new Dictionary<string, MobClassData>();
+            guildMemberClassData = new Dictionary<string, FriendlyClassData>();
+            npcClassData = new Dictionary<string, MobClassData>();
 
             string path = Game1.ContentManager.RootDirectory + "\\Data\\Class\\";
 
@@ -271,13 +275,13 @@ namespace Project_1.GameObjects
                 case ClassData.Type.Ally:
                     {
                         FriendlyClassData data = JsonConvert.DeserializeObject<FriendlyClassData>(aRawData);
-                        allyClassData.Add(data.Name, data);
+                        guildMemberClassData.Add(data.Name, data);
                     }
                     break;
                 case ClassData.Type.Mob:
                     {
                         MobClassData data = JsonConvert.DeserializeObject<MobClassData>(aRawData);
-                        mobClassData.Add(data.Name, data);
+                        npcClassData.Add(data.Name, data);
                     }
                     break;
                 default:

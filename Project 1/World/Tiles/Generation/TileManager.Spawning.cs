@@ -10,6 +10,7 @@ namespace Project_1.Tiles
     {
         public static WorldSpace FindSpawnPointNearChunkLevel(int targetAverageLevel, int maxSearchRadius = 96)
         {
+            //TODO: This should be depricated. Generating a world should generate a spawn point that is maintained in the world data, and this method should be removed. For now, it will be used to find a spawn point for the player when they first start a new world, but after that it should not be used.
             ThreadAffinity.AssertSimThread();
             if (targetAverageLevel <= 10 && NodeWorldManager.TryGetStarterSpawnPoint(out WorldSpace starterSpawn))
             {
