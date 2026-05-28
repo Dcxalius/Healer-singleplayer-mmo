@@ -19,6 +19,8 @@ namespace Project_1.GameObjects
     {
         public static void Init()
         {
+            //TODO: Break this up into PlayerManager/GuildMemberManager/NpcManager
+            //TODO: These managers should hold and maintain the live data for these Entity objects
             ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
@@ -38,6 +40,7 @@ namespace Project_1.GameObjects
 
             LootState.Update();
             PublishPlayerUiSnapshot();
+            //TODO: Move the actuall tick somewhere else, and just check time and call TickAdvance. This should be able to be done seperatly from the timer. With say a /TickStep [nr of steps]
             timer += TimeManager.MilisecondSinceLastFrame;
             if (timer < 2000) return;
 
@@ -50,6 +53,7 @@ namespace Project_1.GameObjects
 
         public static void RefreshPlates()
         {
+            //TODO: This should prob be depricated and Refreshing the plates be up to using the eventsytem
             ThreadAffinity.AssertSimThread();
             List<Entity> all = BuildAllScratch();
             for (int i = 0; i < all.Count; i++)
@@ -110,6 +114,7 @@ namespace Project_1.GameObjects
 
         public static void CreateNewGuildMember()
         {
+            //TODO: Make this no longer debug
             ThreadAffinity.AssertSimThread();
             ObjectFactory.AddGuildMember("xdddd", "Rogue");
             guild = ObjectFactory.GetGuildMemebers();
@@ -119,13 +124,14 @@ namespace Project_1.GameObjects
         public static void Reset()
         {
             ThreadAffinity.AssertSimThread();
+            //TODO: If we call delete on all guildmembers, why aren't we doing it for the other two lists
             for (int i = guild.Count - 1; i >= 0; i--)
             {
                 guild[i].Delete();
             }
 
             MailboxManager.PublishUiEvent(new PartyCleared());
-            MailboxManager.PublishUiEvent(new PlateLayerCleared());
+            MailboxManager.PublishUiEvent(new PlateLayerCleared()); //TODO: Is there an all reset event we can send instead?
             entities.Clear();
             guild.Clear();
             npcs.Clear();

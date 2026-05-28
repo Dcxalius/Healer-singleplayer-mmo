@@ -5,6 +5,7 @@ namespace Project_1.Items.SubTypes
 {
     internal partial class EquipmentData
     {
+        //TODO: Split everything related so suffix to its own class or interface
         const double MinimumRollableSuffixValue = 1.0;
 
         static readonly (string name, StatBonuses[] stats)[] suffixTemplates =
@@ -182,6 +183,7 @@ namespace Project_1.Items.SubTypes
 
         static void ValidateSuffixTemplates()
         {
+            //TODO: Break this up
             for (int i = 0; i < suffixTemplates.Length; i++)
             {
                 string name = suffixTemplates[i].name;
@@ -230,14 +232,7 @@ namespace Project_1.Items.SubTypes
             }
         }
 
-        static bool IsPrimaryStatBonus(StatBonuses aStatBonus)
-        {
-            return aStatBonus is StatBonuses.Agility
-                or StatBonuses.Strength
-                or StatBonuses.Stamina
-                or StatBonuses.Intellect
-                or StatBonuses.Spirit;
-        }
+        static bool IsPrimaryStatBonus(StatBonuses aStatBonus) => aStatBonus is StatBonuses.Agility or StatBonuses.Strength or StatBonuses.Stamina or StatBonuses.Intellect or StatBonuses.Spirit;
 
         static string GetCanonicalSingleStatSuffixName(StatBonuses aStatBonus)
         {
@@ -267,6 +262,7 @@ namespace Project_1.Items.SubTypes
 
         int[] CalculateSuffixStatValues(int aHash, ReadOnlySpan<StatBonuses> aSuffixStats, double aAvailablePoweredBudget, int aSelectableTemplateCount)
         {
+            //TODO: Break up
             int statCount = aSuffixStats.Length;
             int[] statValues = new int[statCount];
             if (statCount == 0 || !IsTemplateRollable(aSuffixStats, aAvailablePoweredBudget))
@@ -353,10 +349,7 @@ namespace Project_1.Items.SubTypes
             }
         }
 
-        double GetAvailableSuffixPoweredBudget()
-        {
-            return RequiredPoweredSumArgument(this) - ComputePoweredStatSum(this);
-        }
+        double GetAvailableSuffixPoweredBudget() => RequiredPoweredSumArgument(this) - ComputePoweredStatSum(this);
 
         (int templateIndex, int selectableTemplateCount, bool isForcedMinimumFallback) SelectSuffixTemplateIndex(int aHash, double aAvailablePoweredBudget)
         {
@@ -437,30 +430,27 @@ namespace Project_1.Items.SubTypes
             return IsAllowedMinimumFallbackStat(aSuffixStats[0]);
         }
 
-        static bool IsAllowedMinimumFallbackStat(StatBonuses aStatBonus)
+        static bool IsAllowedMinimumFallbackStat(StatBonuses aStatBonus) => aStatBonus switch
         {
-            return aStatBonus switch
-            {
-                StatBonuses.Agility or
-                StatBonuses.Strength or
-                StatBonuses.Stamina or
-                StatBonuses.Intellect or
-                StatBonuses.Spirit or
-                StatBonuses.FrostSpellDamage or
-                StatBonuses.FireSpellDamage or
-                StatBonuses.ArcaneSpellDamage or
-                StatBonuses.NatureSpellDamage or
-                StatBonuses.ShadowSpellDamage or
-                StatBonuses.HolySpellDamage or
-                StatBonuses.FrostResist or
-                StatBonuses.FireResist or
-                StatBonuses.ArcaneResist or
-                StatBonuses.NatureResist or
-                StatBonuses.ShadowResist or
-                StatBonuses.HolyResist => true,
-                _ => false
-            };
-        }
+            StatBonuses.Agility or
+            StatBonuses.Strength or
+            StatBonuses.Stamina or
+            StatBonuses.Intellect or
+            StatBonuses.Spirit or
+            StatBonuses.FrostSpellDamage or
+            StatBonuses.FireSpellDamage or
+            StatBonuses.ArcaneSpellDamage or
+            StatBonuses.NatureSpellDamage or
+            StatBonuses.ShadowSpellDamage or
+            StatBonuses.HolySpellDamage or
+            StatBonuses.FrostResist or
+            StatBonuses.FireResist or
+            StatBonuses.ArcaneResist or
+            StatBonuses.NatureResist or
+            StatBonuses.ShadowResist or
+            StatBonuses.HolyResist => true,
+            _ => false
+        };
 
         static bool IsTemplateRollable(ReadOnlySpan<StatBonuses> aSuffixStats, double aAvailablePoweredBudget)
         {

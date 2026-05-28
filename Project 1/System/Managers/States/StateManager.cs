@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -88,6 +88,7 @@ namespace Project_1.Managers.States
 
         static void RegisterUiAndInputSubscriptions()
         {
+            //TODO: Move these closer to the input system
             MailboxManager.Ui.Subscribe<StateChanged>(HandleUiStateChanged);
             MailboxManager.Ui.Subscribe<HudRescaleRequested>(e => UiRescale(e.WindowSize));
             SubscribeSimMailbox<KeyboardSnapshot>(e => KeyboardStateCache.Update(e));
@@ -229,6 +230,7 @@ namespace Project_1.Managers.States
         public static void Draw()
         {
             ThreadAffinity.AssertMainThread();
+            //TODO: Draw pipeline should be reworked
             if (pendingRedrawGame && ThreadAffinity.IsMainThread)
             {
                 pendingRedrawGame = false;

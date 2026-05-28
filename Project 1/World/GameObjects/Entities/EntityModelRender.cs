@@ -48,6 +48,8 @@ namespace Project_1.GameObjects.Entities
 
         float ResolveModelFacingYawRadians()
         {
+            //Q: Why do we have one for returning in Radians and one for a vector?
+            //If they both should remain their calling feels like is should be linked
             if (TryResolvePreviewFacingYawRadians(out float previewFacingYawRadians))
             {
                 modelFacingYawRadians = previewFacingYawRadians;
@@ -75,6 +77,7 @@ namespace Project_1.GameObjects.Entities
 
         Vector2 ResolveModelFacingDirection()
         {
+            //TODO: How do these Resolve the model direction? Seem to just be generic Entity direction rather than its model
             Vector2 momentumDirection = Momentum.ToVector2();
             if (momentumDirection.LengthSquared() > 0.0001f)
             {

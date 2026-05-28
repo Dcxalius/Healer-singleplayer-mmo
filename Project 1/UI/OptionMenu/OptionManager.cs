@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Input;
@@ -50,6 +50,8 @@ namespace Project_1.UI.OptionMenu
 
         static OptionScreen currentScreen = OptionScreen.Video;
 
+        //TODO: Have a datatype for the actual options available
+
         static ExitOptionsButton exitOptionsButton;
         static SaveChangesButton saveChangesButton;
         static bool initialized;
@@ -68,6 +70,11 @@ namespace Project_1.UI.OptionMenu
             RefreshOptionScreens();
         }
 
+
+
+        /// <summary>
+        /// Initalizes the objects that are permanentily on the options screen
+        /// </summary>
         static void InitPermanents()
         {
             optionScreenPermanents.Add(new OptionScreenBox((int)OptionScreen.Count, new RelativeScreenPosition(0), new RelativeScreenPosition(0.3f,0.04f)));
@@ -287,6 +294,8 @@ namespace Project_1.UI.OptionMenu
 
         public static UIElement[] BuildDrawList()
         {
+            //Q: Should the drawlist only live virtually?
+            //We should probably either reuse and only regen when dirty, or manage the drawlist elsewhere
             ThreadAffinity.AssertUiThread();
             UIElement[] drawList = new UIElement[DrawListCount];
             CopyDrawList(drawList);

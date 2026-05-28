@@ -92,6 +92,8 @@ namespace Project_1.UI.HUD.Managers
 
         public static void Init()
         {
+            //TODO: Needs breaking up
+            
             ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
@@ -100,14 +102,15 @@ namespace Project_1.UI.HUD.Managers
             namePlateHandler = new NamePlateHandler();
             windowHandler = new WindowHandler();
 
-            hudMoving = false;
+            hudMoving = false; //TODO: This system should be looked at further 
             ImportSettings();
 
-            hudElements = new List<UIElement>();
+            hudElements = new List<UIElement>(); //TODO: Change this to not rely on a single list. Suggest bundlings by moving next to and wrapping with two // // and a suitable title after the first //
             plateBoxHandler.InitPlateBoxes(LoadedSettings);
 
             lootBox = new LootBox(new RelativeScreenPosition(0.1f, 0.5f), new RelativeScreenPosition(0.4f, 0.4f));
             hudElements.Add(lootBox);
+            //TODO: Currently we have to do this for every object. Can we create something like a parent that just automatically handles the adding?
             inventoryBox = new InventoryBox(new RelativeScreenPosition(0.59f, 0.60f), new RelativeScreenPosition(0.4f), 16);
             hudElements.Add(inventoryBox);
 
@@ -148,6 +151,7 @@ namespace Project_1.UI.HUD.Managers
             hudElements.Add(chatPanel);
 
             inGameMenu = new InGameMenu();
+            //TODO: Move these inside of menu
             inGameMenu.AddButton("Char", Input.KeyBindManager.KeyListner.Character, ToggleCharacterWindowFromMenu);
             inGameMenu.AddButton("Bags", Input.KeyBindManager.KeyListner.Inventory, ToggleInventoryFromMenu);
             inGameMenu.AddButton("Spells", Input.KeyBindManager.KeyListner.SpellBook, ToggleSpellBookFromMenu);
@@ -166,7 +170,9 @@ namespace Project_1.UI.HUD.Managers
 
         static void ToggleCharacterWindowFromMenu()
         {
+            //Q: A lot of these passons. Is there a smoother way to do this?
             windowHandler.ToggleCharacterWindow();
+            //Q: Can the invalidation be further in. If a window don't change by the toggle attempt we can skip the invalidation
             InvalidateUi();
         }
 
@@ -210,6 +216,7 @@ namespace Project_1.UI.HUD.Managers
 
         public static void Update()
         {
+            //TODO: Split up
             AssertUiThreadOrMainFallback();
             long interactionVersionBefore = UIElement.InteractionVersion;
             namePlateHandler.Update();
@@ -296,6 +303,8 @@ namespace Project_1.UI.HUD.Managers
 
         internal static void BuildDrawLists()
         {
+            //TODO: Split up
+            
             AssertUiOrMainThread();
             int namePlateCount = 0;
             int plateBoxCount = 0;
@@ -316,6 +325,7 @@ namespace Project_1.UI.HUD.Managers
                 plateElementCount = namePlateCount + plateBoxCount;
             }
 
+            //TODO: A lot of similar code, perfect target for a refraction
             if (uiDrawListDirty)
             {
                 UiDrawList buildTarget = ReferenceEquals(uiDrawList, uiDrawListA) ? uiDrawListB : uiDrawListA;
@@ -343,6 +353,7 @@ namespace Project_1.UI.HUD.Managers
 
         static void EnsurePlateBoxScratchCapacity(int count)
         {
+            //Q: why is this needed? What are the failure conditions that can cause the size to be too big
             if (count <= plateBoxScratch.Length) return;
             int capacity = Math.Max(count, Math.Max(8, plateBoxScratch.Length * 2));
             plateBoxScratch = new UIElement[capacity];

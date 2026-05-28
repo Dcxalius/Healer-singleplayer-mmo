@@ -13,6 +13,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
 
         public static void Init()
         {
+            //TODO: Move these closer to their respective systems
             ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;

@@ -16,6 +16,7 @@ namespace Project_1.Items
             if (initialized) return;
             initialized = true;
 
+            //Q: Can these be moved to somewhere closer to Shop?
             MailboxManager.RegisterSimCommandType<ShopPurchaseRequested>();
             MailboxManager.Sim.Subscribe<ShopPurchaseRequested>(HandleShopPurchaseRequested);
         }

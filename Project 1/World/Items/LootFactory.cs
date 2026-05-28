@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Content;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 using Project_1.GameObjects.Entities;
@@ -12,8 +12,14 @@ using System.Threading.Tasks;
 
 namespace Project_1.Items
 {
+    /// <summary>
+    /// Handles the distrobution of loot tables
+    /// </summary>
+
     internal static class LootFactory
     {
+        //TODO: Settable improvements
+
         static Dictionary<string, LootTable> lootData;
         static bool initialized;
 
@@ -22,7 +28,15 @@ namespace Project_1.Items
             if (initialized) return;
             initialized = true;
             lootData = new Dictionary<string, LootTable>();
+            //TODO: Create seperate loot intervals.
+            //An easy way to handle regional/species drops
+            //E.g: Mane
+            //Dropped by all equestrian species
+            //Versions at 15, 20, 25, etc
+            //Gray that sells for gold
+            //Also figure out how the generation of green items should be handled
             ImportData(Game1.ContentManager);
+            //TODO: Decide how we should handle making sure all units has loot
         }
 
         static void ImportData(ContentManager aContentManager)

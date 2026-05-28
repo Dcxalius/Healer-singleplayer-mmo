@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.GameObjects.Spells.Buff;
 using Project_1.Tiles;
@@ -34,6 +34,8 @@ namespace Project_1.GameObjects.Entities
 
         public float CalculateMovementSpeedMultiplier()
         {
+            //TODO: Not sure if maximums are needed, but minimums are
+            //TODO: We also need to make a system that stops speeding things from phasing through detections
             double biggestSlow = 1;
             double msBuffs = 1;
             Buff[] buffs = buffList.GetAllBuffs().ToArray();
@@ -51,8 +53,10 @@ namespace Project_1.GameObjects.Entities
 
         public void Movement()
         {
+            //TODO: AttackRange is here to help the entity stop earlier.
             Destination.Update();
 
+            //TODO: Should probably be accessed differently, should we be walking to the closest spot in range rather than the entity and then stopping when we are in range?S
             float minAttackRange = GetMinAttackRange();
 
             velocity += Destination.GetVelocity(minAttackRange, Speed, new WorldSpace(FeetSize));
@@ -66,7 +70,7 @@ namespace Project_1.GameObjects.Entities
 
         void CheckForCollisions() 
         {
-
+            //TODO: Collision needs reworking
             List<(Rectangle, Rectangle)> resultingCollisions = TileManager.CollisionManager.CollisionsWithUnwalkable(this);
 
             if (resultingCollisions.Count != 0)

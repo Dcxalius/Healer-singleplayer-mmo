@@ -85,6 +85,7 @@ namespace Project_1.Managers
 
         public static void Init()
         {
+            //TODO: Move these somewhere closer to the other code handling chat
             ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
@@ -97,6 +98,7 @@ namespace Project_1.Managers
 
         static void HandleChatCommandRequested(ChatCommandRequested e)
         {
+            //TODO: Break this up
             ThreadAffinity.AssertSimThread();
             string raw = (e.CommandText ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(raw)) return;

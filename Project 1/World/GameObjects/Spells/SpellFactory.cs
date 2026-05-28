@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Content;
 using Newtonsoft.Json;
 using Project_1.Managers;
 using Project_1.World.GameObjects.Spells.SpellEffects;
@@ -16,8 +16,9 @@ namespace Project_1.GameObjects.Spells
     internal static class SpellFactory
     {
         static Dictionary<string, SpellData> spellData;
-        static Dictionary<int, SpellData> spellDataById;
+        static Dictionary<int, SpellData> spellDataById; //TODO: This should be a string, int, instead of loading the data twice.
         //static Dictionary<int, SpellEffect> spellEffect;
+        //Q: Why are these arrays instead of dictionaries?
         static InstantEffect[] instantData;
         static OverTimeEffect[] overTimeData;
         static AbsorbEffect[] absorbData;
@@ -30,8 +31,12 @@ namespace Project_1.GameObjects.Spells
             initialized = true;
             InitEffectData();
             InitSpellData();
+            //InitAbsorb();
         }
 
+        /// <summary>
+        /// Loads in the Spelldata into the SpellData dictionary
+        /// </summary>
         static void InitSpellData()
         {
             spellData = new Dictionary<string, SpellData>();
@@ -83,6 +88,7 @@ namespace Project_1.GameObjects.Spells
 
         static void InitAbsorb()
         {
+            //Q: This wasn't called anywhere. If this is needed, why wasn't it called? Or is the call in InitStatus enough?
             List<AbsorbEffect> effects = new List<AbsorbEffect>();
             string path = Game1.ContentManager.RootDirectory + "\\Data\\Effects\\Absorb";
             if (!Directory.Exists(path))
@@ -131,6 +137,7 @@ namespace Project_1.GameObjects.Spells
 
         static void InitOverTime()
         {
+            //Q: Depr?
             List<OverTimeEffect> effects = new List<OverTimeEffect>();
             string pathOverTime = Game1.ContentManager.RootDirectory + "\\Data\\Effects\\OverTime";
             string[] files = Directory.GetFiles(pathOverTime);
@@ -151,12 +158,9 @@ namespace Project_1.GameObjects.Spells
 
         public static SpellEffect GetSpellEffect(int aId)
         {
-            if (aId < instantData.Length)
-            {
-                return instantData[aId];
-            }
+            if (aId > instantData.Length) throw new IndexOutOfRangeException();
 
-            return instantData[aId - instantData.Length];
+            return instantData[aId];
         }
 
         public static SpellEffect GetSpellEffect(string aName)
@@ -175,16 +179,8 @@ namespace Project_1.GameObjects.Spells
             return effect;
         }
 
-        public static SpellData GetSpell(String aName)
-        {
-            Init();
-            return spellData[aName];
-        }
+        public static SpellData GetSpell(String aName) => spellData[aName];
 
-        public static SpellData GetSpell(int aId)
-        {
-            Init();
-            return spellDataById[aId];
-        }
+        public static SpellData GetSpell(int aId) => spellDataById[aId];
     }
 }

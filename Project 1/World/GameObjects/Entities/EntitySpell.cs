@@ -47,6 +47,7 @@ namespace Project_1.GameObjects.Entities
             buffList.RemoveFirstBuffOfType<T>(this);
         }
 
+        //TODO: Destring
         public void RemoveStatusBuffsByTag(string aStatusTag)
         {
             ThreadAffinity.AssertSimThread();
@@ -54,6 +55,7 @@ namespace Project_1.GameObjects.Entities
             FlagForRefresh();
         }
 
+        //TODO: Destring
         public bool HasStatusTag(string aStatusTag)
         {
             ThreadAffinity.AssertSimThread();
@@ -69,18 +71,21 @@ namespace Project_1.GameObjects.Entities
             }
         }
 
+        //TODO: Destring
+
         public double GetStatusStatFlat(string aStat)
         {
             ThreadAffinity.AssertSimThread();
             return buffList?.GetStatusFlat(aStat) ?? 0d;
         }
 
+        //TODO: Destring
         public double GetStatusStatPercent(string aStat)
         {
             ThreadAffinity.AssertSimThread();
             return buffList?.GetStatusPercent(aStat) ?? 0d;
         }
-
+        //TODO: Destring
         public void ConsumeBuffStack(Buff aBuff)
         {
             ThreadAffinity.AssertSimThread();

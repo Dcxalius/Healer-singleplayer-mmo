@@ -14,9 +14,15 @@ namespace Project_1.Managers
         public static double MilisecondSinceLastFrame => instanceTime.ElapsedGameTime.TotalMilliseconds;
         public static double SecondsSinceLastFrame => instanceTime.ElapsedGameTime.TotalSeconds;
 
+        /// <summary>
+        /// Returns the time since the game was launched
+        /// </summary>
         public static double InstanceTotalFrameTime => instanceTime.TotalGameTime.TotalMilliseconds;
         public static TimeSpan InstanceTotalFrameTimeAsTimeSpan => instanceTime.TotalGameTime;
 
+        /// <summary>
+        /// Returns the time since the player created the character/world
+        /// </summary>
         public static double TotalFrameTime => playTime.TotalGameTime.TotalMilliseconds;
 
         public static TimeSpan TotalFrameTimeAsTimeSpan => playTime.TotalGameTime;

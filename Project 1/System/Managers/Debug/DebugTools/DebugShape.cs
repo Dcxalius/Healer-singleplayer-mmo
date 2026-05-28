@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Managers;
@@ -14,6 +14,8 @@ namespace Project_1.DebugTools
     [DebuggerStepThrough]
     internal class DebugShape
     {
+        //TODO: Needs DebugCircle
+        //TODO: Needs DebugComplex; A shape consisting of other smaller debugshapes
         protected Texture2D texture;
         protected float size = 1.0f;
         readonly Color color;

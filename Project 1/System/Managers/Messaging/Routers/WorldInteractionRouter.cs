@@ -48,6 +48,7 @@ namespace Project_1.GameObjects
 
         public static void Init()
         {
+            //TODO: Move these closer to respective system for clearer ownership
             ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;

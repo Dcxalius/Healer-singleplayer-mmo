@@ -20,6 +20,7 @@ namespace Project_1.GameObjects
     {
         internal static void DrawMinimapSnapshots(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
         {
+            //TODO: These should probably be elsewhere in a minimap related class
             ThreadAffinity.AssertMainThread();
             ApplyRenderUpdates();
             foreach (EntityRenderSnapshot snapshot in renderPlayers.Values)
@@ -38,6 +39,7 @@ namespace Project_1.GameObjects
 
         internal static void DrawSnapshots(SpriteBatch aSpriteBatch)
         {
+            //TODO: This should be moved entirely into a main thread class
             ThreadAffinity.AssertMainThread();
             ApplyRenderUpdates();
             foreach (EntityRenderSnapshot snapshot in renderPlayers.Values)
@@ -56,15 +58,17 @@ namespace Project_1.GameObjects
 
         internal static void DrawModelSnapshots()
         {
+            //TODO: Drawing shouldn't be done in sim classes
             ThreadAffinity.AssertMainThread();
             renderModelEntities.ApplyUpdates();
             EntityModelRenderer.DrawSnapshots(renderModelEntities.Values);
         }
 
-        public static LightSnapshot RenderLightSnapshot => renderLightSnapshot;
+        public static LightSnapshot RenderLightSnapshot => renderLightSnapshot; //TODO: Properties should be at the top of the file
 
         internal static void BuildRenderSnapshot()
         {
+            //TODO: Instead of holding the renders here, these should send them of to a main thread owned class
             ThreadAffinity.AssertSimThread();
             PublishPlayerSnapshot();
             PublishEntitySnapshots(entities, renderEntities, knownEntityIds, currentEntityIds);
@@ -74,6 +78,9 @@ namespace Project_1.GameObjects
 
         static void ApplyRenderUpdates()
         {
+            //TODO: ApplyUpdates feels like a wierd name.
+            //Q: What does Applying the update mean? Just loading in a new version of the things? If so, should probably be sent from the sim thread instead of walked through from the main thread
+            //Currently both minimap snaps and snaps both draw it with feels def wrong. If there are updates we only wanna do them once
             renderPlayers.ApplyUpdates();
             renderEntities.ApplyUpdates();
             renderNpcs.ApplyUpdates();
@@ -81,6 +88,7 @@ namespace Project_1.GameObjects
 
         static void PublishPlayerSnapshot()
         {
+            
             currentPlayerIds.Clear();
             if (player != null)
             {
@@ -123,6 +131,7 @@ namespace Project_1.GameObjects
 
         static LightSnapshot BuildRenderLightSnapshot()
         {
+            //TODO: Needs to be refactored. How should shadows work anyways?
             ThreadAffinity.AssertSimThread();
             if (player == null) return LightSnapshot.Empty;
 

@@ -19,6 +19,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public static void Init()
         {
+            //TODO: Move this to somewhere closer to the callers
             ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;

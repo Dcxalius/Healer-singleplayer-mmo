@@ -13,7 +13,8 @@ namespace Project_1.GameObjects
 {
     internal static partial class ObjectManager
     {
-        public const float DistanceOfCircleAroundPlayer = 700;
+        //TODO: This should probably be moved into it's own class which the new EntityManagers have their own instances of
+        public const float DistanceOfCircleAroundPlayer = 700; //TODO: This should possibly be settable from in game OR alternativly a good value should be found and stop relying on this magic gut feel nr
         public static Player Player => player;
 
         static readonly RenderCache<EntityRenderSnapshot> renderPlayers = new RenderCache<EntityRenderSnapshot>();

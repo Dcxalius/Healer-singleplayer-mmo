@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Managers;
@@ -17,6 +17,7 @@ namespace Project_1.Particles
 
         public static void Init()
         {
+            //TODO: Ponder if the particle should live on the main thread, since they won't ever go back and affect the sim (any particle collision will either be part vs part or part vs immovable object)
             ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;

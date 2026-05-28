@@ -40,11 +40,15 @@ namespace Project_1.GameObjects.Entities
             unitData.BaseStats.SetOwner(this);
             unitData.Destination.SetOwner(this);
             unitData.InitializeWeaponSkill(this);
+
+            //TODO: Generalize the particle blood.
+            //TODO: Different races should have differnt blood and durations 
             bloodsplatter = new ParticleBase((1000d, 2000d), ParticleBase.OpacityType.Fading, ParticleBase.ColorType.Static, new Color[] { Color.Red }, new Point(1));
             namePlateRequiresUpdate = false;
             
             spellCast = new SpellCast(this);
             aggroTablesIAmOn = new List<NonFriendly>();
+
 
             velocity = unitData.Velocity;
             momentum = UnitData.Momentum;
@@ -58,6 +62,7 @@ namespace Project_1.GameObjects.Entities
 
         public void Delete()
         {
+            //TODO: Make sure this has to be called if an unit is removed
             Events.Clear();
             RemoveNamePlate();
 
@@ -65,6 +70,7 @@ namespace Project_1.GameObjects.Entities
 
         public override void Update()
         {
+            //TODO: Clean up flow
             ThreadAffinity.AssertSimThread();
             if (AmIDead()) return;
             TargetAliveCheck();
@@ -84,7 +90,7 @@ namespace Project_1.GameObjects.Entities
         public void ServerTick() //"Server tick"
         {
             ThreadAffinity.AssertSimThread();
-            if (unitData.Tick(InCombat))
+            if (unitData.Tick(InCombat)) //TODO: Make sure the things being updated calls for Refresh flag instead of using the return value to determine if a refresh is needed
             {
                 FlagForRefresh();
             }

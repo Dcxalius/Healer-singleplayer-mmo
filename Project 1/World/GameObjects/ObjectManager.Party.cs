@@ -12,6 +12,7 @@ namespace Project_1.GameObjects
     {
         public static GuildMember FriendlyTargetCycle()
         {
+            //TODO: This seems closer to the tab target functionality we want, but why is the other Friendly finder in a seperate partial? Feels like bad design
             ThreadAffinity.AssertSimThread();
 
             if (player.Target == null) return GetClosestGuildMember();
@@ -21,6 +22,7 @@ namespace Project_1.GameObjects
 
         public static bool SpawnGuildMemberToParty(GuildMember aMember, WorldSpace? aPosition)
         {
+            //TODO: Throws instead of assert.
             ThreadAffinity.AssertSimThread();
             Debug.Assert(guild.Contains(aMember));
             Debug.Assert(!player.Party.IsInParty(aMember));
@@ -44,6 +46,7 @@ namespace Project_1.GameObjects
 
         static WorldSpace FindTileAroundPlayer()
         {
+            //TODO: Should be in TileManager possibly (soon to be ChunkManager), rather than in here.
             Tile[] tiles = Array.Empty<Tile>();
             float start = DistanceOfCircleAroundPlayer;
             const float step = 50;

@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Content;
 using Newtonsoft.Json;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities;
@@ -34,9 +34,20 @@ namespace Project_1.GameObjects.Entities.Projectiles
             }
         }
 
+        /// <summary>
+        /// Creates a projectile for aSpell at the caster's position going towards aTarget
+        /// </summary>
+        /// <param name="aCaster"></param>
+        /// <param name="aStartPosition"></param>
+        /// <param name="aSpell"></param>
+        /// <param name="aTarget"></param>
+        /// <returns></returns>
+
         public static Projectile CreateProjectile(Entity aCaster, WorldSpace aStartPosition, Spell aSpell, Entity aTarget)
         {
             return new Projectile(aCaster, aStartPosition, projectiles[aSpell.Name], aSpell, aTarget);
         }
+            
+        //TODO: Implement non-spell projectiles
     }
 }

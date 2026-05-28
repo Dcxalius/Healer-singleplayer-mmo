@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 using Project_1.Managers;
 using System;
 using System.Collections.Concurrent;
@@ -33,7 +33,7 @@ namespace Project_1.GameObjects.FloatingTexts
 
         public static void Reset()
         {
-            if (ThreadAffinity.IsMainThread)
+            if (ThreadAffinity.IsMainThread) //Q: What is this check for? If things shouldn't be able to Clear the probably shouldn't be able to call Reset
             {
                 floatingTexts.Clear();
                 return;
@@ -43,6 +43,7 @@ namespace Project_1.GameObjects.FloatingTexts
 
         public static void Update() 
         {
+            //TODO: Decide if the text living on the main thread is ok, or if the should live on sim and send their updates via events
             ThreadAffinity.AssertMainThread();
             if (clearRequested)
             {

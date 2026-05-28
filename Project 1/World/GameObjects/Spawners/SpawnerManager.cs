@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities;
@@ -30,6 +30,12 @@ namespace Project_1.GameObjects.Spawners
 
         public static void Init()
         {
+            //TODO: This should be handed of to chunks in some shape and form
+            //Q: Unsure on how to handle spawnzones spanning multiple chunks
+            //Determine a head chunk?
+            //If so how do we detemine breakpoints, say two seperate spawnzones are in the same/overlapping chunks
+            //Let a Spawnzone have multiple accessing SpawnerManager?
+            //And how should wanderers be handled? Hand of when walking across chunks? Spawn chunk always has ownership?
             ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;
@@ -41,18 +47,23 @@ namespace Project_1.GameObjects.Spawners
         public static void Load(Save aSave)
         {
             ThreadAffinity.AssertSimThread();
+            //Deletion
             for (int i = 0; i < spawnZones.Count; i++)
             {
                 spawnZones[i].RemoveAllPlates();
             }
             spawnZones.Clear();
             ClearRenderCache();
+            //Creation
             SavedMobData[] unitData = ImportUnitData(aSave);
             ImportZones(aSave, unitData);
         }
 
         public static void LoadFromTokens(IReadOnlyList<JToken> zoneTokens, IReadOnlyList<JToken> mobTokens, JsonSerializer serializer)
         {
+            //TODO: Split up.
+
+            //TODO: Check for version changes
             ThreadAffinity.AssertSimThread();
             for (int i = 0; i < spawnZones.Count; i++)
             {
@@ -99,6 +110,7 @@ namespace Project_1.GameObjects.Spawners
 
         public static void GetSaveSnapshot(out SpawnZone[] zones, out SavedMobData[] savedMobs)
         {
+            //TODO: Split up
             ThreadAffinity.AssertSimThread();
             zones = spawnZones == null || spawnZones.Count == 0 ? Array.Empty<SpawnZone>() : spawnZones.ToArray();
             if (zones.Length == 0)
@@ -129,6 +141,7 @@ namespace Project_1.GameObjects.Spawners
 
         static void ImportZones(Save aSave, SavedMobData[] aUnitData)
         {
+            //TODO: Break up?
             ThreadAffinity.AssertSimThread();
             string path = aSave.SpawnZones;
 
@@ -159,7 +172,7 @@ namespace Project_1.GameObjects.Spawners
 
         }
 
-        class SpawnZoneComparer : IComparer<SavedMobData>, IEqualityComparer<SavedMobData>
+        class SpawnZoneComparer : IComparer<SavedMobData>, IEqualityComparer<SavedMobData> //TODO: Is this necesarry? Are we reusing this? If not just call as Lambda
         {
             public int Compare(SavedMobData x, SavedMobData y)
             {

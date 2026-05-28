@@ -11,6 +11,7 @@ namespace Project_1.GameObjects.Spells
 
         public static void Init()
         {
+            //TODO: Move these closer to the spellcasting
             ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;

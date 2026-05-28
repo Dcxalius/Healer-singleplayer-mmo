@@ -84,6 +84,7 @@ namespace Project_1.GameObjects.Entities
 
         public PairReport PrimaryStatReport => unitData.BaseStats.StatReport;
 
+        
         internal EntityUiSnapshot BuildUiSnapshot()
         {
             return new EntityUiSnapshot(
@@ -103,6 +104,7 @@ namespace Project_1.GameObjects.Entities
                 ResolveNamePlateAnchorWorldPosition());
         }
 
+        //Q: Is this wanted? Or should Nameplates only have their 2d screen pos
         WorldSpace3D ResolveNamePlateAnchorWorldPosition()
         {
             float heightInWorldUnits = Math.Max(0f, WorldRectangle.Height / (float)Math.Max(1, Tile.Size.Y));
@@ -112,6 +114,7 @@ namespace Project_1.GameObjects.Entities
                 FeetPosition.Y / Tile.Size.Y);
         }
 
+        //Q: Why is this in Entity? 
         static float ResolveSurfaceHeight(WorldSpace aFeetPosition)
         {
             Chunk chunk = TileManager.GetChunkUnder(aFeetPosition);
@@ -132,17 +135,18 @@ namespace Project_1.GameObjects.Entities
             return 0f;
         }
 
+        //TODO: Move to helper
         static int PositiveModulo(int aValue, int aDivisor)
         {
             int result = aValue % aDivisor;
             return result < 0 ? result + aDivisor : result;
         }
 
-
+        //TODO: Misplace fields
         bool namePlateRequiresUpdate;
         ParticleBase bloodsplatter;
 
-
+        //TODO: Handle running delete from here maybe?
         bool AmIDead()
         {
             if (!Alive)
@@ -153,9 +157,9 @@ namespace Project_1.GameObjects.Entities
             return false;
         }
 
-
         void TargetAliveCheck()
         {
+            //TODO: Move this into a seperate target handling system that dispatches things like removing dead targets, cycling between them, focusing, and dispatching attacks
             if (Target == null) return;
             if (Target.Alive) return;
 
@@ -180,6 +184,8 @@ namespace Project_1.GameObjects.Entities
 
         public bool ResourceGain(Entity aEntity, float aValue, Resource.ResourceType aResourceType)
         {
+            //TODO: Feels clunky, at least needs breaking up
+            //TODO: Write summary, what entails with a false/true return?
             ThreadAffinity.AssertSimThread();
             if (aResourceType != ResourceType) return false;
 
@@ -202,8 +208,10 @@ namespace Project_1.GameObjects.Entities
             return true;
         }
 
+       
         public virtual bool TakeHealing(Entity aHealer, float aHealingTaken)
         {
+            //TODO: Break up
             ThreadAffinity.AssertSimThread();
             if (FullHealth) return false;
 
@@ -220,10 +228,7 @@ namespace Project_1.GameObjects.Entities
             return true;
         }
 
-        double CalculateHealing(double aHealingTaken)
-        {
-            return ApplyHealthDelta(aHealingTaken);
-        }
+        double CalculateHealing(double aHealingTaken) => ApplyHealthDelta(aHealingTaken); //TODO: Shift to prop/getters
 
         double ApplyHealthDelta(double aDelta)
         {
@@ -235,6 +240,7 @@ namespace Project_1.GameObjects.Entities
             return after - before;
         }
 
+        //TODO: Create a health class to store and do this type of work
         string FormatHealthDelta(double aDelta)
         {
             double abs = Math.Abs(aDelta);
@@ -248,6 +254,7 @@ namespace Project_1.GameObjects.Entities
 
         public abstract void ExpToParty(int aExpAmount);
 
+        //TODO: What does it mean for mobs/npcs to gain exp
         public void GainExperience(int aExpAmount)
         {
             ThreadAffinity.AssertSimThread();
@@ -260,6 +267,7 @@ namespace Project_1.GameObjects.Entities
 
         protected void CreateNamePlate()
         {
+            //TODO: Since this doesn't Create but rather sends a dispatch to create, it should prob not have Create in the name
             ThreadAffinity.AssertSimThread();
             hasNamePlate = true;
             MailboxManager.PublishUiEvent(new NamePlateAdded(BuildUiSnapshot()));
@@ -268,20 +276,23 @@ namespace Project_1.GameObjects.Entities
 
         protected void RemoveNamePlate()
         {
+            //TODO: Since this doesn't Remove but rather sends a dispatch to remove, it should prob not have Remove in the name
             ThreadAffinity.AssertSimThread();
             hasNamePlate = false;
             MailboxManager.PublishUiEvent(new NamePlateRemoved(RenderId));
         }
 
-        protected void FlagForRefresh() => namePlateRequiresUpdate = true;
+        protected void FlagForRefresh() => namePlateRequiresUpdate = true; //TODO: Shift to prop/getters
 
         public virtual void RefreshPlates()
         {
+            //TODO: Should this be bundled to anything that touches the plates?
             ThreadAffinity.AssertSimThread();
             if (!namePlateRequiresUpdate) return;
             MailboxManager.PublishUiEvent(new PlateRefreshRequested(BuildUiSnapshot()));
         }
 
+        //TODO: Summaries, and heads up that this can return null should be somewhere
         public Item EquipInParticularSlot(Items.SubTypes.Equipment aEquipment, Slot aSlot)
         {
             ThreadAffinity.AssertSimThread();

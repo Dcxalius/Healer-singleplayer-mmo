@@ -195,22 +195,13 @@ namespace Project_1
             EffectManager.Init();
             TalentFactory.Init();
             ObjectFactory.Init();
-            //u are here
             ItemFactory.Init();
-            InventoryCommandRouter.Init();
-            ShopCommandRouter.Init();
             LootFactory.Init();
             SpellFactory.Init();
             SpellCastRouter.Init();
-            SpellTrainingRouter.Init();
             ProjectileFactory.Init();
             OptionManager.Init();
-            ChatCommandRouter.Init();
-            SessionFlowRouter.Init();
             StateManager.Init();
-            WorldInteractionRouter.Init();
-            LogicWindowSnapshotRouter.Init();
-            TalentWindowSnapshotRouter.Init();
             HUDManager.Init();
             ObjectManager.Init();
             SpawnerManager.Init();
@@ -219,6 +210,14 @@ namespace Project_1
             ProjectileManager.Init();
             ParticleManager.Init();
             UiInputBridge.Init();
+            InventoryCommandRouter.Init();
+            ShopCommandRouter.Init();
+            SpellTrainingRouter.Init();
+            ChatCommandRouter.Init();
+            SessionFlowRouter.Init();
+            LogicWindowSnapshotRouter.Init();
+            WorldInteractionRouter.Init();
+            TalentWindowSnapshotRouter.Init();
             if (ThreadingSettings.UseWorkerThreads) WorkerPool.Start();
             if (ThreadingSettings.UseUiThread) UiThread.Start();
             if (ThreadingSettings.UseSimThread) SimThread.Start();

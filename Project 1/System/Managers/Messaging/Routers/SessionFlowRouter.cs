@@ -14,6 +14,7 @@ namespace Project_1.Managers
 
         public static void Init()
         {
+            //TODO: Move this somewhere closer to the save manager/other systems
             ThreadAffinity.AssertMainThread();
             if (initialized) return;
             initialized = true;

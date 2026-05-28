@@ -7,7 +7,9 @@ namespace Project_1.GameObjects.Entities
 {
     internal abstract partial class Entity
     {
+        //TODO: Hard coded magical value
         const double dodgeParryWindowMs = 5000;
+        //TODO: Check this gets loaded
         double lastDodgeOrParryTime = double.MinValue;
 
         // Guards against double-subscribing if multiple spells share the same condition.
@@ -18,6 +20,7 @@ namespace Project_1.GameObjects.Entities
 
         internal void ConsumeReactiveWindow()
         {
+            //TODO: Log consumtion?
             ThreadAffinity.AssertSimThread();
             lastDodgeOrParryTime = double.MinValue;
             RemoveFirstBuffOfType<ReactiveBuff>();
@@ -28,8 +31,9 @@ namespace Project_1.GameObjects.Entities
         internal void RegisterReactiveHook(CastCondition condition)
         {
             ThreadAffinity.AssertSimThread();
-            if (!registeredConditions.Add(condition)) return;
+            if (!registeredConditions.Add(condition)) return; //TODO: Are there cases where we want multiple sequental consumptions possible?
 
+            //TODO: Needs more condition cases
             switch (condition)
             {
                 case CastCondition.AfterDodgeOrParry:

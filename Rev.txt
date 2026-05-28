@@ -17,7 +17,23 @@ TalentFactory; Only thing of note is asserts should be done to ensure duplicate 
 ObjectFactory; Should be refactored into seperate classes for the different types. The factory shouldn't have to worry about live data and just the objects loaded from files
 ItemFactory; Unsure why we use a list instead of the out commented dict. Also unsure how we should handle fetching by name incase of collitions
 EnchantmentFactory; A weird doulbe load is currently being done
-EquipmentData!!!!!!!!! Start here
+EquipmentData; This should be broken up. A lot of big methods, most of the suffix functionally should be seperated from EquipmentData.
+Anything with Router; The subscriptions in init should be moved closer to their respective systems, allowing for clearer ownership
+LootFactory; How should we handle verification of all npcs having loot? Seperatly, creation of loottables based on mob type/level
+SpellFactory; Also a weird double dict here. A lot of seemingly depricated loads are remaining. Fixed a bug, if an index is bigger than the asking array, always throw rather than do a hack to prevent it
+ProjectileFactory; Mostly missing the implementation of non-spell projectiles. Also missing the ability for spell projectiles to target an location/area rather than an entity
+OptionManager; Need more development. There should be a list or something similar where things can check what option is toggled
+StateManager; Needs further review. Drawpipeline should probably be changed, and subscriptions should be moved
+HUDManager; Needs refactoring on a major scale
+ObjectManager; Should be split into smaller Managers, allowing for clearer management and responsibilty. ObjectManager should probably exist in some form to all for collection calls like All[]
+SpawnerManager; Needs refactoring. How should the chunk based managers be handled?
+FloatingTextManager; What is the best thread for this?
+CorpseManager; Revives? Also drawing pipeline work
+ProjectileManager; Same drawing pipeline work needed
+ParticleManager; Should the lifespan of the Particles be moved to the main thread?
+UIInputBridge; Should probably be renamed or removed
+DebugShapes; Needs DebugCircle, and DebugComplex
+Entity; CONTINUE HEEERERE
 
 
 Unrelated bug: Left dragging + esc into release leaves the camera stuck at an offangle. 

@@ -21,6 +21,7 @@ namespace Project_1.Input
 
         public static void Init()
         {
+            //TODO: This class only exists to do the subscriptions. Can they be moved to inputManager?
             MailboxManager.Ui.Subscribe<ClickEvent>(HandleClick);
             MailboxManager.Ui.Subscribe<ReleaseEvent>(HandleRelease);
             MailboxManager.Ui.Subscribe<ScrollEvent>(HandleScroll);

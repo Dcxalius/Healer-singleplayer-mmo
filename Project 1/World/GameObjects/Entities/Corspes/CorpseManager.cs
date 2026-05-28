@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.GameObjects;
 using Project_1.Managers;
@@ -16,8 +16,11 @@ namespace Project_1.GameObjects.Entities.Corspes
 {
     internal static class CorpseManager
     {
+        //TODO: What do we do with Revivable corpses?
+        //TODO: Probably a seperate manager, but needs to be noted
         static List<Corpse> corpses;
         static readonly RenderCache<WorldObjectRenderSnapshot> renderCorpses = new RenderCache<WorldObjectRenderSnapshot>();
+        //Q: What causes a Corpse to be known vs current?
         static readonly HashSet<int> knownCorpseIds = new HashSet<int>();
         static readonly HashSet<int> currentCorpseIds = new HashSet<int>();
         static bool initialized;
@@ -123,6 +126,7 @@ namespace Project_1.GameObjects.Entities.Corspes
 
         internal static void DrawSnapshots(SpriteBatch aBatch)
         {
+            //TODO: Should be drawn from somewhere else
             ThreadAffinity.AssertMainThread();
             // Snapshot-only draw path. Do not read live sim corpse list here.
             renderCorpses.ApplyUpdates();

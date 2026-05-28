@@ -36,6 +36,7 @@ namespace Project_1.GameObjects
 
         public static bool TryGetEntityByRenderId(int renderId, out Entity entity)
         {
+            //TODO: Check if there is a cleaner way to fingure this out
             ThreadAffinity.AssertSimThread();
             entity = null;
             if (renderId <= 0) return false;
@@ -66,6 +67,7 @@ namespace Project_1.GameObjects
                 entity = npcs[i];
                 return true;
             }
+            //TODO: If we are searching for something that doesn't exists we should probably be logging that
 
             return false;
         }
@@ -82,6 +84,7 @@ namespace Project_1.GameObjects
                 member = guild[i];
                 return true;
             }
+            //TODO: If we are searching for something that doesn't exists we should probably be logging that
 
             return false;
         }
@@ -112,11 +115,13 @@ namespace Project_1.GameObjects
                 return true;
             }
 
+            //TODO: If we are searching for something that doesn't exists we should probably be logging that
             return false;
         }
 
         public static bool TryGetFriendlyByName(string name, out Friendly friendly)
         {
+            //TODO: Should be depricated. Double get. Name could be an unsafe getter due to duplicates. If by name is desired, then a way to detect and handle duplicates are needed. At least a Name => id and using the above GetFriendlyByRenderId should be used
             ThreadAffinity.AssertSimThread();
             friendly = null;
             if (string.IsNullOrWhiteSpace(name)) return false;
@@ -144,11 +149,13 @@ namespace Project_1.GameObjects
             return false;
         }
 
-        static GuildMember GetClosestGuildMember() => entities.MinBy(x => x.DistanceTo(player.FeetPosition)) as GuildMember;
+        static GuildMember GetClosestGuildMember() => entities.MinBy(x => x.DistanceTo(player.FeetPosition)) as GuildMember; //TODO: This should be changed to only look through the party members on screen. This should eventually be developed to allow for use of tab targeting through this list
         static GuildMember[] GuildMembersInWorld => guild.Where(x => entities.Contains(x)).ToArray();
 
         public static bool TryGetEntityAt(WorldSpace worldPos, out Entity entity)
         {
+            //TODO: Change to the modern 3d system.
+            //TODO: Should search through a build list of rectangles and return rather than live objects
             ThreadAffinity.AssertSimThread();
             entity = null;
             if (player != null && player.WorldRectangle.Contains(worldPos.ToPoint()))

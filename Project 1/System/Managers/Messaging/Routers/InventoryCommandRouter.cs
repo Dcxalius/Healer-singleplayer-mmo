@@ -36,6 +36,7 @@ namespace Project_1.Items
             if (initialized) return;
             initialized = true;
 
+            //Q: Can these be innatilized in their respective systems? Like inventory or equipment?
             SubscribeSimCommand<InventorySwapItemsRequested>(HandleInventorySwapItemsRequested);
             SubscribeSimCommand<InventorySwapEquipmentRequested>(HandleInventorySwapEquipmentRequested);
             SubscribeSimCommand<InventoryEquipBagRequested>(HandleInventoryEquipBagRequested);
@@ -52,12 +53,21 @@ namespace Project_1.Items
             SubscribeSimCommand<EquipmentMoveToInventoryRequested>(HandleEquipmentMoveToInventoryRequested);
         }
 
+        /// <summary>
+        /// Subscribes a handler to the sim mailbox
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="handler"></param>
         static void SubscribeSimCommand<T>(Action<T> handler)
         {
             MailboxManager.RegisterSimCommandType<T>();
             MailboxManager.Sim.Subscribe(handler);
         }
 
+        /// <summary>
+        /// The event that handles the swapping of items in inventory
+        /// </summary>
+        /// <param name="e"></param>
         static void HandleInventorySwapItemsRequested(InventorySwapItemsRequested e)
         {
             ThreadAffinity.AssertSimThread();
@@ -66,6 +76,7 @@ namespace Project_1.Items
             player.Inventory.SwapItems(e.From, e.To);
         }
 
+        //TODO: Continue writing summaries
         static void HandleInventorySwapEquipmentRequested(InventorySwapEquipmentRequested e)
         {
             ThreadAffinity.AssertSimThread();
