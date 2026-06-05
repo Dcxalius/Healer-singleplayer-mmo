@@ -30,7 +30,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
     internal class Player : Friendly, ILightEmitter
     {
         const float PreviewTurnSpeedRadians = MathHelper.PiOver2;
-        static readonly string[] presentationDirectionNames =
+        static readonly string[] presentationDirectionNames = //Q? what is this for?
         {
             "Behind",
             "BackRight",
@@ -42,29 +42,37 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             "BackLeft"
         };
 
-        public float LightRadiusTiles => 6f;
-        public override Color MinimapColor => Color.White;
+        public override Color MinimapColor => Color.White; //TODO: Should be settable
+
+        //All the facing logic feels like it should be in the camera but could be wrong. Just feels like it makes more sense for the camera to manage wheter or not its followed object should rotate
         internal override bool FaceCameraInPreview => false;
         internal override bool FrameFacesCameraInPreview => true;
         internal override bool PresentationFacesCameraInPreview => true;
-        public PlayerData PlayerData => UnitData as PlayerData;
-        public Inventory Inventory => PlayerData.Inventory;
+        //
 
+        public PlayerData PlayerData => UnitData as PlayerData;
+
+        public Inventory Inventory => PlayerData.Inventory;
         public SpellBook SpellBook => PlayerData.SpellBook;
 
+        //TODO: Party should probably be PlayerParty and GuildMemberParty.
         public Party Party => party;
         Party party;
 
+        //TODO: Same thing with guild eventually... probably...
         public Guild Guild => guild;
         Guild guild;
+
+        //TODO: Move this to movement?
         public bool LockedMovement => lockedMovement;
         bool lockedMovement = false;
+
+        //Q: Debug?
         float previewFacingYawRadians;
         bool previewFacingYawInitialized;
         float previewLastFreeMoveYawRadians;
         bool previewLastFreeMoveYawInitialized;
 
-        public int Gold => PlayerData.Gold;
         internal float PreviewBodyFacingYawRadians
         {
             get
@@ -76,10 +84,12 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         internal int PreviewPresentationDirectionIndex => ResolvePreviewPresentationDirectionIndexCore();
         internal string PreviewPresentationDirectionName => presentationDirectionNames[PreviewPresentationDirectionIndex];
 
+        public int Gold => PlayerData.Gold;
 
+        //TODO: Should probably be moved up or depri, I think it's only used by the saving system atm
         public bool InCombatOrPartyInCombat => party.IsInCombat || InCombat;
 
-        public Player(string aName, string aClassName) /*Change class to be a class*/ : this(new PlayerData(aName, aClassName))
+        public Player(string aName, string aClassName)  : this(new PlayerData(aName, aClassName))
         {
 
         }
@@ -94,6 +104,12 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
             LoadSpellBar(PlayerData.SavedSpellsOnBar);
 
+            CreationEvents();
+        }
+
+        void CreationEvents()
+        {
+            //TODO: Could this be collapsed to a single event? PlayerCreated or something like that?
             MailboxManager.PublishUiEvent(new SpellbookRefreshed(RenderId, SpellBook.Spells.Select(x => x.SpellKey).ToArray()));
             MailboxManager.PublishUiEvent(new CharacterWindowSet(BuildCharacterWindowSnapshot()));
             MailboxManager.PublishUiEvent(new PlayerPlateSet(BuildUiSnapshot()));
@@ -103,14 +119,15 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         public override void Update()
         {
             ThreadAffinity.AssertSimThread();
-            Party.Update();
+            Party.Update(); //TODO: Determine the party flow, this feels wrong. Perhaps bundling at the manager levels to parties and update those and have the parties be responsible for their units updates? 
             base.Update();
         }
 
         void LoadSpellBar(string[] aSpellOnBar)
         {
+            //TODO: This feels like it should be in spellbar?
             if (aSpellOnBar == null) return;
-            Project_1.GameObjects.Spells.Spell[] spells = SpellBook.Spells;
+            Spell[] spells = SpellBook.Spells;
             string[] spellNamesToAddToBar = new string[aSpellOnBar.Length];
             for (int i = 0; i < aSpellOnBar.Length; i++)
             {
@@ -118,11 +135,12 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
                 if (!SpellBook.TryGetSpell(aSpellOnBar[i], out Project_1.GameObjects.Spells.Spell spell)) continue;
                 spellNamesToAddToBar[i] = spell.SpellKey;
             }
-            MailboxManager.PublishUiEvent(new SpellbarLoaded(RenderId, spellNamesToAddToBar));
+            MailboxManager.PublishUiEvent(new SpellbarLoaded(RenderId, spellNamesToAddToBar)); //TODO: What do we use the RenderID for? Feels like since the UIE responisble for the spells only exists for the player
         }
 
         public void GetPartyMembersFromGuild()
         {
+            //TODO: Rename, possible depri? //Q: What does this even do? What is the flow?
             ThreadAffinity.AssertSimThread();
             string[] partyMembers = PlayerData.Party;
             for (int i = 0; i < partyMembers.Length; i++)
@@ -133,8 +151,9 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             MailboxManager.PublishUiEvent(new GuildInviteStatusUpdated(partyMembers, Enumerable.Repeat(InviteStatus.Accepted, partyMembers.Length).ToArray()));
         }
 
-        public void ApplyMoveInput(bool left, bool right, bool up, bool down)
+        public void ApplyMoveInput(bool left, bool right, bool up, bool down) //TODO: Should the inputs be separated into Up/None/Down and Left/None/Right enums? Anything other than 4 bools tbh
         {
+            //TODO: Break up
             ThreadAffinity.AssertSimThread();
             if (HasDestination && LockedMovement) return;
 
@@ -160,7 +179,6 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
                     if (up) movementDirection += forward;
                     if (down) movementDirection -= forward;
                 }
-
                 TrackPreviewFreeMoveDirection(movementDirection);
                 velocity += new WorldSpace(movementDirection);
             }
@@ -174,7 +192,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
             if (velocity == WorldSpace.Zero) return;
             velocity.Normalize();
-            velocity *= Speed * (float)TimeManager.SecondsSinceLastFrame;
+            velocity *= Speed * (float)TimeManager.SecondsSinceLastFrame; //TODO: Ponder if it makes sense to make a SpeedProp that mults with deltatime
         }
 
         protected override bool TryResolvePreviewFacingYawRadians(out float aFacingYawRadians)
@@ -296,10 +314,11 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         {
             ThreadAffinity.AssertSimThread();
             PlayerData.Gold += aAmount;
+            //TODO: LoseGold(-aAmount) or GainGold(aAmount) Should prob be a separate event than the gold 
             MailboxManager.PublishUiEvent(new GoldChanged(Gold));
         }
 
-        CharacterWindowSnapshot BuildCharacterWindowSnapshot()
+        CharacterWindowSnapshot BuildCharacterWindowSnapshot() //TODO: This feels like it should be friendly, since guildmembers gear is shown in the same system as the players
         {
             ThreadAffinity.AssertSimThread();
             ItemUiSnapshot[] equippedItems = new ItemUiSnapshot[(int)Unit.Equipment.Slot.Count];
@@ -322,6 +341,8 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         WeaponSkillUiSnapshot[] BuildWeaponSkillSnapshots()
         {
+            //TODO: If this is use for more than just validation or creation something is wrong.
+            //TODO: There should be a SkillUpEvent()
             ThreadAffinity.AssertSimThread();
             List<WeaponSkillUiSnapshot> snapshots = new List<WeaponSkillUiSnapshot>();
             int maxSkill = Math.Max(1, CurrentLevel * 5);
@@ -342,6 +363,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         bool ShouldShowWeaponSkill(Items.SubTypes.Weapon.WeaponType weaponType)
         {
+            //TODO: Make a new class called Skill, Skill => WeaponSkill, Skill => Profession, Skill => Defense (What other skills are there in wow? Riding but nothing in our design about riding yet)
             if (weaponType == Items.SubTypes.Weapon.WeaponType.None ||
                 weaponType == Items.SubTypes.Weapon.WeaponType.Shield ||
                 weaponType == Items.SubTypes.Weapon.WeaponType.Holdable)
@@ -354,6 +376,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         static string FormatWeaponSkillName(Items.SubTypes.Weapon.WeaponType weaponType)
         {
+            //TODO: Move to WeaponSkill class
             return weaponType switch
             {
                 Items.SubTypes.Weapon.WeaponType.TwoHandedSword => "Two-Handed Sword",
@@ -366,6 +389,8 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         StatReportSnapshot BuildSecondaryReport()
         {
+            //TODO: The snapshot system should probably be reworked. Instead of sending each line they should already be bundled here. Strings shouldn't be used, rather just an object, and then the StatReport should get both the number and the string name from the object
+            //TODO: Worth waiting until the customizable Statreports?
             ThreadAffinity.AssertSimThread();
             PairReport report = new PairReport();
             SpellReportDetailsSnapshot spellDetails = BuildSpellReportDetails();
@@ -382,7 +407,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             return StatReportSnapshot.FromPairReport(report, spellDetails, StatLineCategoryResolver.ResolveCharacter);
         }
 
-        int BuildTotalAttackPower()
+        int BuildTotalAttackPower() //TODO: Should be internal to UnitData. Could have been a hack if there was no clean way to get the AP from data though.
         {
             ThreadAffinity.AssertSimThread();
             int strength = 0;
@@ -411,6 +436,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         SpellReportDetailsSnapshot BuildSpellReportDetails()
         {
+            //TODO: Same as other report
             ThreadAffinity.AssertSimThread();
             List<SpellSchoolBonusSnapshot> damageBonuses = new List<SpellSchoolBonusSnapshot>();
             List<SpellSchoolBonusSnapshot> critChanceBonuses = new List<SpellSchoolBonusSnapshot>();
@@ -462,7 +488,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
                 hitChanceBonuses.ToArray());
         }
 
-        protected override bool CheckForRelation()
+        protected override bool CheckForRelation() //TODO: Should be moved probably
         {
             if (target.RelationToPlayer == Relation.RelationToPlayer.Self || target.RelationToPlayer == Relation.RelationToPlayer.Friendly)
             {
@@ -479,7 +505,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         public override void ExpToParty(int aExpAmount)
         {
             ThreadAffinity.AssertSimThread();
-            party.ExpToParty(aExpAmount);
+            party.ExpToParty(aExpAmount); //Player is always in their own party so no need to check.
         }
     }
 }

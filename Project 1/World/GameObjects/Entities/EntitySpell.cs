@@ -17,6 +17,7 @@ namespace Project_1.GameObjects.Entities
         SpellCast spellCast;
         BuffList buffList;
 
+        //Q: At what point do we stop asserting sim threads?
         public bool StartCast(Spell aSpell)
         {
             ThreadAffinity.AssertSimThread();
@@ -99,6 +100,7 @@ namespace Project_1.GameObjects.Entities
             FlagForRefresh();
         }
 
+        //Q: Why does this need a separate method from RefreshStatsFromStatusChange? Rather than just calling FlagForRefresh?
         public void RefreshVisualsFromStatusChange()
         {
             ThreadAffinity.AssertSimThread();

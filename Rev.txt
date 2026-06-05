@@ -1,7 +1,6 @@
 Game1; checked and commented. A lot of todos and qs
 ThreadAffinity; check and commented. Only 1 q
 GraphicsManager; A lot of questions, Some todos added, biggest concern is how we handle drawing effects mid batch which is currently pretty bad
-SaveManager!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! this file is a distaster on multiple levels. Need to review this when more brainpower is available. Alert if this hasnt been reviewed again
 DebugManager; removed old exception handling since the vs one works again, mostly questions about how we handle writing debug
 ThreadingSettings, checked
 RandomManager; checked and commented. Most pressing concerns are the locks and that each type of random generation should have seperate seeds
@@ -33,9 +32,25 @@ ProjectileManager; Same drawing pipeline work needed
 ParticleManager; Should the lifespan of the Particles be moved to the main thread?
 UIInputBridge; Should probably be renamed or removed
 DebugShapes; Needs DebugCircle, and DebugComplex
-Entity; CONTINUE HEEERERE
+Entity; A lot of work needed in all aspects.
+^ Underlying systems havent been checked. Spellbook, Buffs, UnitData, etc
+SaveManager!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! this file is a distaster on multiple levels. Need to review this when more brainpower is available. Alert if this hasnt been reviewed again
 
 
 Unrelated bug: Left dragging + esc into release leaves the camera stuck at an offangle. 
 
 Unrelated note: Fps should be uncapped and a setting for fps cap should be added
+
+Made some notes about code standars somewhere. FIND THEM AND LIST THEM UNDER HERE INSTEAD OF RANDOMLY IN THE CODE
+
+All functions that are believed to be done should have summaries written. Anything that is done temporarily should be wrapped in this format.
+
+//TEMP
+//Reason: [Reason for existance of temp].
+//Remove Con: [At what point should this be deleted/refractored]
+
+int codeGoesHere = 1;
+
+//ENDOFTEMP 
+
+If multiple reasons and removal cons are in a section, add multiple, but there should always be one after the //TEMP line giving either all the reasons, or a summarized verison spanning the entire block

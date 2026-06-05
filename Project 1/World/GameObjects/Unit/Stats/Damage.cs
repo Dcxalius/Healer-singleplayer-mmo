@@ -16,6 +16,7 @@ namespace Project_1.GameObjects.Unit.Stats
 {
     internal struct Damage
     {
+        //Note: This looks like it is getting close to finalization
         public bool ContainsDamage => value.Values.Sum() > 0;
         public double Sum => value.Values.Sum();
         public int Count => value.Count;
@@ -41,6 +42,8 @@ namespace Project_1.GameObjects.Unit.Stats
                     throw new Exception("Tried to add same damage type twice in Damage constructor.");
             }
         }
+
+        static public Damage Zero => new Damage(new double[0], new DamageType[0]); //This might require DamageType to be new DamageType[1] { DamageType.True } or something
 
         public Damage(Damage aDamageTaken)
         {
@@ -77,6 +80,7 @@ namespace Project_1.GameObjects.Unit.Stats
 
             double lowValue, highValue;
 
+            //TODO: Seperate the below code to seperate methods
             if (aAttackingUnit.ClassData.IsCaster)
             {
                 lowValue = Math.Max(0.01, Math.Min(0.6, 1.3 - 0.05 * ratingDifference - 0.7));
@@ -102,7 +106,7 @@ namespace Project_1.GameObjects.Unit.Stats
             }
         }
 
-        public void ApplyBlocked(Entity aAttacker, Entity aDefender)
+        public void ApplyBlocked(Entity aAttacker, Entity aDefender) //Q: Should we track blocked damage separately? Allowing that data to also be displayed.
         {
             ThreadAffinity.AssertSimThread();
             foreach (var (k, v) in value)
@@ -121,13 +125,14 @@ namespace Project_1.GameObjects.Unit.Stats
             {
                 switch (k)
                 {
+                    //TODO: This should probably be reworked, using a seperate DamageType => SpellSchool pattern and then just checking if the damage type is physical, and if not doing the spell calc using the spell school.
                     case DamageType.Physical:
                         value[k] *= Defense.CalculateDamageReductionArmor(aDefender.Equipment.GetArmor * aAttacker.SecondaryStats.Attack.PercentPenetration - aAttacker.SecondaryStats.Attack.FlatPenetration, aAttacker.Level.CurrentLevel);
                         break;
                     case DamageType.Arcane:
-                        //How do we want to handle resistances for spells with multiple schools?
-                        //How do we want to handle partial resists for binary spells? If wow like not at all
-                        //How do we handle spelleffects, do slows and stuff only binary or partial as well?
+                        //Q: How do we want to handle resistances for spells with multiple schools? A: For now the damage is calculated seperately. Need to check how we calculate resitance prob though.
+                        //Q: How do we want to handle partial resists for binary spells? A: If wow-like, not at all
+                        //Q: How do we handle spelleffects, are slows and stuff only binary or partial as well? Just because wow doesn't allow for partially resisting a frost nova doesn't mean we have to.
                         
 
                         if (!aDamager.BinarySpell)
@@ -171,10 +176,7 @@ namespace Project_1.GameObjects.Unit.Stats
         }
     }
 
-   
-
-
-    public enum DamageType
+    public enum DamageType //TODO: Move this into the Damage class
     {
         Physical,
         Arcane,

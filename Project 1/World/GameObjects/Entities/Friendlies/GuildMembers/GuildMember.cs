@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.GameObjects.Unit;
 using Project_1.Textures;
@@ -14,11 +14,8 @@ using Project_1.Managers;
 
 namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
 {
-    internal class GuildMember : Friendly, ILightEmitter
+    internal class GuildMember : Friendly, ILightEmitter //TODO: Find a better name? Since while they are ai, they are more playerlike than other npcs
     {
-        public float LightRadiusTiles => 5f;
-        
-
         public AttackTree AttackLogic => attackTree;
         internal float MinimumAttackRange => CalculateMinimumAttackRange();
 
@@ -26,6 +23,8 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
 
         public struct GuildMemberData
         {
+            //Q: What is this for?
+            //Its called in friendly which feels wrong af
             public string Name => name;
             public string Level => level;
             public string Class => @class;
@@ -64,11 +63,13 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
 
         void CheckLeavingDistance()
         {
+            //TODO: This is pretty rough, we should probably have a more robust system for this, but for now this will do.
             if (!leaving || HasDestination)
             {
                 return;
             }
 
+            //TODO: Make sure this doesn't bug out if the player is dead or guildmember is in combat, potentially prevent leaving if the guildmember is in combat or the player is dead?
             RemoveNamePlate();
             ObjectManager.RemoveEntity(this);
         }
@@ -107,7 +108,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
             Destination.AddDestination(aPos);
         }
 
-        protected override bool CheckForRelation()
+        protected override bool CheckForRelation() //Q: Feels like there is a cleaner way to do this.
         {
             if (target.RelationToPlayer == Relation.RelationToPlayer.Self || target.RelationToPlayer == Relation.RelationToPlayer.Friendly)
             {
@@ -128,15 +129,15 @@ namespace Project_1.GameObjects.Entities.Friendlies.GuildMembers
             Party party = ObjectManager.Player.Party;
             if (!party.IsInParty(this))
             {
+                //TODO: Handling seperate party that the player is not in.
                 GainExperience(aExpAmount);
                 return;
             }
 
             party.DivideExpAmongParty(aExpAmount);
-
         }
 
-        float CalculateMinimumAttackRange()
+        float CalculateMinimumAttackRange() //TODO: This feels like this should be deeper in Enitity even perhaps? Why is it here?
         {
             AttackData attacks = UnitData.AttackData;
 

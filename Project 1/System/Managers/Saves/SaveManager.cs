@@ -29,6 +29,7 @@ namespace Project_1.Managers
         static JsonSerializerSettings serializerSettings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto};
         static string saveFolder;
 
+        //TODO: Is there a cleaner way to do these checks?
         public static string Effects => Path.Combine(contentRootDirectory, "Effects");
         public static string Settings => Path.Combine(contentRootDirectory, "Settings");
         public static string HudSettings => Path.Combine(Settings, "Hud.set");
@@ -71,7 +72,7 @@ namespace Project_1.Managers
             initialized = true;
             contentRootDirectory = Game1.ContentManager.RootDirectory;
 
-
+            //TODO: 
             InitSaveFolder();
 
             InitSaves();
@@ -168,8 +169,9 @@ namespace Project_1.Managers
 
         static void InitSaveFolder()
         {
-            saveFolder = Path.Combine(contentRootDirectory, "Saves");
+            saveFolder = Path.Combine(contentRootDirectory, "Saves"); //Q: Why is this path not one of the string props?
 
+            //Q: Any deeper verification needed that everything is where it is supposed to?
             if (Directory.Exists(saveFolder)) return;
 
             Directory.CreateDirectory(saveFolder);
@@ -178,6 +180,7 @@ namespace Project_1.Managers
         public static bool RequestContinueLastSave()
         {
             ThreadAffinity.AssertSimThread();
+            //TODO: Move this to somewhere else? Prehaps the Continue button/auto call in debug should be done on the main thread by way of events?
             Save save;
             lock (savesLock)
             {
@@ -441,6 +444,7 @@ namespace Project_1.Managers
 
         public static T ImportData<T>(string aJsonString)
         {
+            //TODO: Figure out a way to get cleaner crash data when this fails.
             return JsonConvert.DeserializeObject<T>(aJsonString, serializerSettings);
         }
 

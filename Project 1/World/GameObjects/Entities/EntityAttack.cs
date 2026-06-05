@@ -1,22 +1,23 @@
 using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.GameObjects.Entities.Corspes;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.FloatingTexts;
 using Project_1.GameObjects.Unit;
 using Project_1.GameObjects.Unit.Stats;
 using Project_1.Managers;
-using Project_1.Particles;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
+using Project_1.Particles;
+using Project_1.World.GameObjects.Spells.SpellEffects;
+using Project_1.World.GameObjects.Unit.Stats.Secondary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Project_1.GameObjects.Entities.Friendlies.Players;
-using Project_1.World.GameObjects.Spells.SpellEffects;
-using Project_1.World.GameObjects.Unit.Stats.Secondary;
+using static Project_1.GameObjects.Unit.Stats.HitTable;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -32,6 +33,8 @@ namespace Project_1.GameObjects.Entities
 
         public void SetTarget(Entity aEntity)
         {
+            //TODO: Target should be defined. Probably as an interface. This allows for setting more things like doodads and corpses as targets.
+            //TODO: Target =/= Attacking target, so that needs to be implemented somehow.
             ThreadAffinity.AssertSimThread();
             target = aEntity;
             MailboxManager.PublishUiEvent(new TargetChanged(RelationToPlayer.ToRelationToPlayerKind(), target?.BuildUiSnapshot()));
@@ -47,11 +50,11 @@ namespace Project_1.GameObjects.Entities
         {
             ThreadAffinity.AssertSimThread();
             target = null;
-            MailboxManager.PublishUiEvent(new TargetChanged(RelationToPlayer.ToRelationToPlayerKind(), null));
+            MailboxManager.PublishUiEvent(new TargetChanged(RelationToPlayer.ToRelationToPlayerKind(), null)); //TODO: I'm assuming relation is used to figure out what unit frame is used. This should probably be changed to target the specific affected unitframes
         }
 
 
-        float GetMinAttackRange()
+        float GetMinAttackRange() //Q: How should we handle attack range for different ranges? Currently it checks the smallest, and then internal checks in the attack patterns to see if the particular weapon is in range to be used.
         {
             float minAttackRange;
             if (unitData.AttackData.OffHandAttack != null && unitData.AttackData.MainHandAttack != null)
@@ -72,7 +75,7 @@ namespace Project_1.GameObjects.Entities
 
         void AttackTarget()
         {
-            if (target == null) return;
+            if (target == null) return; //TODO: Make this stop the unit from attacking everything non-friendly that it targets. There should probably be a bool somewhere here or the target interface.
             if (!CheckForRelation()) return;
 
             AttackData a = unitData.AttackData;
@@ -97,19 +100,21 @@ namespace Project_1.GameObjects.Entities
 
         void HitTarget(Unit.Attack aAttack)
         {
-            RemoveStatusBuffsByTag("Stealth");
+            //TODO: Reaching the maximum accepted size, should be broken up.
+            RemoveStatusBuffsByTag("Stealth"); //TODO: Make this general perhaps? Perhaps a event system for buffs? Allowing for the subsription to OnAttack events
             HitTable.HitResult hitResult = HitTable.GenerateTable(aAttack, this, target);
 
-            //TODO: Proc onhits,
+            //TODO: Proc onhits
             Damage damage;
             if (hitResult == HitTable.HitResult.Miss || hitResult == HitTable.HitResult.Dodge || hitResult == HitTable.HitResult.Parry)
             {
-                damage = new Damage(new double[] { 0 }, new DamageType[] { DamageType.True });
+                damage = Damage.Zero;
             }
             else
             {
                 //Check if eq/talents/skills/buffs/spells procs
-                damage = new Damage(new double[] { aAttack.GetAttackDamage }, new DamageType[] { DamageType.Physical }); //TODO: Get DamageType from weapon instead
+                damage = new Damage(aAttack.GetAttackDamage, DamageType.Physical); //TODO: Get DamageType from weapon instead
+                //TODO: Handle attacks from weapons that do multiple types of damage.
             }
             target.RecieveAttack(hitResult, this, aAttack, damage);
             TargetAliveCheck();
@@ -121,6 +126,7 @@ namespace Project_1.GameObjects.Entities
             if (aggroTablesIAmOn.Contains(aNonfriendly))
             {
                 DebugManager.Print(aNonfriendly + " tried to add me to a table I thought I was on.");
+                //Q: This has never been printed, should this just be an Assert?
                 return;
             }
             aggroTablesIAmOn.Add(aNonfriendly);
@@ -132,81 +138,110 @@ namespace Project_1.GameObjects.Entities
             if (!aggroTablesIAmOn.Contains(aNonfriendly))
             {
                 DebugManager.Print(aNonfriendly + " tried to remove me from a table I didn't know I was on.");
+                //Q: This has never been printed, should this just be an Assert?
                 return;
             }
             aggroTablesIAmOn.Remove(aNonfriendly);
         }
-        public void RecieveAttack(HitTable.HitResult aHitResult, Entity aAttacker, Unit.Attack aDamagingThing, Damage aDamageTaken) //TODO: Events need to be checked, all attacks should fire an attack event, and then hit/miss/dodge/parry/block/glancing/crit/crushing events should be fired based on the result, and then a damage event should be fired if damage is actually taken, and then a death event should be fired if the attack killed the target. Also need to make sure that procs can subscribe to the correct events and that the events contain all necessary information for procs to determine whether they should proc or not
-        {
-            ThreadAffinity.AssertSimThread();
-            string resultString = "";
-            Color resultColor = Color.White;
-            if (aHitResult <= HitTable.HitResult.Parry)
-            {
-                switch (aHitResult)
-                {
-                    case HitTable.HitResult.Miss:
-                        resultString = "Miss";
-                        resultColor = Color.Gray;
-                        PublishMissEvent(aAttacker, aDamagingThing);
-                        break;
-                    case HitTable.HitResult.Dodge:
-                        resultString = "Dodge";
-                        resultColor = Color.DarkGray;
-                        PublishDodgeEvent(aAttacker, aDamagingThing);
-                        break;
-                    case HitTable.HitResult.Parry:
-                        resultString = "Parry";
-                        resultColor = Color.DarkSlateGray;
-                        PublishParryEvent(aAttacker, aDamagingThing);
-                        break;
-                }
 
-                SpawnFlyingText(resultString, GetDirOfFloatingText(aAttacker.FeetPosition), resultColor, Color.Black, 1f);
+        bool CheckMiss(HitTable.HitResult aHitResult, Entity aAttacker, Unit.Attack aDamagingThing)
+        {
+            //aHitResult != HitResult.Miss ? return false : PublishMissEvent(aAttacker, aDamagingThing); is probably the final verison
+            //At that point it might be worth breaking it down into simply mapping the HitResult to a PublishEvent, and then just calling that off a switch
+            if (aHitResult != HitResult.Miss) return false;
+            PublishMissEvent(aAttacker, aDamagingThing);
+            if (this is NonFriendly nf) nf.AddToAggroTable(aAttacker, 1); //TODO: This should be moved into the damage recieved event system
+            return true;
+        }
+
+        bool CheckDodge(HitTable.HitResult aHitResult, Entity aAttacker, Unit.Attack aDamagingThing)
+        {
+            if (aHitResult != HitResult.Dodge) return false;
+            PublishDodgeEvent(aAttacker, aDamagingThing);
+            if (this is NonFriendly nf) nf.AddToAggroTable(aAttacker, 1); //TODO: This should be moved into the damage recieved event system
+            return true;
+        }
+
+        bool CheckParry(HitTable.HitResult aHitResult, Entity aAttacker, Unit.Attack aDamagingThing)
+        {
+            if (aHitResult != HitResult.Parry) return false;
+            PublishParryEvent(aAttacker, aDamagingThing);
+            if (this is NonFriendly nf) nf.AddToAggroTable(aAttacker, 1); //TODO: This should be moved into the damage recieved event system
+            return true;
+        }
+        
+        Color CheckCrit(Entity aAttacker, Damage aDamageTaken)
+        {
+            //PublishCritEvent();
+            aDamageTaken.ApplyCriticalStrike(aAttacker, this); //TODO: Double check that this applies correctly
+            return Color.Yellow;
+        }
+
+        Color CheckCrushing(Entity aAttacker, Damage aDamageTaken)
+        {
+            //PublishCrushingEvent();
+            aDamageTaken.ApplyCrushingDamage(aAttacker, this);
+            return Color.Orange;
+        }
+
+        Color CheckBlock(HitTable.HitResult aHitResult, Entity aAttacker, Unit.Attack aDamagingThing, Damage aDamageTaken)
+        {
+            if (aHitResult != HitTable.HitResult.Block) return Color.Black;
+            aDamageTaken.ApplyBlocked(aAttacker, this);
+            PublishBlockEvent(aAttacker, aDamagingThing, !aDamageTaken.ContainsDamage);
+            
+            return CheckFullBlock(aHitResult, aAttacker, aDamagingThing, aDamageTaken); //TODO: Decide if there should be a separate color here, or if current matching Hit is fine, then codify the HitColor somewhere //Not that it matters once the proper coloring system is in place.
+        }
+
+        Color CheckFullBlock(HitTable.HitResult aHitResult, Entity aAttacker, Unit.Attack aDamagingThing, Damage aDamageTaken)
+        {
+            if (!aDamageTaken.ContainsDamage)
+            {
+                SpawnFlyingText("Blocked", GetDirOfFloatingText(aAttacker.FeetPosition), Color.LightGray, Color.Black, 1f);
+                PublishHitEvent(aAttacker, aDamagingThing, aHitResult, aDamageTaken);
+                //TODO: A seperate FullBlock Event for this case? Possible not, either way, firing a hit even seems wrong.
                 if (this is NonFriendly nf) nf.AddToAggroTable(aAttacker, 1);
-                return;
+                return Color.LightGray;
             }
-            Damage premitigation = new Damage(aDamageTaken);
+            return Color.Gray;
+        }
+
+        Color CheckGlancing(Entity aAttacker, Unit.Attack aDamagingThing, Damage aDamageTaken)
+        {
+            Debug.Assert(UnitType != UnitType.Player); //TODO: More robust check? Also gm should probably also be able to glance
+            aDamageTaken.ApplyGlancingBlowDamage(aAttacker, aDamagingThing, this);
+            return Color.DimGray;
+        }
+
+
+        Color CheckHit(HitTable.HitResult aHitResult, Entity aAttacker, Unit.Attack aDamagingThing, Damage aDamageTaken)
+        {
             switch (aHitResult)
             {
                 case HitTable.HitResult.Glancing:
-                    Debug.Assert(UnitType != UnitType.Player);
-                    aDamageTaken.ApplyGlancingBlowDamage(aAttacker, aDamagingThing, this);
-                    resultColor = Color.DimGray;
-                    break;
+                    return CheckGlancing(aAttacker, aDamagingThing, aDamageTaken);
                 case HitTable.HitResult.Block:
-                    aDamageTaken.ApplyBlocked(aAttacker, this);
-                    resultColor = Color.LightGray;
-                    bool fullyBlocked = !aDamageTaken.ContainsDamage;
-                    PublishBlockEvent(aAttacker, aDamagingThing, fullyBlocked);
-                    if (fullyBlocked)
-                    {
-                        resultString = "Blocked";
-                        SpawnFlyingText(resultString, GetDirOfFloatingText(aAttacker.FeetPosition), resultColor, Color.Black, 1f);
-                        PublishHitEvent(aAttacker, aDamagingThing, aHitResult, aDamageTaken);
-                        if (this is NonFriendly nf) nf.AddToAggroTable(aAttacker, 1);
-                        return;
-                    }
-                    break;
+                    return CheckBlock(aHitResult, aAttacker, aDamagingThing, aDamageTaken);
                 case HitTable.HitResult.Crit:
-                    aDamageTaken.ApplyCriticalStrike(aAttacker, this);
-                    resultColor = Color.Yellow;
-                    break;
+                    return CheckCrit(aAttacker, aDamageTaken);
                 case HitTable.HitResult.Crushing:
-                    aDamageTaken.ApplyCrushingDamage(aAttacker, this);
-                    resultColor = Color.Orange;
-                    break;
+                    return CheckCrushing(aAttacker, aDamageTaken);
                 case HitTable.HitResult.Hit:
-                    resultColor = Color.Black; //TODO: Instead of just using text color, have the text color depend on the damage type and glancing/blocked/crit/crushing/hit change the border color
-                    break;
+                    return Color.Black; 
                 default:
-                    break;
+                    throw new Exception("Missing Case");
             }
+        }
+
+        void ProcessHit(HitTable.HitResult aHitResult, Entity aAttacker, Unit.Attack aDamagingThing, Damage aDamageTaken, Color aResultColor)
+        {
             aDamageTaken.ApplyDamageReduction(aAttacker, this, aDamagingThing);
             PublishHitEvent(aAttacker, aDamagingThing, aHitResult, aDamageTaken);
             PublishOutcomeEvent(aAttacker, aDamagingThing, aHitResult, aDamageTaken);
 
             if (!aDamageTaken.ContainsDamage) return; //TODO: Spawn Miss or Immune instead of just returning
+
+
             string causeName = aDamagingThing != null ? aDamagingThing.WeaponType.ToString() : "Attack";
             for (int i = 0; i < aDamageTaken.Count; i++)
             {
@@ -215,16 +250,40 @@ namespace Project_1.GameObjects.Entities
                 // And introduce a offset to the floating text position so that multiple damage types don't overlap
                 float damageValue = (float)aDamageTaken[aDamageTaken.Types[i]];
                 if (damageValue <= 0) continue;
-                ProcessDamage(aAttacker, causeName, damageValue, 1f, aDamageTaken.Types[i], resultColor);
+                ProcessDamage(aAttacker, causeName, damageValue, 1f, aDamageTaken.Types[i], aResultColor);
             }
 
             ParticleMovement bloodMovement = new ParticleMovement(GetDirOfFloatingText(aAttacker.FeetPosition), WorldSpace.Zero, 0.9f);
             ParticleManager.SpawnParticle(bloodsplatter, WorldRectangle, FeetPosition.Y, bloodMovement, (int)Math.Max(1, Math.Min((aDamageTaken.Sum / MaxHealth) * 100, 100)));
-            FlagForRefresh(); //TODO: Check death here?
+            FlagForRefresh();
+            //TODO: Check death here?
+        }
+
+        bool CheckDamageless(HitTable.HitResult aHitResult, Entity aAttacker, Unit.Attack aDamagingThing)
+        {
+            if (CheckMiss(aHitResult, aAttacker, aDamagingThing)) return false;
+            if (CheckDodge(aHitResult, aAttacker, aDamagingThing)) return false;
+            if (CheckParry(aHitResult, aAttacker, aDamagingThing)) return false;
+            return true;
+        }
+
+        public void RecieveAttack(HitTable.HitResult aHitResult, Entity aAttacker, Unit.Attack aDamagingThing, Damage aDamageTaken) //TODO: Events need to be checked, all attacks should fire an attack event, and then hit/miss/dodge/parry/block/glancing/crit/crushing events should be fired based on the result, and then a damage event should be fired if damage is actually taken, and then a death event should be fired if the attack killed the target. Also need to make sure that procs can subscribe to the correct events and that the events contain all necessary information for procs to determine whether they should proc or not
+        {
+            //TODO: Currently this is called by the attacker. Makes more sense to collect the attacks from all entities first, having them send an event, then processing all the damage taken after the attacks have been dealt with.
+            //Then catch that event per entity and process it, allowing for cleaner update flow. Currently entities are updating each other.
+            ThreadAffinity.AssertSimThread();
+
+            //Order shouldn't matter, but should be in proper hittable order for clarity.
+            if (CheckDamageless(aHitResult, aAttacker, aDamagingThing)) return;
+            Damage preMitigation = new Damage(aDamageTaken); //Q: We need to track this for later im pretty sure
+            Color resultColor = CheckHit(aHitResult, aAttacker, aDamagingThing, aDamageTaken); //TODO: Prehaps move the color to an out argument for cleanliness here? Prehaps even better, create a custom struct to hold the results and return that instead.
+            Damage postMitigation = new Damage(aDamageTaken); //Q: We need to track this for later im pretty sure
+            ProcessHit(aHitResult, aAttacker, aDamagingThing, aDamageTaken, resultColor);
         }
 
         public void RecieveSpellAttack(Entity aCaster, SpellEffect aSpellEffect, Damage aDamageTaken)
         {
+            //TODO: Break up
             ThreadAffinity.AssertSimThread();
             if (aSpellEffect.StatSource == AbilityStatSource.Attack)
             {
@@ -361,9 +420,9 @@ namespace Project_1.GameObjects.Entities
             throw new InvalidOperationException("No attack source available for attack-sourced spell.");
         }
 
-        //TODO: aCauseName should probably not be a string, but rather some kind of reference to the spell/ability/item that caused the damage
         protected virtual void ProcessDamage(Entity aCause, string aCauseName, float aDamageTaken, float aThreatMod, DamageType aDamageType, Color aBorderColor, string aPrefix = "", string aSuffix = "")
         {
+            //TODO: Break up
             Color textColor = aDamageType switch
             {
                 DamageType.Physical => Color.Red,
@@ -389,7 +448,7 @@ namespace Project_1.GameObjects.Entities
 
             string absorbSuffix = absorbed > 0 ? $" ({FormatHealthDelta(absorbed)} Absorbed)" : string.Empty;
             double appliedDelta = ApplyHealthDelta(-afterAbsorb);
-            if (appliedDelta < 0)
+            if (appliedDelta < 0) //TODO: This should be handled better. Have the stealthspells instead subscribe to an OnDamageTaken event, and then have the spell remove itself when damage is taken
             {
                 RemoveStatusBuffsByTag("Stealth");
             }
@@ -399,112 +458,17 @@ namespace Project_1.GameObjects.Entities
         void SpawnFlyingText(string aHealthChangeValue, WorldSpace aDirOfFlyingStuff, Color aTextColor, Color aBorderColor, float aBorderWidth) => FloatingTextManager.AddFloatingText(new FloatingText(aHealthChangeValue, aTextColor, FeetPosition, aDirOfFlyingStuff, aBorderColor: aBorderColor, aBorderWidth: aBorderWidth));
 
 
-        WorldSpace GetDirOfFloatingText(WorldSpace aFeetPosOfTriggerer)
+        WorldSpace GetDirOfFloatingText(WorldSpace aFeetPosOfTriggerer) //TODO: Generalize?
         {
+            //TODO: Entire floating text system needs to be reworked. WorldSpace will be 3d eventually, and we need to determine if there should be floating text in the 3d space or just in screenspace.
+            //2d is easier as it is just converting the worldspace position to screenspace and then doing the floating text pos and angle based on that, but 3d needs new objects.
             WorldSpace dirOfFlyingStuff = (FeetPosition - aFeetPosOfTriggerer);
             if (dirOfFlyingStuff == WorldSpace.Zero)
             {
-                dirOfFlyingStuff.Y = 1;
+                dirOfFlyingStuff = new WorldSpace(0, 1);
             }
             dirOfFlyingStuff.Normalize();
             return dirOfFlyingStuff;
-        }
-
-        void PublishDodgeEvent(Entity aAttacker, Unit.Attack aAttack)
-        {
-            PublishToDefender(new DodgeEvent(aAttacker, this, aAttack));
-            PublishToAttacker(aAttacker, new AttackDodgedEvent(aAttacker, this, aAttack));
-        }
-
-        void PublishParryEvent(Entity aAttacker, Unit.Attack aAttack)
-        {
-            PublishToDefender(new ParryEvent(aAttacker, this, aAttack));
-            PublishToAttacker(aAttacker, new AttackParriedEvent(aAttacker, this, aAttack));
-        }
-
-        void PublishBlockEvent(Entity aAttacker, Unit.Attack aAttack, bool aFullyBlocked)
-        {
-            PublishToDefender(new BlockEvent(aAttacker, this, aAttack, aFullyBlocked));
-            PublishToAttacker(aAttacker, new AttackBlockedEvent(aAttacker, this, aAttack, aFullyBlocked));
-        }
-
-        void PublishMissEvent(Entity aAttacker, Unit.Attack aAttack)
-        {
-            PublishToAttacker(aAttacker, new AttackMissedEvent(aAttacker, this, aAttack));
-            PublishToDefender(new MissedByEvent(aAttacker, this, aAttack));
-        }
-
-        void PublishHitEvent(Entity aAttacker, Unit.Attack aAttack, HitTable.HitResult aResult, Damage aDamageTaken)
-        {
-            var snapshot = new Damage(aDamageTaken);
-            PublishToAttacker(aAttacker, new AttackHitEvent(aAttacker, this, aAttack, aResult, snapshot));
-            PublishToDefender(new HitTakenEvent(aAttacker, this, aAttack, aResult, new Damage(snapshot)));
-        }
-
-        void PublishOutcomeEvent(Entity aAttacker, Unit.Attack aAttack, HitTable.HitResult aResult, Damage aDamageTaken)
-        {
-            var snapshot = new Damage(aDamageTaken);
-            switch (aResult)
-            {
-                case HitTable.HitResult.Glancing:
-                    PublishToAttacker(aAttacker, new AttackGlancedEvent(aAttacker, this, aAttack, snapshot));
-                    PublishToDefender(new GlancingTakenEvent(aAttacker, this, aAttack, new Damage(snapshot)));
-                    break;
-                case HitTable.HitResult.Crit:
-                    PublishToAttacker(aAttacker, new AttackCritEvent(aAttacker, this, aAttack, snapshot));
-                    PublishToDefender(new CritTakenEvent(aAttacker, this, aAttack, new Damage(snapshot)));
-                    break;
-                case HitTable.HitResult.Crushing:
-                    PublishToAttacker(aAttacker, new AttackCrushedEvent(aAttacker, this, aAttack, snapshot));
-                    PublishToDefender(new CrushingTakenEvent(aAttacker, this, aAttack, new Damage(snapshot)));
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        void PublishSpellHitEvent(Entity aCaster, SpellEffect aSpellEffect)
-        {
-            PublishToAttacker(aCaster, new SpellHitEvent(aCaster, this, aSpellEffect));
-        }
-
-        void PublishSpellCritEvent(Entity aCaster, SpellEffect aSpellEffect)
-        {
-            PublishToAttacker(aCaster, new SpellCritEvent(aCaster, this, aSpellEffect));
-        }
-
-        void PublishSpellResistEvent(Entity aCaster, SpellEffect aSpellEffect, bool aImmune)
-        {
-            PublishToAttacker(aCaster, new SpellResistEvent(aCaster, this, aSpellEffect, aImmune));
-        }
-
-        void PublishSpellHitTakenEvent(Entity aCaster, SpellEffect aSpellEffect)
-        {
-            var evt = new SpellHitTakenEvent(aCaster, this, aSpellEffect);
-            Events.Publish(evt);
-        }
-
-        void PublishSpellCritTakenEvent(Entity aCaster, SpellEffect aSpellEffect)
-        {
-            var evt = new SpellCritTakenEvent(aCaster, this, aSpellEffect);
-            Events.Publish(evt);
-        }
-
-        void PublishSpellResistedByTargetEvent(Entity aCaster, SpellEffect aSpellEffect, bool aImmune)
-        {
-            var evt = new SpellResistedByTargetEvent(aCaster, this, aSpellEffect, aImmune);
-            Events.Publish(evt);
-        }
-
-        void PublishToDefender<T>(T aEvent)
-        {
-            Events.Publish(aEvent);
-        }
-
-        void PublishToAttacker<T>(Entity aAttacker, T aEvent)
-        {
-            if (aAttacker == null) return;
-            aAttacker.Events.Publish(aEvent);
         }
     }
 }

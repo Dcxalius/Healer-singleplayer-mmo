@@ -13,7 +13,7 @@ using Project_1.World.GameObjects.Unit.Stats.Primary;
 
 namespace Project_1.GameObjects.Unit.Classes
 {
-    internal class ClassData
+    internal class ClassData //TODO: Change class to be a class rathar than using string for id everywhere
     {
         public enum Type
         {

@@ -30,7 +30,7 @@ namespace Project_1.GameObjects.Entities
             }
         }
 
-        public float Speed => unitData.MovementData.Speed * CalculateMovementSpeedMultiplier();
+        public float Speed => unitData.MovementData.Speed * CalculateMovementSpeedMultiplier(); //Q: Should CalculateMovementSpeedMultiplier be here, or should it be moved inside of unitData?
 
         public float CalculateMovementSpeedMultiplier()
         {
@@ -53,14 +53,14 @@ namespace Project_1.GameObjects.Entities
 
         public void Movement()
         {
-            //TODO: AttackRange is here to help the entity stop earlier.
+            //TODO: AttackRange is here to help the entity stop earlier. We should probably seperate the movement and attack range stopping.
             Destination.Update();
 
             //TODO: Should probably be accessed differently, should we be walking to the closest spot in range rather than the entity and then stopping when we are in range?S
             float minAttackRange = GetMinAttackRange();
 
             velocity += Destination.GetVelocity(minAttackRange, Speed, new WorldSpace(FeetSize));
-            base.Update(); //TODO: This shouldnt be here
+            base.Update(); //TODO: This shouldnt be here, for now it has to since thise is where we update the position, so we need it right after velocity is updated but before checking for collisions.
             CheckForCollisions();
 
             unitData.Position = FeetPosition;
@@ -68,9 +68,10 @@ namespace Project_1.GameObjects.Entities
             unitData.Velocity = velocity;
         }
 
-        void CheckForCollisions() 
+        void CheckForCollisions()
         {
             //TODO: Collision needs reworking
+            //Needed a rename anyways since this does more than checking the collisions, but the entire collision system needs to both be designed and implemented.
             List<(Rectangle, Rectangle)> resultingCollisions = TileManager.CollisionManager.CollisionsWithUnwalkable(this);
 
             if (resultingCollisions.Count != 0)

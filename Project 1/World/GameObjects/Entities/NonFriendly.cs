@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.GameObjects.Spawners.Pathing;
 using Project_1.GameObjects.Unit;
@@ -17,8 +17,9 @@ namespace Project_1.GameObjects.Entities
 {
     internal class NonFriendly : Entity
     {
-        public override Color MinimapColor => Color.Red;
-        public enum BehaviourWhenAttacked
+        public override Color MinimapColor => Color.Red; //TODO: Settable, but should it be filterable? Maybe even implement the tracking system, allowing to set the different trackings to different colors?
+        //TODO: Determine how much filtering that tracking system should allow? Color per type of filter?
+        public enum BehaviourWhenAttacked //TODO: Implement AI behaviour trees, mobs can be relative simple but NPCs should be more advanced
         {
             Flee,
             Retaliate,
@@ -28,10 +29,10 @@ namespace Project_1.GameObjects.Entities
         public override bool InCombat => aggroTable.Count > 0;
 
         MobPathing pathing;
-
         AggroTable aggroTable;
 
         public SavedMobData SavedMobData => UnitData as SavedMobData;
+        //TODO: Since the breakup is probably going to be NF => Mob, NF => Npc, this should prob be in mob
 
         public NonFriendly(MobPathing aPathing, SavedMobData aUnitData) : base(aUnitData)
         {
@@ -49,7 +50,7 @@ namespace Project_1.GameObjects.Entities
             aggroTable.Update();
 
 
-            GetNewPath();
+            GetNewPath(); //TODO: Check if this should actually be done after update
         }
 
         void GetNewPath()
@@ -61,10 +62,12 @@ namespace Project_1.GameObjects.Entities
                 Destination.AddDestination(nextSpace.Value);
             }
         }
+
         protected override void Death()
         {
             ThreadAffinity.AssertSimThread();
             int[] averageLevel = aggroTable.GetLevelOfAggroTable(); //TODO: Change this to not be dependant on aggroTable?
+            //TODO: Internal damage by party tracker for exp calcs?
 
             int exp = UnitData.Level.ExpReward((int)Math.Round(averageLevel.Average()));
             aggroTable.Tagger.ExpToParty(exp);
@@ -79,13 +82,13 @@ namespace Project_1.GameObjects.Entities
             base.ProcessDamage(aCause, aCauseName, aDamageTaken, aThreatMod, aDamageType, aBorderColor, aPrefix, aSuffix);
         }
 
-        public virtual void AddToAggroTable(Entity aEntityToAdd, float aThreatValue)
+        public virtual void AddToAggroTable(Entity aEntityToAdd, float aThreatValue) //TODO: Move
         {
             ThreadAffinity.AssertSimThread();
             aggroTable.AddToAggroTable(aEntityToAdd, aThreatValue);
         }
 
-        public void RemoveFromAggroTable(Entity aEntity)
+        public void RemoveFromAggroTable(Entity aEntity) //TODO: Move
         {
             ThreadAffinity.AssertSimThread();
             aggroTable.RemoveFromAggroTable(aEntity);
@@ -93,11 +96,9 @@ namespace Project_1.GameObjects.Entities
 
         protected override bool CheckForRelation()
         {
-            if (target.RelationToPlayer != RelationToPlayer) return true;
-            
+            if (target.RelationToPlayer != RelationToPlayer) return true; //TODO: Deeper check here. Npcs should check factions, Mobs should check type of mob
 
             return false;
-            
         }
 
         public override void ExpToParty(int aExpAmount)

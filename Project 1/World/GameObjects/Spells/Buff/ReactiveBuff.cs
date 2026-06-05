@@ -9,7 +9,8 @@ namespace Project_1.GameObjects.Spells.Buff
     // Applied on the entity that dodged or parried. Signals that Riposte (or any
     // AfterDodgeOrParry spell) is available. Refreshes its duration on repeated
     // dodge/parry within the window, and is consumed immediately when the spell fires.
-    internal class ReactiveBuff : Buff
+            
+    internal class ReactiveBuff : Buff //TODO: ReactiveBuff should be renamed, OR it should take the trigger causes and manage that internally; new ReactiveBuff(causeMask) or something like that.
     {
         const double windowDurationMs = 5000;
 

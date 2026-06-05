@@ -251,7 +251,7 @@ namespace Project_1.GameObjects.Entities
             return abs.ToString("0.##", CultureInfo.InvariantCulture);
         }
 
-
+        //TODO: Move to setter
         public abstract void ExpToParty(int aExpAmount);
 
         //TODO: What does it mean for mobs/npcs to gain exp
@@ -286,13 +286,12 @@ namespace Project_1.GameObjects.Entities
 
         public virtual void RefreshPlates()
         {
-            //TODO: Should this be bundled to anything that touches the plates?
             ThreadAffinity.AssertSimThread();
             if (!namePlateRequiresUpdate) return;
             MailboxManager.PublishUiEvent(new PlateRefreshRequested(BuildUiSnapshot()));
         }
 
-        //TODO: Summaries, and heads up that this can return null should be somewhere
+        //TODO: Summaries which should give a heads up that this can return null
         public Item EquipInParticularSlot(Items.SubTypes.Equipment aEquipment, Slot aSlot)
         {
             ThreadAffinity.AssertSimThread();

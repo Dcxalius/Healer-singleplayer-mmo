@@ -26,6 +26,7 @@ namespace Project_1.GameObjects.Entities.Friendlies
 
         public bool TryLearnTalent(int aTalentId)
         {
+            //TODO: This is too big, break it up.
             if (RemainingTalentPoints <= 0) return false;
             if (ClassData?.TalentTrees == null) return false;
 
@@ -67,17 +68,16 @@ namespace Project_1.GameObjects.Entities.Friendlies
         }
 
 
-        public Friendlies.GuildMembers.GuildMember.GuildMemberData CreateGuildMemberData()
-        {
-            return new Friendlies.GuildMembers.GuildMember.GuildMemberData(Name, CurrentLevel, Class);
-        }
+        public GuildMember.GuildMemberData CreateGuildMemberData() => new GuildMember.GuildMemberData(Name, CurrentLevel, Class);
         public override void ExpToParty(int aExpAmount)
         {
+            //TODO: Not sure what this should do. Or should it just be abstracted?
             throw new NotImplementedException();
         }
 
         protected override bool CheckForRelation()
         {
+            //TODO: What should this do? Or should it just be abstracted?
             throw new NotImplementedException();
         }
     }

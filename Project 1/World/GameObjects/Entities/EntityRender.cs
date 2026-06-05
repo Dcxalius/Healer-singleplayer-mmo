@@ -35,7 +35,7 @@ namespace Project_1.GameObjects.Entities
                 shadowColor);
         }
 
-        //TODO: Is there a cleaner way than applying the opacity like this? Should we instead have somewhere in the model class that sets this and keeps track of its own oppacity?
+        //TODO: Is there a cleaner way than applying the opacity like this? Should we instead have somewhere in the model class that sets this and keeps track of its own oppacity and then sets from here instead?
         static Texture.TextureRenderSnapshot ApplyOpacity(Texture.TextureRenderSnapshot aSnapshot, float aOpacity)
         {
             float opacity = Math.Clamp(aOpacity, 0f, 1f);

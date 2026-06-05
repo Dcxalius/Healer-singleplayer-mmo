@@ -1,4 +1,4 @@
-﻿using Project_1.Camera;
+using Project_1.Camera;
 using Project_1.GameObjects.Unit;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
@@ -15,6 +15,9 @@ namespace Project_1.GameObjects.Entities.Friendlies.Npcs
 {
     internal class Npc : Friendly //TODO: Should this be friendly?
     {
+        //TODO: Ponder what should be in here and what it should inherit from. This and mob should be pretty close, the only difference being that Npc should have interactions if neutral/friendly+, like gossip, shops, spelltraining, and quests
+        //TODO: Make framework for guildmembers interacting with npcs
+
         const float speakRange = 100f;
         GossipData gossip;
         static Npc activeConversation;
@@ -65,7 +68,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Npcs
             ThreadAffinity.AssertSimThread();
             if (activeConversation == npc) return;
             EndConversation();
-            activeConversation = npc;
+            activeConversation = npc; //TODO: Shouldn't there be events for starting conversations?
         }
 
         static void EndConversation()
@@ -73,6 +76,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Npcs
             ThreadAffinity.AssertSimThread();
             if (activeConversation == null) return;
             activeConversation = null;
+            //TODO: Remove overarching event spam. Which is the closing conversation, there might be cases in the future where the player can have two shops open at once or something similar. At least shop + gossip or shop + spelltraining should be possible.
             MailboxManager.PublishUiEvent(new GossipClosed());
             MailboxManager.PublishUiEvent(new ShopClosed());
             MailboxManager.PublishUiEvent(new SpellTrainingClosed());
