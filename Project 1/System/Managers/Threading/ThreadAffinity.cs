@@ -22,7 +22,7 @@ namespace Project_1.Managers
         {
             get
             {
-                //Q: Is this purely to catch worker threads touching things that is shouldnt?
+                //Q: Is this purely to catch worker threads touching things that is shouldnt? If so, bad name. If not, still bad name.
                 int current = Environment.CurrentManagedThreadId;
                 if (mainThreadId.HasValue && mainThreadId.Value == current) return true;
                 if (simThreadId.HasValue && simThreadId.Value == current) return true;

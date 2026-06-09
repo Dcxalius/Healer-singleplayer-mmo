@@ -41,6 +41,8 @@ namespace Project_1.Textures
         public override float LineHeight => lineHeightPx;
         public override float MeasureDescenderDepth(string text)
         {
+            //TODO: Something is wonky here but I don't remember what exactly
+            //TODO: Too big
             if (string.IsNullOrEmpty(text)) return 0f;
 
             float penY = 0f;
@@ -79,6 +81,7 @@ namespace Project_1.Textures
 
         public override void DrawString(SpriteBatch batch, string text, Vector2 position, Color color, Vector2 origin, float scale, float layerDepth, Color aBorderColor, float aBorderWidth)
         {
+            //TODO: Too big.
 
             ThreadAffinity.AssertMainThread();
             if (batch == null || string.IsNullOrEmpty(text)) return;

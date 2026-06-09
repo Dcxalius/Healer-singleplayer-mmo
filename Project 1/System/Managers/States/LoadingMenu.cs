@@ -9,7 +9,7 @@ using System;
 
 namespace Project_1.Managers.States
 {
-    internal class LoadingMenu : State
+    internal class LoadingMenu : State //Q: This should probably be merged into StartMenu
     {
         readonly LoadingBox loadingBox;
         readonly RasterizerState rasterizerState;
@@ -74,7 +74,7 @@ namespace Project_1.Managers.States
             {
                 snapshots[i] = new SaveUiSnapshot(
                     saves[i].Name,
-                    saves[i].SaveDetails?.Stringify ?? string.Empty,
+                    saves[i].SaveDetails?.ToString() ?? string.Empty,
                     saves[i].ImagePath);
             }
 

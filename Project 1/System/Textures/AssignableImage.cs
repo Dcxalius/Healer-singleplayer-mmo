@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Managers;
 using System;
@@ -29,6 +29,7 @@ namespace Project_1.Textures
             if (!File.Exists(aPath))
             {
                 //TODO: File not found gfx
+                DebugManager.Print(aPath + " was not found");
                 pendingPath = null;
                 textureDirty = true;
                 return;
@@ -38,6 +39,7 @@ namespace Project_1.Textures
 
             if (ThreadAffinity.IsMainThread)
             {
+                //Q: Do we ever actually call this or even want to call this from the main thread 
                 EnsureTexture();
             }
         }
@@ -58,6 +60,7 @@ namespace Project_1.Textures
 
         void EnsureTexture()
         {
+            ThreadAffinity.AssertMainThread();
             if (!textureDirty) return;
             textureDirty = false;
             if (pendingPath == null)
@@ -65,8 +68,6 @@ namespace Project_1.Textures
                 gfx = null;
                 return;
             }
-            // Render-side texture loading, main-thread only.
-            ThreadAffinity.AssertMainThread();
             gfx = GraphicsManager.CreateTextureFromFile(pendingPath);
         }
     }

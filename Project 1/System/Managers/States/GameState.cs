@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Input;
 using Project_1.Managers;
@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace Project_1.Managers.States
 {
-    internal abstract class GameState : State
+    internal abstract class GameState : State //TODO: PauseMenu used to be GameState, but since it no longer is this should probably be merged into game.
     {
         protected SpriteBatch uIDraw;
         protected RenderTarget2D uITarget;
@@ -68,6 +68,8 @@ namespace Project_1.Managers.States
         }
         protected void UIDraw()
         {
+            //TODO: We probably shouldn't draw this in here.
+            //TODO: Too big, break up
             ThreadAffinity.AssertMainThread();
             UiDrawList uiDrawList;
             PlateDrawList plateDrawList;

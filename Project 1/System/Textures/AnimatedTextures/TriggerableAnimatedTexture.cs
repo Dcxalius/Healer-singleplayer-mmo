@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -10,6 +10,8 @@ namespace Project_1.Textures.AnimatedTextures
 {
     internal class TriggerableAnimatedTexture
     {
+        //TODO: This should have a final AnimatedTexture, and if set to null, the texture should return to rest, if not it should stay on the final one.
+        //TODO: For things like chests, we should probably do something like rest => triggered => final (hold till next trigger) => closing => rest
         AnimatedTexture restAnimation;
         AnimatedTexture triggeredAnimation;
         bool triggered = false;

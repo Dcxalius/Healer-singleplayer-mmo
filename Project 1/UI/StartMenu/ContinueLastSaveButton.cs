@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Project_1.Camera;
 using Project_1.Messaging;
 using Project_1.Messaging.Events;
@@ -8,6 +8,7 @@ namespace Project_1.UI.StartMenu
 {
     internal class ContinueLastSaveButton : Button
     {
+        //TODO: Remove this and just implement Button with the  MailboxManager.PublishSimCommand(new ContinueLastSaveRequested()) as Action
         public ContinueLastSaveButton(UI.UIElements.UIElement aParent, RelativeScreenPosition aPos, RelativeScreenPosition aSize) : base(aParent, aPos, aSize, Color.LightSkyBlue, "Continue", Color.Black)
         {
         }

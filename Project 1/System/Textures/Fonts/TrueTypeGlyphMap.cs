@@ -8,6 +8,7 @@ namespace Project_1.Textures
     {
         public static Dictionary<int, int> LoadCodepointToGlyphIndex(string path)
         {
+            //TODO: Too big
             if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
             {
                 return null;
@@ -82,6 +83,8 @@ namespace Project_1.Textures
 
         static Dictionary<int, int> ParseFormat12(byte[] data, int offset)
         {
+            //TODO: Too big
+
             if (offset + 16 > data.Length)
             {
                 return null;
@@ -114,6 +117,8 @@ namespace Project_1.Textures
 
         static Dictionary<int, int> ParseFormat4(byte[] data, int offset)
         {
+            //TODO: Too big
+
             if (offset + 16 > data.Length)
             {
                 return null;
@@ -180,6 +185,8 @@ namespace Project_1.Textures
 
         static uint FindTable(byte[] data, string tag)
         {
+            //TODO: Too big
+
             ushort numTables = ReadUInt16(data, 4);
             int tableOffset = 12;
             for (int i = 0; i < numTables; i++)

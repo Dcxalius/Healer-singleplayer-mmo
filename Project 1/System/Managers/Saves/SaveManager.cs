@@ -180,9 +180,9 @@ namespace Project_1.Managers
         public static bool RequestContinueLastSave()
         {
             ThreadAffinity.AssertSimThread();
-            //TODO: Move this to somewhere else? Prehaps the Continue button/auto call in debug should be done on the main thread by way of events?
+            //TODO: Move this to to main thread else? Prehaps the Continue button/auto call in debug should be done on the main thread by way of events?
             Save save;
-            lock (savesLock)
+            lock (savesLock) //TODO: Ideally no locks should be needed
             {
                 if (saves.Count == 0) return false;
                 save = saves.First();
@@ -192,6 +192,7 @@ namespace Project_1.Managers
 
         public static bool RequestLoadData(Save save)
         {
+            //TODO: Break up and move this to Main thread. Then sending a package of the loaded save data to the sim thread
             ThreadAffinity.AssertSimThread();
             if (save == null) return false;
             currentSave = save;
@@ -213,6 +214,7 @@ namespace Project_1.Managers
 
         public static bool ApplyLoadPayload(SaveLoadPayload payload, int requestId)
         {
+            //TODO: Break up
             ThreadAffinity.AssertSimThread();
             if (payload == null) return false;
             if (requestId != Volatile.Read(ref currentLoadRequestId))
@@ -270,6 +272,7 @@ namespace Project_1.Managers
 
         public static void SaveData()
         {
+            //TODO: Break up
             ThreadAffinity.AssertSimThread();
             if (currentSave == null) return;
             if (!ThreadingSettings.UseWorkerThreads || !WorkerPool.IsRunning)
@@ -280,8 +283,18 @@ namespace Project_1.Managers
                     currentSave.SaveData();
                     MailboxManager.PublishUiEvent(new SaveDataFinished("Saved"));
                 }
-                catch (Exception ex) when (TryBuildSaveFailureMessage(ex, out _))
+                catch (Exception ex) when (TryBuildSaveFailureMessage(ex, out _)) //Q: Why do we discard the message from a TryBuild just to call the same function from NotifySaveFailed? Feels like something is way off
                 {
+                    //bool knownError = TryBuildSaveFailureMessage(ex, out string msg);
+                    //if (!knownError)
+                    //{
+                    //    msg = "Failed to save.";
+                    //    NotifySaveFailed(msg);
+                    //    throw;
+                    //} Q: Isn't this cleaner?
+
+
+                    
                     NotifySaveFailed(ex);
                 }
                 return;
@@ -297,13 +310,14 @@ namespace Project_1.Managers
                     payload.Write();
                     MailboxManager.PublishUiEvent(new SaveDataFinished("Saved"));
                 }
-                catch (Exception ex) when (TryBuildSaveFailureMessage(ex, out _))
+                catch (Exception ex) when (TryBuildSaveFailureMessage(ex, out _)) //Q: Why do we discard the message from a TryBuild just to call the same function from NotifySaveFailed? Feels like something is way off
                 {
                     NotifySaveFailed(ex);
                 }
             });
         }
 
+        //TODO: Break up savemanager into multiple files and put it on the top of that file or create a seperate screenshot manager.
         static readonly object screenshotLock = new object();
         static readonly Queue<Save> pendingScreenshots = new Queue<Save>();
         static int pendingScreenshotCount;
@@ -318,7 +332,7 @@ namespace Project_1.Managers
             Interlocked.Read(ref totalScreenshotsEnqueued),
             Interlocked.Read(ref totalScreenshotsProcessed),
             Volatile.Read(ref lastScreenshotMs));
-        public static void RequestScreenshot(Save save)
+        public static void RequestScreenshot(Save save) 
         {
             ThreadAffinity.AssertSimThread();
             if (save == null) return;
@@ -361,6 +375,7 @@ namespace Project_1.Managers
                 }
                 catch (Exception ex) when (TryBuildSaveFailureMessage(ex, out _))
                 {
+                    //Q: Do we really want to mark it as failed if just the screenshot fails? Perhaps a different fail message and just using a default image sounds cleaner
                     NotifySaveFailed(ex);
                 }
             }
@@ -368,6 +383,8 @@ namespace Project_1.Managers
 
         static void RemovePendingScreenshots(Save save)
         {
+            //Q: I assume we do this so if a save is saved, but before the screenshot is captured, deleted. Is this possible though? Even with tas?
+            //Not saying we shouldn't do this, just something to keep in mind and check.
             lock (screenshotLock)
             {
                 if (pendingScreenshots.Count == 0) return;
@@ -400,6 +417,7 @@ namespace Project_1.Managers
 
         public static void ExportData(string aDestination, object aObjectToExport)
         {
+            //Q: Move to a JSON Manager?
             string json = JsonConvert.SerializeObject(aObjectToExport, serializerSettings);
             File.WriteAllText(aDestination, json);
         }
@@ -444,12 +462,14 @@ namespace Project_1.Managers
 
         public static T ImportData<T>(string aJsonString)
         {
+            //Q: Move to a JSON Manager?
             //TODO: Figure out a way to get cleaner crash data when this fails.
             return JsonConvert.DeserializeObject<T>(aJsonString, serializerSettings);
         }
 
         public static string TrimToNameOnly(string aFile)
         {
+            //Q: Move to a JSON Manager?
             string fileOnly = Path.GetFileName(aFile);
             return Path.GetFileNameWithoutExtension(fileOnly);
         }

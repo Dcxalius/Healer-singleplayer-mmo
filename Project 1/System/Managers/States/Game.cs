@@ -47,7 +47,7 @@ namespace Project_1.Managers.States
             CorpseManager.Update();
             SpawnerManager.Update();
             ProjectileManager.Update();
-            base.Update();
+            base.Update(); //Updates the heartbeat timer
 
             ObjectManager.RefreshPlates();
             SpawnerManager.RefreshPlates();
@@ -82,11 +82,13 @@ namespace Project_1.Managers.States
 
         internal void UiOnLeave()
         {
+            //TODO: Instead of doing this, each State have it's own UI Manager that it just alerts the UI thread it's the current UI
             HUDManager.LeavingGameState();
         }
 
         public RenderTarget2D CleanGameDraw()
         {
+            //TODO: Since this is just a draw without UI, we should probably create a method that takes a bool/enum, and if that bool/enum is set to no ui it just skips the ui render parts
             long frameStartTicks = Stopwatch.GetTimestamp();
             UpdateVfx();
             GraphicsManager.SetRenderTarget(renderTarget);
@@ -140,6 +142,7 @@ namespace Project_1.Managers.States
 
         void UpdateVfx()
         {
+            //TODO: Updating in the draw side is yikes, so lets create a mainupdate perhaps? Calling it every main loop for the current state
             ThreadAffinity.AssertMainThread();
             ParticleManager.Update();
             FloatingTextManager.Update();
@@ -157,7 +160,7 @@ namespace Project_1.Managers.States
         void DrawWorld(SpriteBatch aBatch)
         {
             ThreadAffinity.AssertMainThread();
-            if (DebugManager.Mode(DebugMode.ModelPreview)) return;
+            if (DebugManager.Mode(DebugMode.ModelPreview)) return; //TODO: We really need to properly implement the new draw system
 
             DrawList(aBatch);
         }

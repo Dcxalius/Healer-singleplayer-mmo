@@ -10,6 +10,7 @@ namespace Project_1.Managers.States
 {
     internal static partial class StateManager
     {
+        //TODO: This entire portion might be redunant once the new UIManagers have been implemented
         static void AssertUiOwnerThread()
         {
             if (UiThread.IsRunning)

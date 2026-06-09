@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,19 +44,15 @@ namespace Project_1.Managers.Saves
             this.timeInSave = timeInSave;
         }
 
-        [JsonIgnore]
-        public string Stringify
+        public override string ToString()
         {
-            get
-            {
-                string s = string.Empty;
-                s += "Name: " + name + "\n";
-                s += "Class: " + className + "\n";
-                s += "Level: " + level.ToString() + "\n";
-                s += "Time Played: " + timeInSave.ToString(@"dd\.hh\:mm\:ss") + "\n";
-                s += "Last Time Saved: " + timeInfo.ToString() + "\n";
-                return s;
-            }
+            string s = string.Empty;
+            s += "Name: " + name + "\n";
+            s += "Class: " + className + "\n";
+            s += "Level: " + level.ToString() + "\n";
+            s += "Time Played: " + timeInSave.ToString(@"dd\.hh\:mm\:ss") + "\n"; //67.22:10:10 Q: Is this the format we want? hh:mm:ss is fine, but dd.hh feels wonk
+            s += "Last Time Saved: " + timeInfo.ToString() + "\n";
+            return s;
         }
     }
 }

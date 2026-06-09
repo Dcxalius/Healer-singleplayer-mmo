@@ -13,6 +13,7 @@ namespace Project_1.Managers
 {
     internal static class RenderSnapshotManager
     {
+        //TODO: MinimapManager
         static long totalBuilds;
         static long totalDraws;
         static long buildVersion;

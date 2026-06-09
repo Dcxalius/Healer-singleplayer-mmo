@@ -27,7 +27,7 @@ namespace Project_1.Managers
             initialized = true;
             if (DebugManager.Mode(DebugMode.FalseRandom))
             {
-                random = new Random(1);
+                random = new Random(1); //TODO: Seed should be settable
                 return;
             }
             random = new Random();

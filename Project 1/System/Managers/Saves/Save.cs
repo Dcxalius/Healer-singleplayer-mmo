@@ -1,4 +1,4 @@
-﻿using Project_1.GameObjects.Spawners;
+using Project_1.GameObjects.Spawners;
 using Project_1.GameObjects;
 using Project_1.Tiles;
 using System;
@@ -19,7 +19,11 @@ namespace Project_1.Managers.Saves
 {
     internal class Save : IComparable<Save>
     {
-        static int currentVersion = 0; //TODO: Increment this whenever major changes to the save system is implemented
+        static int currentVersion = 0; 
+        //TODO: Increment this whenever major changes to the save system is implemented
+        //TODO: Codify this ^
+        //TODO: Ponder how the game should treat changes from the player.
+
         public string Name => name;
         string name;
         bool isDeleted;
@@ -28,6 +32,7 @@ namespace Project_1.Managers.Saves
 
         int version;
 
+        //Q: Is there a cleaner way to do this? And if so, do we care?
         public string World => nameAsPath + "\\World";
         public string Corpses => World + "\\Corpses";
         public string SpawnZones => World + "\\SpawnZones";
@@ -55,10 +60,11 @@ namespace Project_1.Managers.Saves
 
         public Save(string aName, bool aExistingSave) 
         {
+            //Q: Is it cleaner to check in here if its an existing save? Or possibly two seperate Save ctors, one for when creating a new game and one to call in the init loop
             name = aName;
             if (aExistingSave)
             {
-                version = 0; //TODO: Implement this system
+                version = currentVersion;
                 string file = File.ReadAllText(SaveDetailsPath);
                 saveDetails = SaveManager.ImportData<SaveDetails>(file);
                 return;
@@ -90,6 +96,7 @@ namespace Project_1.Managers.Saves
 
         internal void SaveScreenshot()
         {
+            //TODO: Come up with a good system to mark which methods exists only for the singlethread fallbacks
             ThreadAffinity.AssertMainThread();
             if (isDeleted || !Directory.Exists(nameAsPath)) return;
             AbsoluteScreenPosition windowSize = Camera.Camera.WindowSize;
@@ -103,6 +110,9 @@ namespace Project_1.Managers.Saves
             }
             catch
             {
+                //Q: Why is this done? What is the possible error entries?
+                //Either way, we should probably check if the image already exists, back it up virtually, and then revert to the old picture if this part fails
+                
                 if (File.Exists(ImagePath))
                 {
                     File.Delete(ImagePath);
@@ -132,6 +142,7 @@ namespace Project_1.Managers.Saves
             }
         }
 
+        //Q: This feels like duped methods. Any particular reason why?
         public void ClearFolder(string aPath)
         {
             foreach (string filePath in Directory.GetFiles(aPath))
@@ -146,12 +157,13 @@ namespace Project_1.Managers.Saves
             if (!Directory.Exists(nameAsPath)) return;
             Directory.Delete(nameAsPath, true);
         }
+        //
 
         void CreateNewSaveFolder()
         {
-            if (Directory.Exists(nameAsPath)) return;
-            //TODO: Load version from file
-            version = 0;
+            if (Directory.Exists(nameAsPath)) return; //Q: Should this be a throw? If the folder already exists shouldn't we check structure integrity?
+            version = currentVersion;
+            
             Directory.CreateDirectory(nameAsPath);
             Directory.CreateDirectory(World);
             Directory.CreateDirectory(SpawnZones);

@@ -54,6 +54,7 @@ namespace Project_1.Managers.Saves
 
         public void Write()
         {
+            //TODO: Break this up
             if (Save == null) return;
             SaveManager.ExportData(Save.SaveDetailsPathForWrite, SaveDetails);
             SaveManager.ExportData(Save.CameraPosition, CameraPosition);

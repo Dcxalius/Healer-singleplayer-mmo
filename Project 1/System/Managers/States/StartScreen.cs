@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Input;
 using Project_1.UI;
@@ -8,7 +8,7 @@ using System;
 
 namespace Project_1.Managers.States
 {
-    internal class StartScreen : State
+    internal class StartScreen : State 
     {
         public override StateManager.States GetStateEnum => StateManager.States.StartScreen;
         MainMenu mainMenu;

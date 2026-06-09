@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Input;
@@ -9,7 +9,7 @@ using System;
 
 namespace Project_1.Managers.States
 {
-    internal class NewGame : State
+    internal class NewGame : State //Q: This should probably be merged into StartScreen and the seperate state turned into something callen Screen perhaps? A UIElement the size of the screen, and then just swap between those UIElements instead of statejumping
     {
         NewGameBox newGameBox;
         readonly UiElementDrawList drawListA = new UiElementDrawList();

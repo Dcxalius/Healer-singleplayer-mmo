@@ -29,13 +29,15 @@ namespace Project_1.UI.LoadingMenu
 
             capturesClick = false;
             RelativeScreenPosition buttonSize = new RelativeScreenPosition(0.15f, 0.05f);
-            loadButton = new Button(this, new List<Action> { LoadSave }, spacing.OnlyX + aSize.OnlyY - buttonSize.OnlyY - spacing.OnlyY, buttonSize, Color.White, "Load Save", Color.Black);
-            loadButton.Visible = false;
+            loadButton = new Button(this, new List<Action> { LoadSave }, spacing.OnlyX + aSize.OnlyY - buttonSize.OnlyY - spacing.OnlyY, buttonSize, Color.White, "Load Save", Color.Black)
+            {
+                Visible = false
+            };
         }
 
         void LoadSave()
         {
-            if (!save.HasValue) return;
+            if (!save.HasValue) throw new NullReferenceException(); 
             MailboxManager.PublishSimCommand(new LoadSaveRequested(save.Value.SaveName));
         }
 

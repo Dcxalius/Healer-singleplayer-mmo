@@ -67,6 +67,7 @@ namespace Project_1.Textures
 
         public static Dictionary<string, GameFont> LoadFonts(string fontDir)
         {
+            //TODO: Too big
             Dictionary<string, GameFont> fonts = new Dictionary<string, GameFont>(StringComparer.OrdinalIgnoreCase);
             if (!Directory.Exists(fontDir)) return fonts;
 
@@ -91,6 +92,7 @@ namespace Project_1.Textures
 
         static AtlasFont LoadFont(string fontDir, string jsonPath, AtlasFontJson fontJson)
         {
+            //TODO: Waaaay to big
             if (fontJson?.atlas == null || fontJson.metrics == null || fontJson.glyphs == null) return null;
             string fontName = string.IsNullOrWhiteSpace(fontJson.name) ? Path.GetFileNameWithoutExtension(jsonPath) : fontJson.name;
             string texturePath = ResolveAtlasTexturePath(fontDir, jsonPath, fontName);

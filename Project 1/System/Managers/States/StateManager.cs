@@ -147,9 +147,8 @@ namespace Project_1.Managers.States
 
         static void ApplyStateChange(States aState)
         {
-            States leavingState = currentStateEnum;
             currentState.OnLeave();
-            previousState = leavingState;
+            previousState = currentStateEnum;
             switch (aState)
             {
                 case States.StartScreen:
@@ -181,11 +180,11 @@ namespace Project_1.Managers.States
             currentState.OnEnter();
             if (UiThread.IsRunning || SimThread.IsRunning)
             {
-                MailboxManager.PublishUiEvent(new StateChanged(leavingState.ToStateKind(), aState.ToStateKind()));
+                MailboxManager.PublishUiEvent(new StateChanged(previousState.ToStateKind(), aState.ToStateKind()));
                 return;
             }
 
-            UiOnLeave(leavingState);
+            UiOnLeave(previousState);
             UiOnEnter(aState);
         }
 
