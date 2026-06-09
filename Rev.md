@@ -37,6 +37,8 @@ Entity; A lot of work needed in all aspects.
 SaveManager, Save, SaveDetails (and anything I found that had Save in the name); Some threading logic needs to be looked at. Json wranglers needs to be broken out to a separate manager, A lot of methods that are too chunky
 StateManager/All states; GameState should be collapsed into Game. A lot of states should be collapsed into StartScreen (StartMenu?). States should have an UIManager, and then alerting the UIThread when it is no longer the current state. Drawpipeline needs to be reworked
 
+Texture system is next 
+
 ---
 
 Unrelated bug: Left dragging + esc into release leaves the camera stuck at an offangle. 
@@ -56,3 +58,5 @@ int codeGoesHere = 1;
 //ENDOFTEMP 
 
 If multiple reasons and removal cons are in a section, add multiple, but there should always be one after the //TEMP line giving either all the reasons, or a summarized verison spanning the entire block
+
+ThreadAffinity calls should be done
