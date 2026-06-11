@@ -1,3 +1,4 @@
+using Project_1.GameObjects.Unit.Classes;
 using Project_1.World.GameObjects.Unit.Stats.Primary;
 using System;
 using System.Collections.Generic;
@@ -9,8 +10,20 @@ namespace Project_1.GameObjects.Unit.Stats
 {
     internal class Intellect : Stat
     {
+        //TODO: Weaponchance skillup increase
+        /// <summary>
+        /// Returns the Mana granted by the current Intellect
+        /// </summary>
         public double ManaBonus => Value * 15;
-        public double CastCritChance => 0.01f / 60 * Value; //TODO: Give melee crit from this?
+        /// <summary>
+        /// Returns the Spell crit chance based on a scalar in class and the current Intellect value.
+        /// </summary>
+        /// <param name="aClass"></param>
+        /// <returns></returns>
+        public double GetCastCritChance(ClassData aClass)
+        {
+            return aClass.SpellCritChanceScaler * Value; //Design: Give melee crit from int as well?
+        }
 
         public Intellect(int aValue) : base(aValue)
         {

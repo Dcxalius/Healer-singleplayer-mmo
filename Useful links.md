@@ -1,0 +1,8 @@
+https://www.warcrafttavern.com/wow-classic/
+https://www.wowhead.com/classic/guide/classic-wow-stats-and-attributes-overview
+https://barrens.chat/viewtopic.php?t=1046
+
+
+???????????????
+//https://smart.columbus.gov/columbus-news/classic-wow-base-mana-calculate-yours-now-1767646612
+???????????????

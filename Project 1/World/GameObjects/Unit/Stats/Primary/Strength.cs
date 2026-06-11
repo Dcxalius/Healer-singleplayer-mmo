@@ -10,13 +10,21 @@ namespace Project_1.World.GameObjects.Unit.Stats.Primary
 {
     internal class Strength : Stat
     {
+        /// <summary>
+        /// Returns a Melee Attack Power value which is Strength * 2 if a class is tagged as having MeleeAttackPowerBonus.Strength, if not it returns Strength * 1.
+        /// </summary>
+        /// <param name="aClass"></param>
+        /// <returns></returns>
         public int GetMeleeAttackPower(ClassData aClass)
         {
             if (aClass.MeleeAttackBonus != ClassData.MeleeAttackPowerBonus.Strength) return Value;
             return Value * 2;
         }
 
-        public double BlockValue => Value / 20;
+        /// <summary>
+        /// Returns a BlockValue bonus which is Strength / 20
+        /// </summary>
+        public double BlockValue => Value / 20; //TODO: Double check there is no class scalar in wow for this
 
         public Strength(int aValue) : base(aValue)
         {

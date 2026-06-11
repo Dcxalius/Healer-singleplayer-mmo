@@ -60,7 +60,7 @@ namespace Project_1.GameObjects.Unit.Resources
         public virtual void CastSpell(double aCost)
         {
             AssertSimThread();
-            //TODO: oh no, this is a double and the resource is a float, should we be doing something about that?
+            //TODO: this is a double and the resource is a float, should we be doing something about that?
             Value -= (float)aCost;
         }
 

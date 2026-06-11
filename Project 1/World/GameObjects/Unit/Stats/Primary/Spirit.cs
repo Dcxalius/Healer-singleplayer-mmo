@@ -1,3 +1,4 @@
+using Project_1.GameObjects.Unit.Classes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +9,16 @@ namespace Project_1.World.GameObjects.Unit.Stats.Primary
 {
     internal class Spirit : Stat
     {
-        public float Hp5Bonus => Value * 0.2f;
-        public float Mp5Bonus => Value * 0.125f;
+        //Reminder: If Resting is implemented it should add a bonus to this value. Probably not here tho.
+        public float GetHp5Bonus(ClassData aClass)
+        {
+            return Value * 0.2f;
+        }
+
+        public float GetMp5Bonus()
+        {
+            return Value * 0.125f;
+        }
 
         public Spirit(int aValue) : base(aValue)
         {

@@ -9,12 +9,11 @@ using static Project_1.World.GameObjects.Unit.Stats.Primary.BasePrimaryStats;
 
 namespace Project_1.World.GameObjects.Unit.Stats.Primary
 {
+    /// <summary>
+    /// The primary stats for an entity, calculated based on the given level.
+    /// </summary>
     internal class BasePrimaryStats : PrimaryStats
     {
-        static void AssertSimThread() => ThreadAffinity.AssertSimThread();
-
-
-
         public BasePrimaryStats(PrimaryStats aBaseLevelOfStats, PrimaryStats aPerLevelStats, int aLevel) 
             : base(new int[] 
             { 
@@ -28,7 +27,7 @@ namespace Project_1.World.GameObjects.Unit.Stats.Primary
 
         public void LevelUp(PrimaryStats aPerLevel)
         {
-            AssertSimThread();
+            ThreadAffinity.AssertSimThread();
             for (int i = 0; i < stats.Length; i++)
             {
                 stats[i].Value += aPerLevel.Stats[i];

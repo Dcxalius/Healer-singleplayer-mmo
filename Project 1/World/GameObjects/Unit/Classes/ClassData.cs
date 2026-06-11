@@ -1,20 +1,22 @@
 using Newtonsoft.Json;
+using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.GameObjects.Unit.Resources;
 using Project_1.Items.SubTypes;
+using Project_1.UI.UIElements.Bars;
+using Project_1.World.GameObjects.Unit.Stats.Primary;
+using Project_1.World.GameObjects.Unit.Talents;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Project_1.GameObjects.Entities.Friendlies.Players;
-using Project_1.World.GameObjects.Unit.Talents;
-using Project_1.World.GameObjects.Unit.Stats.Primary;
 
 namespace Project_1.GameObjects.Unit.Classes
 {
     internal class ClassData //TODO: Change class to be a class rathar than using string for id everywhere
     {
+        //TODO: Race => Available classes schema
         public enum Type
         {
             None,
@@ -64,18 +66,51 @@ namespace Project_1.GameObjects.Unit.Classes
         public Resource.ResourceType Resource => resource;
         readonly Resource.ResourceType resource;
 
+
+        //TODO: Base stats should also depend on race
         public PrimaryStats BaseStats => baseStats;
         readonly PrimaryStats baseStats;
 
         public PrimaryStats PerLevelStats => perLevelStats;
         readonly PrimaryStats perLevelStats;
 
-        public int BaseHealth => baseHp;
-        readonly int baseHp;
+        //Youtube vids + https://barrens.chat/viewtopic.php?t=1046
+        //Confirmed ref point, a level 1 troll warrior should have 70 hp, level 1 gnome should have 50. With 23 and 21 base stam resp puts the base hp to 20 for warriors
+        //Undead priest => 62 hp with 21 stam giving 32 hp
+        //Nelf druid => 61 hp with 19 stam giving 42 hp
+        //Nelf rogue => 45 hp with 20 stam giving 25 hp
+        //gnome warlock => 43 hp with 20 stam giving 23 hp
+        //undead mage => 52 hp with 21 stam giving 31 hp
+        //troll hunter => 66 hp with 22 stam giving 24 hp
+        //human paladin => 58 hp with 22 stam giving 18 hp
+        //orc shaman => 77 hp with 23 stam giving 27 hp
+        //NOTE ABOVE VALUES ARE ALL FOR LEVEL 1 SO EITHER CALC THE VALUE - PER LEVEL OR FIGURE OUT WHAT LEVEL 0 => 1 HP / LEVEL IS
 
-        public int PerLevelHp => perLevelHp;
+        public int BaseHealth => baseHp;
+        readonly int baseHp; 
+
+        //TODO: Find what source we use
+        public int PerLevelHp => perLevelHp; //TODO: This scales per level :3
         readonly int perLevelHp;
 
+        //Data from wowhead
+        //Druid(caster) : Spirit/4.5 + 15   //Design: Do we want to implement form mp5 penalty? Cant find any info on boomkin regen, but assuming its the same as caster
+        //Druid(feral), Hunter, Paladin, Warlock: Spirit/5 + 15
+        //Mage, Priest: Spirit/4 + 12.5
+        //Shaman: Spirit/5 + 17 
+
+        //Data from warcrafttavern //TODO: Figure out why these two sites have different numbers
+        //Druid, Hunter, Paladin, Shaman  Spirit/5 +15
+        //Mage, Priest  Spirit/ 4 + 13
+        //Warlock Spirit/4 + 8
+
+        public float SpiritMp5Constant => spiritMp5Constant;
+        float spiritMp5Constant; //TODO: Add this value to class files
+
+        public float SpiritMp5Scaling => spiritMp5Scaling;
+        float spiritMp5Scaling; //TODO: Add this value to class files
+
+        //Data from warcrafttavern
         public float SpiritHp5Constant => spiritHp5Constant;
         readonly float spiritHp5Constant;
 
@@ -93,12 +128,16 @@ namespace Project_1.GameObjects.Unit.Classes
 
         public Movement Movement => movementData;
         Movement movementData;
-
+        
+        //If set to agility, the class gains 1 ap per agi and 1 per str
+        //If set to strength, the class gains 2 per str and 0 per agility
         public MeleeAttackPowerBonus MeleeAttackBonus => meleeAttackPowerBonus;
         MeleeAttackPowerBonus meleeAttackPowerBonus;
 
-        // Backward-compatible alias. Prefer AgilityDodgeChanceScaler.
-        public float DodgeScaling => agilityDodgeChanceScaler;
+        //TODO: Implement ranged attacks
+        //public RangedAttackPowerBonus RangedAttackBonus => rangedAttackBonus;
+        //RangedAttackPowerBonus rangedAttackBonus;
+        //Hunters gain 2 per level, warriors and rogue gain 1. Other classes don't interact with this at all atm, and probably shouldn't since we don't want wands to scale with AP
 
         public bool CanDualWield => canDualWield;
         bool canDualWield;
@@ -109,7 +148,8 @@ namespace Project_1.GameObjects.Unit.Classes
         public bool CanParry => canParry;
         bool canParry;
 
-        //        Druids, Paladins, Shaman and Warriors receive 1% Critical Strike Chance for every 20 points of Agility.
+        //Data from Wowhead
+        //Druids, Paladins, Shaman and Warriors receive 1% Critical Strike Chance for every 20 points of Agility.
         //Rogues receive 1% Critical Strike Chance for every 29 points of Agility.
         //Hunters receive 1% Critical Strike Chance for every 53 points of Agility.
 
@@ -117,7 +157,7 @@ namespace Project_1.GameObjects.Unit.Classes
         float attackCritChanceScaler;
 
 
-        //        You gain Critical Strike chance at varying points, depending on your class:
+        //Data from Wowhead
         //Warlocks receive 1% Spell Critical Strike chance for every 60.6 points of intellect.
         //Druids receive 1% Spell Critical Strike chance for every 60 points of intellect.
         //Shamans receive 1% Spell Critical Strike chance for every 59.5 points of intellect.
@@ -129,6 +169,7 @@ namespace Project_1.GameObjects.Unit.Classes
         public float SpellCritChanceScaler => spellCritChanceScaler;
         float spellCritChanceScaler = 0f;
 
+        //Data from Wowhead
         //All classes but Hunters and Rogues receive 1% Dodge for every 20 points of Agility.
         //Rogues receive 1% Dodge for every 14.5 points of Agility.
         //Hunters receive 1% Dodge for every 26 points of Agility.

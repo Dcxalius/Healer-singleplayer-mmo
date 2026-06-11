@@ -22,7 +22,7 @@ namespace Project_1.World.GameObjects.Unit.Stats.Primary
             Stamina,
             Count
         }
-        public void AppendToExistingReport(ref PairReport report)
+        public void AppendToExistingReport(ref PairReport report) //TODO: Rework this
         {
             for (int i = 0; i < (int)PrimaryStat.Count; i++)
             {
@@ -32,7 +32,7 @@ namespace Project_1.World.GameObjects.Unit.Stats.Primary
 
         }
 
-        public PairReport NewReport
+        public PairReport NewReport //TODO: Rework this
         {
             get
             {
@@ -44,12 +44,30 @@ namespace Project_1.World.GameObjects.Unit.Stats.Primary
             }
         }
 
+        /// <summary>
+        /// Returns the entity's current Strength.
+        /// </summary>
         public Strength Strength => stats[(int)PrimaryStat.Strength] as Strength;
+        /// <summary>
+        /// Returns the entity's current Agility.
+        /// </summary>
         public Agility Agility => stats[(int)PrimaryStat.Agility] as Agility;
+        /// <summary>
+        /// Returns the entity's current Intellect.
+        /// </summary>
         public Intellect Intellect => stats[(int)PrimaryStat.Intellect] as Intellect;
+        /// <summary>
+        /// Returns the entity's current Spirit.
+        /// </summary>
         public Spirit Spirit => stats[(int)PrimaryStat.Spirit] as Spirit;
+        /// <summary>
+        /// Returns the entity's current Stamina.
+        /// </summary>
         public Stamina Stamina => stats[(int)PrimaryStat.Stamina] as Stamina;
 
+        /// <summary>
+        /// Collapses the current stats into an int array.
+        /// </summary>
         public int[] Stats => new int[] { Strength, Agility, Intellect, Spirit, Stamina };
         protected Stat[] stats;
 
@@ -59,6 +77,10 @@ namespace Project_1.World.GameObjects.Unit.Stats.Primary
             SetStats(aStats);
         }
 
+        /// <summary>
+        /// Overrides the current stats with the given int array.
+        /// </summary>
+        /// <param name="aStats"></param>
         protected void SetStats(int[] aStats)
         {
             Debug.Assert(stats.Length == aStats.Length);
