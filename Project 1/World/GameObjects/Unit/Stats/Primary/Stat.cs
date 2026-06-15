@@ -4,6 +4,9 @@ using System.Diagnostics;
 
 namespace Project_1.World.GameObjects.Unit.Stats.Primary
 {
+    /// <summary>
+    /// The base class for Primary Stats.
+    /// </summary>
     internal abstract class Stat
     {
         public int Value
@@ -29,7 +32,9 @@ namespace Project_1.World.GameObjects.Unit.Stats.Primary
 
         public override string ToString()
         {
-            if (value == 0) return "";
+            //Q: This feels weird. Is there actually a case where we want to turn a stat into string and have it return empty?
+            //Probably in statreports cases, but feels like that should be handled in another way.
+            if (value == 0) return ""; 
             return value + " " + GetType().Name.ToString();
         }
 

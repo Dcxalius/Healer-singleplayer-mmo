@@ -1,4 +1,4 @@
-using Project_1.GameObjects.Unit.Stats;
+using Project_1.World.GameObjects.Unit.Stats.Secondary;
 
 namespace Project_1.World.GameObjects.Unit.Stats.Primary
 {

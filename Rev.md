@@ -36,9 +36,8 @@ Entity; A lot of work needed in all aspects.
 ^ Underlying systems havent been checked. Spellbook, Buffs, UnitData, etc
 SaveManager, Save, SaveDetails (and anything I found that had Save in the name); Some threading logic needs to be looked at. Json wranglers needs to be broken out to a separate manager, A lot of methods that are too chunky
 StateManager/All states; GameState should be collapsed into Game. A lot of states should be collapsed into StartScreen (StartMenu?). States should have an UIManager, and then alerting the UIThread when it is no longer the current state. Drawpipeline needs to be reworked
-Stats, Should all Secondary stats have their own separate classes like Primary stats does? 
-^^^^^^^^^^
-TotalPrimaryStats, Stat, Secondary stat are still unrevd
+Stats, All Secondary stats have their own separate classes like Primary stats does
+Secondary stats; A lot of missing implementation of things. All of them are missing implementation of Talents, Defense stats should be classed, only Armor is at the moment.
 
 
 Texture system is next 

@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 
 namespace Project_1.World.GameObjects.Unit.Stats.Primary
 {
+    /// <summary>
+    /// An entities total stats with the base + level and equipment stats combined.
+    /// These values are changed by things like talents and current buffs
+    /// </summary>
     internal class TotalPrimaryStats : PrimaryStats
     {
         static void AssertSimThread() => ThreadAffinity.AssertSimThread();
@@ -57,7 +61,7 @@ namespace Project_1.World.GameObjects.Unit.Stats.Primary
 
         static int ApplyModifiers(int aValue, PrimaryStat aStat, UnitData aUnitData)
         {
-            if (aUnitData == null)
+            if (aUnitData == null) //Q: If Unitdata is null, we have bigger problems do we not?
             {
                 return aValue;
             }

@@ -12,10 +12,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Project_1.World.GameObjects.Unit.Stats.Primary.BasePrimaryStats;
-using Project_1.World.GameObjects.Unit.Stats.Primary;
 using Project_1.World.GameObjects.Unit.Stats.Secondary;
+using Project_1.GameObjects.Unit;
+using Project_1.World.GameObjects.Unit.Stats.Primary;
 
-namespace Project_1.GameObjects.Unit.Stats
+namespace Project_1.World.GameObjects.Unit.Stats
 {
     internal class BaseStats
     {
@@ -70,11 +71,8 @@ namespace Project_1.GameObjects.Unit.Stats
             switch (aClassData.Resource)
             {
                 case Resource.ResourceType.Mana:
-                    //int aBaseManaFromClass;
-                    float manaPer5 = 5; //TODO: Extranct these values from class
-                    int maxResource = /*baseFromClass + */ 1;
 
-                    resource = new Mana(maxResource, TotalPrimaryStats, aCurrentResource, manaPer5, aLevel);
+                    resource = new Mana(classData, TotalPrimaryStats, aCurrentResource, aLevel);
                     break;
                 case Resource.ResourceType.Energy:
                     resource = new Energy(aCurrentResource);
@@ -89,7 +87,7 @@ namespace Project_1.GameObjects.Unit.Stats
                     throw new NotImplementedException();
             }
 
-            fistAttack = new AttackData(AttackData.AttackStyle.OneHander, new Unit.Attack(aClassData.FistMinAttackDamage, aClassData.FistMaxAttackDamage, aClassData.FistAttackSpeed, Items.SubTypes.Weapon.WeaponType.None), null);
+            fistAttack = new AttackData(AttackData.AttackStyle.OneHander, new Project_1.GameObjects.Unit.Attack(aClassData.FistMinAttackDamage, aClassData.FistMaxAttackDamage, aClassData.FistAttackSpeed, Project_1.Items.SubTypes.Weapon.WeaponType.None), null);
             fistAttack.AttackPower = GetAttackPower(aClassData);
 
         }
@@ -134,7 +132,7 @@ namespace Project_1.GameObjects.Unit.Stats
             AssertSimThread();
             totalPrimaryStats.UpdateBaseStats(basePrimaryStats);
             health.Refresh(TotalPrimaryStats);
-            resource.Refresh(TotalPrimaryStats);
+            resource.Refresh(TotalPrimaryStats, classData);
             owner.RefreshSecondaryStats();
             owner.Equipment.SetMeleeAttackPower = GetAttackPower(classData);
             fistAttack.AttackPower = GetAttackPower(classData);

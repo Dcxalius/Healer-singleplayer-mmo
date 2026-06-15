@@ -22,6 +22,8 @@ using Project_1.GameObjects.Entities.Friendlies.Players;
 using Project_1.Managers;
 using Project_1.World.GameObjects.Unit.Stats.Primary;
 using Project_1.World.GameObjects.Unit.Talents;
+using Project_1.World.GameObjects.Unit.Stats.Secondary;
+using Project_1.World.GameObjects.Unit.Stats;
 
 namespace Project_1.GameObjects.Unit
 {

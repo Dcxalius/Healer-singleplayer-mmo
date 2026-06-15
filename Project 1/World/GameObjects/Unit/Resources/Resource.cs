@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Unit.Classes;
 using Project_1.Managers;
 using Project_1.World.GameObjects.Unit.Stats.Primary;
 using System;
@@ -72,6 +73,6 @@ namespace Project_1.GameObjects.Unit.Resources
             Value = MaxValue;
         }
 
-        public abstract void Refresh(TotalPrimaryStats aStats);
+        public abstract void Refresh(TotalPrimaryStats aStats, ClassData aClass);
     }
 }

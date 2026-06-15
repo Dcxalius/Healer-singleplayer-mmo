@@ -1,10 +1,10 @@
+using Project_1.GameObjects.Unit;
 using Project_1.Items.SubTypes;
-using Project_1.World.GameObjects.Unit.Stats.Secondary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Project_1.GameObjects.Unit.Stats
+namespace Project_1.World.GameObjects.Unit.Stats.Secondary
 {
     internal class Spell
     {

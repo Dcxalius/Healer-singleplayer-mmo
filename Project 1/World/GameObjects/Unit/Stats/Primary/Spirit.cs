@@ -10,15 +10,19 @@ namespace Project_1.World.GameObjects.Unit.Stats.Primary
     internal class Spirit : Stat
     {
         //Reminder: If Resting is implemented it should add a bonus to this value. Probably not here tho.
-        public float GetHp5Bonus(ClassData aClass)
-        {
-            return Value * 0.2f;
-        }
 
-        public float GetMp5Bonus()
-        {
-            return Value * 0.125f;
-        }
+        /// <summary>
+        /// Returns the hp5 an entity gains from it's current spirit for the given class.
+        /// </summary>
+        /// <param name="aClass"></param>
+        /// <returns></returns>
+        public float GetHp5Bonus(ClassData aClass) => Value * aClass.SpiritHp5Scaling;
+        /// <summary>
+        /// Returns the mp5 an entity gains from it's current spirit for the given class.
+        /// </summary>
+        /// <param name="aClass"></param>
+        /// <returns></returns>
+        public float GetMp5Bonus(ClassData aClass) => Value * aClass.SpiritMp5Scaling;
 
         public Spirit(int aValue) : base(aValue)
         {

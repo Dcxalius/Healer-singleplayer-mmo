@@ -1,5 +1,4 @@
 using Project_1.GameObjects;
-using Project_1.GameObjects.Unit.Stats;
 using Project_1.Items;
 using Project_1.Items.SubTypes;
 using Project_1.Messaging.Events;

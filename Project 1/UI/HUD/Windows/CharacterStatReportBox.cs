@@ -374,7 +374,7 @@ namespace Project_1.UI.HUD.Windows
                     {
                         int attackPower = classData?.MeleeAttackBonus == ClassData.MeleeAttackPowerBonus.Agility ? statValue : 0;
                         double critFromAgility = classData == null ? 0 : statValue * classData.AttackCritChanceScaler;
-                        double dodgeFromAgility = classData == null ? 0 : statValue * classData.DodgeChanceScaler;
+                        double dodgeFromAgility = classData == null ? 0 : statValue * classData.AgilityDodgeChanceScaler;
                         string statReport = $"+{FormatValue(statValue * 2d)} Armor";
                         if (attackPower > 0)
                         {

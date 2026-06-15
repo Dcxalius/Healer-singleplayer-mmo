@@ -16,7 +16,6 @@ namespace Project_1.GameObjects.Unit.Classes
 {
     internal class ClassData //TODO: Change class to be a class rathar than using string for id everywhere
     {
-        //TODO: Race => Available classes schema
         public enum Type
         {
             None,
@@ -30,6 +29,13 @@ namespace Project_1.GameObjects.Unit.Classes
             None,
             Strength,
             Agility
+        }
+
+        public enum RangeAttackPowerBonus
+        {
+            None,
+            One,
+            Two//Q: Is there a better way to phrase this than one and two?
         }
 
         
@@ -93,25 +99,31 @@ namespace Project_1.GameObjects.Unit.Classes
         public int PerLevelHp => perLevelHp; //TODO: This scales per level :3
         readonly int perLevelHp;
 
+        public int BaseMana => baseMana; //TODO: Implement this in files. For classes that doesn't use mana it should be 0.
+        int baseMana;
+
+        public int PerLevelMana => perLevelMana; //TODO: Think about how this should be implemented. A table? A value and then a scalar?
+        int perLevelMana;
+
         //Data from wowhead
         //Druid(caster) : Spirit/4.5 + 15   //Design: Do we want to implement form mp5 penalty? Cant find any info on boomkin regen, but assuming its the same as caster
         //Druid(feral), Hunter, Paladin, Warlock: Spirit/5 + 15
         //Mage, Priest: Spirit/4 + 12.5
         //Shaman: Spirit/5 + 17 
 
-        //Data from warcrafttavern //TODO: Figure out why these two sites have different numbers
+        //Data from warcrafttavern //TODO: Figure out why this site have different numbers from wowhead (WowHead has spr/4.5+15 for druids not in feral forms)
         //Druid, Hunter, Paladin, Shaman  Spirit/5 +15
         //Mage, Priest  Spirit/ 4 + 13
         //Warlock Spirit/4 + 8
 
-        public float SpiritMp5Constant => spiritMp5Constant;
+        public float BaseMp5 => spiritMp5Constant; //Q: Unsure if the name should be base or spirit. Since the value is treated as Spirit mp5 and not raw mp5
         float spiritMp5Constant; //TODO: Add this value to class files
 
         public float SpiritMp5Scaling => spiritMp5Scaling;
         float spiritMp5Scaling; //TODO: Add this value to class files
 
         //Data from warcrafttavern
-        public float SpiritHp5Constant => spiritHp5Constant;
+        public float BaseHp5 => spiritHp5Constant;
         readonly float spiritHp5Constant;
 
         public float SpiritHp5Scaling => spiritHp5Scaling;
@@ -139,7 +151,7 @@ namespace Project_1.GameObjects.Unit.Classes
         //RangedAttackPowerBonus rangedAttackBonus;
         //Hunters gain 2 per level, warriors and rogue gain 1. Other classes don't interact with this at all atm, and probably shouldn't since we don't want wands to scale with AP
 
-        public bool CanDualWield => canDualWield;
+        public bool CanDualWield => canDualWield; //Q: Should this be a learnable spell like in wow?
         bool canDualWield;
 
         public bool IsCaster => isCaster;
@@ -153,6 +165,7 @@ namespace Project_1.GameObjects.Unit.Classes
         //Rogues receive 1% Critical Strike Chance for every 29 points of Agility.
         //Hunters receive 1% Critical Strike Chance for every 53 points of Agility.
 
+        //Q: Isn't it scalar?
         public float AttackCritChanceScaler => attackCritChanceScaler;
         float attackCritChanceScaler;
 
@@ -173,8 +186,6 @@ namespace Project_1.GameObjects.Unit.Classes
         //All classes but Hunters and Rogues receive 1% Dodge for every 20 points of Agility.
         //Rogues receive 1% Dodge for every 14.5 points of Agility.
         //Hunters receive 1% Dodge for every 26 points of Agility.
-
-        public float DodgeChanceScaler => agilityDodgeChanceScaler;
         public float AgilityDodgeChanceScaler => agilityDodgeChanceScaler;
         float agilityDodgeChanceScaler;
 

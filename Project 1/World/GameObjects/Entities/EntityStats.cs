@@ -23,7 +23,7 @@ using System.Globalization;
 using Project_1.Managers;
 using Project_1.World.Items.Enchantments;
 using Project_1.Tiles;
-using Project_1.World.GameObjects.Unit.Stats.Primary;
+using Project_1.World.GameObjects.Unit.Stats.Secondary;
 
 namespace Project_1.GameObjects.Entities
 {

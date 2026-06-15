@@ -27,6 +27,20 @@ namespace Project_1.World.GameObjects.Unit.Stats.Primary
         public int Armor => Value * 2;
 
         /// <summary>
+        /// Returns an entities bonus crictical strike chance based on their given class and current Agility.
+        /// </summary>
+        /// <param name="aClass"></param>
+        /// <returns></returns>
+        public double GetCriticalChanceBonus(ClassData aClass) => aClass.AttackCritChanceScaler * Value;
+
+        /// <summary>
+        /// Returns an entities bonus dodge chance based on their given class and current Agility.
+        /// </summary>
+        /// <param name="aClass"></param>
+        /// <returns></returns>
+        public double GetDodgeChanceBonus(ClassData aClass) => aClass.AgilityDodgeChanceScaler * Value;
+
+        /// <summary>
         /// Returns a Melee Attack Power value which is Agility * 1 if a class is tagged as having MeleeAttackPowerBonus.Agility, if not it returns 0.
         /// </summary>
         /// <param name="aClass"></param>

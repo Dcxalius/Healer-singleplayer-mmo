@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Project_1.World.GameObjects.Unit.Stats.Primary;
+using Project_1.GameObjects.Unit.Classes;
 
 namespace Project_1.GameObjects.Unit.Resources
 {
@@ -42,22 +43,18 @@ namespace Project_1.GameObjects.Unit.Resources
 
         public override float RegenValue { get => regenValue; }
         float regenValue;
-        float baseRegen;
 
-        double lastCastSpellOrTick;
-        double regenTimer = 5000;
+        double lastCastSpellOrTick; //TODO: This should be saved
+        double regenTimer = 5000; //TODO: This should be pulled from somewhere
 
         protected override float PerLevel => 10;
 
-        public Mana(float aBaseValue, TotalPrimaryStats aStats, float aCurrentValue, float aBaseRegen, int aLevel) : base(ResourceType.Mana, Color.Cyan)
+        public Mana(ClassData aClass, TotalPrimaryStats aStats, float aCurrentValue, int aLevel) : base(ResourceType.Mana, Color.Cyan)
         {
-            Debug.Assert(aBaseValue > 0, "Tried to set base to 0");
-            Debug.Assert(aBaseRegen > 0, "Tried to set regen to 0");
-
-            BaseMaxValue = aBaseValue + PerLevel * (aLevel - 1);
+            BaseMaxValue = aClass.BaseMana + aClass.PerLevelMana * (aLevel - 1); //TODO: The per level needs to be designed
+            
             lastCastSpellOrTick = double.NegativeInfinity; //TODO: Implement loading from file
-            baseRegen = aBaseRegen;
-            CalculateMaxValue(aStats);
+            CalculateMaxValue(aStats, aClass);
             Value = aCurrentValue;
         }
 
@@ -96,15 +93,15 @@ namespace Project_1.GameObjects.Unit.Resources
             base.CastSpell(aCost);
         }
 
-        public override void Refresh(TotalPrimaryStats aStats)
+        public override void Refresh(TotalPrimaryStats aStats, ClassData aClass)
         {
             AssertSimThread();
-            CalculateMaxValue(aStats);
+            CalculateMaxValue(aStats, aClass);
         }
 
-        void CalculateMaxValue(TotalPrimaryStats aStats)
+        void CalculateMaxValue(TotalPrimaryStats aStats, ClassData aClass)
         {
-            regenValue = baseRegen + aStats.Spirit.GetMp5Bonus();
+            regenValue = aClass.BaseMp5 + aStats.Spirit.GetMp5Bonus(aClass);
             maxValue = BaseMaxValue + aStats.Intellect * 15;
         }
     }

@@ -1,4 +1,5 @@
-﻿using Project_1.GameObjects.Unit.Classes;
+using Project_1.GameObjects.Unit;
+using Project_1.GameObjects.Unit.Classes;
 using Project_1.Managers;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
 
-namespace Project_1.GameObjects.Unit.Stats
+namespace Project_1.World.GameObjects.Unit.Stats.Secondary
 {
     internal class Attack
     {
@@ -40,7 +41,7 @@ namespace Project_1.GameObjects.Unit.Stats
             AssertSimThread();
 
             //TODO: Implement spell stats calculations bellow, Don't forget adding racials and talents.
-            criticalChance = (float)Math.Clamp(aUnitData.ApplyStatusModifiers("CritChance", BASE_CRIT_CHANCE + aUnitData.BaseStats.TotalPrimaryStats.Agility * aUnitData.ClassData.AttackCritChanceScaler), 0d, 1d);
+            criticalChance = (float)Math.Clamp(aUnitData.ApplyStatusModifiers("CritChance", BASE_CRIT_CHANCE + aUnitData.BaseStats.TotalPrimaryStats.Agility.GetCriticalChanceBonus(aUnitData.ClassData)), 0d, 1d);
             criticalDamage = (float)aUnitData.ApplyStatusModifiers("CritDamage", BASE_CRIT_DAMAGE + 0/* + unitData.AttackCriticalDamageMultiplier*/);
             percentPenetration = (float)Math.Clamp(aUnitData.ApplyStatusModifiers("PercentPenetration", 0 /*+ unitData.Equipment.GetPercentAttackPen*/), 0d, 1d);
             flatPenetration = aUnitData.ApplyStatusModifiersInt("FlatPenetration", 0 /*+ unitData.Equipment.GetFlatAttackPen*/);

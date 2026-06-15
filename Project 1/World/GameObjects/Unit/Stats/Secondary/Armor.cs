@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_1.GameObjects.Unit.Stats
+namespace Project_1.World.GameObjects.Unit.Stats.Secondary
 {
     internal class Armor : Stat
     {
