@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Project_1.GameObjects.Entities.Friendlies.GuildMembers;
+using Project_1.World.GameObjects.Unit.Talents;
 
 namespace Project_1.GameObjects.Entities.Friendlies
 {
@@ -33,7 +34,7 @@ namespace Project_1.GameObjects.Entities.Friendlies
             for (int treeIndex = 0; treeIndex < ClassData.TalentTrees.Length; treeIndex++)
             {
                 var tree = ClassData.TalentTrees[treeIndex];
-                if (tree?.Talents == null) continue;
+                if (tree?.Talents == null) continue; //TODO: These nulls should probably be asserts at some point
 
                 int pointsSpentInTree = tree.GetIds.Sum(GetTalentRank);
                 for (int rowIndex = 0; rowIndex < tree.Talents.Length; rowIndex++)
@@ -56,6 +57,11 @@ namespace Project_1.GameObjects.Entities.Friendlies
                             if (learntTalents[i].id != aTalentId) continue;
                             learntTalents[i].rank++;
                             UnitData.BaseStats.RefreshStats();
+                            int[] affectedSpells = TalentFactory.GetTalent(learntTalents[i].id).affectedSpellIDs;
+                            for (int spellI = 0; spellI < affectedSpells.Length; spellI++)
+                            {
+                                //TODO: Update the spells
+                            }
                             FlagForRefresh();
                             return true;
                         }

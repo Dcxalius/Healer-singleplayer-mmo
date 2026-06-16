@@ -20,13 +20,13 @@ namespace Project_1.World.GameObjects.Unit.Talents
         GfxPath background;
         Talent[][] talents;
 
-        public void Spell(Spell aS)
+        public void AddTalentsToSpell(Spell aS)
         {
             for (int i = 0; i < talents.Length; i++)
             {
                 for (int j = 0; j < talents[i].Length; j++)
                 {
-                    if (talents[i][j].HasChanges(aS))
+                    if (talents[i][j].HasChangesForSpell(aS))
                     {
                         aS.AddTalent(talents[i][j]);
                     }

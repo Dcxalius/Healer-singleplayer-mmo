@@ -1,4 +1,4 @@
-﻿using Project_1.GameObjects.Spells;
+using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Entities;
 using Project_1.GameObjects.Unit;
 using Project_1.Managers;
@@ -11,11 +11,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Project_1.GameObjects.Entities.Friendlies.Players;
+using System.Diagnostics;
 
 namespace Project_1.GameObjects.Entities.Friendlies.Players
 {
     internal class SpellBook
     {
+        public enum PublishSpellUpdate
+        {
+            No,
+            Yes
+        }
+
         public Spell[] Spells
         {
             get
@@ -24,9 +31,18 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
                 return castableSpells.ToArray();
             }
         }
+
+        public (int spellId, int rank)[] SaveSpells
+        {
+            get
+            {
+                return new (int, int)[] { (0, 0) }; //TODO: Implement this
+            }
+        }
+
         List<(int rank, Spell spell)> knownSpells;
-        readonly List<Spell> castableSpells;
-        readonly Dictionary<string, Spell> castableSpellsByKey;
+        readonly List<Spell> castableSpells; //Q: What does these two track? Aren't all known spells per definition castable?
+        readonly Dictionary<string, Spell> castableSpellsByKey; //TODO: This should be done with ID + rank?
         HashSet<string> learnableSpells;
         HashSet<string> levelOneSpells;
         Entity owner;
@@ -46,7 +62,8 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         }
         string[] loadedSpells;
 
-        public SpellBook(string[] aSpellsAlreadyLearnt)
+        //public SpellBook((int id, int rank) aSpellsAlreadyLearnt)
+        public SpellBook(string[] aSpellsAlreadyLearnt) //TODO: Spells should move to an ID system, rather than a namebased one.
         {
             ThreadAffinity.AssertSimThread();
             loadedSpells = aSpellsAlreadyLearnt;
@@ -55,16 +72,14 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             castableSpellsByKey = new Dictionary<string, Spell>();
         }
 
-        public SpellBook() : this(Array.Empty<string>())
-        {
-        }
+        public SpellBook() : this(Array.Empty<string>()){}
 
 
 
         public void Init(Entity aEntity)
         {
             ThreadAffinity.AssertSimThread();
-            if (aEntity.RelationToPlayer != Relation.RelationToPlayer.Self) return;
+            if (aEntity.RelationToPlayer != Relation.RelationToPlayer.Self) return; //TODO: Npcs should also be able to have a spellbook.
             owner = aEntity as Friendly;
             aEntity = aEntity as Friendly;
             Friendly f = owner as Friendly;
@@ -73,7 +88,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
             foreach (string levelOneSpell in levelOneSpells)
             {
-                AddSpell(levelOneSpell, 1, false);
+                AddSpell(levelOneSpell, 1, PublishSpellUpdate.No);
             }
 
             for (int i = 0; i < loadedSpells.Length; i++)
@@ -81,13 +96,15 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
                 RestoreSpellProgress(loadedSpells[i]);
             }
 
-            if (DebugManager.Mode(DebugMode.LearnKill))
+            if (DebugManager.Mode(DebugMode.LearnKill) && owner is Player) //TODO: Currently this implementation causes the debug to spit out an error message when we restore a player with Kill on bars.
             {
                 AddSpell("Kill", 1);
             }
+
+            PublishSpellbookRefreshed(); //Q: Just added this, feels weird that we add spells and then pressumably update them elsewhere
         }
 
-        public void LearnSpell(string aSpellName)
+        public void LearnSpell(string aSpellName) //TODO: Should use ID instead
         {
             ThreadAffinity.AssertSimThread();
             if (!Spell.TryParseSpellKey(aSpellName, out string spellName, out int explicitRank))
@@ -111,26 +128,12 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             AddSpell(spellName, targetRank);
         }
 
-        public void AddSpell(Spell aSpell)
-        {
-            ThreadAffinity.AssertSimThread();
-            if (aSpell == null) return;
-            AddSpell(aSpell.Name, aSpell.Rank);
-        }
-
-
-        public bool HasSpell(Spell aSpell)
-        {
-            ThreadAffinity.AssertSimThread();
-            return aSpell != null && castableSpellsByKey.ContainsKey(aSpell.SpellKey);
-        }
-
         public bool TryGetSpell(string spellName, out Spell spell)
         {
             ThreadAffinity.AssertSimThread();
             spell = null;
             if (string.IsNullOrWhiteSpace(spellName)) return false;
-            if (!Spell.TryParseSpellKey(spellName, out string parsedName, out int parsedRank)) return false;
+            if (!Spell.TryParseSpellKey(spellName, out string parsedName, out int parsedRank)) return false; //TODO: This is very ugly and due to a misshandling of saved spells. Spells in spellbook should be saved as ID, Rank array. That way we won't have to do this wonky string stuff
 
             string exactKey = Spell.BuildSpellKey(parsedName, parsedRank);
             if (castableSpellsByKey.TryGetValue(exactKey, out spell))
@@ -147,16 +150,16 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         void RestoreSpellProgress(string spellIdentifier)
         {
             ThreadAffinity.AssertSimThread();
-            if (!Spell.TryParseSpellKey(spellIdentifier, out string spellName, out int savedRank)) return;
+            if (!Spell.TryParseSpellKey(spellIdentifier, out string spellName, out int savedRank)) return; //
             if (levelOneSpells.Contains(spellName) && savedRank <= 1) return;
-            AddSpell(spellName, Math.Max(1, savedRank), false);
+            AddSpell(spellName, Math.Max(1, savedRank), PublishSpellUpdate.No); //Q: Why do we Max 1 here? If a spell has rank 0 we have bigger problems somewhere I feel like
         }
 
-        void AddSpell(string spellName, int rank, bool publish = true)
+        void AddSpell(string spellName, int rank, PublishSpellUpdate publishSpellUpdate = PublishSpellUpdate.Yes) //TODO: Should use ID instead
         {
             ThreadAffinity.AssertSimThread();
             SpellData spellData = SpellFactory.GetSpell(spellName);
-            int clampedRank = spellData.ClampRank(rank);
+            int clampedRank = spellData.ClampRank(rank); //Q: If spellrank is invalid, don't we wanna alert instead just clamping and ignoring?
             int index = knownSpells.FindIndex(x => x.spell.Name == spellName);
             if (index >= 0)
             {
@@ -169,16 +172,13 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             }
 
             RebuildCastableSpells();
-            if (spellData.CastCondition != CastCondition.None)
-                owner?.RegisterReactiveHook(spellData.CastCondition);
-            if (publish)
-            {
-                PublishSpellbookRefreshed();
-            }
+            if (spellData.CastCondition != CastCondition.None) owner?.RegisterReactiveHook(spellData.CastCondition);
+            if (publishSpellUpdate == PublishSpellUpdate.Yes) PublishSpellbookRefreshed(); 
         }
 
         void RebuildCastableSpells()
         {
+            //Q: Why is this done? The spellbook already has a list of all castable spell, the ones in the knownSpells Dict 
             ThreadAffinity.AssertSimThread();
             Dictionary<string, Spell> previous = new Dictionary<string, Spell>(castableSpellsByKey);
             castableSpells.Clear();
@@ -208,7 +208,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
             }
         }
 
-        public int GetKnownRank(string spellIdentifier)
+        public int GetKnownRank(string spellIdentifier) //TODO: Should use id instead. Also probably a namechange to GetHighestKnownRank
         {
             if (!Spell.TryParseSpellKey(spellIdentifier, out string spellName, out _)) return 0;
             int index = knownSpells.FindIndex(x => x.spell.Name == spellName);
@@ -218,7 +218,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         void PublishSpellbookRefreshed()
         {
-            if (owner == null) return;
+            Debug.Assert(owner != null);
             MailboxManager.PublishUiEvent(new SpellbookRefreshed(owner.RenderId, castableSpells.Select(x => x.SpellKey).ToArray()));
         }
     }

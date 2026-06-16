@@ -7,6 +7,7 @@ using Project_1.Camera;
 using Project_1.GameObjects.Spells;
 using Project_1.GameObjects.Spells.Buff;
 using Project_1.Managers;
+using Project_1.World.GameObjects.Unit.Talents;
 
 namespace Project_1.GameObjects.Entities
 {
@@ -17,7 +18,6 @@ namespace Project_1.GameObjects.Entities
         SpellCast spellCast;
         BuffList buffList;
 
-        //Q: At what point do we stop asserting sim threads?
         public bool StartCast(Spell aSpell)
         {
             ThreadAffinity.AssertSimThread();

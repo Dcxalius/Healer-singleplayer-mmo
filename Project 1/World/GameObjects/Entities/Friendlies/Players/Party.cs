@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Bson;
+using Newtonsoft.Json.Bson;
 using Project_1.Camera;
 using Project_1.GameObjects.Unit;
 using Project_1.UI.HUD.Managers;
@@ -20,14 +20,14 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
     {
         public const int maxPartySize = 4;
 
-        Player owner;
-        List<GuildMember> commands = new List<GuildMember>();
+        Player owner; //TODO: An owner shouldn't have to be the player
+        List<GuildMember> commandedPartyMembers = new List<GuildMember>();
 
         public int PartyCount => party.Count;
         List<GuildMember> party = new List<GuildMember>();
-        const float lengthOfLeash = 500;
+        const float lengthOfLeash = 500; //TODO: Should be settable by player
 
-        public bool IsInCommand(GuildMember aGuildMember) => commands.IndexOf(aGuildMember) >= 0;
+        public bool IsInCommand(GuildMember aGuildMember) => commandedPartyMembers.IndexOf(aGuildMember) >= 0;
         public bool IsInParty(GuildMember aGuildMember) => party.IndexOf(aGuildMember) >= 0;
 
         public bool IsInCombat => party.Any(x => x.InCombat);
@@ -60,7 +60,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         public void Update()
         {
             ThreadAffinity.AssertSimThread();
-            SummonPartyIfTooFarAway();
+            SummonPartyIfTooFarAway(); //Q: It's possible this entire check should be moved into the guildmembers settable logic tree
         }
 
         void SummonPartyIfTooFarAway()
@@ -77,33 +77,37 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         public void ClearCommand()
         {
             ThreadAffinity.AssertSimThread();
-            if (commands.Count > PartyControlCleared.MaxMembers)
+            if (commandedPartyMembers.Count > PartyControlCleared.MaxMembers)
             {
-                Debug.Assert(false, $"Expected at most {PartyControlCleared.MaxMembers} command members but found {commands.Count}.");
+                Debug.Assert(false, $"Expected at most {PartyControlCleared.MaxMembers} command members but found {commandedPartyMembers.Count}.");
             }
 
-            int count = Math.Min(commands.Count, PartyControlCleared.MaxMembers);
-            int renderId0 = count > 0 ? commands[0].RenderId : 0;
-            int renderId1 = count > 1 ? commands[1].RenderId : 0;
-            int renderId2 = count > 2 ? commands[2].RenderId : 0;
-            int renderId3 = count > 3 ? commands[3].RenderId : 0;
+            int count = Math.Min(commandedPartyMembers.Count, PartyControlCleared.MaxMembers);
+            int renderId0 = count > 0 ? commandedPartyMembers[0].RenderId : 0;
+            int renderId1 = count > 1 ? commandedPartyMembers[1].RenderId : 0;
+            int renderId2 = count > 2 ? commandedPartyMembers[2].RenderId : 0;
+            int renderId3 = count > 3 ? commandedPartyMembers[3].RenderId : 0;
             MailboxManager.PublishUiEvent(new PartyControlCleared(count, renderId0, renderId1, renderId2, renderId3));
-            commands.Clear();
+            commandedPartyMembers.Clear();
         }
 
         public void AddToCommand(GuildMember aGuildMember)
         {
             ThreadAffinity.AssertSimThread();
-            if (commands.Contains(aGuildMember)) { return; }
+            if (commandedPartyMembers.Contains(aGuildMember)) 
+            {
+                DebugManager.Print($"Tried to add {aGuildMember} to a party they were in.");
+                return; 
+            }
 
             MailboxManager.PublishUiEvent(new PartyWalkerAdded(aGuildMember.RenderId));
-            commands.Add(aGuildMember);
+            commandedPartyMembers.Add(aGuildMember);
         }
 
-        public void NeedyAddToCommand(GuildMember aGuildMember)
+        public void NeedyAdd(GuildMember aGuildMember)
         {
             ThreadAffinity.AssertSimThread();
-            commands.Clear();
+            ClearCommand();
             AddToCommand(aGuildMember);
 
         }
@@ -111,16 +115,16 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         public void RemoveFromCommand(GuildMember aGuildMember)
         {
             ThreadAffinity.AssertSimThread();
-            if (!commands.Contains(aGuildMember)) { return; }
+            if (!commandedPartyMembers.Contains(aGuildMember)) { return; }
 
             MailboxManager.PublishUiEvent(new PartyWalkerRemoved(aGuildMember.RenderId));
-            commands.Remove(aGuildMember);
+            commandedPartyMembers.Remove(aGuildMember);
         }
 
-        public bool AddToParty(GuildMember aGuildMember)
+        public bool AddToParty(GuildMember aGuildMember) //Q: Why is there two seperate ways to 
         {
             ThreadAffinity.AssertSimThread();
-            if (PartyCount >= maxPartySize) return false;
+            if (PartyCount >= maxPartySize) return false; //TODO: This should be prevented in the first place from being called in the first place by disabling/hiding the buttons for addind a party. This check should still remain for safety reasons
 
             party.Add(aGuildMember);
             aGuildMember.AddedToParty();
@@ -145,7 +149,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         public void IssueMoveOrder(WorldSpace destination, bool append)
         {
             ThreadAffinity.AssertSimThread();
-            foreach (var walker in commands)
+            foreach (var walker in commandedPartyMembers)
             {
                 if (append)
                 {
@@ -163,9 +167,9 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         public void IssueTargetOrder(Entity aEntity)
         {
             ThreadAffinity.AssertSimThread();
-            for (int i = 0; i < commands.Count; i++)
+            for (int i = 0; i < commandedPartyMembers.Count; i++)
             {
-                commands[i].SetTarget(aEntity);
+                commandedPartyMembers[i].SetTarget(aEntity);
             }
         }
 

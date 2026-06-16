@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using Project_1.Camera;
 using Project_1.GameObjects.Spells;
@@ -30,18 +30,15 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         string[] learntSpellNames;
 
         [JsonIgnore]
-        public SpellBook SpellBook => spellBook;
+        public SpellBook SpellBook => spellBook; //TODO: This shouldn't be here.
         SpellBook spellBook;
 
-        [JsonProperty("SpellOnBar")]
-        string[] SpellsOnBar => spellOnBar;
-
-        [JsonIgnore]
+        [JsonProperty("SpellOnBar")] //TODO: Fix typo. SpellsOnBar, not spell
         public string[] SavedSpellsOnBar => spellOnBar;
         string[] spellOnBar;
 
         [JsonProperty]
-        public int Gold
+        public int Gold //TODO: Should this be moved so guildmembers so they can also have gold?
         {
             get => gold;
             set => gold = value;
@@ -67,7 +64,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         public PlayerData(string aName, string aClassName) : this(aName, null, aClassName, Relation.RelationToPlayer.Self, new string[] { },
             1, 0, null, 0, float.MaxValue, float.MaxValue, null, null, null, null,
-            new WorldSpace(500, 500) /*TODO: Remove hardcoded*/ , new WorldSpace(0, 0), new WorldSpace(0, 0), new List<WorldSpace>() { }, 1)
+            new WorldSpace(500, 500), new WorldSpace(0, 0), new WorldSpace(0, 0), new List<WorldSpace>() { }, 1) //TODO: Remove hardcoded position
         {
             inventory = new Inventory();
             spellBook = new SpellBook();
@@ -75,7 +72,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
 
         }
 
-        internal void CaptureSaveState()
+        internal void CaptureSaveState() //TODO: Rather than doing this, we should probably covert SpellBook directly
         {
             ThreadAffinity.AssertSimThread();
             learntSpellNames = spellBook?.LearntSpells ?? Array.Empty<string>();

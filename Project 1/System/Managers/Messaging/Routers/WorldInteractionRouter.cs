@@ -408,7 +408,7 @@ namespace Project_1.GameObjects
                     if (e.MemberRenderId.HasValue &&
                         ObjectManager.TryGetGuildMemberByRenderId(e.MemberRenderId.Value, out GuildMember needyMember))
                     {
-                        player.Party.NeedyAddToCommand(needyMember);
+                        player.Party.NeedyAdd(needyMember);
                     }
                     break;
             }

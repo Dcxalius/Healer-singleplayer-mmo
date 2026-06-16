@@ -36,6 +36,7 @@ namespace Project_1.GameObjects.Unit
     }
     class UnitData
     {
+        //TODO: This should be broken up into a partial class
         static void AssertSimThread() => ThreadAffinity.AssertSimThread();
         static readonly JsonSerializer equipmentSerializer = JsonSerializer.Create(new JsonSerializerSettings
         {
@@ -48,18 +49,22 @@ namespace Project_1.GameObjects.Unit
         [JsonProperty(PropertyName = "ClassName")]
         string className => classData.Name;
 
-        public (int id, int rank)[] LearntTalents => learntTalents;
+        public (int id, int rank)[] LearntTalents => learntTalents; //Q: This isn't safe right? If I understand c# arrays
         (int id, int rank)[] learntTalents;
 
         public double GetTalentPrimaryStatFlat(PrimaryStats.PrimaryStat aStat) => GetTalentPrimaryStatChange(aStat, true);
         public double GetTalentPrimaryStatPercent(PrimaryStats.PrimaryStat aStat) => GetTalentPrimaryStatChange(aStat, false);
-        Entity owner;
+        Entity owner; //Q: Do we really need owner in here?
 
         internal void SetOwner(Entity aOwner)
         {
             owner = aOwner;
         }
 
+        //TODO: Move buffs into here, they should also be saved and loaded
+
+        //TODO: I think we want the pipeline to go owner => Data, so these calls feels wonky, but is nececcary until we move Buffs into here
+        //TODO: Tbh they should all be deeper somewhere, these stat things are the only thing in unitdata we treat like this.
         public double GetStatusStatFlat(string aStat) => owner?.GetStatusStatFlat(aStat) ?? 0d;
         public double GetStatusStatPercent(string aStat) => owner?.GetStatusStatPercent(aStat) ?? 0d;
 
@@ -105,7 +110,7 @@ namespace Project_1.GameObjects.Unit
             throw new NotImplementedException();
         }
 
-        double GetTalentPrimaryStatChange(PrimaryStats.PrimaryStat aStat, bool aFlat)
+        double GetTalentPrimaryStatChange(PrimaryStats.PrimaryStat aStat, bool aFlat) //Q: Prehaps break this up into a flat and % versions rathar than passing a bool
         {
             double value = 0d;
             if (learntTalents == null)
@@ -171,7 +176,7 @@ namespace Project_1.GameObjects.Unit
         
         [JsonIgnore]
         public Movement MovementData => classData.Movement;
-        public WorldSpace Position
+        public WorldSpace Position //Q: Should we do a Position Class that manages these values? Or maybe Movement is a better name for that class?
         {
             get => position;
             set => position = value;
@@ -192,9 +197,7 @@ namespace Project_1.GameObjects.Unit
         }
 
         WorldSpace velocity;
-        #endregion
 
-        #region Attack
         public WeaponSkill WeaponSkill => weaponSkill;
         WeaponSkill weaponSkill;
 
@@ -249,7 +252,6 @@ namespace Project_1.GameObjects.Unit
         public Equipment Equipment =>  equipment;
         Equipment equipment;
 
-        #region gfx
         [JsonIgnore] 
         public GfxPath GfxPath => gfxPath;
         readonly GfxPath gfxPath;
@@ -257,7 +259,6 @@ namespace Project_1.GameObjects.Unit
         [JsonIgnore] 
         public GfxPath CorpseGfxPath => corpseGfxPath;
         readonly GfxPath corpseGfxPath;
-        #endregion
 
         [JsonIgnore]
         public LootTable LootTable { get => LootFactory.GetData(name); }
@@ -278,8 +279,8 @@ namespace Project_1.GameObjects.Unit
 
             learntTalents = new (int id, int rank)[0];
             position = aSpawn;
-            velocity = WorldSpace.Zero;
-            momentum = WorldSpace.Zero;
+            velocity = WorldSpace.Zero;//TODO: Make 3d
+            momentum = WorldSpace.Zero;//TODO: Make 3d
             destination = new Destination(null);
             secondaryStats = new SecondaryStats(this);
             unitType = aData.UnitType;
@@ -298,9 +299,9 @@ namespace Project_1.GameObjects.Unit
             this.level = new Level(level, experience);
             SetTalents(learntTalents);
             SetEquipment(equipment);
-            this.position = new WorldSpace(position);
-            this.momentum = new WorldSpace(momentum);
-            this.velocity = new WorldSpace(velocity);
+            this.position = new WorldSpace(position); //TODO: Make 3d
+            this.momentum = new WorldSpace(momentum);//TODO: Make 3d
+            this.velocity = new WorldSpace(velocity);//TODO: Make 3d
             this.destination = new Destination(destinations);
             this.defenseSkill = defenseSkill;
             this.weaponSkill = weaponSkill;
@@ -326,6 +327,8 @@ namespace Project_1.GameObjects.Unit
 
         void SetTalents((int id, int rank)[] aLearntTalents)
         {
+            //TODO: Slightly to big I think
+            //TODO: Should be moved, maybe...
             if (aLearntTalents == null)
             {
                 this.learntTalents = classData.GenerateEmptyTalents;
@@ -333,14 +336,14 @@ namespace Project_1.GameObjects.Unit
             }
             
             (int id, int rank)[] emptyTalents = classData.GenerateEmptyTalents;
-            if (emptyTalents.Length == aLearntTalents.Length)
-            {
-                this.learntTalents = aLearntTalents;
-                return;
-            }
+            //if (emptyTalents.Length == aLearntTalents.Length) //Q: I dunnu what this does, but it feels wrong AF that we ignore learnt talents if they are the same length as an empty talent tree.
+            //{
+            //    this.learntTalents = aLearntTalents;
+            //    return;
+            //}
             (int, int)[] newTalents = new (int, int)[emptyTalents.Length];
 
-            for (int i = 0; i < emptyTalents.Length; i++)
+            for (int i = 0; i < emptyTalents.Length; i++) //Q: Shouldn't this be reversed? Is there any reason why we are checking all the empty talents rather than the ones given by learnt? Feels like we can catch more bugs by checking the learnt talents and asserting that they are in the empty set.
             {
                 (int id, int rank) emptyTalent = emptyTalents[i];
                 if (aLearntTalents.Contains(emptyTalent))
@@ -355,6 +358,8 @@ namespace Project_1.GameObjects.Unit
         }
         void SetEquipment(object aEquipment)
         {
+            //TODO: Break up
+            //TODO: Should be moved, maybe...
             if (aEquipment == null)
             {
                 if (relationData.ToPlayer == Unit.Relation.RelationToPlayer.Self || relationData.ToPlayer == Unit.Relation.RelationToPlayer.Friendly)
@@ -441,18 +446,18 @@ namespace Project_1.GameObjects.Unit
         //    Resource.Update();
         //}
 
-        public bool Tick(bool aInCombat)
+        public bool Tick(bool aInCombat) //Q: Do we want hp ticks and resource tcks to be synced?
         {
             AssertSimThread();
-            bool healthChanged = Health.HealthRegenTick(aInCombat, SecondaryStats.Defense.Hp5, SecondaryStats.Defense.SpiritHp5);
+            bool valueChanged = Health.HealthRegenTick(aInCombat, SecondaryStats.Defense.Hp5, SecondaryStats.Defense.SpiritHp5);
             float previousResource = Resource.Value;
             Resource.TickRegen(aInCombat);
             if (Resource.Value != previousResource)
             {
-                healthChanged = true;
+                valueChanged = true;
             }
 
-            return healthChanged;
+            return valueChanged;
         }
 
         public void GainExp(int aExpAmount)
@@ -467,7 +472,5 @@ namespace Project_1.GameObjects.Unit
                 baseStats.LevelUp();
             }
         }
-
-    
     }
 }

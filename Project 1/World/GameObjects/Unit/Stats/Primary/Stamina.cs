@@ -12,7 +12,6 @@ namespace Project_1.World.GameObjects.Unit.Stats.Primary
         /// Returns (current stamina - 20) * 10 + 20. If stamina is less than 20 it returns stamina.
         /// </summary>
         public double HealthBonus => Value > 20 ? (Value - 20 ) * 10 + 20 : Value; //TODO: Implement racial bonuses.
-        //Gnome mage, nelf druid/priest has 19 stam, so check is necessary for that particular case :P
 
         public Stamina(int aValue) : base(aValue)
         {

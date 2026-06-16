@@ -83,7 +83,7 @@ namespace Project_1.GameObjects.Unit.Classes
         //Youtube vids + https://barrens.chat/viewtopic.php?t=1046
         //Confirmed ref point, a level 1 troll warrior should have 70 hp, level 1 gnome should have 50. With 23 and 21 base stam resp puts the base hp to 20 for warriors
         //Undead priest => 62 hp with 21 stam giving 32 hp
-        //Nelf druid => 61 hp with 19 stam giving 42 hp
+        //Nelf druid => 53 hp with 19 stam giving 34 hp
         //Nelf rogue => 45 hp with 20 stam giving 25 hp
         //gnome warlock => 43 hp with 20 stam giving 23 hp
         //undead mage => 52 hp with 21 stam giving 31 hp

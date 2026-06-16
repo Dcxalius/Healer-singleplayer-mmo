@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Project_1.GameObjects.Spells;
 using Project_1.Textures;
 using Project_1.World.GameObjects.Unit.Stats.Primary;
@@ -14,10 +14,12 @@ namespace Project_1.World.GameObjects.Unit.Talents
 {
     internal class Talent
     {
-        public bool HasChanges(Spell aSpell) => changes.Any(x => x.spellDataId == aSpell.SpellDataId);
+        public bool HasChangesForSpell(Spell aSpell) => changes.Any(x => x.spellDataId == aSpell.SpellDataId);
         public GfxPath GfxPath => gfxPath;
 
         GfxPath gfxPath;
+
+        public int[] affectedSpellIDs => changes.Select(x => x.spellDataId).Distinct().ToArray();
 
         public int Id => id;
         int id;

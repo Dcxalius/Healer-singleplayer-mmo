@@ -23,11 +23,12 @@ namespace Project_1.GameObjects.Spells
 {
     internal class Spell : IDamager 
     {
+        //TODO: Think if we wanna collapse spells to have one spell for all ranks rather than one spell per rank
         Entity owner;
 
         const double InstantScalarFloor = 0.4;
         const double FullScalarCastTimeMs = 3500.0;
-        public string Name => spellData.Name;
+        public string Name => spellData.Name; //TODO: The name should contain the rank if there is ranks
 
         public int SpellDataId => spellData.Id;
         public int Id => id;
@@ -61,7 +62,12 @@ namespace Project_1.GameObjects.Spells
         public double TalentFlatChange(TalentChange change) => talents.Sum(t => t.GetChanges(SpellDataId, owner.GetTalentRank(t.Id), change, true));
         public double TalentPercentChange(TalentChange change) => talents.Sum(t => t.GetChanges(SpellDataId, owner.GetTalentRank(t.Id), change, false));
 
-        public void AddTalent(Talent aTalent) => talents.Add(aTalent);
+        public void AddTalent(Talent aTalent)
+        {
+            if (!aTalent.HasChangesForSpell(this)) return; 
+            talents.Add(aTalent);
+        }
+
         List<Talent> talents;
 
         public double GetPower(SpellEffect aEffect)
@@ -71,15 +77,17 @@ namespace Project_1.GameObjects.Spells
         }
 
 
-        public static string BuildSpellKey(string spellName, int rank)
+        public static string BuildSpellKey(string spellName, int rank) //TODO: This shouldn't be done
         {
+            DebugManager.Depricated();
             if (string.IsNullOrWhiteSpace(spellName)) return string.Empty;
             if (rank <= 1) return spellName;
             return spellName + "#" + rank;
         }
 
-        public static bool TryParseSpellKey(string spellIdentifier, out string spellName, out int rank)
+        public static bool TryParseSpellKey(string spellIdentifier, out string spellName, out int rank) //TODO: This should be removed
         {
+            DebugManager.Depricated();
             spellName = spellIdentifier?.Trim() ?? string.Empty;
             rank = 1;
             if (string.IsNullOrWhiteSpace(spellName)) return false;
@@ -95,7 +103,7 @@ namespace Project_1.GameObjects.Spells
             return !string.IsNullOrWhiteSpace(spellName);
         }
 
-        public Spell(Entity owner, string aName, int aRank)
+        public Spell(Entity owner, string aName, int aRank) //TODO: aName shouldn't be used here, it should be found by id instead.
         {
             if (!TryParseSpellKey(aName, out string spellName, out _))
             {
@@ -108,8 +116,11 @@ namespace Project_1.GameObjects.Spells
             lastTimeCasted = double.NegativeInfinity;
             id = spellIds++;
 
-            //TODO: Search through owners talent trees
             talents = new List<Talent>();
+            foreach (TalentTree tree in owner.ClassData.TalentTrees)
+            {
+                tree.AddTalentsToSpell(this);
+            }
         }
 
         public bool Cast(Entity aTarget, Entity aCaster)
@@ -125,8 +136,9 @@ namespace Project_1.GameObjects.Spells
             return true;
         }
 
-        public bool CastAt(WorldSpace aTargetPosition, Entity aCaster)
+        public bool CastAt(WorldSpace aTargetPosition, Entity aCaster) //TODO: Make 3d
         {
+            //TODO: This currently assumes all aoe is instant, that is not the case.
             ThreadAffinity.AssertSimThread();
             if (!RequiresGroundTarget) return false;
             if (!OffCooldown) return false;
@@ -149,6 +161,7 @@ namespace Project_1.GameObjects.Spells
 
         bool TryCast(Entity aTarget, Entity aCaster)
         {
+            //TODO: Break up
             ThreadAffinity.AssertSimThread();
             if (!OffCooldown) return false;
             if (!spellData.Targetable(aTarget.RelationToPlayer)) return false;
@@ -187,10 +200,8 @@ namespace Project_1.GameObjects.Spells
             ThreadAffinity.AssertSimThread();
             lastTimeCasted = TimeManager.TotalFrameTime;
 
-            if (spellData.Travel == SpellData.TravelType.Instant)
-                Trigger(aCaster, aTarget);
-            else
-                ProjectileFactory.CreateProjectile(aCaster, aCaster.Centre, this, aTarget);
+            if (spellData.Travel == SpellData.TravelType.Instant) Trigger(aCaster, aTarget);
+            else ProjectileFactory.CreateProjectile(aCaster, aCaster.Centre, this, aTarget);
         }
 
         public bool Trigger(Entity aCaster, Entity aTarget)
@@ -200,18 +211,9 @@ namespace Project_1.GameObjects.Spells
             for (int i = 0; i < spellData.Effects.Length; i++)
             {
                 SpellEffect effect = spellData.Effects[i];
-                if (effect is InstantEffect instant)
-                {
-                    instant.Trigger(aCaster, aTarget, this);
-                }
-                else if (effect is OverTimeEffect overTime)
-                {
-                    overTime.Trigger(aCaster, aTarget, this);
-                }
-                else
-                {
-                    effect.Trigger(aCaster, aTarget, this);
-                }
+                if (effect is InstantEffect instant) instant.Trigger(aCaster, aTarget, this);
+                else if (effect is OverTimeEffect overTime) overTime.Trigger(aCaster, aTarget, this);
+                else effect.Trigger(aCaster, aTarget, this);
                 aTarget.AddEffect(new VisualEffect(spellData.HitGfxPath, 1000));
             }
             return true;
@@ -249,7 +251,7 @@ namespace Project_1.GameObjects.Spells
             return InstantScalarFloor + (1.0 - InstantScalarFloor) * ratio;
         }
 
-        bool IsInsideGroundArea(WorldSpace center, WorldSpace targetPosition)
+        bool IsInsideGroundArea(WorldSpace center, WorldSpace targetPosition) //TODO: Should be made 3d
         {
             if (GroundTargetShape == SpellData.GroundTargetShapeType.Rectangle)
             {
@@ -264,7 +266,7 @@ namespace Project_1.GameObjects.Spells
             return dx * dx + dy * dy <= 1;
         }
 
-        public (int, int) ScaleInstantValueForRankAndTalent((int min, int max) baseValue, int rank)
+        public (int min, int max) ScaleInstantValueForRankAndTalent((int min, int max) baseValue, int rank) //TODO: Since this isnt static, shouldn't rank just be known already and not be sent in? Same thing for baseVal tbh
         {
             (int min, int max) returnV;
             returnV.min = (int)Math.Round(spellData.ScaleSignedValue(baseValue.min, spellData.ClampRank(rank)), MidpointRounding.AwayFromZero);
@@ -274,7 +276,7 @@ namespace Project_1.GameObjects.Spells
             return returnV;
         }
 
-        public (int, int) ScaleOverTimeTickValueForRank((int min, int max) val, int tickCount, int rank)
+        public (int, int) ScaleOverTimeTickValueForRank((int min, int max) val, int tickCount, int rank) //TODO: Since this isnt static, shouldn't rank just be known already and not be sent in? Same thing for val and tickCount tbh
         {
             Debug.Assert(tickCount > 0, "Tick count must be greater than 0.");
             (double min, double max) scaled = (spellData.ScaleSignedValue(val.min * tickCount, spellData.ClampRank(rank)), spellData.ScaleSignedValue(val.max * tickCount, spellData.ClampRank(rank)));
@@ -282,7 +284,5 @@ namespace Project_1.GameObjects.Spells
             scaled.max = (scaled.max + TalentFlatChange(TalentChange.Amount) * tickCount) * (1.0 + TalentPercentChange(TalentChange.Amount));
             return ((int)Math.Round(scaled.min / tickCount), (int)Math.Round(scaled.max / tickCount)) ;
         }
-
-
     }
 }

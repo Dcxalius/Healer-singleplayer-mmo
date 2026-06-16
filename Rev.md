@@ -33,12 +33,15 @@ ParticleManager; Should the lifespan of the Particles be moved to the main threa
 UIInputBridge; Should probably be renamed or removed
 DebugShapes; Needs DebugCircle, and DebugComplex
 Entity; A lot of work needed in all aspects.
-^ Underlying systems havent been checked. Spellbook, Buffs, UnitData, etc
+^ Underlying systems havent been checked. Buffs, UnitData, etc
+SpellBook; Spells should move to an (ID, rank) system rather than raw strings, including saving and loading.
 SaveManager, Save, SaveDetails (and anything I found that had Save in the name); Some threading logic needs to be looked at. Json wranglers needs to be broken out to a separate manager, A lot of methods that are too chunky
 StateManager/All states; GameState should be collapsed into Game. A lot of states should be collapsed into StartScreen (StartMenu?). States should have an UIManager, and then alerting the UIThread when it is no longer the current state. Drawpipeline needs to be reworked
 Stats, All Secondary stats have their own separate classes like Primary stats does
 Secondary stats; A lot of missing implementation of things. All of them are missing implementation of Talents, Defense stats should be classed, only Armor is at the moment.
 
+UnitData is partially reviewed
+Spell is partially reviewed
 
 Texture system is next 
 
@@ -50,16 +53,37 @@ Unrelated note: Fps should be uncapped and a setting for fps cap should be added
 
 Made some notes about code standars somewhere. FIND THEM AND LIST THEM UNDER HERE INSTEAD OF RANDOMLY IN THE CODE
 
-All functions that are believed to be done should have summaries written. Anything that is done temporarily should be wrapped in this format.
+Codestandard:
+	A class should be formated with fields at the top of the file
+	Then Properties and Setters/Getters
+		If a property/setter/getter only touches one field, it should be just above that field
+	Then ctors and Init
+	Then methods
+	Finally, common methods in the given order
+		Save
+		Load
+		Update
+		Draw
+	SubMethods should be under their closest relative, say UpdatePosition should be under Update. If its called in more than one method, it is not a submethod.
+	A method should ideally be as small as it could be. Ideally a method should only do one thing.
+	If a class is broken up into multiple files, if a field/property/method is used in multiple files it should be in the main file. If it's only in one that field/property/method should be in the top of that file
+	A partial class should be in a file starting with the classname and then the relating theme of the break up. ie Entity has all its code for stats in EntityStats
+.
+	If a line can be done in a singe line, it probably should be
+		if (aEntity.RelationToPlayer != Relation.RelationToPlayer.Self) return;
+	Don't break up single lines into multiple lines, if you are working on something and thats how you wanna live your life thats great. But don't clog vertically.
+	Arguments should start with a
+		aSpell, aEnemy etc
 
-//TEMP
-//Reason: [Reason for existance of temp].
-//Remove Con: [At what point should this be deleted/refractored]
 
-int codeGoesHere = 1;
+All functions that are believed to be done should have summaries written. 
 
-//ENDOFTEMP 
+Anything that is done temporarily should be wrapped in this format.
+	//TEMP
+	//Reason: [Reason for existance of temp].
+	//Remove Con: [At what point should this be deleted/refractored]
+	int codeGoesHere = 1;
+	//ENDOFTEMP 
+		If multiple reasons and removal cons are in a section, add multiple, but there should always be one after the //TEMP line giving either all the reasons, or a summarized verison spanning the entire block
 
-If multiple reasons and removal cons are in a section, add multiple, but there should always be one after the //TEMP line giving either all the reasons, or a summarized verison spanning the entire block
-
-ThreadAffinity calls should be done
+ThreadAffinity calls should be done at the start of a methods if they can

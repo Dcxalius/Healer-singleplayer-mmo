@@ -22,6 +22,11 @@ namespace Project_1.Managers
             Print(aObject?.ToString() ?? "null", filePath, lineNumber, memberName);
         }
 
+        public static void Depricated([CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string memberName = "")
+        {
+            Print("Depricated method used.", filePath, lineNumber, memberName);
+        }
+
         public static void Print(string aMsg,
             [CallerFilePath] string filePath = "",
             [CallerLineNumber] int lineNumber = 0,

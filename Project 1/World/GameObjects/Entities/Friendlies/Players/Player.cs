@@ -127,7 +127,7 @@ namespace Project_1.GameObjects.Entities.Friendlies.Players
         {
             //TODO: This feels like it should be in spellbar?
             if (aSpellOnBar == null) return;
-            Spell[] spells = SpellBook.Spells;
+            Spells.Spell[] spells = SpellBook.Spells;
             string[] spellNamesToAddToBar = new string[aSpellOnBar.Length];
             for (int i = 0; i < aSpellOnBar.Length; i++)
             {
