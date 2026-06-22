@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Project_1.GameObjects.Entities;
+using Project_1.GameObjects.Unit.Classes;
 using Project_1.Managers;
 using Project_1.World.GameObjects.Unit.Stats.Primary;
 using System;
@@ -100,7 +101,7 @@ namespace Project_1.GameObjects.Unit.Resources
             AssertSimThread();
         }
 
-        public override void Refresh(TotalPrimaryStats aStats)
+        public override void Refresh(TotalPrimaryStats aStats, ClassData aClass)
         {
             AssertSimThread();
         }

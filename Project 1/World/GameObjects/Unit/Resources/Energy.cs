@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Project_1.World.GameObjects.Unit.Stats.Primary;
+using Project_1.GameObjects.Unit.Classes;
 
 namespace Project_1.GameObjects.Unit.Resources
 {
@@ -71,7 +72,7 @@ namespace Project_1.GameObjects.Unit.Resources
         {
             AssertSimThread();
         }
-        public override void Refresh(TotalPrimaryStats aStats)
+        public override void Refresh(TotalPrimaryStats aStats, ClassData aClass)
         {
             AssertSimThread();
         }
