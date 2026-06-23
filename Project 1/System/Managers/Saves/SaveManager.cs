@@ -464,6 +464,9 @@ namespace Project_1.Managers
         {
             //Q: Move to a JSON Manager?
             //TODO: Figure out a way to get cleaner crash data when this fails.
+            
+            //Something like this should be done
+            //Debug.Assert(aJsonString != File);
             return JsonConvert.DeserializeObject<T>(aJsonString, serializerSettings);
         }
 

@@ -165,10 +165,10 @@ namespace Project_1.GameObjects.Spells
             ThreadAffinity.AssertSimThread();
             if (!OffCooldown) return false;
             if (!spellData.Targetable(aTarget.RelationToPlayer)) return false;
-            if (spellData.Effects.Any(x => x is InstantEffect)) return true;
-            List<Buff.Buff> targetBuffs = aTarget.GetAllBuffs();
+            if (spellData.Effects.Any(x => x is InstantEffect)) return true; //Q: Do we really want to guratee if there is a single effect that is Instant?
+            List<Buff.Buff> targetBuffs = aTarget.GetAllBuffs().Where(x => spellData.Effects.Any(y => y.Id == x.EffectId)).ToList();
             bool[] failures = new bool[spellData.Effects.Length];
-            for (int i = 0; i < spellData.Effects.Length; i++)
+            for (int i = 0; i < failures.Length; i++)
             {
                 if (spellData.Effects[i] is not StatusEffect statusEffect && spellData.Effects[i] is not OverTimeEffect)
                 {
@@ -177,15 +177,14 @@ namespace Project_1.GameObjects.Spells
 
                 for (int j = 0; j < targetBuffs.Count; j++)
                 {
-                    if (targetBuffs[j].EffectId != spellData.Effects[i].Id) continue;
                     Buff.Buff existing = targetBuffs[j];
                     if (existing.MultipleSourceStackable && !existing.SameCaster(aCaster)) continue;
-                    //Check if spell weak
                     bool numerable = spellData.Effects[i] is OverTimeEffect overTime && overTime.Numerable;
                     double effectPower = spellData.Effects[i].CalculatePower(this, rank);
                     double effectDuration = spellData.Effects[i] is LastingEffect lasting ? lasting.Duration : 0;
+                    //Check if spell is weaker than current buff
                     if ((!numerable && existing.Rank > rank) || (numerable && existing.Power > effectPower)) failures[i] = true;
-                    //Check if time would increase or stack count would increase
+                    //Check if time would increase or stack count wouldn't increase
                     if (((!numerable && existing.Rank == rank) || (numerable && existing.Power == effectPower)) && (existing.DurationRemaining > effectDuration && existing.MaxStackCount == existing.Count)) failures[i] = true;
                 }
             }

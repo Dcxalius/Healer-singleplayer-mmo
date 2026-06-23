@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project_1.Camera;
 using Project_1.Managers;
@@ -36,14 +36,13 @@ namespace Project_1.UI.UIElements
         {
             Project_1.Managers.ThreadAffinity.AssertMainThread();
             base.DrawSelf(aBatch);
-            GraphicsManager.CaptureScissor(this, AbsolutePos);
 
-            if (!MinimapSnapshotManager.TryGetSnapshot(out MinimapDotSnapshot[] dots, out int dotCount, out WorldSpace ws))
-            {
-                GraphicsManager.ReleaseScissor(this);
-                return;
-            }
+            if (!MinimapSnapshotManager.TryGetSnapshot(out MinimapDotSnapshot[] dots, out int dotCount, out WorldSpace ws)) return;
+            
+            GraphicsManager.CaptureScissor(this, AbsolutePos);
+            //TODO: Rather than drawing through the manager, the manager should send its data through the mailbox and we should draw the snapshot that way
             TileManager.DrawMinimapSnapshots(aBatch, ws, Location, Size);
+            //TODO: Same with the Camera rect, it should send its position and angle as snapshots and then we figure out here what lines to draw.
             Camera.Camera.MinimapDraw(aBatch, ws, Location, Size);
             DrawEntities(aBatch, dots, dotCount, ws);
             GraphicsManager.ReleaseScissor(this);

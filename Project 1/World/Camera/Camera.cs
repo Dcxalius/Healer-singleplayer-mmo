@@ -351,6 +351,7 @@ namespace Project_1.Camera
         public static void MinimapDraw(SpriteBatch aBatch, WorldSpace aOrigin, AbsoluteScreenPosition aMinimapOffset, AbsoluteScreenPosition aMinimapSize)
         {
             ThreadAffinity.AssertMainThread();
+            DebugManager.Depricated(); //TODO: This shouldn't be a rectangle anymore, instead a rombus(?)
             if (!TryGetMinimapWorldRectangle(out Rectangle worldRect)) return;
             int minX = (int)MathF.Floor((worldRect.Left - aOrigin.X) / Tile.Size.X);
             int minY = (int)MathF.Floor((worldRect.Top - aOrigin.Y) / Tile.Size.Y);
@@ -362,6 +363,7 @@ namespace Project_1.Camera
             Point topRight = new Point(topLeft.X + width - 1, topLeft.Y);
             Point bottomLeft = new Point(topLeft.X, topLeft.Y + height - 1);
 
+            //TODO: We shouldn't draw them like this, instead we should send a snapshot of the position and angle of the camera and then let the minimap itself figure out what lines to draw
             UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(topLeft, new Point(1, height)), Color.White);
             UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(topLeft, new Point(width, 1)), Color.White);
             UI.UIElements.Minimap.minimapDot.Draw(aBatch, new Rectangle(topRight, new Point(1, height)), Color.White);

@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using Project_1.GameObjects.Unit.Classes;
 using Project_1.World.GameObjects.Unit.Stats.Primary;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace Project_1.GameObjects.Unit.Resources
 
         public override float Value { get => 0; }
 
-        public override void Refresh(TotalPrimaryStats aStats) { }
+        public override void Refresh(TotalPrimaryStats aStats, ClassData aClass) { }
         public override void Update() { }
 
         public override void TickRegen(bool aInCombat) { }

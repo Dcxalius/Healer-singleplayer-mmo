@@ -62,7 +62,8 @@ namespace Project_1.Input
 
         static KeySet[] ImportBinds(string aKeyBindSetting)
         {
-            KeySet[] importedBinds = SaveManager.ImportData<KeySet[]>(aKeyBindSetting);
+            string json = File.ReadAllText(aKeyBindSetting);
+            KeySet[] importedBinds = SaveManager.ImportData<KeySet[]>(json);
             if (importedBinds == null || importedBinds.Length == 0 || importedBinds.Length % 2 != 0)
             {
                 throw new MissingDataException("Invalid keybind data.");

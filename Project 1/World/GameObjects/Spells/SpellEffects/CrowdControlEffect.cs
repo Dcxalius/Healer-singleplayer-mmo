@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Spell = Project_1.GameObjects.Spells.Spell;
 
 namespace Project_1.World.GameObjects.Spells.SpellEffects
 {
