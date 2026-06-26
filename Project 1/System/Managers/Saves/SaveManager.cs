@@ -415,6 +415,7 @@ namespace Project_1.Managers
             }
         }
 
+        [Obsolete("Use JsonManager instead", true)]
         public static void ExportData(string aDestination, object aObjectToExport)
         {
             //Q: Move to a JSON Manager?

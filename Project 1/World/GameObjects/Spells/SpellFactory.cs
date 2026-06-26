@@ -15,8 +15,8 @@ namespace Project_1.GameObjects.Spells
 {
     internal static class SpellFactory
     {
-        static Dictionary<string, SpellData> spellData;
-        static Dictionary<int, SpellData> spellDataById; //TODO: This should be a string, int, instead of loading the data twice.
+        static Dictionary<int, SpellData> spellDataById; 
+        static Dictionary<string, SpellData> spellData; //TODO: This should be removed, the data should only be access by ID
         //static Dictionary<int, SpellEffect> spellEffect;
         //Q: Why are these arrays instead of dictionaries?
         static InstantEffect[] instantData;
