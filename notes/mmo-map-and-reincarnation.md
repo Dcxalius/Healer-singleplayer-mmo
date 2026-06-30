@@ -24,6 +24,122 @@ Resetting a character should not delete the character outright. Instead, it shou
    - Former characters could appear in family trees, records, towns, graves, legends, mentorship systems, or NPC references.
    - The exact inheritance rules should be defined later.
 
+## Parentage, Factions, and Birth Rules
+
+Every reincarnated child must have two parents.
+
+Both parents are NPCs, and each parent belongs to a faction. Parentage therefore ties the reincarnated character directly into the world simulation, faction politics, social identity, and local history.
+
+### Parent Rules
+
+1. **Every child has two parents**
+   - A reincarnated child always has exactly two parents by default.
+   - Both parents are NPCs.
+   - Both parents belong to factions.
+   - The parents may belong to the same faction or different factions.
+
+2. **Parents can be of either gender**
+   - Parent slots are not restricted to one fixed gender pairing.
+   - Any gender combination can be valid, depending on race, culture, magic, and world rules.
+
+3. **Faction ownership matters**
+   - Each parent has a faction identity.
+   - The child's starting reputation, political risk, inherited alliances, or social conflicts can later be derived from the parents' factions.
+   - Mixed-faction parentage can create interesting gameplay hooks.
+
+### Humankind Race Carrying Rule
+
+For humankind races, one parent carries the growing child, and only one parent can carry it under normal rules.
+
+```text
+HumankindChild
+- ParentA: NPC + Faction
+- ParentB: NPC + Faction
+- CarryingParent: ParentA or ParentB
+```
+
+Only one parent can be the carrying parent unless magic gets involved.
+
+Magic can override or modify the normal carrying rule. This allows later systems for magical surrogacy, shared carrying, artificial wombs, spiritual reincarnation, faction rituals, divine intervention, or race-specific exceptions.
+
+### Race-Specific Child Movement Rules
+
+Different races can move or protect a growing child in different ways.
+
+Humankind-style pregnancy should be only one model, not the universal model.
+
+Possible race models:
+
+1. **Carried internally**
+   - One parent carries the growing child.
+   - This is the default humankind model.
+
+2. **Egg laying**
+   - One or both parents create or fertilize an egg.
+   - The child develops outside the body.
+   - The egg may need guarding, warmth, terrain, magic, or faction structures.
+
+3. **Seeds**
+   - Plantlike races may create seeds.
+   - The growing child may need soil, water, light, a grove, or a faction-controlled nursery.
+
+4. **External vessel**
+   - Some races may grow children in pods, crystals, pools, machines, cocoons, or magical containers.
+
+5. **Split-stage growth**
+   - A child may begin carried by one parent, then move to an egg, seed, nest, ritual site, or other growth state.
+
+6. **Magical transfer**
+   - Magic may move the growing child between parents, vessels, locations, or planes.
+   - This should be treated as an exception layer over the normal race rules.
+
+### Suggested Data
+
+```text
+ChildId
+ParentAId
+ParentAFactionId
+ParentBId
+ParentBFactionId
+RaceId
+BirthRuleType
+CarryingParentId
+GrowthContainerId
+GrowthLocationId
+MagicInvolved
+InheritanceSourceCharacterId
+```
+
+### Birth Rule Types
+
+```text
+InternalCarry
+Egg
+Seed
+ExternalVessel
+SplitStage
+MagicalTransfer
+OtherRaceSpecific
+```
+
+### Design Intent
+
+The child system should connect reincarnation to the living world.
+
+The player is not simply choosing a new body from a menu. The new character is born into social context, faction context, racial biology, and possibly magical exception rules.
+
+This makes resets part of the game's world simulation instead of a purely mechanical prestige system.
+
+### Open Parentage Questions
+
+1. Are parents selected automatically, manually, or through faction/world simulation?
+2. Can the retired character influence parent selection?
+3. Can one or both parents be from hostile factions?
+4. Does the child inherit faction standing from both parents?
+5. Does the child inherit race from one parent, both parents, or separate race rules?
+6. Can magic create parentage that breaks the normal two-parent rule?
+7. Can non-humankind races have more than two biological contributors while still assigning two legal/social parents?
+
 ### Open Design Questions
 
 1. What does the child inherit from the retired character?
@@ -31,6 +147,7 @@ Resetting a character should not delete the character outright. Instead, it shou
 3. Can retired characters become NPCs?
 4. Can a player have multiple retired ancestors?
 5. Is reincarnation instant, or does it require an in-world event?
+6. How much control does the player have over parent faction, race, and location?
 
 ## World Movement and Time Tracking
 
@@ -225,6 +342,8 @@ The separate map system should not depend on the minimap.
 4. Add a generic `MapVisualFeature` list for special generated graphics.
 5. Build a map-renderer prototype that renders base terrain first, then overlays directional features.
 6. Keep minimap logic separate from this system.
+7. Define parent NPC references and faction references for reincarnated children.
+8. Define race-specific `BirthRuleType` values before implementing child creation.
 
 ## Later Questions
 
@@ -233,3 +352,4 @@ The separate map system should not depend on the minimap.
 3. Should players discover exact terrain type only after visiting a chunk?
 4. Can maps become inaccurate if world data changes?
 5. Can players annotate maps separately from terrain data?
+6. Should faction parentage affect starting location, safety, reputation, or inheritance?
