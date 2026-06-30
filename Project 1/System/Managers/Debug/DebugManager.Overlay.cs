@@ -110,7 +110,7 @@ namespace Project_1.Managers
                 $"  Avg  ms queue/work/latency: {workerStats.AvgQueueWaitMs,6:0.0} / {workerStats.AvgWorkMs,6:0.0} / {workerStats.AvgLatencyMs,6:0.0}\n" +
                 $"  Max  ms queue/work/latency: {workerStats.MaxQueueWaitMs,6:0.0} / {workerStats.MaxWorkMs,6:0.0} / {workerStats.MaxLatencyMs,6:0.0}";
 
-            ScreenshotQueueStats screenshotStats = SaveManager.ScreenshotQueueStats;
+            ScreenshotQueueStats screenshotStats = ScreenshotManager.QueueStats;
             screenshotText.Value =
                 "Screenshot Queue\n" +
                 $"  Queue depth (pending/peak): {screenshotStats.Pending,4}/{screenshotStats.Peak,4}\n" +

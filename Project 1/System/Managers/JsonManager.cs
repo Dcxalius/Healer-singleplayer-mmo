@@ -33,17 +33,10 @@ namespace Project_1.System.Managers
 
         static JsonSerializerSettings serializerSettings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto };
         static JsonSerializer jsonSerializer;
-        static SchemaValidationEventHandler schemaValidationEventHandler;
-        static JsonErrorLog jsonErrorLog;
 
         public static void Init()
         {
             jsonSerializer = JsonSerializer.Create(serializerSettings);
-            schemaValidationEventHandler = (object sender, SchemaValidationEventArgs e) =>
-            {
-                jsonErrorLog.errors.Add(e.Message);
-            };
-
             LoadSchemas();
         }
 
@@ -53,7 +46,7 @@ namespace Project_1.System.Managers
 
             string baseFolder = Game1.ContentManager.RootDirectory + "\\JSchemas";
 
-            for (int i = 0; i < schemas.Length - 1; i++)//TEMP: -1 to not try to load none, see enum Schema
+            for (int i = 0; i < (int)Schemas.Count - 1; i++)//TEMP: -1 to not try to load none, see enum Schema
             {
 
                 Schemas schemaType = (Schemas)(i + 1);
@@ -73,49 +66,80 @@ namespace Project_1.System.Managers
 
         public static T ImportJsonFile<T>(string aJsonFilePath, Schemas aSchema)
         {
-            if (!File.Exists(aJsonFilePath)) throw new FileNotFoundException($"The file at {aJsonFilePath} could not be found.");
-            string json = File.ReadAllText(aJsonFilePath);
-
-            JObject jObj = JObject.Parse(json);
-            if (aSchema != Schemas.None) //TEMP: See enum Schema
-            {
-                jObj.Validate(schemas[(int)aSchema - 1], schemaValidationEventHandler);
-                
-                if (jsonErrorLog.ErrorFound)
-                {
-                    throw jsonErrorLog.Exception;
-                }
-            }
-            
-            return jsonSerializer.Deserialize<>
+            ValidatedJson json = ValidatedJson.FromFile(aJsonFilePath);
+            json.Validate(aSchema);
+            return json.ToObject<T>();
         }
+        public static string TrimToNameOnly(string aFile) => Path.GetFileNameWithoutExtension(Path.GetFileName(aFile));
 
 
-
-        public static string TrimToNameOnly(string aFile)
+        private sealed class ValidatedJson
         {
-            string fileOnly = Path.GetFileName(aFile);
-            return Path.GetFileNameWithoutExtension(fileOnly);
-        }
+            private readonly JObject jObject;
+            private readonly List<string> errors = new();
 
-        private struct JsonErrorLog
-        {
             public bool ErrorFound => errors.Count > 0;
-
-            public List<string> errors = [];
 
             public JsonException Exception
             {
                 get
                 {
-                    JsonException exception = new JsonException(string.Join("\n", errors));
+                    JsonException exception = new JsonException(
+                        "JSON validation failed:\n" +
+                        string.Join("\n", errors));
+
                     errors.Clear();
                     return exception;
                 }
             }
 
-            public JsonErrorLog()
+            private ValidatedJson(JObject aJObject)
             {
+                jObject = aJObject;
+            }
+
+            public static ValidatedJson FromFile(string aJsonFilePath)
+            {
+                if (!File.Exists(aJsonFilePath))
+                {
+                    throw new FileNotFoundException(
+                        $"The file at {aJsonFilePath} could not be found.");
+                }
+
+                string json = File.ReadAllText(aJsonFilePath);
+                JObject jObj = JObject.Parse(json);
+
+                return new ValidatedJson(jObj);
+            }
+
+            public void Validate(Schemas aSchema)
+            {
+                //TEMP: See Enum schema
+                if (aSchema == Schemas.None) 
+                {
+                    return;
+                }
+                //
+
+                errors.Clear();
+
+                JSchema schema = schemas[(int)aSchema - 1];
+                jObject.Validate(schema, OnValidationError);
+
+                if (ErrorFound)
+                {
+                    throw Exception;
+                }
+            }
+
+            public T ToObject<T>()
+            {
+                return jObject.ToObject<T>(jsonSerializer);
+            }
+
+            private void OnValidationError(object sender, SchemaValidationEventArgs e)
+            {
+                errors.Add(e.Message);
             }
         }
     }

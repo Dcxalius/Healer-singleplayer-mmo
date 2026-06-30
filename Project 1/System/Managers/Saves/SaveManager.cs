@@ -11,7 +11,6 @@ using Project_1.Messaging;
 using Project_1.Messaging.Events;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -157,7 +156,7 @@ namespace Project_1.Managers
                 }
             }
 
-            RemovePendingScreenshots(save);
+            ScreenshotManager.RemovePendingScreenshots(save);
             save.DeleteFiles();
         }
 
@@ -214,7 +213,7 @@ namespace Project_1.Managers
 
         public static bool ApplyLoadPayload(SaveLoadPayload payload, int requestId)
         {
-            //TODO: Break up
+            //TODO: Break up. Try to place as much of the code on the recieving side as possible. For examplde TODOA1
             ThreadAffinity.AssertSimThread();
             if (payload == null) return false;
             if (requestId != Volatile.Read(ref currentLoadRequestId))
@@ -238,7 +237,8 @@ namespace Project_1.Managers
                 Camera.Camera.CentreInWorldSpace = cameraPos;
             }
 
-            List<Chunk> chunks = new List<Chunk>();
+            List<Chunk> chunks = new List<Chunk>(); //TODOA1: This function should only give the data to the chunk manager, instead of working the data and then sending it in.
+            //ChunkManager.LoadChunks(Chunk.FromJson(payload.TileChunks)); Something like that
             if (payload.TileChunks != null && payload.TileChunks.Length > 0)
             {
                 chunks = new List<Chunk>(payload.TileChunks.Length);
@@ -302,7 +302,7 @@ namespace Project_1.Managers
 
             MailboxManager.PublishUiEvent(new SaveDataStarted("Saving..."));
             SaveWritePayload payload = SaveWritePayload.Capture(currentSave);
-            RequestScreenshot(currentSave);
+            ScreenshotManager.RequestScreenshot(currentSave);
             WorkerPool.Enqueue(() =>
             {
                 try
@@ -317,105 +317,8 @@ namespace Project_1.Managers
             });
         }
 
-        //TODO: Break up savemanager into multiple files and put it on the top of that file or create a seperate screenshot manager.
-        static readonly object screenshotLock = new object();
-        static readonly Queue<Save> pendingScreenshots = new Queue<Save>();
-        static int pendingScreenshotCount;
-        static int pendingScreenshotPeak;
-        static long totalScreenshotsEnqueued;
-        static long totalScreenshotsProcessed;
-        static double lastScreenshotMs;
 
-        public static ScreenshotQueueStats ScreenshotQueueStats => new ScreenshotQueueStats(
-            Volatile.Read(ref pendingScreenshotCount),
-            Volatile.Read(ref pendingScreenshotPeak),
-            Interlocked.Read(ref totalScreenshotsEnqueued),
-            Interlocked.Read(ref totalScreenshotsProcessed),
-            Volatile.Read(ref lastScreenshotMs));
-        public static void RequestScreenshot(Save save) 
-        {
-            ThreadAffinity.AssertSimThread();
-            if (save == null) return;
-            lock (screenshotLock)
-            {
-                pendingScreenshots.Enqueue(save);
-            }
-            int pending = Interlocked.Increment(ref pendingScreenshotCount);
-            Interlocked.Increment(ref totalScreenshotsEnqueued);
-            int snapshotPeak;
-            while (pending > (snapshotPeak = Volatile.Read(ref pendingScreenshotPeak)))
-            {
-                if (Interlocked.CompareExchange(ref pendingScreenshotPeak, pending, snapshotPeak) == snapshotPeak)
-                {
-                    break;
-                }
-            }
-        }
-
-        public static void ProcessPendingScreenshots()
-        {
-            ThreadAffinity.AssertMainThread();
-            while (true)
-            {
-                Save save;
-                lock (screenshotLock)
-                {
-                    if (pendingScreenshots.Count == 0) return;
-                    save = pendingScreenshots.Dequeue();
-                }
-                Interlocked.Decrement(ref pendingScreenshotCount);
-                if (save == null) continue;
-                try
-                {
-                    long startTicks = Stopwatch.GetTimestamp();
-                    save.SaveScreenshot();
-                    double elapsedMs = (Stopwatch.GetTimestamp() - startTicks) * 1000d / Stopwatch.Frequency;
-                    Volatile.Write(ref lastScreenshotMs, elapsedMs);
-                    Interlocked.Increment(ref totalScreenshotsProcessed);
-                }
-                catch (Exception ex) when (TryBuildSaveFailureMessage(ex, out _))
-                {
-                    //Q: Do we really want to mark it as failed if just the screenshot fails? Perhaps a different fail message and just using a default image sounds cleaner
-                    NotifySaveFailed(ex);
-                }
-            }
-        }
-
-        static void RemovePendingScreenshots(Save save)
-        {
-            //Q: I assume we do this so if a save is saved, but before the screenshot is captured, deleted. Is this possible though? Even with tas?
-            //Not saying we shouldn't do this, just something to keep in mind and check.
-            lock (screenshotLock)
-            {
-                if (pendingScreenshots.Count == 0) return;
-
-                Queue<Save> remainingScreenshots = new Queue<Save>(pendingScreenshots.Count);
-                int removedCount = 0;
-                while (pendingScreenshots.Count > 0)
-                {
-                    Save pendingSave = pendingScreenshots.Dequeue();
-                    if (ReferenceEquals(pendingSave, save))
-                    {
-                        removedCount++;
-                        continue;
-                    }
-
-                    remainingScreenshots.Enqueue(pendingSave);
-                }
-
-                while (remainingScreenshots.Count > 0)
-                {
-                    pendingScreenshots.Enqueue(remainingScreenshots.Dequeue());
-                }
-
-                if (removedCount > 0)
-                {
-                    Interlocked.Add(ref pendingScreenshotCount, -removedCount);
-                }
-            }
-        }
-
-        [Obsolete("Use JsonManager instead", true)]
+        [Obsolete("Use JsonManager instead")]
         public static void ExportData(string aDestination, object aObjectToExport)
         {
             //Q: Move to a JSON Manager?
@@ -461,6 +364,7 @@ namespace Project_1.Managers
             MailboxManager.PublishUiEvent(new ChatMessagePosted(ChatMessageType.System, message));
         }
 
+        [Obsolete("Use JsonManager instead")]
         public static T ImportData<T>(string aJsonString)
         {
             //Q: Move to a JSON Manager?
@@ -471,29 +375,8 @@ namespace Project_1.Managers
             return JsonConvert.DeserializeObject<T>(aJsonString, serializerSettings);
         }
 
-        public static string TrimToNameOnly(string aFile)
-        {
-            //Q: Move to a JSON Manager?
-            string fileOnly = Path.GetFileName(aFile);
-            return Path.GetFileNameWithoutExtension(fileOnly);
-        }
+        [Obsolete("Use JsonManager instead")]
+        public static string TrimToNameOnly(string aFile) => Path.GetFileNameWithoutExtension(Path.GetFileName(aFile));
     }
 
-    internal readonly struct ScreenshotQueueStats
-    {
-        public ScreenshotQueueStats(int pending, int peak, long totalEnqueued, long totalProcessed, double lastScreenshotMs)
-        {
-            Pending = pending;
-            Peak = peak;
-            TotalEnqueued = totalEnqueued;
-            TotalProcessed = totalProcessed;
-            LastScreenshotMs = lastScreenshotMs;
-        }
-
-        public int Pending { get; }
-        public int Peak { get; }
-        public long TotalEnqueued { get; }
-        public long TotalProcessed { get; }
-        public double LastScreenshotMs { get; }
-    }
 }

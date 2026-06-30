@@ -78,7 +78,7 @@ namespace Project_1
             //    FloatingTextManager.Update();
             //}
 
-            SaveManager.ProcessPendingScreenshots();
+            ScreenshotManager.ProcessPendingScreenshots();
             DebugManager.ProcessPendingPerlinNoiseExports();
 
             base.Update(gameTime);

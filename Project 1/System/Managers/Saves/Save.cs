@@ -138,7 +138,7 @@ namespace Project_1.Managers.Saves
             }
             else
             {
-                SaveManager.RequestScreenshot(this);
+                ScreenshotManager.RequestScreenshot(this);
             }
         }
 
